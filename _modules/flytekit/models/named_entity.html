@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.named_entity &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.named_entity &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -219,11 +219,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.common_pb2.NamedEntityIdentifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_common</span><span class="o">.</span><span class="n">NamedEntityIdentifier</span><span class="p">(</span>
-            <span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_common</span><span class="o">.</span><span class="n">NamedEntityIdentifier</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="NamedEntityIdentifier.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityIdentifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -231,11 +227,7 @@
 <span class="sd">        :param flyteidl.core.common_pb2.NamedEntityIdentifier p:</span>
 <span class="sd">        :rtype: Identifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">project</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="NamedEntityMetadata"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityMetadata">[docs]</a><span class="k">class</span> <span class="nc">NamedEntityMetadata</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -267,10 +259,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.common_pb2.NamedEntityMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_common</span><span class="o">.</span><span class="n">NamedEntityMetadata</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-            <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_common</span><span class="o">.</span><span class="n">NamedEntityMetadata</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="NamedEntityMetadata.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityMetadata.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -278,10 +267,7 @@
 <span class="sd">        :param flyteidl.core.common_pb2.NamedEntityMetadata p:</span>
 <span class="sd">        :rtype: Identifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-            <span class="n">state</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">state</span><span class="p">,)</span></div></div>
 </pre></div>
 
            </div>

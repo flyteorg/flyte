@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.execution &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core.execution &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,7 +161,9 @@
             
   <h1>Source code for flytekit.models.core.execution</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">execution_pb2</span> <span class="k">as</span> <span class="n">_execution_pb2</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 
 
@@ -274,7 +276,6 @@
 
 
 <div class="viewcode-block" id="ExecutionError"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.execution.ExecutionError">[docs]</a><span class="k">class</span> <span class="nc">ExecutionError</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">error_uri</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text code:</span>
@@ -310,11 +311,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.execution_pb2.ExecutionError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">ExecutionError</span><span class="p">(</span>
-            <span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
-            <span class="n">error_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error_uri</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">ExecutionError</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">error_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error_uri</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="ExecutionError.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.execution.ExecutionError.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -322,15 +319,10 @@
 <span class="sd">        :param flyteidl.core.execution_pb2.ExecutionError p:</span>
 <span class="sd">        :rtype: ExecutionError</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">code</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">code</span><span class="p">,</span>
-            <span class="n">message</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
-            <span class="n">error_uri</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">error_uri</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">message</span><span class="p">,</span> <span class="n">error_uri</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">error_uri</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="TaskLog"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.execution.TaskLog">[docs]</a><span class="k">class</span> <span class="nc">TaskLog</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="TaskLog.MessageFormat"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.execution.TaskLog.MessageFormat">[docs]</a>    <span class="k">class</span> <span class="nc">MessageFormat</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">TaskLog</span><span class="o">.</span><span class="n">UNKNOWN</span>
         <span class="n">CSV</span> <span class="o">=</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">TaskLog</span><span class="o">.</span><span class="n">CSV</span>
@@ -381,11 +373,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.execution_pb2.TaskLog</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">TaskLog</span><span class="p">(</span>
-            <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">message_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message_format</span>
-        <span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">_execution_pb2</span><span class="o">.</span><span class="n">TaskLog</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">message_format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">message_format</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">ttl</span><span class="o">.</span><span class="n">FromTimedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ttl</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">p</span></div>
 
@@ -395,12 +383,7 @@
 <span class="sd">        :param flyteidl.core.execution_pb2.TaskLog p:</span>
 <span class="sd">        :rtype: TaskLog</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">uri</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">message_format</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">message_format</span><span class="p">,</span>
-            <span class="n">ttl</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">ttl</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">()</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">message_format</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">message_format</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">ttl</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">(),)</span></div></div>
 </pre></div>
 
            </div>

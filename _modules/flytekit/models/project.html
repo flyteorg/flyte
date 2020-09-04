@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.project &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.project &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -168,7 +168,6 @@
 
 
 <div class="viewcode-block" id="Project"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project">[docs]</a><span class="k">class</span> <span class="nc">Project</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A project represents a logical grouping used to organize entities (tasks, workflows, executions) in the Flyte</span>
@@ -210,11 +209,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.project_pb2.Project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="Project.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -222,11 +217,7 @@
 <span class="sd">        :param flyteidl.admin.project_pb2.Project pb2_object:</span>
 <span class="sd">        :rtype: Project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">description</span><span class="p">,)</span></div></div>
 </pre></div>
 
            </div>

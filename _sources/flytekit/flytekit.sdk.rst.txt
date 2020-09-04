@@ -1,6 +1,13 @@
 flytekit.sdk package
 ====================
 
+Subpackages
+-----------
+
+.. toctree::
+
+   flytekit.sdk.sagemaker
+
 Submodules
 ----------
 

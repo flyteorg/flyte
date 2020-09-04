@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.configuration &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.configuration &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,14 +161,16 @@
             
   <h1>Source code for flytekit.configuration</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">pathlib</span> <span class="k">as</span> <span class="nn">_pathlib</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">pathlib2</span> <span class="k">as</span> <span class="nn">_pathlib</span> <span class="c1"># python 2 backport</span>
+    <span class="kn">import</span> <span class="nn">pathlib2</span> <span class="k">as</span> <span class="nn">_pathlib</span>  <span class="c1"># python 2 backport</span>
 
 
 <div class="viewcode-block" id="set_flyte_config_file"><a class="viewcode-back" href="../../flytekit/flytekit.configuration.html#flytekit.configuration.set_flyte_config_file">[docs]</a><span class="k">def</span> <span class="nf">set_flyte_config_file</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">):</span>
@@ -177,6 +179,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">flytekit.configuration.common</span> <span class="k">as</span> <span class="nn">_common</span>
     <span class="kn">import</span> <span class="nn">flytekit.configuration.internal</span> <span class="k">as</span> <span class="nn">_internal</span>
+
     <span class="k">if</span> <span class="n">config_file_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">config_file_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">config_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
@@ -189,15 +192,14 @@
 
 
 <div class="viewcode-block" id="TemporaryConfiguration"><a class="viewcode-back" href="../../flytekit/flytekit.configuration.html#flytekit.configuration.TemporaryConfiguration">[docs]</a><span class="k">class</span> <span class="nc">TemporaryConfiguration</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_config_path</span><span class="p">,</span> <span class="n">internal_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text new_config_path:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">flytekit.configuration.common</span> <span class="k">as</span> <span class="nn">_common</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_internal_overrides</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">_common</span><span class="o">.</span><span class="n">format_section_key</span><span class="p">(</span><span class="s1">&#39;internal&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">v</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">internal_overrides</span> <span class="ow">or</span> <span class="p">{})</span>
+            <span class="n">_common</span><span class="o">.</span><span class="n">format_section_key</span><span class="p">(</span><span class="s2">&quot;internal&quot;</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">internal_overrides</span> <span class="ow">or</span> <span class="p">{})</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_new_config_path</span> <span class="o">=</span> <span class="n">new_config_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_config_path</span> <span class="o">=</span> <span class="kc">None</span>
@@ -206,10 +208,7 @@
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="kn">import</span> <span class="nn">flytekit.configuration.internal</span> <span class="k">as</span> <span class="nn">_internal</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_old_internals</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_overrides</span><span class="p">)</span>
-        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_old_internals</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_overrides</span><span class="p">)}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_old_config_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_internal</span><span class="o">.</span><span class="n">CONFIGURATION_PATH</span><span class="o">.</span><span class="n">env_var</span><span class="p">)</span>
         <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_internal_overrides</span><span class="p">)</span>
         <span class="n">set_flyte_config_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_config_path</span><span class="p">)</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>execution.proto &mdash; Flyte 0.6.0 documentation</title>
+  <title>execution.proto &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -683,7 +683,9 @@ with the optional cause added to the output_result.</p>
 <p>Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;full_inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;full_outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -693,6 +695,14 @@ with the optional cause added to the output_result.</p>
 </dl>
 <dl class="simple" id="api-field-flyteidl-admin-workflowexecutiongetdataresponse-inputs">
 <dt>inputs</dt><dd><p>(<a class="reference internal" href="common.proto.html#api-msg-flyteidl-admin-urlblob"><span class="std std-ref">flyteidl.admin.UrlBlob</span></a>) Signed url to fetch a core.LiteralMap of execution inputs.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-workflowexecutiongetdataresponse-full-inputs">
+<dt>full_inputs</dt><dd><p>(<a class="reference internal" href="../core/literals.proto.html#api-msg-flyteidl-core-literalmap"><span class="std std-ref">flyteidl.core.LiteralMap</span></a>) Optional, full_inputs will only be populated if they are under a configured size threshold.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-workflowexecutiongetdataresponse-full-outputs">
+<dt>full_outputs</dt><dd><p>(<a class="reference internal" href="../core/literals.proto.html#api-msg-flyteidl-core-literalmap"><span class="std std-ref">flyteidl.core.LiteralMap</span></a>) Optional, full_outputs will only be populated if they are under a configured size threshold.</p>
 </dd>
 </dl>
 </div>

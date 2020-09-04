@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sdk_runnable &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.sdk_runnable &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -170,14 +170,21 @@
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 <span class="kn">from</span> <span class="nn">flytekit</span> <span class="k">import</span> <span class="n">__version__</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span><span class="p">,</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_task</span><span class="p">,</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span><span class="p">,</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span><span class="p">,</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">_resource_config</span>
-<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core.identifier</span> <span class="k">import</span> <span class="n">WorkflowExecutionIdentifier</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_task</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">_resource_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
 
 
 <div class="viewcode-block" id="ExecutionParameters"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.ExecutionParameters">[docs]</a><span class="k">class</span> <span class="nc">ExecutionParameters</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -259,23 +266,10 @@
 
 
 <div class="viewcode-block" id="SdkRunnableContainer"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableContainer">[docs]</a><span class="k">class</span> <span class="nc">SdkRunnableContainer</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">Container</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">command</span><span class="p">,</span>
-        <span class="n">args</span><span class="p">,</span>
-        <span class="n">resources</span><span class="p">,</span>
-        <span class="n">env</span><span class="p">,</span>
-        <span class="n">config</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkRunnableContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">command</span><span class="p">,</span>
-            <span class="n">args</span><span class="p">,</span>
-            <span class="n">resources</span><span class="p">,</span>
-            <span class="n">env</span> <span class="ow">or</span> <span class="p">{},</span>
-            <span class="n">config</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SdkRunnableContainer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">env</span> <span class="ow">or</span> <span class="p">{},</span> <span class="n">config</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -321,25 +315,25 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">task_function</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">interruptible</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">environment</span><span class="p">,</span>
-            <span class="n">custom</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">,</span>
+        <span class="n">custom</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param task_function: Function container user code.  This will be executed via the SDK&#39;s engine.</span>
@@ -368,15 +362,13 @@
             <span class="n">_task_models</span><span class="o">.</span><span class="n">TaskMetadata</span><span class="p">(</span>
                 <span class="n">discoverable</span><span class="p">,</span>
                 <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="o">.</span><span class="n">RuntimeType</span><span class="o">.</span><span class="n">FLYTE_SDK</span><span class="p">,</span>
-                    <span class="n">__version__</span><span class="p">,</span>
-                    <span class="s1">&#39;python&#39;</span>
+                    <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="o">.</span><span class="n">RuntimeType</span><span class="o">.</span><span class="n">FLYTE_SDK</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">timeout</span><span class="p">,</span>
                 <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="n">retries</span><span class="p">),</span>
                 <span class="n">interruptible</span><span class="p">,</span>
                 <span class="n">discovery_version</span><span class="p">,</span>
-                <span class="n">deprecated</span>
+                <span class="n">deprecated</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">({},</span> <span class="p">{}),</span>
             <span class="n">custom</span><span class="p">,</span>
@@ -389,8 +381,8 @@
                 <span class="n">cpu_limit</span><span class="o">=</span><span class="n">cpu_limit</span><span class="p">,</span>
                 <span class="n">gpu_limit</span><span class="o">=</span><span class="n">gpu_limit</span><span class="p">,</span>
                 <span class="n">memory_limit</span><span class="o">=</span><span class="n">memory_limit</span><span class="p">,</span>
-                <span class="n">environment</span><span class="o">=</span><span class="n">environment</span>
-            <span class="p">)</span>
+                <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_function_name</span><span class="p">)</span>
 
@@ -407,7 +399,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_inputs</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span></div>
-        
+
 <div class="viewcode-block" id="SdkRunnableTask.promote_from_model"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
         <span class="c1"># TODO: If the task exists in this container, we should be able to retrieve it.</span>
@@ -438,10 +430,7 @@
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;The task </span><span class="si">{}</span><span class="s2"> is invalid because not all inputs and outputs in the &quot;</span>
                 <span class="s2">&quot;task function definition were specified in @outputs and @inputs. &quot;</span>
-                <span class="s2">&quot;We are missing definitions for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="p">,</span>
-                    <span class="n">missing_args</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;We are missing definitions for </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing_args</span><span class="p">)</span>
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkRunnableTask.unit_test"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.unit_test">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -451,11 +440,18 @@
 <span class="sd">            literals.</span>
 <span class="sd">        :returns: Depends on the behavior of the specific task in the unit engine.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span><span class="n">input_map</span><span class="p">,</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="p">})</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
+                    <span class="n">input_map</span><span class="p">,</span>
+                    <span class="p">{</span>
+                        <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkRunnableTask.local_execute"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.local_execute">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -466,11 +462,18 @@
 <span class="sd">        :rtype: dict[Text, T]</span>
 <span class="sd">        :returns: The output produced by this task in Python standard format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span><span class="n">input_map</span><span class="p">,</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="p">})</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
+                    <span class="n">input_map</span><span class="p">,</span>
+                    <span class="p">{</span>
+                        <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_execute_user_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
@@ -496,7 +499,7 @@
                 <span class="n">execution_id</span><span class="o">=</span><span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">WorkflowExecutionIdentifier</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">execution_id</span><span class="p">)),</span>
                 <span class="n">stats</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
                 <span class="n">logging</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">logging</span><span class="p">,</span>
-                <span class="n">tmp_dir</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_directory</span>
+                <span class="n">tmp_dir</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_directory</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="o">**</span><span class="n">inputs</span>
         <span class="p">)</span>
@@ -513,9 +516,10 @@
 <span class="sd">            working directory (with the names provided), which will in turn allow Flyte Propeller to push along the</span>
 <span class="sd">            workflow.  Where as local engine will merely feed the outputs directly into the next node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)},</span>
+        <span class="p">)</span>
         <span class="n">outputs_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">_task_output</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">(</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
@@ -531,17 +535,17 @@
         <span class="p">}</span></div>
 
     <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text storage_request:</span>
@@ -568,61 +572,29 @@
         <span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">storage_request</span><span class="p">:</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span>
-                    <span class="n">storage_request</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_request</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">cpu_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-                    <span class="n">cpu_request</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">gpu_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
-                    <span class="n">gpu_request</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">memory_request</span><span class="p">:</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span>
-                    <span class="n">memory_request</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="n">limits</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">storage_limit</span><span class="p">:</span>
             <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span>
-                    <span class="n">storage_limit</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">cpu_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-                    <span class="n">cpu_limit</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_limit</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">gpu_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
-                    <span class="n">gpu_limit</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">memory_limit</span><span class="p">:</span>
             <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span>
-                    <span class="n">memory_limit</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">SdkRunnableContainer</span><span class="p">)(</span>
@@ -636,11 +608,13 @@
                 <span class="s2">&quot;--inputs&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;{{.input}}&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;--output-prefix&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;{{.outputPrefix}}&quot;</span>
+                <span class="s2">&quot;{{.outputPrefix}}&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;--raw-output-data-prefix&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;{{.rawOutputDataPrefix}}&quot;</span><span class="p">,</span>
             <span class="p">],</span>
             <span class="n">resources</span><span class="o">=</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="p">(</span><span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="n">requests</span><span class="p">),</span>
             <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">{}</span>
+            <span class="n">config</span><span class="o">=</span><span class="p">{},</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_validate_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>

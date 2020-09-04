@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.matchable_resource &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.matchable_resource &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,11 +161,57 @@
             
   <h1>Source code for flytekit.models.matchable_resource</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">matchable_resource_pb2</span> <span class="k">as</span> <span class="n">_matchable_resource</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 
 
-<div class="viewcode-block" id="ClusterResourceAttributes"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ClusterResourceAttributes">[docs]</a><span class="k">class</span> <span class="nc">ClusterResourceAttributes</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+<div class="viewcode-block" id="MatchableResource"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource">[docs]</a><span class="k">class</span> <span class="nc">MatchableResource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">TASK_RESOURCE</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">TASK_RESOURCE</span>
+    <span class="n">CLUSTER_RESOURCE</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">CLUSTER_RESOURCE</span>
+    <span class="n">EXECUTION_QUEUE</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">EXECUTION_QUEUE</span>
+    <span class="n">EXECUTION_CLUSTER_LABEL</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">EXECUTION_CLUSTER_LABEL</span>
+    <span class="n">QUALITY_OF_SERVICE_SPECIFICATION</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">QUALITY_OF_SERVICE_SPECIFICATION</span>
 
+<div class="viewcode-block" id="MatchableResource.enum_to_string"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.enum_to_string">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">enum_to_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int val:</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">TASK_RESOURCE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;TASK_RESOURCE&quot;</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">CLUSTER_RESOURCE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;CLUSTER_RESOURCE&quot;</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">EXECUTION_QUEUE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;EXECUTION_QUEUE&quot;</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">EXECUTION_CLUSTER_LABEL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;EXECUTION_CLUSTER_LABEL&quot;</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">QUALITY_OF_SERVICE_SPECIFICATION</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;QUALITY_OF_SERVICE_SPECIFICATION&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&lt;UNKNOWN&gt;&quot;</span></div>
+
+<div class="viewcode-block" id="MatchableResource.string_to_enum"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.string_to_enum">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">string_to_enum</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text val:</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;TASK_RESOURCE&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">TASK_RESOURCE</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;CLUSTER_RESOURCE&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">CLUSTER_RESOURCE</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;EXECUTION_QUEUE&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">EXECUTION_QUEUE</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;EXECUTION_CLUSTER_LABEL&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">EXECUTION_CLUSTER_LABEL</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="bp">cls</span><span class="o">.</span><span class="n">QUALITY_OF_SERVICE_SPECIFICATION</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;QUALITY_OF_SERVICE_SPECIFICATION&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&lt;UNKNOWN&gt;&quot;</span></div></div>
+
+
+<div class="viewcode-block" id="ClusterResourceAttributes"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ClusterResourceAttributes">[docs]</a><span class="k">class</span> <span class="nc">ClusterResourceAttributes</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Custom resource attributes which will be applied in cluster resource creation (e.g. quotas).</span>
@@ -188,9 +234,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.ClusterResourceAttributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">ClusterResourceAttributes</span><span class="p">(</span>
-            <span class="n">attributes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">ClusterResourceAttributes</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">attributes</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="ClusterResourceAttributes.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ClusterResourceAttributes.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -198,13 +242,10 @@
 <span class="sd">        :param flyteidl.admin.matchable_resource_pb2.ClusterResourceAttributes pb2_object:</span>
 <span class="sd">        :rtype: ClusterResourceAttributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">attributes</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">attributes</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">attributes</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">attributes</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="ExecutionQueueAttributes"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ExecutionQueueAttributes">[docs]</a><span class="k">class</span> <span class="nc">ExecutionQueueAttributes</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tags</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tags used for assigning execution queues for tasks matching a project, domain and optionally, workflow.</span>
@@ -224,9 +265,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.ExecutionQueueAttributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">ExecutionQueueAttributes</span><span class="p">(</span>
-            <span class="n">tags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">ExecutionQueueAttributes</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="ExecutionQueueAttributes.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ExecutionQueueAttributes.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -234,13 +273,10 @@
 <span class="sd">        :param flyteidl.admin.matchable_resource_pb2.ExecutionQueueAttributes pb2_object:</span>
 <span class="sd">        :rtype: ExecutionQueueAttributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">tags</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">tags</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">tags</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="ExecutionClusterLabel"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ExecutionClusterLabel">[docs]</a><span class="k">class</span> <span class="nc">ExecutionClusterLabel</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Label value to determine where the execution will be run</span>
@@ -260,9 +296,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.ExecutionClusterLabel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">ExecutionClusterLabel</span><span class="p">(</span>
-            <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">ExecutionClusterLabel</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="ExecutionClusterLabel.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.ExecutionClusterLabel.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -270,13 +304,13 @@
 <span class="sd">        :param flyteidl.admin.matchable_resource_pb2.ExecutionClusterLabel pb2_object:</span>
 <span class="sd">        :rtype: ExecutionClusterLabel</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">value</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">value</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="MatchingAttributes"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes">[docs]</a><span class="k">class</span> <span class="nc">MatchingAttributes</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execution_cluster_label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execution_cluster_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        At most one target from cluster_resource_attributes, execution_queue_attributes or execution_cluster_label</span>
 <span class="sd">            can be set.</span>
@@ -323,11 +357,14 @@
 <span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.MatchingAttributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">MatchingAttributes</span><span class="p">(</span>
-            <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster_resource_attributes</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cluster_resource_attributes</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_queue_attributes</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_queue_attributes</span>
+            <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cluster_resource_attributes</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cluster_resource_attributes</span>
             <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">execution_cluster_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_cluster_label</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_cluster_label</span>
+            <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_queue_attributes</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_queue_attributes</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">execution_cluster_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_cluster_label</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_cluster_label</span>
             <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -338,12 +375,15 @@
 <span class="sd">        :rtype: MatchingAttributes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="n">ClusterResourceAttributes</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
-                <span class="n">pb2_object</span><span class="o">.</span><span class="n">cluster_resource_attributes</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;cluster_resource_attributes&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="n">ExecutionQueueAttributes</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">execution_queue_attributes</span><span class="p">)</span> <span class="k">if</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;execution_queue_attributes&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">execution_cluster_label</span><span class="o">=</span><span class="n">ExecutionClusterLabel</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">execution_cluster_label</span><span class="p">)</span> <span class="k">if</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;execution_cluster_label&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="n">ClusterResourceAttributes</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">cluster_resource_attributes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;cluster_resource_attributes&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="n">ExecutionQueueAttributes</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">execution_queue_attributes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;execution_queue_attributes&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">execution_cluster_label</span><span class="o">=</span><span class="n">ExecutionClusterLabel</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">execution_cluster_label</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;execution_cluster_label&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

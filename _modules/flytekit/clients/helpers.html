@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.helpers &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.clients.helpers &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -160,17 +160,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.clients.helpers</h1><div class="highlight"><pre>
-<span></span>
-<span class="kn">from</span> <span class="nn">flytekit.clis.auth</span> <span class="k">import</span> <span class="n">credentials</span> <span class="k">as</span> <span class="n">_credentials_access</span>
-
-
-
-<div class="viewcode-block" id="iterate_node_executions"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.helpers.iterate_node_executions">[docs]</a><span class="k">def</span> <span class="nf">iterate_node_executions</span><span class="p">(</span>
-    <span class="n">client</span><span class="p">,</span>
-    <span class="n">workflow_execution_identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">task_execution_identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">filters</span><span class="o">=</span><span class="kc">None</span>
+<div class="viewcode-block" id="iterate_node_executions"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.helpers.iterate_node_executions">[docs]</a><span></span><span class="k">def</span> <span class="nf">iterate_node_executions</span><span class="p">(</span>
+    <span class="n">client</span><span class="p">,</span> <span class="n">workflow_execution_identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_execution_identifier</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This returns a generator for node executions.</span>
@@ -192,14 +183,11 @@
                 <span class="n">workflow_execution_identifier</span><span class="o">=</span><span class="n">workflow_execution_identifier</span><span class="p">,</span>
                 <span class="n">limit</span><span class="o">=</span><span class="n">num_to_fetch</span><span class="p">,</span>
                 <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
-                <span class="n">filters</span><span class="o">=</span><span class="n">filters</span>
+                <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">node_execs</span><span class="p">,</span> <span class="n">next_token</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_node_executions_for_task_paginated</span><span class="p">(</span>
-                <span class="n">task_execution_identifier</span><span class="o">=</span><span class="n">task_execution_identifier</span><span class="p">,</span>
-                <span class="n">limit</span><span class="o">=</span><span class="n">num_to_fetch</span><span class="p">,</span>
-                <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
-                <span class="n">filters</span><span class="o">=</span><span class="n">filters</span>
+                <span class="n">task_execution_identifier</span><span class="o">=</span><span class="n">task_execution_identifier</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">num_to_fetch</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node_execs</span><span class="p">:</span>
             <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -227,10 +215,7 @@
     <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">task_execs</span><span class="p">,</span> <span class="n">next_token</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_task_executions_paginated</span><span class="p">(</span>
-            <span class="n">node_execution_identifier</span><span class="o">=</span><span class="n">node_execution_identifier</span><span class="p">,</span>
-            <span class="n">limit</span><span class="o">=</span><span class="n">num_to_fetch</span><span class="p">,</span>
-            <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
-            <span class="n">filters</span><span class="o">=</span><span class="n">filters</span>
+            <span class="n">node_execution_identifier</span><span class="o">=</span><span class="n">node_execution_identifier</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="n">num_to_fetch</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">task_execs</span><span class="p">:</span>
             <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -240,7 +225,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">next_token</span><span class="p">:</span>
             <span class="k">break</span>
         <span class="n">token</span> <span class="o">=</span> <span class="n">next_token</span></div>
-
 </pre></div>
 
            </div>

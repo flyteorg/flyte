@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.contrib.sensors.task &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.contrib.sensors.task &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,6 +161,7 @@
             
   <h1>Source code for flytekit.contrib.sensors.task</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_common_constants</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
@@ -173,8 +174,7 @@
         <span class="k">if</span> <span class="n">sensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sensor</span><span class="p">,</span> <span class="n">_Sensor</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
-                    <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">sensor</span><span class="p">),</span>
-                    <span class="n">expected_type</span><span class="o">=</span><span class="n">_Sensor</span><span class="p">,</span>
+                    <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">sensor</span><span class="p">),</span> <span class="n">expected_type</span><span class="o">=</span><span class="n">_Sensor</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="n">succeeded</span> <span class="o">=</span> <span class="n">sensor</span><span class="o">.</span><span class="n">sense</span><span class="p">()</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">succeeded</span><span class="p">:</span>
@@ -185,7 +185,7 @@
     <span class="n">_task_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">deprecated</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -258,6 +258,7 @@
 <span class="sd">        otherwise mimic the behavior.</span>
 <span class="sd">    :rtype: SensorTask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">SensorTask</span> <span class="ow">or</span> <span class="bp">cls</span><span class="p">)(</span>
             <span class="n">task_function</span><span class="o">=</span><span class="n">fn</span><span class="p">,</span>
@@ -276,7 +277,7 @@
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
             <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
             <span class="n">custom</span><span class="o">=</span><span class="p">{},</span>
-            <span class="n">discovery_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">discovery_version</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
             <span class="n">discoverable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)</span>
 

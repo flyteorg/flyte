@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; Flyte 0.6.0 documentation</title>
+  <title>Getting Started &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -234,6 +234,16 @@ Once deployed, you can access the Flyte console on any kubernetes node at <code 
 <li><p>Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. <a class="reference external" href="https://minikube.sigs.k8s.io/docs/handbook/pushing/">https://minikube.sigs.k8s.io/docs/handbook/pushing/</a> provides more
 detailed information about this process. As a TL;DR, Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to
 a regisry that is available to Kuberentes. In case on minikube this registry is the one thats running on the VM.</p></li>
+</ul>
+</dd>
+<dt>SPECIAL NOTE IF YOU WANT TO PORT FORWARD Flyteconsole:</dt><dd><ul class="simple">
+<li><p>FlyteConsole defaults to using its own <code class="docutils literal notranslate"><span class="pre">window.location.origin</span></code> as the host for FlyteAdmin service. This is because the default Flyte Sandbox setup uses an ingress configuration, where
+<code class="docutils literal notranslate"><span class="pre">/console</span></code> maps to FlyteConsole and <code class="docutils literal notranslate"><span class="pre">/api/v1</span></code> and some other <code class="docutils literal notranslate"><span class="pre">paths</span></code> map to FlyteAdmin. Refer to <cite>components-console</cite> to dive deeper.</p></li>
+<li><p>If you are port-forwarding then forwarding both FlyteConsole and FlyteAdmin on the same port may not be possible (I am not aware of a way, unless you do some IPTable tricks), thus you need to let
+FlyteConsole know where to find FlyteAdmin.</p></li>
+<li><p>This can be easily configured using <code class="docutils literal notranslate"><span class="pre">flyte-console-configuration</span></code>. The way to do this is to set <code class="docutils literal notranslate"><span class="pre">ADMIN_API_URL</span></code> variable for FlyteConsole and then “restarting” flyteconsole pod. <cite>The variable
+is commented out in the default configuration&lt;https://github.com/lyft/flyte/blob/2905b8d48263bc194dc3a61d49015c5abda81f5e/kustomize/overlays/sandbox/console/config.yaml#L12&gt;</cite></p></li>
+<li><p>If you have difficulty please slack us in the channel</p></li>
 </ul>
 </dd>
 </dl>

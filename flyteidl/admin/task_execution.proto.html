@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>task_execution.proto &mdash; Flyte 0.6.0 documentation</title>
+  <title>task_execution.proto &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -203,7 +203,7 @@
 <span id="api-file-flyteidl-admin-task-execution-proto"></span><h1>task_execution.proto<a class="headerlink" href="#task-execution-proto" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="flyteidl-admin-taskexecutiongetrequest">
 <span id="api-msg-flyteidl-admin-taskexecutiongetrequest"></span><h2>flyteidl.admin.TaskExecutionGetRequest<a class="headerlink" href="#flyteidl-admin-taskexecutiongetrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L13">[flyteidl.admin.TaskExecutionGetRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L14">[flyteidl.admin.TaskExecutionGetRequest proto]</a></p>
 <p>A message used to fetch a single task execution entity.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -217,7 +217,7 @@
 </div>
 <div class="section" id="flyteidl-admin-taskexecutionlistrequest">
 <span id="api-msg-flyteidl-admin-taskexecutionlistrequest"></span><h2>flyteidl.admin.TaskExecutionListRequest<a class="headerlink" href="#flyteidl-admin-taskexecutionlistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L19">[flyteidl.admin.TaskExecutionListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L20">[flyteidl.admin.TaskExecutionListRequest proto]</a></p>
 <p>Represents a request structure to retrieve a list of task execution entities.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;node_execution_id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -256,7 +256,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-taskexecution">
 <span id="api-msg-flyteidl-admin-taskexecution"></span><h2>flyteidl.admin.TaskExecution<a class="headerlink" href="#flyteidl-admin-taskexecution" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L44">[flyteidl.admin.TaskExecution proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L45">[flyteidl.admin.TaskExecution proto]</a></p>
 <p>Encapsulates all details for a single task execution entity.
 A task execution represents an instantiated task, including all inputs and additional
 metadata as well as computed results included state, outputs, and duration-based attributes.</p>
@@ -287,7 +287,7 @@ metadata as well as computed results included state, outputs, and duration-based
 </div>
 <div class="section" id="flyteidl-admin-taskexecutionlist">
 <span id="api-msg-flyteidl-admin-taskexecutionlist"></span><h2>flyteidl.admin.TaskExecutionList<a class="headerlink" href="#flyteidl-admin-taskexecutionlist" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L59">[flyteidl.admin.TaskExecutionList proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L60">[flyteidl.admin.TaskExecutionList proto]</a></p>
 <p>Response structure for a query to list of task execution entities.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;task_executions&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -307,7 +307,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-taskexecutionclosure">
 <span id="api-msg-flyteidl-admin-taskexecutionclosure"></span><h2>flyteidl.admin.TaskExecutionClosure<a class="headerlink" href="#flyteidl-admin-taskexecutionclosure" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L68">[flyteidl.admin.TaskExecutionClosure proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L69">[flyteidl.admin.TaskExecutionClosure proto]</a></p>
 <p>Container for task execution details and results.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;output_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -363,7 +363,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-taskexecutiongetdatarequest">
 <span id="api-msg-flyteidl-admin-taskexecutiongetdatarequest"></span><h2>flyteidl.admin.TaskExecutionGetDataRequest<a class="headerlink" href="#flyteidl-admin-taskexecutiongetdatarequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L100">[flyteidl.admin.TaskExecutionGetDataRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L101">[flyteidl.admin.TaskExecutionGetDataRequest proto]</a></p>
 <p>Request structure to fetch inputs and output urls for a task execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -377,11 +377,13 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-taskexecutiongetdataresponse">
 <span id="api-msg-flyteidl-admin-taskexecutiongetdataresponse"></span><h2>flyteidl.admin.TaskExecutionGetDataResponse<a class="headerlink" href="#flyteidl-admin-taskexecutiongetdataresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L106">[flyteidl.admin.TaskExecutionGetDataResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/task_execution.proto#L107">[flyteidl.admin.TaskExecutionGetDataResponse proto]</a></p>
 <p>Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;full_inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;full_outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -391,6 +393,14 @@ in a query. If there are no more results, this value will be empty.</p>
 </dl>
 <dl class="simple" id="api-field-flyteidl-admin-taskexecutiongetdataresponse-outputs">
 <dt>outputs</dt><dd><p>(<a class="reference internal" href="common.proto.html#api-msg-flyteidl-admin-urlblob"><span class="std std-ref">flyteidl.admin.UrlBlob</span></a>) Signed url to fetch a core.LiteralMap of task execution outputs.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-taskexecutiongetdataresponse-full-inputs">
+<dt>full_inputs</dt><dd><p>(<a class="reference internal" href="../core/literals.proto.html#api-msg-flyteidl-core-literalmap"><span class="std std-ref">flyteidl.core.LiteralMap</span></a>) Optional, full_inputs will only be populated if they are under a configured size threshold.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-taskexecutiongetdataresponse-full-outputs">
+<dt>full_outputs</dt><dd><p>(<a class="reference internal" href="../core/literals.proto.html#api-msg-flyteidl-core-literalmap"><span class="std std-ref">flyteidl.core.LiteralMap</span></a>) Optional, full_outputs will only be populated if they are under a configured size threshold.</p>
 </dd>
 </dl>
 </div>

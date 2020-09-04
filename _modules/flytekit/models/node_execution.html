@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.node_execution &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.node_execution &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,22 +161,17 @@
             
   <h1>Source code for flytekit.models.node_execution</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_core_execution</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
+
 <span class="kn">import</span> <span class="nn">flyteidl.admin.node_execution_pb2</span> <span class="k">as</span> <span class="nn">_node_execution_pb2</span>
 <span class="kn">import</span> <span class="nn">pytz</span> <span class="k">as</span> <span class="nn">_pytz</span>
 
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_core_execution</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
+
 
 <div class="viewcode-block" id="NodeExecutionClosure"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.node_execution.NodeExecutionClosure">[docs]</a><span class="k">class</span> <span class="nc">NodeExecutionClosure</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">phase</span><span class="p">,</span>
-            <span class="n">started_at</span><span class="p">,</span>
-            <span class="n">duration</span><span class="p">,</span>
-            <span class="n">output_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">error</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">started_at</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">output_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int phase:</span>
 <span class="sd">        :param datetime.datetime started_at:</span>
@@ -232,7 +227,7 @@
         <span class="n">obj</span> <span class="o">=</span> <span class="n">_node_execution_pb2</span><span class="o">.</span><span class="n">NodeExecutionClosure</span><span class="p">(</span>
             <span class="n">phase</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
             <span class="n">output_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_uri</span><span class="p">,</span>
-            <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">FromDatetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">_pytz</span><span class="o">.</span><span class="n">UTC</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">FromTimedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span>
@@ -249,18 +244,12 @@
             <span class="n">output_uri</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">output_uri</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;output_uri&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">error</span><span class="o">=</span><span class="n">_core_execution</span><span class="o">.</span><span class="n">ExecutionError</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">started_at</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">ToDatetime</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">_pytz</span><span class="o">.</span><span class="n">UTC</span><span class="p">),</span>
-            <span class="n">duration</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">()</span>
+            <span class="n">duration</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">(),</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="NodeExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.node_execution.NodeExecution">[docs]</a><span class="k">class</span> <span class="nc">NodeExecution</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="nb">id</span><span class="p">,</span>
-            <span class="n">input_uri</span><span class="p">,</span>
-            <span class="n">closure</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">input_uri</span><span class="p">,</span> <span class="n">closure</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.NodeExecutionIdentifier id:</span>
 <span class="sd">        :param Text input_uri:</span>
@@ -296,9 +285,7 @@
 <span class="sd">        :rtype: flyteidl.admin.node_execution_pb2.NodeExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_node_execution_pb2</span><span class="o">.</span><span class="n">NodeExecution</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">input_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_uri</span><span class="p">,</span>
-            <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">input_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_uri</span><span class="p">,</span> <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="NodeExecution.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.node_execution.NodeExecution.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -310,7 +297,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">NodeExecutionIdentifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">input_uri</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">input_uri</span><span class="p">,</span>
-            <span class="n">closure</span><span class="o">=</span><span class="n">NodeExecutionClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">closure</span><span class="p">)</span>
+            <span class="n">closure</span><span class="o">=</span><span class="n">NodeExecutionClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">closure</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

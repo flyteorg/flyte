@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sagemaker package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.sagemaker package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -198,26 +198,41 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-flytekit.common.tasks.sagemaker.built_in_training_job_task">
+<span id="flytekit-common-tasks-sagemaker-built-in-training-job-task-module"></span><h2>flytekit.common.tasks.sagemaker.built_in_training_job_task module<a class="headerlink" href="#module-flytekit.common.tasks.sagemaker.built_in_training_job_task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sagemaker.built_in_training_job_task.</code><code class="sig-name descname">SdkBuiltinAlgorithmTrainingJobTask</code><span class="sig-paren">(</span><em class="sig-param">training_job_resource_config: flytekit.models.sagemaker.training_job.TrainingJobResourceConfig</em>, <em class="sig-param">algorithm_specification: flytekit.models.sagemaker.training_job.AlgorithmSpecification</em>, <em class="sig-param">retries: int = 0</em>, <em class="sig-param">cacheable: bool = False</em>, <em class="sig-param">cache_version: str = ''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sagemaker/built_in_training_job_task.html#SdkBuiltinAlgorithmTrainingJobTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask.training_job_model">
+<em class="property">property </em><code class="sig-name descname">training_job_model</code><a class="headerlink" href="#flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask.training_job_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-flytekit.common.tasks.sagemaker.custom_training_job_task">
+<span id="flytekit-common-tasks-sagemaker-custom-training-job-task-module"></span><h2>flytekit.common.tasks.sagemaker.custom_training_job_task module<a class="headerlink" href="#module-flytekit.common.tasks.sagemaker.custom_training_job_task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sagemaker.custom_training_job_task.</code><code class="sig-name descname">CustomTrainingJobTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">cache_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">cache</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">algorithm_specification: flytekit.models.sagemaker.training_job.AlgorithmSpecification</em>, <em class="sig-param">training_job_resource_config: flytekit.models.sagemaker.training_job.TrainingJobResourceConfig</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sagemaker/custom_training_job_task.html#CustomTrainingJobTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
+<p>CustomTrainJobTask defines a python task that can run on SageMaker bring your own container.</p>
+<dl class="method">
+<dt id="flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask.training_job_model">
+<em class="property">property </em><code class="sig-name descname">training_job_model</code><a class="headerlink" href="#flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask.training_job_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.common.tasks.sagemaker.hpo_job_task">
 <span id="flytekit-common-tasks-sagemaker-hpo-job-task-module"></span><h2>flytekit.common.tasks.sagemaker.hpo_job_task module<a class="headerlink" href="#module-flytekit.common.tasks.sagemaker.hpo_job_task" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="flytekit.common.tasks.sagemaker.hpo_job_task.SdkSimpleHyperparameterTuningJobTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sagemaker.hpo_job_task.</code><code class="sig-name descname">SdkSimpleHyperparameterTuningJobTask</code><span class="sig-paren">(</span><em class="sig-param">max_number_of_training_jobs: int</em>, <em class="sig-param">max_parallel_training_jobs: int</em>, <em class="sig-param">training_job: flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask</em>, <em class="sig-param">retries: int = 0</em>, <em class="sig-param">cacheable: bool = False</em>, <em class="sig-param">cache_version: str = ''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sagemaker/hpo_job_task.html#SdkSimpleHyperparameterTuningJobTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sagemaker.hpo_job_task.SdkSimpleHyperparameterTuningJobTask" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sagemaker.hpo_job_task.</code><code class="sig-name descname">SdkSimpleHyperparameterTuningJobTask</code><span class="sig-paren">(</span><em class="sig-param">max_number_of_training_jobs: int, max_parallel_training_jobs: int, training_job: Union[flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask, flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask], retries: int = 0, cacheable: bool = False, cache_version: str = ''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sagemaker/hpo_job_task.html#SdkSimpleHyperparameterTuningJobTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sagemaker.hpo_job_task.SdkSimpleHyperparameterTuningJobTask" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
-</dd></dl>
-
-</div>
-<div class="section" id="module-flytekit.common.tasks.sagemaker.training_job_task">
-<span id="flytekit-common-tasks-sagemaker-training-job-task-module"></span><h2>flytekit.common.tasks.sagemaker.training_job_task module<a class="headerlink" href="#module-flytekit.common.tasks.sagemaker.training_job_task" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sagemaker.training_job_task.</code><code class="sig-name descname">SdkBuiltinAlgorithmTrainingJobTask</code><span class="sig-paren">(</span><em class="sig-param">training_job_resource_config: flytekit.models.sagemaker.training_job.TrainingJobResourceConfig</em>, <em class="sig-param">algorithm_specification: flytekit.models.sagemaker.training_job.AlgorithmSpecification</em>, <em class="sig-param">retries: int = 0</em>, <em class="sig-param">cacheable: bool = False</em>, <em class="sig-param">cache_version: str = ''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sagemaker/training_job_task.html#SdkBuiltinAlgorithmTrainingJobTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask" title="flytekit.common.tasks.task.SdkTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.task.SdkTask</span></code></a></p>
-<dl class="method">
-<dt id="flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask.training_job_model">
-<em class="property">property </em><code class="sig-name descname">training_job_model</code><a class="headerlink" href="#flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask.training_job_model" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>

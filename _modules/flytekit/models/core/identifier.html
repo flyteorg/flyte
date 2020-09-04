@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.identifier &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core.identifier &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,8 +161,10 @@
             
   <h1>Source code for flytekit.models.core.identifier</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
+
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">identifier_pb2</span> <span class="k">as</span> <span class="n">_identifier_pb2</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
 
 
 <div class="viewcode-block" id="ResourceType"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.ResourceType">[docs]</a><span class="k">class</span> <span class="nc">ResourceType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -173,7 +175,6 @@
 
 
 <div class="viewcode-block" id="Identifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.Identifier">[docs]</a><span class="k">class</span> <span class="nc">Identifier</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource_type</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int resource_type: enum value from ResourceType</span>
@@ -233,7 +234,7 @@
             <span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
             <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+            <span class="n">version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">version</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Identifier.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.Identifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -242,13 +243,7 @@
 <span class="sd">        :param flyteidl.core.identifier_pb2.Identifier p:</span>
 <span class="sd">        :rtype: Identifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">resource_type</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">resource_type</span><span class="p">,</span>
-            <span class="n">project</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">version</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">version</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">resource_type</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">resource_type</span><span class="p">,</span> <span class="n">project</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">version</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="WorkflowExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.WorkflowExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">WorkflowExecutionIdentifier</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -287,11 +282,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.identifier_pb2.WorkflowExecutionIdentifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_identifier_pb2</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">(</span>
-            <span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_identifier_pb2</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="WorkflowExecutionIdentifier.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.WorkflowExecutionIdentifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -299,15 +290,10 @@
 <span class="sd">        :param flyteidl.core.identifier_pb2.WorkflowExecutionIdentifier p:</span>
 <span class="sd">        :rtype: WorkflowExecutionIdentifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">project</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="NodeExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.NodeExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">NodeExecutionIdentifier</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">execution_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text node_id:</span>
@@ -335,8 +321,7 @@
 <span class="sd">        :rtype: flyteidl.core.identifier_pb2.NodeExecutionIdentifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_identifier_pb2</span><span class="o">.</span><span class="n">NodeExecutionIdentifier</span><span class="p">(</span>
-            <span class="n">node_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span>
-            <span class="n">execution_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">node_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="n">execution_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="NodeExecutionIdentifier.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.NodeExecutionIdentifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -345,14 +330,10 @@
 <span class="sd">        :param flyteidl.core.identifier_pb2.NodeExecutionIdentifier p:</span>
 <span class="sd">        :rtype: NodeExecutionIdentifier</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">node_id</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span>
-            <span class="n">execution_id</span><span class="o">=</span><span class="n">WorkflowExecutionIdentifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">execution_id</span><span class="p">),</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">node_id</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="n">execution_id</span><span class="o">=</span><span class="n">WorkflowExecutionIdentifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">execution_id</span><span class="p">),)</span></div></div>
 
 
 <div class="viewcode-block" id="TaskExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.TaskExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">TaskExecutionIdentifier</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">,</span> <span class="n">node_execution_id</span><span class="p">,</span> <span class="n">retry_attempt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Identifier task_id: The identifier for the task that is executing</span>
@@ -391,7 +372,7 @@
         <span class="k">return</span> <span class="n">_identifier_pb2</span><span class="o">.</span><span class="n">TaskExecutionIdentifier</span><span class="p">(</span>
             <span class="n">task_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">task_id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">node_execution_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">node_execution_id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">retry_attempt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_attempt</span>
+            <span class="n">retry_attempt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retry_attempt</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TaskExecutionIdentifier.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.identifier.TaskExecutionIdentifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -403,7 +384,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">task_id</span><span class="o">=</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">task_id</span><span class="p">),</span>
             <span class="n">node_execution_id</span><span class="o">=</span><span class="n">NodeExecutionIdentifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">node_execution_id</span><span class="p">),</span>
-            <span class="n">retry_attempt</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">retry_attempt</span>
+            <span class="n">retry_attempt</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">retry_attempt</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

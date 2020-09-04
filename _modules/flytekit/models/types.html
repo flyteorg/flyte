@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.types &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.types &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,12 +162,14 @@
   <h1>Source code for flytekit.models.types</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">types_pb2</span> <span class="k">as</span> <span class="n">_types_pb2</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_core_types</span>
-<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span><span class="p">,</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
-<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
 
 
 <div class="viewcode-block" id="SimpleType"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.SimpleType">[docs]</a><span class="k">class</span> <span class="nc">SimpleType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -184,9 +186,7 @@
 
 
 <div class="viewcode-block" id="SchemaType"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.SchemaType">[docs]</a><span class="k">class</span> <span class="nc">SchemaType</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="SchemaType.SchemaColumn"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.SchemaType.SchemaColumn">[docs]</a>    <span class="k">class</span> <span class="nc">SchemaColumn</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="SchemaType.SchemaColumn.SchemaColumnType"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.SchemaType.SchemaColumn.SchemaColumnType">[docs]</a>        <span class="k">class</span> <span class="nc">SchemaColumnType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
             <span class="n">INTEGER</span> <span class="o">=</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">INTEGER</span>
             <span class="n">FLOAT</span> <span class="o">=</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">FLOAT</span>
@@ -223,10 +223,7 @@
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            :rtype: flyteidl.core.types_pb2.SchemaType.SchemaColumn</span>
 <span class="sd">            &quot;&quot;&quot;</span>
-            <span class="k">return</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span>
-            <span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SchemaType.SchemaColumn.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.SchemaType.SchemaColumn.from_flyte_idl">[docs]</a>        <span class="nd">@classmethod</span>
         <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">proto</span><span class="p">):</span>
@@ -254,9 +251,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.types_pb2.SchemaType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">SchemaType</span><span class="p">(</span>
-            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">SchemaType</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="SchemaType.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.SchemaType.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">proto</span><span class="p">):</span>
@@ -268,8 +263,9 @@
 
 
 <div class="viewcode-block" id="LiteralType"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.types.LiteralType">[docs]</a><span class="k">class</span> <span class="nc">LiteralType</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">simple</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_value_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">simple</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">collection_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">map_value_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">blob</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Only one of the kwargs may be set.</span>
 <span class="sd">        :param int simple: Enum type from SimpleType</span>
@@ -347,7 +343,7 @@
             <span class="n">collection_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collection_type</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">collection_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">map_value_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">map_value_type</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">map_value_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">blob</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">blob</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">blob</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">t</span></div>
 
@@ -369,7 +365,7 @@
             <span class="n">collection_type</span><span class="o">=</span><span class="n">collection_type</span><span class="p">,</span>
             <span class="n">map_value_type</span><span class="o">=</span><span class="n">map_value_type</span><span class="p">,</span>
             <span class="n">blob</span><span class="o">=</span><span class="n">_core_types</span><span class="o">.</span><span class="n">BlobType</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">blob</span><span class="p">)</span> <span class="k">if</span> <span class="n">proto</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;blob&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">_json_format</span><span class="o">.</span><span class="n">MessageToDict</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">_json_format</span><span class="o">.</span><span class="n">MessageToDict</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span> <span class="ow">or</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
@@ -417,10 +413,7 @@
 <span class="sd">        :param flyteidl.core.types.OutputReference pb2_object:</span>
 <span class="sd">        :rtype: OutputReference</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">node_id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span>
-            <span class="n">var</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">var</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">node_id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">node_id</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">var</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

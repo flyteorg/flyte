@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.admin.workflow &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.admin.workflow &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,13 +161,16 @@
             
   <h1>Source code for flytekit.models.admin.workflow</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">compiler</span> <span class="k">as</span> <span class="n">_compiler_models</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span><span class="p">,</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_core_workflow</span>
+
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">workflow_pb2</span> <span class="k">as</span> <span class="n">_admin_workflow</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">compiler</span> <span class="k">as</span> <span class="n">_compiler_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_core_workflow</span>
 
 
 <div class="viewcode-block" id="WorkflowSpec"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.WorkflowSpec">[docs]</a><span class="k">class</span> <span class="nc">WorkflowSpec</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This object fully encapsulates the specification of a workflow</span>
@@ -196,8 +199,7 @@
 <span class="sd">        :rtype: flyteidl.admin.workflow_pb2.WorkflowSpec</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_admin_workflow</span><span class="o">.</span><span class="n">WorkflowSpec</span><span class="p">(</span>
-            <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">sub_workflows</span><span class="o">=</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_workflows</span><span class="p">],</span>
+            <span class="n">template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">sub_workflows</span><span class="o">=</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sub_workflows</span><span class="p">],</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="WorkflowSpec.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.WorkflowSpec.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -206,17 +208,14 @@
 <span class="sd">        :param pb2_object: flyteidl.admin.workflow_pb2.WorkflowSpec</span>
 <span class="sd">        :rtype: WorkflowSpec</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowTemplate</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">template</span><span class="p">),</span>
-                   <span class="p">[</span><span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowTemplate</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">sub_workflows</span><span class="p">])</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowTemplate</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">template</span><span class="p">),</span>
+            <span class="p">[</span><span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowTemplate</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">sub_workflows</span><span class="p">],</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Workflow"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow">[docs]</a><span class="k">class</span> <span class="nc">Workflow</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="nb">id</span><span class="p">,</span>
-        <span class="n">closure</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">closure</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier id:</span>
 <span class="sd">        :param WorkflowClosure closure:</span>
@@ -242,10 +241,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.workflow_pb2.Workflow</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_admin_workflow</span><span class="o">.</span><span class="n">Workflow</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_admin_workflow</span><span class="o">.</span><span class="n">Workflow</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="Workflow.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -255,12 +251,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
-            <span class="n">closure</span><span class="o">=</span><span class="n">WorkflowClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">closure</span><span class="p">)</span>
+            <span class="n">closure</span><span class="o">=</span><span class="n">WorkflowClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">closure</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="WorkflowClosure"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.WorkflowClosure">[docs]</a><span class="k">class</span> <span class="nc">WorkflowClosure</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compiled_workflow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.compiler.CompiledWorkflowClosure compiled_workflow:</span>
@@ -278,9 +273,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.workflow_pb2.WorkflowClosure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_admin_workflow</span><span class="o">.</span><span class="n">WorkflowClosure</span><span class="p">(</span>
-            <span class="n">compiled_workflow</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compiled_workflow</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_admin_workflow</span><span class="o">.</span><span class="n">WorkflowClosure</span><span class="p">(</span><span class="n">compiled_workflow</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">compiled_workflow</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="WorkflowClosure.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.workflow.WorkflowClosure.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -288,9 +281,7 @@
 <span class="sd">        :param flyteidl.admin.workflow_pb2.WorkflowClosure p:</span>
 <span class="sd">        :rtype: WorkflowClosure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">compiled_workflow</span><span class="o">=</span><span class="n">_compiler_models</span><span class="o">.</span><span class="n">CompiledWorkflowClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">compiled_workflow</span><span class="p">)</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">compiled_workflow</span><span class="o">=</span><span class="n">_compiler_models</span><span class="o">.</span><span class="n">CompiledWorkflowClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">compiled_workflow</span><span class="p">))</span></div></div>
 </pre></div>
 
            </div>

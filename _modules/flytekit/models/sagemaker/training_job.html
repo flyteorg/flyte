@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.sagemaker.training_job &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.sagemaker.training_job &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.models.sagemaker.training_job</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">flyteidl.plugins.sagemaker</span> <span class="k">import</span> <span class="n">training_job_pb2</span> <span class="k">as</span> <span class="n">_training_job_pb2</span>
 
@@ -175,11 +173,9 @@
 <span class="sd">    number of instances to launch, and the size of the ML storage volume the user wants to provision</span>
 <span class="sd">    Refer to SageMaker official doc for more details: https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">instance_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">instance_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">volume_size_in_gb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">instance_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">instance_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">volume_size_in_gb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance_count</span> <span class="o">=</span> <span class="n">instance_count</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance_type</span> <span class="o">=</span> <span class="n">instance_type</span>
@@ -236,9 +232,7 @@
 
 <div class="viewcode-block" id="MetricDefinition"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.MetricDefinition">[docs]</a><span class="k">class</span> <span class="nc">MetricDefinition</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">regex</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">regex</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_regex</span> <span class="o">=</span> <span class="n">regex</span>
@@ -265,10 +259,7 @@
 
 <span class="sd">        :rtype: _training_job_pb2.MetricDefinition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">MetricDefinition</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">regex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">MetricDefinition</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="p">,)</span></div>
 
 <div class="viewcode-block" id="MetricDefinition.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.MetricDefinition.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">:</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">MetricDefinition</span><span class="p">):</span>
@@ -277,10 +268,7 @@
 <span class="sd">        :param pb2_object: _training_job_pb2.MetricDefinition</span>
 <span class="sd">        :rtype: MetricDefinition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">regex</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">regex</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">regex</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="InputMode"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.InputMode">[docs]</a><span class="k">class</span> <span class="nc">InputMode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -289,6 +277,7 @@
 <span class="sd">    See https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html</span>
 <span class="sd">    https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-algo-docker-registry-paths.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">PIPE</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">InputMode</span><span class="o">.</span><span class="n">PIPE</span>
     <span class="n">FILE</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">InputMode</span><span class="o">.</span><span class="n">FILE</span></div>
 
@@ -300,6 +289,7 @@
 <span class="sd">    While we currently only support a subset of the algorithms, more will be added to the list.</span>
 <span class="sd">    See: https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">CUSTOM</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">AlgorithmName</span><span class="o">.</span><span class="n">CUSTOM</span>
     <span class="n">XGBOOST</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">AlgorithmName</span><span class="o">.</span><span class="n">XGBOOST</span></div>
 
@@ -310,6 +300,7 @@
 <span class="sd">    See https://docs.aws.amazon.com/sagemaker/latest/dg/cdf-training.html</span>
 <span class="sd">    https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-algo-docker-registry-paths.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">TEXT_CSV</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">InputContentType</span><span class="o">.</span><span class="n">TEXT_CSV</span></div>
 
 
@@ -323,13 +314,14 @@
 <span class="sd">    For pass-through use cases: refer to this AWS official document for more details</span>
 <span class="sd">    https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_AlgorithmSpecification.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">input_mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">metric_definitions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MetricDefinition</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">input_content_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">InputContentType</span><span class="o">.</span><span class="n">TEXT_CSV</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">algorithm_name</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">AlgorithmName</span><span class="o">.</span><span class="n">CUSTOM</span><span class="p">,</span>
+        <span class="n">algorithm_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">input_mode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">InputMode</span><span class="o">.</span><span class="n">FILE</span><span class="p">,</span>
+        <span class="n">metric_definitions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">MetricDefinition</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_content_type</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">InputContentType</span><span class="o">.</span><span class="n">TEXT_CSV</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_mode</span> <span class="o">=</span> <span class="n">input_mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_input_content_type</span> <span class="o">=</span> <span class="n">input_content_type</span>
@@ -411,9 +403,7 @@
 
 <div class="viewcode-block" id="TrainingJob"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJob">[docs]</a><span class="k">class</span> <span class="nc">TrainingJob</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">algorithm_specification</span><span class="p">:</span> <span class="n">AlgorithmSpecification</span><span class="p">,</span>
-            <span class="n">training_job_resource_config</span><span class="p">:</span> <span class="n">TrainingJobResourceConfig</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">algorithm_specification</span><span class="p">:</span> <span class="n">AlgorithmSpecification</span><span class="p">,</span> <span class="n">training_job_resource_config</span><span class="p">:</span> <span class="n">TrainingJobResourceConfig</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_algorithm_specification</span> <span class="o">=</span> <span class="n">algorithm_specification</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_training_job_resource_config</span> <span class="o">=</span> <span class="n">training_job_resource_config</span>
@@ -440,8 +430,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">TrainingJob</span><span class="p">(</span>
-            <span class="n">algorithm_specification</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm_specification</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">training_job_resource_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_job_resource_config</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">algorithm_specification</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm_specification</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">algorithm_specification</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">training_job_resource_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">training_job_resource_config</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training_job_resource_config</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TrainingJob.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJob.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>

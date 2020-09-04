@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.admin.task_execution &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.admin.task_execution &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,14 +161,18 @@
             
   <h1>Source code for flytekit.models.admin.task_execution</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span><span class="p">,</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution</span>
+
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">task_execution_pb2</span> <span class="k">as</span> <span class="n">_task_execution_pb2</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 
 
 <div class="viewcode-block" id="TaskExecutionClosure"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.task_execution.TaskExecutionClosure">[docs]</a><span class="k">class</span> <span class="nc">TaskExecutionClosure</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">logs</span><span class="p">,</span> <span class="n">started_at</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">created_at</span><span class="p">,</span> <span class="n">updated_at</span><span class="p">,</span> <span class="n">output_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">,</span> <span class="n">logs</span><span class="p">,</span> <span class="n">started_at</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">created_at</span><span class="p">,</span> <span class="n">updated_at</span><span class="p">,</span> <span class="n">output_uri</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int phase: Enum value from flytekit.models.core.execution.TaskExecutionPhase</span>
 <span class="sd">        :param list[flytekit.models.core.execution.TaskLog] logs: List of all logs associated with the execution.</span>
@@ -255,7 +259,7 @@
             <span class="n">phase</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phase</span><span class="p">,</span>
             <span class="n">logs</span><span class="o">=</span><span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">],</span>
             <span class="n">output_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_uri</span><span class="p">,</span>
-            <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">FromDatetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">started_at</span><span class="p">)</span>
         <span class="n">p</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">FromDatetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="p">)</span>
@@ -277,12 +281,11 @@
             <span class="n">started_at</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">started_at</span><span class="o">.</span><span class="n">ToDatetime</span><span class="p">(),</span>
             <span class="n">created_at</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">ToDatetime</span><span class="p">(),</span>
             <span class="n">updated_at</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">updated_at</span><span class="o">.</span><span class="n">ToDatetime</span><span class="p">(),</span>
-            <span class="n">duration</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">()</span>
+            <span class="n">duration</span><span class="o">=</span><span class="n">p</span><span class="o">.</span><span class="n">duration</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">(),</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TaskExecution"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.task_execution.TaskExecution">[docs]</a><span class="k">class</span> <span class="nc">TaskExecution</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">input_uri</span><span class="p">,</span> <span class="n">closure</span><span class="p">,</span> <span class="n">is_parent</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.TaskExecutionIdentifier id:</span>
@@ -331,7 +334,7 @@
             <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">input_uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">input_uri</span><span class="p">,</span>
             <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">is_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_parent</span>
+            <span class="n">is_parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_parent</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TaskExecution.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.task_execution.TaskExecution.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>

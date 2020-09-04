@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.interfaces.stats.client &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.interfaces.stats.client &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -172,10 +172,11 @@
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">statsd</span> <span class="k">as</span> <span class="n">_statsd_config</span>
 
 <span class="n">RESERVED_TAG_WORDS</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span>
-    <span class="p">[</span><span class="s1">&#39;asg&#39;</span><span class="p">,</span> <span class="s1">&#39;az&#39;</span><span class="p">,</span> <span class="s1">&#39;backend&#39;</span><span class="p">,</span> <span class="s1">&#39;canary&#39;</span><span class="p">,</span> <span class="s1">&#39;host&#39;</span><span class="p">,</span> <span class="s1">&#39;period&#39;</span><span class="p">,</span> <span class="s1">&#39;region&#39;</span><span class="p">,</span> <span class="s1">&#39;shard&#39;</span><span class="p">,</span> <span class="s1">&#39;window&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">])</span>
+    <span class="p">[</span><span class="s2">&quot;asg&quot;</span><span class="p">,</span> <span class="s2">&quot;az&quot;</span><span class="p">,</span> <span class="s2">&quot;backend&quot;</span><span class="p">,</span> <span class="s2">&quot;canary&quot;</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;period&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="s2">&quot;shard&quot;</span><span class="p">,</span> <span class="s2">&quot;window&quot;</span><span class="p">,</span> <span class="s2">&quot;source&quot;</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="c1"># TODO should this be a whitelist instead?</span>
-<span class="n">FORBIDDEN_TAG_VALUE_CHARACTERS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;[|.:]&#39;</span><span class="p">)</span>
+<span class="n">FORBIDDEN_TAG_VALUE_CHARACTERS</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;[|.:]&quot;</span><span class="p">)</span>
 
 <span class="n">_stats_client</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -201,29 +202,31 @@
         <span class="k">for</span> <span class="n">extendable_func</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">EXTENDABLE_FUNC</span><span class="p">:</span>
             <span class="n">base_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="n">extendable_func</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">base_func</span><span class="p">:</span>
-                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                        <span class="n">extendable_func</span><span class="p">,</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_create_wrapped_function</span><span class="p">(</span><span class="n">base_func</span><span class="p">))</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extendable_func</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_wrapped_function</span><span class="p">(</span><span class="n">base_func</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_create_wrapped_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_func</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope_prefix</span><span class="p">:</span>
+
             <span class="k">def</span> <span class="nf">name_wrap</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-                <span class="n">tags</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="p">{})</span>
-                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;per_host&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                    <span class="n">tags</span><span class="p">[</span><span class="s1">&#39;_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;i&#39;</span>
+                <span class="n">tags</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;per_host&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;_f&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;i&quot;</span>
 
                 <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">tags</span><span class="p">):</span>
                     <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_tags</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">base_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_p_with_prefix</span><span class="p">(</span><span class="n">stat</span><span class="p">),</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="k">else</span><span class="p">:</span>
+
             <span class="k">def</span> <span class="nf">name_wrap</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-                <span class="n">tags</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="p">{})</span>
-                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;per_host&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                    <span class="n">tags</span><span class="p">[</span><span class="s1">&#39;_f&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;i&#39;</span>
+                <span class="n">tags</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="k">if</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;per_host&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">tags</span><span class="p">[</span><span class="s2">&quot;_f&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;i&quot;</span>
 
                 <span class="k">if</span> <span class="nb">bool</span><span class="p">(</span><span class="n">tags</span><span class="p">):</span>
                     <span class="n">stat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_serialize_tags</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">base_func</span><span class="p">(</span><span class="n">stat</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">name_wrap</span>
 
 <div class="viewcode-block" id="ScopeableStatsProxy.get_stats"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.stats.html#flytekit.interfaces.stats.client.ScopeableStatsProxy.get_stats">[docs]</a>    <span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -235,8 +238,7 @@
         <span class="k">return</span> <span class="n">ScopeableStatsProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ScopeableStatsProxy.pipeline"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.stats.html#flytekit.interfaces.stats.client.ScopeableStatsProxy.pipeline">[docs]</a>    <span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ScopeableStatsProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(),</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">_scope_prefix</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">ScopeableStatsProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">pipeline</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope_prefix</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_p_with_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -247,7 +249,7 @@
         <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">name</span><span class="o">.</span><span class="n">isascii</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">name</span> <span class="ow">and</span> <span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
@@ -263,7 +265,7 @@
                     <span class="c1"># if the tags fail sanity check we will not serialize the tags, and simply return the metric.</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_ascii</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
                         <span class="k">return</span> <span class="n">stat</span>
-                    <span class="n">tag</span> <span class="o">=</span> <span class="n">FORBIDDEN_TAG_VALUE_CHARACTERS</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+                    <span class="n">tag</span> <span class="o">=</span> <span class="n">FORBIDDEN_TAG_VALUE_CHARACTERS</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
                     <span class="k">if</span> <span class="n">tag</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                         <span class="n">metric</span> <span class="o">+=</span> <span class="s2">&quot;.__</span><span class="si">{0}</span><span class="s2">=</span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">tag</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">UnicodeEncodeError</span><span class="p">:</span>
@@ -279,8 +281,7 @@
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ScopeableStatsProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">(),</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">_scope_prefix</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ScopeableStatsProxy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scope_prefix</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">)</span></div>
@@ -294,6 +295,8 @@
 
 <span class="k">def</span> <span class="nf">_get_stats_client</span><span class="p">():</span>
     <span class="k">global</span> <span class="n">_stats_client</span>
+    <span class="k">if</span> <span class="n">_statsd_config</span><span class="o">.</span><span class="n">DISABLED</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">_stats_client</span> <span class="o">=</span> <span class="n">DummyStatsClient</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">_stats_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">_stats_client</span> <span class="o">=</span> <span class="n">statsd</span><span class="o">.</span><span class="n">StatsClient</span><span class="p">(</span><span class="n">_statsd_config</span><span class="o">.</span><span class="n">HOST</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">_statsd_config</span><span class="o">.</span><span class="n">PORT</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
     <span class="k">return</span> <span class="n">_stats_client</span>
@@ -305,6 +308,16 @@
 
 <div class="viewcode-block" id="get_stats"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.stats.html#flytekit.interfaces.stats.client.get_stats">[docs]</a><span class="k">def</span> <span class="nf">get_stats</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">get_base_stats</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DummyStatsClient"><a class="viewcode-back" href="../../../../flytekit/flytekit.interfaces.stats.html#flytekit.interfaces.stats.client.DummyStatsClient">[docs]</a><span class="k">class</span> <span class="nc">DummyStatsClient</span><span class="p">(</span><span class="n">statsd</span><span class="o">.</span><span class="n">StatsClient</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dummy client for statsd.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8125</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">maxudpsize</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">ipv6</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">maxudpsize</span><span class="p">,</span> <span class="n">ipv6</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">pass</span></div>
 </pre></div>
 
            </div>

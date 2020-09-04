@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.task &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.task &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,27 +162,32 @@
   <h1>Source code for flytekit.common.tasks.task</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
+<span class="kn">import</span> <span class="nn">hashlib</span> <span class="k">as</span> <span class="nn">_hashlib</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
 
-<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span><span class="p">,</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
-
-<span class="kn">import</span> <span class="nn">hashlib</span> <span class="k">as</span> <span class="nn">_hashlib</span>
-<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
-
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">interface</span> <span class="k">as</span> <span class="n">_interfaces</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">workflow_execution</span> <span class="k">as</span> <span class="n">_workflow_execution</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interfaces</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow_execution</span> <span class="k">as</span> <span class="n">_workflow_execution</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">launchable</span> <span class="k">as</span> <span class="n">_launchable_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">launchable</span> <span class="k">as</span> <span class="n">_launchable_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_model</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span>
 
 
 <div class="viewcode-block" id="SdkTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask">[docs]</a><span class="k">class</span> <span class="nc">SdkTask</span><span class="p">(</span>
@@ -194,7 +199,6 @@
         <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">interface</span><span class="p">,</span> <span class="n">custom</span><span class="p">,</span> <span class="n">container</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text type: This is used to define additional extensions for use by Propeller or SDK.</span>
@@ -211,13 +215,13 @@
                 <span class="n">_internal_config</span><span class="o">.</span><span class="n">PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
                 <span class="n">_internal_config</span><span class="o">.</span><span class="n">DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
                 <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
-                <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
             <span class="p">),</span>
             <span class="nb">type</span><span class="p">,</span>
             <span class="n">metadata</span><span class="p">,</span>
             <span class="n">interface</span><span class="p">,</span>
             <span class="n">custom</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">=</span><span class="n">container</span>
+            <span class="n">container</span><span class="o">=</span><span class="n">container</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -261,7 +265,7 @@
             <span class="n">metadata</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
             <span class="n">interface</span><span class="o">=</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">TypedInterface</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">interface</span><span class="p">),</span>
             <span class="n">custom</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">custom</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">container</span>
+            <span class="n">container</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">container</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># Override the newly generated name if one exists in the base model</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">is_empty</span><span class="p">:</span>
@@ -295,10 +299,12 @@
         <span class="c1"># TODO: Remove DEADBEEF</span>
         <span class="k">return</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="s2">&quot;DEADBEEF&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">retries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">interruptible</span><span class="p">),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span>
+                <span class="s2">&quot;DEADBEEF&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">retries</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">interruptible</span><span class="p">,</span>
+            <span class="p">),</span>
             <span class="n">bindings</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">bindings</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">var</span><span class="p">),</span>
             <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">,</span>
-            <span class="n">sdk_task</span><span class="o">=</span><span class="bp">self</span>
+            <span class="n">sdk_task</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="SdkTask.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.register">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -316,7 +322,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>
             <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">old_id</span>
             <span class="k">raise</span></div>
 
@@ -419,10 +425,7 @@
                 <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;Flyte </span><span class="si">{task_type}</span><span class="s2">: </span><span class="si">{interface}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">task_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-            <span class="n">interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;Flyte </span><span class="si">{task_type}</span><span class="s2">: </span><span class="si">{interface}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">task_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_python_std_input_map_to_literal_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -430,10 +433,10 @@
 <span class="sd">            to a LiteralMap</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="k">return</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)},</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_produce_deterministic_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -453,9 +456,13 @@
         <span class="c1"># 1) this method is used to compute the version portion of the identifier and</span>
         <span class="c1"># 2 ) the SDK will actually generate a unique name on every task instantiation which is not great for</span>
         <span class="c1"># the reproducibility this method attempts.</span>
-        <span class="n">task_body</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">custom</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">_hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">task_body</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">task_body</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="n">custom</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">task_body</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SdkTask.register_and_launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.register_and_launch">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">register_and_launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -485,14 +492,22 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>
             <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">old_id</span>
             <span class="k">raise</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkTask.launch_with_literals"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.task.SdkTask.launch_with_literals">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">launch_with_literals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                             <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">launch_with_literals</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">,</span>
+        <span class="n">literal_inputs</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Launches a single task execution and returns the execution identifier.</span>
 <span class="sd">        :param Text project:</span>
@@ -507,14 +522,18 @@
 <span class="sd">        :param flytekit.models.common.Annotations annotation_overrides:</span>
 <span class="sd">        :rtype: flytekit.common.workflow_execution.SdkWorkflowExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">execution</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-            <span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="n">literal_inputs</span><span class="p">,</span>
-            <span class="n">notification_overrides</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
-            <span class="n">label_overrides</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
-            <span class="n">annotation_overrides</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
+        <span class="n">execution</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+                <span class="n">project</span><span class="p">,</span>
+                <span class="n">domain</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">inputs</span><span class="o">=</span><span class="n">literal_inputs</span><span class="p">,</span>
+                <span class="n">notification_overrides</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
+                <span class="n">label_overrides</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
+                <span class="n">annotation_overrides</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">_workflow_execution</span><span class="o">.</span><span class="n">SdkWorkflowExecution</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">execution</span><span class="p">)</span></div></div>
 </pre></div>

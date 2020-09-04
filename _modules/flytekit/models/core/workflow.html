@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.workflow &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core.workflow &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -164,9 +164,13 @@
 
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">workflow_pb2</span> <span class="k">as</span> <span class="n">_core_workflow</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span><span class="p">,</span> <span class="n">errors</span> <span class="k">as</span> <span class="n">_errors</span><span class="p">,</span> <span class="n">condition</span> <span class="k">as</span> <span class="n">_condition</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.literals</span> <span class="k">import</span> <span class="n">RetryStrategy</span> <span class="k">as</span> <span class="n">_RetryStrategy</span><span class="p">,</span> <span class="n">Binding</span> <span class="k">as</span> <span class="n">_Binding</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">condition</span> <span class="k">as</span> <span class="n">_condition</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">errors</span> <span class="k">as</span> <span class="n">_errors</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.literals</span> <span class="k">import</span> <span class="n">Binding</span> <span class="k">as</span> <span class="n">_Binding</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.literals</span> <span class="k">import</span> <span class="n">RetryStrategy</span> <span class="k">as</span> <span class="n">_RetryStrategy</span>
 
 
 <div class="viewcode-block" id="IfBlock"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.IfBlock">[docs]</a><span class="k">class</span> <span class="nc">IfBlock</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -198,13 +202,14 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.IfBlock</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">IfBlock</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-                                      <span class="n">then_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">then_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">IfBlock</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">then_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">then_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),)</span></div>
 
 <div class="viewcode-block" id="IfBlock.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.IfBlock.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="n">_condition</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">condition</span><span class="p">),</span>
-                   <span class="n">then_node</span><span class="o">=</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">then_node</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">condition</span><span class="o">=</span><span class="n">_condition</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">condition</span><span class="p">),</span>
+            <span class="n">then_node</span><span class="o">=</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">then_node</span><span class="p">),</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="IfElseBlock"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.IfElseBlock">[docs]</a><span class="k">class</span> <span class="nc">IfElseBlock</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -264,18 +269,20 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.IfElseBlock</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">IfElseBlock</span><span class="p">(</span><span class="n">case</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">case</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-                                          <span class="n">other</span><span class="o">=</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">other</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                                          <span class="n">else_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">else_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">else_node</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                                          <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">IfElseBlock</span><span class="p">(</span>
+            <span class="n">case</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">case</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">other</span><span class="o">=</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">other</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">other</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">else_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">else_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">else_node</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="IfElseBlock.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.IfElseBlock.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">case</span><span class="o">=</span><span class="n">IfBlock</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">case</span><span class="p">),</span>
             <span class="n">other</span><span class="o">=</span><span class="p">[</span><span class="n">IfBlock</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">other</span><span class="p">],</span>
-            <span class="n">else_node</span><span class="o">=</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">else_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;else_node&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">error</span><span class="o">=</span><span class="n">_errors</span><span class="o">.</span><span class="n">ContainerError</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">else_node</span><span class="o">=</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">else_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;else_node&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">_errors</span><span class="o">.</span><span class="n">ContainerError</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">error</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;error&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
@@ -309,7 +316,6 @@
 
 
 <div class="viewcode-block" id="NodeMetadata"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.NodeMetadata">[docs]</a><span class="k">class</span> <span class="nc">NodeMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines extra information about the Node.</span>
@@ -355,23 +361,31 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.NodeMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">node_metadata</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retries</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">interruptible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interruptible</span><span class="p">)</span>
+        <span class="n">node_metadata</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">retries</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">interruptible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interruptible</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">node_metadata</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">FromTimedelta</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">node_metadata</span></div>
 
 <div class="viewcode-block" id="NodeMetadata.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.NodeMetadata.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">(),</span>
-            <span class="n">_RetryStrategy</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">retries</span><span class="p">)</span>
+            <span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">ToTimedelta</span><span class="p">(),</span> <span class="n">_RetryStrategy</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">retries</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Node"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.Node">[docs]</a><span class="k">class</span> <span class="nc">Node</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">upstream_node_ids</span><span class="p">,</span> <span class="n">output_aliases</span><span class="p">,</span> <span class="n">task_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">workflow_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">branch_node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">,</span>
+        <span class="n">upstream_node_ids</span><span class="p">,</span>
+        <span class="n">output_aliases</span><span class="p">,</span>
+        <span class="n">task_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">workflow_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">branch_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task,</span>
 <span class="sd">        a Workflow or a branch node.  One of the nodes must be specified.</span>
@@ -490,7 +504,7 @@
             <span class="n">output_aliases</span><span class="o">=</span><span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_aliases</span><span class="p">],</span>
             <span class="n">task_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">task_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">workflow_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workflow_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">branch_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">branch_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">branch_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">branch_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">branch_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">branch_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Node.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.Node.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -505,16 +519,17 @@
             <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">_Binding</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">inputs</span><span class="p">],</span>
             <span class="n">upstream_node_ids</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">upstream_node_ids</span><span class="p">,</span>
             <span class="n">output_aliases</span><span class="o">=</span><span class="p">[</span><span class="n">Alias</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">output_aliases</span><span class="p">],</span>
-            <span class="n">task_node</span><span class="o">=</span><span class="n">TaskNode</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">task_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;task_node&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">task_node</span><span class="o">=</span><span class="n">TaskNode</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">task_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;task_node&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">workflow_node</span><span class="o">=</span><span class="n">WorkflowNode</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">workflow_node</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;workflow_node&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">branch_node</span><span class="o">=</span><span class="n">BranchNode</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">branch_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span>
-                <span class="s1">&#39;branch_node&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;workflow_node&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">branch_node</span><span class="o">=</span><span class="n">BranchNode</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">branch_node</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;branch_node&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TaskNode"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.TaskNode">[docs]</a><span class="k">class</span> <span class="nc">TaskNode</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Refers to the task that the Node is to execute.</span>
@@ -549,7 +564,6 @@
 
 
 <div class="viewcode-block" id="WorkflowNode"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowNode">[docs]</a><span class="k">class</span> <span class="nc">WorkflowNode</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launchplan_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sub_workflow_ref</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Refers to a the workflow the node is to execute.  One of the references must be supplied.</span>
@@ -591,7 +605,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowNode</span><span class="p">(</span>
             <span class="n">launchplan_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">launchplan_ref</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">launchplan_ref</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">sub_workflow_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_workflow_ref</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_workflow_ref</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">sub_workflow_ref</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sub_workflow_ref</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sub_workflow_ref</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="WorkflowNode.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowNode.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -600,14 +614,13 @@
 <span class="sd">        :param flyteidl.core.workflow_pb2.WorkflowNode pb2_object:</span>
 <span class="sd">        :rtype: WorkflowNode</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;launchplan_ref&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;launchplan_ref&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">launchplan_ref</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">launchplan_ref</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sub_workflow_ref</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">sub_workflow_ref</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="WorkflowMetadata"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata">[docs]</a><span class="k">class</span> <span class="nc">WorkflowMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="WorkflowMetadata.OnFailurePolicy"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy">[docs]</a>    <span class="k">class</span> <span class="nc">OnFailurePolicy</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Defines the execution behavior of the workflow when a failure is detected.</span>
@@ -618,19 +631,19 @@
 <span class="sd">                                                    clean up resources before finally marking the workflow executions as failed.</span>
 
 <span class="sd">            FAIL_AFTER_EXECUTABLE_NODES_COMPLETE    Instructs the system to make as much progress as it can. The system</span>
-<span class="sd">                                                    will not alter the dependencies of the execution graph so any node </span>
+<span class="sd">                                                    will not alter the dependencies of the execution graph so any node</span>
 <span class="sd">                                                    that depend on the failed node will not be run. Other nodes that will</span>
 <span class="sd">                                                    be executed to completion before cleaning up resources and marking</span>
 <span class="sd">                                                    the workflow execution as failed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">FAIL_IMMEDIATELY</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">FAIL_IMMEDIATELY</span>        
+        <span class="n">FAIL_IMMEDIATELY</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">FAIL_IMMEDIATELY</span>
         <span class="n">FAIL_AFTER_EXECUTABLE_NODES_COMPLETE</span> <span class="o">=</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">FAIL_AFTER_EXECUTABLE_NODES_COMPLETE</span></div>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Metadata for the workflow.</span>
-<span class="sd">        </span>
+
 <span class="sd">        :param on_failure flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy: [Optional] The execution policy when the workflow detects a failure.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_failure</span> <span class="o">=</span> <span class="n">on_failure</span>
@@ -658,12 +671,13 @@
 <span class="sd">        :rtype: WorkflowMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">on_failure</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">on_failure</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">on_failure</span> <span class="k">else</span> <span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">OnFailurePolicy</span><span class="o">.</span><span class="n">FAIL_IMMEDIATELY</span>
+            <span class="n">on_failure</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">on_failure</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">on_failure</span>
+            <span class="k">else</span> <span class="n">WorkflowMetadata</span><span class="o">.</span><span class="n">OnFailurePolicy</span><span class="o">.</span><span class="n">FAIL_IMMEDIATELY</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="WorkflowMetadataDefaults"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadataDefaults">[docs]</a><span class="k">class</span> <span class="nc">WorkflowMetadataDefaults</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interruptible</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Metadata Defaults for the workflow.</span>
@@ -674,9 +688,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.WorkflowMetadataDefaults</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadataDefaults</span><span class="p">(</span>
-            <span class="n">interruptible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interruptible_</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">WorkflowMetadataDefaults</span><span class="p">(</span><span class="n">interruptible</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interruptible_</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="WorkflowMetadataDefaults.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadataDefaults.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -688,8 +700,9 @@
 
 
 <div class="viewcode-block" id="WorkflowTemplate"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate">[docs]</a><span class="k">class</span> <span class="nc">WorkflowTemplate</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">metadata_defaults</span><span class="p">,</span> <span class="n">interface</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">failure_node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">metadata_defaults</span><span class="p">,</span> <span class="n">interface</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">failure_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A workflow template encapsulates all the task, branch, and subworkflow nodes to run a statically analyzable,</span>
 <span class="sd">        directed acyclic graph. It contains also metadata that tells the system how to execute the workflow (i.e.</span>
@@ -794,7 +807,7 @@
             <span class="n">interface</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">],</span>
             <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">],</span>
-            <span class="n">failure_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">failure_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">failure_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">failure_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">failure_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">failure_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="WorkflowTemplate.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -810,12 +823,11 @@
             <span class="n">interface</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">interface</span><span class="p">),</span>
             <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">nodes</span><span class="p">],</span>
             <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">_Binding</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">outputs</span><span class="p">],</span>
-            <span class="n">failure_node</span><span class="o">=</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">failure_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;failure_node&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">failure_node</span><span class="o">=</span><span class="n">Node</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">failure_node</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;failure_node&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Alias"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.Alias">[docs]</a><span class="k">class</span> <span class="nc">Alias</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">alias</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Links a variable to an alias.</span>

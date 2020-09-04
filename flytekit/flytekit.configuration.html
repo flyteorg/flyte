@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.configuration package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.configuration package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -207,6 +207,15 @@ string.</p>
 <dt id="flytekit.configuration.auth.KUBERNETES_SERVICE_ACCOUNT">
 <code class="sig-prename descclassname">flytekit.configuration.auth.</code><code class="sig-name descname">KUBERNETES_SERVICE_ACCOUNT</code><em class="property"> = &lt;flytekit.configuration.common.FlyteStringConfigurationEntry object&gt;</em><a class="headerlink" href="#flytekit.configuration.auth.KUBERNETES_SERVICE_ACCOUNT" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is the kubernetes service account that will be passed to workflow executions.</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="flytekit.configuration.auth.RAW_OUTPUT_DATA_PREFIX">
+<code class="sig-prename descclassname">flytekit.configuration.auth.</code><code class="sig-name descname">RAW_OUTPUT_DATA_PREFIX</code><em class="property"> = &lt;flytekit.configuration.common.FlyteStringConfigurationEntry object&gt;</em><a class="headerlink" href="#flytekit.configuration.auth.RAW_OUTPUT_DATA_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is not output metadata but rather where users can specify an S3 or gcs path for offloaded data like blobs
+and schemas.</p>
+<p>The reason this setting is in this file is because it’s inextricably tied to a workflow’s role or service account,
+since that is what ultimately gives the tasks the ability to write to certain buckets.</p>
 </dd></dl>
 
 </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.raw &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.clients.raw &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,22 +162,24 @@
   <h1>Source code for flytekit.clients.raw</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">insecure_channel</span> <span class="k">as</span> <span class="n">_insecure_channel</span><span class="p">,</span> <span class="n">secure_channel</span> <span class="k">as</span> <span class="n">_secure_channel</span><span class="p">,</span> <span class="n">RpcError</span> <span class="k">as</span> <span class="n">_RpcError</span><span class="p">,</span> \
-    <span class="n">StatusCode</span> <span class="k">as</span> <span class="n">_GrpcStatusCode</span><span class="p">,</span> <span class="n">ssl_channel_credentials</span> <span class="k">as</span> <span class="n">_ssl_channel_credentials</span>
-<span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">MessageToJson</span> <span class="k">as</span> <span class="n">_MessageToJson</span>
-<span class="kn">from</span> <span class="nn">flyteidl.service</span> <span class="k">import</span> <span class="n">admin_pb2_grpc</span> <span class="k">as</span> <span class="n">_admin_service</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration.platform</span> <span class="k">import</span> <span class="n">AUTH</span> <span class="k">as</span> <span class="n">_AUTH</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration.creds</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">CLIENT_ID</span> <span class="k">as</span> <span class="n">_CLIENT_ID</span><span class="p">,</span>
-    <span class="n">CLIENT_CREDENTIALS_SCOPE</span> <span class="k">as</span> <span class="n">_SCOPE</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container</span> <span class="k">import</span> <span class="n">basic_auth</span> <span class="k">as</span> <span class="n">_basic_auth</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">creds</span> <span class="k">as</span> <span class="n">_creds_config</span><span class="p">,</span> <span class="n">platform</span> <span class="k">as</span> <span class="n">_platform_config</span>
+<span class="kn">from</span> <span class="nn">flyteidl.service</span> <span class="k">import</span> <span class="n">admin_pb2_grpc</span> <span class="k">as</span> <span class="n">_admin_service</span>
+<span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">MessageToJson</span> <span class="k">as</span> <span class="n">_MessageToJson</span>
+<span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">RpcError</span> <span class="k">as</span> <span class="n">_RpcError</span>
+<span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">StatusCode</span> <span class="k">as</span> <span class="n">_GrpcStatusCode</span>
+<span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">insecure_channel</span> <span class="k">as</span> <span class="n">_insecure_channel</span>
+<span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">secure_channel</span> <span class="k">as</span> <span class="n">_secure_channel</span>
+<span class="kn">from</span> <span class="nn">grpc</span> <span class="k">import</span> <span class="n">ssl_channel_credentials</span> <span class="k">as</span> <span class="n">_ssl_channel_credentials</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.clis.auth</span> <span class="k">import</span> <span class="n">credentials</span> <span class="k">as</span> <span class="n">_credentials_access</span>
+<span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container</span> <span class="k">import</span> <span class="n">basic_auth</span> <span class="k">as</span> <span class="n">_basic_auth</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">creds</span> <span class="k">as</span> <span class="n">_creds_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration.creds</span> <span class="k">import</span> <span class="n">CLIENT_CREDENTIALS_SCOPE</span> <span class="k">as</span> <span class="n">_SCOPE</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration.creds</span> <span class="k">import</span> <span class="n">CLIENT_ID</span> <span class="k">as</span> <span class="n">_CLIENT_ID</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration.platform</span> <span class="k">import</span> <span class="n">AUTH</span> <span class="k">as</span> <span class="n">_AUTH</span>
 
 
 <span class="k">def</span> <span class="nf">_refresh_credentials_standard</span><span class="p">(</span><span class="n">flyte_client</span><span class="p">):</span>
@@ -205,10 +207,10 @@
     <span class="n">auth_endpoints</span> <span class="o">=</span> <span class="n">_credentials_access</span><span class="o">.</span><span class="n">get_authorization_endpoints</span><span class="p">(</span><span class="n">flyte_client</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
     <span class="n">token_endpoint</span> <span class="o">=</span> <span class="n">auth_endpoints</span><span class="o">.</span><span class="n">token_endpoint</span>
     <span class="n">client_secret</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_secret</span><span class="p">()</span>
-    <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Basic authorization flow with client id </span><span class="si">{}</span><span class="s1"> scope </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_CLIENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">_SCOPE</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
+    <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Basic authorization flow with client id </span><span class="si">{}</span><span class="s2"> scope </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">_CLIENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">_SCOPE</span><span class="o">.</span><span class="n">get</span><span class="p">()))</span>
     <span class="n">authorization_header</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_basic_authorization_header</span><span class="p">(</span><span class="n">_CLIENT_ID</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">client_secret</span><span class="p">)</span>
     <span class="n">token</span><span class="p">,</span> <span class="n">expires_in</span> <span class="o">=</span> <span class="n">_basic_auth</span><span class="o">.</span><span class="n">get_token</span><span class="p">(</span><span class="n">token_endpoint</span><span class="p">,</span> <span class="n">authorization_header</span><span class="p">,</span> <span class="n">_SCOPE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
-    <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Retrieved new token, expires in </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expires_in</span><span class="p">))</span>
+    <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrieved new token, expires in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">expires_in</span><span class="p">))</span>
     <span class="n">flyte_client</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 
 
@@ -223,7 +225,8 @@
         <span class="k">return</span> <span class="n">_refresh_credentials_basic</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Invalid auth mode [</span><span class="si">{}</span><span class="s2">] specified. Please update the creds config to use a valid value&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">auth_mode</span><span class="p">))</span>
+            <span class="s2">&quot;Invalid auth mode [</span><span class="si">{}</span><span class="s2">] specified. Please update the creds config to use a valid value&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">auth_mode</span><span class="p">)</span>
+        <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_handle_rpc_error</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
@@ -253,6 +256,7 @@
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteEntityAlreadyExistsException</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span>
+
     <span class="k">return</span> <span class="n">handler</span>
 
 
@@ -298,9 +302,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="n">_insecure_channel</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">((</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_channel</span> <span class="o">=</span> <span class="n">_secure_channel</span><span class="p">(</span>
-                <span class="n">url</span><span class="p">,</span>
-                <span class="n">credentials</span> <span class="ow">or</span> <span class="n">_ssl_channel_credentials</span><span class="p">(),</span>
-                <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">((</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                <span class="n">url</span><span class="p">,</span> <span class="n">credentials</span> <span class="ow">or</span> <span class="n">_ssl_channel_credentials</span><span class="p">(),</span> <span class="n">options</span><span class="o">=</span><span class="nb">list</span><span class="p">((</span><span class="n">options</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()),</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span> <span class="o">=</span> <span class="n">_admin_service</span><span class="o">.</span><span class="n">AdminServiceStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_channel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="kc">None</span>
@@ -314,7 +316,7 @@
 <div class="viewcode-block" id="RawSynchronousFlyteClient.set_access_token"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.set_access_token">[docs]</a>    <span class="k">def</span> <span class="nf">set_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">access_token</span><span class="p">):</span>
         <span class="c1"># Always set the header to lower-case regardless of what the config is. The grpc libraries that Admin uses</span>
         <span class="c1"># to parse the metadata don&#39;t change the metadata, but they do automatically lower the key you&#39;re looking for.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="p">[(</span><span class="n">_creds_config</span><span class="o">.</span><span class="n">AUTHORIZATION_METADATA_KEY</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s2">&quot;Bearer </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">access_token</span><span class="p">))]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="p">[(</span><span class="n">_creds_config</span><span class="o">.</span><span class="n">AUTHORIZATION_METADATA_KEY</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="s2">&quot;Bearer </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">access_token</span><span class="p">),)]</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.force_auth_flow"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.force_auth_flow">[docs]</a>    <span class="k">def</span> <span class="nf">force_auth_flow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">refresh_handler_fn</span> <span class="o">=</span> <span class="n">_get_refresh_handler</span><span class="p">(</span><span class="n">_creds_config</span><span class="o">.</span><span class="n">AUTH_MODE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
@@ -766,20 +768,48 @@
     <span class="k">def</span> <span class="nf">update_project_domain_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_domain_attributes_update_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This updates the attributes for a project and domain registered with the Flyte Admin Service</span>
-<span class="sd">        :param flyteidl.admin..ProjectDomainAttributesUpdateRequest project_domain_attributes_update_request:</span>
-<span class="sd">        :rtype: flyteidl.admin..ProjectDomainAttributesUpdateResponse</span>
+<span class="sd">        :param flyteidl.admin.ProjectDomainAttributesUpdateRequest project_domain_attributes_update_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.ProjectDomainAttributesUpdateResponse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateProjectDomainAttributes</span><span class="p">(</span><span class="n">project_domain_attributes_update_request</span><span class="p">,</span>
-                                                        <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateProjectDomainAttributes</span><span class="p">(</span>
+            <span class="n">project_domain_attributes_update_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="RawSynchronousFlyteClient.update_workflow_attributes"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.update_workflow_attributes">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
     <span class="k">def</span> <span class="nf">update_workflow_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_attributes_update_request</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This updates the attributes for a project, domain, and workflow registered with the Flyte Admin Service</span>
-<span class="sd">        :param flyteidl.admin..UpdateWorkflowAttributes workflow_attributes_update_request:</span>
-<span class="sd">        :rtype: flyteidl.admin..workflow_attributes_update_requestResponse</span>
+<span class="sd">        :param flyteidl.admin.UpdateWorkflowAttributesRequest workflow_attributes_update_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.WorkflowAttributesUpdateResponse</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateWorkflowAttributes</span><span class="p">(</span><span class="n">workflow_attributes_update_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">UpdateWorkflowAttributes</span><span class="p">(</span><span class="n">workflow_attributes_update_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_project_domain_attributes"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_project_domain_attributes">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_project_domain_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_domain_attributes_get_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This fetches the attributes for a project and domain registered with the Flyte Admin Service</span>
+<span class="sd">        :param flyteidl.admin.ProjectDomainAttributesGetRequest project_domain_attributes_get_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.ProjectDomainAttributesGetResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetProjectDomainAttributes</span><span class="p">(</span><span class="n">project_domain_attributes_get_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.get_workflow_attributes"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_workflow_attributes">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">get_workflow_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_attributes_get_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This fetches the attributes for a project, domain, and workflow registered with the Flyte Admin Service</span>
+<span class="sd">        :param flyteidl.admin.GetWorkflowAttributesAttributesRequest workflow_attributes_get_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.WorkflowAttributesGetResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">GetWorkflowAttributes</span><span class="p">(</span><span class="n">workflow_attributes_get_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RawSynchronousFlyteClient.list_matchable_attributes"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_matchable_attributes">[docs]</a>    <span class="nd">@_handle_rpc_error</span>
+    <span class="k">def</span> <span class="nf">list_matchable_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">matchable_attributes_list_request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This fetches the attributes for a specific resource type registered with the Flyte Admin Service</span>
+<span class="sd">        :param flyteidl.admin.ListMatchableAttributesRequest matchable_attributes_list_request:</span>
+<span class="sd">        :rtype: flyteidl.admin.ListMatchableAttributesResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stub</span><span class="o">.</span><span class="n">ListMatchableAttributes</span><span class="p">(</span><span class="n">matchable_attributes_list_request</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span><span class="p">)</span></div></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>

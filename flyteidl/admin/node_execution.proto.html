@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>node_execution.proto &mdash; Flyte 0.6.0 documentation</title>
+  <title>node_execution.proto &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -207,7 +207,7 @@
 <span id="api-file-flyteidl-admin-node-execution-proto"></span><h1>node_execution.proto<a class="headerlink" href="#node-execution-proto" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="flyteidl-admin-nodeexecutiongetrequest">
 <span id="api-msg-flyteidl-admin-nodeexecutiongetrequest"></span><h2>flyteidl.admin.NodeExecutionGetRequest<a class="headerlink" href="#flyteidl-admin-nodeexecutiongetrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L13">[flyteidl.admin.NodeExecutionGetRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L14">[flyteidl.admin.NodeExecutionGetRequest proto]</a></p>
 <p>A message used to fetch a single node execution entity.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -221,7 +221,7 @@
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutionlistrequest">
 <span id="api-msg-flyteidl-admin-nodeexecutionlistrequest"></span><h2>flyteidl.admin.NodeExecutionListRequest<a class="headerlink" href="#flyteidl-admin-nodeexecutionlistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L20">[flyteidl.admin.NodeExecutionListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L21">[flyteidl.admin.NodeExecutionListRequest proto]</a></p>
 <p>Represents a request structure to retrieve a list of node execution entities.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;workflow_execution_id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -266,7 +266,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutionfortasklistrequest">
 <span id="api-msg-flyteidl-admin-nodeexecutionfortasklistrequest"></span><h2>flyteidl.admin.NodeExecutionForTaskListRequest<a class="headerlink" href="#flyteidl-admin-nodeexecutionfortasklistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L45">[flyteidl.admin.NodeExecutionForTaskListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L46">[flyteidl.admin.NodeExecutionForTaskListRequest proto]</a></p>
 <p>Represents a request structure to retrieve a list of node execution entities launched by a specific task.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;task_execution_id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
@@ -305,7 +305,7 @@ More info on constructing filters : &lt;Link&gt;
 </div>
 <div class="section" id="flyteidl-admin-nodeexecution">
 <span id="api-msg-flyteidl-admin-nodeexecution"></span><h2>flyteidl.admin.NodeExecution<a class="headerlink" href="#flyteidl-admin-nodeexecution" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L69">[flyteidl.admin.NodeExecution proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L70">[flyteidl.admin.NodeExecution proto]</a></p>
 <p>Encapsulates all details for a single node execution entity.
 A node represents a component in the overall workflow graph. A node launch a task, multiple tasks, an entire nested
 sub-workflow, or even a separate child-workflow execution.
@@ -337,7 +337,7 @@ The same task can be called repeatedly in a single workflow but each node is uni
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutionmetadata">
 <span id="api-msg-flyteidl-admin-nodeexecutionmetadata"></span><h2>flyteidl.admin.NodeExecutionMetaData<a class="headerlink" href="#flyteidl-admin-nodeexecutionmetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L85">[flyteidl.admin.NodeExecutionMetaData proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L86">[flyteidl.admin.NodeExecutionMetaData proto]</a></p>
 <p>Represents additional attributes related to a Node Execution</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;retry_group&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -363,7 +363,7 @@ This maps to value of WorkflowTemplate.nodes[X].id</p>
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutionlist">
 <span id="api-msg-flyteidl-admin-nodeexecutionlist"></span><h2>flyteidl.admin.NodeExecutionList<a class="headerlink" href="#flyteidl-admin-nodeexecutionlist" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L99">[flyteidl.admin.NodeExecutionList proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L100">[flyteidl.admin.NodeExecutionList proto]</a></p>
 <p>Request structure to retrieve a list of node execution entities.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;node_executions&quot;</span><span class="p">:</span> <span class="p">[],</span>
@@ -383,7 +383,7 @@ in a query. If there are no more results, this value will be empty.</p>
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutionclosure">
 <span id="api-msg-flyteidl-admin-nodeexecutionclosure"></span><h2>flyteidl.admin.NodeExecutionClosure<a class="headerlink" href="#flyteidl-admin-nodeexecutionclosure" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L108">[flyteidl.admin.NodeExecutionClosure proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L109">[flyteidl.admin.NodeExecutionClosure proto]</a></p>
 <p>Container for node execution details and results.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;output_uri&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -447,7 +447,7 @@ for ex: if this is a workflow node, we store information for the launched workfl
 </div>
 <div class="section" id="flyteidl-admin-workflownodemetadata">
 <span id="api-msg-flyteidl-admin-workflownodemetadata"></span><h2>flyteidl.admin.WorkflowNodeMetadata<a class="headerlink" href="#flyteidl-admin-workflownodemetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L141">[flyteidl.admin.WorkflowNodeMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L142">[flyteidl.admin.WorkflowNodeMetadata proto]</a></p>
 <p>Metadata for a WorkflowNode</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;executionId&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -461,7 +461,7 @@ for ex: if this is a workflow node, we store information for the launched workfl
 </div>
 <div class="section" id="flyteidl-admin-tasknodemetadata">
 <span id="api-msg-flyteidl-admin-tasknodemetadata"></span><h2>flyteidl.admin.TaskNodeMetadata<a class="headerlink" href="#flyteidl-admin-tasknodemetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L146">[flyteidl.admin.TaskNodeMetadata proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L147">[flyteidl.admin.TaskNodeMetadata proto]</a></p>
 <p>Metadata for the case in which the node is a TaskNode</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;cache_status&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
@@ -480,7 +480,7 @@ for ex: if this is a workflow node, we store information for the launched workfl
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutiongetdatarequest">
 <span id="api-msg-flyteidl-admin-nodeexecutiongetdatarequest"></span><h2>flyteidl.admin.NodeExecutionGetDataRequest<a class="headerlink" href="#flyteidl-admin-nodeexecutiongetdatarequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L154">[flyteidl.admin.NodeExecutionGetDataRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L155">[flyteidl.admin.NodeExecutionGetDataRequest proto]</a></p>
 <p>Request structure to fetch inputs and output urls for a node execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
@@ -494,11 +494,13 @@ for ex: if this is a workflow node, we store information for the launched workfl
 </div>
 <div class="section" id="flyteidl-admin-nodeexecutiongetdataresponse">
 <span id="api-msg-flyteidl-admin-nodeexecutiongetdataresponse"></span><h2>flyteidl.admin.NodeExecutionGetDataResponse<a class="headerlink" href="#flyteidl-admin-nodeexecutiongetdataresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L160">[flyteidl.admin.NodeExecutionGetDataResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L161">[flyteidl.admin.NodeExecutionGetDataResponse proto]</a></p>
 <p>Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;full_inputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;full_outputs&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -508,6 +510,14 @@ for ex: if this is a workflow node, we store information for the launched workfl
 </dl>
 <dl class="simple" id="api-field-flyteidl-admin-nodeexecutiongetdataresponse-outputs">
 <dt>outputs</dt><dd><p>(<a class="reference internal" href="common.proto.html#api-msg-flyteidl-admin-urlblob"><span class="std std-ref">flyteidl.admin.UrlBlob</span></a>) Signed url to fetch a core.LiteralMap of node execution outputs.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-nodeexecutiongetdataresponse-full-inputs">
+<dt>full_inputs</dt><dd><p>(<a class="reference internal" href="../core/literals.proto.html#api-msg-flyteidl-core-literalmap"><span class="std std-ref">flyteidl.core.LiteralMap</span></a>) Optional, full_inputs will only be populated if they are under a configured size threshold.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-field-flyteidl-admin-nodeexecutiongetdataresponse-full-outputs">
+<dt>full_outputs</dt><dd><p>(<a class="reference internal" href="../core/literals.proto.html#api-msg-flyteidl-core-literalmap"><span class="std std-ref">flyteidl.core.LiteralMap</span></a>) Optional, full_outputs will only be populated if they are under a configured size threshold.</p>
 </dd>
 </dl>
 </div>

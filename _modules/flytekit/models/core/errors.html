@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.errors &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core.errors &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,12 +161,13 @@
             
   <h1>Source code for flytekit.models.core.errors</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">errors_pb2</span> <span class="k">as</span> <span class="n">_errors_pb2</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 
 
 <div class="viewcode-block" id="ContainerError"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.errors.ContainerError">[docs]</a><span class="k">class</span> <span class="nc">ContainerError</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="ContainerError.Kind"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.errors.ContainerError.Kind">[docs]</a>    <span class="k">class</span> <span class="nc">Kind</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="n">NON_RECOVERABLE</span> <span class="o">=</span> <span class="n">_errors_pb2</span><span class="o">.</span><span class="n">ContainerError</span><span class="o">.</span><span class="n">NON_RECOVERABLE</span>
         <span class="n">RECOVERABLE</span> <span class="o">=</span> <span class="n">_errors_pb2</span><span class="o">.</span><span class="n">ContainerError</span><span class="o">.</span><span class="n">RECOVERABLE</span></div>
@@ -218,7 +219,6 @@
 
 
 <div class="viewcode-block" id="ErrorDocument"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.errors.ErrorDocument">[docs]</a><span class="k">class</span> <span class="nc">ErrorDocument</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ContainerError error:</span>

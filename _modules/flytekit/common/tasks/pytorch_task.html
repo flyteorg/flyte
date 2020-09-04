@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.pytorch_task &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.pytorch_task &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,22 +162,13 @@
   <h1>Source code for flytekit.common.tasks.pytorch_task</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getfullargspec</span> <span class="k">as</span> <span class="n">_getargspec</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getargspec</span> <span class="k">as</span> <span class="n">_getargspec</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span><span class="p">,</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
 <span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">MessageToDict</span> <span class="k">as</span> <span class="n">_MessageToDict</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
 
 
 <div class="viewcode-block" id="SdkRunnablePytorchContainer"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer">[docs]</a><span class="k">class</span> <span class="nc">SdkRunnablePytorchContainer</span><span class="p">(</span><span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableContainer</span><span class="p">):</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -186,31 +177,30 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_args</span></div>
 
+
 <div class="viewcode-block" id="SdkPyTorchTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.pytorch_task.SdkPyTorchTask">[docs]</a><span class="k">class</span> <span class="nc">SdkPyTorchTask</span><span class="p">(</span><span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">task_function</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">interruptible</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">workers_count</span><span class="p">,</span>
-            <span class="n">per_replica_storage_request</span><span class="p">,</span>
-            <span class="n">per_replica_cpu_request</span><span class="p">,</span>
-            <span class="n">per_replica_gpu_request</span><span class="p">,</span>
-            <span class="n">per_replica_memory_request</span><span class="p">,</span>
-            <span class="n">per_replica_storage_limit</span><span class="p">,</span>
-            <span class="n">per_replica_cpu_limit</span><span class="p">,</span>
-            <span class="n">per_replica_gpu_limit</span><span class="p">,</span>
-            <span class="n">per_replica_memory_limit</span><span class="p">,</span>
-            <span class="n">environment</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">workers_count</span><span class="p">,</span>
+        <span class="n">per_replica_storage_request</span><span class="p">,</span>
+        <span class="n">per_replica_cpu_request</span><span class="p">,</span>
+        <span class="n">per_replica_gpu_request</span><span class="p">,</span>
+        <span class="n">per_replica_memory_request</span><span class="p">,</span>
+        <span class="n">per_replica_storage_limit</span><span class="p">,</span>
+        <span class="n">per_replica_cpu_limit</span><span class="p">,</span>
+        <span class="n">per_replica_gpu_limit</span><span class="p">,</span>
+        <span class="n">per_replica_memory_limit</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="n">pytorch_job</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">PyTorchJob</span><span class="p">(</span>
-            <span class="n">workers_count</span><span class="o">=</span><span class="n">workers_count</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+        <span class="n">pytorch_job</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">PyTorchJob</span><span class="p">(</span><span class="n">workers_count</span><span class="o">=</span><span class="n">workers_count</span><span class="p">)</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkPyTorchTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">task_function</span><span class="o">=</span><span class="n">task_function</span><span class="p">,</span>
             <span class="n">task_type</span><span class="o">=</span><span class="n">task_type</span><span class="p">,</span>
@@ -229,13 +219,10 @@
             <span class="n">discoverable</span><span class="o">=</span><span class="n">discoverable</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
             <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-            <span class="n">custom</span><span class="o">=</span><span class="n">_MessageToDict</span><span class="p">(</span><span class="n">pytorch_job</span><span class="p">)</span>
+            <span class="n">custom</span><span class="o">=</span><span class="n">_MessageToDict</span><span class="p">(</span><span class="n">pytorch_job</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: SdkRunnablePytorchContainer</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.types &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core.types &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -200,10 +200,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.types_pb2.BlobType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">BlobType</span><span class="p">(</span>
-            <span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
-            <span class="n">dimensionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_types_pb2</span><span class="o">.</span><span class="n">BlobType</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">dimensionality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BlobType.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.types.BlobType.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">proto</span><span class="p">):</span>
@@ -211,10 +208,7 @@
 <span class="sd">        :param flyteidl.core.types_pb2.BlobType proto:</span>
 <span class="sd">        :rtype: BlobType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="nb">format</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">format</span><span class="p">,</span>
-            <span class="n">dimensionality</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">dimensionality</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">format</span><span class="p">,</span> <span class="n">dimensionality</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">dimensionality</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

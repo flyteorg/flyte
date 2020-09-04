@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.clients package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -387,6 +387,16 @@ error if no active launch plan exists.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_project_domain_attributes">
+<code class="sig-name descname">get_project_domain_attributes</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">resource_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_project_domain_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_project_domain_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the custom attributes set for a project and domain combination.
+:param Text project:
+:param Text domain:
+:param flytekit.models.MatchableResource resource_type:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_task">
 <code class="sig-name descname">get_task</code><span class="sig-paren">(</span><em class="sig-param">id</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>This returns a single task for a given identifier.</p>
@@ -445,6 +455,17 @@ error if no active launch plan exists.</p>
 <dd class="field-odd"><p><a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow" title="flytekit.models.admin.workflow.Workflow">flytekit.models.admin.workflow.Workflow</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.get_workflow_attributes">
+<code class="sig-name descname">get_workflow_attributes</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">workflow</em>, <em class="sig-param">resource_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.get_workflow_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.get_workflow_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the custom attributes set for a project, domain, and workflow combination.
+:param Text project:
+:param Text domain:
+:param Text workflow:
+:param flytekit.models.MatchableResource resource_type:
+:return:</p>
 </dd></dl>
 
 <dl class="method">
@@ -605,6 +626,14 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.launch_plan.LaunchPlan" title="flytekit.models.launch_plan.LaunchPlan">flytekit.models.launch_plan.LaunchPlan</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.list_matchable_attributes">
+<code class="sig-name descname">list_matchable_attributes</code><span class="sig-paren">(</span><em class="sig-param">resource_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.list_matchable_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.list_matchable_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches all custom attributes for a resource type.
+:param flytekit.models.MatchableResource resource_type:
+:return:</p>
 </dd></dl>
 
 <dl class="method">
@@ -1050,6 +1079,15 @@ be explicit as opposed to inferred from the environment or a configuration file.
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_project_domain_attributes">
+<code class="sig-name descname">get_project_domain_attributes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_project_domain_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_project_domain_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
+:param args:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_task">
 <code class="sig-name descname">get_task</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
@@ -1086,6 +1124,15 @@ be explicit as opposed to inferred from the environment or a configuration file.
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.get_workflow_attributes">
+<code class="sig-name descname">get_workflow_attributes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.get_workflow_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.get_workflow_attributes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
+:param args:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_active_launch_plans_paginated">
 <code class="sig-name descname">list_active_launch_plans_paginated</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_active_launch_plans_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_active_launch_plans_paginated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
@@ -1115,6 +1162,15 @@ be explicit as opposed to inferred from the environment or a configuration file.
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_launch_plans_paginated">
 <code class="sig-name descname">list_launch_plans_paginated</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_launch_plans_paginated"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_launch_plans_paginated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
+:param args:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.list_matchable_attributes">
+<code class="sig-name descname">list_matchable_attributes</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.list_matchable_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.list_matchable_attributes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
 :param args:
 :param kwargs:

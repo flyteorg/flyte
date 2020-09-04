@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.interfaces.data.gcs package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.interfaces.data.gcs package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -202,7 +202,7 @@
 <span id="flytekit-interfaces-data-gcs-gcs-proxy-module"></span><h2>flytekit.interfaces.data.gcs.gcs_proxy module<a class="headerlink" href="#module-flytekit.interfaces.data.gcs.gcs_proxy" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.interfaces.data.gcs.gcs_proxy.</code><code class="sig-name descname">GCSProxy</code><a class="reference internal" href="../_modules/flytekit/interfaces/data/gcs/gcs_proxy.html#GCSProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.interfaces.data.gcs.gcs_proxy.</code><code class="sig-name descname">GCSProxy</code><span class="sig-paren">(</span><em class="sig-param">raw_output_data_prefix_override: str = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/interfaces/data/gcs/gcs_proxy.html#GCSProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.interfaces.data.html#flytekit.interfaces.data.common.DataProxy" title="flytekit.interfaces.data.common.DataProxy"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.interfaces.data.common.DataProxy</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.download">
@@ -255,13 +255,15 @@
 
 <dl class="method">
 <dt id="flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.get_random_path">
-<code class="sig-name descname">get_random_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/interfaces/data/gcs/gcs_proxy.html#GCSProxy.get_random_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.get_random_path" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Text</p>
-</dd>
-</dl>
+<code class="sig-name descname">get_random_path</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/interfaces/data/gcs/gcs_proxy.html#GCSProxy.get_random_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.get_random_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>If this object was created with a raw output data prefix, usually set by Propeller/Plugins at execution time
+and piped all the way here, it will be used instead of referencing the GCS_PREFIX configuration.</p>
 </dd></dl>
+
+<dl class="method">
+<dt id="flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.raw_output_data_prefix_override">
+<em class="property">property </em><code class="sig-name descname">raw_output_data_prefix_override</code><a class="headerlink" href="#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.raw_output_data_prefix_override" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.upload">

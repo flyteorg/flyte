@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.interfaces.stats package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.interfaces.stats package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -198,6 +198,13 @@
 </div>
 <div class="section" id="module-flytekit.interfaces.stats.client">
 <span id="flytekit-interfaces-stats-client-module"></span><h2>flytekit.interfaces.stats.client module<a class="headerlink" href="#module-flytekit.interfaces.stats.client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.interfaces.stats.client.DummyStatsClient">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.interfaces.stats.client.</code><code class="sig-name descname">DummyStatsClient</code><span class="sig-paren">(</span><em class="sig-param">host='localhost'</em>, <em class="sig-param">port=8125</em>, <em class="sig-param">prefix=None</em>, <em class="sig-param">maxudpsize=512</em>, <em class="sig-param">ipv6=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/interfaces/stats/client.html#DummyStatsClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.stats.client.DummyStatsClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">statsd.client.udp.StatsClient</span></code></p>
+<p>A dummy client for statsd.</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="flytekit.interfaces.stats.client.ScopeableStatsProxy">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.interfaces.stats.client.</code><code class="sig-name descname">ScopeableStatsProxy</code><span class="sig-paren">(</span><em class="sig-param">client</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/interfaces/stats/client.html#ScopeableStatsProxy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.interfaces.stats.client.ScopeableStatsProxy" title="Permalink to this definition">¶</a></dt>

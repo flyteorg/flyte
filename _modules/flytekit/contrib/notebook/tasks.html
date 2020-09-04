@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.contrib.notebook.tasks &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.contrib.notebook.tasks &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -160,49 +160,59 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.contrib.notebook.tasks</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
-<span class="kn">import</span> <span class="nn">papermill</span> <span class="k">as</span> <span class="nn">_pm</span>
-<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">text_format</span> <span class="k">as</span> <span class="n">_text_format</span><span class="p">,</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
 <span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importlib</span>
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
+<span class="kn">import</span> <span class="nn">inspect</span> <span class="k">as</span> <span class="nn">_inspect</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">sys</span> <span class="k">as</span> <span class="nn">_sys</span>
+
+<span class="kn">import</span> <span class="nn">papermill</span> <span class="k">as</span> <span class="nn">_pm</span>
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">text_format</span> <span class="k">as</span> <span class="n">_text_format</span>
+
 <span class="kn">from</span> <span class="nn">flytekit</span> <span class="k">import</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">flytekit.bin</span> <span class="k">import</span> <span class="n">entrypoint</span> <span class="k">as</span> <span class="n">_entrypoint</span>
-<span class="kn">from</span> <span class="nn">flytekit.sdk.types</span> <span class="k">import</span> <span class="n">Types</span> <span class="k">as</span> <span class="n">_Types</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span><span class="p">,</span> <span class="n">primitives</span> <span class="k">as</span> <span class="n">_primitives</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface2</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span><span class="p">,</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span><span class="p">,</span> <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_spark_task</span><span class="p">,</span>\
-    <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_tasks</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
-<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">import</span> <span class="nn">inspect</span> <span class="k">as</span> <span class="nn">_inspect</span>
-<span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span> <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface2</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">spark_task</span> <span class="k">as</span> <span class="n">_spark_task</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_tasks</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.contrib.notebook.supported_types</span> <span class="k">import</span> <span class="n">notebook_types_map</span> <span class="k">as</span> <span class="n">_notebook_types_map</span>
+<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.sdk.spark_types</span> <span class="k">import</span> <span class="n">SparkType</span> <span class="k">as</span> <span class="n">_spark_type</span>
+<span class="kn">from</span> <span class="nn">flytekit.sdk.types</span> <span class="k">import</span> <span class="n">Types</span> <span class="k">as</span> <span class="n">_Types</span>
 
-<span class="n">OUTPUT_NOTEBOOK</span> <span class="o">=</span> <span class="s1">&#39;output_notebook&#39;</span>
+<span class="n">OUTPUT_NOTEBOOK</span> <span class="o">=</span> <span class="s2">&quot;output_notebook&quot;</span>
+
+
 <div class="viewcode-block" id="python_notebook"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.notebook.html#flytekit.contrib.notebook.tasks.python_notebook">[docs]</a><span class="k">def</span> <span class="nf">python_notebook</span><span class="p">(</span>
-        <span class="n">notebook_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">{},</span>
-        <span class="n">outputs</span><span class="o">=</span><span class="p">{},</span>
-        <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-        <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-        <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">memory_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">storage_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">cpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-
+    <span class="n">notebook_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">cache_version</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">deprecated</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">memory_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">storage_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to create a Python Notebook Task definition.</span>
@@ -210,25 +220,26 @@
 <span class="sd">    :rtype: SdkNotebookTask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SdkNotebookTask</span><span class="p">(</span>
-            <span class="n">notebook_path</span><span class="o">=</span><span class="n">notebook_path</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="o">=</span><span class="n">_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTHON_TASK</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="o">=</span><span class="n">gpu_request</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="o">=</span><span class="n">memory_request</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="o">=</span><span class="n">storage_limit</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="o">=</span><span class="n">cpu_limit</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="o">=</span><span class="n">gpu_limit</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="o">=</span><span class="n">memory_limit</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-            <span class="n">custom</span><span class="o">=</span><span class="p">{})</span></div>
+        <span class="n">notebook_path</span><span class="o">=</span><span class="n">notebook_path</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="o">=</span><span class="n">_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTHON_TASK</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="o">=</span><span class="n">storage_request</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="o">=</span><span class="n">cpu_request</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="o">=</span><span class="n">gpu_request</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="o">=</span><span class="n">memory_request</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="o">=</span><span class="n">storage_limit</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="o">=</span><span class="n">cpu_limit</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="o">=</span><span class="n">gpu_limit</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="o">=</span><span class="n">memory_limit</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+        <span class="n">custom</span><span class="o">=</span><span class="p">{},</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SdkNotebookTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.notebook.html#flytekit.contrib.notebook.tasks.SdkNotebookTask">[docs]</a><span class="k">class</span> <span class="nc">SdkNotebookTask</span><span class="p">(</span><span class="n">_base_tasks</span><span class="o">.</span><span class="n">SdkTask</span><span class="p">):</span>
@@ -239,26 +250,26 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">notebook_path</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">environment</span><span class="p">,</span>
-            <span class="n">custom</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">notebook_path</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">,</span>
+        <span class="n">custom</span><span class="p">,</span>
     <span class="p">):</span>
 
         <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">notebook_path</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -274,15 +285,13 @@
             <span class="n">_task_models</span><span class="o">.</span><span class="n">TaskMetadata</span><span class="p">(</span>
                 <span class="n">discoverable</span><span class="p">,</span>
                 <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="o">.</span><span class="n">RuntimeType</span><span class="o">.</span><span class="n">FLYTE_SDK</span><span class="p">,</span>
-                    <span class="n">__version__</span><span class="p">,</span>
-                    <span class="s1">&#39;notebook&#39;</span>
+                    <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="o">.</span><span class="n">RuntimeType</span><span class="o">.</span><span class="n">FLYTE_SDK</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span> <span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">timeout</span><span class="p">,</span>
                 <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="n">retries</span><span class="p">),</span>
                 <span class="kc">False</span><span class="p">,</span>
                 <span class="n">discovery_version</span><span class="p">,</span>
-                <span class="n">deprecated</span>
+                <span class="n">deprecated</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">_interface2</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">({},</span> <span class="p">{}),</span>
             <span class="n">custom</span><span class="p">,</span>
@@ -295,8 +304,8 @@
                 <span class="n">cpu_limit</span><span class="o">=</span><span class="n">cpu_limit</span><span class="p">,</span>
                 <span class="n">gpu_limit</span><span class="o">=</span><span class="n">gpu_limit</span><span class="p">,</span>
                 <span class="n">memory_limit</span><span class="o">=</span><span class="n">memory_limit</span><span class="p">,</span>
-                <span class="n">environment</span><span class="o">=</span><span class="n">environment</span>
-            <span class="p">)</span>
+                <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
+            <span class="p">),</span>
         <span class="p">)</span>
         <span class="c1"># Add Inputs</span>
         <span class="k">if</span> <span class="n">inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -307,8 +316,9 @@
             <span class="n">outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="c1"># Add a Notebook output as a Blob.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">output_notebook</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">_Types</span><span class="o">.</span><span class="n">Blob</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">OUTPUT_NOTEBOOK</span><span class="p">))</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">output_notebook</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">_Types</span><span class="o">.</span><span class="n">Blob</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">OUTPUT_NOTEBOOK</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_validate_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -316,7 +326,7 @@
 <span class="sd">        :raises: flytekit.common.exceptions.user.FlyteValidationException</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
-            <span class="n">sdk_type</span> <span class="o">=</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+            <span class="n">sdk_type</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sdk_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_notebook_types_map</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValidationException</span><span class="p">(</span>
                     <span class="s2">&quot;Input Type &#39;</span><span class="si">{}</span><span class="s2">&#39; not supported.  Only Primitives are supported for notebook.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">)</span>
@@ -335,7 +345,8 @@
 
             <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">OUTPUT_NOTEBOOK</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is a reserved output keyword. Please use a different output name.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OUTPUT_NOTEBOOK</span><span class="p">))</span>
+                    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is a reserved output keyword. Please use a different output name.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">OUTPUT_NOTEBOOK</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="n">sdk_type</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sdk_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_notebook_types_map</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -374,11 +385,18 @@
 <span class="sd">        :returns: Depends on the behavior of the specific task in the unit engine.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span><span class="n">input_map</span><span class="p">,</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="p">})</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s2">&quot;unit&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
+                    <span class="n">input_map</span><span class="p">,</span>
+                    <span class="p">{</span>
+                        <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkNotebookTask.local_execute"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.notebook.html#flytekit.contrib.notebook.tasks.SdkNotebookTask.local_execute">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -389,11 +407,18 @@
 <span class="sd">        :rtype: dict[Text, T]</span>
 <span class="sd">        :returns: The output produced by this task in Python standard format.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s1">&#39;local&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span><span class="n">input_map</span><span class="p">,</span> <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-            <span class="p">})</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">execute</span><span class="p">(</span>
+                <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
+                    <span class="n">input_map</span><span class="p">,</span>
+                    <span class="p">{</span>
+                        <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkNotebookTask.execute"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.notebook.html#flytekit.contrib.notebook.tasks.SdkNotebookTask.execute">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -408,27 +433,24 @@
 <span class="sd">            working directory (with the names provided), which will in turn allow Flyte Propeller to push along the</span>
 <span class="sd">            workflow.  Where as local engine will merely feed the outputs directly into the next node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)},</span>
+        <span class="p">)</span>
 
         <span class="n">input_notebook_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_notebook_path</span>
         <span class="c1"># Execute Notebook via Papermill.</span>
-        <span class="n">output_notebook_path</span> <span class="o">=</span> <span class="n">input_notebook_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.ipynb&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;-out.ipynb&#39;</span>
-        <span class="n">_pm</span><span class="o">.</span><span class="n">execute_notebook</span><span class="p">(</span>
-            <span class="n">input_notebook_path</span><span class="p">,</span>
-            <span class="n">output_notebook_path</span><span class="p">,</span>
-            <span class="n">parameters</span><span class="o">=</span><span class="n">inputs_dict</span>
-        <span class="p">)</span>
+        <span class="n">output_notebook_path</span> <span class="o">=</span> <span class="n">input_notebook_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.ipynb&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;-out.ipynb&quot;</span>
+        <span class="n">_pm</span><span class="o">.</span><span class="n">execute_notebook</span><span class="p">(</span><span class="n">input_notebook_path</span><span class="p">,</span> <span class="n">output_notebook_path</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">inputs_dict</span><span class="p">)</span>
 
         <span class="c1"># Parse Outputs from Notebook.</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_notebook_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">_json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">]:</span>
-                <span class="n">meta</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cells&quot;</span><span class="p">]:</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="s2">&quot;outputs&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">]:</span>
-                    <span class="n">outputs</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s1">&#39;outputs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;text/plain&#39;</span><span class="p">])</span>
+                    <span class="n">outputs</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;text/plain&quot;</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="n">outputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="nb">dict</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">_literals_pb2</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">()</span>
@@ -436,15 +458,14 @@
 
         <span class="c1"># Add output_notebook as an output to the task.</span>
         <span class="n">output_notebook</span> <span class="o">=</span> <span class="n">_task_output</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">(</span>
-            <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_Types</span><span class="o">.</span><span class="n">Blob</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()))</span>
+            <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_Types</span><span class="o">.</span><span class="n">Blob</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">())</span>
+        <span class="p">)</span>
         <span class="n">output_notebook</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">output_notebook_path</span><span class="p">)</span>
 
         <span class="n">output_literal_map</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
         <span class="n">output_literal_map</span><span class="o">.</span><span class="n">literals</span><span class="p">[</span><span class="n">OUTPUT_NOTEBOOK</span><span class="p">]</span> <span class="o">=</span> <span class="n">output_notebook</span><span class="o">.</span><span class="n">sdk_value</span>
 
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">_constants</span><span class="o">.</span><span class="n">OUTPUT_FILE_NAME</span><span class="p">:</span> <span class="n">output_literal_map</span>
-        <span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="n">_constants</span><span class="o">.</span><span class="n">OUTPUT_FILE_NAME</span><span class="p">:</span> <span class="n">output_literal_map</span><span class="p">}</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">container</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -469,21 +490,24 @@
             <span class="s2">&quot;--inputs&quot;</span><span class="p">,</span>
             <span class="s2">&quot;{{.input}}&quot;</span><span class="p">,</span>
             <span class="s2">&quot;--output-prefix&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;{{.outputPrefix}}&quot;</span><span class="p">]</span>
+            <span class="s2">&quot;{{.outputPrefix}}&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;--raw-output-data-prefix&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;{{.rawOutputDataPrefix}}&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_container</span>
 
     <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text storage_request:</span>
@@ -506,61 +530,29 @@
         <span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">storage_request</span><span class="p">:</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span>
-                    <span class="n">storage_request</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_request</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">cpu_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-                    <span class="n">cpu_request</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">gpu_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
-                    <span class="n">gpu_request</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">memory_request</span><span class="p">:</span>
             <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span>
-                    <span class="n">memory_request</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="n">limits</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">storage_limit</span><span class="p">:</span>
             <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span>
-                    <span class="n">storage_limit</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">cpu_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-                    <span class="n">cpu_limit</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_limit</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">gpu_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
-                    <span class="n">gpu_limit</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">memory_limit</span><span class="p">:</span>
             <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                    <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span>
-                    <span class="n">memory_limit</span>
-                <span class="p">)</span>
+                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableContainer</span><span class="p">(</span>
@@ -568,45 +560,45 @@
             <span class="n">args</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">resources</span><span class="o">=</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="p">(</span><span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="n">requests</span><span class="p">),</span>
             <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">{}</span>
+            <span class="n">config</span><span class="o">=</span><span class="p">{},</span>
         <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="spark_notebook"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.notebook.html#flytekit.contrib.notebook.tasks.spark_notebook">[docs]</a><span class="k">def</span> <span class="nf">spark_notebook</span><span class="p">(</span>
-        <span class="n">notebook_path</span><span class="p">,</span>
-        <span class="n">inputs</span><span class="o">=</span><span class="p">{},</span>
-        <span class="n">outputs</span><span class="o">=</span><span class="p">{},</span>
-        <span class="n">spark_conf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">cache_version</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-        <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-        <span class="n">deprecated</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-        <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">notebook_path</span><span class="p">,</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">outputs</span><span class="o">=</span><span class="p">{},</span>
+    <span class="n">spark_conf</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">cache_version</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">retries</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">deprecated</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to create a Notebook spark task. This task will connect to a Spark cluster, configure the environment,</span>
 <span class="sd">    and then execute the code within the notebook_path as the Spark driver program.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SdkNotebookSparkTask</span><span class="p">(</span>
-            <span class="n">notebook_path</span><span class="o">=</span><span class="n">notebook_path</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
-            <span class="n">spark_conf</span><span class="o">=</span><span class="n">spark_conf</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
-            <span class="n">environment</span><span class="o">=</span><span class="n">environment</span> <span class="ow">or</span> <span class="p">{},</span>
-        <span class="p">)</span></div>
+        <span class="n">notebook_path</span><span class="o">=</span><span class="n">notebook_path</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span>
+        <span class="n">spark_conf</span><span class="o">=</span><span class="n">spark_conf</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="o">=</span><span class="n">cache_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="o">=</span><span class="n">retries</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="o">=</span><span class="n">cache</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="n">environment</span><span class="o">=</span><span class="n">environment</span> <span class="ow">or</span> <span class="p">{},</span>
+    <span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_find_instance_module</span><span class="p">():</span>
     <span class="n">frame</span> <span class="o">=</span> <span class="n">_inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span>
     <span class="k">while</span> <span class="n">frame</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s1">&#39;&lt;module&gt;&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s2">&quot;&lt;module&gt;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s2">&quot;__name__&quot;</span><span class="p">]</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span>
     <span class="k">return</span> <span class="kc">None</span>
 
@@ -619,40 +611,40 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">notebook_path</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="p">,</span>
-            <span class="n">spark_conf</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">notebook_path</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">,</span>
+        <span class="n">spark_conf</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 
         <span class="n">spark_exec_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_entrypoint</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">spark_exec_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pyc&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">spark_exec_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pyc&quot;</span><span class="p">):</span>
             <span class="n">spark_exec_path</span> <span class="o">=</span> <span class="n">spark_exec_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">spark_conf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Parse spark_conf from notebook if not set at task_level.</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">notebook_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_file</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">_json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_file</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;cells&#39;</span><span class="p">]:</span>
-                    <span class="n">meta</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;cells&quot;</span><span class="p">]:</span>
+                    <span class="n">meta</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="s2">&quot;metadata&quot;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="s2">&quot;tags&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
                         <span class="k">if</span> <span class="s2">&quot;conf&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">]:</span>
-                            <span class="n">sc_str</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">])</span>
+                            <span class="n">sc_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">])</span>
                             <span class="n">ldict</span> <span class="o">=</span> <span class="p">{}</span>
-                            <span class="n">exec</span> <span class="p">(</span><span class="n">sc_str</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="n">ldict</span><span class="p">)</span>
-                            <span class="n">spark_conf</span> <span class="o">=</span> <span class="n">ldict</span><span class="p">[</span><span class="s1">&#39;spark_conf&#39;</span><span class="p">]</span>
+                            <span class="n">exec</span><span class="p">(</span><span class="n">sc_str</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="n">ldict</span><span class="p">)</span>
+                            <span class="n">spark_conf</span> <span class="o">=</span> <span class="n">ldict</span><span class="p">[</span><span class="s2">&quot;spark_conf&quot;</span><span class="p">]</span>
 
             <span class="n">spark_job</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">SparkJob</span><span class="p">(</span>
                 <span class="n">spark_conf</span><span class="o">=</span><span class="n">spark_conf</span><span class="p">,</span>
-                <span class="n">main_class</span><span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="n">spark_type</span><span class="o">=</span> <span class="n">_spark_type</span><span class="o">.</span><span class="n">PYTHON</span><span class="p">,</span>
+                <span class="n">main_class</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">spark_type</span><span class="o">=</span><span class="n">_spark_type</span><span class="o">.</span><span class="n">PYTHON</span><span class="p">,</span>
                 <span class="n">hadoop_conf</span><span class="o">=</span><span class="p">{},</span>
                 <span class="n">application_file</span><span class="o">=</span><span class="s2">&quot;local://&quot;</span> <span class="o">+</span> <span class="n">spark_exec_path</span><span class="p">,</span>
                 <span class="n">executor_path</span><span class="o">=</span><span class="n">_sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span>
@@ -680,11 +672,7 @@
             <span class="n">_json_format</span><span class="o">.</span><span class="n">MessageToDict</span><span class="p">(</span><span class="n">spark_job</span><span class="p">),</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environment</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.task.Container</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -694,7 +682,7 @@
             <span class="n">args</span><span class="o">=</span><span class="p">[],</span>
             <span class="n">resources</span><span class="o">=</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="p">(</span><span class="n">limits</span><span class="o">=</span><span class="p">[],</span> <span class="n">requests</span><span class="o">=</span><span class="p">[]),</span>
             <span class="n">env</span><span class="o">=</span><span class="n">environment</span> <span class="ow">or</span> <span class="p">{},</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">{}</span>
+            <span class="n">config</span><span class="o">=</span><span class="p">{},</span>
         <span class="p">)</span></div>
 </pre></div>
 

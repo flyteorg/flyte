@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.interface &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.interface &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,14 +161,16 @@
             
   <h1>Source code for flytekit.models.interface</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_types</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
-<span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">interface_pb2</span> <span class="k">as</span> <span class="n">_interface_pb2</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">interface_pb2</span> <span class="k">as</span> <span class="n">_interface_pb2</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_types</span>
 
 
 <div class="viewcode-block" id="Variable"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.Variable">[docs]</a><span class="k">class</span> <span class="nc">Variable</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.types.LiteralType type: This describes the type of value that must be provided to</span>
@@ -199,10 +201,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.interface_pb2.Variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_interface_pb2</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_interface_pb2</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Variable.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.Variable.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">variable_proto</span><span class="p">):</span>
@@ -210,14 +209,10 @@
 <span class="sd">        :param flyteidl.core.interface_pb2.Variable variable_proto:</span>
 <span class="sd">        :rtype: Variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="n">_types</span><span class="o">.</span><span class="n">LiteralType</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">variable_proto</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
-            <span class="n">description</span><span class="o">=</span><span class="n">variable_proto</span><span class="o">.</span><span class="n">description</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">_types</span><span class="o">.</span><span class="n">LiteralType</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">variable_proto</span><span class="o">.</span><span class="n">type</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="n">variable_proto</span><span class="o">.</span><span class="n">description</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="VariableMap"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.VariableMap">[docs]</a><span class="k">class</span> <span class="nc">VariableMap</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variables</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A map of Variables</span>
@@ -237,9 +232,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: dict[Text, Variable]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_interface_pb2</span><span class="o">.</span><span class="n">VariableMap</span><span class="p">(</span>
-            <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)}</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_interface_pb2</span><span class="o">.</span><span class="n">VariableMap</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)})</span></div>
 
 <div class="viewcode-block" id="VariableMap.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.VariableMap.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -247,12 +240,10 @@
 <span class="sd">        :param dict[Text, Variable] pb2_object:</span>
 <span class="sd">        :rtype: VariableMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">variables</span><span class="p">)})</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">variables</span><span class="p">)})</span></div></div>
 
 
 <div class="viewcode-block" id="TypedInterface"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.TypedInterface">[docs]</a><span class="k">class</span> <span class="nc">TypedInterface</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Please note that this model is slightly incorrect, but is more user-friendly. The underlying inputs and</span>
@@ -283,12 +274,10 @@
 <span class="sd">        :rtype: flyteidl.core.interface_pb2.TypedInterface</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_interface_pb2</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="n">_interface_pb2</span><span class="o">.</span><span class="n">VariableMap</span><span class="p">(</span>
-                <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)}</span>
-            <span class="p">),</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">_interface_pb2</span><span class="o">.</span><span class="n">VariableMap</span><span class="p">(</span><span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">)}),</span>
             <span class="n">outputs</span><span class="o">=</span><span class="n">_interface_pb2</span><span class="o">.</span><span class="n">VariableMap</span><span class="p">(</span>
                 <span class="n">variables</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">)}</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TypedInterface.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.TypedInterface.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -299,12 +288,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">variables</span><span class="p">)},</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">variables</span><span class="p">)}</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">Variable</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">variables</span><span class="p">)},</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Parameter"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.Parameter">[docs]</a><span class="k">class</span> <span class="nc">Parameter</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Declares an input parameter.  A parameter is used as input to a launch plan and has</span>
@@ -368,12 +356,11 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">Variable</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">var</span><span class="p">),</span>
             <span class="n">_literals</span><span class="o">.</span><span class="n">Literal</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">required</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">pb2_object</span><span class="o">.</span><span class="n">required</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ParameterMap"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.interface.ParameterMap">[docs]</a><span class="k">class</span> <span class="nc">ParameterMap</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A map of Parameters</span>

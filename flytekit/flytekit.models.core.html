@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -1805,7 +1805,7 @@ an implicit dependency on any node that appears in inputs field.
 <dt>FAIL_IMMEDIATELY                        Instructs the system to fail as soon as a node fails in the</dt><dd><p>workflow. It’ll automatically abort all currently running nodes and
 clean up resources before finally marking the workflow executions as failed.</p>
 </dd>
-<dt>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE    Instructs the system to make as much progress as it can. The system</dt><dd><p>will not alter the dependencies of the execution graph so any node 
+<dt>FAIL_AFTER_EXECUTABLE_NODES_COMPLETE    Instructs the system to make as much progress as it can. The system</dt><dd><p>will not alter the dependencies of the execution graph so any node
 that depend on the failed node will not be run. Other nodes that will
 be executed to completion before cleaning up resources and marking
 the workflow execution as failed.</p>

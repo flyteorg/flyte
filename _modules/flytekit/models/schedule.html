@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.schedule &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.schedule &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -189,7 +189,6 @@
                 <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">int_value</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Schedule.FixedRate"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.schedule.Schedule.FixedRate">[docs]</a>    <span class="k">class</span> <span class="nc">FixedRate</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            :param int value:</span>
@@ -279,7 +278,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">pb2_object</span><span class="o">.</span><span class="n">kickoff_time_input_arg</span><span class="p">,</span>
             <span class="n">cron_expression</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">cron_expression</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;cron_expression&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">rate</span><span class="o">=</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRate</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">rate</span><span class="o">=</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRate</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">rate</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;rate&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

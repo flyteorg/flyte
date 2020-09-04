@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.promise &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.promise &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -164,14 +164,15 @@
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span><span class="p">,</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_type_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_type_models</span>
 
 
 <div class="viewcode-block" id="Input"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.Input">[docs]</a><span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_interface_models</span><span class="o">.</span><span class="n">Parameter</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text name:</span>
@@ -182,22 +183,22 @@
 <span class="sd">        :param T default:  If this is not a required input, the value will default to this value.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">param_default</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="s1">&#39;required&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;default&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;required&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s2">&quot;default&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="c1"># Neither required or default is set so assume required</span>
             <span class="n">required</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;required&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="c1"># Required cannot be set to True and have a default specified</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Default cannot be set when required is True&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="s1">&#39;default&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="s2">&quot;default&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="c1"># If default is specified, then required must be false and the value is whatever is specified</span>
             <span class="n">required</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">default</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;default&quot;</span><span class="p">]</span>
             <span class="n">param_default</span> <span class="o">=</span> <span class="n">sdk_type</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If no default is set, but required is set, then the behavior is determined by required == True or False</span>
             <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="n">required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span>
+            <span class="n">required</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span><span class="p">:</span>
                 <span class="c1"># If required == False, we assume default to be None</span>
                 <span class="n">param_default</span> <span class="o">=</span> <span class="n">sdk_type</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
@@ -210,9 +211,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_promise</span> <span class="o">=</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">(</span><span class="n">_constants</span><span class="o">.</span><span class="n">GLOBAL_INPUT_NODE_ID</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Input</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">_interface_models</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="n">help</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
+            <span class="n">_interface_models</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">description</span><span class="o">=</span><span class="n">help</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
             <span class="n">required</span><span class="o">=</span><span class="n">required</span><span class="p">,</span>
-            <span class="n">default</span><span class="o">=</span><span class="n">param_default</span>
+            <span class="n">default</span><span class="o">=</span><span class="n">param_default</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="Input.rename_and_return_reference"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.Input.rename_and_return_reference">[docs]</a>    <span class="k">def</span> <span class="nf">rename_and_return_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
@@ -274,24 +275,12 @@
 
         <span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">default_value</span> <span class="o">=</span> <span class="n">sdk_type</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">default</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span><span class="o">.</span><span class="n">to_python_std</span><span class="p">()</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-                <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="n">sdk_type</span><span class="p">,</span>
-                <span class="n">help</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">default</span><span class="o">=</span><span class="n">default_value</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">default_value</span><span class="p">,)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-                <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="n">sdk_type</span><span class="p">,</span>
-                <span class="n">help</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
-                <span class="n">required</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span></div></div>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="NodeOutput"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.NodeOutput">[docs]</a><span class="k">class</span> <span class="nc">NodeOutput</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_node</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.nodes.SdkNode sdk_node:</span>
@@ -300,10 +289,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_node</span> <span class="o">=</span> <span class="n">sdk_node</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_type</span> <span class="o">=</span> <span class="n">sdk_type</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">NodeOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="n">var</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NodeOutput</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">node_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -319,8 +305,10 @@
 <span class="sd">        :param flytekit.models.types.OutputReference model:</span>
 <span class="sd">        :rtype: NodeOutput</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;A NodeOutput cannot be promoted from a protobuf because it must be &quot;</span>
-                                              <span class="s2">&quot;contextualized by an existing SdkNode.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+            <span class="s2">&quot;A NodeOutput cannot be promoted from a protobuf because it must be &quot;</span>
+            <span class="s2">&quot;contextualized by an existing SdkNode.&quot;</span>
+        <span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">sdk_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

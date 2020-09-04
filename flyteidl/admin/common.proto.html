@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>common.proto &mdash; Flyte 0.6.0 documentation</title>
+  <title>common.proto &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -118,6 +118,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-labels">flyteidl.admin.Labels</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-annotations">flyteidl.admin.Annotations</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-authrole">flyteidl.admin.AuthRole</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-rawoutputdataconfig">flyteidl.admin.RawOutputDataConfig</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-admin-namedentitystate">Enum flyteidl.admin.NamedEntityState</a></li>
 </ul>
 </li>
@@ -701,6 +702,22 @@ to specify how to merge annotations defined at registration and execution time.<
 <dl id="api-field-flyteidl-admin-authrole-kubernetes-service-account">
 <dt>kubernetes_service_account</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>)</p>
 <p>Only one of <a class="reference internal" href="#api-field-flyteidl-admin-authrole-assumable-iam-role"><span class="std std-ref">assumable_iam_role</span></a>, <a class="reference internal" href="#api-field-flyteidl-admin-authrole-kubernetes-service-account"><span class="std std-ref">kubernetes_service_account</span></a> may be set.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="flyteidl-admin-rawoutputdataconfig">
+<span id="api-msg-flyteidl-admin-rawoutputdataconfig"></span><h2>flyteidl.admin.RawOutputDataConfig<a class="headerlink" href="#flyteidl-admin-rawoutputdataconfig" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L249">[flyteidl.admin.RawOutputDataConfig proto]</a></p>
+<p>Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+See <a class="reference external" href="https://github.com/lyft/flyte/issues/211">https://github.com/lyft/flyte/issues/211</a> for more background information.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="nt">&quot;output_location_prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<dl class="simple" id="api-field-flyteidl-admin-rawoutputdataconfig-output-location-prefix">
+<dt>output_location_prefix</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">string</a>) Prefix for where offloaded data from user workflows will be written
+e.g. s3://bucket/key or s3://bucket/</p>
 </dd>
 </dl>
 </div>

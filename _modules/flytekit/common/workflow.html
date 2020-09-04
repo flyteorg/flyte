@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.workflow &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.workflow &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,29 +162,36 @@
   <h1>Source code for flytekit.common.workflow</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">six.moves</span> <span class="k">import</span> <span class="n">queue</span> <span class="k">as</span> <span class="n">_queue</span>
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> \
-    <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span><span class="p">,</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span><span class="p">,</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.admin</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_admin_workflow_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span>
 
 
 <div class="viewcode-block" id="Output"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.Output">[docs]</a><span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">sdk_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text name:</span>
@@ -202,7 +209,7 @@
         <span class="n">sdk_type</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">python_std_to_sdk_type</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_binding_data</span> <span class="o">=</span> <span class="n">_interface</span><span class="o">.</span><span class="n">BindingData</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">value</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_var</span> <span class="o">=</span> <span class="n">_interface_models</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">help</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_var</span> <span class="o">=</span> <span class="n">_interface_models</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">help</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
 <div class="viewcode-block" id="Output.rename_and_return_reference"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.Output.rename_and_return_reference">[docs]</a>    <span class="k">def</span> <span class="nf">rename_and_return_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
@@ -212,8 +219,10 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_infer_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="c1"># TODO: Infer types</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Currently the SDK cannot infer a workflow output type, so please use the type kwarg &quot;</span>
-                                  <span class="s2">&quot;when instantiating an output.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">&quot;Currently the SDK cannot infer a workflow output type, so please use the type kwarg &quot;</span>
+            <span class="s2">&quot;when instantiating an output.&quot;</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -245,8 +254,18 @@
         <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">metadata_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_bindings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">,</span>
+        <span class="n">nodes</span><span class="p">,</span>
+        <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata_defaults</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">interface</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_bindings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">disable_default_launch_plan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[flytekit.common.promise.Input] inputs:</span>
 <span class="sd">        :param list[Output] outputs:</span>
@@ -261,6 +280,7 @@
 <span class="sd">            the interface field must be bound</span>
 <span class="sd">            in order for the workflow to be validated. A workflow has an implicit dependency on all of its nodes</span>
 <span class="sd">            to execute successfully in order to bind final outputs.</span>
+<span class="sd">        :param bool disable_default_launch_plan: Determines whether to create a default launch plan for the workflow.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
@@ -273,22 +293,30 @@
                     <span class="p">)</span>
 
         <span class="c1"># Allow overrides if specified for all the arguments to the parent class constructor</span>
-        <span class="nb">id</span> <span class="o">=</span> <span class="nb">id</span> <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
-            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span>
-            <span class="n">_internal_config</span><span class="o">.</span><span class="n">PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-            <span class="n">_internal_config</span><span class="o">.</span><span class="n">DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
-            <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
-            <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="nb">id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">id</span>
+            <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
+                <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span>
+                <span class="n">_internal_config</span><span class="o">.</span><span class="n">PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">_internal_config</span><span class="o">.</span><span class="n">DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+                <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="k">if</span> <span class="n">metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">()</span>
 
-        <span class="n">interface</span> <span class="o">=</span> <span class="n">interface</span> <span class="k">if</span> <span class="n">interface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">(</span>
-            <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">},</span>
-            <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">}</span>
+        <span class="n">interface</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">interface</span>
+            <span class="k">if</span> <span class="n">interface</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">({</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">},</span> <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">})</span>
         <span class="p">)</span>
 
-        <span class="n">output_bindings</span> <span class="o">=</span> <span class="n">output_bindings</span> <span class="k">if</span> <span class="n">output_bindings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> \
-            <span class="p">[</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">binding_data</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span>
+        <span class="n">output_bindings</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">output_bindings</span>
+            <span class="k">if</span> <span class="n">output_bindings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="p">[</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">binding_data</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span>
+        <span class="p">)</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkWorkflow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
@@ -300,6 +328,15 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_user_inputs</span> <span class="o">=</span> <span class="n">inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_should_create_default_launch_plan</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">disable_default_launch_plan</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">should_create_default_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines whether registration flow should create a default launch plan for this workflow or not.</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_create_default_launch_plan</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">upstream_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -347,13 +384,14 @@
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">workflow_node</span><span class="o">.</span><span class="n">sub_workflow_ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">entity_type_text</span> <span class="o">==</span> <span class="s1">&#39;Workflow&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">entity_type_text</span> <span class="o">==</span> <span class="s2">&quot;Workflow&quot;</span><span class="p">:</span>
                     <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
                     <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">get_sub_workflows</span><span class="p">())</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span>
                         <span class="s2">&quot;workflow node with subworkflow found but bad executable &quot;</span>
-                        <span class="s2">&quot;object </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">))</span>
+                        <span class="s2">&quot;object </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
+                    <span class="p">)</span>
             <span class="c1"># Ignore other node types (branch, task)</span>
 
         <span class="k">return</span> <span class="n">result</span></div>
@@ -403,8 +441,9 @@
         <span class="n">base_model_non_system_nodes</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">get_non_system_nodes</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
         <span class="n">sub_workflows</span> <span class="o">=</span> <span class="n">sub_workflows</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="n">tasks</span> <span class="o">=</span> <span class="n">tasks</span> <span class="ow">or</span> <span class="p">{}</span>
-        <span class="n">node_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">base_model_non_system_nodes</span><span class="p">}</span>
+        <span class="n">node_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">base_model_non_system_nodes</span>
+        <span class="p">}</span>
 
         <span class="c1"># Set upstream nodes for each node</span>
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">base_model_non_system_nodes</span><span class="p">:</span>
@@ -415,7 +454,9 @@
 
         <span class="c1"># No inputs/outputs specified, see the constructor for more information on the overrides.</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">node_map</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">outputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">nodes</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">node_map</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">metadata</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
             <span class="n">metadata_defaults</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">metadata_defaults</span><span class="p">,</span>
@@ -432,19 +473,13 @@
 <span class="sd">        :param Text version:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
-        <span class="n">id_to_register</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
-            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span>
-            <span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
-            <span class="n">version</span>
-        <span class="p">)</span>
+        <span class="n">id_to_register</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span><span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">WORKFLOW</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
         <span class="n">old_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>
             <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">old_id</span>
             <span class="k">raise</span></div>
 
@@ -457,10 +492,7 @@
 <span class="sd">        :rtype: flyteidl.admin.workflow_pb2.WorkflowSpec</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sub_workflows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_sub_workflows</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">_admin_workflow_model</span><span class="o">.</span><span class="n">WorkflowSpec</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">sub_workflows</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">_admin_workflow_model</span><span class="o">.</span><span class="n">WorkflowSpec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,)</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="SdkWorkflow.validate"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.validate">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -468,17 +500,18 @@
 
 <div class="viewcode-block" id="SdkWorkflow.create_launch_plan"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.create_launch_plan">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">create_launch_plan</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">default_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">fixed_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">schedule</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">assumable_iam_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">default_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">schedule</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">assumable_iam_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">raw_output_data_prefix</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method will create a launch plan object that can execute this workflow.</span>
@@ -494,6 +527,8 @@
 <span class="sd">        class provided should be a subclass of flytekit.common.launch_plan.SdkLaunchPlan.</span>
 <span class="sd">        :param Text assumable_iam_role: The IAM role to execute the workflow with.</span>
 <span class="sd">        :param Text kubernetes_service_account: The kubernetes service account to execute the workflow with.</span>
+<span class="sd">        :param Text raw_output_data_prefix: Bucket for offloaded data</span>
+
 <span class="sd">        :rtype: flytekit.common.launch_plan.SdkRunnableLaunchPlan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Actually ensure the parameters conform.</span>
@@ -505,14 +540,16 @@
 
         <span class="k">if</span> <span class="n">role</span><span class="p">:</span>
             <span class="n">assumable_iam_role</span> <span class="o">=</span> <span class="n">role</span>
-        <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span>
-                                            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
+        <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span>
+            <span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span> <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">raw_output_config</span> <span class="o">=</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">RawOutputDataConfig</span><span class="p">(</span><span class="n">raw_output_data_prefix</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="bp">cls</span> <span class="ow">or</span> <span class="n">_launch_plan</span><span class="o">.</span><span class="n">SdkRunnableLaunchPlan</span><span class="p">)(</span>
             <span class="n">sdk_workflow</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
             <span class="n">default_inputs</span><span class="o">=</span><span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">user_input</span><span class="o">.</span><span class="n">rename_and_return_reference</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">user_input</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">merged_default_inputs</span><span class="p">)</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">user_input</span><span class="o">.</span><span class="n">rename_and_return_reference</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">user_input</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">merged_default_inputs</span><span class="p">)</span>
             <span class="p">},</span>
             <span class="n">fixed_inputs</span><span class="o">=</span><span class="n">fixed_inputs</span><span class="p">,</span>
             <span class="n">schedule</span><span class="o">=</span><span class="n">schedule</span><span class="p">,</span>
@@ -520,6 +557,7 @@
             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
             <span class="n">annotations</span><span class="o">=</span><span class="n">annotations</span><span class="p">,</span>
             <span class="n">auth_role</span><span class="o">=</span><span class="n">auth_role</span><span class="p">,</span>
+            <span class="n">raw_output_data_config</span><span class="o">=</span><span class="n">raw_output_config</span><span class="p">,</span>
         <span class="p">)</span></div>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -531,21 +569,19 @@
             <span class="p">)</span>
 
         <span class="c1"># Take the default values from the Inputs</span>
-        <span class="n">compiled_inputs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_default</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_inputs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_required</span>
-        <span class="p">}</span>
+        <span class="n">compiled_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_default</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_inputs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_required</span><span class="p">}</span>
         <span class="n">compiled_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">input_map</span><span class="p">)</span>
 
         <span class="n">bindings</span><span class="p">,</span> <span class="n">upstream_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">create_bindings_for_inputs</span><span class="p">(</span><span class="n">compiled_inputs</span><span class="p">)</span>
 
         <span class="n">node</span> <span class="o">=</span> <span class="n">_nodes</span><span class="o">.</span><span class="n">SdkNode</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="s2">&quot;placeholder&quot;</span><span class="p">,</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(),</span>
-                                                   <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span>
+                <span class="s2">&quot;placeholder&quot;</span><span class="p">,</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(),</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="p">),</span>
             <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">,</span>
             <span class="n">bindings</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">bindings</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">var</span><span class="p">),</span>
-            <span class="n">sdk_workflow</span><span class="o">=</span><span class="bp">self</span>
+            <span class="n">sdk_workflow</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">node</span></div>
 
@@ -590,39 +626,36 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_obj</span><span class="p">,</span> <span class="n">_promise</span><span class="o">.</span><span class="n">Input</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">attribute_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">attribute_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_level_attributes</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
-                    <span class="n">attribute_name</span><span class="p">,</span>
-                    <span class="s2">&quot;Detected workflow input specified outside of top level.&quot;</span>
+                    <span class="n">attribute_name</span><span class="p">,</span> <span class="s2">&quot;Detected workflow input specified outside of top level.&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_obj</span><span class="o">.</span><span class="n">rename_and_return_reference</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_obj</span><span class="p">,</span> <span class="n">Output</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">attribute_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">attribute_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_level_attributes</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
-                    <span class="n">attribute_name</span><span class="p">,</span>
-                    <span class="s2">&quot;Detected workflow output specified outside of top level.&quot;</span>
+                    <span class="n">attribute_name</span><span class="p">,</span> <span class="s2">&quot;Detected workflow output specified outside of top level.&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_obj</span><span class="o">.</span><span class="n">rename_and_return_reference</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_obj</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_obj</span><span class="p">,</span> <span class="nb">set</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_obj</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">current_obj</span><span class="p">):</span>
-                <span class="n">to_visit_objs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">idx</span><span class="p">),</span> <span class="n">value</span><span class="p">))</span>
+                <span class="n">to_visit_objs</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">idx</span><span class="p">),</span> <span class="n">value</span><span class="p">))</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current_obj</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="c1"># Visit dictionary keys.</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">current_obj</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="n">to_visit_objs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">key</span><span class="p">))</span>
+                <span class="n">to_visit_objs</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">key</span><span class="p">))</span>
             <span class="c1"># Visit dictionary values.</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">current_obj</span><span class="p">):</span>
-                <span class="n">to_visit_objs</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
-                    <span class="p">(</span><span class="n">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">))</span>
+                <span class="n">to_visit_objs</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">_assign_indexed_attribute_name</span><span class="p">(</span><span class="n">attribute_name</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">value</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span>
 
 
-<div class="viewcode-block" id="build_sdk_workflow_from_metaclass"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.build_sdk_workflow_from_metaclass">[docs]</a><span class="k">def</span> <span class="nf">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="build_sdk_workflow_from_metaclass"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.workflow.build_sdk_workflow_from_metaclass">[docs]</a><span class="k">def</span> <span class="nf">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disable_default_launch_plan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    :param T metaclass:</span>
 <span class="sd">    :param cls: This is the class that will be instantiated from the inputs, outputs, and nodes.  This will be used</span>
 <span class="sd">        by users extending the base Flyte programming model. If set, it must be a subclass of SdkWorkflow.</span>
-<span class="sd">    :param on_failure flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy: [Optional] The execution policy when the workflow detects a failure.</span>
+<span class="sd">    :param flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy on_failure: [Optional] The execution policy</span>
+<span class="sd">        when the workflow detects a failure.</span>
+<span class="sd">    :param bool disable_default_launch_plan: Determines whether to create a default launch plan for the workflow or not.</span>
 <span class="sd">    :rtype: SdkWorkflow</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">nodes</span> <span class="o">=</span> <span class="n">_discover_workflow_components</span><span class="p">(</span><span class="n">metaclass</span><span class="p">)</span>
@@ -631,7 +664,8 @@
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>
         <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span><span class="p">)],</span>
         <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">id</span><span class="p">)],</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="n">disable_default_launch_plan</span><span class="o">=</span><span class="n">disable_default_launch_plan</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
 

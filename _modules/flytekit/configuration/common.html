@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.configuration.common &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.configuration.common &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -165,9 +165,9 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
+<span class="kn">import</span> <span class="nn">configparser</span> <span class="k">as</span> <span class="nn">_configparser</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 
-<span class="kn">import</span> <span class="nn">configparser</span> <span class="k">as</span> <span class="nn">_configparser</span>
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
@@ -179,11 +179,10 @@
 <span class="sd">    :param Text key:</span>
 <span class="sd">    :rtype: Text</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s1">&#39;FLYTE_</span><span class="si">{section}</span><span class="s1">_</span><span class="si">{key}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span></div>
+    <span class="k">return</span> <span class="s2">&quot;FLYTE_</span><span class="si">{section}</span><span class="s2">_</span><span class="si">{key}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="o">.</span><span class="n">upper</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="FlyteConfigurationFile"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteConfigurationFile">[docs]</a><span class="k">class</span> <span class="nc">FlyteConfigurationFile</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This singleton is initialized on module load with empty location. If pyflyte is called with</span>
@@ -199,9 +198,11 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_location</span><span class="p">:</span>
             <span class="n">config</span> <span class="o">=</span> <span class="n">_configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
             <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_location</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s1">&#39;internal&#39;</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;The config file &#39;</span><span class="si">{}</span><span class="s2">&#39; cannot contain a section for internal &quot;</span>
-                                                      <span class="s2">&quot;only configurations.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_location</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">has_section</span><span class="p">(</span><span class="s2">&quot;internal&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                    <span class="s2">&quot;The config file &#39;</span><span class="si">{}</span><span class="s2">&#39; cannot contain a section for internal &quot;</span>
+                    <span class="s2">&quot;only configurations.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_location</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="n">config</span>
 
 <div class="viewcode-block" id="FlyteConfigurationFile.get_string"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteConfigurationFile.get_string">[docs]</a>    <span class="k">def</span> <span class="nf">get_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -215,7 +216,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="n">default</span></div>
 
@@ -230,7 +231,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="n">default</span></div>
 
@@ -245,7 +246,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="n">default</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">pass</span>
         <span class="k">return</span> <span class="n">default</span></div>
 
@@ -253,12 +254,11 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text location:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_location</span> <span class="o">=</span> <span class="n">location</span> <span class="ow">or</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FLYTE_INTERNAL_CONFIGURATION_PATH&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_location</span> <span class="o">=</span> <span class="n">location</span> <span class="ow">or</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FLYTE_INTERNAL_CONFIGURATION_PATH&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_config</span> <span class="o">=</span> <span class="kc">None</span></div></div>
 
 
 <span class="k">class</span> <span class="nc">_FlyteConfigurationPatcher</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_value</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text new_value:</span>
@@ -291,13 +291,12 @@
 <span class="sd">    :rtype: Text</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">location</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="kc">None</span>
 
 
 <span class="k">class</span> <span class="nc">_FlyteConfigurationEntry</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fallback</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_section</span> <span class="o">=</span> <span class="n">section</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="n">key</span>
@@ -364,22 +363,14 @@
 
 
 <span class="k">class</span> <span class="nc">_FlyteRequiredConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteConfigurationEntry</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">section</span><span class="p">,</span>
-            <span class="n">key</span><span class="p">,</span>
-            <span class="n">validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_validate_not_null</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">validator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_validate_not_null</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_extra_validator</span> <span class="o">=</span> <span class="n">validator</span>
 
     <span class="k">def</span> <span class="nf">_validate_not_null</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
-                <span class="s2">&quot;No configuration set for [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">.  This is a required configuration.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_key</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;No configuration set for [</span><span class="si">{}</span><span class="s2">] </span><span class="si">{}</span><span class="s2">.  This is a required configuration.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extra_validator</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_extra_validator</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
@@ -411,7 +402,7 @@
             <span class="k">return</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_default</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Because bool(&#39;False&#39;) is True, compare to the same values that ConfigParser uses</span>
-            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;false&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span> <span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">val</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;off&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">]:</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">return</span> <span class="kc">True</span></div>
 
@@ -423,7 +414,7 @@
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span>
-        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FlyteRequiredStringConfigurationEntry"><a class="viewcode-back" href="../../../flytekit/flytekit.configuration.html#flytekit.configuration.auth.FlyteRequiredStringConfigurationEntry">[docs]</a><span class="k">class</span> <span class="nc">FlyteRequiredStringConfigurationEntry</span><span class="p">(</span><span class="n">_FlyteRequiredConfigurationEntry</span><span class="p">):</span>
@@ -457,7 +448,7 @@
             <span class="n">val</span> <span class="o">=</span> <span class="n">CONFIGURATION_SINGLETON</span><span class="o">.</span><span class="n">get_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_section</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default</span>
-        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span></div>
 
 
 <span class="n">CONFIGURATION_SINGLETON</span> <span class="o">=</span> <span class="n">FlyteConfigurationFile</span><span class="p">()</span>

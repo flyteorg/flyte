@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.helpers &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.types.helpers &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,11 +162,14 @@
   <h1>Source code for flytekit.common.types.helpers</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
 <span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importlib</span>
+
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
 
 
 <span class="k">class</span> <span class="nc">_TypeEngineLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -188,14 +191,13 @@
                     <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                         <span class="n">module</span><span class="p">,</span>
                         <span class="s2">&quot;Failed to load the type engine because the attribute named &#39;</span><span class="si">{}</span><span class="s2">&#39; could not be found&quot;</span>
-                        <span class="s2">&quot;in the module &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">attr</span><span class="p">,</span> <span class="n">module_path</span>
-                        <span class="p">)</span>
+                        <span class="s2">&quot;in the module &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">module_path</span><span class="p">),</span>
                     <span class="p">)</span>
 
                 <span class="n">engine_impl</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">attr</span><span class="p">)()</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">_LOADED_ENGINES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">engine_impl</span><span class="p">)</span>
             <span class="kn">from</span> <span class="nn">flytekit.type_engines.default.flyte</span> <span class="k">import</span> <span class="n">FlyteDefaultTypeEngine</span> <span class="k">as</span> <span class="n">_DefaultEngine</span>
+
             <span class="bp">cls</span><span class="o">.</span><span class="n">_LOADED_ENGINES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_DefaultEngine</span><span class="p">())</span>
 
     <span class="nd">@classmethod</span>
@@ -228,8 +230,9 @@
         <span class="n">out</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">literal_type</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">out</span>
-    <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span><span class="n">literal_type</span><span class="p">,</span> <span class="s2">&quot;Could not resolve to a type implementation for this &quot;</span>
-                                                             <span class="s2">&quot;value.&quot;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
+        <span class="n">literal_type</span><span class="p">,</span> <span class="s2">&quot;Could not resolve to a type implementation for this &quot;</span> <span class="s2">&quot;value.&quot;</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="infer_sdk_type_from_literal"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.helpers.infer_sdk_type_from_literal">[docs]</a><span class="k">def</span> <span class="nf">infer_sdk_type_from_literal</span><span class="p">(</span><span class="n">literal</span><span class="p">):</span>
@@ -288,11 +291,7 @@
 <span class="sd">    :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">    :raises: flytekit.common.exceptions.user.FlyteTypeException</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-        <span class="n">literals</span><span class="o">=</span><span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">std_map</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">type_map</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span><span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">std_map</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">type_map</span><span class="p">)})</span></div>
 </pre></div>
 
            </div>

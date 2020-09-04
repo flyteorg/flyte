@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.launch_plan &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.launch_plan &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -164,12 +164,14 @@
 
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">launch_plan_pb2</span> <span class="k">as</span> <span class="n">_launch_plan</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span><span class="p">,</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 
 
 <div class="viewcode-block" id="LaunchPlanMetadata"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanMetadata">[docs]</a><span class="k">class</span> <span class="nc">LaunchPlanMetadata</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schedule</span><span class="p">,</span> <span class="n">notifications</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
@@ -203,7 +205,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_launch_plan</span><span class="o">.</span><span class="n">LaunchPlanMetadata</span><span class="p">(</span>
             <span class="n">schedule</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">schedule</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">notifications</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notifications</span><span class="p">]</span>
+            <span class="n">notifications</span><span class="o">=</span><span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notifications</span><span class="p">],</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LaunchPlanMetadata.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanMetadata.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -212,9 +214,12 @@
 <span class="sd">        :param flyteidl.admin.launch_plan_pb2.LaunchPlanMetadata pb2_object:</span>
 <span class="sd">        :rtype: LaunchPlanMetadata</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">schedule</span><span class="o">=</span><span class="n">_schedule</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">schedule</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;schedule&quot;</span><span class="p">)</span>
-                   <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">notifications</span><span class="o">=</span><span class="p">[</span><span class="n">_common</span><span class="o">.</span><span class="n">Notification</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">notifications</span><span class="p">])</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">schedule</span><span class="o">=</span><span class="n">_schedule</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">schedule</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;schedule&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">notifications</span><span class="o">=</span><span class="p">[</span><span class="n">_common</span><span class="o">.</span><span class="n">Notification</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">notifications</span><span class="p">],</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Auth"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.Auth">[docs]</a><span class="k">class</span> <span class="nc">Auth</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -264,14 +269,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;assumable_iam_role&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="k">if</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;kubernetes_service_account&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">kubernetes_service_account</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;kubernetes_service_account&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="LaunchPlanSpec"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec">[docs]</a><span class="k">class</span> <span class="nc">LaunchPlanSpec</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">,</span> <span class="n">entity_metadata</span><span class="p">,</span> <span class="n">default_inputs</span><span class="p">,</span> <span class="n">fixed_inputs</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">annotations</span><span class="p">,</span> <span class="n">auth_role</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">workflow_id</span><span class="p">,</span>
+        <span class="n">entity_metadata</span><span class="p">,</span>
+        <span class="n">default_inputs</span><span class="p">,</span>
+        <span class="n">fixed_inputs</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="p">,</span>
+        <span class="n">auth_role</span><span class="p">,</span>
+        <span class="n">raw_output_data_config</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The spec for a Launch Plan.</span>
 
@@ -284,6 +299,8 @@
 <span class="sd">        :param flyteidl.admin.common_pb2.Annotations annotations:</span>
 <span class="sd">            Any custom kubernetes annotations to apply to workflows executed by this launch plan.</span>
 <span class="sd">        :param flytekit.models.common.Auth auth_role: The auth method with which to execute the workflow.</span>
+<span class="sd">        :param flytekit.models.common.RawOutputDataConfig raw_output_data_config: Value for where to store offloaded</span>
+<span class="sd">            data like Blobs and Schemas.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_id</span> <span class="o">=</span> <span class="n">workflow_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_entity_metadata</span> <span class="o">=</span> <span class="n">entity_metadata</span>
@@ -292,6 +309,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="n">labels</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_annotations</span> <span class="o">=</span> <span class="n">annotations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span> <span class="o">=</span> <span class="n">auth_role</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_output_data_config</span> <span class="o">=</span> <span class="n">raw_output_data_config</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">workflow_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -344,9 +362,17 @@
     <span class="k">def</span> <span class="nf">auth_role</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The authorization method with which to execute the workflow.</span>
-<span class="sd">        :return: flytekit.models.common.Auth</span>
+<span class="sd">        :rtype: flytekit.models.common.Auth</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_role</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw_output_data_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Where to store offloaded data like Blobs and Schemas</span>
+<span class="sd">        :rtype: flytekit.models.common.RawOutputDataConfig</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_output_data_config</span>
 
 <div class="viewcode-block" id="LaunchPlanSpec.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -360,22 +386,35 @@
             <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">annotations</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">auth_role</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_role</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">raw_output_data_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_output_data_config</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LaunchPlanSpec.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flyteidl.admin.launch_plan_pb2.LaunchPlanSpec pb2_object:</span>
+<span class="sd">        :param flyteidl.admin.launch_plan_pb2.LaunchPlanSpec pb2:</span>
 <span class="sd">        :rtype: LaunchPlanSpec</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">auth_role</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># First check the newer field, auth_role.</span>
+        <span class="k">if</span> <span class="n">pb2</span><span class="o">.</span><span class="n">auth_role</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">auth_role</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="ow">or</span> <span class="n">pb2</span><span class="o">.</span><span class="n">auth_role</span><span class="o">.</span><span class="n">kubernetes_service_account</span><span class="p">):</span>
+            <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common</span><span class="o">.</span><span class="n">AuthRole</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">auth_role</span><span class="p">)</span>
+        <span class="c1"># Fallback to the deprecated field.</span>
+        <span class="k">elif</span> <span class="n">pb2</span><span class="o">.</span><span class="n">auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pb2</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">assumable_iam_role</span><span class="p">:</span>
+                <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">assumable_iam_role</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">auth_role</span> <span class="o">=</span> <span class="n">_common</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">workflow_id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">workflow_id</span><span class="p">),</span>
-            <span class="n">entity_metadata</span><span class="o">=</span><span class="n">LaunchPlanMetadata</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">entity_metadata</span><span class="p">),</span>
-            <span class="n">default_inputs</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">ParameterMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">default_inputs</span><span class="p">),</span>
-            <span class="n">fixed_inputs</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">fixed_inputs</span><span class="p">),</span>
-            <span class="n">labels</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Labels</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">labels</span><span class="p">),</span>
-            <span class="n">annotations</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Annotations</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">annotations</span><span class="p">),</span>
-            <span class="n">auth_role</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">AuthRole</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">auth_role</span><span class="p">),</span>
+            <span class="n">workflow_id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">workflow_id</span><span class="p">),</span>
+            <span class="n">entity_metadata</span><span class="o">=</span><span class="n">LaunchPlanMetadata</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">entity_metadata</span><span class="p">),</span>
+            <span class="n">default_inputs</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">ParameterMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">default_inputs</span><span class="p">),</span>
+            <span class="n">fixed_inputs</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">fixed_inputs</span><span class="p">),</span>
+            <span class="n">labels</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Labels</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">labels</span><span class="p">),</span>
+            <span class="n">annotations</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">Annotations</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">annotations</span><span class="p">),</span>
+            <span class="n">auth_role</span><span class="o">=</span><span class="n">auth_role</span><span class="p">,</span>
+            <span class="n">raw_output_data_config</span><span class="o">=</span><span class="n">_common</span><span class="o">.</span><span class="n">RawOutputDataConfig</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2</span><span class="o">.</span><span class="n">raw_output_data_config</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 
 
@@ -398,7 +437,6 @@
 
 
 <div class="viewcode-block" id="LaunchPlanClosure"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanClosure">[docs]</a><span class="k">class</span> <span class="nc">LaunchPlanClosure</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">expected_inputs</span><span class="p">,</span> <span class="n">expected_outputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param LaunchPlanState state: Indicate the Launch plan phase</span>
@@ -455,13 +493,7 @@
 
 
 <div class="viewcode-block" id="LaunchPlan"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">LaunchPlan</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="nb">id</span><span class="p">,</span>
-        <span class="n">spec</span><span class="p">,</span>
-        <span class="n">closure</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">closure</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier id:</span>
 <span class="sd">        :param LaunchPlanSpec spec:</span>
@@ -497,9 +529,7 @@
 <span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_launch_plan</span><span class="o">.</span><span class="n">LaunchPlan</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+            <span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">spec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">closure</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="LaunchPlan.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlan.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -511,7 +541,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
             <span class="n">spec</span><span class="o">=</span><span class="n">LaunchPlanSpec</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">spec</span><span class="p">),</span>
-            <span class="n">closure</span><span class="o">=</span><span class="n">LaunchPlanClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">closure</span><span class="p">)</span>
+            <span class="n">closure</span><span class="o">=</span><span class="n">LaunchPlanClosure</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">closure</span><span class="p">),</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

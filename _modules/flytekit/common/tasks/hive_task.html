@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.hive_task &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.hive_task &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -167,19 +167,20 @@
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">MessageToDict</span> <span class="k">as</span> <span class="n">_MessageToDict</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions.user</span> <span class="k">import</span> <span class="n">FlyteTypeException</span> <span class="k">as</span> <span class="n">_FlyteTypeException</span><span class="p">,</span> \
-    <span class="n">FlyteValueException</span> <span class="k">as</span> <span class="n">_FlyteValueException</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions.user</span> <span class="k">import</span> <span class="n">FlyteTypeException</span> <span class="k">as</span> <span class="n">_FlyteTypeException</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions.user</span> <span class="k">import</span> <span class="n">FlyteValueException</span> <span class="k">as</span> <span class="n">_FlyteValueException</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_task</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">qubole</span> <span class="k">as</span> <span class="n">_qubole</span><span class="p">,</span>
-    <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_model</span><span class="p">,</span>
-    <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span>
-    <span class="n">dynamic_job</span> <span class="k">as</span> <span class="n">_dynamic_job</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">dynamic_job</span> <span class="k">as</span> <span class="n">_dynamic_job</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">qubole</span> <span class="k">as</span> <span class="n">_qubole</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span>
 
 <span class="n">ALLOWED_TAGS_COUNT</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
@@ -192,26 +193,26 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">task_function</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">interruptible</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">cluster_label</span><span class="p">,</span>
-            <span class="n">tags</span><span class="p">,</span>
-            <span class="n">environment</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">cluster_label</span><span class="p">,</span>
+        <span class="n">tags</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param task_function: Function container user code.  This will be executed via the SDK&#39;s engine.</span>
@@ -234,9 +235,26 @@
 <span class="sd">        :param dict[Text, Text] environment:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_task_function</span> <span class="o">=</span> <span class="n">task_function</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkHiveTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">task_function</span><span class="p">,</span> <span class="n">task_type</span><span class="p">,</span> <span class="n">discovery_version</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">,</span>
-                                          <span class="n">storage_request</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">,</span>
-                                          <span class="n">cpu_limit</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">,</span> <span class="n">discoverable</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SdkHiveTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">task_function</span><span class="p">,</span>
+            <span class="n">task_type</span><span class="p">,</span>
+            <span class="n">discovery_version</span><span class="p">,</span>
+            <span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="p">,</span>
+            <span class="n">storage_request</span><span class="p">,</span>
+            <span class="n">cpu_request</span><span class="p">,</span>
+            <span class="n">gpu_request</span><span class="p">,</span>
+            <span class="n">memory_request</span><span class="p">,</span>
+            <span class="n">storage_limit</span><span class="p">,</span>
+            <span class="n">cpu_limit</span><span class="p">,</span>
+            <span class="n">gpu_limit</span><span class="p">,</span>
+            <span class="n">memory_limit</span><span class="p">,</span>
+            <span class="n">discoverable</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="p">,</span>
+            <span class="n">environment</span><span class="p">,</span>
+            <span class="p">{},</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validate_task_parameters</span><span class="p">(</span><span class="n">cluster_label</span><span class="p">,</span> <span class="n">tags</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_label</span> <span class="o">=</span> <span class="n">cluster_label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span> <span class="o">=</span> <span class="n">tags</span>
@@ -256,8 +274,9 @@
         <span class="n">plugin_objects</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries_from_task</span><span class="p">:</span>
-            <span class="n">hive_query</span> <span class="o">=</span> <span class="n">_qubole</span><span class="o">.</span><span class="n">HiveQuery</span><span class="p">(</span><span class="n">query</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">seconds</span><span class="p">,</span>
-                                           <span class="n">retry_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">retries</span><span class="o">.</span><span class="n">retries</span><span class="p">)</span>
+            <span class="n">hive_query</span> <span class="o">=</span> <span class="n">_qubole</span><span class="o">.</span><span class="n">HiveQuery</span><span class="p">(</span>
+                <span class="n">query</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">timeout_sec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="o">.</span><span class="n">seconds</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">retries</span><span class="o">.</span><span class="n">retries</span><span class="p">,</span>
+            <span class="p">)</span>
 
             <span class="c1"># TODO: Remove this after all users of older SDK versions that did the single node, multi-query pattern are</span>
             <span class="c1">#       deprecated. This is only here for backwards compatibility - in addition to writing the query to the</span>
@@ -265,8 +284,9 @@
             <span class="c1">#       older plugin will continue to work.</span>
             <span class="n">query_collection</span> <span class="o">=</span> <span class="n">_qubole</span><span class="o">.</span><span class="n">HiveQueryCollection</span><span class="p">([</span><span class="n">hive_query</span><span class="p">])</span>
 
-            <span class="n">plugin_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_qubole</span><span class="o">.</span><span class="n">QuboleHiveJob</span><span class="p">(</span><span class="n">hive_query</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">,</span>
-                                                        <span class="n">query_collection</span><span class="o">=</span><span class="n">query_collection</span><span class="p">))</span>
+            <span class="n">plugin_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">_qubole</span><span class="o">.</span><span class="n">QuboleHiveJob</span><span class="p">(</span><span class="n">hive_query</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tags</span><span class="p">,</span> <span class="n">query_collection</span><span class="o">=</span><span class="n">query_collection</span><span class="p">,)</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">plugin_objects</span>
 
@@ -277,7 +297,7 @@
                 <span class="nb">type</span><span class="p">(</span><span class="n">cluster_label</span><span class="p">),</span>
                 <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">},</span>
                 <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;cluster_label for a hive task must be in text format&quot;</span><span class="p">,</span>
-                <span class="n">received_value</span><span class="o">=</span><span class="n">cluster_label</span>
+                <span class="n">received_value</span><span class="o">=</span><span class="n">cluster_label</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="n">tags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">))</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">)):</span>
@@ -285,12 +305,16 @@
                     <span class="nb">type</span><span class="p">(</span><span class="n">tags</span><span class="p">),</span>
                     <span class="p">[],</span>
                     <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;tags for a hive task must be in &#39;list of text&#39; format&quot;</span><span class="p">,</span>
-                    <span class="n">received_value</span><span class="o">=</span><span class="n">tags</span>
+                    <span class="n">received_value</span><span class="o">=</span><span class="n">tags</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">ALLOWED_TAGS_COUNT</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">_FlyteValueException</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">),</span> <span class="s2">&quot;number of tags must be less than </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ALLOWED_TAGS_COUNT</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">_FlyteValueException</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">),</span> <span class="s2">&quot;number of tags must be less than </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ALLOWED_TAGS_COUNT</span><span class="p">),</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span> <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">tags</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">_FlyteValueException</span><span class="p">(</span><span class="n">tags</span><span class="p">,</span> <span class="s2">&quot;length of a tag must be less than </span><span class="si">{}</span><span class="s2"> chars&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MAX_TAG_LENGTH</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">_FlyteValueException</span><span class="p">(</span>
+                    <span class="n">tags</span><span class="p">,</span> <span class="s2">&quot;length of a tag must be less than </span><span class="si">{}</span><span class="s2"> chars&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">MAX_TAG_LENGTH</span><span class="p">),</span>
+                <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_validate_queries</span><span class="p">(</span><span class="n">queries_from_task</span><span class="p">):</span>
@@ -300,7 +324,7 @@
                     <span class="nb">type</span><span class="p">(</span><span class="n">query_from_task</span><span class="p">),</span>
                     <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">},</span>
                     <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;All queries returned from a Hive task must be in text format.&quot;</span><span class="p">,</span>
-                    <span class="n">received_value</span><span class="o">=</span><span class="n">query_from_task</span>
+                    <span class="n">received_value</span><span class="o">=</span><span class="n">query_from_task</span><span class="p">,</span>
                 <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_produce_dynamic_job_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
@@ -310,9 +334,10 @@
 <span class="sd">        :param flytekit.models.literals.LiteralMap literal_map inputs:</span>
 <span class="sd">        :rtype: flytekit.models.dynamic_job.DynamicJobSpec</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)},</span>
+        <span class="p">)</span>
         <span class="n">outputs_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">_task_output</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">(</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
@@ -327,27 +352,23 @@
         <span class="n">generated_queries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_plugin_objects</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">inputs_dict</span><span class="p">)</span>
 
         <span class="c1"># Create output bindings always - this has to happen after user code has run</span>
-        <span class="n">output_bindings</span> <span class="o">=</span> <span class="p">[</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">BindingData</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span>
-            <span class="n">b</span><span class="o">.</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-                           <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">outputs_dict</span><span class="p">)]</span>
+        <span class="n">output_bindings</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span>
+                <span class="n">var</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">BindingData</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">outputs_dict</span><span class="p">)</span>
+        <span class="p">]</span>
 
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">quboleHiveJob</span> <span class="ow">in</span> <span class="n">generated_queries</span><span class="p">:</span>
-            <span class="n">hive_job_node</span> <span class="o">=</span> <span class="n">_create_hive_job_node</span><span class="p">(</span>
-                <span class="s2">&quot;HiveQuery_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
-                <span class="n">quboleHiveJob</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span>
-            <span class="p">)</span>
+            <span class="n">hive_job_node</span> <span class="o">=</span> <span class="n">_create_hive_job_node</span><span class="p">(</span><span class="s2">&quot;HiveQuery_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">quboleHiveJob</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
             <span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hive_job_node</span><span class="p">)</span>
             <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hive_job_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="n">dynamic_job_spec</span> <span class="o">=</span> <span class="n">_dynamic_job</span><span class="o">.</span><span class="n">DynamicJobSpec</span><span class="p">(</span>
-            <span class="n">min_successes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">),</span>
-            <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">,</span>
-            <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="o">=</span><span class="n">output_bindings</span><span class="p">,</span>
-            <span class="n">subworkflows</span><span class="o">=</span><span class="p">[])</span>
+            <span class="n">min_successes</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">nodes</span><span class="p">),</span> <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">output_bindings</span><span class="p">,</span> <span class="n">subworkflows</span><span class="o">=</span><span class="p">[],</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">dynamic_job_spec</span>
 
@@ -373,12 +394,11 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span>
                 <span class="n">_constants</span><span class="o">.</span><span class="n">OUTPUT_FILE_NAME</span><span class="p">:</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-                    <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">outputs</span><span class="p">})</span>
+                    <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
+                <span class="p">)</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">generated_files</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-                <span class="n">_constants</span><span class="o">.</span><span class="n">FUTURES_FILE_NAME</span><span class="p">:</span> <span class="n">spec</span>
-            <span class="p">})</span>
+            <span class="n">generated_files</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_constants</span><span class="o">.</span><span class="n">FUTURES_FILE_NAME</span><span class="p">:</span> <span class="n">spec</span><span class="p">})</span>
 
             <span class="k">return</span> <span class="n">generated_files</span></div></div>
 
@@ -396,7 +416,7 @@
         <span class="n">upstream_nodes</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">bindings</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">metadata</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
-        <span class="n">sdk_task</span><span class="o">=</span><span class="n">SdkHiveJob</span><span class="p">(</span><span class="n">hive_job</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+        <span class="n">sdk_task</span><span class="o">=</span><span class="n">SdkHiveJob</span><span class="p">(</span><span class="n">hive_job</span><span class="p">,</span> <span class="n">metadata</span><span class="p">),</span>
     <span class="p">)</span>
 
 
@@ -407,9 +427,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">hive_job</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">hive_job</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param _qubole.QuboleHiveJob hive_job: Hive job spec</span>

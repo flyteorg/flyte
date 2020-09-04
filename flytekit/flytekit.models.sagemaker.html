@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.sagemaker package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.sagemaker package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -584,7 +584,7 @@ See: <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/l
 
 <dl class="class">
 <dt id="flytekit.models.sagemaker.training_job.AlgorithmSpecification">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.training_job.</code><code class="sig-name descname">AlgorithmSpecification</code><span class="sig-paren">(</span><em class="sig-param">algorithm_name: int</em>, <em class="sig-param">algorithm_version: str</em>, <em class="sig-param">input_mode: int</em>, <em class="sig-param">metric_definitions: List[flytekit.models.sagemaker.training_job.MetricDefinition] = None</em>, <em class="sig-param">input_content_type: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#AlgorithmSpecification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.AlgorithmSpecification" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.training_job.</code><code class="sig-name descname">AlgorithmSpecification</code><span class="sig-paren">(</span><em class="sig-param">algorithm_name: int = 0</em>, <em class="sig-param">algorithm_version: str = ''</em>, <em class="sig-param">input_mode: int = 0</em>, <em class="sig-param">metric_definitions: List[flytekit.models.sagemaker.training_job.MetricDefinition] = None</em>, <em class="sig-param">input_content_type: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#AlgorithmSpecification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.AlgorithmSpecification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <p>Specifies the training algorithm to be used in the training job
 This object is mostly a pass-through, with a couple of exceptions include: (1) in Flyte, users don’t need to specify

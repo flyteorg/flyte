@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.filters &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.filters &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,11 +161,11 @@
             
   <h1>Source code for flytekit.models.filters</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.models.common</span> <span class="k">import</span> <span class="n">FlyteIdlEntity</span> <span class="k">as</span> <span class="n">_FlyteIdlEntity</span>
 
 
 <div class="viewcode-block" id="FilterList"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.FilterList">[docs]</a><span class="k">class</span> <span class="nc">FilterList</span><span class="p">(</span><span class="n">_FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filter_list</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[Filter] filter_list: List of filters to AND together</span>
@@ -213,21 +213,21 @@
 <span class="sd">        :param Text string:</span>
 <span class="sd">        :rtype: Filter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;eq(&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;eq(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">Equal</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;neq(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;neq(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">NotEqual</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;gt(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;gt(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">GreaterThan</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;gte(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;gte(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">GreaterThanOrEqual</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;lt(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;lt(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">LessThan</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;lte(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;lte(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">LessThanOrEqual</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;contains(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;contains(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">Contains</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;value_in(&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">string</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;value_in(&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">ValueIn</span><span class="o">.</span><span class="n">_parse_from_string</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; could not be parsed into a filter.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
@@ -238,8 +238,8 @@
 <span class="sd">        :param Text string:</span>
 <span class="sd">        :rtype: Filter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">stripped</span> <span class="o">=</span> <span class="n">string</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_comparator</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="k">if</span> <span class="n">stripped</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
+        <span class="n">stripped</span> <span class="o">=</span> <span class="n">string</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_comparator</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="k">if</span> <span class="n">stripped</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Filter could not be parsed because </span><span class="si">{}</span><span class="s2"> did not end with a &#39;)&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
         <span class="n">split</span> <span class="o">=</span> <span class="n">stripped</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">split</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
@@ -254,31 +254,30 @@
 
 
 <div class="viewcode-block" id="Equal"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.Equal">[docs]</a><span class="k">class</span> <span class="nc">Equal</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;eq&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;eq&quot;</span></div>
 
 
 <div class="viewcode-block" id="NotEqual"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.NotEqual">[docs]</a><span class="k">class</span> <span class="nc">NotEqual</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;neq&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;neq&quot;</span></div>
 
 
 <div class="viewcode-block" id="GreaterThan"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.GreaterThan">[docs]</a><span class="k">class</span> <span class="nc">GreaterThan</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;gt&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;gt&quot;</span></div>
 
 
 <div class="viewcode-block" id="GreaterThanOrEqual"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.GreaterThanOrEqual">[docs]</a><span class="k">class</span> <span class="nc">GreaterThanOrEqual</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;gte&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;gte&quot;</span></div>
 
 
 <div class="viewcode-block" id="LessThan"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.LessThan">[docs]</a><span class="k">class</span> <span class="nc">LessThan</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;lt&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;lt&quot;</span></div>
 
 
 <div class="viewcode-block" id="LessThanOrEqual"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.LessThanOrEqual">[docs]</a><span class="k">class</span> <span class="nc">LessThanOrEqual</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;lte&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;lte&quot;</span></div>
 
 
 <div class="viewcode-block" id="SetFilter"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.SetFilter">[docs]</a><span class="k">class</span> <span class="nc">SetFilter</span><span class="p">(</span><span class="n">Filter</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text key:  The name of the field to compare against</span>
@@ -288,15 +287,15 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_parse_value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Contains"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.Contains">[docs]</a><span class="k">class</span> <span class="nc">Contains</span><span class="p">(</span><span class="n">SetFilter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;contains&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;contains&quot;</span></div>
 
 
 <div class="viewcode-block" id="ValueIn"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.filters.ValueIn">[docs]</a><span class="k">class</span> <span class="nc">ValueIn</span><span class="p">(</span><span class="n">SetFilter</span><span class="p">):</span>
-    <span class="n">_comparator</span> <span class="o">=</span> <span class="s1">&#39;value_in&#39;</span></div>
+    <span class="n">_comparator</span> <span class="o">=</span> <span class="s2">&quot;value_in&quot;</span></div>
 </pre></div>
 
            </div>

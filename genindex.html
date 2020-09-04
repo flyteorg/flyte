@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Flyte 0.6.0 documentation</title>
+  <title>Index &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -479,6 +479,8 @@
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.QuboleHiveJob.cluster_label">cluster_label() (flytekit.models.qubole.QuboleHiveJob property)</a>
 </li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.CLUSTER_RESOURCE">CLUSTER_RESOURCE (flytekit.models.matchable_resource.MatchableResource attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes.cluster_resource_attributes">cluster_resource_attributes() (flytekit.models.matchable_resource.MatchingAttributes property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.ClusterResourceAttributes">ClusterResourceAttributes (class in flytekit.models.matchable_resource)</a>
@@ -667,6 +669,10 @@
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.TaskTemplate.custom">custom() (flytekit.models.task.TaskTemplate property)</a>
 </li>
+      <li><a href="flytekit/flytekit.sdk.sagemaker.html#flytekit.sdk.sagemaker.task.custom_training_job_task">custom_training_job_task() (in module flytekit.sdk.sagemaker.task)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask">CustomTrainingJobTask (class in flytekit.common.tasks.sagemaker.custom_training_job_task)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -741,10 +747,10 @@
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.TaskMetadata.discoverable">discoverable() (flytekit.models.task.TaskMetadata property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.TaskMetadata.discovery_version">discovery_version() (flytekit.models.task.TaskMetadata property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.discovery.DiscoveryClient">DiscoveryClient (class in flytekit.clis.auth.discovery)</a>
 </li>
       <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.auth.OAuthCallbackHandler.do_GET">do_GET() (flytekit.clis.auth.auth.OAuthCallbackHandler method)</a>
@@ -797,6 +803,8 @@
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.compiler.ConnectionSet.downstream">downstream() (flytekit.models.core.compiler.ConnectionSet property)</a>
 </li>
+      <li><a href="flytekit/flytekit.interfaces.stats.html#flytekit.interfaces.stats.client.DummyStatsClient">DummyStatsClient (class in flytekit.interfaces.stats.client)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.types.SchemaType.SchemaColumn.SchemaColumnType.DURATION">DURATION (flytekit.models.types.SchemaType.SchemaColumn.SchemaColumnType attribute)</a>
 
       <ul>
@@ -811,6 +819,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.node_execution.NodeExecutionClosure.duration">(flytekit.models.node_execution.NodeExecutionClosure property)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.dynamic_sidecar_task">dynamic_sidecar_task() (in module flytekit.sdk.tasks)</a>
+</li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.DYNAMIC_TASK">DYNAMIC_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.dynamic_task">dynamic_task() (in module flytekit.sdk.tasks)</a>
@@ -857,6 +867,8 @@
         <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.execution.WorkflowExecutionPhase.enum_to_string">(flytekit.models.core.execution.WorkflowExecutionPhase class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanState.enum_to_string">(flytekit.models.launch_plan.LaunchPlanState class method)</a>
+</li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.enum_to_string">(flytekit.models.matchable_resource.MatchableResource class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityState.enum_to_string">(flytekit.models.named_entity.NamedEntityState class method)</a>
 </li>
@@ -910,7 +922,7 @@
       <ul>
         <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.hive_task.SdkHiveTask.execute">(flytekit.common.tasks.hive_task.SdkHiveTask method)</a>
 </li>
-        <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask.execute">(flytekit.common.tasks.sdk_dynamic.SdkDynamicTask method)</a>
+        <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin.execute">(flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.execute">(flytekit.common.tasks.sdk_runnable.SdkRunnableTask method)</a>
 </li>
@@ -939,6 +951,8 @@
       </ul></li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.execution.Execution">Execution (class in flytekit.models.execution)</a>
 </li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.EXECUTION_CLUSTER_LABEL">EXECUTION_CLUSTER_LABEL (flytekit.models.matchable_resource.MatchableResource attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes.execution_cluster_label">execution_cluster_label() (flytekit.models.matchable_resource.MatchingAttributes property)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.ExecutionParameters.execution_date">execution_date() (flytekit.common.tasks.sdk_runnable.ExecutionParameters property)</a>
@@ -957,6 +971,8 @@
         <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.identifier.NodeExecutionIdentifier.execution_id">(flytekit.models.core.identifier.NodeExecutionIdentifier property)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.EXECUTION_QUEUE">EXECUTION_QUEUE (flytekit.models.matchable_resource.MatchableResource attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes.execution_queue_attributes">execution_queue_attributes() (flytekit.models.matchable_resource.MatchingAttributes property)</a>
 </li>
       <li><a href="flytekit/flytekit.common.mixins.html#flytekit.common.mixins.artifact.ExecutionArtifact">ExecutionArtifact (class in flytekit.common.mixins.artifact)</a>
@@ -1267,9 +1283,11 @@
 </li>
       <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker">flytekit.common.tasks.sagemaker (module)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task (module)</a>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.built_in_training_job_task">flytekit.common.tasks.sagemaker.built_in_training_job_task (module)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.training_job_task">flytekit.common.tasks.sagemaker.training_job_task (module)</a>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.custom_training_job_task">flytekit.common.tasks.sagemaker.custom_training_job_task (module)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task (module)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_dynamic">flytekit.common.tasks.sdk_dynamic (module)</a>
 </li>
@@ -1473,6 +1491,10 @@
 </li>
       <li><a href="flytekit/flytekit.sdk.html#module-flytekit.sdk.exceptions">flytekit.sdk.exceptions (module)</a>
 </li>
+      <li><a href="flytekit/flytekit.sdk.sagemaker.html#module-flytekit.sdk.sagemaker">flytekit.sdk.sagemaker (module)</a>
+</li>
+      <li><a href="flytekit/flytekit.sdk.sagemaker.html#module-flytekit.sdk.sagemaker.task">flytekit.sdk.sagemaker.task (module)</a>
+</li>
       <li><a href="flytekit/flytekit.sdk.html#module-flytekit.sdk.spark_types">flytekit.sdk.spark_types (module)</a>
 </li>
       <li><a href="flytekit/flytekit.sdk.html#module-flytekit.sdk.tasks">flytekit.sdk.tasks (module)</a>
@@ -1499,10 +1521,10 @@
 </li>
       <li><a href="flytekit/flytekit.type_engines.default.html#module-flytekit.type_engines.default.flyte">flytekit.type_engines.default.flyte (module)</a>
 </li>
-      <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan">FlyteLaunchPlan (class in flytekit.engines.flyte.engine)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan">FlyteLaunchPlan (class in flytekit.engines.flyte.engine)</a>
+</li>
       <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution">FlyteNodeExecution (class in flytekit.engines.flyte.engine)</a>
 </li>
       <li><a href="flytekit/flytekit.common.exceptions.html#flytekit.common.exceptions.system.FlyteNotImplementedException">FlyteNotImplementedException</a>
@@ -1611,6 +1633,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.common.Notification.from_flyte_idl">(flytekit.models.common.Notification class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.common.PagerDutyNotification.from_flyte_idl">(flytekit.models.common.PagerDutyNotification class method)</a>
+</li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig.from_flyte_idl">(flytekit.models.common.RawOutputDataConfig class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.common.SlackNotification.from_flyte_idl">(flytekit.models.common.SlackNotification class method)</a>
 </li>
@@ -2119,6 +2143,12 @@
         <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_outputs">(flytekit.engines.flyte.engine.FlyteWorkflowExecution method)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.get_project_domain_attributes">get_project_domain_attributes() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_project_domain_attributes">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
+</li>
+      </ul></li>
       <li><a href="flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.common.DataProxy.get_random_directory">get_random_directory() (flytekit.interfaces.data.common.DataProxy method)</a>
 
       <ul>
@@ -2239,6 +2269,12 @@
         <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.get_workflow">(flytekit.engines.flyte.engine.FlyteEngineFactory method)</a>
 </li>
         <li><a href="flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineFactory.get_workflow">(flytekit.engines.unit.engine.UnitTestEngineFactory method)</a>
+</li>
+      </ul></li>
+      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.get_workflow_attributes">get_workflow_attributes() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_workflow_attributes">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
       <li><a href="flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.get_workflow_execution">get_workflow_execution() (flytekit.engines.common.BaseExecutionEngineFactory method)</a>
@@ -2697,10 +2733,16 @@
         <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_launch_plans_paginated">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
-      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.list_node_executions">list_node_executions() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
+      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.list_matchable_attributes">list_matchable_attributes() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.list_matchable_attributes">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.list_node_executions">list_node_executions() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
+</li>
       <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.list_node_executions_for_task_paginated">list_node_executions_for_task_paginated() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
 
       <ul>
@@ -2835,6 +2877,8 @@
       </ul></li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.types.LiteralType.map_value_type">map_value_type() (flytekit.models.types.LiteralType property)</a>
 </li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource">MatchableResource (class in flytekit.models.matchable_resource)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes">MatchingAttributes (class in flytekit.models.matchable_resource)</a>
 </li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJob.max_number_of_training_jobs">max_number_of_training_jobs() (flytekit.models.sagemaker.hpo_job.HyperparameterTuningJob property)</a>
@@ -2875,10 +2919,10 @@
       </ul></li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate.metadata_defaults">metadata_defaults() (flytekit.models.core.workflow.WorkflowTemplate property)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_JSON">METADATA_FORMAT_JSON (flytekit.common.tasks.raw_container.SdkRawContainerTask attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_JSON">METADATA_FORMAT_JSON (flytekit.common.tasks.raw_container.SdkRawContainerTask attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_PROTO">METADATA_FORMAT_PROTO (flytekit.common.tasks.raw_container.SdkRawContainerTask attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.raw_container.SdkRawContainerTask.METADATA_FORMAT_YAML">METADATA_FORMAT_YAML (flytekit.common.tasks.raw_container.SdkRawContainerTask attribute)</a>
@@ -3080,6 +3124,8 @@
 </li>
       </ul></li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.workflow.Node.output_aliases">output_aliases() (flytekit.models.core.workflow.Node property)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig.output_location_prefix">output_location_prefix() (flytekit.models.common.RawOutputDataConfig property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -3367,6 +3413,8 @@
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.QUALITY_OF_SERVICE_SPECIFICATION">QUALITY_OF_SERVICE_SPECIFICATION (flytekit.models.matchable_resource.MatchableResource attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.qubole_hive_task">qubole_hive_task() (in module flytekit.sdk.tasks)</a>
 </li>
       <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.qubole_spark_task">qubole_spark_task() (in module flytekit.sdk.tasks)</a>
@@ -3375,14 +3423,14 @@
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.HiveQueryCollection.queries">queries() (flytekit.models.qubole.HiveQueryCollection property)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.HiveQuery.query">query() (flytekit.models.qubole.HiveQuery property)</a>
 
       <ul>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.QuboleHiveJob.query">(flytekit.models.qubole.QuboleHiveJob property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.QuboleHiveJob.query_collection">query_collection() (flytekit.models.qubole.QuboleHiveJob property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.execution.NodeExecutionPhase.QUEUED">QUEUED (flytekit.models.core.execution.NodeExecutionPhase attribute)</a>
@@ -3411,7 +3459,25 @@
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.RAW_CONTAINER_TASK">RAW_CONTAINER_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.raw_output_data_config">raw_output_data_config() (flytekit.common.launch_plan.SdkLaunchPlan property)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.launch_plan.LaunchPlanSpec.raw_output_data_config">(flytekit.models.launch_plan.LaunchPlanSpec property)</a>
+</li>
+      </ul></li>
+      <li><a href="flytekit/flytekit.configuration.html#flytekit.configuration.auth.RAW_OUTPUT_DATA_PREFIX">RAW_OUTPUT_DATA_PREFIX (in module flytekit.configuration.auth)</a>
+</li>
+      <li><a href="flytekit/flytekit.engines.html#flytekit.engines.common.EngineContext.raw_output_data_prefix">raw_output_data_prefix() (flytekit.engines.common.EngineContext property)</a>
+</li>
+      <li><a href="flytekit/flytekit.interfaces.data.gcs.html#flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy.raw_output_data_prefix_override">raw_output_data_prefix_override() (flytekit.interfaces.data.gcs.gcs_proxy.GCSProxy property)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.interfaces.data.s3.html#flytekit.interfaces.data.s3.s3proxy.AwsS3Proxy.raw_output_data_prefix_override">(flytekit.interfaces.data.s3.s3proxy.AwsS3Proxy property)</a>
+</li>
+      </ul></li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.PromiseOutputReference.raw_value">raw_value() (flytekit.common.tasks.sdk_dynamic.PromiseOutputReference property)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig">RawOutputDataConfig (class in flytekit.models.common)</a>
 </li>
       <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient">RawSynchronousFlyteClient (class in flytekit.clients.raw)</a>
 </li>
@@ -3481,6 +3547,8 @@
         <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.register_project">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.register.register_tasks_only">register_tasks_only() (in module flytekit.clis.sdk_in_container.register)</a>
 </li>
       <li><a href="flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity">RegisterableEntity (class in flytekit.common.mixins.registerable)</a>
@@ -3491,8 +3559,6 @@
         <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.relaunch_execution">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.blobs.Blob.remote_location">remote_location() (flytekit.common.types.impl.blobs.Blob property)</a>
 
       <ul>
@@ -3591,6 +3657,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.SAGEMAKER_CUSTOM_TRAINING_JOB_TASK">SAGEMAKER_CUSTOM_TRAINING_JOB_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.SAGEMAKER_HYPERPARAMETER_TUNING_JOB_TASK">SAGEMAKER_HYPERPARAMETER_TUNING_JOB_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.SAGEMAKER_TRAINING_JOB_TASK">SAGEMAKER_TRAINING_JOB_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
@@ -3707,9 +3775,13 @@
       </ul></li>
       <li><a href="flytekit/flytekit.engines.html#flytekit.engines.common.BaseWorkflowExecution.sdk_workflow_execution">sdk_workflow_execution() (flytekit.engines.common.BaseWorkflowExecution property)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask">SdkBuiltinAlgorithmTrainingJobTask (class in flytekit.common.tasks.sagemaker.training_job_task)</a>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask">SdkBuiltinAlgorithmTrainingJobTask (class in flytekit.common.tasks.sagemaker.built_in_training_job_task)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sidecar_task.SdkDynamicSidecarTask">SdkDynamicSidecarTask (class in flytekit.common.tasks.sidecar_task)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask">SdkDynamicTask (class in flytekit.common.tasks.sdk_dynamic)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin">SdkDynamicTaskMixin (class in flytekit.common.tasks.sdk_dynamic)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask">SdkGenericSparkTask (class in flytekit.common.tasks.generic_spark_task)</a>
 </li>
@@ -3909,6 +3981,8 @@
         <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.types.Types.Timedelta.short_string">(flytekit.sdk.types.Types.Timedelta method)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.common.html#flytekit.common.workflow.SdkWorkflow.should_create_default_launch_plan">should_create_default_launch_plan() (flytekit.common.workflow.SdkWorkflow property)</a>
+</li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType.SIDECAR_TASK">SIDECAR_TASK (flytekit.common.constants.SdkTaskType attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.sidecar_task">sidecar_task() (in module flytekit.sdk.tasks)</a>
@@ -3993,6 +4067,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.types.SimpleType.STRING">(flytekit.models.types.SimpleType attribute)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.string_to_enum">string_to_enum() (flytekit.models.matchable_resource.MatchableResource class method)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.literals.Primitive.string_value">string_value() (flytekit.models.literals.Primitive property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.types.SimpleType.STRUCT">STRUCT (flytekit.models.types.SimpleType attribute)</a>
@@ -4092,6 +4168,8 @@
       <li><a href="flytekit/flytekit.configuration.html#flytekit.configuration.sdk.TASK_NAME_FORMAT">TASK_NAME_FORMAT (in module flytekit.configuration.sdk)</a>
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.workflow.Node.task_node">task_node() (flytekit.models.core.workflow.Node property)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.TASK_RESOURCE">TASK_RESOURCE (flytekit.models.matchable_resource.MatchableResource attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.TaskClosure">TaskClosure (class in flytekit.models.task)</a>
 </li>
@@ -4217,6 +4295,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.common.Notification.to_flyte_idl">(flytekit.models.common.Notification method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.common.PagerDutyNotification.to_flyte_idl">(flytekit.models.common.PagerDutyNotification method)</a>
+</li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig.to_flyte_idl">(flytekit.models.common.RawOutputDataConfig method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.common.SlackNotification.to_flyte_idl">(flytekit.models.common.SlackNotification method)</a>
 </li>
@@ -4563,8 +4643,12 @@
 </li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.training_job_early_stopping_type">training_job_early_stopping_type() (flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig property)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask.training_job_model">training_job_model() (flytekit.common.tasks.sagemaker.training_job_task.SdkBuiltinAlgorithmTrainingJobTask property)</a>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask.training_job_model">training_job_model() (flytekit.common.tasks.sagemaker.built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask property)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask.training_job_model">(flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask property)</a>
 </li>
+      </ul></li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJob.training_job_resource_config">training_job_resource_config() (flytekit.models.sagemaker.training_job.TrainingJob property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJob">TrainingJob (class in flytekit.models.sagemaker.training_job)</a>

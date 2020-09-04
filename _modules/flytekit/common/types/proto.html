@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.proto &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.types.proto &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,13 +162,15 @@
   <h1>Source code for flytekit.common.types.proto</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">base_sdk_types</span> <span class="k">as</span> <span class="n">_base_sdk_types</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_idl_types</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">import</span> <span class="nn">base64</span> <span class="k">as</span> <span class="nn">_base64</span>
+
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">reflection</span> <span class="k">as</span> <span class="n">_proto_reflection</span>
 
-<span class="kn">import</span> <span class="nn">base64</span> <span class="k">as</span> <span class="nn">_base64</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">base_sdk_types</span> <span class="k">as</span> <span class="n">_base_sdk_types</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_idl_types</span>
 
 
 <div class="viewcode-block" id="create_protobuf"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.proto.create_protobuf">[docs]</a><span class="k">def</span> <span class="nf">create_protobuf</span><span class="p">(</span><span class="n">pb_type</span><span class="p">):</span>
@@ -180,16 +182,16 @@
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
             <span class="n">expected_type</span><span class="o">=</span><span class="n">_proto_reflection</span><span class="o">.</span><span class="n">GeneratedProtocolMessageType</span><span class="p">,</span>
             <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">pb_type</span><span class="p">),</span>
-            <span class="n">received_value</span><span class="o">=</span><span class="n">pb_type</span>
+            <span class="n">received_value</span><span class="o">=</span><span class="n">pb_type</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">_Protobuf</span><span class="p">(</span><span class="n">Protobuf</span><span class="p">):</span>
         <span class="n">_pb_type</span> <span class="o">=</span> <span class="n">pb_type</span>
+
     <span class="k">return</span> <span class="n">_Protobuf</span></div>
 
 
 <div class="viewcode-block" id="ProtobufType"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.proto.ProtobufType">[docs]</a><span class="k">class</span> <span class="nc">ProtobufType</span><span class="p">(</span><span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkType</span><span class="p">):</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pb_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -224,10 +226,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="n">pb_object</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Protobuf</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">scalar</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">Scalar</span><span class="p">(</span>
-                <span class="n">binary</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">Binary</span><span class="p">(</span>
-                    <span class="n">value</span><span class="o">=</span><span class="nb">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">_six</span><span class="o">.</span><span class="n">PY2</span> <span class="k">else</span> <span class="n">data</span><span class="p">,</span>
-                    <span class="n">tag</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">tag</span>
-                <span class="p">)</span>
+                <span class="n">binary</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">Binary</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="nb">bytes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="k">if</span> <span class="n">_six</span><span class="o">.</span><span class="n">PY2</span> <span class="k">else</span> <span class="n">data</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
@@ -265,23 +264,14 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t_value</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">pb_type</span><span class="p">):</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">t_value</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
-                <span class="nb">type</span><span class="p">(</span><span class="n">t_value</span><span class="p">),</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">pb_type</span><span class="p">,</span>
-                <span class="n">received_value</span><span class="o">=</span><span class="n">t_value</span>
-            <span class="p">)</span></div>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">t_value</span><span class="p">),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">pb_type</span><span class="p">,</span> <span class="n">received_value</span><span class="o">=</span><span class="n">t_value</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Protobuf.to_flyte_literal_type"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.to_flyte_literal_type">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">to_flyte_literal_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.types.LiteralType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_idl_types</span><span class="o">.</span><span class="n">LiteralType</span><span class="p">(</span>
-            <span class="n">simple</span><span class="o">=</span><span class="n">_idl_types</span><span class="o">.</span><span class="n">SimpleType</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
-                <span class="bp">cls</span><span class="o">.</span><span class="n">PB_FIELD_KEY</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">descriptor</span>
-            <span class="p">}</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_idl_types</span><span class="o">.</span><span class="n">LiteralType</span><span class="p">(</span><span class="n">simple</span><span class="o">=</span><span class="n">_idl_types</span><span class="o">.</span><span class="n">SimpleType</span><span class="o">.</span><span class="n">BINARY</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">PB_FIELD_KEY</span><span class="p">:</span> <span class="bp">cls</span><span class="o">.</span><span class="n">descriptor</span><span class="p">},)</span></div>
 
 <div class="viewcode-block" id="Protobuf.promote_from_model"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">literal_model</span><span class="p">):</span>
@@ -295,7 +285,7 @@
                 <span class="n">literal_model</span><span class="o">.</span><span class="n">scalar</span><span class="o">.</span><span class="n">binary</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="n">pb_type</span><span class="p">,</span>
                 <span class="n">received_value</span><span class="o">=</span><span class="n">_base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">literal_model</span><span class="o">.</span><span class="n">scalar</span><span class="o">.</span><span class="n">binary</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
-                <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Can not deserialize as proto tags don&#39;t match.&quot;</span>
+                <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Can not deserialize as proto tags don&#39;t match.&quot;</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">pb_obj</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">pb_type</span><span class="p">()</span>
         <span class="n">pb_obj</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">literal_model</span><span class="o">.</span><span class="n">scalar</span><span class="o">.</span><span class="n">binary</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>

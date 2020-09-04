@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sdk_dynamic &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.sdk_dynamic &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,22 +162,29 @@
   <h1>Source code for flytekit.common.tasks.sdk_dynamic</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-
 <span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">_itertools</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> \
-    <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span><span class="p">,</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span><span class="p">,</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.utils</span> <span class="k">import</span> <span class="n">_dnsify</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">internal</span> <span class="k">as</span> <span class="n">_internal_config</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">dynamic_job</span> <span class="k">as</span> <span class="n">_dynamic_job</span><span class="p">,</span> <span class="n">array_job</span> <span class="k">as</span> <span class="n">_array_job</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">array_job</span> <span class="k">as</span> <span class="n">_array_job</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">dynamic_job</span> <span class="k">as</span> <span class="n">_dynamic_job</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
 
 
 <div class="viewcode-block" id="PromiseOutputReference"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.PromiseOutputReference">[docs]</a><span class="k">class</span> <span class="nc">PromiseOutputReference</span><span class="p">(</span><span class="n">_task_output</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">):</span>
@@ -209,68 +216,23 @@
     <span class="c1"># Upload inputs to working directory under /array_job.input_ref/inputs.pb</span>
     <span class="n">input_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">)</span>
     <span class="n">generated_files</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span>
-                  <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">})</span>
+        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">}</span>
+    <span class="p">)</span>
 
 
-<div class="viewcode-block" id="SdkDynamicTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask">[docs]</a><span class="k">class</span> <span class="nc">SdkDynamicTask</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">)):</span>
+<div class="viewcode-block" id="SdkDynamicTaskMixin"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin">[docs]</a><span class="k">class</span> <span class="nc">SdkDynamicTaskMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This class includes the additional logic for building a task that executes parent-child tasks in Python code.  It</span>
-<span class="sd">    has even more validation checks to ensure proper behavior than it&#39;s superclasses.</span>
+<span class="sd">    This mixin implements logic for building a task that executes</span>
+<span class="sd">    parent-child tasks in Python code.</span>
 
-<span class="sd">    Since an SdkDynamicTask is assumed to run by hooking into Python code, we will provide additional shortcuts and</span>
-<span class="sd">    methods on this object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">task_function</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">interruptible</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">allowed_failure_ratio</span><span class="p">,</span>
-            <span class="n">max_concurrency</span><span class="p">,</span>
-            <span class="n">environment</span><span class="p">,</span>
-            <span class="n">custom</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allowed_failure_ratio</span><span class="p">,</span> <span class="n">max_concurrency</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param task_function: Function container user code.  This will be executed via the SDK&#39;s engine.</span>
-<span class="sd">        :param Text task_type: string describing the task type</span>
-<span class="sd">        :param Text discovery_version: string describing the version for task discovery purposes</span>
-<span class="sd">        :param int retries: Number of retries to attempt</span>
-<span class="sd">        :param bool interruptible: Whether or not task is interruptible</span>
-<span class="sd">        :param Text deprecated:</span>
-<span class="sd">        :param Text storage_request:</span>
-<span class="sd">        :param Text cpu_request:</span>
-<span class="sd">        :param Text gpu_request:</span>
-<span class="sd">        :param Text memory_request:</span>
-<span class="sd">        :param Text storage_limit:</span>
-<span class="sd">        :param Text cpu_limit:</span>
-<span class="sd">        :param Text gpu_limit:</span>
-<span class="sd">        :param Text memory_limit:</span>
-<span class="sd">        :param bool discoverable:</span>
-<span class="sd">        :param datetime.timedelta timeout:</span>
 <span class="sd">        :param float allowed_failure_ratio:</span>
 <span class="sd">        :param int max_concurrency:</span>
-<span class="sd">        :param dict[Text, Text] environment:</span>
-<span class="sd">        :param dict[Text, T] custom:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SdkDynamicTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">task_function</span><span class="p">,</span> <span class="n">task_type</span><span class="p">,</span> <span class="n">discovery_version</span><span class="p">,</span> <span class="n">retries</span><span class="p">,</span> <span class="n">interruptible</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">,</span> <span class="n">discoverable</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">environment</span><span class="p">,</span> <span class="n">custom</span><span class="p">)</span>
 
         <span class="c1"># These will only appear in the generated futures</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_allowed_failure_ratio</span> <span class="o">=</span> <span class="n">allowed_failure_ratio</span>
@@ -282,9 +244,9 @@
 <span class="sd">        :param str inputs_prefix:</span>
 <span class="sd">        :rtype: _array_job.ArrayJob</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_array_job</span><span class="o">.</span><span class="n">ArrayJob</span><span class="p">(</span><span class="n">parallelism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_concurrency</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_concurrency</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
-                                   <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                                   <span class="n">min_successes</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_array_job</span><span class="o">.</span><span class="n">ArrayJob</span><span class="p">(</span>
+            <span class="n">parallelism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_concurrency</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_concurrency</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">min_successes</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_can_run_as_array</span><span class="p">(</span><span class="n">task_type</span><span class="p">):</span>
@@ -316,9 +278,10 @@
 <span class="sd">        :param flytekit.models.literals.LiteralMap literal_map inputs:</span>
 <span class="sd">        :rtype: (_dynamic_job.DynamicJobSpec, dict[Text, flytekit.models.common.FlyteIdlEntity])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)},</span>
+        <span class="p">)</span>
         <span class="n">outputs_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">PromiseOutputReference</span><span class="p">(</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
@@ -327,13 +290,18 @@
         <span class="c1"># Because users declare both inputs and outputs in their functions signatures, merge them together</span>
         <span class="c1"># before calling user code</span>
         <span class="n">inputs_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">outputs_dict</span><span class="p">)</span>
-        <span class="n">yielded_sub_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sub_task</span> <span class="k">for</span> <span class="n">sub_task</span> <span class="ow">in</span>
-                             <span class="nb">super</span><span class="p">(</span><span class="n">SdkDynamicTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_execute_user_code</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">inputs_dict</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]]</span>
+        <span class="n">yielded_sub_tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">sub_task</span> <span class="k">for</span> <span class="n">sub_task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_user_code</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">inputs_dict</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]]</span>
 
         <span class="n">upstream_nodes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">output_bindings</span> <span class="o">=</span> <span class="p">[</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span><span class="n">var</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">binding</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">BindingData</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span>
-            <span class="n">b</span><span class="o">.</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span> <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">))</span>
-                           <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">outputs_dict</span><span class="p">)]</span>
+        <span class="n">output_bindings</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">_literal_models</span><span class="o">.</span><span class="n">Binding</span><span class="p">(</span>
+                <span class="n">var</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">binding</span><span class="o">=</span><span class="n">_interface</span><span class="o">.</span><span class="n">BindingData</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span>
+                    <span class="n">b</span><span class="o">.</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">(),</span> <span class="n">b</span><span class="o">.</span><span class="n">raw_value</span><span class="p">,</span> <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">outputs_dict</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="n">upstream_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">upstream_nodes</span><span class="p">)</span>
 
         <span class="n">generated_files</span> <span class="o">=</span> <span class="p">{}</span>
@@ -366,7 +334,7 @@
                     <span class="n">_internal_config</span><span class="o">.</span><span class="n">TASK_PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">PROJECT</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
                     <span class="n">_internal_config</span><span class="o">.</span><span class="n">TASK_DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">DOMAIN</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
                     <span class="n">executable</span><span class="o">.</span><span class="n">platform_valid_name</span><span class="p">,</span>
-                    <span class="n">_internal_config</span><span class="o">.</span><span class="n">TASK_VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                    <span class="n">_internal_config</span><span class="o">.</span><span class="n">TASK_VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_internal_config</span><span class="o">.</span><span class="n">VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
                 <span class="p">)</span>
 
             <span class="c1"># Generate an id that&#39;s unique in the document (if the same task is used multiple times with</span>
@@ -403,7 +371,10 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">array_job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_array_job</span><span class="p">(</span><span class="n">inputs_prefix</span><span class="o">=</span><span class="n">unique_node_id</span><span class="p">)</span>
                         <span class="n">node</span> <span class="o">=</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">unique_node_id</span><span class="p">)</span>
-                        <span class="n">array_job_index</span><span class="p">[</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">array_job</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+                        <span class="n">array_job_index</span><span class="p">[</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">array_job</span><span class="p">,</span>
+                            <span class="n">node</span><span class="p">,</span>
+                        <span class="p">)</span>
 
                     <span class="n">node_index</span> <span class="o">=</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">array_job</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">node_output</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">outputs</span><span class="p">):</span>
@@ -414,8 +385,8 @@
                     <span class="c1"># Upload inputs to working directory under /array_job.input_ref/&lt;index&gt;/inputs.pb</span>
                     <span class="n">input_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">node_index</span><span class="p">,</span> <span class="n">_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">)</span>
                     <span class="n">generated_files</span><span class="p">[</span><span class="n">input_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-                        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span>
-                                  <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">})</span>
+                        <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">inputs</span><span class="p">}</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">node</span> <span class="o">=</span> <span class="n">sub_task_node</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">unique_node_id</span><span class="p">)</span>
                     <span class="n">tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sub_task_node</span><span class="o">.</span><span class="n">executable_sdk_object</span><span class="p">)</span>
@@ -424,8 +395,11 @@
         <span class="c1"># assign custom field to the ArrayJob properties computed.</span>
         <span class="k">for</span> <span class="n">task</span><span class="p">,</span> <span class="p">(</span><span class="n">array_job</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">array_job_index</span><span class="p">):</span>
             <span class="c1"># TODO: Reconstruct task template object instead of modifying an existing one?</span>
-            <span class="n">tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">assign_custom_and_return</span><span class="p">(</span><span class="n">array_job</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span><span class="o">.</span><span class="n">assign_type_and_return</span><span class="p">(</span>
-                <span class="n">_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">CONTAINER_ARRAY_TASK</span><span class="p">))</span>
+            <span class="n">tasks</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">assign_custom_and_return</span><span class="p">(</span><span class="n">array_job</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span><span class="o">.</span><span class="n">assign_type_and_return</span><span class="p">(</span>
+                    <span class="n">_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">CONTAINER_ARRAY_TASK</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="c1"># min_successes is absolute, it&#39;s computed as the reverse of allowed_failure_ratio and multiplied by the</span>
         <span class="c1"># total length of tasks to get an absolute count.</span>
@@ -435,11 +409,12 @@
             <span class="n">tasks</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">tasks</span><span class="p">),</span>
             <span class="n">nodes</span><span class="o">=</span><span class="n">nodes</span><span class="p">,</span>
             <span class="n">outputs</span><span class="o">=</span><span class="n">output_bindings</span><span class="p">,</span>
-            <span class="n">subworkflows</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">sub_workflows</span><span class="p">))</span>
+            <span class="n">subworkflows</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">sub_workflows</span><span class="p">),</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">dynamic_job_spec</span><span class="p">,</span> <span class="n">generated_files</span>
 
-<div class="viewcode-block" id="SdkDynamicTask.execute"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask.execute">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+<div class="viewcode-block" id="SdkDynamicTaskMixin.execute"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin.execute">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes batch task&#39;s user code and produces futures file as well as all sub-task inputs.pb files.</span>
@@ -459,14 +434,93 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{</span>
                 <span class="n">_constants</span><span class="o">.</span><span class="n">OUTPUT_FILE_NAME</span><span class="p">:</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-                    <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">outputs</span><span class="p">})</span>
+                    <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">binding</span><span class="o">.</span><span class="n">var</span><span class="p">:</span> <span class="n">binding</span><span class="o">.</span><span class="n">binding</span><span class="o">.</span><span class="n">to_literal_model</span><span class="p">()</span> <span class="k">for</span> <span class="n">binding</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">outputs</span><span class="p">}</span>
+                <span class="p">)</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">generated_files</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-                <span class="n">_constants</span><span class="o">.</span><span class="n">FUTURES_FILE_NAME</span><span class="p">:</span> <span class="n">spec</span>
-            <span class="p">})</span>
+            <span class="n">generated_files</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">_constants</span><span class="o">.</span><span class="n">FUTURES_FILE_NAME</span><span class="p">:</span> <span class="n">spec</span><span class="p">})</span>
 
             <span class="k">return</span> <span class="n">generated_files</span></div></div>
+
+
+<div class="viewcode-block" id="SdkDynamicTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask">[docs]</a><span class="k">class</span> <span class="nc">SdkDynamicTask</span><span class="p">(</span>
+    <span class="n">SdkDynamicTaskMixin</span><span class="p">,</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span>
+<span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class includes the additional logic for building a task that executes</span>
+<span class="sd">    parent-child tasks in Python code.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">allowed_failure_ratio</span><span class="p">,</span>
+        <span class="n">max_concurrency</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">,</span>
+        <span class="n">custom</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param task_function: Function container user code.  This will be executed via the SDK&#39;s engine.</span>
+<span class="sd">        :param Text task_type: string describing the task type</span>
+<span class="sd">        :param Text discovery_version: string describing the version for task discovery purposes</span>
+<span class="sd">        :param int retries: Number of retries to attempt</span>
+<span class="sd">        :param bool interruptible: Whether or not task is interruptible</span>
+<span class="sd">        :param Text deprecated:</span>
+<span class="sd">        :param Text storage_request:</span>
+<span class="sd">        :param Text cpu_request:</span>
+<span class="sd">        :param Text gpu_request:</span>
+<span class="sd">        :param Text memory_request:</span>
+<span class="sd">        :param Text storage_limit:</span>
+<span class="sd">        :param Text cpu_limit:</span>
+<span class="sd">        :param Text gpu_limit:</span>
+<span class="sd">        :param Text memory_limit:</span>
+<span class="sd">        :param bool discoverable:</span>
+<span class="sd">        :param datetime.timedelta timeout:</span>
+<span class="sd">        :param float allowed_failure_ratio:</span>
+<span class="sd">        :param int max_concurrency:</span>
+<span class="sd">        :param dict[Text, Text] environment:</span>
+<span class="sd">        :param dict[Text, T] custom:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableTask</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">task_function</span><span class="p">,</span>
+            <span class="n">task_type</span><span class="p">,</span>
+            <span class="n">discovery_version</span><span class="p">,</span>
+            <span class="n">retries</span><span class="p">,</span>
+            <span class="n">interruptible</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="p">,</span>
+            <span class="n">storage_request</span><span class="p">,</span>
+            <span class="n">cpu_request</span><span class="p">,</span>
+            <span class="n">gpu_request</span><span class="p">,</span>
+            <span class="n">memory_request</span><span class="p">,</span>
+            <span class="n">storage_limit</span><span class="p">,</span>
+            <span class="n">cpu_limit</span><span class="p">,</span>
+            <span class="n">gpu_limit</span><span class="p">,</span>
+            <span class="n">memory_limit</span><span class="p">,</span>
+            <span class="n">discoverable</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="p">,</span>
+            <span class="n">environment</span><span class="p">,</span>
+            <span class="n">custom</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">SdkDynamicTaskMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">allowed_failure_ratio</span><span class="p">,</span> <span class="n">max_concurrency</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
