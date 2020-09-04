@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools.lazy_loader &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.tools.lazy_loader &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,6 +161,7 @@
             
   <h1>Source code for flytekit.tools.lazy_loader</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importlib</span>
 <span class="kn">import</span> <span class="nn">sys</span> <span class="k">as</span> <span class="nn">_sys</span>
 <span class="kn">import</span> <span class="nn">types</span> <span class="k">as</span> <span class="nn">_types</span>
@@ -186,21 +187,28 @@
 <span class="sd">        :rtype: dict[Text,list[Text]]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">d</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">LAZY_LOADING_PLUGINS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">all_plugins</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_plugins_spark2</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_plugins_spark3</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">:</span>
-            <span class="c1"># Default to Spark 2.4.x .</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span><span class="s2">&quot;spark3&quot;</span><span class="p">:</span>
-                <span class="n">all_plugins</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="c1"># Default to Spark 2.4.x in all-spark2 and Spark 3.x in all-spark3.</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;spark3&quot;</span><span class="p">:</span>
+                <span class="n">all_plugins_spark2</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;spark&quot;</span><span class="p">:</span>
+                <span class="n">all_plugins_spark3</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 
-        <span class="n">d</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_plugins</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;all-spark2.4&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_plugins_spark2</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;all-spark3&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_plugins_spark3</span>
+        <span class="c1"># all points to Spark 2.4</span>
+        <span class="n">d</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_plugins_spark2</span>
         <span class="k">return</span> <span class="n">d</span></div></div>
 
 
 <div class="viewcode-block" id="lazy_load_module"><a class="viewcode-back" href="../../../flytekit/flytekit.tools.html#flytekit.tools.lazy_loader.lazy_load_module">[docs]</a><span class="k">def</span> <span class="nf">lazy_load_module</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param Text module: </span>
+<span class="sd">    :param Text module:</span>
 <span class="sd">    :rtype: _types.ModuleType</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">class</span> <span class="nc">LazyLoadModule</span><span class="p">(</span><span class="n">_LazyLoadModule</span><span class="p">):</span>
         <span class="n">_module</span> <span class="o">=</span> <span class="n">module</span>
         <span class="n">_lazy_submodules</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -211,11 +219,13 @@
 
 <span class="k">class</span> <span class="nc">_LazyLoadModule</span><span class="p">(</span><span class="n">_types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">):</span>
 
-    <span class="n">_ERROR_MSG_FMT</span> <span class="o">=</span> <span class="s2">&quot;Attempting to use a plugin functionality that requires module &quot;</span> \
-                     <span class="s2">&quot;`</span><span class="si">{module}</span><span class="s2">`, but it couldn&#39;t be loaded. Please pip install at least one of </span><span class="si">{plugins}</span><span class="s2"> or &quot;</span> \
-                     <span class="s2">&quot;`flytekit[all]` to get these dependencies.</span><span class="se">\n</span><span class="s2">&quot;</span> \
-                     <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> \
-                     <span class="s2">&quot;Original message: </span><span class="si">{msg}</span><span class="s2">&quot;</span>
+    <span class="n">_ERROR_MSG_FMT</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;Attempting to use a plugin functionality that requires module &quot;</span>
+        <span class="s2">&quot;`</span><span class="si">{module}</span><span class="s2">`, but it couldn&#39;t be loaded. Please pip install at least one of </span><span class="si">{plugins}</span><span class="s2"> or &quot;</span>
+        <span class="s2">&quot;`flytekit[all]` to get these dependencies.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;Original message: </span><span class="si">{msg}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
@@ -224,13 +234,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">module</span> <span class="o">=</span> <span class="n">_importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_module</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                    <span class="bp">cls</span><span class="o">.</span><span class="n">_ERROR_MSG_FMT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_module</span><span class="p">,</span>
-                        <span class="n">plugins</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_plugins</span><span class="p">,</span>
-                        <span class="n">msg</span><span class="o">=</span><span class="n">e</span>
-                    <span class="p">)</span>
-                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_ERROR_MSG_FMT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">module</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_module</span><span class="p">,</span> <span class="n">plugins</span><span class="o">=</span><span class="bp">cls</span><span class="o">.</span><span class="n">_plugins</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="n">e</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">module</span>
 
     <span class="k">def</span> <span class="nf">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>

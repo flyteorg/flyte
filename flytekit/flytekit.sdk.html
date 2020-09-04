@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.sdk package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -35,7 +35,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="flytekit.tools package" href="flytekit.tools.html" />
+    <link rel="next" title="flytekit.sdk.sagemaker package" href="flytekit.sdk.sagemaker.html" />
     <link rel="prev" title="flytekit.plugins package" href="flytekit.plugins.html" /> 
 </head>
 
@@ -191,6 +191,19 @@
             
   <div class="section" id="flytekit-sdk-package">
 <h1>flytekit.sdk package<a class="headerlink" href="#flytekit-sdk-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="flytekit.sdk.sagemaker.html">flytekit.sdk.sagemaker package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.sdk.sagemaker.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.sdk.sagemaker.html#module-flytekit.sdk.sagemaker.task">flytekit.sdk.sagemaker.task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.sdk.sagemaker.html#module-flytekit.sdk.sagemaker">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
@@ -238,6 +251,153 @@ will fail without additional retries.</p>
 </div>
 <div class="section" id="module-flytekit.sdk.tasks">
 <span id="flytekit-sdk-tasks-module"></span><h2>flytekit.sdk.tasks module<a class="headerlink" href="#module-flytekit.sdk.tasks" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="flytekit.sdk.tasks.dynamic_sidecar_task">
+<code class="sig-prename descclassname">flytekit.sdk.tasks.</code><code class="sig-name descname">dynamic_sidecar_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">cache_version=''</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">interruptible=None</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">storage_request=None</em>, <em class="sig-param">cpu_request=None</em>, <em class="sig-param">gpu_request=None</em>, <em class="sig-param">memory_request=None</em>, <em class="sig-param">storage_limit=None</em>, <em class="sig-param">cpu_limit=None</em>, <em class="sig-param">gpu_limit=None</em>, <em class="sig-param">memory_limit=None</em>, <em class="sig-param">cache=False</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">allowed_failure_ratio=None</em>, <em class="sig-param">max_concurrency=None</em>, <em class="sig-param">environment=None</em>, <em class="sig-param">pod_spec=None</em>, <em class="sig-param">primary_container_name=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/tasks.html#dynamic_sidecar_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.tasks.dynamic_sidecar_task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to create a custom dynamic sidecar task definition. Dynamic
+tasks should be used to split up work into an arbitrary number of parallel
+sub-tasks, or workflows. This task will execute the primary task alongside
+the specified kubernetes PodSpec. Custom primary task container attributes
+can be defined in the PodSpec by defining a container whose name matches
+the primary_container_name. These container attributes will be applied to
+the container brought up to execute the primary task definition.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_pod_spec_for_task</span><span class="p">():</span>
+    <span class="n">pod_spec</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">PodSpec</span><span class="p">()</span>
+    <span class="n">secondary_container</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;alpine&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">secondary_container</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;/bin/sh&quot;</span><span class="p">])</span>
+    <span class="n">secondary_container</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;echo hi sidecar world &gt; /data/message.txt&quot;</span><span class="p">])</span>
+    <span class="n">shared_volume_mount</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">VolumeMount</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;shared-data&quot;</span><span class="p">,</span>
+        <span class="n">mountPath</span><span class="o">=</span><span class="s2">&quot;/data&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">secondary_container</span><span class="o">.</span><span class="n">volumeMounts</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">shared_volume_mount</span><span class="p">])</span>
+
+    <span class="n">primary_container</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">)</span>
+    <span class="n">primary_container</span><span class="o">.</span><span class="n">volumeMounts</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">shared_volume_mount</span><span class="p">])</span>
+
+    <span class="n">pod_spec</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">generated_pb2</span><span class="o">.</span><span class="n">Volume</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;shared-data&quot;</span><span class="p">,</span>
+        <span class="n">volumeSource</span><span class="o">=</span><span class="n">generated_pb2</span><span class="o">.</span><span class="n">VolumeSource</span><span class="p">(</span>
+            <span class="n">emptyDir</span><span class="o">=</span><span class="n">generated_pb2</span><span class="o">.</span><span class="n">EmptyDirVolumeSource</span><span class="p">(</span>
+                <span class="n">medium</span><span class="o">=</span><span class="s2">&quot;Memory&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)])</span>
+    <span class="n">pod_spec</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">primary_container</span><span class="p">,</span> <span class="n">secondary_container</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">pod_spec</span>
+
+<span class="nd">@outputs</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">)</span>
+<span class="nd">@python_task</span>
+<span class="k">def</span> <span class="nf">my_sub_task</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">randint</span><span class="p">())</span>
+
+<span class="nd">@outputs</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="p">[</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">])</span>
+<span class="nd">@dynamic_sidecar_task</span><span class="p">(</span>
+    <span class="n">pod_spec</span><span class="o">=</span><span class="n">generate_pod_spec_for_task</span><span class="p">(),</span>
+    <span class="n">primary_container_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_task</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
+    <span class="n">out_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+        <span class="n">out_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_sub_task</span><span class="p">()</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">out_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>All outputs of a batch task must be a list.  This is because the individual outputs of sub-tasks should be
+appended into a list.  There cannot be aggregation of outputs done in this task.  To accomplish aggregation,
+it is recommended that a python_task take the outputs of this task as input and do the necessary work.
+If a sub-task does not contribute an output, it must be yielded from the task with the <cite>yield</cite> keyword or
+returned from the task in a list.  If this isn’t done, the sub-task will not be executed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_task_function</strong> – this is the decorated method and shouldn’t be declared explicitly.  The function must
+take a first argument, and then named arguments matching those defined in &#64;inputs and &#64;outputs.  No keyword
+arguments are allowed.</p></li>
+<li><p><strong>cache_version</strong> (<em>Text</em>) – <p>[optional] string representing logical version for discovery.  This field should be
+updated whenever the underlying algorithm changes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
+</div>
+</p></li>
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
+to 0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is
+strongly recommended that tasks are written to be idempotent.</p>
+</div>
+</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
+will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
+<li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
+for the task to run.  Default is set by platform-level configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is currently not supported by the platform.</p>
+</div>
+</p></li>
+<li><p><strong>cpu_request</strong> (<em>Text</em>) – [optional] Kubernetes resource string for lower-bound of cores for the task to execute.
+This can be set to a fractional portion of a CPU. Default is set by platform-level configuration.
+TODO: Add links to resource string documentation for Kubernetes</p></li>
+<li><p><strong>gpu_request</strong> (<em>Text</em>) – [optional] Kubernetes resource string for lower-bound of desired GPUs.
+Default is set by platform-level configuration.
+TODO: Add links to resource string documentation for Kubernetes</p></li>
+<li><p><strong>memory_request</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for lower-bound of physical memory
+necessary for the task to execute.  Default is set by platform-level configuration.
+TODO: Add links to resource string documentation for Kubernetes</p></li>
+<li><p><strong>storage_limit</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for upper-bound of disk storage space
+for the task to run.  This amount is not guaranteed!  If not specified, it is set equal to storage_request.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is currently not supported by the platform.</p>
+</div>
+</p></li>
+<li><p><strong>cpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of cores for the task to execute.
+This can be set to a fractional portion of a CPU. This amount is not guaranteed!  If not specified,
+it is set equal to cpu_request.</p></li>
+<li><p><strong>gpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of desired GPUs. This amount is not
+guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
+<li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
+necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
+memory_request.</p></li>
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+re-usable.</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
+indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
+<li><p><strong>allowed_failure_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – [optional] float value describing the ratio of sub-tasks that may fail before
+the master batch task considers itself a failure.  By default, the value is 0 so if any task fails, the master
+batch task will be marked a failure.  If specified, the value must be between 0 and 1 inclusive.  In the event a
+non-zero value is specified, downstream tasks must be able to accept None values as outputs from individual
+sub-tasks because the output values will be set to None for any sub-task that fails.</p></li>
+<li><p><strong>max_concurrency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [optional] integer value describing the maximum number of tasks to run concurrently.
+This is a stand-in pending better concurrency controls for special use-cases.  The existence of this parameter
+is not guaranteed between versions and therefore it is NOT recommended that it be used.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>pod_spec</strong> (<em>k8s.io.api.core.v1.generated_pb2.PodSpec</em>) – PodSpec to bring up alongside task execution.</p></li>
+<li><p><strong>primary_container_name</strong> (<em>Text</em>) – primary container to monitor for the duration of the task.</p></li>
+<li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
+provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  Generally, it should be a
+subclass of flytekit.common.tasks.sidecar_Task.SdkDynamicSidecarTask.  A user can use this parameter to inject bespoke
+logic into the base Flyte programming model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>flytekit.common.tasks.sidecar_Task.SdkDynamicSidecarTask</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="function">
 <dt id="flytekit.sdk.tasks.dynamic_task">
 <code class="sig-prename descclassname">flytekit.sdk.tasks.</code><code class="sig-name descname">dynamic_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">cache_version=''</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">interruptible=None</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">storage_request=None</em>, <em class="sig-param">cpu_request=None</em>, <em class="sig-param">gpu_request=None</em>, <em class="sig-param">memory_request=None</em>, <em class="sig-param">storage_limit=None</em>, <em class="sig-param">cpu_limit=None</em>, <em class="sig-param">gpu_limit=None</em>, <em class="sig-param">memory_limit=None</em>, <em class="sig-param">cache=False</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">allowed_failure_ratio=None</em>, <em class="sig-param">max_concurrency=None</em>, <em class="sig-param">environment=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/tasks.html#dynamic_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.tasks.dynamic_task" title="Permalink to this definition">¶</a></dt>
@@ -2317,7 +2477,7 @@ by users extending the base Flyte programming model. If set, it must be a subcla
 
 <dl class="function">
 <dt id="flytekit.sdk.workflow.workflow_class">
-<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow_class</code><span class="sig-paren">(</span><em class="sig-param">_workflow_metaclass=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow_class" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow_class</code><span class="sig-paren">(</span><em class="sig-param">_workflow_metaclass=None</em>, <em class="sig-param">on_failure=None</em>, <em class="sig-param">disable_default_launch_plan=False</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a decorator for wrapping class definitions into workflows.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@workflow_class</span>
@@ -2338,7 +2498,9 @@ wrapped by this decorator.</p></li>
 <li><p><strong>cls</strong> – This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used
 by users extending the base Flyte programming model. If set, it must be a subclass of
 <a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
-<li><p><strong>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</strong> (<em>on_failure</em>) – [Optional] The execution policy when the workflow detects a failure.</p></li>
+<li><p><strong>on_failure</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy" title="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy"><em>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</em></a>) – [Optional] The execution policy
+when the workflow detects a failure.</p></li>
+<li><p><strong>disable_default_launch_plan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Determines whether to create a default launch plan for the workflow or not.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -2361,7 +2523,7 @@ by users extending the base Flyte programming model. If set, it must be a subcla
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="flytekit.tools.html" class="btn btn-neutral float-right" title="flytekit.tools package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="flytekit.sdk.sagemaker.html" class="btn btn-neutral float-right" title="flytekit.sdk.sagemaker package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="flytekit.plugins.html" class="btn btn-neutral float-left" title="flytekit.plugins package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

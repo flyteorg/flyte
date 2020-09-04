@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks package &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks package &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -199,8 +199,9 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html">flytekit.common.tasks.sagemaker package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.built_in_training_job_task">flytekit.common.tasks.sagemaker.built_in_training_job_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.custom_training_job_task">flytekit.common.tasks.sagemaker.custom_training_job_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.training_job_task">flytekit.common.tasks.sagemaker.training_job_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker">Module contents</a></li>
 </ul>
 </li>
@@ -533,14 +534,20 @@ It will raise an exception if necessary.
 <dl class="class">
 <dt id="flytekit.common.tasks.sdk_dynamic.SdkDynamicTask">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sdk_dynamic.</code><code class="sig-name descname">SdkDynamicTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">allowed_failure_ratio</em>, <em class="sig-param">max_concurrency</em>, <em class="sig-param">environment</em>, <em class="sig-param">custom</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_dynamic.html#SdkDynamicTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
-<p>This class includes the additional logic for building a task that executes parent-child tasks in Python code.  It
-has even more validation checks to ensure proper behavior than it’s superclasses.</p>
-<p>Since an SdkDynamicTask is assumed to run by hooking into Python code, we will provide additional shortcuts and
-methods on this object.</p>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin" title="flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin</span></code></a>, <a class="reference internal" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</span></code></a></p>
+<p>This class includes the additional logic for building a task that executes
+parent-child tasks in Python code.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sdk_dynamic.</code><code class="sig-name descname">SdkDynamicTaskMixin</code><span class="sig-paren">(</span><em class="sig-param">allowed_failure_ratio</em>, <em class="sig-param">max_concurrency</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_dynamic.html#SdkDynamicTaskMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This mixin implements logic for building a task that executes
+parent-child tasks in Python code.</p>
 <dl class="method">
-<dt id="flytekit.common.tasks.sdk_dynamic.SdkDynamicTask.execute">
-<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_dynamic.html#SdkDynamicTask.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTask.execute" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">context</em>, <em class="sig-param">inputs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_dynamic.html#SdkDynamicTaskMixin.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Executes batch task’s user code and produces futures file as well as all sub-task inputs.pb files.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -800,6 +807,14 @@ literals.</p>
 </div>
 <div class="section" id="module-flytekit.common.tasks.sidecar_task">
 <span id="flytekit-common-tasks-sidecar-task-module"></span><h2>flytekit.common.tasks.sidecar_task module<a class="headerlink" href="#module-flytekit.common.tasks.sidecar_task" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="flytekit.common.tasks.sidecar_task.SdkDynamicSidecarTask">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sidecar_task.</code><code class="sig-name descname">SdkDynamicSidecarTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">allowed_failure_ratio</em>, <em class="sig-param">max_concurrency</em>, <em class="sig-param">environment</em>, <em class="sig-param">pod_spec=None</em>, <em class="sig-param">primary_container_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sidecar_task.html#SdkDynamicSidecarTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sidecar_task.SdkDynamicSidecarTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin" title="flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin</span></code></a>, <a class="reference internal" href="#flytekit.common.tasks.sidecar_task.SdkSidecarTask" title="flytekit.common.tasks.sidecar_task.SdkSidecarTask"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.tasks.sidecar_task.SdkSidecarTask</span></code></a></p>
+<p>This class includes the additional logic for building a task that runs as
+a Sidecar Job and executes parent-child tasks.</p>
+</dd></dl>
+
 <dl class="class">
 <dt id="flytekit.common.tasks.sidecar_task.SdkSidecarTask">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.tasks.sidecar_task.</code><code class="sig-name descname">SdkSidecarTask</code><span class="sig-paren">(</span><em class="sig-param">task_function</em>, <em class="sig-param">task_type</em>, <em class="sig-param">discovery_version</em>, <em class="sig-param">retries</em>, <em class="sig-param">interruptible</em>, <em class="sig-param">deprecated</em>, <em class="sig-param">storage_request</em>, <em class="sig-param">cpu_request</em>, <em class="sig-param">gpu_request</em>, <em class="sig-param">memory_request</em>, <em class="sig-param">storage_limit</em>, <em class="sig-param">cpu_limit</em>, <em class="sig-param">gpu_limit</em>, <em class="sig-param">memory_limit</em>, <em class="sig-param">discoverable</em>, <em class="sig-param">timeout</em>, <em class="sig-param">environment</em>, <em class="sig-param">pod_spec=None</em>, <em class="sig-param">primary_container_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/tasks/sidecar_task.html#SdkSidecarTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sidecar_task.SdkSidecarTask" title="Permalink to this definition">¶</a></dt>

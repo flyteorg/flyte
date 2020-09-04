@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clis.sdk_in_container.basic_auth &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.clis.sdk_in_container.basic_auth &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -168,11 +168,9 @@
 <span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">_requests</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions.user</span> <span class="k">import</span> <span class="n">FlyteAuthenticationException</span> <span class="k">as</span> <span class="n">_FlyteAuthenticationException</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration.creds</span> <span class="k">import</span> <span class="p">(</span>
-    <span class="n">CLIENT_CREDENTIALS_SECRET</span> <span class="k">as</span> <span class="n">_CREDENTIALS_SECRET</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration.creds</span> <span class="k">import</span> <span class="n">CLIENT_CREDENTIALS_SECRET</span> <span class="k">as</span> <span class="n">_CREDENTIALS_SECRET</span>
 
-<span class="n">_utf_8</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span>
+<span class="n">_utf_8</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span>
 
 
 <div class="viewcode-block" id="get_secret"><a class="viewcode-back" href="../../../../flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.basic_auth.get_secret">[docs]</a><span class="k">def</span> <span class="nf">get_secret</span><span class="p">():</span>
@@ -184,7 +182,7 @@
     <span class="n">secret</span> <span class="o">=</span> <span class="n">_CREDENTIALS_SECRET</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">secret</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">secret</span>
-    <span class="k">raise</span> <span class="n">_FlyteAuthenticationException</span><span class="p">(</span><span class="s1">&#39;No secret could be found&#39;</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="n">_FlyteAuthenticationException</span><span class="p">(</span><span class="s2">&quot;No secret could be found&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_basic_authorization_header"><a class="viewcode-back" href="../../../../flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.basic_auth.get_basic_authorization_header">[docs]</a><span class="k">def</span> <span class="nf">get_basic_authorization_header</span><span class="p">(</span><span class="n">client_id</span><span class="p">,</span> <span class="n">client_secret</span><span class="p">):</span>
@@ -208,23 +206,23 @@
 <span class="sd">            in seconds</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="n">authorization_header</span><span class="p">,</span>
-        <span class="s1">&#39;Cache-Control&#39;</span><span class="p">:</span> <span class="s1">&#39;no-cache&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Accept&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/x-www-form-urlencoded&#39;</span>
+        <span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="n">authorization_header</span><span class="p">,</span>
+        <span class="s2">&quot;Cache-Control&quot;</span><span class="p">:</span> <span class="s2">&quot;no-cache&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Accept&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;grant_type&#39;</span><span class="p">:</span> <span class="s1">&#39;client_credentials&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;grant_type&quot;</span><span class="p">:</span> <span class="s2">&quot;client_credentials&quot;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">scope</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">body</span><span class="p">[</span><span class="s1">&#39;scope&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scope</span>
+        <span class="n">body</span><span class="p">[</span><span class="s2">&quot;scope&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scope</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">token_endpoint</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">body</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
         <span class="n">_logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Non-200 (</span><span class="si">{}</span><span class="s2">) received from IDP: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="n">_FlyteAuthenticationException</span><span class="p">(</span><span class="s1">&#39;Non-200 received from IDP&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">_FlyteAuthenticationException</span><span class="p">(</span><span class="s2">&quot;Non-200 received from IDP&quot;</span><span class="p">)</span>
 
     <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;access_token&#39;</span><span class="p">],</span> <span class="n">response</span><span class="p">[</span><span class="s1">&#39;expires_in&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">],</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;expires_in&quot;</span><span class="p">]</span></div>
 </pre></div>
 
            </div>

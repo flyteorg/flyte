@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.condition &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.core.condition &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -164,7 +164,8 @@
 
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">condition_pb2</span> <span class="k">as</span> <span class="n">_condition</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
 
 
 <div class="viewcode-block" id="ComparisonExpression"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.ComparisonExpression">[docs]</a><span class="k">class</span> <span class="nc">ComparisonExpression</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -221,15 +222,19 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.condition_pb2.ComparisonExpression</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
-                                               <span class="n">left_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">left_value</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-                                               <span class="n">right_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">right_value</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">ComparisonExpression</span><span class="p">(</span>
+            <span class="n">operator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">left_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">left_value</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">right_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">right_value</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ComparisonExpression.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.ComparisonExpression.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
-                   <span class="n">left_value</span><span class="o">=</span><span class="n">Operand</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">left_value</span><span class="p">),</span>
-                   <span class="n">right_value</span><span class="o">=</span><span class="n">Operand</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">right_value</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">left_value</span><span class="o">=</span><span class="n">Operand</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">left_value</span><span class="p">),</span>
+            <span class="n">right_value</span><span class="o">=</span><span class="n">Operand</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">right_value</span><span class="p">),</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ConjunctionExpression"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.ConjunctionExpression">[docs]</a><span class="k">class</span> <span class="nc">ConjunctionExpression</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -277,15 +282,19 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.condition_pb2.ConjunctionExpression</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">ConjunctionExpression</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
-                                                <span class="n">left_expression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">left_expression</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-                                                <span class="n">right_expression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">right_expression</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">ConjunctionExpression</span><span class="p">(</span>
+            <span class="n">operator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">left_expression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">left_expression</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+            <span class="n">right_expression</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">right_expression</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ConjunctionExpression.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.ConjunctionExpression.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">operator</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
-                   <span class="n">left_expression</span><span class="o">=</span><span class="n">BooleanExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">left_expression</span><span class="p">),</span>
-                   <span class="n">right_expression</span><span class="o">=</span><span class="n">BooleanExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">right_expression</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">operator</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">operator</span><span class="p">,</span>
+            <span class="n">left_expression</span><span class="o">=</span><span class="n">BooleanExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">left_expression</span><span class="p">),</span>
+            <span class="n">right_expression</span><span class="o">=</span><span class="n">BooleanExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">right_expression</span><span class="p">),</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Operand"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.Operand">[docs]</a><span class="k">class</span> <span class="nc">Operand</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -319,14 +328,18 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.condition_pb2.Operand</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">Operand</span><span class="p">(</span><span class="n">primitive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">primitive</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                                  <span class="n">var</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">Operand</span><span class="p">(</span>
+            <span class="n">primitive</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">primitive</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">primitive</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">var</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Operand.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.Operand.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">primitive</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">Primitive</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">primitive</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span>
-            <span class="s1">&#39;primitive&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">var</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">var</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">primitive</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">Primitive</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">primitive</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;primitive&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">var</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">var</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="BooleanExpression"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.BooleanExpression">[docs]</a><span class="k">class</span> <span class="nc">BooleanExpression</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
@@ -362,15 +375,21 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.condition_pb2.BooleanExpression</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span><span class="n">conjunction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conjunction</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conjunction</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                                            <span class="n">comparison</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comparison</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comparison</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_condition</span><span class="o">.</span><span class="n">BooleanExpression</span><span class="p">(</span>
+            <span class="n">conjunction</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">conjunction</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">conjunction</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">comparison</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comparison</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="BooleanExpression.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.condition.BooleanExpression.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">conjunction</span><span class="o">=</span><span class="n">ConjunctionExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">conjunction</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;conjunction&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-                   <span class="n">comparison</span><span class="o">=</span><span class="n">ComparisonExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span>
-                       <span class="n">pb2_object</span><span class="o">.</span><span class="n">comparison</span><span class="p">)</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s1">&#39;comparison&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">conjunction</span><span class="o">=</span><span class="n">ConjunctionExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">conjunction</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;conjunction&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">comparison</span><span class="o">=</span><span class="n">ComparisonExpression</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">comparison</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;comparison&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

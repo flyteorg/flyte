@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.interfaces.data.http.http_data_proxy &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.interfaces.data.http.http_data_proxy &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -163,8 +163,9 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">_requests</span>
-<span class="kn">from</span> <span class="nn">flytekit.interfaces.data</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_data</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.interfaces.data</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_data</span>
 
 
 <div class="viewcode-block" id="HttpFileProxy"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.http.html#flytekit.interfaces.data.http.http_data_proxy.HttpFileProxy">[docs]</a><span class="k">class</span> <span class="nc">HttpFileProxy</span><span class="p">(</span><span class="n">_common_data</span><span class="o">.</span><span class="n">DataProxy</span><span class="p">):</span>
@@ -179,14 +180,15 @@
 <span class="sd">        :rtype bool: whether the file exists or not</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rsp</span> <span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">allowed_codes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_OK</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_NOT_FOUND</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_FORBIDDEN</span><span class="p">}</span>
+        <span class="n">allowed_codes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_OK</span><span class="p">,</span>
+            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_NOT_FOUND</span><span class="p">,</span>
+            <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_FORBIDDEN</span><span class="p">,</span>
+        <span class="p">}</span>
         <span class="k">if</span> <span class="n">rsp</span><span class="o">.</span><span class="n">status_code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_codes</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                 <span class="n">rsp</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-                <span class="s2">&quot;Data at </span><span class="si">{}</span><span class="s2"> could not be checked for existence. Expected one of: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">path</span><span class="p">,</span>
-                    <span class="n">allowed_codes</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;Data at </span><span class="si">{}</span><span class="s2"> could not be checked for existence. Expected one of: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">allowed_codes</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">rsp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_OK</span></div>
 
@@ -207,9 +209,9 @@
         <span class="k">if</span> <span class="n">rsp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_OK</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                 <span class="n">rsp</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
-                <span class="s2">&quot;Request for data @ </span><span class="si">{}</span><span class="s2"> failed. Expected status code </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_path</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_OK</span><span class="p">)</span>
+                <span class="s2">&quot;Request for data @ </span><span class="si">{}</span><span class="s2"> failed. Expected status code </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">from_path</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_HTTP_OK</span><span class="p">),</span>
             <span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">to_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
             <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">rsp</span><span class="o">.</span><span class="n">content</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="HttpFileProxy.upload"><a class="viewcode-back" href="../../../../../flytekit/flytekit.interfaces.data.http.html#flytekit.interfaces.data.http.http_data_proxy.HttpFileProxy.upload">[docs]</a>    <span class="k">def</span> <span class="nf">upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_path</span><span class="p">,</span> <span class="n">to_path</span><span class="p">):</span>

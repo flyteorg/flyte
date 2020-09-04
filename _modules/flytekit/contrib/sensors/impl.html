@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.contrib.sensors.impl &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.contrib.sensors.impl &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,19 +162,12 @@
   <h1>Source code for flytekit.contrib.sensors.impl</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">hmsclient</span> <span class="k">as</span> <span class="n">_hmsclient</span>
 <span class="kn">from</span> <span class="nn">flytekit.contrib.sensors.base_sensor</span> <span class="k">import</span> <span class="n">Sensor</span> <span class="k">as</span> <span class="n">_Sensor</span>
+<span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">hmsclient</span> <span class="k">as</span> <span class="n">_hmsclient</span>
 
 
 <span class="k">class</span> <span class="nc">_HiveSensor</span><span class="p">(</span><span class="n">_Sensor</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">host</span><span class="p">,</span>
-        <span class="n">port</span><span class="p">,</span>
-        <span class="n">schema</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text host:</span>
 <span class="sd">        :param Text port:</span>
@@ -190,14 +183,7 @@
 
 
 <div class="viewcode-block" id="HiveTableSensor"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.impl.HiveTableSensor">[docs]</a><span class="k">class</span> <span class="nc">HiveTableSensor</span><span class="p">(</span><span class="n">_HiveSensor</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="p">,</span>
-        <span class="n">host</span><span class="p">,</span>
-        <span class="n">port</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text host: The host for the Hive metastore Thrift service.</span>
 <span class="sd">        :param Text port: The port for the Hive metastore Thrift Service</span>
@@ -205,11 +191,7 @@
 <span class="sd">        :param **kwargs: See _HiveSensor and flytekit.contrib.sensors.base_sensor.Sensor for more</span>
 <span class="sd">            parameters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">HiveTableSensor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">host</span><span class="p">,</span>
-            <span class="n">port</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HiveTableSensor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_table_name</span> <span class="o">=</span> <span class="n">table_name</span>
 
     <span class="k">def</span> <span class="nf">_do_poll</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -225,15 +207,7 @@
 
 
 <div class="viewcode-block" id="HiveNamedPartitionSensor"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.impl.HiveNamedPartitionSensor">[docs]</a><span class="k">class</span> <span class="nc">HiveNamedPartitionSensor</span><span class="p">(</span><span class="n">_HiveSensor</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="p">,</span>
-        <span class="n">partition_names</span><span class="p">,</span>
-        <span class="n">host</span><span class="p">,</span>
-        <span class="n">port</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">partition_names</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This class allows sensing for a specific named Hive Partition.  This is the preferred partition sensing</span>
 <span class="sd">        operator because it is more efficient than evaluating a filter expression.</span>
@@ -263,15 +237,7 @@
 
 
 <div class="viewcode-block" id="HiveFilteredPartitionSensor"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.impl.HiveFilteredPartitionSensor">[docs]</a><span class="k">class</span> <span class="nc">HiveFilteredPartitionSensor</span><span class="p">(</span><span class="n">_HiveSensor</span><span class="p">):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">table_name</span><span class="p">,</span>
-        <span class="n">partition_filter</span><span class="p">,</span>
-        <span class="n">host</span><span class="p">,</span>
-        <span class="n">port</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">partition_filter</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This class allows sensing for any Hive partition that matches a filter expression.  It is recommended that the</span>
 <span class="sd">        user should use HiveNamedPartitionSensor instead when possible because it is a more efficient API.</span>
@@ -284,11 +250,7 @@
 <span class="sd">        :param **kwargs: See _HiveSensor and flytekit.contrib.sensors.base_sensor.Sensor for more</span>
 <span class="sd">            parameters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">HiveFilteredPartitionSensor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">host</span><span class="p">,</span>
-            <span class="n">port</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HiveFilteredPartitionSensor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_table_name</span> <span class="o">=</span> <span class="n">table_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_partition_filter</span> <span class="o">=</span> <span class="n">partition_filter</span>
 
@@ -298,10 +260,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hive_metastore_client</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
             <span class="n">partitions</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_partitions_by_filter</span><span class="p">(</span>
-                <span class="n">db_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">,</span>
-                <span class="n">tbl_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_table_name</span><span class="p">,</span>
-                <span class="nb">filter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_partition_filter</span><span class="p">,</span>
-                <span class="n">max_parts</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">db_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="p">,</span> <span class="n">tbl_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_table_name</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_partition_filter</span><span class="p">,</span> <span class="n">max_parts</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">partitions</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">None</span>

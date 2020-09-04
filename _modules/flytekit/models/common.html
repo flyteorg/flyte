@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.common &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.common &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -167,7 +167,8 @@
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">common_pb2</span> <span class="k">as</span> <span class="n">_common_pb2</span>
-<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span><span class="p">,</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span>
+<span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
 
 
 <div class="viewcode-block" id="FlyteABCMeta"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.FlyteABCMeta">[docs]</a><span class="k">class</span> <span class="nc">FlyteABCMeta</span><span class="p">(</span><span class="n">_abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
@@ -178,7 +179,6 @@
 
 
 <div class="viewcode-block" id="FlyteType"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.FlyteType">[docs]</a><span class="k">class</span> <span class="nc">FlyteType</span><span class="p">(</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">short_class_string</span><span class="p">()</span>
 
@@ -203,10 +203,8 @@
 
 
 <div class="viewcode-block" id="FlyteIdlEntity"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.FlyteIdlEntity">[docs]</a><span class="k">class</span> <span class="nc">FlyteIdlEntity</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">FlyteType</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">FlyteIdlEntity</span><span class="p">)</span> <span class="ow">and</span> \
-            <span class="n">other</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">FlyteIdlEntity</span><span class="p">)</span> <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span> <span class="o">==</span> <span class="n">other</span><span class="p">)</span>
@@ -242,7 +240,6 @@
 
 
 <div class="viewcode-block" id="FlyteCustomIdlEntity"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.FlyteCustomIdlEntity">[docs]</a><span class="k">class</span> <span class="nc">FlyteCustomIdlEntity</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="FlyteCustomIdlEntity.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.FlyteCustomIdlEntity.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">idl_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -269,7 +266,6 @@
 
 
 <div class="viewcode-block" id="NamedEntityIdentifier"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.NamedEntityIdentifier">[docs]</a><span class="k">class</span> <span class="nc">NamedEntityIdentifier</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text project: The name of the project in which this entity lives.</span>
@@ -311,11 +307,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># We use the kwarg constructor of the protobuf and setting name=None is equivalent to not setting it at all</span>
-        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">NamedEntityIdentifier</span><span class="p">(</span>
-            <span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">NamedEntityIdentifier</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="NamedEntityIdentifier.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.NamedEntityIdentifier.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">idl_object</span><span class="p">):</span>
@@ -327,7 +319,6 @@
 
 
 <div class="viewcode-block" id="EmailNotification"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.EmailNotification">[docs]</a><span class="k">class</span> <span class="nc">EmailNotification</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipients_email</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[Text] recipients_email:</span>
@@ -357,7 +348,6 @@
 
 
 <div class="viewcode-block" id="SlackNotification"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.SlackNotification">[docs]</a><span class="k">class</span> <span class="nc">SlackNotification</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipients_email</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[Text] recipients_email:</span>
@@ -387,7 +377,6 @@
 
 
 <div class="viewcode-block" id="PagerDutyNotification"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.PagerDutyNotification">[docs]</a><span class="k">class</span> <span class="nc">PagerDutyNotification</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recipients_email</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[Text] recipients_email:</span>
@@ -417,7 +406,6 @@
 
 
 <div class="viewcode-block" id="Notification"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.Notification">[docs]</a><span class="k">class</span> <span class="nc">Notification</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phases</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pager_duty</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slack</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Represents a structure for notifications based on execution status.</span>
@@ -469,7 +457,7 @@
             <span class="n">phases</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span>
             <span class="n">email</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">email</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">pager_duty</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pager_duty</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pager_duty</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">slack</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slack</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">slack</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">slack</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">slack</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Notification.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.Notification.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -503,9 +491,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: dict[Text, Text]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">Labels</span><span class="p">(</span>
-            <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)}</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">Labels</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)})</span></div>
 
 <div class="viewcode-block" id="Labels.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.Labels.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -533,9 +519,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: _common_pb2.Annotations</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">Annotations</span><span class="p">(</span>
-            <span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)}</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">Annotations</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)})</span></div>
 
 <div class="viewcode-block" id="Annotations.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.Annotations.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -547,7 +531,6 @@
 
 
 <div class="viewcode-block" id="UrlBlob"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.UrlBlob">[docs]</a><span class="k">class</span> <span class="nc">UrlBlob</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text url:</span>
@@ -631,11 +614,32 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;assumable_iam_role&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="k">if</span>
-            <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;kubernetes_service_account&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">kubernetes_service_account</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;kubernetes_service_account&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 
+<div class="viewcode-block" id="RawOutputDataConfig"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig">[docs]</a><span class="k">class</span> <span class="nc">RawOutputDataConfig</span><span class="p">(</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_location_prefix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text output_location_prefix: Location of offloaded data for things like S3, etc.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_location_prefix</span> <span class="o">=</span> <span class="n">output_location_prefix</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_location_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_location_prefix</span>
+
+<div class="viewcode-block" id="RawOutputDataConfig.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flyteidl.admin.common_pb2.Auth</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">RawOutputDataConfig</span><span class="p">(</span><span class="n">output_location_prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_location_prefix</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RawOutputDataConfig.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.common.RawOutputDataConfig.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">output_location_prefix</span><span class="o">=</span><span class="n">pb2</span><span class="o">.</span><span class="n">output_location_prefix</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

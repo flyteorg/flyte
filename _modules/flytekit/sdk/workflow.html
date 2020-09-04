@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.workflow &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.sdk.workflow &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -164,7 +164,8 @@
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_common_workflow</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_common_workflow</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 
 
@@ -182,7 +183,7 @@
 <span class="sd">        :param bool required: If set, default must be None</span>
 <span class="sd">        :param T default: If this is not a required input, the value will default to this value.  Specify as a kwarg.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Input</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">python_std_to_sdk_type</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">),</span> <span class="n">help</span><span class="o">=</span><span class="n">help</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Input</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">python_std_to_sdk_type</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">),</span> <span class="n">help</span><span class="o">=</span><span class="n">help</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Output"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.workflow.Output">[docs]</a><span class="k">class</span> <span class="nc">Output</span><span class="p">(</span><span class="n">_common_workflow</span><span class="o">.</span><span class="n">Output</span><span class="p">):</span>
@@ -199,14 +200,11 @@
 <span class="sd">            this value be provided as the SDK might not always be able to infer the correct type.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Output</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="n">value</span><span class="p">,</span>
-            <span class="n">sdk_type</span><span class="o">=</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">python_std_to_sdk_type</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">)</span> <span class="k">if</span> <span class="n">sdk_type</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">help</span><span class="o">=</span><span class="n">help</span>
+            <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">sdk_type</span><span class="o">=</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">python_std_to_sdk_type</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">)</span> <span class="k">if</span> <span class="n">sdk_type</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">help</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="workflow_class"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.workflow.workflow_class">[docs]</a><span class="k">def</span> <span class="nf">workflow_class</span><span class="p">(</span><span class="n">_workflow_metaclass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="workflow_class"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.workflow.workflow_class">[docs]</a><span class="k">def</span> <span class="nf">workflow_class</span><span class="p">(</span><span class="n">_workflow_metaclass</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">disable_default_launch_plan</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a decorator for wrapping class definitions into workflows.</span>
 
@@ -226,12 +224,17 @@
 <span class="sd">    :param cls: This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used</span>
 <span class="sd">        by users extending the base Flyte programming model. If set, it must be a subclass of</span>
 <span class="sd">        :py:class:`flytekit.common.workflow.SdkWorkflow`.</span>
-<span class="sd">    :param on_failure flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy: [Optional] The execution policy when the workflow detects a failure.</span>
+<span class="sd">    :param flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy on_failure: [Optional] The execution policy</span>
+<span class="sd">        when the workflow detects a failure.</span>
+<span class="sd">    :param bool disable_default_launch_plan: Determines whether to create a default launch plan for the workflow or not.</span>
+
 <span class="sd">    :rtype: flytekit.common.workflow.SdkWorkflow</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">metaclass</span><span class="p">):</span>
-        <span class="n">wf</span> <span class="o">=</span> <span class="n">_common_workflow</span><span class="o">.</span><span class="n">build_sdk_workflow_from_metaclass</span><span class="p">(</span><span class="n">metaclass</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="n">on_failure</span><span class="p">)</span>
+        <span class="n">wf</span> <span class="o">=</span> <span class="n">_common_workflow</span><span class="o">.</span><span class="n">build_sdk_workflow_from_metaclass</span><span class="p">(</span>
+            <span class="n">metaclass</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="n">on_failure</span><span class="p">,</span> <span class="n">disable_default_launch_plan</span><span class="o">=</span><span class="n">disable_default_launch_plan</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="bp">cls</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">wf</span>
 
     <span class="k">if</span> <span class="n">_workflow_metaclass</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -279,7 +282,8 @@
         <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">rename_and_return_reference</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">inputs</span> <span class="ow">or</span> <span class="p">{}))],</span>
         <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">rename_and_return_reference</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">outputs</span> <span class="ow">or</span> <span class="p">{}))],</span>
         <span class="n">nodes</span><span class="o">=</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">assign_id_and_return</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">nodes</span><span class="p">))],</span>
-        <span class="n">metadata</span><span class="o">=</span><span class="n">_common_workflow</span><span class="o">.</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">(</span><span class="n">on_failure</span><span class="o">=</span><span class="n">on_failure</span><span class="p">))</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="n">_common_workflow</span><span class="o">.</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">WorkflowMetadata</span><span class="p">(</span><span class="n">on_failure</span><span class="o">=</span><span class="n">on_failure</span><span class="p">),</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">wf</span></div>
 </pre></div>
 

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.loader &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.engines.loader &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,14 +161,16 @@
             
   <h1>Source code for flytekit.engines.loader</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
+
 <span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importlib</span>
 
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
 
 <span class="n">_ENGINE_NAME_TO_MODULES_CACHE</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;flyte&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;flytekit.engines.flyte.engine&#39;</span><span class="p">,</span> <span class="s1">&#39;FlyteEngineFactory&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
-    <span class="s1">&#39;unit&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;flytekit.engines.unit.engine&#39;</span><span class="p">,</span> <span class="s1">&#39;UnitTestEngineFactory&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;flyte&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;flytekit.engines.flyte.engine&quot;</span><span class="p">,</span> <span class="s2">&quot;FlyteEngineFactory&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;flytekit.engines.unit.engine&quot;</span><span class="p">,</span> <span class="s2">&quot;UnitTestEngineFactory&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
     <span class="c1"># &#39;local&#39;: (&#39;flytekit.engines.local.engine&#39;, &#39;EngineObjectFactory&#39;, None)</span>
 <span class="p">}</span>
 
@@ -185,9 +187,8 @@
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
             <span class="n">engine_name</span><span class="p">,</span>
             <span class="s2">&quot;Could not load an engine with the identifier &#39;</span><span class="si">{}</span><span class="s2">&#39;.  Known engines are: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">engine_name</span><span class="p">,</span>
-                <span class="nb">list</span><span class="p">(</span><span class="n">_ENGINE_NAME_TO_MODULES_CACHE</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-            <span class="p">)</span>
+                <span class="n">engine_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">_ENGINE_NAME_TO_MODULES_CACHE</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="p">),</span>
         <span class="p">)</span>
 
     <span class="n">module_path</span><span class="p">,</span> <span class="n">attr</span><span class="p">,</span> <span class="n">engine_impl</span> <span class="o">=</span> <span class="n">_ENGINE_NAME_TO_MODULES_CACHE</span><span class="p">[</span><span class="n">engine_name</span><span class="p">]</span>
@@ -198,9 +199,7 @@
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                 <span class="n">module</span><span class="p">,</span>
                 <span class="s2">&quot;Failed to load the engine because the attribute named &#39;</span><span class="si">{}</span><span class="s2">&#39; could not be found&quot;</span>
-                <span class="s2">&quot;in the module &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">attr</span><span class="p">,</span> <span class="n">module_path</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;in the module &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">module_path</span><span class="p">),</span>
             <span class="p">)</span>
 
         <span class="n">engine_impl</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">attr</span><span class="p">)()</span>

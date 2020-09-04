@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.component_nodes &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.component_nodes &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,8 +162,9 @@
   <h1>Source code for flytekit.common.component_nodes</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
@@ -171,7 +172,6 @@
 
 
 <div class="viewcode-block" id="SdkTaskNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.component_nodes.SdkTaskNode">[docs]</a><span class="k">class</span> <span class="nc">SdkTaskNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">TaskNode</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.tasks.task.SdkTask sdk_task:</span>
@@ -205,6 +205,7 @@
 <span class="sd">        :rtype: SdkTaskNode</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task</span>
+
         <span class="k">if</span> <span class="n">base_model</span><span class="o">.</span><span class="n">reference_id</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="n">base_model</span><span class="o">.</span><span class="n">reference_id</span><span class="p">]</span>
             <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found existing task template for </span><span class="si">{}</span><span class="s2">, will not retrieve from Admin&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
@@ -228,9 +229,12 @@
 <span class="sd">        :param flytekit.common.launch_plan.SdkLaunchPlan sdk_launch_plan:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">sdk_workflow</span> <span class="ow">and</span> <span class="n">sdk_launch_plan</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;SdkWorkflowNode cannot be called with both a workflow and &quot;</span>
-                                                          <span class="s2">&quot;a launchplan specified, please pick one. WF: </span><span class="si">{}</span><span class="s2"> LP: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
-                                                          <span class="n">sdk_workflow</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span>
+                <span class="s2">&quot;SdkWorkflowNode cannot be called with both a workflow and &quot;</span>
+                <span class="s2">&quot;a launchplan specified, please pick one. WF: </span><span class="si">{}</span><span class="s2"> LP: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">sdk_workflow</span><span class="p">,</span>
+                <span class="n">sdk_launch_plan</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span> <span class="o">=</span> <span class="n">sdk_workflow</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_launch_plan</span> <span class="o">=</span> <span class="n">sdk_launch_plan</span>
@@ -286,7 +290,8 @@
 <span class="sd">        :rtype: SdkWorkflowNode</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># put the import statement here to prevent circular dependency error</span>
-        <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span><span class="p">,</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span>
+        <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan</span>
+        <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span>
 
         <span class="n">project</span> <span class="o">=</span> <span class="n">base_model</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">project</span>
         <span class="n">domain</span> <span class="o">=</span> <span class="n">base_model</span><span class="o">.</span><span class="n">reference</span><span class="o">.</span><span class="n">domain</span>
@@ -299,21 +304,22 @@
             <span class="c1"># The workflow templates for sub-workflows should have been included in the original response</span>
             <span class="k">if</span> <span class="n">base_model</span><span class="o">.</span><span class="n">reference</span> <span class="ow">in</span> <span class="n">sub_workflows</span><span class="p">:</span>
                 <span class="n">sw</span> <span class="o">=</span> <span class="n">sub_workflows</span><span class="p">[</span><span class="n">base_model</span><span class="o">.</span><span class="n">reference</span><span class="p">]</span>
-                <span class="n">promoted</span> <span class="o">=</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="o">=</span><span class="n">sub_workflows</span><span class="p">,</span>
-                                                                    <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">)</span>
+                <span class="n">promoted</span> <span class="o">=</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">sw</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="o">=</span><span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="n">tasks</span><span class="p">)</span>
                 <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sdk_workflow</span><span class="o">=</span><span class="n">promoted</span><span class="p">)</span>
 
             <span class="c1"># If not found for some reason, fetch it from Admin again.</span>
             <span class="c1"># The reason there is a warning here but not for tasks is because sub-workflows should always be passed</span>
             <span class="c1"># along. Ideally subworkflows are never even registered with Admin, so fetching from Admin ideally doesn&#39;t</span>
             <span class="c1"># return anything.</span>
-            <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Your subworkflow with id </span><span class="si">{}</span><span class="s2"> is not included in the promote call.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">base_model</span><span class="o">.</span><span class="n">reference</span><span class="p">))</span>
+            <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Your subworkflow with id </span><span class="si">{}</span><span class="s2"> is not included in the promote call.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">reference</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="n">sdk_workflow</span> <span class="o">=</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sdk_workflow</span><span class="o">=</span><span class="n">sdk_workflow</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;Bad workflow node model, neither subworkflow nor &quot;</span>
-                                                          <span class="s2">&quot;launchplan specified.&quot;</span><span class="p">)</span></div></div>
+            <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span>
+                <span class="s2">&quot;Bad workflow node model, neither subworkflow nor &quot;</span> <span class="s2">&quot;launchplan specified.&quot;</span>
+            <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

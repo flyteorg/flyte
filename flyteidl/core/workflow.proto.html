@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>workflow.proto &mdash; Flyte 0.6.0 documentation</title>
+  <title>workflow.proto &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -421,8 +421,9 @@ nodes outputs using the alias if one’s specified.</p>
 </div>
 <div class="section" id="flyteidl-core-workflowmetadata">
 <span id="api-msg-flyteidl-core-workflowmetadata"></span><h2>flyteidl.core.WorkflowMetadata<a class="headerlink" href="#flyteidl-core-workflowmetadata" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L130">[flyteidl.core.WorkflowMetadata proto]</a></p>
-<p>Metadata for the entire workflow. Defines execution behavior that does not change the final outputs of the workflow.</p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L131">[flyteidl.core.WorkflowMetadata proto]</a></p>
+<p>This is workflow layer metadata. These settings are only applicable to the workflow as a whole, and do not
+percolate down to child entities (like tasks) launched by the workflow.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;quality_of_service&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
   <span class="nt">&quot;on_failure&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
@@ -440,7 +441,7 @@ nodes outputs using the alias if one’s specified.</p>
 </div>
 <div class="section" id="enum-flyteidl-core-workflowmetadata-onfailurepolicy">
 <span id="api-enum-flyteidl-core-workflowmetadata-onfailurepolicy"></span><h2>Enum flyteidl.core.WorkflowMetadata.OnFailurePolicy<a class="headerlink" href="#enum-flyteidl-core-workflowmetadata-onfailurepolicy" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L135">[flyteidl.core.WorkflowMetadata.OnFailurePolicy proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L136">[flyteidl.core.WorkflowMetadata.OnFailurePolicy proto]</a></p>
 <p>Failure Handling Strategy</p>
 <dl class="simple" id="api-enum-value-flyteidl-core-workflowmetadata-onfailurepolicy-fail-immediately">
 <dt>FAIL_IMMEDIATELY</dt><dd><p><em>(DEFAULT)</em> ⁣FAIL_IMMEDIATELY instructs the system to fail as soon as a node fails in the workflow. It’ll automatically
@@ -458,23 +459,26 @@ execution as failed.</p>
 </div>
 <div class="section" id="flyteidl-core-workflowmetadatadefaults">
 <span id="api-msg-flyteidl-core-workflowmetadatadefaults"></span><h2>flyteidl.core.WorkflowMetadataDefaults<a class="headerlink" href="#flyteidl-core-workflowmetadatadefaults" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L153">[flyteidl.core.WorkflowMetadataDefaults proto]</a></p>
-<p>Default Workflow Metadata for the entire workflow.</p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L159">[flyteidl.core.WorkflowMetadataDefaults proto]</a></p>
+<p>The difference between these settings and the WorkflowMetadata ones is that these are meant to be passed down to
+a workflow’s underlying entities (like tasks). For instance, ‘interruptible’ has no meaning at the workflow layer, it
+is only relevant when a task executes. The settings here are the defaults that are passed to all nodes
+unless explicitly overridden at the node layer.
+If you are adding a setting that applies to both the Workflow itself, and everything underneath it, it should be
+added to both this object and the WorkflowMetadata object above.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;interruptible&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <dl class="simple" id="api-field-flyteidl-core-workflowmetadatadefaults-interruptible">
-<dt>interruptible</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">bool</a>) Identify whether workflow is interruptible.
-The value set at the workflow level will be the defualt value used for nodes
-unless explicitly set at the node level.</p>
+<dt>interruptible</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">bool</a>) Whether child nodes of the workflow are interruptible.</p>
 </dd>
 </dl>
 </div>
 <div class="section" id="flyteidl-core-workflowtemplate">
 <span id="api-msg-flyteidl-core-workflowtemplate"></span><h2>flyteidl.core.WorkflowTemplate<a class="headerlink" href="#flyteidl-core-workflowtemplate" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L162">[flyteidl.core.WorkflowTemplate proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/workflow.proto#L166">[flyteidl.core.WorkflowTemplate proto]</a></p>
 <p>Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,
 directed acyclic graph.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>

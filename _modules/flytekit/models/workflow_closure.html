@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.workflow_closure &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.workflow_closure &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -163,13 +163,13 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">workflow_closure_pb2</span> <span class="k">as</span> <span class="n">_workflow_closure_pb2</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_core_workflow_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_core_workflow_models</span>
 
 
 <div class="viewcode-block" id="WorkflowClosure"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.workflow_closure.WorkflowClosure">[docs]</a><span class="k">class</span> <span class="nc">WorkflowClosure</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow</span><span class="p">,</span> <span class="n">tasks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.workflow.WorkflowTemplate workflow: Workflow template</span>
@@ -197,8 +197,7 @@
 <span class="sd">        :rtype: flyteidl.core.workflow_closure_pb2.WorkflowClosure</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_workflow_closure_pb2</span><span class="o">.</span><span class="n">WorkflowClosure</span><span class="p">(</span>
-            <span class="n">workflow</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
-            <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">]</span>
+            <span class="n">workflow</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workflow</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">tasks</span><span class="o">=</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">],</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="WorkflowClosure.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.workflow_closure.WorkflowClosure.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>

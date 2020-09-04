@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.notifications &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.notifications &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,11 +161,13 @@
             
   <h1>Source code for flytekit.common.notifications</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution_model</span>
+
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution_model</span>
 
 
 <div class="viewcode-block" id="Notification"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.notifications.Notification">[docs]</a><span class="k">class</span> <span class="nc">Notification</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_common_model</span><span class="o">.</span><span class="n">Notification</span><span class="p">)):</span>
@@ -174,7 +176,7 @@
         <span class="n">_execution_model</span><span class="o">.</span><span class="n">WorkflowExecutionPhase</span><span class="o">.</span><span class="n">ABORTED</span><span class="p">,</span>
         <span class="n">_execution_model</span><span class="o">.</span><span class="n">WorkflowExecutionPhase</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
         <span class="n">_execution_model</span><span class="o">.</span><span class="n">WorkflowExecutionPhase</span><span class="o">.</span><span class="n">SUCCEEDED</span><span class="p">,</span>
-        <span class="n">_execution_model</span><span class="o">.</span><span class="n">WorkflowExecutionPhase</span><span class="o">.</span><span class="n">TIMED_OUT</span>
+        <span class="n">_execution_model</span><span class="o">.</span><span class="n">WorkflowExecutionPhase</span><span class="o">.</span><span class="n">TIMED_OUT</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phases</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pager_duty</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slack</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -196,7 +198,7 @@
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                     <span class="n">phase</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">VALID_PHASES</span><span class="p">,</span>
-                    <span class="n">additional_message</span><span class="o">=</span><span class="s2">&quot;Notifications can only be specified on terminal states.&quot;</span>
+                    <span class="n">additional_message</span><span class="o">=</span><span class="s2">&quot;Notifications can only be specified on terminal states.&quot;</span><span class="p">,</span>
                 <span class="p">)</span>
 
 <div class="viewcode-block" id="Notification.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.notifications.Notification.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -226,10 +228,7 @@
 <span class="sd">        :param flytekit.models.common.Notification base_model:</span>
 <span class="sd">        :rtype: Notification</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">pager_duty</span><span class="o">.</span><span class="n">recipients_email</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span> <span class="n">base_model</span><span class="o">.</span><span class="n">pager_duty</span><span class="o">.</span><span class="n">recipients_email</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Email"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.notifications.Email">[docs]</a><span class="k">class</span> <span class="nc">Email</span><span class="p">(</span><span class="n">Notification</span><span class="p">):</span>
@@ -247,10 +246,7 @@
 <span class="sd">        :param flytekit.models.common.Notification base_model:</span>
 <span class="sd">        :rtype: Notification</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">recipients_email</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span> <span class="n">base_model</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="n">recipients_email</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Slack"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.notifications.Slack">[docs]</a><span class="k">class</span> <span class="nc">Slack</span><span class="p">(</span><span class="n">Notification</span><span class="p">):</span>
@@ -268,10 +264,7 @@
 <span class="sd">        :param flytekit.models.common.Notification base_model:</span>
 <span class="sd">        :rtype: Notification</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">slack</span><span class="o">.</span><span class="n">recipients_email</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">phases</span><span class="p">,</span> <span class="n">base_model</span><span class="o">.</span><span class="n">slack</span><span class="o">.</span><span class="n">recipients_email</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

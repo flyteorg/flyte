@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clis.auth.discovery &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.clis.auth.discovery &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -160,16 +160,9 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.clis.auth.discovery</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">_requests</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="k">try</span><span class="p">:</span>  <span class="c1"># Python 3.5+</span>
-    <span class="kn">from</span> <span class="nn">http</span> <span class="k">import</span> <span class="n">HTTPStatus</span> <span class="k">as</span> <span class="n">_StatusCodes</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="k">try</span><span class="p">:</span>  <span class="c1"># Python 3</span>
-        <span class="kn">from</span> <span class="nn">http</span> <span class="k">import</span> <span class="n">client</span> <span class="k">as</span> <span class="n">_StatusCodes</span>
-    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># Python 2</span>
-        <span class="kn">import</span> <span class="nn">httplib</span> <span class="k">as</span> <span class="nn">_StatusCodes</span>
+<span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">_requests</span>
 
 <span class="c1"># These response keys are defined in https://tools.ietf.org/id/draft-ietf-oauth-discovery-08.html.</span>
 <span class="n">_authorization_endpoint_key</span> <span class="o">=</span> <span class="s2">&quot;authorization_endpoint&quot;</span>
@@ -180,6 +173,7 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple wrapper around commonly discovered endpoints used for the PKCE auth flow.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">auth_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">token_endpoint</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_auth_endpoint</span> <span class="o">=</span> <span class="n">auth_endpoint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_token_endpoint</span> <span class="o">=</span> <span class="n">token_endpoint</span>
@@ -214,9 +208,7 @@
 <div class="viewcode-block" id="DiscoveryClient.get_authorization_endpoints"><a class="viewcode-back" href="../../../../flytekit/flytekit.clis.auth.html#flytekit.clis.auth.discovery.DiscoveryClient.get_authorization_endpoints">[docs]</a>    <span class="k">def</span> <span class="nf">get_authorization_endpoints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorization_endpoints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorization_endpoints</span>
-        <span class="n">resp</span> <span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-            <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_discovery_url</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_discovery_url</span><span class="p">,)</span>
 
         <span class="n">response_body</span> <span class="o">=</span> <span class="n">resp</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
 
@@ -224,19 +216,20 @@
         <span class="n">token_endpoint</span> <span class="o">=</span> <span class="n">response_body</span><span class="p">[</span><span class="n">_token_endpoint_key</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">authorization_endpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to discover authorization endpoint&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to discover authorization endpoint&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">token_endpoint</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unable to discover token endpoint&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to discover token endpoint&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">authorization_endpoint</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
-             <span class="n">authorization_endpoint</span><span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_discovery_url</span><span class="p">,</span> <span class="n">authorization_endpoint</span><span class="p">)</span>
+            <span class="n">authorization_endpoint</span> <span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_discovery_url</span><span class="p">,</span> <span class="n">authorization_endpoint</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">token_endpoint</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
             <span class="n">token_endpoint</span> <span class="o">=</span> <span class="n">_requests</span><span class="o">.</span><span class="n">compat</span><span class="o">.</span><span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_discovery_url</span><span class="p">,</span> <span class="n">token_endpoint</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_authorization_endpoints</span> <span class="o">=</span> <span class="n">AuthorizationEndpoints</span><span class="p">(</span><span class="n">auth_endpoint</span><span class="o">=</span><span class="n">authorization_endpoint</span><span class="p">,</span>
-                                                               <span class="n">token_endpoint</span><span class="o">=</span><span class="n">token_endpoint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_authorization_endpoints</span> <span class="o">=</span> <span class="n">AuthorizationEndpoints</span><span class="p">(</span>
+            <span class="n">auth_endpoint</span><span class="o">=</span><span class="n">authorization_endpoint</span><span class="p">,</span> <span class="n">token_endpoint</span><span class="o">=</span><span class="n">token_endpoint</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">authorization_endpoints</span></div></div>
 </pre></div>
 

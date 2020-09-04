@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.admin.common &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.admin.common &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,12 +162,12 @@
   <h1>Source code for flytekit.models.admin.common</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">common_pb2</span> <span class="k">as</span> <span class="n">_common_pb2</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 
 
 <div class="viewcode-block" id="Sort"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.common.Sort">[docs]</a><span class="k">class</span> <span class="nc">Sort</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
 <div class="viewcode-block" id="Sort.Direction"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.admin.html#flytekit.models.admin.common.Sort.Direction">[docs]</a>    <span class="k">class</span> <span class="nc">Direction</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="n">DESCENDING</span> <span class="o">=</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">Sort</span><span class="o">.</span><span class="n">DESCENDING</span>
         <span class="n">ASCENDING</span> <span class="o">=</span> <span class="n">_common_pb2</span><span class="o">.</span><span class="n">Sort</span><span class="o">.</span><span class="n">ASCENDING</span></div>
@@ -215,18 +215,22 @@
 <span class="sd">        :rtype: Sort</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;)&#39;</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse string.  Must be in format &#39;asc(key)&#39; or &#39;desc(key)&#39;.  &#39;</span><span class="si">{}</span><span class="s2">&#39; did not &quot;</span>
-                             <span class="s2">&quot;end with &#39;)&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;)&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not parse string.  Must be in format &#39;asc(key)&#39; or &#39;desc(key)&#39;.  &#39;</span><span class="si">{}</span><span class="s2">&#39; did not &quot;</span>
+                <span class="s2">&quot;end with &#39;)&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;asc(&quot;</span><span class="p">):</span>
             <span class="n">direction</span> <span class="o">=</span> <span class="n">Sort</span><span class="o">.</span><span class="n">Direction</span><span class="o">.</span><span class="n">ASCENDING</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;asc(&quot;</span><span class="p">):</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;asc(&quot;</span><span class="p">)</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">elif</span> <span class="n">text</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;desc(&quot;</span><span class="p">):</span>
             <span class="n">direction</span> <span class="o">=</span> <span class="n">Sort</span><span class="o">.</span><span class="n">Direction</span><span class="o">.</span><span class="n">DESCENDING</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;desc(&quot;</span><span class="p">):</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;desc(&quot;</span><span class="p">)</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Could not parse string.  Must be in format &#39;asc(key)&#39; or &#39;desc(key)&#39;.  &#39;</span><span class="si">{}</span><span class="s2">&#39; did not &quot;</span>
-                             <span class="s2">&quot;start with &#39;asc(&#39; or &#39;desc&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Could not parse string.  Must be in format &#39;asc(key)&#39; or &#39;desc(key)&#39;.  &#39;</span><span class="si">{}</span><span class="s2">&#39; did not &quot;</span>
+                <span class="s2">&quot;start with &#39;asc(&#39; or &#39;desc&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="n">direction</span><span class="p">)</span></div></div>
 </pre></div>
 

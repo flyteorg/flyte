@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.test_utils &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.sdk.test_utils &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,9 +161,11 @@
             
   <h1>Source code for flytekit.sdk.test_utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
+<span class="kn">from</span> <span class="nn">wrapt</span> <span class="k">import</span> <span class="n">decorator</span> <span class="k">as</span> <span class="n">_decorator</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_utils</span>
 <span class="kn">from</span> <span class="nn">flytekit.interfaces.data</span> <span class="k">import</span> <span class="n">data_proxy</span> <span class="k">as</span> <span class="n">_data_proxy</span>
-<span class="kn">from</span> <span class="nn">wrapt</span> <span class="k">import</span> <span class="n">decorator</span> <span class="k">as</span> <span class="n">_decorator</span>
 
 
 <div class="viewcode-block" id="LocalTestFileSystem"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.test_utils.LocalTestFileSystem">[docs]</a><span class="k">class</span> <span class="nc">LocalTestFileSystem</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

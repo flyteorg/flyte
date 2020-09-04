@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.utils &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.utils &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -165,22 +165,17 @@
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">shutil</span> <span class="k">as</span> <span class="nn">_shutil</span>
-<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">sha224</span> <span class="k">as</span> <span class="n">_sha224</span>
 <span class="kn">import</span> <span class="nn">tempfile</span> <span class="k">as</span> <span class="nn">_tempfile</span>
 <span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">_time</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">sha224</span> <span class="k">as</span> <span class="n">_sha224</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">flytekit</span> <span class="k">as</span> <span class="nn">_flytekit</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pathlib2</span> <span class="k">import</span> <span class="n">Path</span>  <span class="c1"># python 2 backport</span>
 
-
-<span class="k">def</span> <span class="nf">_dnsify</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-    <span class="c1"># type: (Text) -&gt; Text</span>
+<span class="k">def</span> <span class="nf">_dnsify</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>  <span class="c1"># type: (str) -&gt; str</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts value into a DNS-compliant (RFC1035/RFC1123 DNS_LABEL). The resulting string must only consist of</span>
 <span class="sd">    alphanumeric (lower-case a-z, and 0-9) and not exceed 63 characters. It&#39;s permitted to have &#39;-&#39; character as long</span>
@@ -193,10 +188,10 @@
     <span class="n">MAX</span> <span class="o">=</span> <span class="mi">63</span>
     <span class="n">HASH_LEN</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">MAX</span><span class="p">:</span>
-        <span class="n">h</span> <span class="o">=</span> <span class="n">_sha224</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="n">HASH_LEN</span><span class="p">]</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">MAX</span> <span class="o">-</span> <span class="n">HASH_LEN</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):])</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">_sha224</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()[:</span><span class="n">HASH_LEN</span><span class="p">]</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">-</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">MAX</span> <span class="o">-</span> <span class="n">HASH_LEN</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="p">:])</span>
     <span class="k">for</span> <span class="n">ch</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">&#39;_&#39;</span> <span class="ow">or</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span> <span class="ow">or</span> <span class="n">ch</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ch</span> <span class="o">==</span> <span class="s2">&quot;_&quot;</span> <span class="ow">or</span> <span class="n">ch</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span> <span class="ow">or</span> <span class="n">ch</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
             <span class="c1"># Convert &#39;_&#39; to &#39;-&#39; unless it&#39;s the first character, in which case we drop it.</span>
             <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">62</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;-&quot;</span>
@@ -208,18 +203,18 @@
             <span class="n">res</span> <span class="o">+=</span> <span class="n">ch</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Character is upper-case. Add a &#39;-&#39; before it for better readability.</span>
-            <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;-&#39;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">62</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">res</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;-&quot;</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">62</span><span class="p">:</span>
                 <span class="n">res</span> <span class="o">+=</span> <span class="s2">&quot;-&quot;</span>
             <span class="n">res</span> <span class="o">+=</span> <span class="n">ch</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
-        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[:</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">res</span>
 
 
 <div class="viewcode-block" id="load_proto_from_file"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.utils.load_proto_from_file">[docs]</a><span class="k">def</span> <span class="nf">load_proto_from_file</span><span class="p">(</span><span class="n">pb2_type</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">pb2_type</span><span class="p">()</span>
         <span class="n">out</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -227,7 +222,7 @@
 
 <div class="viewcode-block" id="write_proto_to_file"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.utils.write_proto_to_file">[docs]</a><span class="k">def</span> <span class="nf">write_proto_to_file</span><span class="p">(</span><span class="n">proto</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
     <span class="n">Path</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span></div>
 
 
@@ -236,7 +231,6 @@
 
 
 <div class="viewcode-block" id="Directory"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.utils.Directory">[docs]</a><span class="k">class</span> <span class="nc">Directory</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text path: local path of directory</span>
@@ -276,7 +270,7 @@
 <span class="sd">        :param bool cleanup: Whether the directory should be cleaned up upon exit</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tmp_dir</span> <span class="o">=</span> <span class="n">tmp_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir_prefix</span> <span class="o">=</span> <span class="p">(</span><span class="n">working_dir_prefix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">working_dir_prefix</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_working_dir_prefix</span> <span class="o">=</span> <span class="p">(</span><span class="n">working_dir_prefix</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">working_dir_prefix</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup</span> <span class="o">=</span> <span class="n">cleanup</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">AutoDeletingTempDir</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 
@@ -307,7 +301,6 @@
 
 
 <div class="viewcode-block" id="PerformanceTimer"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.utils.PerformanceTimer">[docs]</a><span class="k">class</span> <span class="nc">PerformanceTimer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context_statement</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text context_statement: the statement to log</span>
@@ -318,21 +311,22 @@
 
     <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Entering timed context: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_context_statement</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_start_wall_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_start_process_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_wall_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_process_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-        <span class="n">end_wall_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">end_process_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">clock</span><span class="p">()</span>
-        <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Exiting timed context: </span><span class="si">{}</span><span class="s2"> [Wall Time: </span><span class="si">{}</span><span class="s2">s, Process Time: </span><span class="si">{}</span><span class="s2">s]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_context_statement</span><span class="p">,</span>
-            <span class="n">end_wall_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_wall_time</span><span class="p">,</span>
-            <span class="n">end_process_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_process_time</span>
-        <span class="p">))</span></div>
+        <span class="n">end_wall_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+        <span class="n">end_process_time</span> <span class="o">=</span> <span class="n">_time</span><span class="o">.</span><span class="n">process_time</span><span class="p">()</span>
+        <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Exiting timed context: </span><span class="si">{}</span><span class="s2"> [Wall Time: </span><span class="si">{}</span><span class="s2">s, Process Time: </span><span class="si">{}</span><span class="s2">s]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_context_statement</span><span class="p">,</span>
+                <span class="n">end_wall_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_wall_time</span><span class="p">,</span>
+                <span class="n">end_process_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_process_time</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ExitStack"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.utils.ExitStack">[docs]</a><span class="k">class</span> <span class="nc">ExitStack</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entered_stack</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_contexts</span> <span class="o">=</span> <span class="n">entered_stack</span>
 

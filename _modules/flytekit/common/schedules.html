@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.schedules &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.schedules &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,12 +161,15 @@
             
   <h1>Source code for flytekit.common.schedules</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule_models</span>
+
+<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
+
+<span class="kn">import</span> <span class="nn">croniter</span> <span class="k">as</span> <span class="nn">_croniter</span>
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-<span class="kn">import</span> <span class="nn">croniter</span> <span class="k">as</span> <span class="nn">_croniter</span>
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule_models</span>
 
 
 <span class="k">class</span> <span class="nc">_ExtendedSchedule</span><span class="p">(</span><span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="p">):</span>
@@ -180,7 +183,6 @@
 
 
 <div class="viewcode-block" id="CronSchedule"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.schedules.CronSchedule">[docs]</a><span class="k">class</span> <span class="nc">CronSchedule</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_ExtendedSchedule</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cron_expression</span><span class="p">,</span> <span class="n">kickoff_time_input_arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text cron_expression:</span>
@@ -203,12 +205,10 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;Cron expression is invalid.  A cron expression must have 6 fields.  Cron expressions are in the &quot;</span>
-                <span class="s2">&quot;format of: `minute hour day-of-month month day-of-week year`.  Received: `</span><span class="si">{}</span><span class="s2">`&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">cron_expression</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;format of: `minute hour day-of-month month day-of-week year`.  Received: `</span><span class="si">{}</span><span class="s2">`&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cron_expression</span><span class="p">)</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;?&#39;</span> <span class="ow">and</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;?&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span> <span class="ow">and</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;?&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;Scheduled string is invalid.  A cron expression must have a &#39;?&#39; for either day-of-month or &quot;</span>
                 <span class="s2">&quot;day-of-week.  Please specify &#39;?&#39; for one of those fields.  Cron expressions are in the format of: &quot;</span>
@@ -220,13 +220,11 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Cut to 5 fields and just assume year field is good because croniter treats the 6th field as seconds.</span>
             <span class="c1"># TODO: Parse this field ourselves and check</span>
-            <span class="n">_croniter</span><span class="o">.</span><span class="n">croniter</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cron_expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]))</span>
-        <span class="k">except</span><span class="p">:</span>
+            <span class="n">_croniter</span><span class="o">.</span><span class="n">croniter</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cron_expression</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]))</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;Scheduled string is invalid.  The cron expression was found to be invalid.&quot;</span>
-                <span class="s2">&quot; Provided cron expr: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">cron_expression</span>
-                <span class="p">)</span>
+                <span class="s2">&quot; Provided cron expr: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cron_expression</span><span class="p">)</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="CronSchedule.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.schedules.CronSchedule.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
@@ -235,14 +233,10 @@
 <span class="sd">        :param flytekit.models.schedule.Schedule base_model:</span>
 <span class="sd">        :rtype: CronSchedule</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">base_model</span><span class="o">.</span><span class="n">cron_expression</span><span class="p">,</span>
-            <span class="n">kickoff_time_input_arg</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">kickoff_time_input_arg</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">base_model</span><span class="o">.</span><span class="n">cron_expression</span><span class="p">,</span> <span class="n">kickoff_time_input_arg</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">kickoff_time_input_arg</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="FixedRate"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.schedules.FixedRate">[docs]</a><span class="k">class</span> <span class="nc">FixedRate</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_ExtendedSchedule</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">kickoff_time_input_arg</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param datetime.timedelta duration:</span>
@@ -268,18 +262,15 @@
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span> <span class="o">%</span> <span class="n">_SECONDS_TO_DAYS</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRate</span><span class="p">(</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="n">_SECONDS_TO_DAYS</span><span class="p">),</span>
-                <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRateUnit</span><span class="o">.</span><span class="n">DAY</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="n">_SECONDS_TO_DAYS</span><span class="p">),</span> <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRateUnit</span><span class="o">.</span><span class="n">DAY</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span> <span class="o">%</span> <span class="n">_SECONDS_TO_HOURS</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRate</span><span class="p">(</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="n">_SECONDS_TO_HOURS</span><span class="p">),</span>
-                <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRateUnit</span><span class="o">.</span><span class="n">HOUR</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="n">_SECONDS_TO_HOURS</span><span class="p">),</span> <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRateUnit</span><span class="o">.</span><span class="n">HOUR</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRate</span><span class="p">(</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="n">_SECONDS_TO_MINUTES</span><span class="p">),</span>
-                <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRateUnit</span><span class="o">.</span><span class="n">MINUTE</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="n">_SECONDS_TO_MINUTES</span><span class="p">),</span> <span class="n">_schedule_models</span><span class="o">.</span><span class="n">Schedule</span><span class="o">.</span><span class="n">FixedRateUnit</span><span class="o">.</span><span class="n">MINUTE</span><span class="p">,</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="FixedRate.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.schedules.FixedRate.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
@@ -295,10 +286,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">duration</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">duration</span><span class="p">,</span>
-            <span class="n">kickoff_time_input_arg</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">kickoff_time_input_arg</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="n">kickoff_time_input_arg</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">kickoff_time_input_arg</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

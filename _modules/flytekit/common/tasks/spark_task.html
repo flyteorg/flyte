@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.spark_task &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.spark_task &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -169,15 +169,19 @@
 
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">sys</span> <span class="k">as</span> <span class="nn">_sys</span>
+
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">MessageToDict</span> <span class="k">as</span> <span class="n">_MessageToDict</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.bin</span> <span class="k">import</span> <span class="n">entrypoint</span> <span class="k">as</span> <span class="n">_entrypoint</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span><span class="p">,</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">output</span> <span class="k">as</span> <span class="n">_task_output</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">sdk_runnable</span> <span class="k">as</span> <span class="n">_sdk_runnable</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">pyspark</span> <span class="k">as</span> <span class="n">_pyspark</span>
-<span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">MessageToDict</span> <span class="k">as</span> <span class="n">_MessageToDict</span>
 
 
 <div class="viewcode-block" id="GlobalSparkContext"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.spark_task.GlobalSparkContext">[docs]</a><span class="k">class</span> <span class="nc">GlobalSparkContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -198,7 +202,6 @@
 
 
 <div class="viewcode-block" id="SdkRunnableSparkContainer"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.spark_task.SdkRunnableSparkContainer">[docs]</a><span class="k">class</span> <span class="nc">SdkRunnableSparkContainer</span><span class="p">(</span><span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableContainer</span><span class="p">):</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -213,20 +216,21 @@
 <span class="sd">    This class includes the additional logic for building a task that executes as a Spark Job.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">task_function</span><span class="p">,</span>
-            <span class="n">task_type</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">,</span>
-            <span class="n">interruptible</span><span class="p">,</span>
-            <span class="n">deprecated</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">,</span>
-            <span class="n">spark_type</span><span class="p">,</span>
-            <span class="n">spark_conf</span><span class="p">,</span>
-            <span class="n">hadoop_conf</span><span class="p">,</span>
-            <span class="n">environment</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">task_function</span><span class="p">,</span>
+        <span class="n">task_type</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">,</span>
+        <span class="n">spark_type</span><span class="p">,</span>
+        <span class="n">spark_conf</span><span class="p">,</span>
+        <span class="n">hadoop_conf</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param task_function: Function container user code.  This will be executed via the SDK&#39;s engine.</span>
@@ -243,7 +247,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">spark_exec_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_entrypoint</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">spark_exec_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pyc&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">spark_exec_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pyc&quot;</span><span class="p">):</span>
             <span class="n">spark_exec_path</span> <span class="o">=</span> <span class="n">spark_exec_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="n">spark_job</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">SparkJob</span><span class="p">(</span>
@@ -287,9 +291,10 @@
 <span class="sd">            working directory (with the names provided), which will in turn allow Flyte Propeller to push along the</span>
 <span class="sd">            workflow.  Where as local engine will merely feed the outputs directly into the next node.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
-        <span class="p">})</span>
+        <span class="n">inputs_dict</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">unpack_literal_map_to_sdk_python_std</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)},</span>
+        <span class="p">)</span>
         <span class="n">outputs_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">_task_output</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">(</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
@@ -304,7 +309,7 @@
                     <span class="n">execution_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">execution_id</span><span class="p">,</span>
                     <span class="n">stats</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
                     <span class="n">logging</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">logging</span><span class="p">,</span>
-                    <span class="n">tmp_dir</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_directory</span>
+                    <span class="n">tmp_dir</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_directory</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">GlobalSparkContext</span><span class="o">.</span><span class="n">get_spark_context</span><span class="p">(),</span>
                 <span class="o">**</span><span class="n">inputs_dict</span>
@@ -315,10 +320,7 @@
             <span class="p">)</span>
         <span class="p">}</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: SdkRunnableSparkContainer</span>
 <span class="sd">        &quot;&quot;&quot;</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools.module_loader &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.tools.module_loader &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -176,7 +176,7 @@
     <span class="k">for</span> <span class="n">package_name</span> <span class="ow">in</span> <span class="n">pkgs</span><span class="p">:</span>
         <span class="n">package</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">package_name</span><span class="p">)</span>
         <span class="k">yield</span> <span class="n">package</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">walk_packages</span><span class="p">(</span><span class="n">package</span><span class="o">.</span><span class="n">__path__</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">pkgutil</span><span class="o">.</span><span class="n">walk_packages</span><span class="p">(</span><span class="n">package</span><span class="o">.</span><span class="n">__path__</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">package_name</span><span class="p">)):</span>
             <span class="k">yield</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
 
 
@@ -193,40 +193,36 @@
 
 
 <span class="k">def</span> <span class="nf">_topo_sort_helper</span><span class="p">(</span>
-        <span class="n">obj</span><span class="p">,</span>
-        <span class="n">entity_to_module_key</span><span class="p">,</span>
-        <span class="n">visited</span><span class="p">,</span>
-        <span class="n">recursion_set</span><span class="p">,</span>
-        <span class="n">recursion_stack</span><span class="p">,</span>
-        <span class="n">include_entities</span><span class="p">,</span>
-        <span class="n">ignore_entities</span><span class="p">,</span>
-        <span class="n">detect_unreferenced_entities</span><span class="p">):</span>
+    <span class="n">obj</span><span class="p">,</span>
+    <span class="n">entity_to_module_key</span><span class="p">,</span>
+    <span class="n">visited</span><span class="p">,</span>
+    <span class="n">recursion_set</span><span class="p">,</span>
+    <span class="n">recursion_stack</span><span class="p">,</span>
+    <span class="n">include_entities</span><span class="p">,</span>
+    <span class="n">ignore_entities</span><span class="p">,</span>
+    <span class="n">detect_unreferenced_entities</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="n">recursion_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">recursion_set</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
             <span class="s2">&quot;A cyclical dependency was detected during topological sort of entities.  &quot;</span>
-            <span class="s2">&quot;Cycle path was:</span><span class="se">\n\n\t</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">recursion_stack</span><span class="p">[</span><span class="n">recursion_set</span><span class="p">[</span><span class="n">obj</span><span class="p">]:]</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="s2">&quot;Cycle path was:</span><span class="se">\n\n\t</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">recursion_stack</span><span class="p">[</span><span class="n">recursion_set</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="p">:]))</span>
         <span class="p">)</span>
     <span class="n">recursion_set</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">recursion_stack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
     <span class="k">for</span> <span class="n">upstream</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">upstream_entities</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">upstream</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span> <span class="ow">in</span> \
-                    <span class="n">_topo_sort_helper</span><span class="p">(</span>
-                        <span class="n">upstream</span><span class="p">,</span>
-                        <span class="n">entity_to_module_key</span><span class="p">,</span>
-                        <span class="n">visited</span><span class="p">,</span>
-                        <span class="n">recursion_set</span><span class="p">,</span>
-                        <span class="n">recursion_stack</span><span class="p">,</span>
-                        <span class="n">include_entities</span><span class="p">,</span>
-                        <span class="n">ignore_entities</span><span class="p">,</span>
-                        <span class="n">detect_unreferenced_entities</span>
-                    <span class="p">):</span>
+            <span class="k">for</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span> <span class="ow">in</span> <span class="n">_topo_sort_helper</span><span class="p">(</span>
+                <span class="n">upstream</span><span class="p">,</span>
+                <span class="n">entity_to_module_key</span><span class="p">,</span>
+                <span class="n">visited</span><span class="p">,</span>
+                <span class="n">recursion_set</span><span class="p">,</span>
+                <span class="n">recursion_stack</span><span class="p">,</span>
+                <span class="n">include_entities</span><span class="p">,</span>
+                <span class="n">ignore_entities</span><span class="p">,</span>
+                <span class="n">detect_unreferenced_entities</span><span class="p">,</span>
+            <span class="p">):</span>
                 <span class="k">yield</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span>
 
     <span class="n">recursion_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
@@ -245,10 +241,7 @@
 
 
 <div class="viewcode-block" id="iterate_registerable_entities_in_order"><a class="viewcode-back" href="../../../flytekit/flytekit.tools.html#flytekit.tools.module_loader.iterate_registerable_entities_in_order">[docs]</a><span class="k">def</span> <span class="nf">iterate_registerable_entities_in_order</span><span class="p">(</span>
-        <span class="n">pkgs</span><span class="p">,</span>
-        <span class="n">ignore_entities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">include_entities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">detect_unreferenced_entities</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">pkgs</span><span class="p">,</span> <span class="n">ignore_entities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_entities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">detect_unreferenced_entities</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This function will iterate all discovered entities in the given package list.  It will then attempt to</span>
@@ -279,7 +272,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">instantiated_in</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
                     <span class="n">entity_to_module_key</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_SdkWorkflow</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_SdkWorkflow</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">should_create_default_launch_plan</span><span class="p">:</span>
                         <span class="c1"># SDK should create a default launch plan for a workflow.  This is a special-case to simplify</span>
                         <span class="c1"># authoring of workflows.</span>
                         <span class="n">entity_to_module_key</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">create_launch_plan</span><span class="p">()]</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
@@ -289,17 +282,16 @@
         <span class="k">if</span> <span class="n">o</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
             <span class="n">recursion_set</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
             <span class="n">recursion_stack</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">o2</span> <span class="ow">in</span> \
-                    <span class="n">_topo_sort_helper</span><span class="p">(</span>
-                        <span class="n">o</span><span class="p">,</span>
-                        <span class="n">entity_to_module_key</span><span class="p">,</span>
-                        <span class="n">visited</span><span class="p">,</span>
-                        <span class="n">recursion_set</span><span class="p">,</span>
-                        <span class="n">recursion_stack</span><span class="p">,</span>
-                        <span class="n">include_entities</span><span class="p">,</span>
-                        <span class="n">ignore_entities</span><span class="p">,</span>
-                        <span class="n">detect_unreferenced_entities</span><span class="o">=</span><span class="n">detect_unreferenced_entities</span>
-                    <span class="p">):</span>
+            <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">o2</span> <span class="ow">in</span> <span class="n">_topo_sort_helper</span><span class="p">(</span>
+                <span class="n">o</span><span class="p">,</span>
+                <span class="n">entity_to_module_key</span><span class="p">,</span>
+                <span class="n">visited</span><span class="p">,</span>
+                <span class="n">recursion_set</span><span class="p">,</span>
+                <span class="n">recursion_stack</span><span class="p">,</span>
+                <span class="n">include_entities</span><span class="p">,</span>
+                <span class="n">ignore_entities</span><span class="p">,</span>
+                <span class="n">detect_unreferenced_entities</span><span class="o">=</span><span class="n">detect_unreferenced_entities</span><span class="p">,</span>
+            <span class="p">):</span>
                 <span class="k">yield</span> <span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">o2</span></div>
 </pre></div>
 

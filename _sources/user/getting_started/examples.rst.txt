@@ -17,7 +17,7 @@ Registration
 
 If you're using the ``sandbox`` flyte installation, you can use the following command to register our example workflow with Flyte ::
 
-  docker run --network host -e FLYTE_PLATFORM_URL='127.0.0.1:30081' lyft/flytesnacks:v0.1.0 pyflyte -p flytesnacks -d development -c sandbox.config register workflows
+  docker run --network host -e FLYTE_PLATFORM_URL='127.0.0.1:30081' lyft/flytesnacks:v0.2.0 pyflyte -p flytesnacks -d development -c sandbox.config register workflows
 
 This command will register the workflow with your Flyte app under the ``development`` domain of the project ``flytesnacks``.
 

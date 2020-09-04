@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.nodes &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.nodes &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -168,17 +168,23 @@
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">sortedcontainers</span> <span class="k">import</span> <span class="n">SortedDict</span> <span class="k">as</span> <span class="n">_SortedDict</span>
 
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">component_nodes</span> <span class="k">as</span> <span class="n">_component_nodes</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span><span class="p">,</span> <span class="n">component_nodes</span> <span class="k">as</span> <span class="n">_component_nodes</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span><span class="p">,</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promise</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">artifact</span> <span class="k">as</span> <span class="n">_artifact_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">artifact</span> <span class="k">as</span> <span class="n">_artifact_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">executions</span> <span class="k">as</span> <span class="n">_task_executions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.utils</span> <span class="k">import</span> <span class="n">_dnsify</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span><span class="p">,</span> <span class="n">node_execution</span> <span class="k">as</span> <span class="n">_node_execution_models</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span><span class="p">,</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">node_execution</span> <span class="k">as</span> <span class="n">_node_execution_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span>
 
 
 <div class="viewcode-block" id="ParameterMapper"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.ParameterMapper">[docs]</a><span class="k">class</span> <span class="nc">ParameterMapper</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="n">_SortedDict</span><span class="p">)):</span>
@@ -224,7 +230,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;iteritems&#39;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="s1">&#39;items&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;iteritems&quot;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="s2">&quot;items&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="n">key</span><span class="p">)</span>
@@ -233,7 +239,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="k">if</span> <span class="s1">&#39;_initialized&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;_initialized&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Parameters are immutable.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">super</span><span class="p">(</span><span class="n">ParameterMapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
@@ -262,18 +268,17 @@
         <span class="k">return</span> <span class="n">_promise</span><span class="o">.</span><span class="n">NodeOutput</span><span class="p">(</span><span class="n">sdk_node</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="SdkNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode">[docs]</a><span class="k">class</span> <span class="nc">SdkNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">Node</span><span class="p">)):</span>
-
+<div class="viewcode-block" id="SdkNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNode">[docs]</a><span class="k">class</span> <span class="nc">SdkNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">Node</span><span class="p">,)):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="nb">id</span><span class="p">,</span>
-            <span class="n">upstream_nodes</span><span class="p">,</span>
-            <span class="n">bindings</span><span class="p">,</span>
-            <span class="n">metadata</span><span class="p">,</span>
-            <span class="n">sdk_task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">sdk_workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">sdk_branch</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="nb">id</span><span class="p">,</span>
+        <span class="n">upstream_nodes</span><span class="p">,</span>
+        <span class="n">bindings</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">,</span>
+        <span class="n">sdk_task</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sdk_workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">sdk_branch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text id: A workflow-level unique identifier that identifies this node in the workflow. &quot;inputs&quot; and</span>
@@ -292,15 +297,12 @@
 <span class="sd">        :param TODO sdk_branch: TODO</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">non_none_entities</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">entity</span>
-            <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sdk_workflow</span><span class="p">,</span> <span class="n">sdk_branch</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">]</span> <span class="k">if</span> <span class="n">entity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">entity</span> <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="p">[</span><span class="n">sdk_workflow</span><span class="p">,</span> <span class="n">sdk_branch</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">]</span> <span class="k">if</span> <span class="n">entity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_none_entities</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;An SDK node must have one underlying entity specified at once.  Received the following &quot;</span>
-                <span class="s2">&quot;entities: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">non_none_entities</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;entities: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">non_none_entities</span><span class="p">)</span>
             <span class="p">)</span>
 
         <span class="n">workflow_node</span> <span class="o">=</span> <span class="kc">None</span>
@@ -317,7 +319,7 @@
             <span class="n">output_aliases</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># TODO: Are aliases a thing in SDK nodes</span>
             <span class="n">task_node</span><span class="o">=</span><span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkTaskNode</span><span class="p">(</span><span class="n">sdk_task</span><span class="p">)</span> <span class="k">if</span> <span class="n">sdk_task</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">workflow_node</span><span class="o">=</span><span class="n">workflow_node</span><span class="p">,</span>
-            <span class="n">branch_node</span><span class="o">=</span><span class="n">sdk_branch</span><span class="o">.</span><span class="n">target</span> <span class="k">if</span> <span class="n">sdk_branch</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">branch_node</span><span class="o">=</span><span class="n">sdk_branch</span><span class="o">.</span><span class="n">target</span> <span class="k">if</span> <span class="n">sdk_branch</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_upstream</span> <span class="o">=</span> <span class="n">upstream_nodes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_executable_sdk_object</span> <span class="o">=</span> <span class="n">sdk_task</span> <span class="ow">or</span> <span class="n">sdk_workflow</span> <span class="ow">or</span> <span class="n">sdk_branch</span> <span class="ow">or</span> <span class="n">sdk_launch_plan</span>
@@ -349,7 +351,8 @@
             <span class="n">sdk_task_node</span> <span class="o">=</span> <span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkTaskNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">task_node</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">model</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sdk_workflow_node</span> <span class="o">=</span> <span class="n">_component_nodes</span><span class="o">.</span><span class="n">SdkWorkflowNode</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span>
-                <span class="n">model</span><span class="o">.</span><span class="n">workflow_node</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">)</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">workflow_node</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;Bad Node model, neither task nor workflow detected&quot;</span><span class="p">)</span>
 
@@ -386,7 +389,8 @@
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span>
-                    <span class="s2">&quot;Bad SdkWorkflowNode model, both lp and workflow are None&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Bad SdkWorkflowNode model, both lp and workflow are None&quot;</span>
+                <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;Bad SdkNode model, both task and workflow nodes are empty&quot;</span><span class="p">)</span></div>
 
@@ -459,9 +463,7 @@
 
 <div class="viewcode-block" id="SdkNodeExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNodeExecution">[docs]</a><span class="k">class</span> <span class="nc">SdkNodeExecution</span><span class="p">(</span>
     <span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span>
-        <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span>
-        <span class="n">_node_execution_models</span><span class="o">.</span><span class="n">NodeExecution</span><span class="p">,</span>
-        <span class="n">_artifact_mixin</span><span class="o">.</span><span class="n">ExecutionArtifact</span>
+        <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_node_execution_models</span><span class="o">.</span><span class="n">NodeExecution</span><span class="p">,</span> <span class="n">_artifact_mixin</span><span class="o">.</span><span class="n">ExecutionArtifact</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -515,8 +517,9 @@
 <span class="sd">        :rtype: dict[Text, T]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_complete</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Please what until the node execution has completed before &quot;</span>
-                                                  <span class="s2">&quot;requesting the outputs.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                <span class="s2">&quot;Please what until the node execution has completed before &quot;</span> <span class="s2">&quot;requesting the outputs.&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Outputs could not be found because the execution ended in failure.&quot;</span><span class="p">)</span>
 
@@ -534,8 +537,9 @@
 <span class="sd">        :rtype: flytekit.models.core.execution.ExecutionError or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_complete</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Please what until the node execution has completed before &quot;</span>
-                                                  <span class="s2">&quot;requesting error information.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                <span class="s2">&quot;Please what until the node execution has completed before &quot;</span> <span class="s2">&quot;requesting error information.&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">closure</span><span class="o">.</span><span class="n">error</span>
 
     <span class="nd">@property</span>
@@ -558,11 +562,7 @@
 <span class="sd">        :param _node_execution_models.NodeExecution base_model:</span>
 <span class="sd">        :rtype: SdkNodeExecution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">closure</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">closure</span><span class="p">,</span>
-            <span class="nb">id</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-            <span class="n">input_uri</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">input_uri</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">closure</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">closure</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">input_uri</span><span class="o">=</span><span class="n">base_model</span><span class="o">.</span><span class="n">input_uri</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkNodeExecution.sync"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.nodes.SdkNodeExecution.sync">[docs]</a>    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

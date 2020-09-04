@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.raw_container &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.tasks.raw_container &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -172,7 +172,8 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_base_task</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types.base_sdk_types</span> <span class="k">import</span> <span class="n">FlyteSdkType</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">resources</span> <span class="k">as</span> <span class="n">_resource_config</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span><span class="p">,</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">task</span> <span class="k">as</span> <span class="n">_task_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.interface</span> <span class="k">import</span> <span class="n">Variable</span>
 
 
@@ -185,19 +186,19 @@
 
 
 <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
-        <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-        <span class="n">data_loading_config</span><span class="p">:</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">,</span>
-        <span class="n">storage_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">gpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">memory_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">storage_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">gpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">memory_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">environment</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">data_loading_config</span><span class="p">:</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">,</span>
+    <span class="n">storage_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">memory_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">storage_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">cpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">memory_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">environment</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">Container</span><span class="p">:</span>
     <span class="n">storage_limit</span> <span class="o">=</span> <span class="n">storage_limit</span> <span class="ow">or</span> <span class="n">_resource_config</span><span class="o">.</span><span class="n">DEFAULT_STORAGE_LIMIT</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
     <span class="n">storage_request</span> <span class="o">=</span> <span class="n">storage_request</span> <span class="ow">or</span> <span class="n">_resource_config</span><span class="o">.</span><span class="n">DEFAULT_STORAGE_REQUEST</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
@@ -211,62 +212,26 @@
     <span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">storage_request</span><span class="p">:</span>
         <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span>
-                <span class="n">storage_request</span>
-            <span class="p">)</span>
+            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_request</span><span class="p">)</span>
         <span class="p">)</span>
     <span class="k">if</span> <span class="n">cpu_request</span><span class="p">:</span>
-        <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-                <span class="n">cpu_request</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">gpu_request</span><span class="p">:</span>
-        <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
-                <span class="n">gpu_request</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">memory_request</span><span class="p">:</span>
         <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span>
-                <span class="n">memory_request</span>
-            <span class="p">)</span>
+            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="n">limits</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">storage_limit</span><span class="p">:</span>
-        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span>
-                <span class="n">storage_limit</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">cpu_limit</span><span class="p">:</span>
-        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span>
-                <span class="n">cpu_limit</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_limit</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">gpu_limit</span><span class="p">:</span>
-        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
-                <span class="n">gpu_limit</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">memory_limit</span><span class="p">:</span>
-        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span>
-                <span class="n">memory_limit</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">environment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">environment</span> <span class="o">=</span> <span class="p">{}</span>
@@ -287,35 +252,36 @@
 <span class="sd">    Use this task when you want to run an arbitrary container as a task (e.g. external tools, binaries compiled</span>
 <span class="sd">    separately as a container completely separate from the container where your Flyte workflow is defined.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">METADATA_FORMAT_JSON</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">LITERALMAP_FORMAT_JSON</span>
     <span class="n">METADATA_FORMAT_YAML</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">LITERALMAP_FORMAT_YAML</span>
     <span class="n">METADATA_FORMAT_PROTO</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="o">.</span><span class="n">LITERALMAP_FORMAT_PROTO</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlyteSdkType</span><span class="p">],</span>
-            <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-            <span class="n">outputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlyteSdkType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">input_data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">output_data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">metadata_format</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">METADATA_FORMAT_JSON</span><span class="p">,</span>
-            <span class="n">io_strategy</span><span class="p">:</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">IOStrategy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">storage_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">cpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">gpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">memory_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">storage_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">cpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">gpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">memory_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">environment</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">interruptible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">discoverable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-            <span class="n">discovery_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">timeout</span><span class="p">:</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlyteSdkType</span><span class="p">],</span>
+        <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FlyteSdkType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">input_data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">output_data_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata_format</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">METADATA_FORMAT_JSON</span><span class="p">,</span>
+        <span class="n">io_strategy</span><span class="p">:</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">IOStrategy</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">storage_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">gpu_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_request</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">storage_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">gpu_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">memory_limit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">environment</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">interruptible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">discoverable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">discovery_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param inputs:</span>
@@ -355,14 +321,12 @@
         <span class="n">metadata</span> <span class="o">=</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">TaskMetadata</span><span class="p">(</span>
             <span class="n">discoverable</span><span class="p">,</span>
             <span class="c1"># This needs to have the proper version reflected in it</span>
-            <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="o">.</span><span class="n">RuntimeType</span><span class="o">.</span><span class="n">FLYTE_SDK</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span>
-                <span class="s2">&quot;python&quot;</span><span class="p">),</span>
+            <span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">RuntimeMetadata</span><span class="o">.</span><span class="n">RuntimeType</span><span class="o">.</span><span class="n">FLYTE_SDK</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span> <span class="s2">&quot;python&quot;</span><span class="p">,),</span>
             <span class="n">timeout</span> <span class="ow">or</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
             <span class="n">_literals</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="n">retries</span><span class="p">),</span>
             <span class="n">interruptible</span><span class="p">,</span>
             <span class="n">discovery_version</span><span class="p">,</span>
-            <span class="kc">None</span>
+            <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># The interface is defined using the inputs and outputs</span>
@@ -388,9 +352,8 @@
                 <span class="n">gpu_limit</span><span class="o">=</span><span class="n">gpu_limit</span><span class="p">,</span>
                 <span class="n">memory_limit</span><span class="o">=</span><span class="n">memory_limit</span><span class="p">,</span>
                 <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
         <span class="p">)</span>
-
 
 <div class="viewcode-block" id="SdkRawContainerTask.add_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.raw_container.SdkRawContainerTask.add_inputs">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">add_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Variable</span><span class="p">]):</span>

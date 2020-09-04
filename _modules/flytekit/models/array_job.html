@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.array_job &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.array_job &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -171,7 +171,6 @@
 
 
 <div class="viewcode-block" id="ArrayJob"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.array_job.ArrayJob">[docs]</a><span class="k">class</span> <span class="nc">ArrayJob</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteCustomIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parallelism</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">min_successes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a new ArrayJob.</span>
@@ -226,11 +225,9 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: dict[T, Text]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_json_format</span><span class="o">.</span><span class="n">MessageToDict</span><span class="p">(</span><span class="n">_array_job</span><span class="o">.</span><span class="n">ArrayJob</span><span class="p">(</span>
-            <span class="n">parallelism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parallelism</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-            <span class="n">min_successes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_successes</span>
-        <span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">_json_format</span><span class="o">.</span><span class="n">MessageToDict</span><span class="p">(</span>
+            <span class="n">_array_job</span><span class="o">.</span><span class="n">ArrayJob</span><span class="p">(</span><span class="n">parallelism</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parallelism</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">min_successes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_successes</span><span class="p">,)</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ArrayJob.from_dict"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.array_job.ArrayJob.from_dict">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">idl_dict</span><span class="p">):</span>
@@ -240,11 +237,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pb2_object</span> <span class="o">=</span> <span class="n">_json_format</span><span class="o">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">_json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">idl_dict</span><span class="p">),</span> <span class="n">_array_job</span><span class="o">.</span><span class="n">ArrayJob</span><span class="p">())</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">parallelism</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">parallelism</span><span class="p">,</span>
-            <span class="n">size</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-            <span class="n">min_successes</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">min_successes</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">parallelism</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">parallelism</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">min_successes</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">min_successes</span><span class="p">,)</span></div></div>
 </pre></div>
 
            </div>

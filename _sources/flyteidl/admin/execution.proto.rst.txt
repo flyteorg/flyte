@@ -722,7 +722,9 @@ Response structure for WorkflowExecutionGetDataRequest which contains inputs and
 
   {
     "outputs": "{...}",
-    "inputs": "{...}"
+    "inputs": "{...}",
+    "full_inputs": "{...}",
+    "full_outputs": "{...}"
   }
 
 .. _api_field_flyteidl.admin.WorkflowExecutionGetDataResponse.outputs:
@@ -735,6 +737,18 @@ outputs
 
 inputs
   (:ref:`flyteidl.admin.UrlBlob <api_msg_flyteidl.admin.UrlBlob>`) Signed url to fetch a core.LiteralMap of execution inputs.
+  
+  
+.. _api_field_flyteidl.admin.WorkflowExecutionGetDataResponse.full_inputs:
+
+full_inputs
+  (:ref:`flyteidl.core.LiteralMap <api_msg_flyteidl.core.LiteralMap>`) Optional, full_inputs will only be populated if they are under a configured size threshold.
+  
+  
+.. _api_field_flyteidl.admin.WorkflowExecutionGetDataResponse.full_outputs:
+
+full_outputs
+  (:ref:`flyteidl.core.LiteralMap <api_msg_flyteidl.core.LiteralMap>`) Optional, full_outputs will only be populated if they are under a configured size threshold.
   
   
 

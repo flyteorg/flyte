@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.types &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.sdk.types &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,8 +161,13 @@
             
   <h1>Source code for flytekit.sdk.types</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">primitives</span> <span class="k">as</span> <span class="n">_primitives</span><span class="p">,</span> <span class="n">blobs</span> <span class="k">as</span> <span class="n">_blobs</span><span class="p">,</span> <span class="n">schema</span> <span class="k">as</span> <span class="n">_schema</span><span class="p">,</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_helpers</span><span class="p">,</span> \
-    <span class="n">proto</span> <span class="k">as</span> <span class="n">_proto</span><span class="p">,</span> <span class="n">containers</span> <span class="k">as</span> <span class="n">_containers</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">blobs</span> <span class="k">as</span> <span class="n">_blobs</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">containers</span> <span class="k">as</span> <span class="n">_containers</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_helpers</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">primitives</span> <span class="k">as</span> <span class="n">_primitives</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">proto</span> <span class="k">as</span> <span class="n">_proto</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">schema</span> <span class="k">as</span> <span class="n">_schema</span>
 
 
 <div class="viewcode-block" id="Types"><a class="viewcode-back" href="../../../flytekit/flytekit.sdk.html#flytekit.sdk.types.Types">[docs]</a><span class="k">class</span> <span class="nc">Types</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>

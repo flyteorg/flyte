@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.unit.engine &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.engines.unit.engine &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -164,26 +164,29 @@
 
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
+<span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">qubole_pb2</span> <span class="k">as</span> <span class="n">_qubole_pb2</span>
+<span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">ParseDict</span> <span class="k">as</span> <span class="n">_ParseDict</span>
 <span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">moves</span> <span class="k">as</span> <span class="n">_six_moves</span>
 
-<span class="kn">from</span> <span class="nn">google.protobuf.json_format</span> <span class="k">import</span> <span class="n">ParseDict</span> <span class="k">as</span> <span class="n">_ParseDict</span>
-<span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">qubole_pb2</span> <span class="k">as</span> <span class="n">_qubole_pb2</span>
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_sdk_constants</span><span class="p">,</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_common_utils</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exception</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_sdk_constants</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_common_utils</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exception</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">TemporaryConfiguration</span> <span class="k">as</span> <span class="n">_TemporaryConfiguration</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_engine</span>
 <span class="kn">from</span> <span class="nn">flytekit.engines.unit.mock_stats</span> <span class="k">import</span> <span class="n">MockStats</span>
 <span class="kn">from</span> <span class="nn">flytekit.interfaces.data</span> <span class="k">import</span> <span class="n">data_proxy</span> <span class="k">as</span> <span class="n">_data_proxy</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span><span class="p">,</span> <span class="n">array_job</span> <span class="k">as</span> <span class="n">_array_job</span><span class="p">,</span> <span class="n">qubole</span> <span class="k">as</span> <span class="n">_qubole_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">array_job</span> <span class="k">as</span> <span class="n">_array_job</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">qubole</span> <span class="k">as</span> <span class="n">_qubole_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core.identifier</span> <span class="k">import</span> <span class="n">WorkflowExecutionIdentifier</span>
 
 
 <div class="viewcode-block" id="UnitTestEngineFactory"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineFactory">[docs]</a><span class="k">class</span> <span class="nc">UnitTestEngineFactory</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseExecutionEngineFactory</span><span class="p">):</span>
-
 <div class="viewcode-block" id="UnitTestEngineFactory.get_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineFactory.get_task">[docs]</a>    <span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.tasks.task.SdkTask sdk_task:</span>
@@ -205,9 +208,7 @@
             <span class="k">return</span> <span class="n">HiveTask</span><span class="p">(</span><span class="n">sdk_task</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
-                <span class="s2">&quot;Unit tests are not currently supported for tasks of type: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">sdk_task</span><span class="o">.</span><span class="n">type</span>
-                <span class="p">)</span>
+                <span class="s2">&quot;Unit tests are not currently supported for tasks of type: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sdk_task</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="UnitTestEngineFactory.get_workflow"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineFactory.get_workflow">[docs]</a>    <span class="k">def</span> <span class="nf">get_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
@@ -250,8 +251,7 @@
 <span class="sd">        :rtype: dict[Text,flytekit.models.common.FlyteIdlEntity]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">_TemporaryConfiguration</span><span class="p">(</span>
-            <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;unit.config&#39;</span><span class="p">),</span>
-            <span class="n">internal_overrides</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;image&#39;</span><span class="p">:</span> <span class="s1">&#39;unit_image&#39;</span><span class="p">}</span>
+            <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;unit.config&quot;</span><span class="p">),</span> <span class="n">internal_overrides</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;unit_image&quot;</span><span class="p">},</span>
         <span class="p">):</span>
             <span class="k">with</span> <span class="n">_common_utils</span><span class="o">.</span><span class="n">AutoDeletingTempDir</span><span class="p">(</span><span class="s2">&quot;unit_test_dir&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">working_directory</span><span class="p">:</span>
                 <span class="k">with</span> <span class="n">_data_proxy</span><span class="o">.</span><span class="n">LocalWorkingDirectoryContext</span><span class="p">(</span><span class="n">working_directory</span><span class="p">):</span>
@@ -265,17 +265,13 @@
         <span class="k">with</span> <span class="n">_common_utils</span><span class="o">.</span><span class="n">AutoDeletingTempDir</span><span class="p">(</span><span class="s2">&quot;user_dir&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">user_working_directory</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_task</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
                 <span class="n">_common_engine</span><span class="o">.</span><span class="n">EngineContext</span><span class="p">(</span>
-                    <span class="n">execution_id</span><span class="o">=</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">(</span>
-                        <span class="n">project</span><span class="o">=</span><span class="s1">&#39;unit_test&#39;</span><span class="p">,</span>
-                        <span class="n">domain</span><span class="o">=</span><span class="s1">&#39;unit_test&#39;</span><span class="p">,</span>
-                        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;unit_test&#39;</span>
-                    <span class="p">),</span>
+                    <span class="n">execution_id</span><span class="o">=</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">&quot;unit_test&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;unit_test&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;unit_test&quot;</span><span class="p">),</span>
                     <span class="n">execution_date</span><span class="o">=</span><span class="n">_datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
                     <span class="n">stats</span><span class="o">=</span><span class="n">MockStats</span><span class="p">(),</span>
                     <span class="n">logging</span><span class="o">=</span><span class="n">_logging</span><span class="p">,</span>  <span class="c1"># TODO: A mock logging object that we can read later.</span>
-                    <span class="n">tmp_dir</span><span class="o">=</span><span class="n">user_working_directory</span>
+                    <span class="n">tmp_dir</span><span class="o">=</span><span class="n">user_working_directory</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="n">inputs</span>
+                <span class="n">inputs</span><span class="p">,</span>
             <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_transform_for_user_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
@@ -290,8 +286,17 @@
 <div class="viewcode-block" id="UnitTestEngineTask.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineTask.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;You cannot register unit test tasks.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="UnitTestEngineTask.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineTask.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-               <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="UnitTestEngineTask.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.UnitTestEngineTask.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;You cannot launch unit test tasks.&quot;</span><span class="p">)</span></div></div>
 
 
@@ -305,15 +310,13 @@
         <span class="n">literal_map</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="n">_sdk_constants</span><span class="o">.</span><span class="n">OUTPUT_FILE_NAME</span><span class="p">]</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="n">name</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_value_from_literal</span><span class="p">(</span>
-                <span class="n">literal_map</span><span class="o">.</span><span class="n">literals</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
-                <span class="n">sdk_type</span><span class="o">=</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+                <span class="n">literal_map</span><span class="o">.</span><span class="n">literals</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">sdk_type</span><span class="o">=</span><span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
             <span class="p">)</span><span class="o">.</span><span class="n">to_python_std</span><span class="p">()</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_task</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span>
         <span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="DynamicTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.DynamicTask">[docs]</a><span class="k">class</span> <span class="nc">DynamicTask</span><span class="p">(</span><span class="n">ReturnOutputsTask</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_workflow_node</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DynamicTask</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -341,10 +344,12 @@
             <span class="k">for</span> <span class="n">future_node</span> <span class="ow">in</span> <span class="n">futures</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">future_node</span><span class="o">.</span><span class="n">workflow_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="c1"># TODO: implement proper unit testing for launchplan and subworkflow nodes somehow</span>
-                    <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;A workflow node has been detected in the output of the dynamic task. The &quot;</span>
-                                     <span class="s2">&quot;Flytekit unit test engine is incomplete for dynamic tasks that return launch &quot;</span>
-                                     <span class="s2">&quot;plans or subworkflows. The generated dynamic job spec will be returned but &quot;</span>
-                                     <span class="s2">&quot;they will not be run.&quot;</span><span class="p">)</span>
+                    <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;A workflow node has been detected in the output of the dynamic task. The &quot;</span>
+                        <span class="s2">&quot;Flytekit unit test engine is incomplete for dynamic tasks that return launch &quot;</span>
+                        <span class="s2">&quot;plans or subworkflows. The generated dynamic job spec will be returned but &quot;</span>
+                        <span class="s2">&quot;they will not be run.&quot;</span>
+                    <span class="p">)</span>
                     <span class="c1"># For now, just return the output of the parent task</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_has_workflow_node</span> <span class="o">=</span> <span class="kc">True</span>
                     <span class="k">return</span> <span class="n">results</span>
@@ -364,7 +369,9 @@
                     <span class="k">if</span> <span class="n">inputs_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">_system_exception</span><span class="o">.</span><span class="n">FlyteSystemAssertion</span><span class="p">(</span>
                             <span class="s2">&quot;dynamic task hasn&#39;t generated expected inputs document [</span><span class="si">{}</span><span class="s2">] found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                <span class="n">future_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+                                <span class="n">future_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
                     <span class="n">sub_task_output</span> <span class="o">=</span> <span class="n">UnitTestEngineFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task</span><span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">inputs_path</span><span class="p">])</span>
                 <span class="n">sub_task_outputs</span><span class="p">[</span><span class="n">future_node</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_task_output</span>
 
@@ -388,19 +395,20 @@
         <span class="n">array_job</span> <span class="o">=</span> <span class="n">_array_job</span><span class="o">.</span><span class="n">ArrayJob</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">task</span><span class="o">.</span><span class="n">custom</span><span class="p">)</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">job_index</span> <span class="ow">in</span> <span class="n">_six_moves</span><span class="o">.</span><span class="n">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">array_job</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
-            <span class="n">inputs_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_input_path</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">job_index</span><span class="p">),</span> <span class="n">_sdk_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">)</span>
+            <span class="n">inputs_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_input_path</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">job_index</span><span class="p">),</span> <span class="n">_sdk_constants</span><span class="o">.</span><span class="n">INPUT_FILE_NAME</span><span class="p">,)</span>
             <span class="k">if</span> <span class="n">inputs_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">array_inputs</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_system_exception</span><span class="o">.</span><span class="n">FlyteSystemAssertion</span><span class="p">(</span>
-                    <span class="s2">&quot;dynamic task hasn&#39;t generated expected inputs document [</span><span class="si">{}</span><span class="s2">].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inputs_path</span><span class="p">))</span>
+                    <span class="s2">&quot;dynamic task hasn&#39;t generated expected inputs document [</span><span class="si">{}</span><span class="s2">].&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">inputs_path</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="n">input_proto</span> <span class="o">=</span> <span class="n">array_inputs</span><span class="p">[</span><span class="n">inputs_path</span><span class="p">]</span>
             <span class="c1"># All outputs generated by the same array job will have the same key in sub_task_outputs,</span>
             <span class="c1"># they will, however, differ in the var names; they will be on the format [&lt;job_index&gt;].&lt;var_name&gt;</span>
             <span class="c1"># e.g. [1].out1</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span>
-                    <span class="n">ReturnOutputsTask</span><span class="p">(</span>
-                        <span class="n">task</span><span class="o">.</span><span class="n">assign_type_and_return</span><span class="p">(</span><span class="n">_sdk_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTHON_TASK</span><span class="p">)</span>  <span class="c1"># TODO: This is weird</span>
-                    <span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">input_proto</span><span class="p">)</span>
+                <span class="n">ReturnOutputsTask</span><span class="p">(</span>
+                    <span class="n">task</span><span class="o">.</span><span class="n">assign_type_and_return</span><span class="p">(</span><span class="n">_sdk_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">PYTHON_TASK</span><span class="p">)</span>  <span class="c1"># TODO: This is weird</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">input_proto</span><span class="p">)</span>
             <span class="p">):</span>
                 <span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">].</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">job_index</span><span class="p">,</span> <span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">return</span> <span class="n">outputs</span></div>
@@ -418,27 +426,37 @@
         <span class="k">if</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">scalar</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="n">scalar</span><span class="o">=</span><span class="n">binding_data</span><span class="o">.</span><span class="n">scalar</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">collection</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="n">collection</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralCollection</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">DynamicTask</span><span class="o">.</span><span class="n">fulfil_bindings</span><span class="p">(</span><span class="n">sub_binding_data</span><span class="p">,</span> <span class="n">fulfilled_promises</span><span class="p">)</span> <span class="k">for</span> <span class="n">sub_binding_data</span> <span class="ow">in</span>
-                 <span class="n">binding_data</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">bindings</span><span class="p">]))</span>
+            <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span>
+                <span class="n">collection</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralCollection</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">DynamicTask</span><span class="o">.</span><span class="n">fulfil_bindings</span><span class="p">(</span><span class="n">sub_binding_data</span><span class="p">,</span> <span class="n">fulfilled_promises</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">sub_binding_data</span> <span class="ow">in</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">bindings</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">elif</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fulfilled_promises</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_system_exception</span><span class="o">.</span><span class="n">FlyteSystemAssertion</span><span class="p">(</span>
-                    <span class="s2">&quot;Expecting output of node [</span><span class="si">{}</span><span class="s2">] but that hasn&#39;t been produced.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span><span class="p">))</span>
+                    <span class="s2">&quot;Expecting output of node [</span><span class="si">{}</span><span class="s2">] but that hasn&#39;t been produced.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">node_output</span> <span class="o">=</span> <span class="n">fulfilled_promises</span><span class="p">[</span><span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">var</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_output</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_system_exception</span><span class="o">.</span><span class="n">FlyteSystemAssertion</span><span class="p">(</span>
                     <span class="s2">&quot;Expecting output [</span><span class="si">{}</span><span class="s2">] of node [</span><span class="si">{}</span><span class="s2">] but that hasn&#39;t been produced.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">var</span><span class="p">,</span>
-                        <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span><span class="p">))</span>
+                        <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">var</span><span class="p">,</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">node_id</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="k">return</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">sdk_type</span><span class="o">.</span><span class="n">from_python_std</span><span class="p">(</span><span class="n">node_output</span><span class="p">[</span><span class="n">binding_data</span><span class="o">.</span><span class="n">promise</span><span class="o">.</span><span class="n">var</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">binding_data</span><span class="o">.</span><span class="n">map</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="nb">map</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="n">k</span><span class="p">:</span> <span class="n">DynamicTask</span><span class="o">.</span><span class="n">fulfil_bindings</span><span class="p">(</span><span class="n">sub_binding_data</span><span class="p">,</span> <span class="n">fulfilled_promises</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">sub_binding_data</span> <span class="ow">in</span>
-                    <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">binding_data</span><span class="o">.</span><span class="n">map</span><span class="o">.</span><span class="n">bindings</span><span class="p">)</span>
-                <span class="p">}))</span></div></div>
+            <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span>
+                <span class="nb">map</span><span class="o">=</span><span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="n">k</span><span class="p">:</span> <span class="n">DynamicTask</span><span class="o">.</span><span class="n">fulfil_bindings</span><span class="p">(</span><span class="n">sub_binding_data</span><span class="p">,</span> <span class="n">fulfilled_promises</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">sub_binding_data</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">binding_data</span><span class="o">.</span><span class="n">map</span><span class="o">.</span><span class="n">bindings</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="HiveTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.HiveTask">[docs]</a><span class="k">class</span> <span class="nc">HiveTask</span><span class="p">(</span><span class="n">DynamicTask</span><span class="p">):</span>
@@ -458,9 +476,7 @@
                 <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">futures</span><span class="o">.</span><span class="n">tasks</span>
             <span class="p">}</span>
             <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">futures</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
-                <span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="n">task_ids_to_defs</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">task_node</span><span class="o">.</span><span class="n">reference_id</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">query</span>
-                <span class="p">)</span>
+                <span class="n">queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task_ids_to_defs</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">task_node</span><span class="o">.</span><span class="n">reference_id</span><span class="o">.</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">queries</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span></div>

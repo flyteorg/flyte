@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.launch_plan &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.launch_plan &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,30 +162,40 @@
   <h1>Source code for flytekit.common.launch_plan</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span><span class="p">,</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promises</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span><span class="p">,</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span><span class="p">,</span> \
-    <span class="n">workflow_execution</span> <span class="k">as</span> <span class="n">_workflow_execution</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span><span class="p">,</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
-
-<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span><span class="p">,</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span><span class="p">,</span> <span class="n">launchable</span> <span class="k">as</span> <span class="n">_launchable_mixin</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
-<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span><span class="p">,</span> <span class="n">auth</span> <span class="k">as</span> <span class="n">_auth_config</span>
-<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan_models</span><span class="p">,</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule_model</span><span class="p">,</span> <span class="n">interface</span> <span class="k">as</span> \
-    <span class="n">_interface_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span><span class="p">,</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span><span class="p">,</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span>
 <span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
-<span class="kn">from</span> <span class="nn">deprecated</span> <span class="k">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">_deprecated</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
+
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">deprecated</span> <span class="k">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">_deprecated</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">nodes</span> <span class="k">as</span> <span class="n">_nodes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">promise</span> <span class="k">as</span> <span class="n">_promises</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow_execution</span> <span class="k">as</span> <span class="n">_workflow_execution</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="nb">hash</span> <span class="k">as</span> <span class="n">_hash_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">launchable</span> <span class="k">as</span> <span class="n">_launchable_mixin</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">auth</span> <span class="k">as</span> <span class="n">_auth_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">schedule</span> <span class="k">as</span> <span class="n">_schedule_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_identifier_model</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_models</span>
 
 
 <div class="viewcode-block" id="SdkLaunchPlan"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">SdkLaunchPlan</span><span class="p">(</span>
     <span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span>
-        <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span>
-        <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">LaunchPlanSpec</span><span class="p">,</span>
-        <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
+        <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">LaunchPlanSpec</span><span class="p">,</span> <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -215,6 +225,7 @@
             <span class="n">labels</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels</span><span class="p">,</span>
             <span class="n">annotations</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">annotations</span><span class="p">,</span>
             <span class="n">auth_role</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">auth_role</span><span class="p">,</span>
+            <span class="n">raw_output_data_config</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">raw_output_data_config</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkLaunchPlan.fetch"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.fetch">[docs]</a>    <span class="nd">@classmethod</span>
@@ -230,6 +241,7 @@
 <span class="sd">        :rtype: SdkLaunchPlan</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow</span>
+
         <span class="n">launch_plan_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
             <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
         <span class="p">)</span>
@@ -268,19 +280,22 @@
 <span class="sd">        :rtype: flytekit.models.common.AuthRole</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">fixed_auth</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">auth_role</span>
-        <span class="k">if</span> <span class="n">fixed_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>\
-                <span class="p">(</span><span class="n">fixed_auth</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fixed_auth</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">fixed_auth</span>
+        <span class="k">if</span> <span class="n">fixed_auth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">fixed_auth</span><span class="o">.</span><span class="n">assumable_iam_role</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fixed_auth</span><span class="o">.</span><span class="n">kubernetes_service_account</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="n">fixed_auth</span>
 
         <span class="n">assumable_iam_role</span> <span class="o">=</span> <span class="n">_auth_config</span><span class="o">.</span><span class="n">ASSUMABLE_IAM_ROLE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="n">kubernetes_service_account</span> <span class="o">=</span> <span class="n">_auth_config</span><span class="o">.</span><span class="n">KUBERNETES_SERVICE_ACCOUNT</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">assumable_iam_role</span> <span class="ow">or</span> <span class="n">kubernetes_service_account</span><span class="p">):</span>
-            <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using deprecated `role` from config. &quot;</span>
-                             <span class="s2">&quot;Please update your config to use `assumable_iam_role` instead&quot;</span><span class="p">)</span>
+            <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Using deprecated `role` from config. &quot;</span> <span class="s2">&quot;Please update your config to use `assumable_iam_role` instead&quot;</span>
+            <span class="p">)</span>
             <span class="n">assumable_iam_role</span> <span class="o">=</span> <span class="n">_sdk_config</span><span class="o">.</span><span class="n">ROLE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span><span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span>
-                                       <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span>
+            <span class="n">assumable_iam_role</span><span class="o">=</span><span class="n">assumable_iam_role</span><span class="p">,</span> <span class="n">kubernetes_service_account</span><span class="o">=</span><span class="n">kubernetes_service_account</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -303,6 +318,18 @@
 <span class="sd">        :rtype: Text</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;Launch Plan&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raw_output_data_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flytekit.models.common.RawOutputDataConfig</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">raw_output_data_config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">raw_output_data_config</span>
+        <span class="k">if</span> <span class="n">raw_output_data_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">raw_output_data_config</span><span class="o">.</span><span class="n">output_location_prefix</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">raw_output_data_config</span>
+
+        <span class="c1"># If it was not set explicitly then let&#39;s use the value found in the configuration.</span>
+        <span class="k">return</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">RawOutputDataConfig</span><span class="p">(</span><span class="n">_auth_config</span><span class="o">.</span><span class="n">RAW_OUTPUT_DATA_PREFIX</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
 
 <div class="viewcode-block" id="SdkLaunchPlan.validate"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.validate">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -329,24 +356,38 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
             <span class="n">inputs</span><span class="p">,</span>
-            <span class="p">{</span>
-                <span class="n">k</span><span class="p">:</span> <span class="n">user_input</span><span class="o">.</span><span class="n">sdk_type</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">user_input</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_inputs</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">inputs</span>
-            <span class="p">}</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">user_input</span><span class="o">.</span><span class="n">sdk_type</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">user_input</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_inputs</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">},</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="SdkLaunchPlan.execute_with_literals"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.execute_with_literals">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Use launch_with_literals instead&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">execute_with_literals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                              <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SdkLaunchPlan.execute_with_literals"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.execute_with_literals">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span><span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Use launch_with_literals instead&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.9.0&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_with_literals</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">,</span>
+        <span class="n">literal_inputs</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Deprecated.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">launch_with_literals</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="p">,</span> <span class="n">label_overrides</span><span class="p">,</span>
-                                         <span class="n">annotation_overrides</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">launch_with_literals</span><span class="p">(</span>
+            <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="p">,</span> <span class="n">label_overrides</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SdkLaunchPlan.launch_with_literals"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.launch_with_literals">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">launch_with_literals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">literal_inputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                             <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">launch_with_literals</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">project</span><span class="p">,</span>
+        <span class="n">domain</span><span class="p">,</span>
+        <span class="n">literal_inputs</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">notification_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">label_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotation_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Executes the launch plan and returns the execution identifier.  This version of execution is meant for when</span>
 <span class="sd">        you already have a LiteralMap of inputs.</span>
@@ -365,14 +406,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Kubernetes requires names starting with an alphabet for some resources.</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">19</span><span class="p">]</span>
-        <span class="n">execution</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-            <span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
-            <span class="n">literal_inputs</span><span class="p">,</span>
-            <span class="n">notification_overrides</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
-            <span class="n">label_overrides</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
-            <span class="n">annotation_overrides</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
+        <span class="n">execution</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+                <span class="n">project</span><span class="p">,</span>
+                <span class="n">domain</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">literal_inputs</span><span class="p">,</span>
+                <span class="n">notification_overrides</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
+                <span class="n">label_overrides</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
+                <span class="n">annotation_overrides</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">_workflow_execution</span><span class="o">.</span><span class="n">SdkWorkflowExecution</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">execution</span><span class="p">)</span></div>
 
@@ -386,14 +431,11 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;When adding a launchplan as a node in a workflow, all inputs must be specified with kwargs only.  We &quot;</span>
-                <span class="s2">&quot;detected </span><span class="si">{}</span><span class="s2"> positional args.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+                <span class="s2">&quot;detected </span><span class="si">{}</span><span class="s2"> positional args.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
             <span class="p">)</span>
 
         <span class="c1"># Take the default values from the launch plan</span>
-        <span class="n">default_inputs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_default</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_inputs</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">required</span>
-        <span class="p">}</span>
+        <span class="n">default_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_default</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_inputs</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="o">.</span><span class="n">required</span><span class="p">}</span>
         <span class="n">default_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">input_map</span><span class="p">)</span>
 
         <span class="n">bindings</span><span class="p">,</span> <span class="n">upstream_nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">create_bindings_for_inputs</span><span class="p">(</span><span class="n">default_inputs</span><span class="p">)</span>
@@ -403,7 +445,7 @@
             <span class="n">metadata</span><span class="o">=</span><span class="n">_workflow_models</span><span class="o">.</span><span class="n">NodeMetadata</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(),</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">RetryStrategy</span><span class="p">(</span><span class="mi">0</span><span class="p">)),</span>
             <span class="n">bindings</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">bindings</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">var</span><span class="p">),</span>
             <span class="n">upstream_nodes</span><span class="o">=</span><span class="n">upstream_nodes</span><span class="p">,</span>
-            <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="bp">self</span>
+            <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -416,21 +458,20 @@
 <span class="c1"># The difference between this and the SdkLaunchPlan class is that this runnable class is supposed to only be used for</span>
 <span class="c1"># launch plans loaded alongside the current Python interpreter.</span>
 <div class="viewcode-block" id="SdkRunnableLaunchPlan"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">SdkRunnableLaunchPlan</span><span class="p">(</span>
-    <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span>
-    <span class="n">SdkLaunchPlan</span><span class="p">,</span>
-    <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">,</span>
+    <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">sdk_workflow</span><span class="p">,</span>
-            <span class="n">default_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">fixed_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">schedule</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sdk_workflow</span><span class="p">,</span>
+        <span class="n">default_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fixed_inputs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">schedule</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">notifications</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">auth_role</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">raw_output_data_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>
@@ -446,6 +487,7 @@
 <span class="sd">            executed by this launch plan.</span>
 <span class="sd">            Any custom kubernetes annotations to apply to workflows executed by this launch plan.</span>
 <span class="sd">        :param flytekit.models.common.Authrole auth_role: The auth method with which to execute the workflow.</span>
+<span class="sd">        :param flytekit.models.common.RawOutputDataConfig raw_output_data_config: Config for offloading data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">role</span> <span class="ow">and</span> <span class="n">auth_role</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot set both role and auth. Role is deprecated, use auth instead.&quot;</span><span class="p">)</span>
@@ -465,24 +507,24 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkRunnableLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="kc">None</span><span class="p">,</span>
             <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">LaunchPlanMetadata</span><span class="p">(</span>
-                <span class="n">schedule</span><span class="o">=</span><span class="n">schedule</span> <span class="ow">or</span> <span class="n">_schedule_model</span><span class="o">.</span><span class="n">Schedule</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">),</span>
-                <span class="n">notifications</span><span class="o">=</span><span class="n">notifications</span> <span class="ow">or</span> <span class="p">[]</span>
+                <span class="n">schedule</span><span class="o">=</span><span class="n">schedule</span> <span class="ow">or</span> <span class="n">_schedule_model</span><span class="o">.</span><span class="n">Schedule</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">notifications</span><span class="o">=</span><span class="n">notifications</span> <span class="ow">or</span> <span class="p">[],</span>
             <span class="p">),</span>
             <span class="n">_interface_models</span><span class="o">.</span><span class="n">ParameterMap</span><span class="p">(</span><span class="n">default_inputs</span><span class="p">),</span>
             <span class="n">_type_helpers</span><span class="o">.</span><span class="n">pack_python_std_map_to_literal_map</span><span class="p">(</span>
                 <span class="n">fixed_inputs</span><span class="p">,</span>
                 <span class="p">{</span>
                     <span class="n">k</span><span class="p">:</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">var</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sdk_workflow</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fixed_inputs</span>
-                <span class="p">}</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">sdk_workflow</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">fixed_inputs</span>
+                <span class="p">},</span>
             <span class="p">),</span>
             <span class="n">labels</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Labels</span><span class="p">({}),</span>
             <span class="n">annotations</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">Annotations</span><span class="p">({}),</span>
             <span class="n">auth_role</span><span class="p">,</span>
+            <span class="n">raw_output_data_config</span> <span class="ow">or</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">RawOutputDataConfig</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">_interface</span><span class="o">.</span><span class="n">TypedInterface</span><span class="p">(</span>
-            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">default_inputs</span><span class="p">)},</span>
-            <span class="n">sdk_workflow</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span>
+            <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">var</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">default_inputs</span><span class="p">)},</span> <span class="n">sdk_workflow</span><span class="o">.</span><span class="n">interface</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span> <span class="o">=</span> <span class="p">{</span><span class="n">sdk_workflow</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span> <span class="o">=</span> <span class="n">sdk_workflow</span>
@@ -497,11 +539,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
         <span class="n">id_to_register</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
-            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span>
-            <span class="n">project</span><span class="p">,</span>
-            <span class="n">domain</span><span class="p">,</span>
-            <span class="n">name</span><span class="p">,</span>
-            <span class="n">version</span>
+            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
         <span class="p">)</span>
         <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>

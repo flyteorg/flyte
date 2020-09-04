@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools.subprocess &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.tools.subprocess &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -160,8 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.tools.subprocess</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">shlex</span> <span class="k">as</span> <span class="nn">_schlex</span>
@@ -176,12 +175,7 @@
     <span class="c1"># Jupyter notebooks hijack I/O and thus we cannot dump directly to stdout.</span>
     <span class="k">with</span> <span class="n">_tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">std_out</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">_tempfile</span><span class="o">.</span><span class="n">TemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">std_err</span><span class="p">:</span>
-            <span class="n">ret_code</span> <span class="o">=</span> <span class="n">_subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-                <span class="n">cmd_args</span><span class="p">,</span>
-                <span class="n">stdout</span><span class="o">=</span><span class="n">std_out</span><span class="p">,</span>
-                <span class="n">stderr</span><span class="o">=</span><span class="n">std_err</span><span class="p">,</span>
-                <span class="o">**</span><span class="n">kwargs</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+            <span class="n">ret_code</span> <span class="o">=</span> <span class="n">_subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd_args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">std_out</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">std_err</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
 
             <span class="c1"># Dump sub-process&#39; std out into current std out</span>
             <span class="n">std_out</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>

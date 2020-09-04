@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.impl.schema &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.types.impl.schema &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -163,19 +163,25 @@
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">collections</span> <span class="k">as</span> <span class="nn">_collections</span>
-<span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">_np</span>
-<span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">_pd</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
 
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_utils</span><span class="p">,</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">primitives</span> <span class="k">as</span> <span class="n">_primitives</span><span class="p">,</span> <span class="n">base_sdk_types</span> <span class="k">as</span> <span class="n">_base_sdk_types</span><span class="p">,</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_helpers</span>
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
+<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_utils</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">base_sdk_types</span> <span class="k">as</span> <span class="n">_base_sdk_types</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_helpers</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">primitives</span> <span class="k">as</span> <span class="n">_primitives</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types.impl</span> <span class="k">import</span> <span class="n">blobs</span> <span class="k">as</span> <span class="n">_blob_impl</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span><span class="p">,</span> <span class="n">scopes</span> <span class="k">as</span> <span class="n">_exception_scopes</span>
-<span class="kn">from</span> <span class="nn">flytekit.interfaces.data</span> <span class="k">import</span> <span class="n">data_proxy</span> <span class="k">as</span> <span class="n">_data_proxy</span>
-<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_type_models</span><span class="p">,</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
+<span class="kn">from</span> <span class="nn">flytekit.interfaces.data</span> <span class="k">import</span> <span class="n">data_proxy</span> <span class="k">as</span> <span class="n">_data_proxy</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_type_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">_np</span>
+<span class="kn">from</span> <span class="nn">flytekit.plugins</span> <span class="k">import</span> <span class="n">pandas</span> <span class="k">as</span> <span class="n">_pd</span>
 
 <span class="c1"># Note: For now, this is only for basic type-checking.  We need not differentiate between TINYINT, BIGINT,</span>
 <span class="c1"># and INT or DOUBLE and FLOAT, VARCHAR and STRING, etc. as we will unpack into appropriate Python</span>
@@ -192,7 +198,7 @@
             <span class="n">_primitives</span><span class="o">.</span><span class="n">Boolean</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="p">{</span><span class="n">_np</span><span class="o">.</span><span class="n">bool</span><span class="p">},</span>
             <span class="n">_primitives</span><span class="o">.</span><span class="n">Datetime</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="p">{</span><span class="n">_np</span><span class="o">.</span><span class="n">datetime64</span><span class="p">},</span>
             <span class="n">_primitives</span><span class="o">.</span><span class="n">Timedelta</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="p">{</span><span class="n">_np</span><span class="o">.</span><span class="n">timedelta64</span><span class="p">},</span>
-            <span class="n">_primitives</span><span class="o">.</span><span class="n">String</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="p">{</span><span class="n">_np</span><span class="o">.</span><span class="n">object_</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">str_</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">string_</span><span class="p">}</span>
+            <span class="n">_primitives</span><span class="o">.</span><span class="n">String</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="p">{</span><span class="n">_np</span><span class="o">.</span><span class="n">object_</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">str_</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">string_</span><span class="p">},</span>
         <span class="p">}</span>
     <span class="k">return</span> <span class="n">_SUPPORTED_LITERAL_TYPE_TO_PANDAS_TYPES</span></div>
 
@@ -204,61 +210,55 @@
 <span class="c1"># work-around where we create an external table with the appropriate schema and write the data to our desired</span>
 <span class="c1"># location.  The issue here is that the table information in the meta-store might not get cleaned up during a partial</span>
 <span class="c1"># failure.</span>
-<span class="n">_HIVE_QUERY_FORMATTER</span> <span class="o">=</span> \
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    {stage_query_str}</span>
+<span class="n">_HIVE_QUERY_FORMATTER</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    </span><span class="si">{stage_query_str}</span><span class="s2"></span>
 
-<span class="sd">    CREATE TEMPORARY TABLE {table}_tmp AS {query_str};</span>
-<span class="sd">    CREATE EXTERNAL TABLE {table} LIKE {table}_tmp STORED AS PARQUET;</span>
-<span class="sd">    ALTER TABLE {table} SET LOCATION &#39;{url}&#39;;</span>
+<span class="s2">    CREATE TEMPORARY TABLE </span><span class="si">{table}</span><span class="s2">_tmp AS </span><span class="si">{query_str}</span><span class="s2">;</span>
+<span class="s2">    CREATE EXTERNAL TABLE </span><span class="si">{table}</span><span class="s2"> LIKE </span><span class="si">{table}</span><span class="s2">_tmp STORED AS PARQUET;</span>
+<span class="s2">    ALTER TABLE </span><span class="si">{table}</span><span class="s2"> SET LOCATION &#39;</span><span class="si">{url}</span><span class="s2">&#39;;</span>
 
-<span class="sd">    INSERT OVERWRITE TABLE {table}</span>
-<span class="sd">        SELECT</span>
-<span class="sd">            {columnar_query}</span>
-<span class="sd">        FROM {table}_tmp;</span>
-<span class="sd">    DROP TABLE {table};</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="s2">    INSERT OVERWRITE TABLE </span><span class="si">{table}</span><span class="s2"></span>
+<span class="s2">        SELECT</span>
+<span class="s2">            </span><span class="si">{columnar_query}</span><span class="s2"></span>
+<span class="s2">        FROM </span><span class="si">{table}</span><span class="s2">_tmp;</span>
+<span class="s2">    DROP TABLE </span><span class="si">{table}</span><span class="s2">;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 
 <span class="c1"># Once https://issues.apache.org/jira/browse/HIVE-12860 is resolved.  We will prefer the following syntax because it</span>
 <span class="c1"># guarantees cleanup on partial failures.</span>
-<span class="n">_HIVE_QUERY_FORMATTER_V2</span> <span class="o">=</span> \
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    CREATE TEMPORARY TABLE {table} AS {query_str};</span>
+<span class="n">_HIVE_QUERY_FORMATTER_V2</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    CREATE TEMPORARY TABLE </span><span class="si">{table}</span><span class="s2"> AS </span><span class="si">{query_str}</span><span class="s2">;</span>
 
-<span class="sd">    INSERT OVERWRITE DIRECTORY &#39;{url}&#39; STORED AS PARQUET</span>
-<span class="sd">        SELECT {columnar_query}</span>
-<span class="sd">        FROM {table};</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="s2">    INSERT OVERWRITE DIRECTORY &#39;</span><span class="si">{url}</span><span class="s2">&#39; STORED AS PARQUET</span>
+<span class="s2">        SELECT </span><span class="si">{columnar_query}</span><span class="s2"></span>
+<span class="s2">        FROM </span><span class="si">{table}</span><span class="s2">;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 
 <span class="c1"># Set location in both parts of this query so in case of a partial failure, we will always have some data backing a</span>
 <span class="c1"># partition.</span>
-<span class="n">_WRITE_HIVE_PARTITION_QUERY_FORMATTER</span> <span class="o">=</span> \
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    ALTER TABLE {write_table} ADD IF NOT EXISTS {partition_string} LOCATION &#39;{url}&#39;;</span>
+<span class="n">_WRITE_HIVE_PARTITION_QUERY_FORMATTER</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    ALTER TABLE </span><span class="si">{write_table}</span><span class="s2"> ADD IF NOT EXISTS </span><span class="si">{partition_string}</span><span class="s2"> LOCATION &#39;</span><span class="si">{url}</span><span class="s2">&#39;;</span>
 
-<span class="sd">    ALTER TABLE {write_table} {partition_string} SET LOCATION &#39;{url}&#39;;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="s2">    ALTER TABLE </span><span class="si">{write_table}</span><span class="s2"> </span><span class="si">{partition_string}</span><span class="s2"> SET LOCATION &#39;</span><span class="si">{url}</span><span class="s2">&#39;;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 
 
 <span class="k">def</span> <span class="nf">_format_insert_partition_query</span><span class="p">(</span><span class="n">table_name</span><span class="p">,</span> <span class="n">partition_string</span><span class="p">,</span> <span class="n">remote_location</span><span class="p">):</span>
-    <span class="n">table_pieces</span> <span class="o">=</span> <span class="n">table_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">table_pieces</span> <span class="o">=</span> <span class="n">table_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">table_pieces</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
         <span class="c1"># Hive shell commands don&#39;t allow us to alter tables and select databases in the table specification.  So</span>
         <span class="c1"># we split the table name and use the &#39;use&#39; command to choose the correct database.</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;use </span><span class="si">{}</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">table_pieces</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">table_name</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table_pieces</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">table_name</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">table_pieces</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
     <span class="k">return</span> <span class="n">prefix</span> <span class="o">+</span> <span class="n">_WRITE_HIVE_PARTITION_QUERY_FORMATTER</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="n">write_table</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
-        <span class="n">partition_string</span><span class="o">=</span><span class="n">partition_string</span><span class="p">,</span>
-        <span class="n">url</span><span class="o">=</span><span class="n">remote_location</span>
+        <span class="n">write_table</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">partition_string</span><span class="o">=</span><span class="n">partition_string</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">remote_location</span>
     <span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">_SchemaIO</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Schema schema_instance:</span>
@@ -308,7 +308,7 @@
         <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunk_count</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                 <span class="n">index</span><span class="p">,</span>
-                <span class="s2">&quot;Attempting to seek to a chunk that is out of range. Allowed range is [0, </span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_count</span><span class="p">)</span>
+                <span class="s2">&quot;Attempting to seek to a chunk that is out of range. Allowed range is [0, </span><span class="si">{}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chunk_count</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
 
@@ -318,19 +318,17 @@
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{mode}</span><span class="s2"> IO Object for </span><span class="si">{type}</span><span class="s2"> @ </span><span class="si">{location}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
-            <span class="n">location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">remote_prefix</span><span class="p">,</span>
-            <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span><span class="p">)</span>
+            <span class="nb">type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">remote_prefix</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_mode</span>
+        <span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">_SchemaReader</span><span class="p">(</span><span class="n">_SchemaIO</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Schema schema_instance:</span>
 <span class="sd">        :param flytekit.common.utils.Directory local_dir:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaReader</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="s1">&#39;Read-Only&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaReader</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="s2">&quot;Read-Only&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_chunks</span><span class="p">()</span>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -358,9 +356,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="n">parquet_engine</span> <span class="o">==</span> <span class="s1">&#39;fastparquet&#39;</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">fastparquet</span> <span class="k">import</span> <span class="n">ParquetFile</span> <span class="k">as</span> <span class="n">_ParquetFile</span>
+        <span class="k">if</span> <span class="n">parquet_engine</span> <span class="o">==</span> <span class="s2">&quot;fastparquet&quot;</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">fastparquet.thrift_structures</span> <span class="k">as</span> <span class="nn">_ts</span>
+            <span class="kn">from</span> <span class="nn">fastparquet</span> <span class="k">import</span> <span class="n">ParquetFile</span> <span class="k">as</span> <span class="n">_ParquetFile</span>
 
             <span class="c1"># https://github.com/dask/fastparquet/issues/414#issuecomment-478983811</span>
             <span class="n">df</span> <span class="o">=</span> <span class="n">_pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="n">parquet_engine</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -368,12 +366,12 @@
             <span class="n">pf</span> <span class="o">=</span> <span class="n">_ParquetFile</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
             <span class="n">schema_column_dtypes</span> <span class="o">=</span> <span class="p">{</span><span class="n">l</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">pf</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">schema_elements</span><span class="p">)}</span>
 
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">df_column_types</span><span class="p">[</span><span class="n">df_column_types</span> <span class="o">==</span> <span class="s1">&#39;float16&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">df_column_types</span><span class="p">[</span><span class="n">df_column_types</span> <span class="o">==</span> <span class="s2">&quot;float16&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
                 <span class="c1"># A hacky way to get the string representations of the column types of a parquet schema</span>
                 <span class="c1"># Reference:</span>
                 <span class="c1"># https://github.com/dask/fastparquet/blob/f4ecc67f50e7bf98b2d0099c9589c615ea4b06aa/fastparquet/schema.py</span>
                 <span class="k">if</span> <span class="n">_ts</span><span class="o">.</span><span class="n">parquet_thrift</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">_VALUES_TO_NAMES</span><span class="p">[</span><span class="n">schema_column_dtypes</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">==</span> <span class="s2">&quot;BOOLEAN&quot;</span><span class="p">:</span>
-                    <span class="n">df</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;object&#39;</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">({</span><span class="mi">0</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="n">_pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span> <span class="kc">None</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -406,9 +404,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_access_guard</span><span class="p">()</span>
 
         <span class="n">parquet_engine</span> <span class="o">=</span> <span class="n">_sdk_config</span><span class="o">.</span><span class="n">PARQUET_ENGINE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">parquet_engine</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;fastparquet&#39;</span><span class="p">,</span> <span class="s1">&#39;pyarrow&#39;</span><span class="p">}:</span>
+        <span class="k">if</span> <span class="n">parquet_engine</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;fastparquet&quot;</span><span class="p">,</span> <span class="s2">&quot;pyarrow&quot;</span><span class="p">}:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
-                <span class="s2">&quot;environment variable parquet_engine must be one of &#39;pyarrow&#39;, &#39;fastparquet&#39;, or be unset&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;environment variable parquet_engine must be one of &#39;pyarrow&#39;, &#39;fastparquet&#39;, or be unset&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">df_out</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">columns</span><span class="p">:</span>
@@ -426,25 +425,21 @@
                     <span class="n">chunk</span><span class="o">=</span><span class="n">chunk</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">parquet_engine</span><span class="o">=</span><span class="n">parquet_engine</span>
                 <span class="p">)</span>
                 <span class="c1"># _pd.read_parquet(chunk, columns=columns, engine=parquet_engine)</span>
-                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">:]</span>
+                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="p">:]</span>
                 <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
             <span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">df_out</span> <span class="o">=</span> <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">df_out</span> <span class="o">=</span> <span class="n">_pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
-                    <span class="n">frames</span><span class="p">,</span>
-                    <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">df_out</span> <span class="o">=</span> <span class="n">_pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">)</span> <span class="ow">and</span> <span class="n">df_out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Skip empty chunks so the user appears to have a continuous stream of data.</span>
                 <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">df_out</span> <span class="o">=</span> <span class="n">_SchemaReader</span><span class="o">.</span><span class="n">_read_parquet_with_type_promotion_override</span><span class="p">(</span>
-                        <span class="n">chunk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">],</span>
-                        <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span>
-                        <span class="n">parquet_engine</span><span class="o">=</span><span class="n">parquet_engine</span><span class="p">,</span>
-                        <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+                        <span class="n">chunk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">parquet_engine</span><span class="o">=</span><span class="n">parquet_engine</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="n">df_out</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -463,20 +458,19 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1"># Avoid using pandas.DataFrame.rename() as this function incurs significant memory overhead</span>
                 <span class="n">df_out</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">user_column_dict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">user_columns</span> <span class="k">else</span> <span class="n">col</span>
-                    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_out</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+                    <span class="n">user_column_dict</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">user_columns</span> <span class="k">else</span> <span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_out</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span>
+                <span class="p">]</span>
         <span class="k">return</span> <span class="n">df_out</span>
 
 
 <span class="k">class</span> <span class="nc">_SchemaWriter</span><span class="p">(</span><span class="n">_SchemaIO</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Schema schema_instance:</span>
 <span class="sd">        :param flytekit.common.utils.Directory local_dir:</span>
 <span class="sd">        :param Text mode:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="s1">&#39;Write-Only&#39;</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">schema_instance</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="s2">&quot;Write-Only&quot;</span><span class="p">)</span>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -491,7 +485,7 @@
             <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">coerce_timestamps</span><span class="o">=</span><span class="s1">&#39;us&#39;</span><span class="p">,</span> <span class="n">allow_truncated_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">coerce_timestamps</span><span class="o">=</span><span class="s2">&quot;us&quot;</span><span class="p">,</span> <span class="n">allow_truncated_timestamps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes data frame as a chunk to the local directory owned by the Schema object.  Will later be uploaded to s3.</span>
 
@@ -508,7 +502,8 @@
                 <span class="n">expected_type</span><span class="o">=</span><span class="n">_pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
                 <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">data_frame</span><span class="p">),</span>
                 <span class="n">received_value</span><span class="o">=</span><span class="n">data_frame</span><span class="p">,</span>
-                <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Only pandas DataFrame objects can be written to a Schema object&quot;</span><span class="p">)</span>
+                <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Only pandas DataFrame objects can be written to a Schema object&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_schema</span><span class="o">.</span><span class="n">compare_dataframe_to_schema</span><span class="p">(</span><span class="n">data_frame</span><span class="p">)</span>
         <span class="n">all_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
@@ -521,9 +516,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_dir</span><span class="o">.</span><span class="n">get_named_tempfile</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_index</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">6</span><span class="p">)))</span>
             <span class="n">data_frame</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
-                <span class="n">filename</span><span class="p">,</span>
-                <span class="n">coerce_timestamps</span><span class="o">=</span><span class="n">coerce_timestamps</span><span class="p">,</span>
-                <span class="n">allow_truncated_timestamps</span><span class="o">=</span><span class="n">allow_truncated_timestamps</span><span class="p">)</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">coerce_timestamps</span><span class="o">=</span><span class="n">coerce_timestamps</span><span class="p">,</span> <span class="n">allow_truncated_timestamps</span><span class="o">=</span><span class="n">allow_truncated_timestamps</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">+=</span> <span class="mi">1</span>
@@ -533,7 +527,6 @@
 
 
 <span class="k">class</span> <span class="nc">_SchemaBackingMpBlob</span><span class="p">(</span><span class="n">_blob_impl</span><span class="o">.</span><span class="n">MultiPartBlob</span><span class="p">):</span>
-
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -550,17 +543,16 @@
                     <span class="s2">&quot;specify a path when calling this function.&quot;</span>
                 <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">AutoDeletingTempDir</span><span class="p">(</span>
-                <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
-                <span class="n">tmp_dir</span><span class="o">=</span><span class="n">_data_proxy</span><span class="o">.</span><span class="n">LocalWorkingDirectoryContext</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="o">=</span><span class="n">_data_proxy</span><span class="o">.</span><span class="n">LocalWorkingDirectoryContext</span><span class="o">.</span><span class="n">get</span><span class="p">()</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_is_managed</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_directory</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;r&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
                 <span class="n">_data_proxy</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="n">is_multipart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-        <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;w&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
             <span class="n">_data_proxy</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">put_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span> <span class="n">is_multipart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaBackingMpBlob</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
 
@@ -594,10 +586,7 @@
 <span class="sd">        :rtype: list[flytekit.models.types.SchemaType.SchemaColumn]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">[</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="p">(</span>
-                <span class="n">n</span><span class="p">,</span>
-                <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_LITERAL_TYPE_TO_PROTO_ENUM</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()]</span>
-            <span class="p">)</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_LITERAL_TYPE_TO_PROTO_ENUM</span><span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()])</span>
             <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">)</span>
         <span class="p">]</span>
 
@@ -608,18 +597,24 @@
 <span class="sd">        :rtype: SchemaType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_PROTO_ENUM_TO_SDK_TYPE</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">:</span>
-                <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">Integer</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()),</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">:</span>
-                <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">Float</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()),</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">:</span>
-                <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">Boolean</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()),</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">:</span>
-                <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">Datetime</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()),</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">DURATION</span><span class="p">:</span>
-                <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">Timedelta</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()),</span>
-            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span>
-                <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">String</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()),</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">:</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span>
+                <span class="n">_primitives</span><span class="o">.</span><span class="n">Integer</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">:</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span>
+                <span class="n">_primitives</span><span class="o">.</span><span class="n">Float</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">BOOLEAN</span><span class="p">:</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span>
+                <span class="n">_primitives</span><span class="o">.</span><span class="n">Boolean</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">DATETIME</span><span class="p">:</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span>
+                <span class="n">_primitives</span><span class="o">.</span><span class="n">Datetime</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">DURATION</span><span class="p">:</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span>
+                <span class="n">_primitives</span><span class="o">.</span><span class="n">Timedelta</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">STRING</span><span class="p">:</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span>
+                <span class="n">_primitives</span><span class="o">.</span><span class="n">String</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+            <span class="p">),</span>
         <span class="p">}</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">([(</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">_PROTO_ENUM_TO_SDK_TYPE</span><span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">type</span><span class="p">])</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">columns</span><span class="p">])</span></div>
 
@@ -630,46 +625,55 @@
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                     <span class="n">column</span><span class="p">,</span>
                     <span class="s2">&quot;When specifying a Schema type with a known set of columns.  Each column must be &quot;</span>
-                    <span class="s2">&quot;specified as a tuple in the form (&#39;name&#39;, type).&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;specified as a tuple in the form (&#39;name&#39;, type).&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">column</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
                     <span class="n">column</span><span class="p">,</span>
                     <span class="s2">&quot;When specifying a Schema type with a known set of columns.  Each column must be &quot;</span>
-                    <span class="s2">&quot;specified as a tuple in the form (&#39;name&#39;, type).&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;specified as a tuple in the form (&#39;name&#39;, type).&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="n">name</span><span class="p">,</span> <span class="n">sdk_type</span> <span class="o">=</span> <span class="n">column</span>
             <span class="n">sdk_type</span> <span class="o">=</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">python_std_to_sdk_type</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
-                <span class="n">additional_msg</span> <span class="o">=</span> <span class="s2">&quot;When specifying a Schema type with a known set of columns, the first element in&quot;</span> \
-                                 <span class="s2">&quot; each tuple must be text.&quot;</span>
+                <span class="n">additional_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;When specifying a Schema type with a known set of columns, the first element in&quot;</span>
+                    <span class="s2">&quot; each tuple must be text.&quot;</span>
+                <span class="p">)</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
                     <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
                     <span class="n">received_value</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
                     <span class="n">expected_type</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">},</span>
-                    <span class="n">additional_msg</span><span class="o">=</span><span class="n">additional_msg</span><span class="p">)</span>
+                    <span class="n">additional_msg</span><span class="o">=</span><span class="n">additional_msg</span><span class="p">,</span>
+                <span class="p">)</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkType</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> \
-                    <span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">():</span>
-                <span class="n">additional_msg</span> <span class="o">=</span> \
-                    <span class="s2">&quot;When specifying a Schema type with a known set of columns, the second element of &quot;</span> \
-                    <span class="s2">&quot;each tuple must be a supported type.  Failed for column: </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sdk_type</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkType</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="n">sdk_type</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">additional_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;When specifying a Schema type with a known set of columns, the second element of &quot;</span>
+                    <span class="s2">&quot;each tuple must be a supported type.  Failed for column: </span><span class="si">{name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                <span class="p">)</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
                     <span class="n">expected_type</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
                     <span class="n">received_type</span><span class="o">=</span><span class="n">sdk_type</span><span class="p">,</span>
-                    <span class="n">additional_msg</span><span class="o">=</span><span class="n">additional_msg</span><span class="p">)</span>
+                    <span class="n">additional_msg</span><span class="o">=</span><span class="n">additional_msg</span><span class="p">,</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names_seen</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The column name </span><span class="si">{name}</span><span class="s2"> was specified multiple times when instantiating the &quot;</span>
-                                 <span class="s2">&quot;Schema.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The column name </span><span class="si">{name}</span><span class="s2"> was specified multiple times when instantiating the &quot;</span>
+                    <span class="s2">&quot;Schema.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">names_seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_columns</span> <span class="o">=</span> <span class="n">_collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Schema"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema">[docs]</a><span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">Schema</span><span class="p">)):</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text remote_path:</span>
 <span class="sd">        :param Text mode:</span>
@@ -677,10 +681,7 @@
 <span class="sd">            not specified, the schema will be considered generic.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mp_blob</span> <span class="o">=</span> <span class="n">_SchemaBackingMpBlob</span><span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Schema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_mp_blob</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span>
-            <span class="n">schema_type</span> <span class="ow">or</span> <span class="n">SchemaType</span><span class="p">()</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Schema</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mp_blob</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">schema_type</span> <span class="ow">or</span> <span class="n">SchemaType</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_io_object</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="Schema.promote_from_model"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
@@ -693,7 +694,7 @@
 
 <div class="viewcode-block" id="Schema.create_at_known_location"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.create_at_known_location">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">create_at_known_location</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">known_remote_location</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_at_known_location</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">known_remote_location</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text known_remote_location: The location to which to write the object.  Usually an s3 path.</span>
 <span class="sd">        :param Text mode:</span>
@@ -705,7 +706,7 @@
 
 <div class="viewcode-block" id="Schema.create_at_any_location"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.create_at_any_location">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">create_at_any_location</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">create_at_any_location</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text mode:</span>
 <span class="sd">        :param SchemaType schema_type: [Optional] If specified, the schema will be forced to conform to this type.  If</span>
@@ -716,7 +717,7 @@
 
 <div class="viewcode-block" id="Schema.fetch"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.fetch">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;rb&#39;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text remote_path: The location from which to fetch the object. Usually an s3 path.</span>
 <span class="sd">        :param Text local_path: [Optional] A local path to which to download the object. If specified, the object</span>
@@ -768,7 +769,7 @@
                             <span class="nb">type</span><span class="p">(</span><span class="n">t_value</span><span class="p">),</span>
                             <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">,</span> <span class="n">Schema</span><span class="p">},</span>
                             <span class="n">received_value</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
-                            <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;A Schema object can only be create from a pandas DataFrame or a list of pandas DataFrame.&quot;</span>
+                            <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;A Schema object can only be create from a pandas DataFrame or a list of pandas DataFrame.&quot;</span><span class="p">,</span>
                         <span class="p">)</span>
             <span class="k">return</span> <span class="n">o</span>
         <span class="k">else</span><span class="p">:</span>
@@ -776,7 +777,7 @@
                 <span class="nb">type</span><span class="p">(</span><span class="n">t_value</span><span class="p">),</span>
                 <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">,</span> <span class="n">Schema</span><span class="p">},</span>
                 <span class="n">received_value</span><span class="o">=</span><span class="n">t_value</span><span class="p">,</span>
-                <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Unable to create Schema from user-provided value.&quot;</span>
+                <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Unable to create Schema from user-provided value.&quot;</span><span class="p">,</span>
             <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Schema.from_string"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.from_string">[docs]</a>    <span class="nd">@classmethod</span>
@@ -793,12 +794,8 @@
 <div class="viewcode-block" id="Schema.create_from_hive_query"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.create_from_hive_query">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">create_from_hive_query</span><span class="p">(</span>
-            <span class="bp">cls</span><span class="p">,</span>
-            <span class="n">select_query</span><span class="p">,</span>
-            <span class="n">stage_query</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">schema_to_table_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">known_location</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">select_query</span><span class="p">,</span> <span class="n">stage_query</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_to_table_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">known_location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a query that can be submitted to Hive and produce the desired output.  It also returns a properly-typed</span>
 <span class="sd">        schema object.</span>
@@ -814,9 +811,7 @@
 <span class="sd">        :return: Schema, Text</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">schema_object</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">known_location</span> <span class="ow">or</span> <span class="n">_data_proxy</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">get_remote_directory</span><span class="p">(),</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wb&#39;</span><span class="p">,</span>
-            <span class="n">schema_type</span><span class="o">=</span><span class="n">schema_type</span>
+            <span class="n">known_location</span> <span class="ow">or</span> <span class="n">_data_proxy</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">get_remote_directory</span><span class="p">(),</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;wb&quot;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="n">schema_type</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema_object</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -827,26 +822,31 @@
             <span class="n">columnar_clauses</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">sdk_type</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">schema_object</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">sdk_type</span> <span class="o">==</span> <span class="n">_primitives</span><span class="o">.</span><span class="n">Float</span><span class="p">:</span>
-                    <span class="n">columnar_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;CAST(</span><span class="si">{table_column_name}</span><span class="s2"> as double) </span><span class="si">{schema_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">table_column_name</span><span class="o">=</span><span class="n">schema_to_table_name_map</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
-                        <span class="n">schema_name</span><span class="o">=</span><span class="n">name</span><span class="p">))</span>
+                    <span class="n">columnar_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;CAST(</span><span class="si">{table_column_name}</span><span class="s2"> as double) </span><span class="si">{schema_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">table_column_name</span><span class="o">=</span><span class="n">schema_to_table_name_map</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">schema_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">columnar_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{table_column_name}</span><span class="s2"> as </span><span class="si">{schema_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">table_column_name</span><span class="o">=</span><span class="n">schema_to_table_name_map</span><span class="p">[</span><span class="n">name</span><span class="p">],</span>
-                        <span class="n">schema_name</span><span class="o">=</span><span class="n">name</span><span class="p">))</span>
+                    <span class="n">columnar_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="si">{table_column_name}</span><span class="s2"> as </span><span class="si">{schema_name}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">table_column_name</span><span class="o">=</span><span class="n">schema_to_table_name_map</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">schema_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
             <span class="n">columnar_query</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n\t\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">columnar_clauses</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">columnar_query</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
 
-        <span class="n">stage_query_str</span> <span class="o">=</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">stage_query</span> <span class="ow">or</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">stage_query_str</span> <span class="o">=</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">stage_query</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="c1"># the stage query should always end with a semicolon</span>
-        <span class="n">stage_query_str</span> <span class="o">=</span> <span class="n">stage_query_str</span> <span class="k">if</span> <span class="n">stage_query_str</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">stage_query_str</span> <span class="o">+</span> <span class="s1">&#39;;&#39;</span><span class="p">)</span>
+        <span class="n">stage_query_str</span> <span class="o">=</span> <span class="n">stage_query_str</span> <span class="k">if</span> <span class="n">stage_query_str</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">stage_query_str</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span>
         <span class="n">query</span> <span class="o">=</span> <span class="n">_HIVE_QUERY_FORMATTER</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">url</span><span class="o">=</span><span class="n">schema_object</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span>
             <span class="n">stage_query_str</span><span class="o">=</span><span class="n">stage_query_str</span><span class="p">,</span>
-            <span class="n">query_str</span><span class="o">=</span><span class="n">select_query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">),</span>
+            <span class="n">query_str</span><span class="o">=</span><span class="n">select_query</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">),</span>
             <span class="n">columnar_query</span><span class="o">=</span><span class="n">columnar_query</span><span class="p">,</span>
-            <span class="n">table</span><span class="o">=</span><span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">)</span>
+            <span class="n">table</span><span class="o">=</span><span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">schema_object</span><span class="p">,</span> <span class="n">query</span></div>
 
     <span class="nd">@property</span>
@@ -916,7 +916,7 @@
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_mp_blob</span><span class="o">.</span><span class="fm">__enter__</span><span class="p">()</span>
-        <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;r&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_io_object</span> <span class="o">=</span> <span class="n">_SchemaReader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">multipart_blob</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_io_object</span> <span class="o">=</span> <span class="n">_SchemaWriter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">multipart_blob</span><span class="o">.</span><span class="n">directory</span><span class="p">)</span>
@@ -931,7 +931,7 @@
         <span class="k">return</span> <span class="s2">&quot;Schema(</span><span class="si">{columns}</span><span class="s2">) @ </span><span class="si">{location}</span><span class="s2"> (</span><span class="si">{mode}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
             <span class="n">location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_prefix</span><span class="p">,</span>
-            <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;read-only&#39;</span> <span class="k">if</span> <span class="s1">&#39;r&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="k">else</span> <span class="s1">&#39;write-only&#39;</span>
+            <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;read-only&quot;</span> <span class="k">if</span> <span class="s2">&quot;r&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="k">else</span> <span class="s2">&quot;write-only&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="Schema.download"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.download">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -947,12 +947,13 @@
 
 <div class="viewcode-block" id="Schema.get_write_partition_to_hive_table_query"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.get_write_partition_to_hive_table_query">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">get_write_partition_to_hive_table_query</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">table_name</span><span class="p">,</span>
-            <span class="n">partitions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">schema_to_table_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">partitions_in_table</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">append_to_partition</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">table_name</span><span class="p">,</span>
+        <span class="n">partitions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">schema_to_table_name_map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">partitions_in_table</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">append_to_partition</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns a Hive query string that will update the metatable to point to the data as the new partition.</span>
 
@@ -981,36 +982,41 @@
                         <span class="n">expected_type</span><span class="o">=</span><span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">},</span>
                         <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">partition_name</span><span class="p">),</span>
                         <span class="n">received_value</span><span class="o">=</span><span class="n">partition_name</span><span class="p">,</span>
-                        <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;All partition names must be type str.&quot;</span><span class="p">)</span>
+                        <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;All partition names must be type str.&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">partition_value</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_ALLOWED_PARTITION_TYPES</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
                         <span class="n">expected_type</span><span class="o">=</span><span class="n">_ALLOWED_PARTITION_TYPES</span><span class="p">,</span>
                         <span class="n">received_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">partition_value</span><span class="p">),</span>
                         <span class="n">received_value</span><span class="o">=</span><span class="n">partition_value</span><span class="p">,</span>
-                        <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Partition </span><span class="si">{name}</span><span class="s2"> has an unsupported type.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">partition_name</span><span class="p">)</span>
+                        <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Partition </span><span class="si">{name}</span><span class="s2"> has an unsupported type.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">partition_name</span><span class="p">),</span>
                     <span class="p">)</span>
 
                 <span class="c1"># We need the string to be quoted in the query, so let&#39;s take repr of it.</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">partition_value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">)):</span>
                     <span class="n">partition_value</span> <span class="o">=</span> <span class="nb">repr</span><span class="p">(</span><span class="n">partition_value</span><span class="p">)</span>
-                <span class="n">partition_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{partition_name}</span><span class="s2"> = </span><span class="si">{partition_value}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">partition_name</span><span class="o">=</span><span class="n">partition_name</span><span class="p">,</span>
-                    <span class="n">partition_value</span><span class="o">=</span><span class="n">partition_value</span><span class="p">))</span>
+                <span class="n">partition_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="si">{partition_name}</span><span class="s2"> = </span><span class="si">{partition_value}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">partition_name</span><span class="o">=</span><span class="n">partition_name</span><span class="p">,</span> <span class="n">partition_value</span><span class="o">=</span><span class="n">partition_value</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">partition_formatter</span> <span class="o">=</span> <span class="s2">&quot;PARTITION (</span><span class="se">\n\t</span><span class="si">{conditions}</span><span class="se">\n</span><span class="s2">)&quot;</span>
             <span class="n">partition_string</span> <span class="o">=</span> <span class="n">partition_formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">conditions</span><span class="o">=</span><span class="s2">&quot;,</span><span class="se">\n\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">partition_conditions</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">partitions_in_table</span> <span class="ow">and</span> <span class="n">partitions</span><span class="p">:</span>
             <span class="n">where_clauses</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">partition_name</span><span class="p">,</span> <span class="n">partition_value</span> <span class="ow">in</span> <span class="n">partitions</span><span class="p">:</span>
-                <span class="n">where_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{schema_name}</span><span class="s2"> = </span><span class="si">{value_str}</span><span class="s2"> AND &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">schema_name</span><span class="o">=</span><span class="n">table_to_schema_name_map</span><span class="p">[</span><span class="n">partition_name</span><span class="p">],</span>
-                    <span class="n">value_str</span><span class="o">=</span><span class="n">partition_value</span>
-                <span class="p">))</span>
+                <span class="n">where_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;</span><span class="se">\n\t\t</span><span class="si">{schema_name}</span><span class="s2"> = </span><span class="si">{value_str}</span><span class="s2"> AND &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">schema_name</span><span class="o">=</span><span class="n">table_to_schema_name_map</span><span class="p">[</span><span class="n">partition_name</span><span class="p">],</span> <span class="n">value_str</span><span class="o">=</span><span class="n">partition_value</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">where_string</span> <span class="o">=</span> <span class="s2">&quot;WHERE</span><span class="se">\n\t\t</span><span class="si">{where_clauses}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">where_clauses</span><span class="o">=</span><span class="s2">&quot; AND</span><span class="se">\n\t\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">where_clauses</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">where_string</span> <span class="ow">or</span> <span class="n">partitions_in_table</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
-                <span class="s2">&quot;Currently, the partition values should not be present in the schema pushed to Hive.&quot;</span><span class="p">)</span>
+                <span class="s2">&quot;Currently, the partition values should not be present in the schema pushed to Hive.&quot;</span>
+            <span class="p">)</span>
         <span class="k">if</span> <span class="n">append_to_partition</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                 <span class="s2">&quot;Currently, partitions can only be overwritten, they cannot be appended.&quot;</span>
@@ -1021,9 +1027,8 @@
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">_format_insert_partition_query</span><span class="p">(</span>
-            <span class="n">remote_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span>
-            <span class="n">partition_string</span><span class="o">=</span><span class="n">partition_string</span><span class="p">)</span></div>
+            <span class="n">remote_location</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">partition_string</span><span class="o">=</span><span class="n">partition_string</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Schema.compare_dataframe_to_schema"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.compare_dataframe_to_schema">[docs]</a>    <span class="k">def</span> <span class="nf">compare_dataframe_to_schema</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_frame</span><span class="p">,</span> <span class="n">column_subset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">read</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1053,9 +1058,7 @@
                 <span class="n">additional_msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
                     <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> was/where requested but could not be found in the schema: </span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">failed_columns</span><span class="p">,</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">,</span>
-                        <span class="n">additional_msg</span>
+                        <span class="n">failed_columns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">,</span> <span class="n">additional_msg</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
 
@@ -1064,7 +1067,7 @@
                 <span class="n">expected_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">,</span>
                 <span class="n">received_type</span><span class="o">=</span><span class="n">data_frame</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
                 <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Mismatch between the data frame&#39;s column names </span><span class="si">{}</span><span class="s2"> and schema&#39;s column names </span><span class="si">{}</span><span class="s2"> &quot;</span>
-                               <span class="s2">&quot;with strict_names=True.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">all_columns</span><span class="p">,</span> <span class="n">schema_column_names</span><span class="p">)</span>
+                <span class="s2">&quot;with strict_names=True.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">all_columns</span><span class="p">,</span> <span class="n">schema_column_names</span><span class="p">),</span>
             <span class="p">)</span>
 
         <span class="c1"># This only iterates if the Schema has specified columns.</span>
@@ -1074,25 +1077,27 @@
 
             <span class="c1"># TODO np.issubdtype is deprecated. Replace it</span>
             <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
-                    <span class="ow">not</span> <span class="n">_np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">allowed_type</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">allowed_type</span> <span class="ow">in</span> <span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()[</span><span class="n">literal_type</span><span class="p">]</span>
+                <span class="ow">not</span> <span class="n">_np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">,</span> <span class="n">allowed_type</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">allowed_type</span> <span class="ow">in</span> <span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()[</span><span class="n">literal_type</span><span class="p">]</span>
             <span class="p">):</span>
                 <span class="k">if</span> <span class="n">read</span><span class="p">:</span>
                     <span class="n">read_or_write_msg</span> <span class="o">=</span> <span class="s2">&quot;read data frame object from schema&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">read_or_write_msg</span> <span class="o">=</span> <span class="s2">&quot;write data frame object to schema&quot;</span>
-                <span class="n">additional_msg</span> <span class="o">=</span> \
-                    <span class="s2">&quot;Cannot </span><span class="si">{read_write}</span><span class="s2"> because the types do not match. Column &quot;</span> \
-                    <span class="s2">&quot;&#39;</span><span class="si">{name}</span><span class="s2">&#39; did not pass type checking.  Note: If your &quot;</span> \
-                    <span class="s2">&quot;column contains null values, the types might not transition as expected between parquet and &quot;</span> \
-                    <span class="s2">&quot;pandas.  For more information, see: &quot;</span> \
+                <span class="n">additional_msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;Cannot </span><span class="si">{read_write}</span><span class="s2"> because the types do not match. Column &quot;</span>
+                    <span class="s2">&quot;&#39;</span><span class="si">{name}</span><span class="s2">&#39; did not pass type checking.  Note: If your &quot;</span>
+                    <span class="s2">&quot;column contains null values, the types might not transition as expected between parquet and &quot;</span>
+                    <span class="s2">&quot;pandas.  For more information, see: &quot;</span>
                     <span class="s2">&quot;http://arrow.apache.org/docs/python/pandas.html#arrow-pandas-conversion&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">read_write</span><span class="o">=</span><span class="n">read_or_write_msg</span><span class="p">,</span>
-                        <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+                        <span class="n">read_write</span><span class="o">=</span><span class="n">read_or_write_msg</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
                 <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
                     <span class="n">expected_type</span><span class="o">=</span><span class="n">get_supported_literal_types_to_pandas_types</span><span class="p">()[</span><span class="n">literal_type</span><span class="p">],</span>
                     <span class="n">received_type</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-                    <span class="n">additional_msg</span><span class="o">=</span><span class="n">additional_msg</span><span class="p">)</span></div>
+                    <span class="n">additional_msg</span><span class="o">=</span><span class="n">additional_msg</span><span class="p">,</span>
+                <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Schema.cast_to"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.cast_to">[docs]</a>    <span class="k">def</span> <span class="nf">cast_to</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other_type</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1106,16 +1111,16 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
                         <span class="n">other_type</span><span class="p">,</span>
                         <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Cannot cast because a required column &#39;</span><span class="si">{}</span><span class="s2">&#39; was not found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
-                        <span class="n">received_value</span><span class="o">=</span><span class="bp">self</span>
+                        <span class="n">received_value</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
                     <span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkType</span><span class="p">)</span> <span class="ow">or</span> \
-                        <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkType</span><span class="p">)</span>
+                    <span class="ow">or</span> <span class="n">v</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">()</span>
+                <span class="p">):</span>
                     <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteTypeException</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">sdk_columns</span><span class="p">[</span><span class="n">k</span><span class="p">],</span>
                         <span class="n">v</span><span class="p">,</span>
-                        <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Cannot cast because the column type for column &#39;</span><span class="si">{}</span><span class="s2">&#39; does not match.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">k</span>
-                        <span class="p">)</span>
+                        <span class="n">additional_msg</span><span class="o">=</span><span class="s2">&quot;Cannot cast because the column type for column &#39;</span><span class="si">{}</span><span class="s2">&#39; does not match.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">),</span>
                     <span class="p">)</span>
         <span class="k">return</span> <span class="n">Schema</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="n">other_type</span><span class="p">)</span></div>
 
@@ -1124,21 +1129,19 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Upload the schema to the remote location</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;w&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;w&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Cannot upload a read-only schema!&quot;</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;The schema is not currently backed by a local directory &quot;</span>
-                                                  <span class="s2">&quot;and therefore cannot be uploaded.  Please write to this before &quot;</span>
-                                                  <span class="s2">&quot;attempting an upload.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
+                <span class="s2">&quot;The schema is not currently backed by a local directory &quot;</span>
+                <span class="s2">&quot;and therefore cannot be uploaded.  Please write to this before &quot;</span>
+                <span class="s2">&quot;attempting an upload.&quot;</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># TODO: Introduce system logging</span>
             <span class="c1"># logging.info(&quot;Putting {} -&gt; {}&quot;.format(self.local_path, self.remote_location))</span>
-            <span class="n">_data_proxy</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">put_data</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span>
-                <span class="n">is_multipart</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span></div></div>
+            <span class="n">_data_proxy</span><span class="o">.</span><span class="n">Data</span><span class="o">.</span><span class="n">put_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">local_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remote_location</span><span class="p">,</span> <span class="n">is_multipart</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

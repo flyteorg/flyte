@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.mixins.registerable &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.mixins.registerable &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -161,15 +161,17 @@
             
   <h1>Source code for flytekit.common.mixins.registerable</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
+
 <span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
-<span class="kn">import</span> <span class="nn">inspect</span> <span class="k">as</span> <span class="nn">_inspect</span>
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importlib</span>
+<span class="kn">import</span> <span class="nn">inspect</span> <span class="k">as</span> <span class="nn">_inspect</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 
+<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_utils</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 
 
 <span class="k">class</span> <span class="nc">_InstanceTracker</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
@@ -183,12 +185,13 @@
 <span class="sd">    like to only register a task once and do so with the name where it is defined.  This metaclass allows us to do this</span>
 <span class="sd">    by inspecting the call stack when __call__ is called on the metaclass (thus instantiating an object).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_find_instance_module</span><span class="p">():</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">_inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span>
         <span class="k">while</span> <span class="n">frame</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s1">&#39;&lt;module&gt;&#39;</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s1">&#39;__name__&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s2">&quot;&lt;module&gt;&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_globals</span><span class="p">[</span><span class="s2">&quot;__name__&quot;</span><span class="p">]</span>
             <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span>
         <span class="k">return</span> <span class="kc">None</span>
 
@@ -199,7 +202,6 @@
 
 
 <div class="viewcode-block" id="RegisterableEntity"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity">[docs]</a><span class="k">class</span> <span class="nc">RegisterableEntity</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_InstanceTracker</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RegisterableEntity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

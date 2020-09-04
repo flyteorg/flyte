@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Quick Start Examples &mdash; Flyte 0.6.0 documentation</title>
+  <title>Quick Start Examples &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -191,7 +191,7 @@
 <div class="section" id="registration">
 <h3>Registration<a class="headerlink" href="#registration" title="Permalink to this headline">¶</a></h3>
 <p id="getting-started-examples-registration">If you’re using the <code class="docutils literal notranslate"><span class="pre">sandbox</span></code> flyte installation, you can use the following command to register our example workflow with Flyte</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">--</span><span class="n">network</span> <span class="n">host</span> <span class="o">-</span><span class="n">e</span> <span class="n">FLYTE_PLATFORM_URL</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:30081&#39;</span> <span class="n">lyft</span><span class="o">/</span><span class="n">flytesnacks</span><span class="p">:</span><span class="n">v0</span><span class="o">.</span><span class="mf">1.0</span> <span class="n">pyflyte</span> <span class="o">-</span><span class="n">p</span> <span class="n">flytesnacks</span> <span class="o">-</span><span class="n">d</span> <span class="n">development</span> <span class="o">-</span><span class="n">c</span> <span class="n">sandbox</span><span class="o">.</span><span class="n">config</span> <span class="n">register</span> <span class="n">workflows</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="o">--</span><span class="n">network</span> <span class="n">host</span> <span class="o">-</span><span class="n">e</span> <span class="n">FLYTE_PLATFORM_URL</span><span class="o">=</span><span class="s1">&#39;127.0.0.1:30081&#39;</span> <span class="n">lyft</span><span class="o">/</span><span class="n">flytesnacks</span><span class="p">:</span><span class="n">v0</span><span class="o">.</span><span class="mf">2.0</span> <span class="n">pyflyte</span> <span class="o">-</span><span class="n">p</span> <span class="n">flytesnacks</span> <span class="o">-</span><span class="n">d</span> <span class="n">development</span> <span class="o">-</span><span class="n">c</span> <span class="n">sandbox</span><span class="o">.</span><span class="n">config</span> <span class="n">register</span> <span class="n">workflows</span>
 </pre></div>
 </div>
 <p>This command will register the workflow with your Flyte app under the <code class="docutils literal notranslate"><span class="pre">development</span></code> domain of the project <code class="docutils literal notranslate"><span class="pre">flytesnacks</span></code>.</p>

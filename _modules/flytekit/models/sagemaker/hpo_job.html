@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.sagemaker.hpo_job &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.models.sagemaker.hpo_job &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -160,12 +160,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.models.sagemaker.hpo_job</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">from</span> <span class="nn">flyteidl.plugins.sagemaker</span> <span class="k">import</span> <span class="n">hyperparameter_tuning_job_pb2</span> <span class="k">as</span> <span class="n">_pb2_hpo_job</span>
+<span></span><span class="kn">from</span> <span class="nn">flyteidl.plugins.sagemaker</span> <span class="k">import</span> <span class="n">hyperparameter_tuning_job_pb2</span> <span class="k">as</span> <span class="n">_pb2_hpo_job</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.sagemaker</span> <span class="k">import</span> <span class="n">parameter_ranges</span> <span class="k">as</span> <span class="n">_parameter_ranges_models</span><span class="p">,</span> <span class="n">training_job</span> <span class="k">as</span> <span class="n">_training_job</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.sagemaker</span> <span class="k">import</span> <span class="n">parameter_ranges</span> <span class="k">as</span> <span class="n">_parameter_ranges_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models.sagemaker</span> <span class="k">import</span> <span class="n">training_job</span> <span class="k">as</span> <span class="n">_training_job</span>
 
 
 <div class="viewcode-block" id="HyperparameterTuningObjectiveType"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningObjectiveType">[docs]</a><span class="k">class</span> <span class="nc">HyperparameterTuningObjectiveType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -180,10 +179,9 @@
 
 <span class="sd">    https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-metrics.html</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">objective_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">objective_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_objective_type</span> <span class="o">=</span> <span class="n">objective_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_metric_name</span> <span class="o">=</span> <span class="n">metric_name</span>
@@ -209,17 +207,13 @@
 <div class="viewcode-block" id="HyperparameterTuningObjective.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningObjective.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_pb2_hpo_job</span><span class="o">.</span><span class="n">HyperparameterTuningObjective</span><span class="p">:</span>
 
         <span class="k">return</span> <span class="n">_pb2_hpo_job</span><span class="o">.</span><span class="n">HyperparameterTuningObjective</span><span class="p">(</span>
-            <span class="n">objective_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_type</span><span class="p">,</span>
-            <span class="n">metric_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric_name</span><span class="p">,</span>
+            <span class="n">objective_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">objective_type</span><span class="p">,</span> <span class="n">metric_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_metric_name</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="HyperparameterTuningObjective.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningObjective.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">:</span> <span class="n">_pb2_hpo_job</span><span class="o">.</span><span class="n">HyperparameterTuningObjective</span><span class="p">):</span>
 
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">objective_type</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">objective_type</span><span class="p">,</span>
-            <span class="n">metric_name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">metric_name</span><span class="p">,</span>
-        <span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">objective_type</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">objective_type</span><span class="p">,</span> <span class="n">metric_name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">metric_name</span><span class="p">,)</span></div></div>
 
 
 <div class="viewcode-block" id="HyperparameterTuningStrategy"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningStrategy">[docs]</a><span class="k">class</span> <span class="nc">HyperparameterTuningStrategy</span><span class="p">:</span>
@@ -237,12 +231,13 @@
 <span class="sd">    The specification of the hyperparameter tuning process</span>
 <span class="sd">    https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-ex-tuning-job.html#automatic-model-tuning-ex-low-tuning-config</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">hyperparameter_ranges</span><span class="p">:</span> <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="p">,</span>
-            <span class="n">tuning_strategy</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">tuning_objective</span><span class="p">:</span> <span class="n">HyperparameterTuningObjective</span><span class="p">,</span>
-            <span class="n">training_job_early_stopping_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">hyperparameter_ranges</span><span class="p">:</span> <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="p">,</span>
+        <span class="n">tuning_strategy</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">tuning_objective</span><span class="p">:</span> <span class="n">HyperparameterTuningObjective</span><span class="p">,</span>
+        <span class="n">training_job_early_stopping_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hyperparameter_ranges</span> <span class="o">=</span> <span class="n">hyperparameter_ranges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tuning_strategy</span> <span class="o">=</span> <span class="n">tuning_strategy</span>
@@ -300,7 +295,8 @@
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">hyperparameter_ranges</span><span class="o">=</span><span class="p">(</span>
-                <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">hyperparameter_ranges</span><span class="p">)),</span>
+                <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">hyperparameter_ranges</span><span class="p">)</span>
+            <span class="p">),</span>
             <span class="n">tuning_strategy</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">tuning_strategy</span><span class="p">,</span>
             <span class="n">tuning_objective</span><span class="o">=</span><span class="n">HyperparameterTuningObjective</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">tuning_objective</span><span class="p">),</span>
             <span class="n">training_job_early_stopping_type</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">training_job_early_stopping_type</span><span class="p">,</span>
@@ -308,12 +304,11 @@
 
 
 <div class="viewcode-block" id="HyperparameterTuningJob"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJob">[docs]</a><span class="k">class</span> <span class="nc">HyperparameterTuningJob</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">max_number_of_training_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">max_parallel_training_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-            <span class="n">training_job</span><span class="p">:</span> <span class="n">_training_job</span><span class="o">.</span><span class="n">TrainingJob</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">max_number_of_training_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">max_parallel_training_jobs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">training_job</span><span class="p">:</span> <span class="n">_training_job</span><span class="o">.</span><span class="n">TrainingJob</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_number_of_training_jobs</span> <span class="o">=</span> <span class="n">max_number_of_training_jobs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_parallel_training_jobs</span> <span class="o">=</span> <span class="n">max_parallel_training_jobs</span>

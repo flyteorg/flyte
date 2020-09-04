@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.constants &mdash; Flyte 0.6.0 documentation</title>
+  <title>flytekit.common.constants &mdash; Flyte 0.7.0 documentation</title>
   
 
   
@@ -162,10 +162,10 @@
   <h1>Source code for flytekit.common.constants</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
 
-<span class="n">INPUT_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;inputs.pb&#39;</span>
-<span class="n">OUTPUT_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;outputs.pb&#39;</span>
-<span class="n">FUTURES_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;futures.pb&#39;</span>
-<span class="n">ERROR_FILE_NAME</span> <span class="o">=</span> <span class="s1">&#39;error.pb&#39;</span>
+<span class="n">INPUT_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;inputs.pb&quot;</span>
+<span class="n">OUTPUT_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;outputs.pb&quot;</span>
+<span class="n">FUTURES_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;futures.pb&quot;</span>
+<span class="n">ERROR_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;error.pb&quot;</span>
 
 
 <div class="viewcode-block" id="SdkTaskType"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.constants.SdkTaskType">[docs]</a><span class="k">class</span> <span class="nc">SdkTaskType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -187,9 +187,11 @@
     <span class="c1"># Raw container task is just a name, it defaults to using the regular container task (like python etc), but sets the data_config in the container</span>
     <span class="n">RAW_CONTAINER_TASK</span> <span class="o">=</span> <span class="s2">&quot;raw-container&quot;</span>
     <span class="n">SAGEMAKER_TRAINING_JOB_TASK</span> <span class="o">=</span> <span class="s2">&quot;sagemaker_training_job_task&quot;</span>
+    <span class="n">SAGEMAKER_CUSTOM_TRAINING_JOB_TASK</span> <span class="o">=</span> <span class="s2">&quot;sagemaker_custom_training_job_task&quot;</span>
     <span class="n">SAGEMAKER_HYPERPARAMETER_TUNING_JOB_TASK</span> <span class="o">=</span> <span class="s2">&quot;sagemaker_hyperparameter_tuning_job_task&quot;</span></div>
 
-<span class="n">GLOBAL_INPUT_NODE_ID</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+<span class="n">GLOBAL_INPUT_NODE_ID</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
 <span class="n">START_NODE_ID</span> <span class="o">=</span> <span class="s2">&quot;start-node&quot;</span>
 <span class="n">END_NODE_ID</span> <span class="o">=</span> <span class="s2">&quot;end-node&quot;</span>
