@@ -65,6 +65,15 @@ plugins:
       - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
       - spark.blacklist.enabled: "true"
       - spark.blacklist.timeout: "5m"
+    features:
+      - name: "feature1"
+        spark-config:
+          - spark.hadoop.feature1 : "true"
+          - spark.sql.feature1 : "true"
+      - name: "feature2"
+        spark-config:
+          - spark.hadoop.feature2: "true"
+          - spark.sql.feature2: "true"
   # Logging configuration
   logs:
     kubernetes-enabled: true

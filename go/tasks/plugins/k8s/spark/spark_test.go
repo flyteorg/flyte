@@ -34,11 +34,13 @@ const sparkUIAddress = "spark-ui.flyte"
 
 var (
 	dummySparkConf = map[string]string{
-		"spark.driver.memory":      "500M",
-		"spark.driver.cores":       "1",
-		"spark.executor.cores":     "1",
-		"spark.executor.instances": "3",
-		"spark.executor.memory":    "500M",
+		"spark.driver.memory":          "500M",
+		"spark.driver.cores":           "1",
+		"spark.executor.cores":         "1",
+		"spark.executor.instances":     "3",
+		"spark.executor.memory":        "500M",
+		"spark.flyte.feature1.enabled": "true",
+		"spark.lyft.feature2.enabled":  "true",
 	}
 
 	dummyEnvVars = []*core.KeyValuePair{
@@ -271,6 +273,19 @@ func TestBuildResourceSpark(t *testing.T) {
 	// Case1: Valid Spark Task-Template
 	taskTemplate := dummySparkTaskTemplate("blah-1")
 
+	// Set spark custom feature config.
+	assert.NoError(t, setSparkConfig(&Config{
+		Features: []Feature{
+			{
+				Name:        "feature1",
+				SparkConfig: map[string]string{"spark.hadoop.feature1": "true"},
+			},
+			{
+				Name:        "feature2",
+				SparkConfig: map[string]string{"spark.hadoop.feature2": "true"},
+			},
+		},
+	}))
 	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate))
 	assert.Nil(t, err)
 
@@ -285,10 +300,25 @@ func TestBuildResourceSpark(t *testing.T) {
 
 	for confKey, confVal := range dummySparkConf {
 		exists := false
-		for k, v := range sparkApp.Spec.SparkConf {
-			if k == confKey {
-				assert.Equal(t, v, confVal)
-				exists = true
+
+		if featureRegex.MatchString(confKey) {
+			match := featureRegex.FindAllStringSubmatch(confKey, -1)
+			feature := match[0][len(match[0])-1]
+			assert.True(t, feature == "feature1" || feature == "feature2")
+			for k, v := range sparkApp.Spec.SparkConf {
+				key := "spark.hadoop." + feature
+				if k == key {
+					assert.Equal(t, v, "true")
+					exists = true
+				}
+			}
+		} else {
+			for k, v := range sparkApp.Spec.SparkConf {
+
+				if k == confKey {
+					assert.Equal(t, v, confVal)
+					exists = true
+				}
 			}
 		}
 		assert.True(t, exists)

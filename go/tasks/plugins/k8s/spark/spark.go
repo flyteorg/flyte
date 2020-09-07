@@ -3,17 +3,17 @@ package spark
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
+	"github.com/lyft/flyteplugins/go/tasks/errors"
 	"github.com/lyft/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
-
 	"k8s.io/client-go/kubernetes/scheme"
 
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta1"
@@ -22,7 +22,9 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
+	"regexp"
+	"strings"
+	"time"
 
 	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
 )
@@ -31,12 +33,21 @@ const KindSparkApplication = "SparkApplication"
 const sparkDriverUI = "sparkDriverUI"
 const sparkHistoryUI = "sparkHistoryUI"
 
+var featureRegex = regexp.MustCompile(`^spark.((lyft)|(flyte)).(.+).enabled$`)
+
 var sparkTaskType = "spark"
 
 // Spark-specific configs
 type Config struct {
 	DefaultSparkConfig    map[string]string `json:"spark-config-default" pflag:",Key value pairs of default spark configuration that should be applied to every SparkJob"`
 	SparkHistoryServerURL string            `json:"spark-history-server-url" pflag:",URL for SparkHistory Server that each job will publish the execution history to."`
+	Features              []Feature         `json:"features" pflag:",List of optional features supported."`
+}
+
+// Optional feature with name and corresponding spark-config to use.
+type Feature struct {
+	Name        string            `json:"name"`
+	SparkConfig map[string]string `json:"spark-config"`
 }
 
 var (
@@ -139,7 +150,12 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	for k, v := range sparkJob.GetSparkConf() {
-		sparkConfig[k] = v
+		// Add optional features if present.
+		if featureRegex.MatchString(k) {
+			addConfig(sparkConfig, k, v)
+		} else {
+			sparkConfig[k] = v
+		}
 	}
 
 	// Set pod limits.
@@ -182,6 +198,29 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 
 	return j, nil
+}
+
+func addConfig(sparkConfig map[string]string, key string, value string) {
+
+	if strings.ToLower(strings.TrimSpace(value)) != "true" {
+		return
+	}
+
+	matches := featureRegex.FindAllStringSubmatch(key, -1)
+	if len(matches) == 0 || len(matches[0]) == 0 {
+		return
+	}
+	featureName := matches[0][len(matches[0])-1]
+	// Use the first matching feature in-case of duplicates.
+	for _, feature := range GetSparkConfig().Features {
+		if feature.Name == featureName {
+			for k, v := range feature.SparkConfig {
+				sparkConfig[k] = v
+			}
+			break
+		}
+
+	}
 }
 
 // Convert SparkJob ApplicationType to Operator CRD ApplicationType

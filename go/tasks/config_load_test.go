@@ -84,6 +84,12 @@ func TestLoadConfig(t *testing.T) {
 	t.Run("spark-config-test", func(t *testing.T) {
 		assert.NotNil(t, spark.GetSparkConfig())
 		assert.NotNil(t, spark.GetSparkConfig().DefaultSparkConfig)
+		assert.Equal(t, 2, len(spark.GetSparkConfig().Features))
+		assert.Equal(t, "feature1", spark.GetSparkConfig().Features[0].Name)
+		assert.Equal(t, "feature2", spark.GetSparkConfig().Features[1].Name)
+		assert.Equal(t, 2, len(spark.GetSparkConfig().Features[0].SparkConfig))
+		assert.Equal(t, 2, len(spark.GetSparkConfig().Features[1].SparkConfig))
+
 	})
 
 	t.Run("sagemaker-config-test", func(t *testing.T) {
