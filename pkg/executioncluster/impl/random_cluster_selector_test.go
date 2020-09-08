@@ -36,7 +36,7 @@ func initTestConfig(fileName string) error {
 	}
 
 	configAccessor := viper.NewAccessor(config.Options{
-		SearchPaths: []string{filepath.Join(pwd, "../testdata", fileName)},
+		SearchPaths: []string{filepath.Join(pwd, "testdata", fileName)},
 		StrictMode:  false,
 	})
 	return configAccessor.UpdateConfig(context.Background())
