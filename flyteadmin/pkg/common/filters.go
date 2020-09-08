@@ -79,6 +79,11 @@ var executionIdentifierFields = map[string]bool{
 	"name":    true,
 }
 
+var entityMetadataFields = map[string]bool{
+	"description": true,
+	"state":       true,
+}
+
 const unrecognizedFilterFunction = "unrecognized filter function: %s"
 const unsupportedFilterExpression = "unsupported filter expression: %s"
 const invalidSingleValueFilter = "invalid single value filter expression: %s"
@@ -235,14 +240,24 @@ func customizeField(field string, entity Entity) string {
 	return field
 }
 
+func customizeEntity(field string, entity Entity) Entity {
+	// NamedEntity is considered a single object, but the metdata
+	// is stored using a different entity type.
+	if entity == NamedEntity && entityMetadataFields[field] {
+		return NamedEntityMetadata
+	}
+	return entity
+}
+
 // Returns a filter which uses a single argument value.
 func NewSingleValueFilter(entity Entity, function FilterExpression, field string, value interface{}) (InlineFilter, error) {
 	if _, ok := singleValueFilters[function]; !ok {
 		return nil, GetInvalidSingleValueFilterErr(function)
 	}
 	customizedField := customizeField(field, entity)
+	customizedEntity := customizeEntity(field, entity)
 	return &inlineFilterImpl{
-		entity:   entity,
+		entity:   customizedEntity,
 		function: function,
 		field:    customizedField,
 		value:    value,
