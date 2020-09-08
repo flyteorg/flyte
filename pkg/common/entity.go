@@ -14,6 +14,7 @@ const (
 	Task                = "t"
 	TaskExecution       = "te"
 	Workflow            = "w"
+	NamedEntity         = "nen"
 	NamedEntityMetadata = "nem"
 )
 

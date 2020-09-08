@@ -48,7 +48,7 @@ func TestNewSingleBoolValueFilter(t *testing.T) {
 	assert.Equal(t, expression.Args, true)
 }
 
-func TestNewSingleValueCustomizedFilter(t *testing.T) {
+func TestNewSingleValueCustomizedFieldFilter(t *testing.T) {
 	filter, err := NewSingleValueFilter(Execution, Equal, "project", "a project")
 	assert.NoError(t, err)
 
@@ -59,6 +59,18 @@ func TestNewSingleValueCustomizedFilter(t *testing.T) {
 	expression, err = filter.GetGormJoinTableQueryExpr("node_executions")
 	assert.NoError(t, err)
 	assert.Equal(t, "node_executions.execution_project = ?", expression.Query)
+}
+
+func TestNewSingleValueCustomizedEntityFilter(t *testing.T) {
+	filter, err := NewSingleValueFilter(NamedEntity, Equal, "state", 1)
+	assert.NoError(t, err)
+
+	assert.Equal(t, NamedEntityMetadata, filter.GetEntity())
+
+	filter, err = NewSingleValueFilter(NamedEntity, Equal, "description", "test value")
+	assert.NoError(t, err)
+
+	assert.Equal(t, NamedEntityMetadata, filter.GetEntity())
 }
 
 func TestNewRepeatedValueFilter(t *testing.T) {

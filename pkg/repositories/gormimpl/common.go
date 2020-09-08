@@ -45,6 +45,7 @@ var entityToTableName = map[common.Entity]string{
 	common.Task:                "tasks",
 	common.TaskExecution:       "task_executions",
 	common.Workflow:            "workflows",
+	common.NamedEntity:         "entities",
 	common.NamedEntityMetadata: "named_entity_metadata",
 }
 

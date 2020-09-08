@@ -58,6 +58,7 @@ var filterFieldEntityPrefix = map[string]common.Entity{
 	"execution":             common.Execution,
 	"node_execution":        common.NodeExecution,
 	"task_execution":        common.TaskExecution,
+	"entities":              common.NamedEntity,
 	"named_entity_metadata": common.NamedEntityMetadata,
 }
 

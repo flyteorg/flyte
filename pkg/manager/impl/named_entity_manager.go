@@ -86,7 +86,7 @@ func (m *NamedEntityManager) getQueryFilters(referenceEntity core.ResourceType, 
 	if len(requestFilters) == 0 {
 		return filters, nil
 	}
-	additionalFilters, err := util.ParseFilters(requestFilters, common.NamedEntityMetadata)
+	additionalFilters, err := util.ParseFilters(requestFilters, common.NamedEntity)
 	if err != nil {
 		return nil, err
 	}
