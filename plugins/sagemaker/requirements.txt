@@ -1,0 +1,2 @@
+flytekit==0.12.6
+tensorflow
