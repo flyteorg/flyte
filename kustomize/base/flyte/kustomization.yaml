@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: flyte-test
+images:
+  # FlyteAdmin
+  - name: flyteadmin # match images with this name
+    newTag: v0.3.5 # override the tag
+    newName: docker.io/lyft/flyteadmin # override the name
+  # FlytePropeller
+  - name: flytepropeller # match images with this name
+    newTag: 0.3.12 # override the tag
+    newName: docker.io/lyft/flytepropeller # override the name
+  # Flyte DataCatalog
+  - name: datacatalog # match images with this name
+    newTag: v0.2.2 # override the tag
+    newName: docker.io/lyft/datacatalog # override the name
+  # FlyteConsole
+  - name: flyteconsole # match images with this name
+    newTag: v0.11.0 # override the tag
+    newName: docker.io/lyft/flyteconsole # override the name
+resources:
+# global resources
+- ../namespace
+- ../../dependencies/database
+- ../../dependencies/storage
+
+# user plane / control plane resources
+- ../ingress
+- ../../dependencies/contour_ingress_controller
+- ../admindeployment
+- ../datacatalog
+- ../console
+
+# data plane resources
+- ../wf_crd
+- ../operators/spark
+- ../adminserviceaccount
+- ../propeller
+- ../../dependencies/redis
+
