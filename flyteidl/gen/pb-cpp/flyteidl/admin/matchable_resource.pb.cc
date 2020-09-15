@@ -19,11 +19,12 @@
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ClusterResourceAttributes_AttributesEntry_DoNotUse_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_PluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskResourceSpec_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_MatchableAttributesConfiguration_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TaskResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fmatchable_5fresource_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto;
 namespace flyteidl {
 namespace admin {
@@ -51,6 +52,10 @@ class ExecutionClusterLabelDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ExecutionClusterLabel> _instance;
 } _ExecutionClusterLabel_default_instance_;
+class PluginOverrideDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<PluginOverride> _instance;
+} _PluginOverride_default_instance_;
 class MatchingAttributesDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<MatchingAttributes> _instance;
@@ -59,6 +64,7 @@ class MatchingAttributesDefaultTypeInternal {
   const ::flyteidl::admin::ExecutionQueueAttributes* execution_queue_attributes_;
   const ::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label_;
   const ::flyteidl::core::QualityOfService* quality_of_service_;
+  const ::flyteidl::admin::PluginOverride* plugin_override_;
 } _MatchingAttributes_default_instance_;
 class MatchableAttributesConfigurationDefaultTypeInternal {
  public:
@@ -159,6 +165,20 @@ static void InitDefaultsExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fres
 ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {}};
 
+static void InitDefaultsPluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_PluginOverride_default_instance_;
+    new (ptr) ::flyteidl::admin::PluginOverride();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::PluginOverride::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_PluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsPluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {}};
+
 static void InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -170,13 +190,14 @@ static void InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresour
   ::flyteidl::admin::MatchingAttributes::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<5> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 5, InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {
+::google::protobuf::internal::SCCInfo<6> scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 6, InitDefaultsMatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto}, {
       &scc_info_TaskResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
       &scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,
-      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,}};
+      &scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto.base,
+      &scc_info_PluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base,}};
 
 static void InitDefaultsMatchableAttributesConfiguration_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -229,14 +250,15 @@ void InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ClusterResourceAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ExecutionQueueAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ExecutionClusterLabel_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_PluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_MatchingAttributes_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_MatchableAttributesConfiguration_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ListMatchableAttributesRequest_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ListMatchableAttributesResponse_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[10];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[11];
+const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[2];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -284,6 +306,14 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fmatchable_5freso
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionClusterLabel, value_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::PluginOverride, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::PluginOverride, task_type_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::PluginOverride, plugin_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::PluginOverride, missing_plugin_behavior_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, _internal_metadata_),
   ~0u,  // no _extensions_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, _oneof_case_[0]),
@@ -293,6 +323,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fmatchable_5freso
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, execution_queue_attributes_),
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, execution_cluster_label_),
   offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, quality_of_service_),
+  offsetof(::flyteidl::admin::MatchingAttributesDefaultTypeInternal, plugin_override_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchingAttributes, target_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::MatchableAttributesConfiguration, _internal_metadata_),
@@ -324,10 +355,11 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 25, -1, sizeof(::flyteidl::admin::ClusterResourceAttributes)},
   { 31, -1, sizeof(::flyteidl::admin::ExecutionQueueAttributes)},
   { 37, -1, sizeof(::flyteidl::admin::ExecutionClusterLabel)},
-  { 43, -1, sizeof(::flyteidl::admin::MatchingAttributes)},
-  { 54, -1, sizeof(::flyteidl::admin::MatchableAttributesConfiguration)},
-  { 64, -1, sizeof(::flyteidl::admin::ListMatchableAttributesRequest)},
-  { 70, -1, sizeof(::flyteidl::admin::ListMatchableAttributesResponse)},
+  { 43, -1, sizeof(::flyteidl::admin::PluginOverride)},
+  { 51, -1, sizeof(::flyteidl::admin::MatchingAttributes)},
+  { 63, -1, sizeof(::flyteidl::admin::MatchableAttributesConfiguration)},
+  { 73, -1, sizeof(::flyteidl::admin::ListMatchableAttributesRequest)},
+  { 79, -1, sizeof(::flyteidl::admin::ListMatchableAttributesResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -337,6 +369,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ClusterResourceAttributes_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ExecutionQueueAttributes_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ExecutionClusterLabel_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_PluginOverride_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_MatchingAttributes_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_MatchableAttributesConfiguration_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_ListMatchableAttributesRequest_default_instance_),
@@ -346,7 +379,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = {
   {}, AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, "flyteidl/admin/matchable_resource.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto::offsets,
-  file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 10, file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
+  file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 11, file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[] =
@@ -364,36 +397,43 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2ep
   "ributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t"
   ":\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags"
   "\030\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value"
-  "\030\001 \001(\t\"\225\003\n\022MatchingAttributes\022J\n\030task_re"
-  "source_attributes\030\001 \001(\0132&.flyteidl.admin"
-  ".TaskResourceAttributesH\000\022P\n\033cluster_res"
-  "ource_attributes\030\002 \001(\0132).flyteidl.admin."
-  "ClusterResourceAttributesH\000\022N\n\032execution"
-  "_queue_attributes\030\003 \001(\0132(.flyteidl.admin"
-  ".ExecutionQueueAttributesH\000\022H\n\027execution"
-  "_cluster_label\030\004 \001(\0132%.flyteidl.admin.Ex"
-  "ecutionClusterLabelH\000\022=\n\022quality_of_serv"
-  "ice\030\005 \001(\0132\037.flyteidl.core.QualityOfServi"
-  "ceH\000B\010\n\006target\"\242\001\n MatchableAttributesCo"
-  "nfiguration\0226\n\nattributes\030\001 \001(\0132\".flytei"
-  "dl.admin.MatchingAttributes\022\016\n\006domain\030\002 "
-  "\001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023"
-  "\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAttr"
-  "ibutesRequest\0228\n\rresource_type\030\001 \001(\0162!.f"
-  "lyteidl.admin.MatchableResource\"k\n\037ListM"
-  "atchableAttributesResponse\022H\n\016configurat"
-  "ions\030\001 \003(\01320.flyteidl.admin.MatchableAtt"
-  "ributesConfiguration*\224\001\n\021MatchableResour"
-  "ce\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURC"
-  "E\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_CL"
-  "USTER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPEC"
-  "IFICATION\020\004B3Z1github.com/lyft/flyteidl/"
-  "gen/pb-go/flyteidl/adminb\006proto3"
+  "\030\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001"
+  " \001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugi"
+  "n_behavior\030\004 \001(\01624.flyteidl.admin.Plugin"
+  "Override.MissingPluginBehavior\"2\n\025Missin"
+  "gPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT"
+  "\020\001\"\320\003\n\022MatchingAttributes\022J\n\030task_resour"
+  "ce_attributes\030\001 \001(\0132&.flyteidl.admin.Tas"
+  "kResourceAttributesH\000\022P\n\033cluster_resourc"
+  "e_attributes\030\002 \001(\0132).flyteidl.admin.Clus"
+  "terResourceAttributesH\000\022N\n\032execution_que"
+  "ue_attributes\030\003 \001(\0132(.flyteidl.admin.Exe"
+  "cutionQueueAttributesH\000\022H\n\027execution_clu"
+  "ster_label\030\004 \001(\0132%.flyteidl.admin.Execut"
+  "ionClusterLabelH\000\022=\n\022quality_of_service\030"
+  "\005 \001(\0132\037.flyteidl.core.QualityOfServiceH\000"
+  "\0229\n\017plugin_override\030\006 \001(\0132\036.flyteidl.adm"
+  "in.PluginOverrideH\000B\010\n\006target\"\242\001\n Matcha"
+  "bleAttributesConfiguration\0226\n\nattributes"
+  "\030\001 \001(\0132\".flyteidl.admin.MatchingAttribut"
+  "es\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010w"
+  "orkflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036Li"
+  "stMatchableAttributesRequest\0228\n\rresource"
+  "_type\030\001 \001(\0162!.flyteidl.admin.MatchableRe"
+  "source\"k\n\037ListMatchableAttributesRespons"
+  "e\022H\n\016configurations\030\001 \003(\01320.flyteidl.adm"
+  "in.MatchableAttributesConfiguration*\251\001\n\021"
+  "MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020"
+  "CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022"
+  "\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALITY_"
+  "OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVE"
+  "RRIDE\020\005B3Z1github.com/lyft/flyteidl/gen/"
+  "pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
-  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 1552,
+  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 1828,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
@@ -409,9 +449,30 @@ void AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
 static bool dynamic_init_dummy_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = []() { AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto(); return true; }();
 namespace flyteidl {
 namespace admin {
-const ::google::protobuf::EnumDescriptor* MatchableResource_descriptor() {
+const ::google::protobuf::EnumDescriptor* PluginOverride_MissingPluginBehavior_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto);
   return file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[0];
+}
+bool PluginOverride_MissingPluginBehavior_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const PluginOverride_MissingPluginBehavior PluginOverride::FAIL;
+const PluginOverride_MissingPluginBehavior PluginOverride::USE_DEFAULT;
+const PluginOverride_MissingPluginBehavior PluginOverride::MissingPluginBehavior_MIN;
+const PluginOverride_MissingPluginBehavior PluginOverride::MissingPluginBehavior_MAX;
+const int PluginOverride::MissingPluginBehavior_ARRAYSIZE;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+const ::google::protobuf::EnumDescriptor* MatchableResource_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto);
+  return file_level_enum_descriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[1];
 }
 bool MatchableResource_IsValid(int value) {
   switch (value) {
@@ -420,6 +481,7 @@ bool MatchableResource_IsValid(int value) {
     case 2:
     case 3:
     case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -2312,6 +2374,419 @@ void ExecutionClusterLabel::InternalSwap(ExecutionClusterLabel* other) {
 
 // ===================================================================
 
+void PluginOverride::InitAsDefaultInstance() {
+}
+class PluginOverride::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int PluginOverride::kTaskTypeFieldNumber;
+const int PluginOverride::kPluginIdFieldNumber;
+const int PluginOverride::kMissingPluginBehaviorFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+PluginOverride::PluginOverride()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.PluginOverride)
+}
+PluginOverride::PluginOverride(const PluginOverride& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr),
+      plugin_id_(from.plugin_id_) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.task_type().size() > 0) {
+    task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.task_type_);
+  }
+  missing_plugin_behavior_ = from.missing_plugin_behavior_;
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.PluginOverride)
+}
+
+void PluginOverride::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_PluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
+  task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  missing_plugin_behavior_ = 0;
+}
+
+PluginOverride::~PluginOverride() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.PluginOverride)
+  SharedDtor();
+}
+
+void PluginOverride::SharedDtor() {
+  task_type_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void PluginOverride::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const PluginOverride& PluginOverride::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_PluginOverride_flyteidl_2fadmin_2fmatchable_5fresource_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void PluginOverride::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.PluginOverride)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  plugin_id_.Clear();
+  task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  missing_plugin_behavior_ = 0;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* PluginOverride::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<PluginOverride*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string task_type = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.PluginOverride.task_type");
+        object = msg->mutable_task_type();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // repeated string plugin_id = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("flyteidl.admin.PluginOverride.plugin_id");
+          object = msg->add_plugin_id();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
+        break;
+      }
+      // .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_missing_plugin_behavior(static_cast<::flyteidl::admin::PluginOverride_MissingPluginBehavior>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool PluginOverride::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.PluginOverride)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string task_type = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_task_type()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->task_type().data(), static_cast<int>(this->task_type().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.PluginOverride.task_type"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated string plugin_id = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_plugin_id()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->plugin_id(this->plugin_id_size() - 1).data(),
+            static_cast<int>(this->plugin_id(this->plugin_id_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.PluginOverride.plugin_id"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_missing_plugin_behavior(static_cast< ::flyteidl::admin::PluginOverride_MissingPluginBehavior >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.PluginOverride)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.PluginOverride)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void PluginOverride::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.PluginOverride)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string task_type = 1;
+  if (this->task_type().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->task_type().data(), static_cast<int>(this->task_type().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.PluginOverride.task_type");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->task_type(), output);
+  }
+
+  // repeated string plugin_id = 2;
+  for (int i = 0, n = this->plugin_id_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->plugin_id(i).data(), static_cast<int>(this->plugin_id(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.PluginOverride.plugin_id");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->plugin_id(i), output);
+  }
+
+  // .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+  if (this->missing_plugin_behavior() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->missing_plugin_behavior(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.PluginOverride)
+}
+
+::google::protobuf::uint8* PluginOverride::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.PluginOverride)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string task_type = 1;
+  if (this->task_type().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->task_type().data(), static_cast<int>(this->task_type().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.PluginOverride.task_type");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->task_type(), target);
+  }
+
+  // repeated string plugin_id = 2;
+  for (int i = 0, n = this->plugin_id_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->plugin_id(i).data(), static_cast<int>(this->plugin_id(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.PluginOverride.plugin_id");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(2, this->plugin_id(i), target);
+  }
+
+  // .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+  if (this->missing_plugin_behavior() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->missing_plugin_behavior(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.PluginOverride)
+  return target;
+}
+
+size_t PluginOverride::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.PluginOverride)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string plugin_id = 2;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->plugin_id_size());
+  for (int i = 0, n = this->plugin_id_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->plugin_id(i));
+  }
+
+  // string task_type = 1;
+  if (this->task_type().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->task_type());
+  }
+
+  // .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+  if (this->missing_plugin_behavior() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->missing_plugin_behavior());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void PluginOverride::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.PluginOverride)
+  GOOGLE_DCHECK_NE(&from, this);
+  const PluginOverride* source =
+      ::google::protobuf::DynamicCastToGenerated<PluginOverride>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.PluginOverride)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.PluginOverride)
+    MergeFrom(*source);
+  }
+}
+
+void PluginOverride::MergeFrom(const PluginOverride& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.PluginOverride)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  plugin_id_.MergeFrom(from.plugin_id_);
+  if (from.task_type().size() > 0) {
+
+    task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.task_type_);
+  }
+  if (from.missing_plugin_behavior() != 0) {
+    set_missing_plugin_behavior(from.missing_plugin_behavior());
+  }
+}
+
+void PluginOverride::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.PluginOverride)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void PluginOverride::CopyFrom(const PluginOverride& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.PluginOverride)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool PluginOverride::IsInitialized() const {
+  return true;
+}
+
+void PluginOverride::Swap(PluginOverride* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void PluginOverride::InternalSwap(PluginOverride* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  plugin_id_.InternalSwap(CastToBase(&other->plugin_id_));
+  task_type_.Swap(&other->task_type_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(missing_plugin_behavior_, other->missing_plugin_behavior_);
+}
+
+::google::protobuf::Metadata PluginOverride::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void MatchingAttributes::InitAsDefaultInstance() {
   ::flyteidl::admin::_MatchingAttributes_default_instance_.task_resource_attributes_ = const_cast< ::flyteidl::admin::TaskResourceAttributes*>(
       ::flyteidl::admin::TaskResourceAttributes::internal_default_instance());
@@ -2323,6 +2798,8 @@ void MatchingAttributes::InitAsDefaultInstance() {
       ::flyteidl::admin::ExecutionClusterLabel::internal_default_instance());
   ::flyteidl::admin::_MatchingAttributes_default_instance_.quality_of_service_ = const_cast< ::flyteidl::core::QualityOfService*>(
       ::flyteidl::core::QualityOfService::internal_default_instance());
+  ::flyteidl::admin::_MatchingAttributes_default_instance_.plugin_override_ = const_cast< ::flyteidl::admin::PluginOverride*>(
+      ::flyteidl::admin::PluginOverride::internal_default_instance());
 }
 class MatchingAttributes::HasBitSetters {
  public:
@@ -2331,6 +2808,7 @@ class MatchingAttributes::HasBitSetters {
   static const ::flyteidl::admin::ExecutionQueueAttributes& execution_queue_attributes(const MatchingAttributes* msg);
   static const ::flyteidl::admin::ExecutionClusterLabel& execution_cluster_label(const MatchingAttributes* msg);
   static const ::flyteidl::core::QualityOfService& quality_of_service(const MatchingAttributes* msg);
+  static const ::flyteidl::admin::PluginOverride& plugin_override(const MatchingAttributes* msg);
 };
 
 const ::flyteidl::admin::TaskResourceAttributes&
@@ -2352,6 +2830,10 @@ MatchingAttributes::HasBitSetters::execution_cluster_label(const MatchingAttribu
 const ::flyteidl::core::QualityOfService&
 MatchingAttributes::HasBitSetters::quality_of_service(const MatchingAttributes* msg) {
   return *msg->target_.quality_of_service_;
+}
+const ::flyteidl::admin::PluginOverride&
+MatchingAttributes::HasBitSetters::plugin_override(const MatchingAttributes* msg) {
+  return *msg->target_.plugin_override_;
 }
 void MatchingAttributes::set_allocated_task_resource_attributes(::flyteidl::admin::TaskResourceAttributes* task_resource_attributes) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
@@ -2429,12 +2911,27 @@ void MatchingAttributes::clear_quality_of_service() {
     clear_has_target();
   }
 }
+void MatchingAttributes::set_allocated_plugin_override(::flyteidl::admin::PluginOverride* plugin_override) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_target();
+  if (plugin_override) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      plugin_override = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, plugin_override, submessage_arena);
+    }
+    set_has_plugin_override();
+    target_.plugin_override_ = plugin_override;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchingAttributes.plugin_override)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int MatchingAttributes::kTaskResourceAttributesFieldNumber;
 const int MatchingAttributes::kClusterResourceAttributesFieldNumber;
 const int MatchingAttributes::kExecutionQueueAttributesFieldNumber;
 const int MatchingAttributes::kExecutionClusterLabelFieldNumber;
 const int MatchingAttributes::kQualityOfServiceFieldNumber;
+const int MatchingAttributes::kPluginOverrideFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 MatchingAttributes::MatchingAttributes()
@@ -2466,6 +2963,10 @@ MatchingAttributes::MatchingAttributes(const MatchingAttributes& from)
     }
     case kQualityOfService: {
       mutable_quality_of_service()->::flyteidl::core::QualityOfService::MergeFrom(from.quality_of_service());
+      break;
+    }
+    case kPluginOverride: {
+      mutable_plugin_override()->::flyteidl::admin::PluginOverride::MergeFrom(from.plugin_override());
       break;
     }
     case TARGET_NOT_SET: {
@@ -2522,6 +3023,10 @@ void MatchingAttributes::clear_target() {
     }
     case kQualityOfService: {
       delete target_.quality_of_service_;
+      break;
+    }
+    case kPluginOverride: {
+      delete target_.plugin_override_;
       break;
     }
     case TARGET_NOT_SET: {
@@ -2620,6 +3125,19 @@ const char* MatchingAttributes::_InternalParse(const char* begin, const char* en
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // .flyteidl.admin.PluginOverride plugin_override = 6;
+      case 6: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::PluginOverride::_InternalParse;
+        object = msg->mutable_plugin_override();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -2705,6 +3223,17 @@ bool MatchingAttributes::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.admin.PluginOverride plugin_override = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (50 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_plugin_override()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2762,6 +3291,12 @@ void MatchingAttributes::SerializeWithCachedSizes(
       5, HasBitSetters::quality_of_service(this), output);
   }
 
+  // .flyteidl.admin.PluginOverride plugin_override = 6;
+  if (has_plugin_override()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      6, HasBitSetters::plugin_override(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2808,6 +3343,13 @@ void MatchingAttributes::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         5, HasBitSetters::quality_of_service(this), target);
+  }
+
+  // .flyteidl.admin.PluginOverride plugin_override = 6;
+  if (has_plugin_override()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        6, HasBitSetters::plugin_override(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2867,6 +3409,13 @@ size_t MatchingAttributes::ByteSizeLong() const {
           *target_.quality_of_service_);
       break;
     }
+    // .flyteidl.admin.PluginOverride plugin_override = 6;
+    case kPluginOverride: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *target_.plugin_override_);
+      break;
+    }
     case TARGET_NOT_SET: {
       break;
     }
@@ -2917,6 +3466,10 @@ void MatchingAttributes::MergeFrom(const MatchingAttributes& from) {
     }
     case kQualityOfService: {
       mutable_quality_of_service()->::flyteidl::core::QualityOfService::MergeFrom(from.quality_of_service());
+      break;
+    }
+    case kPluginOverride: {
+      mutable_plugin_override()->::flyteidl::admin::PluginOverride::MergeFrom(from.plugin_override());
       break;
     }
     case TARGET_NOT_SET: {
@@ -4108,6 +4661,9 @@ template<> PROTOBUF_NOINLINE ::flyteidl::admin::ExecutionQueueAttributes* Arena:
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::ExecutionClusterLabel* Arena::CreateMaybeMessage< ::flyteidl::admin::ExecutionClusterLabel >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::ExecutionClusterLabel >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::PluginOverride* Arena::CreateMaybeMessage< ::flyteidl::admin::PluginOverride >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::PluginOverride >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::MatchingAttributes* Arena::CreateMaybeMessage< ::flyteidl::admin::MatchingAttributes >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::MatchingAttributes >(arena);

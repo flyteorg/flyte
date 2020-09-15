@@ -995,7 +995,9 @@ paths:
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
           \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
           \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
-          \ Configures default quality of service when undefined in an execution spec."
+          \ Configures default quality of service when undefined in an execution spec.\n\
+          \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
+          \ for a given task type."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1005,6 +1007,7 @@ paths:
         - "EXECUTION_QUEUE"
         - "EXECUTION_CLUSTER_LABEL"
         - "QUALITY_OF_SERVICE_SPECIFICATION"
+        - "PLUGIN_OVERRIDE"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1361,7 +1364,9 @@ paths:
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
           \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
           \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
-          \ Configures default quality of service when undefined in an execution spec."
+          \ Configures default quality of service when undefined in an execution spec.\n\
+          \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
+          \ for a given task type."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1371,6 +1376,7 @@ paths:
         - "EXECUTION_QUEUE"
         - "EXECUTION_CLUSTER_LABEL"
         - "QUALITY_OF_SERVICE_SPECIFICATION"
+        - "PLUGIN_OVERRIDE"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2004,7 +2010,9 @@ paths:
           \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
           \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
           \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
-          \ Configures default quality of service when undefined in an execution spec."
+          \ Configures default quality of service when undefined in an execution spec.\n\
+          \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
+          \ for a given task type."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -2014,6 +2022,7 @@ paths:
         - "EXECUTION_QUEUE"
         - "EXECUTION_CLUSTER_LABEL"
         - "QUALITY_OF_SERVICE_SPECIFICATION"
+        - "PLUGIN_OVERRIDE"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2467,6 +2476,13 @@ definitions:
     - "UPLOAD_EAGER"
     - "DO_NOT_UPLOAD"
     default: "UPLOAD_ON_EXIT"
+  PluginOverrideMissingPluginBehavior:
+    type: "string"
+    description: " - USE_DEFAULT: Uses the system-configured default implementation."
+    enum:
+    - "FAIL"
+    - "USE_DEFAULT"
+    default: "FAIL"
   QualityOfServiceTier:
     type: "string"
     description: " - UNDEFINED: Default: no quality of service specified."
@@ -4696,6 +4712,12 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
+          plugin_override:
+            plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
           execution_cluster_label:
             value: "value"
       - launch_plan: "launch_plan"
@@ -4725,6 +4747,12 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
+          plugin_override:
+            plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
           execution_cluster_label:
             value: "value"
   adminLiteralMapBlob:
@@ -4785,6 +4813,12 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
+        plugin_override:
+          plugin_id:
+          - "plugin_id"
+          - "plugin_id"
+          missing_plugin_behavior: {}
+          task_type: "task_type"
         execution_cluster_label:
           value: "value"
   adminMatchableResource:
@@ -4795,13 +4829,16 @@ definitions:
       \ Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE:\
       \ Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL:\
       \ Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
-      \ Configures default quality of service when undefined in an execution spec."
+      \ Configures default quality of service when undefined in an execution spec.\n\
+      \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for\
+      \ a given task type."
     enum:
     - "TASK_RESOURCE"
     - "CLUSTER_RESOURCE"
     - "EXECUTION_QUEUE"
     - "EXECUTION_CLUSTER_LABEL"
     - "QUALITY_OF_SERVICE_SPECIFICATION"
+    - "PLUGIN_OVERRIDE"
     default: "TASK_RESOURCE"
   adminMatchingAttributes:
     type: "object"
@@ -4816,6 +4853,8 @@ definitions:
         $ref: "#/definitions/adminExecutionClusterLabel"
       quality_of_service:
         $ref: "#/definitions/coreQualityOfService"
+      plugin_override:
+        $ref: "#/definitions/adminPluginOverride"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
     example:
@@ -4841,6 +4880,12 @@ definitions:
           cpu: "cpu"
           storage: "storage"
           gpu: "gpu"
+      plugin_override:
+        plugin_id:
+        - "plugin_id"
+        - "plugin_id"
+        missing_plugin_behavior: {}
+        task_type: "task_type"
       execution_cluster_label:
         value: "value"
   adminNamedEntity:
@@ -5329,6 +5374,33 @@ definitions:
       recipients_email:
       - "recipients_email"
       - "recipients_email"
+  adminPluginOverride:
+    type: "object"
+    properties:
+      task_type:
+        type: "string"
+        description: "A predefined yet extensible Task type identifier."
+      plugin_id:
+        type: "array"
+        description: "A set of plugin ids which should handle tasks of this type instead\
+          \ of the default registered plugin. The list will be tried in order until\
+          \ a plugin is found with that id."
+        items:
+          type: "string"
+      missing_plugin_behavior:
+        description: "Defines the behavior when no plugin from the plugin_id list\
+          \ is not found."
+        $ref: "#/definitions/PluginOverrideMissingPluginBehavior"
+    description: "This MatchableAttribute configures selecting alternate plugin implementations\
+      \ for a given task type.\nIn addition to an override implementation a selection\
+      \ of fallbacks can be provided or other modes\nfor handling cases where the\
+      \ desired plugin override is not enabled in a given Flyte deployment."
+    example:
+      plugin_id:
+      - "plugin_id"
+      - "plugin_id"
+      missing_plugin_behavior: {}
+      task_type: "task_type"
   adminProject:
     type: "object"
     properties:
@@ -5398,6 +5470,12 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
+        plugin_override:
+          plugin_id:
+          - "plugin_id"
+          - "plugin_id"
+          missing_plugin_behavior: {}
+          task_type: "task_type"
         execution_cluster_label:
           value: "value"
   adminProjectDomainAttributesDeleteRequest:
@@ -5446,6 +5524,12 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
+          plugin_override:
+            plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
           execution_cluster_label:
             value: "value"
   adminProjectDomainAttributesUpdateRequest:
@@ -9221,6 +9305,12 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
+        plugin_override:
+          plugin_id:
+          - "plugin_id"
+          - "plugin_id"
+          missing_plugin_behavior: {}
+          task_type: "task_type"
         execution_cluster_label:
           value: "value"
   adminWorkflowAttributesDeleteRequest:
@@ -9273,6 +9363,12 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
+          plugin_override:
+            plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
           execution_cluster_label:
             value: "value"
   adminWorkflowAttributesUpdateRequest:
