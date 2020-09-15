@@ -9152,7 +9152,8 @@ export namespace flyteidl {
             CLUSTER_RESOURCE = 1,
             EXECUTION_QUEUE = 2,
             EXECUTION_CLUSTER_LABEL = 3,
-            QUALITY_OF_SERVICE_SPECIFICATION = 4
+            QUALITY_OF_SERVICE_SPECIFICATION = 4,
+            PLUGIN_OVERRIDE = 5
         }
 
         /** Properties of a TaskResourceSpec. */
@@ -9439,6 +9440,79 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a PluginOverride. */
+        interface IPluginOverride {
+
+            /** PluginOverride taskType */
+            taskType?: (string|null);
+
+            /** PluginOverride pluginId */
+            pluginId?: (string[]|null);
+
+            /** PluginOverride missingPluginBehavior */
+            missingPluginBehavior?: (flyteidl.admin.PluginOverride.MissingPluginBehavior|null);
+        }
+
+        /** Represents a PluginOverride. */
+        class PluginOverride implements IPluginOverride {
+
+            /**
+             * Constructs a new PluginOverride.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IPluginOverride);
+
+            /** PluginOverride taskType. */
+            public taskType: string;
+
+            /** PluginOverride pluginId. */
+            public pluginId: string[];
+
+            /** PluginOverride missingPluginBehavior. */
+            public missingPluginBehavior: flyteidl.admin.PluginOverride.MissingPluginBehavior;
+
+            /**
+             * Creates a new PluginOverride instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PluginOverride instance
+             */
+            public static create(properties?: flyteidl.admin.IPluginOverride): flyteidl.admin.PluginOverride;
+
+            /**
+             * Encodes the specified PluginOverride message. Does not implicitly {@link flyteidl.admin.PluginOverride.verify|verify} messages.
+             * @param message PluginOverride message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IPluginOverride, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PluginOverride message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PluginOverride
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.PluginOverride;
+
+            /**
+             * Verifies a PluginOverride message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace PluginOverride {
+
+            /** MissingPluginBehavior enum. */
+            enum MissingPluginBehavior {
+                FAIL = 0,
+                USE_DEFAULT = 1
+            }
+        }
+
         /** Properties of a MatchingAttributes. */
         interface IMatchingAttributes {
 
@@ -9456,6 +9530,9 @@ export namespace flyteidl {
 
             /** MatchingAttributes qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
+
+            /** MatchingAttributes pluginOverride */
+            pluginOverride?: (flyteidl.admin.IPluginOverride|null);
         }
 
         /** Represents a MatchingAttributes. */
@@ -9482,8 +9559,11 @@ export namespace flyteidl {
             /** MatchingAttributes qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);
 
+            /** MatchingAttributes pluginOverride. */
+            public pluginOverride?: (flyteidl.admin.IPluginOverride|null);
+
             /** MatchingAttributes target. */
-            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService");
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverride");
 
             /**
              * Creates a new MatchingAttributes instance using the specified properties.
