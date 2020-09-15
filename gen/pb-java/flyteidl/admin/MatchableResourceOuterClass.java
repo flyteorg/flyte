@@ -64,6 +64,14 @@ public final class MatchableResourceOuterClass {
      * <code>QUALITY_OF_SERVICE_SPECIFICATION = 4;</code>
      */
     QUALITY_OF_SERVICE_SPECIFICATION(4),
+    /**
+     * <pre>
+     * Selects configurable plugin implementation behavior for a given task type.
+     * </pre>
+     *
+     * <code>PLUGIN_OVERRIDE = 5;</code>
+     */
+    PLUGIN_OVERRIDE(5),
     UNRECOGNIZED(-1),
     ;
 
@@ -107,6 +115,14 @@ public final class MatchableResourceOuterClass {
      * <code>QUALITY_OF_SERVICE_SPECIFICATION = 4;</code>
      */
     public static final int QUALITY_OF_SERVICE_SPECIFICATION_VALUE = 4;
+    /**
+     * <pre>
+     * Selects configurable plugin implementation behavior for a given task type.
+     * </pre>
+     *
+     * <code>PLUGIN_OVERRIDE = 5;</code>
+     */
+    public static final int PLUGIN_OVERRIDE_VALUE = 5;
 
 
     public final int getNumber() {
@@ -132,6 +148,7 @@ public final class MatchableResourceOuterClass {
         case 2: return EXECUTION_QUEUE;
         case 3: return EXECUTION_CLUSTER_LABEL;
         case 4: return QUALITY_OF_SERVICE_SPECIFICATION;
+        case 5: return PLUGIN_OVERRIDE;
         default: return null;
       }
     }
@@ -4017,6 +4034,1101 @@ public final class MatchableResourceOuterClass {
 
   }
 
+  public interface PluginOverrideOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.PluginOverride)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    java.lang.String getTaskType();
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getTaskTypeBytes();
+
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    java.util.List<java.lang.String>
+        getPluginIdList();
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    int getPluginIdCount();
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    java.lang.String getPluginId(int index);
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getPluginIdBytes(int index);
+
+    /**
+     * <pre>
+     * Defines the behavior when no plugin from the plugin_id list is not found.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+     */
+    int getMissingPluginBehaviorValue();
+    /**
+     * <pre>
+     * Defines the behavior when no plugin from the plugin_id list is not found.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior getMissingPluginBehavior();
+  }
+  /**
+   * <pre>
+   * This MatchableAttribute configures selecting alternate plugin implementations for a given task type.
+   * In addition to an override implementation a selection of fallbacks can be provided or other modes
+   * for handling cases where the desired plugin override is not enabled in a given Flyte deployment.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.PluginOverride}
+   */
+  public  static final class PluginOverride extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.PluginOverride)
+      PluginOverrideOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PluginOverride.newBuilder() to construct.
+    private PluginOverride(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PluginOverride() {
+      taskType_ = "";
+      pluginId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      missingPluginBehavior_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PluginOverride(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              taskType_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                pluginId_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              pluginId_.add(s);
+              break;
+            }
+            case 32: {
+              int rawValue = input.readEnum();
+
+              missingPluginBehavior_ = rawValue;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
+          pluginId_ = pluginId_.getUnmodifiableView();
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverride_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverride_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverride.class, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder.class);
+    }
+
+    /**
+     * Protobuf enum {@code flyteidl.admin.PluginOverride.MissingPluginBehavior}
+     */
+    public enum MissingPluginBehavior
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>FAIL = 0;</code>
+       */
+      FAIL(0),
+      /**
+       * <pre>
+       * Uses the system-configured default implementation.
+       * </pre>
+       *
+       * <code>USE_DEFAULT = 1;</code>
+       */
+      USE_DEFAULT(1),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>FAIL = 0;</code>
+       */
+      public static final int FAIL_VALUE = 0;
+      /**
+       * <pre>
+       * Uses the system-configured default implementation.
+       * </pre>
+       *
+       * <code>USE_DEFAULT = 1;</code>
+       */
+      public static final int USE_DEFAULT_VALUE = 1;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static MissingPluginBehavior valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static MissingPluginBehavior forNumber(int value) {
+        switch (value) {
+          case 0: return FAIL;
+          case 1: return USE_DEFAULT;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<MissingPluginBehavior>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          MissingPluginBehavior> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<MissingPluginBehavior>() {
+              public MissingPluginBehavior findValueByNumber(int number) {
+                return MissingPluginBehavior.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final MissingPluginBehavior[] VALUES = values();
+
+      public static MissingPluginBehavior valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private MissingPluginBehavior(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.admin.PluginOverride.MissingPluginBehavior)
+    }
+
+    private int bitField0_;
+    public static final int TASK_TYPE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object taskType_;
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    public java.lang.String getTaskType() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        taskType_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTaskTypeBytes() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        taskType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PLUGIN_ID_FIELD_NUMBER = 2;
+    private com.google.protobuf.LazyStringList pluginId_;
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getPluginIdList() {
+      return pluginId_;
+    }
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    public int getPluginIdCount() {
+      return pluginId_.size();
+    }
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    public java.lang.String getPluginId(int index) {
+      return pluginId_.get(index);
+    }
+    /**
+     * <pre>
+     * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+     * </pre>
+     *
+     * <code>repeated string plugin_id = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPluginIdBytes(int index) {
+      return pluginId_.getByteString(index);
+    }
+
+    public static final int MISSING_PLUGIN_BEHAVIOR_FIELD_NUMBER = 4;
+    private int missingPluginBehavior_;
+    /**
+     * <pre>
+     * Defines the behavior when no plugin from the plugin_id list is not found.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+     */
+    public int getMissingPluginBehaviorValue() {
+      return missingPluginBehavior_;
+    }
+    /**
+     * <pre>
+     * Defines the behavior when no plugin from the plugin_id list is not found.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior getMissingPluginBehavior() {
+      @SuppressWarnings("deprecation")
+      flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior result = flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior.valueOf(missingPluginBehavior_);
+      return result == null ? flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior.UNRECOGNIZED : result;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getTaskTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, taskType_);
+      }
+      for (int i = 0; i < pluginId_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, pluginId_.getRaw(i));
+      }
+      if (missingPluginBehavior_ != flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior.FAIL.getNumber()) {
+        output.writeEnum(4, missingPluginBehavior_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getTaskTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, taskType_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < pluginId_.size(); i++) {
+          dataSize += computeStringSizeNoTag(pluginId_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getPluginIdList().size();
+      }
+      if (missingPluginBehavior_ != flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior.FAIL.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(4, missingPluginBehavior_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.MatchableResourceOuterClass.PluginOverride)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.MatchableResourceOuterClass.PluginOverride other = (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) obj;
+
+      if (!getTaskType()
+          .equals(other.getTaskType())) return false;
+      if (!getPluginIdList()
+          .equals(other.getPluginIdList())) return false;
+      if (missingPluginBehavior_ != other.missingPluginBehavior_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + TASK_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getTaskType().hashCode();
+      if (getPluginIdCount() > 0) {
+        hash = (37 * hash) + PLUGIN_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getPluginIdList().hashCode();
+      }
+      hash = (37 * hash) + MISSING_PLUGIN_BEHAVIOR_FIELD_NUMBER;
+      hash = (53 * hash) + missingPluginBehavior_;
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.MatchableResourceOuterClass.PluginOverride prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * This MatchableAttribute configures selecting alternate plugin implementations for a given task type.
+     * In addition to an override implementation a selection of fallbacks can be provided or other modes
+     * for handling cases where the desired plugin override is not enabled in a given Flyte deployment.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.PluginOverride}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.PluginOverride)
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverride_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverride_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.MatchableResourceOuterClass.PluginOverride.class, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.MatchableResourceOuterClass.PluginOverride.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        taskType_ = "";
+
+        pluginId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        missingPluginBehavior_ = 0;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverride_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getDefaultInstanceForType() {
+        return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride build() {
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverride result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride buildPartial() {
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverride result = new flyteidl.admin.MatchableResourceOuterClass.PluginOverride(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        result.taskType_ = taskType_;
+        if (((bitField0_ & 0x00000002) != 0)) {
+          pluginId_ = pluginId_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.pluginId_ = pluginId_;
+        result.missingPluginBehavior_ = missingPluginBehavior_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.MatchableResourceOuterClass.PluginOverride) {
+          return mergeFrom((flyteidl.admin.MatchableResourceOuterClass.PluginOverride)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.MatchableResourceOuterClass.PluginOverride other) {
+        if (other == flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance()) return this;
+        if (!other.getTaskType().isEmpty()) {
+          taskType_ = other.taskType_;
+          onChanged();
+        }
+        if (!other.pluginId_.isEmpty()) {
+          if (pluginId_.isEmpty()) {
+            pluginId_ = other.pluginId_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensurePluginIdIsMutable();
+            pluginId_.addAll(other.pluginId_);
+          }
+          onChanged();
+        }
+        if (other.missingPluginBehavior_ != 0) {
+          setMissingPluginBehaviorValue(other.getMissingPluginBehaviorValue());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverride parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object taskType_ = "";
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public java.lang.String getTaskType() {
+        java.lang.Object ref = taskType_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          taskType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTaskTypeBytes() {
+        java.lang.Object ref = taskType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          taskType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder setTaskType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder clearTaskType() {
+        
+        taskType_ = getDefaultInstance().getTaskType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder setTaskTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList pluginId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensurePluginIdIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          pluginId_ = new com.google.protobuf.LazyStringArrayList(pluginId_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getPluginIdList() {
+        return pluginId_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public int getPluginIdCount() {
+        return pluginId_.size();
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public java.lang.String getPluginId(int index) {
+        return pluginId_.get(index);
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPluginIdBytes(int index) {
+        return pluginId_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public Builder setPluginId(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensurePluginIdIsMutable();
+        pluginId_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public Builder addPluginId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensurePluginIdIsMutable();
+        pluginId_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public Builder addAllPluginId(
+          java.lang.Iterable<java.lang.String> values) {
+        ensurePluginIdIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, pluginId_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public Builder clearPluginId() {
+        pluginId_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id.
+       * </pre>
+       *
+       * <code>repeated string plugin_id = 2;</code>
+       */
+      public Builder addPluginIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensurePluginIdIsMutable();
+        pluginId_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private int missingPluginBehavior_ = 0;
+      /**
+       * <pre>
+       * Defines the behavior when no plugin from the plugin_id list is not found.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+       */
+      public int getMissingPluginBehaviorValue() {
+        return missingPluginBehavior_;
+      }
+      /**
+       * <pre>
+       * Defines the behavior when no plugin from the plugin_id list is not found.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+       */
+      public Builder setMissingPluginBehaviorValue(int value) {
+        missingPluginBehavior_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the behavior when no plugin from the plugin_id list is not found.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior getMissingPluginBehavior() {
+        @SuppressWarnings("deprecation")
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior result = flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior.valueOf(missingPluginBehavior_);
+        return result == null ? flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * Defines the behavior when no plugin from the plugin_id list is not found.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+       */
+      public Builder setMissingPluginBehavior(flyteidl.admin.MatchableResourceOuterClass.PluginOverride.MissingPluginBehavior value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        missingPluginBehavior_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the behavior when no plugin from the plugin_id list is not found.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;</code>
+       */
+      public Builder clearMissingPluginBehavior() {
+        
+        missingPluginBehavior_ = 0;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.PluginOverride)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.PluginOverride)
+    private static final flyteidl.admin.MatchableResourceOuterClass.PluginOverride DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.MatchableResourceOuterClass.PluginOverride();
+    }
+
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverride getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PluginOverride>
+        PARSER = new com.google.protobuf.AbstractParser<PluginOverride>() {
+      @java.lang.Override
+      public PluginOverride parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PluginOverride(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PluginOverride> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PluginOverride> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface MatchingAttributesOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.MatchingAttributes)
       com.google.protobuf.MessageOrBuilder {
@@ -4085,6 +5197,19 @@ public final class MatchableResourceOuterClass {
      * <code>.flyteidl.core.QualityOfService quality_of_service = 5;</code>
      */
     flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
+
+    /**
+     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     */
+    boolean hasPluginOverride();
+    /**
+     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverride getPluginOverride();
+    /**
+     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getPluginOverrideOrBuilder();
 
     public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.TargetCase getTargetCase();
   }
@@ -4201,6 +5326,20 @@ public final class MatchableResourceOuterClass {
               targetCase_ = 5;
               break;
             }
+            case 50: {
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder subBuilder = null;
+              if (targetCase_ == 6) {
+                subBuilder = ((flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.admin.MatchableResourceOuterClass.PluginOverride.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 6;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -4242,6 +5381,7 @@ public final class MatchableResourceOuterClass {
       EXECUTION_QUEUE_ATTRIBUTES(3),
       EXECUTION_CLUSTER_LABEL(4),
       QUALITY_OF_SERVICE(5),
+      PLUGIN_OVERRIDE(6),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -4262,6 +5402,7 @@ public final class MatchableResourceOuterClass {
           case 3: return EXECUTION_QUEUE_ATTRIBUTES;
           case 4: return EXECUTION_CLUSTER_LABEL;
           case 5: return QUALITY_OF_SERVICE;
+          case 6: return PLUGIN_OVERRIDE;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -4407,6 +5548,32 @@ public final class MatchableResourceOuterClass {
       return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
     }
 
+    public static final int PLUGIN_OVERRIDE_FIELD_NUMBER = 6;
+    /**
+     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     */
+    public boolean hasPluginOverride() {
+      return targetCase_ == 6;
+    }
+    /**
+     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getPluginOverride() {
+      if (targetCase_ == 6) {
+         return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+      }
+      return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getPluginOverrideOrBuilder() {
+      if (targetCase_ == 6) {
+         return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+      }
+      return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4436,6 +5603,9 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 5) {
         output.writeMessage(5, (flyteidl.core.Execution.QualityOfService) target_);
       }
+      if (targetCase_ == 6) {
+        output.writeMessage(6, (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4464,6 +5634,10 @@ public final class MatchableResourceOuterClass {
       if (targetCase_ == 5) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, (flyteidl.core.Execution.QualityOfService) target_);
+      }
+      if (targetCase_ == 6) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4502,6 +5676,10 @@ public final class MatchableResourceOuterClass {
           if (!getQualityOfService()
               .equals(other.getQualityOfService())) return false;
           break;
+        case 6:
+          if (!getPluginOverride()
+              .equals(other.getPluginOverride())) return false;
+          break;
         case 0:
         default:
       }
@@ -4536,6 +5714,10 @@ public final class MatchableResourceOuterClass {
         case 5:
           hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
           hash = (53 * hash) + getQualityOfService().hashCode();
+          break;
+        case 6:
+          hash = (37 * hash) + PLUGIN_OVERRIDE_FIELD_NUMBER;
+          hash = (53 * hash) + getPluginOverride().hashCode();
           break;
         case 0:
         default:
@@ -4740,6 +5922,13 @@ public final class MatchableResourceOuterClass {
             result.target_ = qualityOfServiceBuilder_.build();
           }
         }
+        if (targetCase_ == 6) {
+          if (pluginOverrideBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = pluginOverrideBuilder_.build();
+          }
+        }
         result.targetCase_ = targetCase_;
         onBuilt();
         return result;
@@ -4808,6 +5997,10 @@ public final class MatchableResourceOuterClass {
           }
           case QUALITY_OF_SERVICE: {
             mergeQualityOfService(other.getQualityOfService());
+            break;
+          }
+          case PLUGIN_OVERRIDE: {
+            mergePluginOverride(other.getPluginOverride());
             break;
           }
           case TARGET_NOT_SET: {
@@ -5536,6 +6729,142 @@ public final class MatchableResourceOuterClass {
         targetCase_ = 5;
         onChanged();;
         return qualityOfServiceBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> pluginOverrideBuilder_;
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public boolean hasPluginOverride() {
+        return targetCase_ == 6;
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getPluginOverride() {
+        if (pluginOverrideBuilder_ == null) {
+          if (targetCase_ == 6) {
+            return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+          }
+          return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+        } else {
+          if (targetCase_ == 6) {
+            return pluginOverrideBuilder_.getMessage();
+          }
+          return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public Builder setPluginOverride(flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
+        if (pluginOverrideBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          pluginOverrideBuilder_.setMessage(value);
+        }
+        targetCase_ = 6;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public Builder setPluginOverride(
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder builderForValue) {
+        if (pluginOverrideBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          pluginOverrideBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 6;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public Builder mergePluginOverride(flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
+        if (pluginOverrideBuilder_ == null) {
+          if (targetCase_ == 6 &&
+              target_ != flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance()) {
+            target_ = flyteidl.admin.MatchableResourceOuterClass.PluginOverride.newBuilder((flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 6) {
+            pluginOverrideBuilder_.mergeFrom(value);
+          }
+          pluginOverrideBuilder_.setMessage(value);
+        }
+        targetCase_ = 6;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public Builder clearPluginOverride() {
+        if (pluginOverrideBuilder_ == null) {
+          if (targetCase_ == 6) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 6) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          pluginOverrideBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder getPluginOverrideBuilder() {
+        return getPluginOverrideFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getPluginOverrideOrBuilder() {
+        if ((targetCase_ == 6) && (pluginOverrideBuilder_ != null)) {
+          return pluginOverrideBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 6) {
+            return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+          }
+          return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> 
+          getPluginOverrideFieldBuilder() {
+        if (pluginOverrideBuilder_ == null) {
+          if (!(targetCase_ == 6)) {
+            target_ = flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+          }
+          pluginOverrideBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder>(
+                  (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 6;
+        onChanged();;
+        return pluginOverrideBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8088,6 +9417,11 @@ public final class MatchableResourceOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_ExecutionClusterLabel_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_PluginOverride_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_PluginOverride_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_MatchingAttributes_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -8130,31 +9464,38 @@ public final class MatchableResourceOuterClass {
       "ributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
       ":\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags" +
       "\030\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value" +
-      "\030\001 \001(\t\"\225\003\n\022MatchingAttributes\022J\n\030task_re" +
-      "source_attributes\030\001 \001(\0132&.flyteidl.admin" +
-      ".TaskResourceAttributesH\000\022P\n\033cluster_res" +
-      "ource_attributes\030\002 \001(\0132).flyteidl.admin." +
-      "ClusterResourceAttributesH\000\022N\n\032execution" +
-      "_queue_attributes\030\003 \001(\0132(.flyteidl.admin" +
-      ".ExecutionQueueAttributesH\000\022H\n\027execution" +
-      "_cluster_label\030\004 \001(\0132%.flyteidl.admin.Ex" +
-      "ecutionClusterLabelH\000\022=\n\022quality_of_serv" +
-      "ice\030\005 \001(\0132\037.flyteidl.core.QualityOfServi" +
-      "ceH\000B\010\n\006target\"\242\001\n MatchableAttributesCo" +
-      "nfiguration\0226\n\nattributes\030\001 \001(\0132\".flytei" +
-      "dl.admin.MatchingAttributes\022\016\n\006domain\030\002 " +
-      "\001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030\004 \001(\t\022\023" +
-      "\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatchableAttr" +
-      "ibutesRequest\0228\n\rresource_type\030\001 \001(\0162!.f" +
-      "lyteidl.admin.MatchableResource\"k\n\037ListM" +
-      "atchableAttributesResponse\022H\n\016configurat" +
-      "ions\030\001 \003(\01320.flyteidl.admin.MatchableAtt" +
-      "ributesConfiguration*\224\001\n\021MatchableResour" +
-      "ce\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_RESOURC" +
-      "E\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECUTION_CL" +
-      "USTER_LABEL\020\003\022$\n QUALITY_OF_SERVICE_SPEC" +
-      "IFICATION\020\004B3Z1github.com/lyft/flyteidl/" +
-      "gen/pb-go/flyteidl/adminb\006proto3"
+      "\030\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001" +
+      " \001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugi" +
+      "n_behavior\030\004 \001(\01624.flyteidl.admin.Plugin" +
+      "Override.MissingPluginBehavior\"2\n\025Missin" +
+      "gPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT" +
+      "\020\001\"\320\003\n\022MatchingAttributes\022J\n\030task_resour" +
+      "ce_attributes\030\001 \001(\0132&.flyteidl.admin.Tas" +
+      "kResourceAttributesH\000\022P\n\033cluster_resourc" +
+      "e_attributes\030\002 \001(\0132).flyteidl.admin.Clus" +
+      "terResourceAttributesH\000\022N\n\032execution_que" +
+      "ue_attributes\030\003 \001(\0132(.flyteidl.admin.Exe" +
+      "cutionQueueAttributesH\000\022H\n\027execution_clu" +
+      "ster_label\030\004 \001(\0132%.flyteidl.admin.Execut" +
+      "ionClusterLabelH\000\022=\n\022quality_of_service\030" +
+      "\005 \001(\0132\037.flyteidl.core.QualityOfServiceH\000" +
+      "\0229\n\017plugin_override\030\006 \001(\0132\036.flyteidl.adm" +
+      "in.PluginOverrideH\000B\010\n\006target\"\242\001\n Matcha" +
+      "bleAttributesConfiguration\0226\n\nattributes" +
+      "\030\001 \001(\0132\".flyteidl.admin.MatchingAttribut" +
+      "es\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010w" +
+      "orkflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036Li" +
+      "stMatchableAttributesRequest\0228\n\rresource" +
+      "_type\030\001 \001(\0162!.flyteidl.admin.MatchableRe" +
+      "source\"k\n\037ListMatchableAttributesRespons" +
+      "e\022H\n\016configurations\030\001 \003(\01320.flyteidl.adm" +
+      "in.MatchableAttributesConfiguration*\251\001\n\021" +
+      "MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020" +
+      "CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022" +
+      "\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALITY_" +
+      "OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVE" +
+      "RRIDE\020\005B3Z1github.com/lyft/flyteidl/gen/" +
+      "pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -8206,26 +9547,32 @@ public final class MatchableResourceOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionClusterLabel_descriptor,
         new java.lang.String[] { "Value", });
-    internal_static_flyteidl_admin_MatchingAttributes_descriptor =
+    internal_static_flyteidl_admin_PluginOverride_descriptor =
       getDescriptor().getMessageTypes().get(5);
+    internal_static_flyteidl_admin_PluginOverride_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_PluginOverride_descriptor,
+        new java.lang.String[] { "TaskType", "PluginId", "MissingPluginBehavior", });
+    internal_static_flyteidl_admin_MatchingAttributes_descriptor =
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchingAttributes_descriptor,
-        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "Target", });
+        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "PluginOverride", "Target", });
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchableAttributesConfiguration_descriptor,
         new java.lang.String[] { "Attributes", "Domain", "Project", "Workflow", "LaunchPlan", });
     internal_static_flyteidl_admin_ListMatchableAttributesRequest_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_ListMatchableAttributesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesRequest_descriptor,
         new java.lang.String[] { "ResourceType", });
     internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_ListMatchableAttributesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor,

@@ -47,7 +47,7 @@ struct TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[10]
+  static const ::google::protobuf::internal::ParseTable schema[11]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -80,6 +80,9 @@ extern MatchableAttributesConfigurationDefaultTypeInternal _MatchableAttributesC
 class MatchingAttributes;
 class MatchingAttributesDefaultTypeInternal;
 extern MatchingAttributesDefaultTypeInternal _MatchingAttributes_default_instance_;
+class PluginOverride;
+class PluginOverrideDefaultTypeInternal;
+extern PluginOverrideDefaultTypeInternal _PluginOverride_default_instance_;
 class TaskResourceAttributes;
 class TaskResourceAttributesDefaultTypeInternal;
 extern TaskResourceAttributesDefaultTypeInternal _TaskResourceAttributes_default_instance_;
@@ -98,6 +101,7 @@ template<> ::flyteidl::admin::ListMatchableAttributesRequest* Arena::CreateMaybe
 template<> ::flyteidl::admin::ListMatchableAttributesResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ListMatchableAttributesResponse>(Arena*);
 template<> ::flyteidl::admin::MatchableAttributesConfiguration* Arena::CreateMaybeMessage<::flyteidl::admin::MatchableAttributesConfiguration>(Arena*);
 template<> ::flyteidl::admin::MatchingAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::MatchingAttributes>(Arena*);
+template<> ::flyteidl::admin::PluginOverride* Arena::CreateMaybeMessage<::flyteidl::admin::PluginOverride>(Arena*);
 template<> ::flyteidl::admin::TaskResourceAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceAttributes>(Arena*);
 template<> ::flyteidl::admin::TaskResourceSpec* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceSpec>(Arena*);
 }  // namespace protobuf
@@ -105,18 +109,40 @@ template<> ::flyteidl::admin::TaskResourceSpec* Arena::CreateMaybeMessage<::flyt
 namespace flyteidl {
 namespace admin {
 
+enum PluginOverride_MissingPluginBehavior {
+  PluginOverride_MissingPluginBehavior_FAIL = 0,
+  PluginOverride_MissingPluginBehavior_USE_DEFAULT = 1,
+  PluginOverride_MissingPluginBehavior_PluginOverride_MissingPluginBehavior_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  PluginOverride_MissingPluginBehavior_PluginOverride_MissingPluginBehavior_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool PluginOverride_MissingPluginBehavior_IsValid(int value);
+const PluginOverride_MissingPluginBehavior PluginOverride_MissingPluginBehavior_MissingPluginBehavior_MIN = PluginOverride_MissingPluginBehavior_FAIL;
+const PluginOverride_MissingPluginBehavior PluginOverride_MissingPluginBehavior_MissingPluginBehavior_MAX = PluginOverride_MissingPluginBehavior_USE_DEFAULT;
+const int PluginOverride_MissingPluginBehavior_MissingPluginBehavior_ARRAYSIZE = PluginOverride_MissingPluginBehavior_MissingPluginBehavior_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* PluginOverride_MissingPluginBehavior_descriptor();
+inline const ::std::string& PluginOverride_MissingPluginBehavior_Name(PluginOverride_MissingPluginBehavior value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    PluginOverride_MissingPluginBehavior_descriptor(), value);
+}
+inline bool PluginOverride_MissingPluginBehavior_Parse(
+    const ::std::string& name, PluginOverride_MissingPluginBehavior* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<PluginOverride_MissingPluginBehavior>(
+    PluginOverride_MissingPluginBehavior_descriptor(), name, value);
+}
 enum MatchableResource {
   TASK_RESOURCE = 0,
   CLUSTER_RESOURCE = 1,
   EXECUTION_QUEUE = 2,
   EXECUTION_CLUSTER_LABEL = 3,
   QUALITY_OF_SERVICE_SPECIFICATION = 4,
+  PLUGIN_OVERRIDE = 5,
   MatchableResource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   MatchableResource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool MatchableResource_IsValid(int value);
 const MatchableResource MatchableResource_MIN = TASK_RESOURCE;
-const MatchableResource MatchableResource_MAX = QUALITY_OF_SERVICE_SPECIFICATION;
+const MatchableResource MatchableResource_MAX = PLUGIN_OVERRIDE;
 const int MatchableResource_ARRAYSIZE = MatchableResource_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MatchableResource_descriptor();
@@ -814,6 +840,182 @@ class ExecutionClusterLabel final :
 };
 // -------------------------------------------------------------------
 
+class PluginOverride final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.PluginOverride) */ {
+ public:
+  PluginOverride();
+  virtual ~PluginOverride();
+
+  PluginOverride(const PluginOverride& from);
+
+  inline PluginOverride& operator=(const PluginOverride& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PluginOverride(PluginOverride&& from) noexcept
+    : PluginOverride() {
+    *this = ::std::move(from);
+  }
+
+  inline PluginOverride& operator=(PluginOverride&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const PluginOverride& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PluginOverride* internal_default_instance() {
+    return reinterpret_cast<const PluginOverride*>(
+               &_PluginOverride_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(PluginOverride* other);
+  friend void swap(PluginOverride& a, PluginOverride& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PluginOverride* New() const final {
+    return CreateMaybeMessage<PluginOverride>(nullptr);
+  }
+
+  PluginOverride* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PluginOverride>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PluginOverride& from);
+  void MergeFrom(const PluginOverride& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PluginOverride* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef PluginOverride_MissingPluginBehavior MissingPluginBehavior;
+  static const MissingPluginBehavior FAIL =
+    PluginOverride_MissingPluginBehavior_FAIL;
+  static const MissingPluginBehavior USE_DEFAULT =
+    PluginOverride_MissingPluginBehavior_USE_DEFAULT;
+  static inline bool MissingPluginBehavior_IsValid(int value) {
+    return PluginOverride_MissingPluginBehavior_IsValid(value);
+  }
+  static const MissingPluginBehavior MissingPluginBehavior_MIN =
+    PluginOverride_MissingPluginBehavior_MissingPluginBehavior_MIN;
+  static const MissingPluginBehavior MissingPluginBehavior_MAX =
+    PluginOverride_MissingPluginBehavior_MissingPluginBehavior_MAX;
+  static const int MissingPluginBehavior_ARRAYSIZE =
+    PluginOverride_MissingPluginBehavior_MissingPluginBehavior_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  MissingPluginBehavior_descriptor() {
+    return PluginOverride_MissingPluginBehavior_descriptor();
+  }
+  static inline const ::std::string& MissingPluginBehavior_Name(MissingPluginBehavior value) {
+    return PluginOverride_MissingPluginBehavior_Name(value);
+  }
+  static inline bool MissingPluginBehavior_Parse(const ::std::string& name,
+      MissingPluginBehavior* value) {
+    return PluginOverride_MissingPluginBehavior_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // repeated string plugin_id = 2;
+  int plugin_id_size() const;
+  void clear_plugin_id();
+  static const int kPluginIdFieldNumber = 2;
+  const ::std::string& plugin_id(int index) const;
+  ::std::string* mutable_plugin_id(int index);
+  void set_plugin_id(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_plugin_id(int index, ::std::string&& value);
+  #endif
+  void set_plugin_id(int index, const char* value);
+  void set_plugin_id(int index, const char* value, size_t size);
+  ::std::string* add_plugin_id();
+  void add_plugin_id(const ::std::string& value);
+  #if LANG_CXX11
+  void add_plugin_id(::std::string&& value);
+  #endif
+  void add_plugin_id(const char* value);
+  void add_plugin_id(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& plugin_id() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_plugin_id();
+
+  // string task_type = 1;
+  void clear_task_type();
+  static const int kTaskTypeFieldNumber = 1;
+  const ::std::string& task_type() const;
+  void set_task_type(const ::std::string& value);
+  #if LANG_CXX11
+  void set_task_type(::std::string&& value);
+  #endif
+  void set_task_type(const char* value);
+  void set_task_type(const char* value, size_t size);
+  ::std::string* mutable_task_type();
+  ::std::string* release_task_type();
+  void set_allocated_task_type(::std::string* task_type);
+
+  // .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+  void clear_missing_plugin_behavior();
+  static const int kMissingPluginBehaviorFieldNumber = 4;
+  ::flyteidl::admin::PluginOverride_MissingPluginBehavior missing_plugin_behavior() const;
+  void set_missing_plugin_behavior(::flyteidl::admin::PluginOverride_MissingPluginBehavior value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.PluginOverride)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> plugin_id_;
+  ::google::protobuf::internal::ArenaStringPtr task_type_;
+  int missing_plugin_behavior_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MatchingAttributes final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.MatchingAttributes) */ {
  public:
@@ -852,6 +1054,7 @@ class MatchingAttributes final :
     kExecutionQueueAttributes = 3,
     kExecutionClusterLabel = 4,
     kQualityOfService = 5,
+    kPluginOverride = 6,
     TARGET_NOT_SET = 0,
   };
 
@@ -861,7 +1064,7 @@ class MatchingAttributes final :
                &_MatchingAttributes_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(MatchingAttributes* other);
   friend void swap(MatchingAttributes& a, MatchingAttributes& b) {
@@ -963,6 +1166,15 @@ class MatchingAttributes final :
   ::flyteidl::core::QualityOfService* mutable_quality_of_service();
   void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
 
+  // .flyteidl.admin.PluginOverride plugin_override = 6;
+  bool has_plugin_override() const;
+  void clear_plugin_override();
+  static const int kPluginOverrideFieldNumber = 6;
+  const ::flyteidl::admin::PluginOverride& plugin_override() const;
+  ::flyteidl::admin::PluginOverride* release_plugin_override();
+  ::flyteidl::admin::PluginOverride* mutable_plugin_override();
+  void set_allocated_plugin_override(::flyteidl::admin::PluginOverride* plugin_override);
+
   void clear_target();
   TargetCase target_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.MatchingAttributes)
@@ -973,6 +1185,7 @@ class MatchingAttributes final :
   void set_has_execution_queue_attributes();
   void set_has_execution_cluster_label();
   void set_has_quality_of_service();
+  void set_has_plugin_override();
 
   inline bool has_target() const;
   inline void clear_has_target();
@@ -985,6 +1198,7 @@ class MatchingAttributes final :
     ::flyteidl::admin::ExecutionQueueAttributes* execution_queue_attributes_;
     ::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label_;
     ::flyteidl::core::QualityOfService* quality_of_service_;
+    ::flyteidl::admin::PluginOverride* plugin_override_;
   } target_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -1031,7 +1245,7 @@ class MatchableAttributesConfiguration final :
                &_MatchableAttributesConfiguration_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(MatchableAttributesConfiguration* other);
   friend void swap(MatchableAttributesConfiguration& a, MatchableAttributesConfiguration& b) {
@@ -1206,7 +1420,7 @@ class ListMatchableAttributesRequest final :
                &_ListMatchableAttributesRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(ListMatchableAttributesRequest* other);
   friend void swap(ListMatchableAttributesRequest& a, ListMatchableAttributesRequest& b) {
@@ -1318,7 +1532,7 @@ class ListMatchableAttributesResponse final :
                &_ListMatchableAttributesResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(ListMatchableAttributesResponse* other);
   friend void swap(ListMatchableAttributesResponse& a, ListMatchableAttributesResponse& b) {
@@ -1881,6 +2095,146 @@ inline void ExecutionClusterLabel::set_allocated_value(::std::string* value) {
 
 // -------------------------------------------------------------------
 
+// PluginOverride
+
+// string task_type = 1;
+inline void PluginOverride::clear_task_type() {
+  task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& PluginOverride::task_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.PluginOverride.task_type)
+  return task_type_.GetNoArena();
+}
+inline void PluginOverride::set_task_type(const ::std::string& value) {
+  
+  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.PluginOverride.task_type)
+}
+#if LANG_CXX11
+inline void PluginOverride::set_task_type(::std::string&& value) {
+  
+  task_type_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.PluginOverride.task_type)
+}
+#endif
+inline void PluginOverride::set_task_type(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.PluginOverride.task_type)
+}
+inline void PluginOverride::set_task_type(const char* value, size_t size) {
+  
+  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.PluginOverride.task_type)
+}
+inline ::std::string* PluginOverride::mutable_task_type() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.PluginOverride.task_type)
+  return task_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* PluginOverride::release_task_type() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.PluginOverride.task_type)
+  
+  return task_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void PluginOverride::set_allocated_task_type(::std::string* task_type) {
+  if (task_type != nullptr) {
+    
+  } else {
+    
+  }
+  task_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), task_type);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.PluginOverride.task_type)
+}
+
+// repeated string plugin_id = 2;
+inline int PluginOverride::plugin_id_size() const {
+  return plugin_id_.size();
+}
+inline void PluginOverride::clear_plugin_id() {
+  plugin_id_.Clear();
+}
+inline const ::std::string& PluginOverride::plugin_id(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.PluginOverride.plugin_id)
+  return plugin_id_.Get(index);
+}
+inline ::std::string* PluginOverride::mutable_plugin_id(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.PluginOverride.plugin_id)
+  return plugin_id_.Mutable(index);
+}
+inline void PluginOverride::set_plugin_id(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.admin.PluginOverride.plugin_id)
+  plugin_id_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void PluginOverride::set_plugin_id(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.admin.PluginOverride.plugin_id)
+  plugin_id_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void PluginOverride::set_plugin_id(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  plugin_id_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.PluginOverride.plugin_id)
+}
+inline void PluginOverride::set_plugin_id(int index, const char* value, size_t size) {
+  plugin_id_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.PluginOverride.plugin_id)
+}
+inline ::std::string* PluginOverride::add_plugin_id() {
+  // @@protoc_insertion_point(field_add_mutable:flyteidl.admin.PluginOverride.plugin_id)
+  return plugin_id_.Add();
+}
+inline void PluginOverride::add_plugin_id(const ::std::string& value) {
+  plugin_id_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:flyteidl.admin.PluginOverride.plugin_id)
+}
+#if LANG_CXX11
+inline void PluginOverride::add_plugin_id(::std::string&& value) {
+  plugin_id_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:flyteidl.admin.PluginOverride.plugin_id)
+}
+#endif
+inline void PluginOverride::add_plugin_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  plugin_id_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:flyteidl.admin.PluginOverride.plugin_id)
+}
+inline void PluginOverride::add_plugin_id(const char* value, size_t size) {
+  plugin_id_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:flyteidl.admin.PluginOverride.plugin_id)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+PluginOverride::plugin_id() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.PluginOverride.plugin_id)
+  return plugin_id_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+PluginOverride::mutable_plugin_id() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.PluginOverride.plugin_id)
+  return &plugin_id_;
+}
+
+// .flyteidl.admin.PluginOverride.MissingPluginBehavior missing_plugin_behavior = 4;
+inline void PluginOverride::clear_missing_plugin_behavior() {
+  missing_plugin_behavior_ = 0;
+}
+inline ::flyteidl::admin::PluginOverride_MissingPluginBehavior PluginOverride::missing_plugin_behavior() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.PluginOverride.missing_plugin_behavior)
+  return static_cast< ::flyteidl::admin::PluginOverride_MissingPluginBehavior >(missing_plugin_behavior_);
+}
+inline void PluginOverride::set_missing_plugin_behavior(::flyteidl::admin::PluginOverride_MissingPluginBehavior value) {
+  
+  missing_plugin_behavior_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.PluginOverride.missing_plugin_behavior)
+}
+
+// -------------------------------------------------------------------
+
 // MatchingAttributes
 
 // .flyteidl.admin.TaskResourceAttributes task_resource_attributes = 1;
@@ -2080,6 +2434,47 @@ inline ::flyteidl::core::QualityOfService* MatchingAttributes::mutable_quality_o
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.quality_of_service)
   return target_.quality_of_service_;
+}
+
+// .flyteidl.admin.PluginOverride plugin_override = 6;
+inline bool MatchingAttributes::has_plugin_override() const {
+  return target_case() == kPluginOverride;
+}
+inline void MatchingAttributes::set_has_plugin_override() {
+  _oneof_case_[0] = kPluginOverride;
+}
+inline void MatchingAttributes::clear_plugin_override() {
+  if (has_plugin_override()) {
+    delete target_.plugin_override_;
+    clear_has_target();
+  }
+}
+inline ::flyteidl::admin::PluginOverride* MatchingAttributes::release_plugin_override() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchingAttributes.plugin_override)
+  if (has_plugin_override()) {
+    clear_has_target();
+      ::flyteidl::admin::PluginOverride* temp = target_.plugin_override_;
+    target_.plugin_override_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::PluginOverride& MatchingAttributes::plugin_override() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchingAttributes.plugin_override)
+  return has_plugin_override()
+      ? *target_.plugin_override_
+      : *reinterpret_cast< ::flyteidl::admin::PluginOverride*>(&::flyteidl::admin::_PluginOverride_default_instance_);
+}
+inline ::flyteidl::admin::PluginOverride* MatchingAttributes::mutable_plugin_override() {
+  if (!has_plugin_override()) {
+    clear_target();
+    set_has_plugin_override();
+    target_.plugin_override_ = CreateMaybeMessage< ::flyteidl::admin::PluginOverride >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.plugin_override)
+  return target_.plugin_override_;
 }
 
 inline bool MatchingAttributes::has_target() const {
@@ -2431,6 +2826,8 @@ ListMatchableAttributesResponse::configurations() const {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -2440,6 +2837,11 @@ ListMatchableAttributesResponse::configurations() const {
 namespace google {
 namespace protobuf {
 
+template <> struct is_proto_enum< ::flyteidl::admin::PluginOverride_MissingPluginBehavior> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::admin::PluginOverride_MissingPluginBehavior>() {
+  return ::flyteidl::admin::PluginOverride_MissingPluginBehavior_descriptor();
+}
 template <> struct is_proto_enum< ::flyteidl::admin::MatchableResource> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::admin::MatchableResource>() {

@@ -1144,7 +1144,7 @@
         "parameters": [
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1153,7 +1153,8 @@
               "CLUSTER_RESOURCE",
               "EXECUTION_QUEUE",
               "EXECUTION_CLUSTER_LABEL",
-              "QUALITY_OF_SERVICE_SPECIFICATION"
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -1567,7 +1568,7 @@
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1576,7 +1577,8 @@
               "CLUSTER_RESOURCE",
               "EXECUTION_QUEUE",
               "EXECUTION_CLUSTER_LABEL",
-              "QUALITY_OF_SERVICE_SPECIFICATION"
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -2301,7 +2303,7 @@
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2310,7 +2312,8 @@
               "CLUSTER_RESOURCE",
               "EXECUTION_QUEUE",
               "EXECUTION_CLUSTER_LABEL",
-              "QUALITY_OF_SERVICE_SPECIFICATION"
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -2798,6 +2801,15 @@
       "default": "UPLOAD_ON_EXIT",
       "description": "- UPLOAD_ON_EXIT: All data will be uploaded after the main container exits\n - UPLOAD_EAGER: Data will be uploaded as it appears. Refer to protocol specification for details\n - DO_NOT_UPLOAD: Data will not be uploaded, only references will be written",
       "title": "Mode to use for uploading"
+    },
+    "PluginOverrideMissingPluginBehavior": {
+      "type": "string",
+      "enum": [
+        "FAIL",
+        "USE_DEFAULT"
+      ],
+      "default": "FAIL",
+      "description": " - USE_DEFAULT: Uses the system-configured default implementation."
     },
     "QualityOfServiceTier": {
       "type": "string",
@@ -3500,10 +3512,11 @@
         "CLUSTER_RESOURCE",
         "EXECUTION_QUEUE",
         "EXECUTION_CLUSTER_LABEL",
-        "QUALITY_OF_SERVICE_SPECIFICATION"
+        "QUALITY_OF_SERVICE_SPECIFICATION",
+        "PLUGIN_OVERRIDE"
       ],
       "default": "TASK_RESOURCE",
-      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec."
+      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type."
     },
     "adminMatchingAttributes": {
       "type": "object",
@@ -3522,6 +3535,9 @@
         },
         "quality_of_service": {
           "$ref": "#/definitions/coreQualityOfService"
+        },
+        "plugin_override": {
+          "$ref": "#/definitions/adminPluginOverride"
         }
       },
       "description": "Generic container for encapsulating all types of the above attributes messages."
@@ -3799,6 +3815,27 @@
           "description": "Currently, PagerDuty notifications leverage email to trigger a notification."
         }
       }
+    },
+    "adminPluginOverride": {
+      "type": "object",
+      "properties": {
+        "task_type": {
+          "type": "string",
+          "description": "A predefined yet extensible Task type identifier."
+        },
+        "plugin_id": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A set of plugin ids which should handle tasks of this type instead of the default registered plugin. The list will be tried in order until a plugin is found with that id."
+        },
+        "missing_plugin_behavior": {
+          "$ref": "#/definitions/PluginOverrideMissingPluginBehavior",
+          "description": "Defines the behavior when no plugin from the plugin_id list is not found."
+        }
+      },
+      "description": "This MatchableAttribute configures selecting alternate plugin implementations for a given task type.\nIn addition to an override implementation a selection of fallbacks can be provided or other modes\nfor handling cases where the desired plugin override is not enabled in a given Flyte deployment."
     },
     "adminProject": {
       "type": "object",
