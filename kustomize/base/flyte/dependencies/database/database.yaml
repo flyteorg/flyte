@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          emptyDir: {}
+      containers:
+      - image: "postgres:10.1"
+        name: postgres
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+---
+ apiVersion: v1
+ kind: Service
+ metadata:
+   name: postgres
+   namespace: flyte
+ spec:
+   ports:
+   - port: 5432
+   selector:
+     app: postgres

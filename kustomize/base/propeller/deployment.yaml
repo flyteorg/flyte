@@ -26,9 +26,6 @@ spec:
       - name: config-volume
         configMap:
           name: flyte-propeller-config
-      - name: plugin-config-volume
-        configMap:
-          name: flyte-plugin-config
       containers:
       - name: flytepropeller
         image: flytepropeller:v0.3.12
@@ -36,7 +33,7 @@ spec:
         - flytepropeller
         args:
         - --config
-        - /etc/flyte/config*/config.yaml
+        - /etc/flyte/config/*.yaml
         env:
         - name: POD_NAME
           valueFrom:
@@ -48,5 +45,3 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
-        - name: plugin-config-volume
-          mountPath: /etc/flyte/config-plugin

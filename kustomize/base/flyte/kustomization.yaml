@@ -1,6 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: flyte-test
+
+# Override the namespace
+namespace: flyte
+
+# Images that should be used
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
@@ -8,7 +12,7 @@ images:
     newName: docker.io/lyft/flyteadmin # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: 0.3.12 # override the tag
+    newTag: v0.3.12 # override the tag
     newName: docker.io/lyft/flytepropeller # override the name
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
@@ -18,15 +22,17 @@ images:
   - name: flyteconsole # match images with this name
     newTag: v0.11.0 # override the tag
     newName: docker.io/lyft/flyteconsole # override the name
+
+# All the resources that make up the deployment
 resources:
 # global resources
 - ../namespace
-- ../../dependencies/database
-- ../../dependencies/storage
+- ./dependencies/database
+- ./dependencies/storage
 
 # user plane / control plane resources
 - ../ingress
-- ../../dependencies/contour_ingress_controller
+- ./dependencies/contour_ingress_controller
 - ../admindeployment
 - ../datacatalog
 - ../console
@@ -36,5 +42,40 @@ resources:
 - ../operators/spark
 - ../adminserviceaccount
 - ../propeller
-- ../../dependencies/redis
+- ./dependencies/redis
 
+configMapGenerator:
+# the main admin configmap
+- name: flyte-admin-config
+  files:
+    - ./config/admin.yaml
+    - ./config/db.yaml
+    - ./config/storage.yaml
+    - ./config/logger.yaml
+# cluster resource templates
+- name: clusterresource-template
+  files:
+# Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
+    - ./config/clusterresource-templates/aa_namespace.yaml
+    - ./config/clusterresource-templates/ab_project-resource-quota.yaml
+    - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
+    - ./config/clusterresource-templates/ad_spark-role.yaml
+    - ./config/clusterresource-templates/ae_spark-service-account.yaml
+    - ./config/clusterresource-templates/af_spark-role-binding.yaml
+# Flyte Propeller Configuration
+- name: flyte-propeller-config
+  files:
+    - ./config/propeller.yaml
+    - ./config/storage.yaml
+    - ./config/logger.yaml
+# Flyte Console Configuration
+#- name: flyte-console-config
+#  files:
+#    - ./config/console.yaml
+
+
+- name: datacatalog-config
+  files:
+    - ./config/datacatalog.yaml
+    - ./config/storage.yaml
+    - ./config/logger.yaml
