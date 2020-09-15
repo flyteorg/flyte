@@ -37,7 +37,7 @@ resources:
   ########
   # Operators to be enabled
 - ../operators/spark
-- ../operators/sagemaker
+  #- ../operators/sagemaker
 - ../operators/kfoperators/pytorch
   #- ../operators/kfoperators/tensorflow
   ###########
