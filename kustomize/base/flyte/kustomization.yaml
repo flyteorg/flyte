@@ -33,7 +33,7 @@ resources:
 # user plane / control plane resources
 - ../ingress
 - ./dependencies/contour_ingress_controller
-- ../admindeployment
+- ./admin/
 - ../datacatalog
 - ../console
 
@@ -52,6 +52,7 @@ configMapGenerator:
     - ./config/db.yaml
     - ./config/storage.yaml
     - ./config/logger.yaml
+      
 # cluster resource templates
 - name: clusterresource-template
   files:
@@ -62,17 +63,23 @@ configMapGenerator:
     - ./config/clusterresource-templates/ad_spark-role.yaml
     - ./config/clusterresource-templates/ae_spark-service-account.yaml
     - ./config/clusterresource-templates/af_spark-role-binding.yaml
+
 # Flyte Propeller Configuration
 - name: flyte-propeller-config
   files:
     - ./config/propeller.yaml
+    - ./config/enabled_plugins.yaml
+    - ./config/plugins/copilot.yaml
+    - ./config/plugins/k8s.yaml
+    - ./config/plugins/qubole.yaml
+    - ./config/plugins/spark.yaml
+    - ./config/plugins/task_logs.yaml
     - ./config/storage.yaml
     - ./config/logger.yaml
 # Flyte Console Configuration
 #- name: flyte-console-config
 #  files:
 #    - ./config/console.yaml
-
 
 - name: datacatalog-config
   files:

@@ -54,3 +54,6 @@ spec:
           name: redis-data
       dnsPolicy: ClusterFirst
       restartPolicy: Always
+      volumes:
+        - name: redis-data
+          emptyDir: {}

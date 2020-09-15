@@ -1,0 +1,5 @@
+bases:
+- ../../admindeployment
+
+patches:
+- deployment.yaml

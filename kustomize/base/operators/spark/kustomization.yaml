@@ -3,3 +3,12 @@ resources:
 - spark-dummy-crd.yaml
 - deployment.yaml
 - webhook.yaml
+
+vars:
+  - name: NAMESPACE
+    objref:
+      kind: Deployment
+      name: sparkoperator
+      apiVersion: apps/v1
+    fieldref:
+      fieldpath: metadata.namespace

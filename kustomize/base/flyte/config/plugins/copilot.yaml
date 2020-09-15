@@ -1,4 +1,5 @@
 plugins:
+  k8s:
     co-pilot:
       name: "flyte-copilot-"
       image: "docker.io/lyft/flytecopilot:v0.3.35"
