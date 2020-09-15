@@ -27,23 +27,42 @@ images:
 resources:
 # global resources
 - ../namespace
-- ./dependencies/database
-- ./dependencies/storage
-
-# user plane / control plane resources
 - ../ingress
-- ./dependencies/contour_ingress_controller
 - ./admin/
 - ../datacatalog
 - ../console
-
-# data plane resources
 - ../wf_crd
-- ../operators/spark
-- ../adminserviceaccount
 - ../propeller
+- ../adminserviceaccount
+  ########
+  # Operators to be enabled
+- ../operators/spark
+- ../operators/sagemaker
+- ../operators/kfoperators/pytorch
+  #- ../operators/kfoperators/tensorflow
+  ###########
+  # Used to store data. In production use hosted SQL Servers - e.g. Postgres (AWS RDS), Aurora postgres (AWS RDS), CLOUDSQL (GCP) etc
+- ./dependencies/database
+  ##########
+  # In local we use minio, but in cloud environment use S3 / GCS / AFS / Oracle Blob store etc
+- ./dependencies/storage
+  #####
+  # This is used for Resource pooling. On cloud you can use hosted redis (e.g. AWS elasticache)
 - ./dependencies/redis
+  ###### 
+  # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
+- ./dependencies/contour_ingress_controller
 
+##############################################  
+# Generate Configs
+# For each component exactly one config is generated
+# For every component required configs are
+# 1. logger.yaml
+# 2. storage.yaml
+# 3. component.yaml
+#
+# db.yaml is required for FlyteAdmin and DataCatalog
+# ############################################
 configMapGenerator:
 # the main admin configmap
 - name: flyte-admin-config
@@ -76,7 +95,8 @@ configMapGenerator:
     - ./config/plugins/task_logs.yaml
     - ./config/storage.yaml
     - ./config/logger.yaml
-# Flyte Console Configuration
+
+# TODO Flyte Console Configuration
 #- name: flyte-console-config
 #  files:
 #    - ./config/console.yaml

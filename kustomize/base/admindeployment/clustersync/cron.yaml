@@ -14,7 +14,7 @@ spec:
           - name: sync-cluster-resources
             image: flyteadmin:v0.3.5
             imagePullPolicy: IfNotPresent
-            command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
+            command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
             volumeMounts:
             - name: resource-templates 
               mountPath: /etc/flyte/clusterresource/templates
