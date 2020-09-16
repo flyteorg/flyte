@@ -55,7 +55,7 @@ cluster_resources:
           value: "3000Mi"
     development:
       - projectQuotaCpu:
-          value: "2"
+          value: "4"
       - projectQuotaMemory:
           value: "3000Mi"
   refresh: 5m

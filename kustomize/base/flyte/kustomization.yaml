@@ -52,6 +52,8 @@ resources:
   ###### 
   # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
 - ./dependencies/contour_ingress_controller
+  # Add node ports for ease of use locally
+- ./dependencies/nodeport-services.yaml
 
 ##############################################  
 # Generate Configs

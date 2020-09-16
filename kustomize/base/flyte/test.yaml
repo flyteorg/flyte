@@ -801,7 +801,7 @@ data:
               value: "3000Mi"
         development:
           - projectQuotaCpu:
-              value: "2"
+              value: "4"
           - projectQuotaMemory:
               value: "3000Mi"
       refresh: 5m
@@ -830,7 +830,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-8728tmmd5f
+  name: flyte-admin-config-gbk8k2985m
   namespace: flyte
 ---
 apiVersion: v1
@@ -866,6 +866,8 @@ data:
           - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        default-cpus: 100m
+        default-memory: 100Mi
   logger.yaml: |
     logger:
       show-source: true
@@ -959,7 +961,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-gk57799d87
+  name: flyte-propeller-config-4c748k96th
   namespace: flyte
 ---
 apiVersion: v1
@@ -1050,6 +1052,22 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  labels:
+    app: minio
+  name: minio-direct
+  namespace: flyte
+spec:
+  ports:
+  - nodePort: 30084
+    port: 9000
+    protocol: TCP
+  selector:
+    app: minio
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: postgres
   namespace: flyte
 spec:
@@ -1057,6 +1075,22 @@ spec:
   - port: 5432
   selector:
     app: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: postgres
+  name: postgres-direct
+  namespace: flyte
+spec:
+  ports:
+  - nodePort: 30083
+    port: 5432
+    protocol: TCP
+  selector:
+    app: postgres
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
@@ -1375,7 +1409,7 @@ spec:
       volumes:
       - name: shared-data
       - configMap:
-          name: flyte-admin-config-8728tmmd5f
+          name: flyte-admin-config-gbk8k2985m
         name: config-volume
       - configMap:
           name: clusterresource-template-kf62ttf64k
@@ -1459,7 +1493,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-gk57799d87
+          name: flyte-propeller-config-4c748k96th
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1709,7 +1743,7 @@ spec:
               name: clusterresource-template-kf62ttf64k
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-8728tmmd5f
+              name: flyte-admin-config-gbk8k2985m
             name: config-volume
   schedule: '*/1 * * * *'
 ---
