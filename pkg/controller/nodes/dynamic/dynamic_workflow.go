@@ -291,9 +291,11 @@ func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context,
 		if err != nil {
 			logger.Debugf(ctx, "Error fetching launch plan definition from admin")
 			if launchplan.IsNotFound(err) || launchplan.IsUserError(err) {
-				return nil, errors.Wrapf(utils.ErrorCodeUser, err, "incorrectly specified launchplan")
+				return nil, errors.Wrapf(utils.ErrorCodeUser, err, "incorrectly specified launchplan %s:%s:%s:%s",
+					id.Project, id.Domain, id.Name, id.Version)
 			}
-			return nil, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to retrieve launchplan information")
+			return nil, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to retrieve launchplan information %s:%s:%s:%s",
+				id.Project, id.Domain, id.Name, id.Version)
 		}
 		launchPlanInterfaces[idx] = compiler.NewLaunchPlanInterfaceProvider(*lp)
 	}
