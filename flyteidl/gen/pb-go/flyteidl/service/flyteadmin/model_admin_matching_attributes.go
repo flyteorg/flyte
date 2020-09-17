@@ -16,5 +16,5 @@ type AdminMatchingAttributes struct {
 	ExecutionQueueAttributes *AdminExecutionQueueAttributes `json:"execution_queue_attributes,omitempty"`
 	ExecutionClusterLabel *AdminExecutionClusterLabel `json:"execution_cluster_label,omitempty"`
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`
-	PluginOverride *AdminPluginOverride `json:"plugin_override,omitempty"`
+	PluginOverrides *AdminPluginOverrides `json:"plugin_overrides,omitempty"`
 }

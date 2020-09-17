@@ -470,6 +470,86 @@ var _ interface {
 	ErrorName() string
 } = PluginOverrideValidationError{}
 
+// Validate checks the field values on PluginOverrides with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *PluginOverrides) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetOverrides() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PluginOverridesValidationError{
+					field:  fmt.Sprintf("Overrides[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// PluginOverridesValidationError is the validation error returned by
+// PluginOverrides.Validate if the designated constraints aren't met.
+type PluginOverridesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PluginOverridesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PluginOverridesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PluginOverridesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PluginOverridesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PluginOverridesValidationError) ErrorName() string { return "PluginOverridesValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PluginOverridesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPluginOverrides.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PluginOverridesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PluginOverridesValidationError{}
+
 // Validate checks the field values on MatchingAttributes with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -540,12 +620,12 @@ func (m *MatchingAttributes) Validate() error {
 			}
 		}
 
-	case *MatchingAttributes_PluginOverride:
+	case *MatchingAttributes_PluginOverrides:
 
-		if v, ok := interface{}(m.GetPluginOverride()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetPluginOverrides()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return MatchingAttributesValidationError{
-					field:  "PluginOverride",
+					field:  "PluginOverrides",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

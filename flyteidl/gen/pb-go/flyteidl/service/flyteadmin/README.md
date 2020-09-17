@@ -127,6 +127,7 @@ Class | Method | HTTP request | Description
  - [AdminNotificationList](docs/AdminNotificationList.md)
  - [AdminPagerDutyNotification](docs/AdminPagerDutyNotification.md)
  - [AdminPluginOverride](docs/AdminPluginOverride.md)
+ - [AdminPluginOverrides](docs/AdminPluginOverrides.md)
  - [AdminProject](docs/AdminProject.md)
  - [AdminProjectDomainAttributes](docs/AdminProjectDomainAttributes.md)
  - [AdminProjectDomainAttributesDeleteRequest](docs/AdminProjectDomainAttributesDeleteRequest.md)
