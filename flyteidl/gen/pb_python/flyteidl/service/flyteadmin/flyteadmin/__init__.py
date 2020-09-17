@@ -77,6 +77,7 @@ from flyteadmin.models.admin_notification import AdminNotification
 from flyteadmin.models.admin_notification_list import AdminNotificationList
 from flyteadmin.models.admin_pager_duty_notification import AdminPagerDutyNotification
 from flyteadmin.models.admin_plugin_override import AdminPluginOverride
+from flyteadmin.models.admin_plugin_overrides import AdminPluginOverrides
 from flyteadmin.models.admin_project import AdminProject
 from flyteadmin.models.admin_project_domain_attributes import AdminProjectDomainAttributes
 from flyteadmin.models.admin_project_domain_attributes_delete_request import AdminProjectDomainAttributesDeleteRequest

@@ -22744,6 +22744,126 @@ export const flyteidl = $root.flyteidl = (() => {
             return PluginOverride;
         })();
 
+        admin.PluginOverrides = (function() {
+
+            /**
+             * Properties of a PluginOverrides.
+             * @memberof flyteidl.admin
+             * @interface IPluginOverrides
+             * @property {Array.<flyteidl.admin.IPluginOverride>|null} [overrides] PluginOverrides overrides
+             */
+
+            /**
+             * Constructs a new PluginOverrides.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a PluginOverrides.
+             * @implements IPluginOverrides
+             * @constructor
+             * @param {flyteidl.admin.IPluginOverrides=} [properties] Properties to set
+             */
+            function PluginOverrides(properties) {
+                this.overrides = [];
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * PluginOverrides overrides.
+             * @member {Array.<flyteidl.admin.IPluginOverride>} overrides
+             * @memberof flyteidl.admin.PluginOverrides
+             * @instance
+             */
+            PluginOverrides.prototype.overrides = $util.emptyArray;
+
+            /**
+             * Creates a new PluginOverrides instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.PluginOverrides
+             * @static
+             * @param {flyteidl.admin.IPluginOverrides=} [properties] Properties to set
+             * @returns {flyteidl.admin.PluginOverrides} PluginOverrides instance
+             */
+            PluginOverrides.create = function create(properties) {
+                return new PluginOverrides(properties);
+            };
+
+            /**
+             * Encodes the specified PluginOverrides message. Does not implicitly {@link flyteidl.admin.PluginOverrides.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.PluginOverrides
+             * @static
+             * @param {flyteidl.admin.IPluginOverrides} message PluginOverrides message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            PluginOverrides.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.overrides != null && message.overrides.length)
+                    for (let i = 0; i < message.overrides.length; ++i)
+                        $root.flyteidl.admin.PluginOverride.encode(message.overrides[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a PluginOverrides message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.PluginOverrides
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.PluginOverrides} PluginOverrides
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            PluginOverrides.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.PluginOverrides();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        if (!(message.overrides && message.overrides.length))
+                            message.overrides = [];
+                        message.overrides.push($root.flyteidl.admin.PluginOverride.decode(reader, reader.uint32()));
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a PluginOverrides message.
+             * @function verify
+             * @memberof flyteidl.admin.PluginOverrides
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            PluginOverrides.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.overrides != null && message.hasOwnProperty("overrides")) {
+                    if (!Array.isArray(message.overrides))
+                        return "overrides: array expected";
+                    for (let i = 0; i < message.overrides.length; ++i) {
+                        let error = $root.flyteidl.admin.PluginOverride.verify(message.overrides[i]);
+                        if (error)
+                            return "overrides." + error;
+                    }
+                }
+                return null;
+            };
+
+            return PluginOverrides;
+        })();
+
         admin.MatchingAttributes = (function() {
 
             /**
@@ -22755,7 +22875,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.IExecutionQueueAttributes|null} [executionQueueAttributes] MatchingAttributes executionQueueAttributes
              * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] MatchingAttributes executionClusterLabel
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] MatchingAttributes qualityOfService
-             * @property {flyteidl.admin.IPluginOverride|null} [pluginOverride] MatchingAttributes pluginOverride
+             * @property {flyteidl.admin.IPluginOverrides|null} [pluginOverrides] MatchingAttributes pluginOverrides
              */
 
             /**
@@ -22814,24 +22934,24 @@ export const flyteidl = $root.flyteidl = (() => {
             MatchingAttributes.prototype.qualityOfService = null;
 
             /**
-             * MatchingAttributes pluginOverride.
-             * @member {flyteidl.admin.IPluginOverride|null|undefined} pluginOverride
+             * MatchingAttributes pluginOverrides.
+             * @member {flyteidl.admin.IPluginOverrides|null|undefined} pluginOverrides
              * @memberof flyteidl.admin.MatchingAttributes
              * @instance
              */
-            MatchingAttributes.prototype.pluginOverride = null;
+            MatchingAttributes.prototype.pluginOverrides = null;
 
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
             /**
              * MatchingAttributes target.
-             * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverride"|undefined} target
+             * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|undefined} target
              * @memberof flyteidl.admin.MatchingAttributes
              * @instance
              */
             Object.defineProperty(MatchingAttributes.prototype, "target", {
-                get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverride"]),
+                get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -22869,8 +22989,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.ExecutionClusterLabel.encode(message.executionClusterLabel, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-                if (message.pluginOverride != null && message.hasOwnProperty("pluginOverride"))
-                    $root.flyteidl.admin.PluginOverride.encode(message.pluginOverride, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides"))
+                    $root.flyteidl.admin.PluginOverrides.encode(message.pluginOverrides, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                 return writer;
             };
 
@@ -22908,7 +23028,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
                         break;
                     case 6:
-                        message.pluginOverride = $root.flyteidl.admin.PluginOverride.decode(reader, reader.uint32());
+                        message.pluginOverrides = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -22978,14 +23098,14 @@ export const flyteidl = $root.flyteidl = (() => {
                             return "qualityOfService." + error;
                     }
                 }
-                if (message.pluginOverride != null && message.hasOwnProperty("pluginOverride")) {
+                if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides")) {
                     if (properties.target === 1)
                         return "target: multiple values";
                     properties.target = 1;
                     {
-                        let error = $root.flyteidl.admin.PluginOverride.verify(message.pluginOverride);
+                        let error = $root.flyteidl.admin.PluginOverrides.verify(message.pluginOverrides);
                         if (error)
-                            return "pluginOverride." + error;
+                            return "pluginOverrides." + error;
                     }
                 }
                 return null;

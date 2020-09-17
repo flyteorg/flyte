@@ -82,6 +82,11 @@ message PluginOverride {
   MissingPluginBehavior missing_plugin_behavior = 4;
 }
 
+
+message PluginOverrides {
+  repeated PluginOverride overrides = 1;
+}
+
 // Generic container for encapsulating all types of the above attributes messages.
 message MatchingAttributes {
   oneof target {
@@ -95,7 +100,7 @@ message MatchingAttributes {
 
     core.QualityOfService quality_of_service = 5;
 
-    PluginOverride plugin_override = 6;
+    PluginOverrides plugin_overrides = 6;
   }
 }
 

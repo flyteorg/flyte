@@ -47,7 +47,7 @@ struct TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[11]
+  static const ::google::protobuf::internal::ParseTable schema[12]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -83,6 +83,9 @@ extern MatchingAttributesDefaultTypeInternal _MatchingAttributes_default_instanc
 class PluginOverride;
 class PluginOverrideDefaultTypeInternal;
 extern PluginOverrideDefaultTypeInternal _PluginOverride_default_instance_;
+class PluginOverrides;
+class PluginOverridesDefaultTypeInternal;
+extern PluginOverridesDefaultTypeInternal _PluginOverrides_default_instance_;
 class TaskResourceAttributes;
 class TaskResourceAttributesDefaultTypeInternal;
 extern TaskResourceAttributesDefaultTypeInternal _TaskResourceAttributes_default_instance_;
@@ -102,6 +105,7 @@ template<> ::flyteidl::admin::ListMatchableAttributesResponse* Arena::CreateMayb
 template<> ::flyteidl::admin::MatchableAttributesConfiguration* Arena::CreateMaybeMessage<::flyteidl::admin::MatchableAttributesConfiguration>(Arena*);
 template<> ::flyteidl::admin::MatchingAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::MatchingAttributes>(Arena*);
 template<> ::flyteidl::admin::PluginOverride* Arena::CreateMaybeMessage<::flyteidl::admin::PluginOverride>(Arena*);
+template<> ::flyteidl::admin::PluginOverrides* Arena::CreateMaybeMessage<::flyteidl::admin::PluginOverrides>(Arena*);
 template<> ::flyteidl::admin::TaskResourceAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceAttributes>(Arena*);
 template<> ::flyteidl::admin::TaskResourceSpec* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceSpec>(Arena*);
 }  // namespace protobuf
@@ -1016,6 +1020,124 @@ class PluginOverride final :
 };
 // -------------------------------------------------------------------
 
+class PluginOverrides final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.PluginOverrides) */ {
+ public:
+  PluginOverrides();
+  virtual ~PluginOverrides();
+
+  PluginOverrides(const PluginOverrides& from);
+
+  inline PluginOverrides& operator=(const PluginOverrides& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  PluginOverrides(PluginOverrides&& from) noexcept
+    : PluginOverrides() {
+    *this = ::std::move(from);
+  }
+
+  inline PluginOverrides& operator=(PluginOverrides&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const PluginOverrides& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const PluginOverrides* internal_default_instance() {
+    return reinterpret_cast<const PluginOverrides*>(
+               &_PluginOverrides_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(PluginOverrides* other);
+  friend void swap(PluginOverrides& a, PluginOverrides& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PluginOverrides* New() const final {
+    return CreateMaybeMessage<PluginOverrides>(nullptr);
+  }
+
+  PluginOverrides* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<PluginOverrides>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const PluginOverrides& from);
+  void MergeFrom(const PluginOverrides& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PluginOverrides* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .flyteidl.admin.PluginOverride overrides = 1;
+  int overrides_size() const;
+  void clear_overrides();
+  static const int kOverridesFieldNumber = 1;
+  ::flyteidl::admin::PluginOverride* mutable_overrides(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::PluginOverride >*
+      mutable_overrides();
+  const ::flyteidl::admin::PluginOverride& overrides(int index) const;
+  ::flyteidl::admin::PluginOverride* add_overrides();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::PluginOverride >&
+      overrides() const;
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.PluginOverrides)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::PluginOverride > overrides_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MatchingAttributes final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.MatchingAttributes) */ {
  public:
@@ -1054,7 +1176,7 @@ class MatchingAttributes final :
     kExecutionQueueAttributes = 3,
     kExecutionClusterLabel = 4,
     kQualityOfService = 5,
-    kPluginOverride = 6,
+    kPluginOverrides = 6,
     TARGET_NOT_SET = 0,
   };
 
@@ -1064,7 +1186,7 @@ class MatchingAttributes final :
                &_MatchingAttributes_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(MatchingAttributes* other);
   friend void swap(MatchingAttributes& a, MatchingAttributes& b) {
@@ -1166,14 +1288,14 @@ class MatchingAttributes final :
   ::flyteidl::core::QualityOfService* mutable_quality_of_service();
   void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
 
-  // .flyteidl.admin.PluginOverride plugin_override = 6;
-  bool has_plugin_override() const;
-  void clear_plugin_override();
-  static const int kPluginOverrideFieldNumber = 6;
-  const ::flyteidl::admin::PluginOverride& plugin_override() const;
-  ::flyteidl::admin::PluginOverride* release_plugin_override();
-  ::flyteidl::admin::PluginOverride* mutable_plugin_override();
-  void set_allocated_plugin_override(::flyteidl::admin::PluginOverride* plugin_override);
+  // .flyteidl.admin.PluginOverrides plugin_overrides = 6;
+  bool has_plugin_overrides() const;
+  void clear_plugin_overrides();
+  static const int kPluginOverridesFieldNumber = 6;
+  const ::flyteidl::admin::PluginOverrides& plugin_overrides() const;
+  ::flyteidl::admin::PluginOverrides* release_plugin_overrides();
+  ::flyteidl::admin::PluginOverrides* mutable_plugin_overrides();
+  void set_allocated_plugin_overrides(::flyteidl::admin::PluginOverrides* plugin_overrides);
 
   void clear_target();
   TargetCase target_case() const;
@@ -1185,7 +1307,7 @@ class MatchingAttributes final :
   void set_has_execution_queue_attributes();
   void set_has_execution_cluster_label();
   void set_has_quality_of_service();
-  void set_has_plugin_override();
+  void set_has_plugin_overrides();
 
   inline bool has_target() const;
   inline void clear_has_target();
@@ -1198,7 +1320,7 @@ class MatchingAttributes final :
     ::flyteidl::admin::ExecutionQueueAttributes* execution_queue_attributes_;
     ::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label_;
     ::flyteidl::core::QualityOfService* quality_of_service_;
-    ::flyteidl::admin::PluginOverride* plugin_override_;
+    ::flyteidl::admin::PluginOverrides* plugin_overrides_;
   } target_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -1245,7 +1367,7 @@ class MatchableAttributesConfiguration final :
                &_MatchableAttributesConfiguration_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(MatchableAttributesConfiguration* other);
   friend void swap(MatchableAttributesConfiguration& a, MatchableAttributesConfiguration& b) {
@@ -1420,7 +1542,7 @@ class ListMatchableAttributesRequest final :
                &_ListMatchableAttributesRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(ListMatchableAttributesRequest* other);
   friend void swap(ListMatchableAttributesRequest& a, ListMatchableAttributesRequest& b) {
@@ -1532,7 +1654,7 @@ class ListMatchableAttributesResponse final :
                &_ListMatchableAttributesResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(ListMatchableAttributesResponse* other);
   friend void swap(ListMatchableAttributesResponse& a, ListMatchableAttributesResponse& b) {
@@ -2235,6 +2357,40 @@ inline void PluginOverride::set_missing_plugin_behavior(::flyteidl::admin::Plugi
 
 // -------------------------------------------------------------------
 
+// PluginOverrides
+
+// repeated .flyteidl.admin.PluginOverride overrides = 1;
+inline int PluginOverrides::overrides_size() const {
+  return overrides_.size();
+}
+inline void PluginOverrides::clear_overrides() {
+  overrides_.Clear();
+}
+inline ::flyteidl::admin::PluginOverride* PluginOverrides::mutable_overrides(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.PluginOverrides.overrides)
+  return overrides_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::PluginOverride >*
+PluginOverrides::mutable_overrides() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.PluginOverrides.overrides)
+  return &overrides_;
+}
+inline const ::flyteidl::admin::PluginOverride& PluginOverrides::overrides(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.PluginOverrides.overrides)
+  return overrides_.Get(index);
+}
+inline ::flyteidl::admin::PluginOverride* PluginOverrides::add_overrides() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.PluginOverrides.overrides)
+  return overrides_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::PluginOverride >&
+PluginOverrides::overrides() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.PluginOverrides.overrides)
+  return overrides_;
+}
+
+// -------------------------------------------------------------------
+
 // MatchingAttributes
 
 // .flyteidl.admin.TaskResourceAttributes task_resource_attributes = 1;
@@ -2436,45 +2592,45 @@ inline ::flyteidl::core::QualityOfService* MatchingAttributes::mutable_quality_o
   return target_.quality_of_service_;
 }
 
-// .flyteidl.admin.PluginOverride plugin_override = 6;
-inline bool MatchingAttributes::has_plugin_override() const {
-  return target_case() == kPluginOverride;
+// .flyteidl.admin.PluginOverrides plugin_overrides = 6;
+inline bool MatchingAttributes::has_plugin_overrides() const {
+  return target_case() == kPluginOverrides;
 }
-inline void MatchingAttributes::set_has_plugin_override() {
-  _oneof_case_[0] = kPluginOverride;
+inline void MatchingAttributes::set_has_plugin_overrides() {
+  _oneof_case_[0] = kPluginOverrides;
 }
-inline void MatchingAttributes::clear_plugin_override() {
-  if (has_plugin_override()) {
-    delete target_.plugin_override_;
+inline void MatchingAttributes::clear_plugin_overrides() {
+  if (has_plugin_overrides()) {
+    delete target_.plugin_overrides_;
     clear_has_target();
   }
 }
-inline ::flyteidl::admin::PluginOverride* MatchingAttributes::release_plugin_override() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchingAttributes.plugin_override)
-  if (has_plugin_override()) {
+inline ::flyteidl::admin::PluginOverrides* MatchingAttributes::release_plugin_overrides() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchingAttributes.plugin_overrides)
+  if (has_plugin_overrides()) {
     clear_has_target();
-      ::flyteidl::admin::PluginOverride* temp = target_.plugin_override_;
-    target_.plugin_override_ = nullptr;
+      ::flyteidl::admin::PluginOverrides* temp = target_.plugin_overrides_;
+    target_.plugin_overrides_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::flyteidl::admin::PluginOverride& MatchingAttributes::plugin_override() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchingAttributes.plugin_override)
-  return has_plugin_override()
-      ? *target_.plugin_override_
-      : *reinterpret_cast< ::flyteidl::admin::PluginOverride*>(&::flyteidl::admin::_PluginOverride_default_instance_);
+inline const ::flyteidl::admin::PluginOverrides& MatchingAttributes::plugin_overrides() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchingAttributes.plugin_overrides)
+  return has_plugin_overrides()
+      ? *target_.plugin_overrides_
+      : *reinterpret_cast< ::flyteidl::admin::PluginOverrides*>(&::flyteidl::admin::_PluginOverrides_default_instance_);
 }
-inline ::flyteidl::admin::PluginOverride* MatchingAttributes::mutable_plugin_override() {
-  if (!has_plugin_override()) {
+inline ::flyteidl::admin::PluginOverrides* MatchingAttributes::mutable_plugin_overrides() {
+  if (!has_plugin_overrides()) {
     clear_target();
-    set_has_plugin_override();
-    target_.plugin_override_ = CreateMaybeMessage< ::flyteidl::admin::PluginOverride >(
+    set_has_plugin_overrides();
+    target_.plugin_overrides_ = CreateMaybeMessage< ::flyteidl::admin::PluginOverrides >(
         GetArenaNoVirtual());
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.plugin_override)
-  return target_.plugin_override_;
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.plugin_overrides)
+  return target_.plugin_overrides_;
 }
 
 inline bool MatchingAttributes::has_target() const {
@@ -2808,6 +2964,8 @@ ListMatchableAttributesResponse::configurations() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

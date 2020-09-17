@@ -4712,14 +4712,20 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
-          plugin_override:
-            plugin_id:
-            - "plugin_id"
-            - "plugin_id"
-            missing_plugin_behavior: {}
-            task_type: "task_type"
           execution_cluster_label:
             value: "value"
+          plugin_overrides:
+            overrides:
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
       - launch_plan: "launch_plan"
         workflow: "workflow"
         domain: "domain"
@@ -4747,14 +4753,20 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
-          plugin_override:
-            plugin_id:
-            - "plugin_id"
-            - "plugin_id"
-            missing_plugin_behavior: {}
-            task_type: "task_type"
           execution_cluster_label:
             value: "value"
+          plugin_overrides:
+            overrides:
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
   adminLiteralMapBlob:
     type: "object"
     properties:
@@ -4813,14 +4825,20 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
-        plugin_override:
-          plugin_id:
-          - "plugin_id"
-          - "plugin_id"
-          missing_plugin_behavior: {}
-          task_type: "task_type"
         execution_cluster_label:
           value: "value"
+        plugin_overrides:
+          overrides:
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
   adminMatchableResource:
     type: "string"
     description: "Defines a resource that can be configured by customizable Project-,\
@@ -4853,8 +4871,8 @@ definitions:
         $ref: "#/definitions/adminExecutionClusterLabel"
       quality_of_service:
         $ref: "#/definitions/coreQualityOfService"
-      plugin_override:
-        $ref: "#/definitions/adminPluginOverride"
+      plugin_overrides:
+        $ref: "#/definitions/adminPluginOverrides"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
     example:
@@ -4880,14 +4898,20 @@ definitions:
           cpu: "cpu"
           storage: "storage"
           gpu: "gpu"
-      plugin_override:
-        plugin_id:
-        - "plugin_id"
-        - "plugin_id"
-        missing_plugin_behavior: {}
-        task_type: "task_type"
       execution_cluster_label:
         value: "value"
+      plugin_overrides:
+        overrides:
+        - plugin_id:
+          - "plugin_id"
+          - "plugin_id"
+          missing_plugin_behavior: {}
+          task_type: "task_type"
+        - plugin_id:
+          - "plugin_id"
+          - "plugin_id"
+          missing_plugin_behavior: {}
+          task_type: "task_type"
   adminNamedEntity:
     type: "object"
     properties:
@@ -5401,6 +5425,25 @@ definitions:
       - "plugin_id"
       missing_plugin_behavior: {}
       task_type: "task_type"
+  adminPluginOverrides:
+    type: "object"
+    properties:
+      overrides:
+        type: "array"
+        items:
+          $ref: "#/definitions/adminPluginOverride"
+    example:
+      overrides:
+      - plugin_id:
+        - "plugin_id"
+        - "plugin_id"
+        missing_plugin_behavior: {}
+        task_type: "task_type"
+      - plugin_id:
+        - "plugin_id"
+        - "plugin_id"
+        missing_plugin_behavior: {}
+        task_type: "task_type"
   adminProject:
     type: "object"
     properties:
@@ -5470,14 +5513,20 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
-        plugin_override:
-          plugin_id:
-          - "plugin_id"
-          - "plugin_id"
-          missing_plugin_behavior: {}
-          task_type: "task_type"
         execution_cluster_label:
           value: "value"
+        plugin_overrides:
+          overrides:
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
   adminProjectDomainAttributesDeleteRequest:
     type: "object"
     properties:
@@ -5524,14 +5573,20 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
-          plugin_override:
-            plugin_id:
-            - "plugin_id"
-            - "plugin_id"
-            missing_plugin_behavior: {}
-            task_type: "task_type"
           execution_cluster_label:
             value: "value"
+          plugin_overrides:
+            overrides:
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
   adminProjectDomainAttributesUpdateRequest:
     type: "object"
     properties:
@@ -9305,14 +9360,20 @@ definitions:
             cpu: "cpu"
             storage: "storage"
             gpu: "gpu"
-        plugin_override:
-          plugin_id:
-          - "plugin_id"
-          - "plugin_id"
-          missing_plugin_behavior: {}
-          task_type: "task_type"
         execution_cluster_label:
           value: "value"
+        plugin_overrides:
+          overrides:
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
+          - plugin_id:
+            - "plugin_id"
+            - "plugin_id"
+            missing_plugin_behavior: {}
+            task_type: "task_type"
   adminWorkflowAttributesDeleteRequest:
     type: "object"
     properties:
@@ -9363,14 +9424,20 @@ definitions:
               cpu: "cpu"
               storage: "storage"
               gpu: "gpu"
-          plugin_override:
-            plugin_id:
-            - "plugin_id"
-            - "plugin_id"
-            missing_plugin_behavior: {}
-            task_type: "task_type"
           execution_cluster_label:
             value: "value"
+          plugin_overrides:
+            overrides:
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
+            - plugin_id:
+              - "plugin_id"
+              - "plugin_id"
+              missing_plugin_behavior: {}
+              task_type: "task_type"
   adminWorkflowAttributesUpdateRequest:
     type: "object"
     properties:

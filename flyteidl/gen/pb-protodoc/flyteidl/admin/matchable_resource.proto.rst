@@ -195,12 +195,33 @@ USE_DEFAULT
   
   
 
+.. _api_msg_flyteidl.admin.PluginOverrides:
+
+flyteidl.admin.PluginOverrides
+------------------------------
+
+`[flyteidl.admin.PluginOverrides proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L85>`_
+
+
+.. code-block:: json
+
+  {
+    "overrides": []
+  }
+
+.. _api_field_flyteidl.admin.PluginOverrides.overrides:
+
+overrides
+  (:ref:`flyteidl.admin.PluginOverride <api_msg_flyteidl.admin.PluginOverride>`) 
+  
+
+
 .. _api_msg_flyteidl.admin.MatchingAttributes:
 
 flyteidl.admin.MatchingAttributes
 ---------------------------------
 
-`[flyteidl.admin.MatchingAttributes proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L85>`_
+`[flyteidl.admin.MatchingAttributes proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L90>`_
 
 Generic container for encapsulating all types of the above attributes messages.
 
@@ -212,7 +233,7 @@ Generic container for encapsulating all types of the above attributes messages.
     "execution_queue_attributes": "{...}",
     "execution_cluster_label": "{...}",
     "quality_of_service": "{...}",
-    "plugin_override": "{...}"
+    "plugin_overrides": "{...}"
   }
 
 .. _api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes:
@@ -221,7 +242,7 @@ task_resource_attributes
   (:ref:`flyteidl.admin.TaskResourceAttributes <api_msg_flyteidl.admin.TaskResourceAttributes>`) 
   
   
-  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_override <api_field_flyteidl.admin.MatchingAttributes.plugin_override>` may be set.
+  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_overrides <api_field_flyteidl.admin.MatchingAttributes.plugin_overrides>` may be set.
   
 .. _api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes:
 
@@ -229,7 +250,7 @@ cluster_resource_attributes
   (:ref:`flyteidl.admin.ClusterResourceAttributes <api_msg_flyteidl.admin.ClusterResourceAttributes>`) 
   
   
-  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_override <api_field_flyteidl.admin.MatchingAttributes.plugin_override>` may be set.
+  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_overrides <api_field_flyteidl.admin.MatchingAttributes.plugin_overrides>` may be set.
   
 .. _api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes:
 
@@ -237,7 +258,7 @@ execution_queue_attributes
   (:ref:`flyteidl.admin.ExecutionQueueAttributes <api_msg_flyteidl.admin.ExecutionQueueAttributes>`) 
   
   
-  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_override <api_field_flyteidl.admin.MatchingAttributes.plugin_override>` may be set.
+  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_overrides <api_field_flyteidl.admin.MatchingAttributes.plugin_overrides>` may be set.
   
 .. _api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label:
 
@@ -245,7 +266,7 @@ execution_cluster_label
   (:ref:`flyteidl.admin.ExecutionClusterLabel <api_msg_flyteidl.admin.ExecutionClusterLabel>`) 
   
   
-  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_override <api_field_flyteidl.admin.MatchingAttributes.plugin_override>` may be set.
+  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_overrides <api_field_flyteidl.admin.MatchingAttributes.plugin_overrides>` may be set.
   
 .. _api_field_flyteidl.admin.MatchingAttributes.quality_of_service:
 
@@ -253,15 +274,15 @@ quality_of_service
   (:ref:`flyteidl.core.QualityOfService <api_msg_flyteidl.core.QualityOfService>`) 
   
   
-  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_override <api_field_flyteidl.admin.MatchingAttributes.plugin_override>` may be set.
+  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_overrides <api_field_flyteidl.admin.MatchingAttributes.plugin_overrides>` may be set.
   
-.. _api_field_flyteidl.admin.MatchingAttributes.plugin_override:
+.. _api_field_flyteidl.admin.MatchingAttributes.plugin_overrides:
 
-plugin_override
-  (:ref:`flyteidl.admin.PluginOverride <api_msg_flyteidl.admin.PluginOverride>`) 
+plugin_overrides
+  (:ref:`flyteidl.admin.PluginOverrides <api_msg_flyteidl.admin.PluginOverrides>`) 
   
   
-  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_override <api_field_flyteidl.admin.MatchingAttributes.plugin_override>` may be set.
+  Only one of :ref:`task_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.task_resource_attributes>`, :ref:`cluster_resource_attributes <api_field_flyteidl.admin.MatchingAttributes.cluster_resource_attributes>`, :ref:`execution_queue_attributes <api_field_flyteidl.admin.MatchingAttributes.execution_queue_attributes>`, :ref:`execution_cluster_label <api_field_flyteidl.admin.MatchingAttributes.execution_cluster_label>`, :ref:`quality_of_service <api_field_flyteidl.admin.MatchingAttributes.quality_of_service>`, :ref:`plugin_overrides <api_field_flyteidl.admin.MatchingAttributes.plugin_overrides>` may be set.
   
 
 
@@ -270,7 +291,7 @@ plugin_override
 flyteidl.admin.MatchableAttributesConfiguration
 -----------------------------------------------
 
-`[flyteidl.admin.MatchableAttributesConfiguration proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L103>`_
+`[flyteidl.admin.MatchableAttributesConfiguration proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L108>`_
 
 Represents a custom set of attributes applied for either a domain; a domain and project; or
 domain, project and workflow name.
@@ -317,7 +338,7 @@ launch_plan
 flyteidl.admin.ListMatchableAttributesRequest
 ---------------------------------------------
 
-`[flyteidl.admin.ListMatchableAttributesRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L116>`_
+`[flyteidl.admin.ListMatchableAttributesRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L121>`_
 
 Request all matching resource attributes.
 
@@ -339,7 +360,7 @@ resource_type
 flyteidl.admin.ListMatchableAttributesResponse
 ----------------------------------------------
 
-`[flyteidl.admin.ListMatchableAttributesResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L121>`_
+`[flyteidl.admin.ListMatchableAttributesResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L126>`_
 
 Response for a request for all matching resource attributes.
 
