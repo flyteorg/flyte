@@ -19,7 +19,7 @@ import six
 from flyteadmin.models.admin_cluster_resource_attributes import AdminClusterResourceAttributes  # noqa: F401,E501
 from flyteadmin.models.admin_execution_cluster_label import AdminExecutionClusterLabel  # noqa: F401,E501
 from flyteadmin.models.admin_execution_queue_attributes import AdminExecutionQueueAttributes  # noqa: F401,E501
-from flyteadmin.models.admin_plugin_override import AdminPluginOverride  # noqa: F401,E501
+from flyteadmin.models.admin_plugin_overrides import AdminPluginOverrides  # noqa: F401,E501
 from flyteadmin.models.admin_task_resource_attributes import AdminTaskResourceAttributes  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
 
@@ -43,7 +43,7 @@ class AdminMatchingAttributes(object):
         'execution_queue_attributes': 'AdminExecutionQueueAttributes',
         'execution_cluster_label': 'AdminExecutionClusterLabel',
         'quality_of_service': 'CoreQualityOfService',
-        'plugin_override': 'AdminPluginOverride'
+        'plugin_overrides': 'AdminPluginOverrides'
     }
 
     attribute_map = {
@@ -52,10 +52,10 @@ class AdminMatchingAttributes(object):
         'execution_queue_attributes': 'execution_queue_attributes',
         'execution_cluster_label': 'execution_cluster_label',
         'quality_of_service': 'quality_of_service',
-        'plugin_override': 'plugin_override'
+        'plugin_overrides': 'plugin_overrides'
     }
 
-    def __init__(self, task_resource_attributes=None, cluster_resource_attributes=None, execution_queue_attributes=None, execution_cluster_label=None, quality_of_service=None, plugin_override=None):  # noqa: E501
+    def __init__(self, task_resource_attributes=None, cluster_resource_attributes=None, execution_queue_attributes=None, execution_cluster_label=None, quality_of_service=None, plugin_overrides=None):  # noqa: E501
         """AdminMatchingAttributes - a model defined in Swagger"""  # noqa: E501
 
         self._task_resource_attributes = None
@@ -63,7 +63,7 @@ class AdminMatchingAttributes(object):
         self._execution_queue_attributes = None
         self._execution_cluster_label = None
         self._quality_of_service = None
-        self._plugin_override = None
+        self._plugin_overrides = None
         self.discriminator = None
 
         if task_resource_attributes is not None:
@@ -76,8 +76,8 @@ class AdminMatchingAttributes(object):
             self.execution_cluster_label = execution_cluster_label
         if quality_of_service is not None:
             self.quality_of_service = quality_of_service
-        if plugin_override is not None:
-            self.plugin_override = plugin_override
+        if plugin_overrides is not None:
+            self.plugin_overrides = plugin_overrides
 
     @property
     def task_resource_attributes(self):
@@ -185,25 +185,25 @@ class AdminMatchingAttributes(object):
         self._quality_of_service = quality_of_service
 
     @property
-    def plugin_override(self):
-        """Gets the plugin_override of this AdminMatchingAttributes.  # noqa: E501
+    def plugin_overrides(self):
+        """Gets the plugin_overrides of this AdminMatchingAttributes.  # noqa: E501
 
 
-        :return: The plugin_override of this AdminMatchingAttributes.  # noqa: E501
-        :rtype: AdminPluginOverride
+        :return: The plugin_overrides of this AdminMatchingAttributes.  # noqa: E501
+        :rtype: AdminPluginOverrides
         """
-        return self._plugin_override
+        return self._plugin_overrides
 
-    @plugin_override.setter
-    def plugin_override(self, plugin_override):
-        """Sets the plugin_override of this AdminMatchingAttributes.
+    @plugin_overrides.setter
+    def plugin_overrides(self, plugin_overrides):
+        """Sets the plugin_overrides of this AdminMatchingAttributes.
 
 
-        :param plugin_override: The plugin_override of this AdminMatchingAttributes.  # noqa: E501
-        :type: AdminPluginOverride
+        :param plugin_overrides: The plugin_overrides of this AdminMatchingAttributes.  # noqa: E501
+        :type: AdminPluginOverrides
         """
 
-        self._plugin_override = plugin_override
+        self._plugin_overrides = plugin_overrides
 
     def to_dict(self):
         """Returns the model properties as a dict"""

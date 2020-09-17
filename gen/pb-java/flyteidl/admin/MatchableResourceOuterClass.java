@@ -5129,6 +5129,787 @@ public final class MatchableResourceOuterClass {
 
   }
 
+  public interface PluginOverridesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.PluginOverrides)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    java.util.List<flyteidl.admin.MatchableResourceOuterClass.PluginOverride> 
+        getOverridesList();
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverride getOverrides(int index);
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    int getOverridesCount();
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    java.util.List<? extends flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> 
+        getOverridesOrBuilderList();
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getOverridesOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code flyteidl.admin.PluginOverrides}
+   */
+  public  static final class PluginOverrides extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.PluginOverrides)
+      PluginOverridesOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PluginOverrides.newBuilder() to construct.
+    private PluginOverrides(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PluginOverrides() {
+      overrides_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PluginOverrides(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                overrides_ = new java.util.ArrayList<flyteidl.admin.MatchableResourceOuterClass.PluginOverride>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              overrides_.add(
+                  input.readMessage(flyteidl.admin.MatchableResourceOuterClass.PluginOverride.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          overrides_ = java.util.Collections.unmodifiableList(overrides_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverrides_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverrides_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.class, flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder.class);
+    }
+
+    public static final int OVERRIDES_FIELD_NUMBER = 1;
+    private java.util.List<flyteidl.admin.MatchableResourceOuterClass.PluginOverride> overrides_;
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    public java.util.List<flyteidl.admin.MatchableResourceOuterClass.PluginOverride> getOverridesList() {
+      return overrides_;
+    }
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    public java.util.List<? extends flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> 
+        getOverridesOrBuilderList() {
+      return overrides_;
+    }
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    public int getOverridesCount() {
+      return overrides_.size();
+    }
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getOverrides(int index) {
+      return overrides_.get(index);
+    }
+    /**
+     * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+     */
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getOverridesOrBuilder(
+        int index) {
+      return overrides_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < overrides_.size(); i++) {
+        output.writeMessage(1, overrides_.get(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < overrides_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, overrides_.get(i));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.MatchableResourceOuterClass.PluginOverrides)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.MatchableResourceOuterClass.PluginOverrides other = (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) obj;
+
+      if (!getOverridesList()
+          .equals(other.getOverridesList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getOverridesCount() > 0) {
+        hash = (37 * hash) + OVERRIDES_FIELD_NUMBER;
+        hash = (53 * hash) + getOverridesList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.MatchableResourceOuterClass.PluginOverrides prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.admin.PluginOverrides}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.PluginOverrides)
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverrides_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverrides_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.class, flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getOverridesFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (overridesBuilder_ == null) {
+          overrides_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          overridesBuilder_.clear();
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.MatchableResourceOuterClass.internal_static_flyteidl_admin_PluginOverrides_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides getDefaultInstanceForType() {
+        return flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides build() {
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverrides result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides buildPartial() {
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverrides result = new flyteidl.admin.MatchableResourceOuterClass.PluginOverrides(this);
+        int from_bitField0_ = bitField0_;
+        if (overridesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            overrides_ = java.util.Collections.unmodifiableList(overrides_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.overrides_ = overrides_;
+        } else {
+          result.overrides_ = overridesBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) {
+          return mergeFrom((flyteidl.admin.MatchableResourceOuterClass.PluginOverrides)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.MatchableResourceOuterClass.PluginOverrides other) {
+        if (other == flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance()) return this;
+        if (overridesBuilder_ == null) {
+          if (!other.overrides_.isEmpty()) {
+            if (overrides_.isEmpty()) {
+              overrides_ = other.overrides_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureOverridesIsMutable();
+              overrides_.addAll(other.overrides_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.overrides_.isEmpty()) {
+            if (overridesBuilder_.isEmpty()) {
+              overridesBuilder_.dispose();
+              overridesBuilder_ = null;
+              overrides_ = other.overrides_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              overridesBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getOverridesFieldBuilder() : null;
+            } else {
+              overridesBuilder_.addAllMessages(other.overrides_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.MatchableResourceOuterClass.PluginOverrides parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<flyteidl.admin.MatchableResourceOuterClass.PluginOverride> overrides_ =
+        java.util.Collections.emptyList();
+      private void ensureOverridesIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          overrides_ = new java.util.ArrayList<flyteidl.admin.MatchableResourceOuterClass.PluginOverride>(overrides_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> overridesBuilder_;
+
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public java.util.List<flyteidl.admin.MatchableResourceOuterClass.PluginOverride> getOverridesList() {
+        if (overridesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(overrides_);
+        } else {
+          return overridesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public int getOverridesCount() {
+        if (overridesBuilder_ == null) {
+          return overrides_.size();
+        } else {
+          return overridesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getOverrides(int index) {
+        if (overridesBuilder_ == null) {
+          return overrides_.get(index);
+        } else {
+          return overridesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder setOverrides(
+          int index, flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
+        if (overridesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureOverridesIsMutable();
+          overrides_.set(index, value);
+          onChanged();
+        } else {
+          overridesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder setOverrides(
+          int index, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder builderForValue) {
+        if (overridesBuilder_ == null) {
+          ensureOverridesIsMutable();
+          overrides_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          overridesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder addOverrides(flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
+        if (overridesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureOverridesIsMutable();
+          overrides_.add(value);
+          onChanged();
+        } else {
+          overridesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder addOverrides(
+          int index, flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
+        if (overridesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureOverridesIsMutable();
+          overrides_.add(index, value);
+          onChanged();
+        } else {
+          overridesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder addOverrides(
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder builderForValue) {
+        if (overridesBuilder_ == null) {
+          ensureOverridesIsMutable();
+          overrides_.add(builderForValue.build());
+          onChanged();
+        } else {
+          overridesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder addOverrides(
+          int index, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder builderForValue) {
+        if (overridesBuilder_ == null) {
+          ensureOverridesIsMutable();
+          overrides_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          overridesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder addAllOverrides(
+          java.lang.Iterable<? extends flyteidl.admin.MatchableResourceOuterClass.PluginOverride> values) {
+        if (overridesBuilder_ == null) {
+          ensureOverridesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, overrides_);
+          onChanged();
+        } else {
+          overridesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder clearOverrides() {
+        if (overridesBuilder_ == null) {
+          overrides_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          overridesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public Builder removeOverrides(int index) {
+        if (overridesBuilder_ == null) {
+          ensureOverridesIsMutable();
+          overrides_.remove(index);
+          onChanged();
+        } else {
+          overridesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder getOverridesBuilder(
+          int index) {
+        return getOverridesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getOverridesOrBuilder(
+          int index) {
+        if (overridesBuilder_ == null) {
+          return overrides_.get(index);  } else {
+          return overridesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public java.util.List<? extends flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> 
+           getOverridesOrBuilderList() {
+        if (overridesBuilder_ != null) {
+          return overridesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(overrides_);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder addOverridesBuilder() {
+        return getOverridesFieldBuilder().addBuilder(
+            flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder addOverridesBuilder(
+          int index) {
+        return getOverridesFieldBuilder().addBuilder(
+            index, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .flyteidl.admin.PluginOverride overrides = 1;</code>
+       */
+      public java.util.List<flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder> 
+           getOverridesBuilderList() {
+        return getOverridesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> 
+          getOverridesFieldBuilder() {
+        if (overridesBuilder_ == null) {
+          overridesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder>(
+                  overrides_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          overrides_ = null;
+        }
+        return overridesBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.PluginOverrides)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.PluginOverrides)
+    private static final flyteidl.admin.MatchableResourceOuterClass.PluginOverrides DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.MatchableResourceOuterClass.PluginOverrides();
+    }
+
+    public static flyteidl.admin.MatchableResourceOuterClass.PluginOverrides getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PluginOverrides>
+        PARSER = new com.google.protobuf.AbstractParser<PluginOverrides>() {
+      @java.lang.Override
+      public PluginOverrides parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PluginOverrides(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PluginOverrides> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PluginOverrides> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface MatchingAttributesOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.MatchingAttributes)
       com.google.protobuf.MessageOrBuilder {
@@ -5199,17 +5980,17 @@ public final class MatchableResourceOuterClass {
     flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
 
     /**
-     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
      */
-    boolean hasPluginOverride();
+    boolean hasPluginOverrides();
     /**
-     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
      */
-    flyteidl.admin.MatchableResourceOuterClass.PluginOverride getPluginOverride();
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverrides getPluginOverrides();
     /**
-     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
      */
-    flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getPluginOverrideOrBuilder();
+    flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder getPluginOverridesOrBuilder();
 
     public flyteidl.admin.MatchableResourceOuterClass.MatchingAttributes.TargetCase getTargetCase();
   }
@@ -5327,14 +6108,14 @@ public final class MatchableResourceOuterClass {
               break;
             }
             case 50: {
-              flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder subBuilder = null;
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder subBuilder = null;
               if (targetCase_ == 6) {
-                subBuilder = ((flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_).toBuilder();
+                subBuilder = ((flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_).toBuilder();
               }
               target_ =
-                  input.readMessage(flyteidl.admin.MatchableResourceOuterClass.PluginOverride.parser(), extensionRegistry);
+                  input.readMessage(flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_);
+                subBuilder.mergeFrom((flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_);
                 target_ = subBuilder.buildPartial();
               }
               targetCase_ = 6;
@@ -5381,7 +6162,7 @@ public final class MatchableResourceOuterClass {
       EXECUTION_QUEUE_ATTRIBUTES(3),
       EXECUTION_CLUSTER_LABEL(4),
       QUALITY_OF_SERVICE(5),
-      PLUGIN_OVERRIDE(6),
+      PLUGIN_OVERRIDES(6),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -5402,7 +6183,7 @@ public final class MatchableResourceOuterClass {
           case 3: return EXECUTION_QUEUE_ATTRIBUTES;
           case 4: return EXECUTION_CLUSTER_LABEL;
           case 5: return QUALITY_OF_SERVICE;
-          case 6: return PLUGIN_OVERRIDE;
+          case 6: return PLUGIN_OVERRIDES;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -5548,30 +6329,30 @@ public final class MatchableResourceOuterClass {
       return flyteidl.core.Execution.QualityOfService.getDefaultInstance();
     }
 
-    public static final int PLUGIN_OVERRIDE_FIELD_NUMBER = 6;
+    public static final int PLUGIN_OVERRIDES_FIELD_NUMBER = 6;
     /**
-     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
      */
-    public boolean hasPluginOverride() {
+    public boolean hasPluginOverrides() {
       return targetCase_ == 6;
     }
     /**
-     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
      */
-    public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getPluginOverride() {
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides getPluginOverrides() {
       if (targetCase_ == 6) {
-         return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+         return (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_;
       }
-      return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+      return flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
     }
     /**
-     * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+     * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
      */
-    public flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getPluginOverrideOrBuilder() {
+    public flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder getPluginOverridesOrBuilder() {
       if (targetCase_ == 6) {
-         return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+         return (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_;
       }
-      return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+      return flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5604,7 +6385,7 @@ public final class MatchableResourceOuterClass {
         output.writeMessage(5, (flyteidl.core.Execution.QualityOfService) target_);
       }
       if (targetCase_ == 6) {
-        output.writeMessage(6, (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_);
+        output.writeMessage(6, (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_);
       }
       unknownFields.writeTo(output);
     }
@@ -5637,7 +6418,7 @@ public final class MatchableResourceOuterClass {
       }
       if (targetCase_ == 6) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_);
+          .computeMessageSize(6, (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5677,8 +6458,8 @@ public final class MatchableResourceOuterClass {
               .equals(other.getQualityOfService())) return false;
           break;
         case 6:
-          if (!getPluginOverride()
-              .equals(other.getPluginOverride())) return false;
+          if (!getPluginOverrides()
+              .equals(other.getPluginOverrides())) return false;
           break;
         case 0:
         default:
@@ -5716,8 +6497,8 @@ public final class MatchableResourceOuterClass {
           hash = (53 * hash) + getQualityOfService().hashCode();
           break;
         case 6:
-          hash = (37 * hash) + PLUGIN_OVERRIDE_FIELD_NUMBER;
-          hash = (53 * hash) + getPluginOverride().hashCode();
+          hash = (37 * hash) + PLUGIN_OVERRIDES_FIELD_NUMBER;
+          hash = (53 * hash) + getPluginOverrides().hashCode();
           break;
         case 0:
         default:
@@ -5923,10 +6704,10 @@ public final class MatchableResourceOuterClass {
           }
         }
         if (targetCase_ == 6) {
-          if (pluginOverrideBuilder_ == null) {
+          if (pluginOverridesBuilder_ == null) {
             result.target_ = target_;
           } else {
-            result.target_ = pluginOverrideBuilder_.build();
+            result.target_ = pluginOverridesBuilder_.build();
           }
         }
         result.targetCase_ = targetCase_;
@@ -5999,8 +6780,8 @@ public final class MatchableResourceOuterClass {
             mergeQualityOfService(other.getQualityOfService());
             break;
           }
-          case PLUGIN_OVERRIDE: {
-            mergePluginOverride(other.getPluginOverride());
+          case PLUGIN_OVERRIDES: {
+            mergePluginOverrides(other.getPluginOverrides());
             break;
           }
           case TARGET_NOT_SET: {
@@ -6732,67 +7513,67 @@ public final class MatchableResourceOuterClass {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> pluginOverrideBuilder_;
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverrides, flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder> pluginOverridesBuilder_;
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public boolean hasPluginOverride() {
+      public boolean hasPluginOverrides() {
         return targetCase_ == 6;
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride getPluginOverride() {
-        if (pluginOverrideBuilder_ == null) {
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides getPluginOverrides() {
+        if (pluginOverridesBuilder_ == null) {
           if (targetCase_ == 6) {
-            return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+            return (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_;
           }
-          return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+          return flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
         } else {
           if (targetCase_ == 6) {
-            return pluginOverrideBuilder_.getMessage();
+            return pluginOverridesBuilder_.getMessage();
           }
-          return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+          return flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
         }
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public Builder setPluginOverride(flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
-        if (pluginOverrideBuilder_ == null) {
+      public Builder setPluginOverrides(flyteidl.admin.MatchableResourceOuterClass.PluginOverrides value) {
+        if (pluginOverridesBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           target_ = value;
           onChanged();
         } else {
-          pluginOverrideBuilder_.setMessage(value);
+          pluginOverridesBuilder_.setMessage(value);
         }
         targetCase_ = 6;
         return this;
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public Builder setPluginOverride(
-          flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder builderForValue) {
-        if (pluginOverrideBuilder_ == null) {
+      public Builder setPluginOverrides(
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder builderForValue) {
+        if (pluginOverridesBuilder_ == null) {
           target_ = builderForValue.build();
           onChanged();
         } else {
-          pluginOverrideBuilder_.setMessage(builderForValue.build());
+          pluginOverridesBuilder_.setMessage(builderForValue.build());
         }
         targetCase_ = 6;
         return this;
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public Builder mergePluginOverride(flyteidl.admin.MatchableResourceOuterClass.PluginOverride value) {
-        if (pluginOverrideBuilder_ == null) {
+      public Builder mergePluginOverrides(flyteidl.admin.MatchableResourceOuterClass.PluginOverrides value) {
+        if (pluginOverridesBuilder_ == null) {
           if (targetCase_ == 6 &&
-              target_ != flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance()) {
-            target_ = flyteidl.admin.MatchableResourceOuterClass.PluginOverride.newBuilder((flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_)
+              target_ != flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance()) {
+            target_ = flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.newBuilder((flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_)
                 .mergeFrom(value).buildPartial();
           } else {
             target_ = value;
@@ -6800,18 +7581,18 @@ public final class MatchableResourceOuterClass {
           onChanged();
         } else {
           if (targetCase_ == 6) {
-            pluginOverrideBuilder_.mergeFrom(value);
+            pluginOverridesBuilder_.mergeFrom(value);
           }
-          pluginOverrideBuilder_.setMessage(value);
+          pluginOverridesBuilder_.setMessage(value);
         }
         targetCase_ = 6;
         return this;
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public Builder clearPluginOverride() {
-        if (pluginOverrideBuilder_ == null) {
+      public Builder clearPluginOverrides() {
+        if (pluginOverridesBuilder_ == null) {
           if (targetCase_ == 6) {
             targetCase_ = 0;
             target_ = null;
@@ -6822,49 +7603,49 @@ public final class MatchableResourceOuterClass {
             targetCase_ = 0;
             target_ = null;
           }
-          pluginOverrideBuilder_.clear();
+          pluginOverridesBuilder_.clear();
         }
         return this;
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder getPluginOverrideBuilder() {
-        return getPluginOverrideFieldBuilder().getBuilder();
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder getPluginOverridesBuilder() {
+        return getPluginOverridesFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
-      public flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder getPluginOverrideOrBuilder() {
-        if ((targetCase_ == 6) && (pluginOverrideBuilder_ != null)) {
-          return pluginOverrideBuilder_.getMessageOrBuilder();
+      public flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder getPluginOverridesOrBuilder() {
+        if ((targetCase_ == 6) && (pluginOverridesBuilder_ != null)) {
+          return pluginOverridesBuilder_.getMessageOrBuilder();
         } else {
           if (targetCase_ == 6) {
-            return (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_;
+            return (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_;
           }
-          return flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+          return flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
         }
       }
       /**
-       * <code>.flyteidl.admin.PluginOverride plugin_override = 6;</code>
+       * <code>.flyteidl.admin.PluginOverrides plugin_overrides = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder> 
-          getPluginOverrideFieldBuilder() {
-        if (pluginOverrideBuilder_ == null) {
+          flyteidl.admin.MatchableResourceOuterClass.PluginOverrides, flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder> 
+          getPluginOverridesFieldBuilder() {
+        if (pluginOverridesBuilder_ == null) {
           if (!(targetCase_ == 6)) {
-            target_ = flyteidl.admin.MatchableResourceOuterClass.PluginOverride.getDefaultInstance();
+            target_ = flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.getDefaultInstance();
           }
-          pluginOverrideBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.admin.MatchableResourceOuterClass.PluginOverride, flyteidl.admin.MatchableResourceOuterClass.PluginOverride.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverrideOrBuilder>(
-                  (flyteidl.admin.MatchableResourceOuterClass.PluginOverride) target_,
+          pluginOverridesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.MatchableResourceOuterClass.PluginOverrides, flyteidl.admin.MatchableResourceOuterClass.PluginOverrides.Builder, flyteidl.admin.MatchableResourceOuterClass.PluginOverridesOrBuilder>(
+                  (flyteidl.admin.MatchableResourceOuterClass.PluginOverrides) target_,
                   getParentForChildren(),
                   isClean());
           target_ = null;
         }
         targetCase_ = 6;
         onChanged();;
-        return pluginOverrideBuilder_;
+        return pluginOverridesBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -9422,6 +10203,11 @@ public final class MatchableResourceOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_PluginOverride_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_PluginOverrides_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_PluginOverrides_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_MatchingAttributes_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -9469,33 +10255,35 @@ public final class MatchableResourceOuterClass {
       "n_behavior\030\004 \001(\01624.flyteidl.admin.Plugin" +
       "Override.MissingPluginBehavior\"2\n\025Missin" +
       "gPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT" +
-      "\020\001\"\320\003\n\022MatchingAttributes\022J\n\030task_resour" +
-      "ce_attributes\030\001 \001(\0132&.flyteidl.admin.Tas" +
-      "kResourceAttributesH\000\022P\n\033cluster_resourc" +
-      "e_attributes\030\002 \001(\0132).flyteidl.admin.Clus" +
-      "terResourceAttributesH\000\022N\n\032execution_que" +
-      "ue_attributes\030\003 \001(\0132(.flyteidl.admin.Exe" +
-      "cutionQueueAttributesH\000\022H\n\027execution_clu" +
-      "ster_label\030\004 \001(\0132%.flyteidl.admin.Execut" +
-      "ionClusterLabelH\000\022=\n\022quality_of_service\030" +
-      "\005 \001(\0132\037.flyteidl.core.QualityOfServiceH\000" +
-      "\0229\n\017plugin_override\030\006 \001(\0132\036.flyteidl.adm" +
-      "in.PluginOverrideH\000B\010\n\006target\"\242\001\n Matcha" +
-      "bleAttributesConfiguration\0226\n\nattributes" +
-      "\030\001 \001(\0132\".flyteidl.admin.MatchingAttribut" +
-      "es\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010w" +
-      "orkflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036Li" +
-      "stMatchableAttributesRequest\0228\n\rresource" +
-      "_type\030\001 \001(\0162!.flyteidl.admin.MatchableRe" +
-      "source\"k\n\037ListMatchableAttributesRespons" +
-      "e\022H\n\016configurations\030\001 \003(\01320.flyteidl.adm" +
-      "in.MatchableAttributesConfiguration*\251\001\n\021" +
-      "MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020" +
-      "CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022" +
-      "\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALITY_" +
-      "OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVE" +
-      "RRIDE\020\005B3Z1github.com/lyft/flyteidl/gen/" +
-      "pb-go/flyteidl/adminb\006proto3"
+      "\020\001\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\013" +
+      "2\036.flyteidl.admin.PluginOverride\"\322\003\n\022Mat" +
+      "chingAttributes\022J\n\030task_resource_attribu" +
+      "tes\030\001 \001(\0132&.flyteidl.admin.TaskResourceA" +
+      "ttributesH\000\022P\n\033cluster_resource_attribut" +
+      "es\030\002 \001(\0132).flyteidl.admin.ClusterResourc" +
+      "eAttributesH\000\022N\n\032execution_queue_attribu" +
+      "tes\030\003 \001(\0132(.flyteidl.admin.ExecutionQueu" +
+      "eAttributesH\000\022H\n\027execution_cluster_label" +
+      "\030\004 \001(\0132%.flyteidl.admin.ExecutionCluster" +
+      "LabelH\000\022=\n\022quality_of_service\030\005 \001(\0132\037.fl" +
+      "yteidl.core.QualityOfServiceH\000\022;\n\020plugin" +
+      "_overrides\030\006 \001(\0132\037.flyteidl.admin.Plugin" +
+      "OverridesH\000B\010\n\006target\"\242\001\n MatchableAttri" +
+      "butesConfiguration\0226\n\nattributes\030\001 \001(\0132\"" +
+      ".flyteidl.admin.MatchingAttributes\022\016\n\006do" +
+      "main\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030" +
+      "\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatcha" +
+      "bleAttributesRequest\0228\n\rresource_type\030\001 " +
+      "\001(\0162!.flyteidl.admin.MatchableResource\"k" +
+      "\n\037ListMatchableAttributesResponse\022H\n\016con" +
+      "figurations\030\001 \003(\01320.flyteidl.admin.Match" +
+      "ableAttributesConfiguration*\251\001\n\021Matchabl" +
+      "eResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_" +
+      "RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECU" +
+      "TION_CLUSTER_LABEL\020\003\022$\n QUALITY_OF_SERVI" +
+      "CE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVERRIDE\020\005B" +
+      "3Z1github.com/lyft/flyteidl/gen/pb-go/fl" +
+      "yteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -9553,26 +10341,32 @@ public final class MatchableResourceOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_PluginOverride_descriptor,
         new java.lang.String[] { "TaskType", "PluginId", "MissingPluginBehavior", });
-    internal_static_flyteidl_admin_MatchingAttributes_descriptor =
+    internal_static_flyteidl_admin_PluginOverrides_descriptor =
       getDescriptor().getMessageTypes().get(6);
+    internal_static_flyteidl_admin_PluginOverrides_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_PluginOverrides_descriptor,
+        new java.lang.String[] { "Overrides", });
+    internal_static_flyteidl_admin_MatchingAttributes_descriptor =
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_MatchingAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchingAttributes_descriptor,
-        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "PluginOverride", "Target", });
+        new java.lang.String[] { "TaskResourceAttributes", "ClusterResourceAttributes", "ExecutionQueueAttributes", "ExecutionClusterLabel", "QualityOfService", "PluginOverrides", "Target", });
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_MatchableAttributesConfiguration_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_MatchableAttributesConfiguration_descriptor,
         new java.lang.String[] { "Attributes", "Domain", "Project", "Workflow", "LaunchPlan", });
     internal_static_flyteidl_admin_ListMatchableAttributesRequest_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_ListMatchableAttributesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesRequest_descriptor,
         new java.lang.String[] { "ResourceType", });
     internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_admin_ListMatchableAttributesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListMatchableAttributesResponse_descriptor,

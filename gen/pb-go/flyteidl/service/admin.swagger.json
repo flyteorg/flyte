@@ -3536,8 +3536,8 @@
         "quality_of_service": {
           "$ref": "#/definitions/coreQualityOfService"
         },
-        "plugin_override": {
-          "$ref": "#/definitions/adminPluginOverride"
+        "plugin_overrides": {
+          "$ref": "#/definitions/adminPluginOverrides"
         }
       },
       "description": "Generic container for encapsulating all types of the above attributes messages."
@@ -3836,6 +3836,17 @@
         }
       },
       "description": "This MatchableAttribute configures selecting alternate plugin implementations for a given task type.\nIn addition to an override implementation a selection of fallbacks can be provided or other modes\nfor handling cases where the desired plugin override is not enabled in a given Flyte deployment."
+    },
+    "adminPluginOverrides": {
+      "type": "object",
+      "properties": {
+        "overrides": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminPluginOverride"
+          }
+        }
+      }
     },
     "adminProject": {
       "type": "object",
