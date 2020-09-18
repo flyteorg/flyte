@@ -148,6 +148,11 @@ func (w workflowBuilder) AddEdges(n c.NodeBuilder, errs errors.CompileErrors) (o
 
 // Contains the main validation logic for the coreWorkflow. If successful, it'll build an executable Workflow.
 func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.CompileErrors) (c.Workflow, bool) {
+	if len(fg.Template.Nodes) == 0 {
+		errs.Collect(errors.NewNoNodesFoundErr(fg.Template.Id.String()))
+		return nil, !errs.HasErrors()
+	}
+
 	// Initialize workflow
 	wf := w.newWorkflowBuilder(fg)
 	wf.updateRequiredReferences()

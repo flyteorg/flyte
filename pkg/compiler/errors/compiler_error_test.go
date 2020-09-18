@@ -32,6 +32,7 @@ func TestErrorCodes(t *testing.T) {
 		UnreachableNodes:           NewUnreachableNodesErr("", ""),
 		UnrecognizedValue:          NewUnrecognizedValueErr("", ""),
 		WorkflowBuildError:         NewWorkflowBuildError(errors.New("")),
+		NoNodesFound:               NewNoNodesFoundErr(""),
 	}
 
 	for key, value := range testCases {
@@ -47,6 +48,6 @@ func TestIncludeSource(t *testing.T) {
 
 	SetConfig(Config{IncludeSource: true})
 	e = NewCycleDetectedInWorkflowErr("", "")
-	assert.Equal(t, e.source, "compiler_error_test.go:49")
+	assert.Equal(t, e.source, "compiler_error_test.go:50")
 	SetConfig(Config{})
 }
