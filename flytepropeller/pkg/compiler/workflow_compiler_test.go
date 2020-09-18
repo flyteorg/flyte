@@ -631,6 +631,30 @@ func TestCompileWorkflow(t *testing.T) {
 	}
 }
 
+func TestNoNodesFound(t *testing.T) {
+	inputWorkflow := &core.WorkflowTemplate{
+		Id: &core.Identifier{Name: "repo"},
+		Interface: &core.TypedInterface{
+			Inputs: createVariableMap(map[string]*core.Variable{
+				"x": {
+					Type: getIntegerLiteralType(),
+				},
+			}),
+			Outputs: createVariableMap(map[string]*core.Variable{
+				"x": {
+					Type: getIntegerLiteralType(),
+				},
+			}),
+		},
+		Nodes:   []*core.Node{},
+		Outputs: []*core.Binding{newVarBinding("node_456", "x", "x")},
+	}
+
+	_, errs := CompileWorkflow(inputWorkflow, []*core.WorkflowTemplate{},
+		mustCompileTasks(make([]*core.TaskTemplate, 0)), []common.InterfaceProvider{})
+	assert.Contains(t, errs.Error(), errors.NoNodesFound)
+}
+
 func mustCompileTasks(tasks []*core.TaskTemplate) []*core.CompiledTask {
 	res := make([]*core.CompiledTask, 0, len(tasks))
 	for _, t := range tasks {

@@ -72,6 +72,9 @@ const (
 
 	// A value isn't on the right syntax.
 	SyntaxError ErrorCode = "SyntaxError"
+
+	// A workflow is missing any nodes to execute
+	NoNodesFound ErrorCode = "NoNodesFound"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -243,6 +246,14 @@ func NewSyntaxError(nodeID string, element string, err error) *CompileError {
 	return newError(SyntaxError,
 		fmt.Sprintf("Failed to parse element [%v].", element),
 		nodeID,
+	)
+}
+
+func NewNoNodesFoundErr(graphID string) *CompileError {
+	return newError(
+		NoNodesFound,
+		fmt.Sprintf("Can't find any nodes in workflow [%v].", graphID),
+		graphID,
 	)
 }
 
