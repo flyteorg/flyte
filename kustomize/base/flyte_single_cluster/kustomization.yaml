@@ -13,16 +13,6 @@ resources:
 - ../propeller
 - ../adminserviceaccount
 
-##############################################
-# Generate Configs
-# For each component exactly one config is generated
-# For every component required configs are
-# 1. logger.yaml
-# 2. storage.yaml
-# 3. component.yaml
-#
-# db.yaml is required for FlyteAdmin and DataCatalog
-# ############################################
 configMapGenerator:
 # the main admin configmap
 - name: flyte-admin-config
@@ -32,8 +22,8 @@ configMapGenerator:
     - ./config/admin/cluster_resources.yaml
     - ./config/admin/remote_data.yaml
     - ./config/admin/task_resource_defaults.yaml
-    - ./config/storage.yaml
-    - ./config/logger.yaml
+    - ./config/common/storage.yaml
+    - ./config/common/logger.yaml
 
 # cluster resource templates
 - name: clusterresource-template
@@ -42,9 +32,6 @@ configMapGenerator:
     - ./config/clusterresource-templates/aa_namespace.yaml
     - ./config/clusterresource-templates/ab_project-resource-quota.yaml
     - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
-    - ./config/clusterresource-templates/ad_spark-role.yaml
-    - ./config/clusterresource-templates/ae_spark-service-account.yaml
-    - ./config/clusterresource-templates/af_spark-role-binding.yaml
 
 # Flyte Propeller Configuration
 - name: flyte-propeller-config
@@ -52,12 +39,13 @@ configMapGenerator:
     - ./config/propeller/core.yaml
     - ./config/propeller/admin.yaml
     - ./config/propeller/catalog.yaml
-    - ./config/enabled_plugins.yaml
-    - ./config/plugins/copilot.yaml
-    - ./config/plugins/k8s.yaml
-    - ./config/plugins/task_logs.yaml
-    - ./config/storage.yaml
-    - ./config/logger.yaml
+    - ./config/propeller/resource_manager.yaml
+    - ./config/propeller/enabled_plugins.yaml
+    - ./config/propeller/plugins/copilot.yaml
+    - ./config/propeller/plugins/k8s.yaml
+    - ./config/propeller/plugins/task_logs.yaml
+    - ./config/common/storage.yaml
+    - ./config/common/logger.yaml
 
 # TODO Flyte Console Configuration
 #- name: flyte-console-config
@@ -68,5 +56,5 @@ configMapGenerator:
   files:
     - ./config/datacatalog/server.yaml
     - ./config/datacatalog/db.yaml
-    - ./config/storage.yaml
-    - ./config/logger.yaml
+    - ./config/common/storage.yaml
+    - ./config/common/logger.yaml
