@@ -1,0 +1,5 @@
+remoteData:
+  region: "us-east-1"
+  scheme: "local"
+  signedUrls:
+    durationMinutes: 3

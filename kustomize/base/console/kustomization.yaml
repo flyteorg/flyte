@@ -2,3 +2,10 @@ resources:
 - deployment.yaml
 - service.yaml
 - configmap.yaml
+
+# Images that should be used
+images:
+  # FlyteConsole
+  - name: flyteconsole # match images with this name
+    newTag: v0.11.0 # override the tag
+    newName: docker.io/lyft/flyteconsole # override the name

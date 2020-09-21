@@ -1,0 +1,6 @@
+datacatalog:
+  storage-prefix: metadata/datacatalog
+  metrics-scope: "datacatalog"
+  profiler-port: 10254
+application:
+  grpcPort: 8089

@@ -1,3 +1,11 @@
 resources:
 - deployment.yaml
 - rbac.yaml
+
+# Images that should be used
+images:
+  # FlytePropeller
+  - name: flytepropeller # match images with this name
+    newTag: v0.3.12 # override the tag
+    newName: docker.io/lyft/flytepropeller # override the name
+ 

@@ -1,7 +1,0 @@
-tasks:
-  task-plugins:
-    enabled-plugins:
-      - container
-      - sidecar
-      - spark
-      - k8s-array

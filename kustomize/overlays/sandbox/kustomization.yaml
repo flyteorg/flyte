@@ -1,0 +1,77 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Override the namespace
+namespace: flyte
+
+bases:
+- ../../base/flyte_single_cluster
+
+
+# All the resources that make up the deployment
+resources:
+  ########
+  # Operators to be enabled
+- ../../base/operators/spark
+- ../../base/operators/kfoperators/pytorch
+  #############
+  # Dependencies to be configured
+- ./dependencies/database
+  # In local we use minio, but in cloud environment use S3 / GCS / AFS / Oracle Blob store etc
+- ./dependencies/storage
+  # This is used for Resource pooling. On cloud you can use hosted redis (e.g. AWS elasticache)
+- ./dependencies/redis
+  # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
+- ./dependencies/contour_ingress_controller
+  # Add node ports for ease of use locally
+- ./dependencies/nodeport-services.yaml
+
+##############################################  
+# Generate Configs
+# For each component exactly one config is generated
+# For every component required configs are
+# 1. logger.yaml
+# 2. storage.yaml
+# 3. component.yaml
+#
+# db.yaml is required for FlyteAdmin and DataCatalog
+# ############################################
+configMapGenerator:
+# the main admin configmap
+- name: flyte-admin-config
+  behavior: merge
+  files:
+    - ./config/db.yaml
+    - ./config/storage.yaml
+    - ./config/logger.yaml
+      
+# cluster resource templates
+- name: clusterresource-template
+  behavior: merge
+  files:
+# Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
+    - ./config/clusterresource-templates/ab_project-resource-quota.yaml
+    - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
+
+# Flyte Propeller Configuration
+- name: flyte-propeller-config
+  behavior: merge
+  files:
+    - ./config/enabled_plugins.yaml
+    - ./config/plugins/k8s.yaml
+    - ./config/plugins/qubole.yaml
+    - ./config/plugins/spark.yaml
+    - ./config/plugins/task_logs.yaml
+    - ./config/storage.yaml
+    - ./config/logger.yaml
+
+# TODO Flyte Console Configuration
+#- name: flyte-console-config
+#  files:
+#    - ./config/console.yaml
+
+- name: datacatalog-config
+  behavior: merge
+  files:
+    - ./config/storage.yaml
+    - ./config/logger.yaml

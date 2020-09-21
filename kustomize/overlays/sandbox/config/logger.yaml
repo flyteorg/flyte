@@ -1,0 +1,3 @@
+logger:
+  show-source: true
+  level: 2
