@@ -42,7 +42,12 @@ const RemoteExecutionInputs: React.FC<{ execution: Execution }> = ({
     const executionData = useWorkflowExecutionData(execution.id);
     return (
         <WaitForData {...executionData} spinnerVariant="none">
-            {() => <RemoteLiteralMapViewer blob={executionData.value.inputs} />}
+            {() => (
+                <RemoteLiteralMapViewer
+                    map={executionData.value.fullInputs}
+                    blob={executionData.value.inputs}
+                />
+            )}
         </WaitForData>
     );
 };
@@ -54,7 +59,10 @@ const RemoteExecutionOutputs: React.FC<{ execution: Execution }> = ({
     return (
         <WaitForData {...executionData} spinnerVariant="none">
             {() => (
-                <RemoteLiteralMapViewer blob={executionData.value.outputs} />
+                <RemoteLiteralMapViewer
+                    map={executionData.value.fullOutputs}
+                    blob={executionData.value.outputs}
+                />
             )}
         </WaitForData>
     );

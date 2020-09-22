@@ -15,7 +15,10 @@ const RemoteExecutionOutputs: React.FC<{ execution: Execution }> = ({
     return (
         <WaitForData {...executionData}>
             {() => (
-                <RemoteLiteralMapViewer blob={executionData.value.outputs} />
+                <RemoteLiteralMapViewer
+                    map={executionData.value.fullOutputs}
+                    blob={executionData.value.outputs}
+                />
             )}
         </WaitForData>
     );

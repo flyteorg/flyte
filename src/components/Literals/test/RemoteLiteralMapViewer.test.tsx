@@ -1,0 +1,74 @@
+import { getByText, render } from '@testing-library/react';
+import * as React from 'react';
+
+import { FetchableData } from 'components/hooks';
+import { loadedFetchable } from 'components/hooks/__mocks__/fetchableData';
+import { useRemoteLiteralMap } from 'components/hooks/useRemoteLiteralMap';
+import * as Long from 'long';
+import { LiteralMap } from 'models';
+import { RemoteLiteralMapViewer } from '../RemoteLiteralMapViewer';
+
+jest.mock('components/hooks/useRemoteLiteralMap');
+
+describe('RemoteLiteralMapViewer', () => {
+    it('renders no data available', () => {
+        const blob = {
+            url: '',
+            bytes: Long.fromInt(0)
+        };
+
+        const { getAllByText } = render(
+            <RemoteLiteralMapViewer map={undefined} blob={blob} />
+        );
+
+        const items = getAllByText('No data is available.');
+        expect(items.length).toBe(1);
+    });
+
+    it('renders map if it is defined', () => {
+        const blob = {
+            url: 'http://url',
+            bytes: Long.fromInt(1337)
+        };
+
+        const map: LiteralMap = {
+            literals: {
+                input1: {}
+            }
+        };
+
+        const { getAllByText } = render(
+            <RemoteLiteralMapViewer map={map} blob={blob} />
+        );
+
+        const items = getAllByText('input1:');
+        expect(items.length).toBe(1);
+    });
+
+    it('fetches blob if map is undefined', () => {
+        const map: LiteralMap = {
+            literals: {
+                input1: {}
+            }
+        };
+
+        const mockUseRemoteLiteralMap = useRemoteLiteralMap as jest.Mock<
+            FetchableData<LiteralMap>
+        >;
+        mockUseRemoteLiteralMap.mockReturnValue(
+            loadedFetchable(map, () => null)
+        );
+
+        const blob = {
+            url: 'http://url',
+            bytes: Long.fromInt(1337)
+        };
+
+        const { getAllByText } = render(
+            <RemoteLiteralMapViewer map={undefined} blob={blob} />
+        );
+
+        const items = getAllByText('input1:');
+        expect(items.length).toBe(1);
+    });
+});

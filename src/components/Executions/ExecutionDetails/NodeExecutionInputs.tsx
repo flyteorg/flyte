@@ -1,7 +1,7 @@
 import { WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { useNodeExecutionData } from 'components/hooks';
-import { RemoteLiteralMapViewer } from 'components/Literals';
+import { LiteralMapViewer, RemoteLiteralMapViewer } from 'components/Literals';
 import { NodeExecution } from 'models';
 import * as React from 'react';
 
@@ -18,6 +18,7 @@ export const NodeExecutionInputs: React.FC<{ execution: NodeExecution }> = ({
                     <div className={commonStyles.detailsPanelCard}>
                         <div className={commonStyles.detailsPanelCardContent}>
                             <RemoteLiteralMapViewer
+                                map={executionData.value.fullInputs}
                                 blob={executionData.value.inputs}
                             />
                         </div>

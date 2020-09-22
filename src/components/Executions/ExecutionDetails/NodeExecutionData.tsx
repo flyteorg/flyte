@@ -3,7 +3,7 @@ import Typography from '@material-ui/core/Typography';
 import { WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { useNodeExecutionData } from 'components/hooks';
-import { RemoteLiteralMapViewer } from 'components/Literals';
+import { LiteralMapViewer, RemoteLiteralMapViewer } from 'components/Literals';
 import { NodeExecution } from 'models';
 import * as React from 'react';
 
@@ -27,6 +27,7 @@ export const NodeExecutionData: React.FC<{ execution: NodeExecution }> = ({
                             </header>
                             <section>
                                 <RemoteLiteralMapViewer
+                                    map={executionData.value.fullInputs}
                                     blob={executionData.value.inputs}
                                 />
                             </section>
@@ -41,6 +42,7 @@ export const NodeExecutionData: React.FC<{ execution: NodeExecution }> = ({
                             </header>
                             <section>
                                 <RemoteLiteralMapViewer
+                                    map={executionData.value.fullOutputs}
                                     blob={executionData.value.outputs}
                                 />
                             </section>
