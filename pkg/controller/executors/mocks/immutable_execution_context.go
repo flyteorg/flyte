@@ -114,6 +114,38 @@ func (_m *ImmutableExecutionContext) GetEventVersion() v1alpha1.EventVersion {
 	return r0
 }
 
+type ImmutableExecutionContext_GetExecutionConfig struct {
+	*mock.Call
+}
+
+func (_m ImmutableExecutionContext_GetExecutionConfig) Return(_a0 v1alpha1.ExecutionConfig) *ImmutableExecutionContext_GetExecutionConfig {
+	return &ImmutableExecutionContext_GetExecutionConfig{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ImmutableExecutionContext) OnGetExecutionConfig() *ImmutableExecutionContext_GetExecutionConfig {
+	c := _m.On("GetExecutionConfig")
+	return &ImmutableExecutionContext_GetExecutionConfig{Call: c}
+}
+
+func (_m *ImmutableExecutionContext) OnGetExecutionConfigMatch(matchers ...interface{}) *ImmutableExecutionContext_GetExecutionConfig {
+	c := _m.On("GetExecutionConfig", matchers...)
+	return &ImmutableExecutionContext_GetExecutionConfig{Call: c}
+}
+
+// GetExecutionConfig provides a mock function with given fields:
+func (_m *ImmutableExecutionContext) GetExecutionConfig() v1alpha1.ExecutionConfig {
+	ret := _m.Called()
+
+	var r0 v1alpha1.ExecutionConfig
+	if rf, ok := ret.Get(0).(func() v1alpha1.ExecutionConfig); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(v1alpha1.ExecutionConfig)
+	}
+
+	return r0
+}
+
 type ImmutableExecutionContext_GetExecutionID struct {
 	*mock.Call
 }

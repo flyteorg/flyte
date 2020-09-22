@@ -42,6 +42,11 @@ type ContextualWorkflow struct {
 	v1alpha1.NodeStatusGetter
 }
 
+func (w *ContextualWorkflow) GetExecutionConfig() v1alpha1.ExecutionConfig {
+	// ExecutionConfig isn't rendered in the printed workflow.
+	return v1alpha1.ExecutionConfig{}
+}
+
 type WorkflowPrinter struct {
 }
 

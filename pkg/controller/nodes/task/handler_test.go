@@ -7,6 +7,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
@@ -208,7 +211,7 @@ func Test_task_Setup(t *testing.T) {
 					t.Errorf("Handler.Setup() error expected, got none!")
 				}
 				for k, v := range tt.fields.pluginIDs {
-					p, ok := tk.plugins[k]
+					p, ok := tk.defaultPlugins[k]
 					if assert.True(t, ok, "plugin %s not found", k) {
 						assert.Equal(t, v, p.GetID())
 					}
@@ -231,11 +234,13 @@ func Test_task_ResolvePlugin(t *testing.T) {
 	somePlugin := &pluginCoreMocks.Plugin{}
 	somePlugin.On("GetID").Return(someID)
 	type fields struct {
-		plugins       map[pluginCore.TaskType]pluginCore.Plugin
-		defaultPlugin pluginCore.Plugin
+		plugins        map[pluginCore.TaskType]pluginCore.Plugin
+		defaultPlugin  pluginCore.Plugin
+		pluginsForType map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin
 	}
 	type args struct {
-		ttype string
+		ttype           string
+		executionConfig v1alpha1.ExecutionConfig
 	}
 	tests := []struct {
 		name    string
@@ -256,14 +261,32 @@ func Test_task_ResolvePlugin(t *testing.T) {
 				},
 				defaultPlugin: defaultPlugin,
 			}, args{ttype: someID}, someID, false},
+		{"override",
+			fields{
+				plugins:       make(map[pluginCore.TaskType]pluginCore.Plugin),
+				defaultPlugin: defaultPlugin,
+				pluginsForType: map[pluginCore.TaskType]map[pluginID]pluginCore.Plugin{
+					someID: {
+						someID: somePlugin,
+					},
+				},
+			}, args{ttype: someID, executionConfig: v1alpha1.ExecutionConfig{
+				TaskPluginImpls: map[string]v1alpha1.TaskPluginOverride{
+					someID: {
+						PluginIDs:             []string{someID},
+						MissingPluginBehavior: admin.PluginOverride_FAIL,
+					},
+				},
+			}}, someID, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tk := Handler{
-				plugins:       tt.fields.plugins,
-				defaultPlugin: tt.fields.defaultPlugin,
+				defaultPlugins: tt.fields.plugins,
+				defaultPlugin:  tt.fields.defaultPlugin,
+				pluginsForType: tt.fields.pluginsForType,
 			}
-			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype)
+			got, err := tk.ResolvePlugin(context.TODO(), tt.args.ttype, tt.args.executionConfig)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Handler.ResolvePlugin() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -395,6 +418,10 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+
+		executionContext := &mocks.ExecutionContext{}
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		nCtx.OnExecutionContext().Return(executionContext)
 
 		st := bytes.NewBuffer([]byte{})
 		cod := codex.GobStateCodec{}
@@ -576,7 +603,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
 				cfg: &config.Config{MaxErrorMessageLength: 100},
-				plugins: map[pluginCore.TaskType]pluginCore.Plugin{
+				defaultPlugins: map[pluginCore.TaskType]pluginCore.Plugin{
 					"test": fakeplugins.NewPhaseBasedPlugin(),
 				},
 				pluginScope: promutils.NewTestScope(),
@@ -711,6 +738,10 @@ func Test_task_Handle_Catalog(t *testing.T) {
 		nCtx.OnEventsRecorder().Return(recorder)
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 
+		executionContext := &mocks.ExecutionContext{}
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		nCtx.OnExecutionContext().Return(executionContext)
+
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
@@ -810,7 +841,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 			}
 			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), c, promutils.NewTestScope())
 			assert.NoError(t, err)
-			tk.plugins = map[pluginCore.TaskType]pluginCore.Plugin{
+			tk.defaultPlugins = map[pluginCore.TaskType]pluginCore.Plugin{
 				"test": fakeplugins.NewPhaseBasedPlugin(),
 			}
 			tk.catalog = c
@@ -927,6 +958,10 @@ func Test_task_Handle_Barrier(t *testing.T) {
 		nCtx.OnNodeID().Return("n1")
 		nCtx.OnEventsRecorder().Return(recorder)
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
+
+		executionContext := &mocks.ExecutionContext{}
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
@@ -1103,7 +1138,7 @@ func Test_task_Handle_Barrier(t *testing.T) {
 				tk.barrierCache.RecordBarrierTransition(context.TODO(), id, BarrierTransition{tt.args.btrnsTick, PluginCallLog{x}})
 			}
 
-			tk.plugins = map[pluginCore.TaskType]pluginCore.Plugin{
+			tk.defaultPlugins = map[pluginCore.TaskType]pluginCore.Plugin{
 				"test": fakeplugins.NewReplayer("test", pluginCore.PluginProperties{},
 					tt.args.res, nil, nil),
 			}
@@ -1193,6 +1228,10 @@ func Test_task_Abort(t *testing.T) {
 		nCtx.OnNodeID().Return("n1")
 		nCtx.OnEnqueueOwnerFunc().Return(nil)
 		nCtx.OnEventsRecorder().Return(ev)
+
+		executionContext := &mocks.ExecutionContext{}
+		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 		nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
@@ -1328,6 +1367,10 @@ func Test_task_Finalize(t *testing.T) {
 	nCtx.OnEventsRecorder().Return(nil)
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
 
+	executionContext := &mocks.ExecutionContext{}
+	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	nCtx.OnExecutionContext().Return(executionContext)
+
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
 
@@ -1400,7 +1443,7 @@ func TestNew(t *testing.T) {
 	got, err := New(context.TODO(), mocks.NewFakeKubeClient(), &pluginCatalogMocks.Client{}, promutils.NewTestScope())
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
-	assert.NotNil(t, got.plugins)
+	assert.NotNil(t, got.defaultPlugins)
 	assert.NotNil(t, got.metrics)
 	assert.Equal(t, got.pluginRegistry, pluginmachinery.PluginRegistry())
 }
