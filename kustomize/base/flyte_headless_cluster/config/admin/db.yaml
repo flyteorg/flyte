@@ -7,3 +7,4 @@ database:
   host: postgres
   dbname: postgres
   options: sslmode=disable
+  passwordPath: /etc/db/pass.txt

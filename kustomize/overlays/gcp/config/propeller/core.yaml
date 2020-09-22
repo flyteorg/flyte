@@ -1,8 +1,9 @@
 propeller:
   rawoutput-prefix: s3://my-s3-bucket/
   metadata-prefix: metadata/propeller
-  workers: 4
-  max-workflow-retries: 30
+  workers: 40
+  gc-interval: 12h
+  max-workflow-retries: 50
   workflow-reeval-duration: 30s
   downstream-eval-duration: 30s
   limit-namespace: "all"
@@ -17,15 +18,23 @@ propeller:
     lease-duration: 15s
     renew-deadline: 10s
     retry-period: 2s
+  kube-client-config:
+    qps: 100
+    burst: 25
+    timeout: 30s
   queue:
     type: batch
     batching-interval: 2s
     batch-size: -1
     queue:
-      type: bucket
-      rate: 10
-      capacity: 100
+      type: maxof
+      rate: 100
+      capacity: 1000
+      base-delay: 5s
+      max-delay: 120s
     sub-queue:
       type: bucket
-      rate: 10
-      capacity: 100
+      rate: 100
+      capacity: 1000
+  workflowStore:
+    policy: "ResourceVersionCache"

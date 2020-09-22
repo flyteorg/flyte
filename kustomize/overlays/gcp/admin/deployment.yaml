@@ -6,55 +6,10 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: flyteadmin
-      initContainers:
-      - name: check-db-ready
-        image: postgres:10.1
-        imagePullPolicy: IfNotPresent
-        command: ['sh', '-c',
-          'until pg_isready -h cloudsqlproxy -p 5432;
-          do echo waiting for database; sleep 2; done;']
-      - name: run-migrations
-        volumeMounts:
-        - name: db-user-pass
-          mountPath: /etc/gcp
-      - name: seed-projects
-        image: docker.io/lyft/flyteadmin:v0.3.5
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/flyte/config
-        - name: db-user-pass
-          mountPath: /etc/gcp
-      - name: sync-cluster-resources
-        image: docker.io/lyft/flyteadmin:v0.3.5
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
-        volumeMounts:
-        - name: resource-templates
-          mountPath: /etc/flyte/clusterresource/templates
-        - name: config-volume
-          mountPath: /etc/flyte/config
-        - name: db-user-pass
-          mountPath: /etc/gcp
-
       containers:
       - name: flyteadmin
-        volumeMounts:
-        - name: db-user-pass
-          mountPath: /etc/gcp
         resources:
           limits:
-            memory: "200Mi"
-            cpu: "1"
-            ephemeral-storage: "100Mi"
-      volumes:
-      - name: db-user-pass
-        secret:
-          secretName: db-user-pass
-      - name: resource-templates
-        configMap:
-          name: clusterresource-template
-
+            memory: "1Gi"
+            cpu: "2"
+            ephemeral-storage: "1Gi"

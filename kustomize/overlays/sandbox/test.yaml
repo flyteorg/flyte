@@ -709,9 +709,6 @@ metadata:
 apiVersion: v1
 data:
   db.yaml: |
-    # This should be replaced with the db endpoint
-    # This can be a postgres data base in the cloud like AWS Aurora / AWS RDS, Google Cloud SQL, etc
-    # Or can be a self hosted Postgres in the cluster
     database:
       port: 5432
       username: postgres
@@ -745,7 +742,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: datacatalog-config-kc8cgttd4k
+  name: datacatalog-config-dcg96ktb98
   namespace: flyte
 ---
 apiVersion: v1
@@ -981,6 +978,15 @@ metadata:
   labels: {}
   name: flyte-propeller-config-4bgc7667bm
   namespace: flyte
+---
+apiVersion: v1
+data:
+  pass.txt: YXdlc29tZXNhdWNl
+kind: Secret
+metadata:
+  name: db-pass-8mb4h2b9hf
+  namespace: flyte
+type: Opaque
 ---
 apiVersion: v1
 kind: Service
@@ -1284,6 +1290,8 @@ spec:
         volumeMounts:
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
       initContainers:
       - command:
         - datacatalog
@@ -1298,13 +1306,18 @@ spec:
         volumeMounts:
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
       serviceAccountName: datacatalog
       volumes:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-kc8cgttd4k
+          name: datacatalog-config-dcg96ktb98
         name: config-volume
+      - name: db-pass
+        secret:
+          secretName: db-pass-8mb4h2b9hf
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1352,6 +1365,8 @@ spec:
           name: shared-data
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
       - command:
         - sh
         - -c
@@ -1380,12 +1395,14 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
       - command:
         - flyteadmin
         - --logtostderr
@@ -1396,12 +1413,14 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
       - command:
         - flyteadmin
         - --logtostderr
@@ -1409,7 +1428,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1417,6 +1436,8 @@ spec:
           name: resource-templates
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/db
+          name: db-pass
       - command:
         - sh
         - -c
@@ -1432,6 +1453,9 @@ spec:
       - configMap:
           name: clusterresource-template-kf62ttf64k
         name: resource-templates
+      - name: db-pass
+        secret:
+          secretName: db-pass-8mb4h2b9hf
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1754,6 +1778,8 @@ spec:
               name: resource-templates
             - mountPath: /etc/flyte/config
               name: config-volume
+            - mountPath: /etc/db
+              name: db-pass
           restartPolicy: OnFailure
           serviceAccountName: flyteadmin
           volumes:
@@ -1763,6 +1789,9 @@ spec:
           - configMap:
               name: flyte-admin-config-76m7t86kf2
             name: config-volume
+          - name: db-pass
+            secret:
+              secretName: db-pass-8mb4h2b9hf
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1

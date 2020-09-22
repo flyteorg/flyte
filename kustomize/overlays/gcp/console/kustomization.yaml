@@ -1,7 +1,0 @@
-bases:
-- ../../../base/console
-
-patches:
-- deployment.yaml
-- service.yaml
-- configmap.yaml

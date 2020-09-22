@@ -10,6 +10,6 @@ spec:
       - name: flytepropeller
         resources:
           limits:
-            memory: "1000Mi"
-            cpu: "1"
-            ephemeral-storage: "1000Mi"
+            memory: "4Gi"
+            cpu: "2"
+            ephemeral-storage: "1Gi"

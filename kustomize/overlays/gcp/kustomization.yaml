@@ -8,6 +8,8 @@ bases:
 - ../../base/flyte_single_cluster
 
 # All the resources that make up the deployment
+- datacatalog/service.yaml
+- propeller/service.yaml
   ########
   # Operators to be enabled
   #############
@@ -19,43 +21,25 @@ bases:
 resources:
 - ../../base/operators/spark
 - ../../base/operators/kfoperators/pytorch
-- ./dependencies/database
-- ./dependencies/storage
+- ./dependencies/cloudsqlproxy
+  # Optional dependency
 - ./dependencies/redis
-- ./dependencies/contour_ingress_controller
-- ./dependencies/nodeport-services.yaml
 
 patchesStrategicMerge:
 - admin/deployment.yaml
+- admin/service.yaml
+- datacatalog/deployment.yaml
+- propeller/deployment.yaml
 
-##############################################  
-# Generate Configs
-# For each component exactly one config is generated
-# For every component required configs are
-# 1. logger.yaml
-# 2. storage.yaml
-# 3. component.yaml
-#
-# db.yaml is required for FlyteAdmin and DataCatalog
-# ############################################
-# the main admin configmap
-      
-# cluster resource templates
 # Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
-
-# Flyte Propeller Configuration
-
-# TODO Flyte Console Configuration
-#- name: flyte-console-config
-#  files:
-#    - ./config/console.yaml
 
 configMapGenerator:
 - behavior: merge
   files:
   - ./config/admin/db.yaml
+  - ./config/admin/remote_data.yaml
+  - ./config/admin/task_resource_defaults.yaml
   - ./config/common/storage.yaml
-  - ./config/common/logger.yaml
   name: flyte-admin-config
 - behavior: merge
   files:
@@ -66,18 +50,18 @@ configMapGenerator:
   name: clusterresource-template
 - behavior: merge
   files:
+  - ./config/propeller/core.yaml
   - ./config/propeller/enabled_plugins.yaml
+  - ./config/propeller/plugins/catalog_cache.yaml
   - ./config/propeller/plugins/k8s.yaml
   - ./config/propeller/plugins/qubole.yaml
   - ./config/propeller/plugins/spark.yaml
   - ./config/propeller/plugins/task_logs.yaml
   - ./config/common/storage.yaml
-  - ./config/common/logger.yaml
   name: flyte-propeller-config
 - behavior: merge
   files:
   - ./config/common/storage.yaml
-  - ./config/common/logger.yaml
   - ./config/datacatalog/db.yaml
   name: datacatalog-config
 

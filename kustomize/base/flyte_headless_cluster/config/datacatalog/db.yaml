@@ -7,3 +7,4 @@ database:
   host: postgres
   dbname: datacatalog
   options: sslmode=disable
+  passwordPath: /etc/db/pass.txt

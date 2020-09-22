@@ -57,3 +57,8 @@ configMapGenerator:
     - ./config/datacatalog/db.yaml
     - ./config/common/storage.yaml
     - ./config/common/logger.yaml
+
+secretGenerator:
+- name: db-pass
+  literals:
+  - pass.txt="awesomesauce"

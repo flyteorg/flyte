@@ -6,28 +6,10 @@ metadata:
 spec:
   template:
     spec:
-      initContainers:
-      - name: check-db-ready
-        image: postgres:10.1
-        imagePullPolicy: IfNotPresent
-        command: ['sh', '-c',
-          'until pg_isready -h cloudsqlproxy -p 5432;
-          do echo waiting for database; sleep 2; done;']
-      - name: run-migrations
-        volumeMounts:
-        - name: db-user-pass
-          mountPath: /etc/gcp
       containers:
       - name: datacatalog
         resources:
           limits:
-            memory: "200Mi"
-            cpu: "0.1"
-            ephemeral-storage: "100Mi"
-        volumeMounts:
-        - name: db-user-pass
-          mountPath: /etc/gcp
-      volumes:
-        - name: db-user-pass
-          secret:
-            secretName: db-user-pass
+            memory: "1Gi"
+            cpu: "2"
+            ephemeral-storage: "1000Mi"

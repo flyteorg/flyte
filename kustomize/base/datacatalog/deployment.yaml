@@ -28,6 +28,9 @@ spec:
       - name: config-volume
         configMap:
           name: datacatalog-config
+      - name: db-pass
+        secret:
+          secretName: db-pass
       initContainers:
       - name: run-migrations
         image: datacatalog:v0.2.2
@@ -36,6 +39,8 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/datacatalog/config
+        - name: db-pass
+          mountPath: /etc/db
       containers:
       - name: datacatalog
         image: datacatalog:v0.2.2
@@ -47,3 +52,5 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/datacatalog/config
+        - name: db-pass
+          mountPath: /etc/db

@@ -32,6 +32,9 @@ spec:
       - name: resource-templates 
         configMap:
           name: clusterresource-template 
+      - name: db-pass
+        secret:
+          secretName: db-pass
       initContainers:
       - name: run-migrations
         image: flyteadmin:v0.3.5
@@ -40,6 +43,8 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        - name: db-pass
+          mountPath: /etc/db
       # Optional, These just seed the project - TODO move them to only
       - name: seed-projects
         image: docker.io/lyft/flyteadmin:v0.3.5
@@ -49,6 +54,8 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        - name: db-pass
+          mountPath: /etc/db
       - name: sync-cluster-resources
         image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
@@ -58,6 +65,8 @@ spec:
           mountPath: /etc/flyte/clusterresource/templates
         - name: config-volume
           mountPath: /etc/flyte/config
+        - name: db-pass
+          mountPath: /etc/db
       containers:
       - name: flyteadmin
         image: flyteadmin:v0.3.5
@@ -71,6 +80,8 @@ spec:
           mountPath: /srv/flyte
         - name: config-volume
           mountPath: /etc/flyte/config
+        - name: db-pass
+          mountPath: /etc/db
       - name: redoc
         image: docker.io/redocly/redoc
         imagePullPolicy: IfNotPresent

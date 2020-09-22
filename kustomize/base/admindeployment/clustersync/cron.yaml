@@ -20,6 +20,8 @@ spec:
               mountPath: /etc/flyte/clusterresource/templates
             - name: config-volume
               mountPath: /etc/flyte/config
+            - name: db-pass
+              mountPath: /etc/db
           volumes:
           - name: resource-templates 
             configMap:
@@ -27,4 +29,7 @@ spec:
           - name: config-volume
             configMap:
               name: flyte-admin-config
+          - name: db-pass
+            secret:
+              secretName: db-pass
           restartPolicy: OnFailure
