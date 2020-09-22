@@ -1,0 +1,6 @@
+resources:
+- namespace.yaml
+- rbac.yaml
+- custom-config.yaml
+- service.yaml
+- deployment.yaml

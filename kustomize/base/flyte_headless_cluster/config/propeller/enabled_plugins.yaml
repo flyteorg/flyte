@@ -1,3 +1,5 @@
+##
+# TODO  It is important to enable the plugins that you want to deploy here.
 tasks:
   task-plugins:
     enabled-plugins:

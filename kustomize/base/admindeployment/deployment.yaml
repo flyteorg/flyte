@@ -29,6 +29,9 @@ spec:
       - name: config-volume
         configMap:
           name: flyte-admin-config
+      - name: resource-templates 
+        configMap:
+          name: clusterresource-template 
       initContainers:
       - name: run-migrations
         image: flyteadmin:v0.3.5
@@ -41,7 +44,7 @@ spec:
       - name: seed-projects
         image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
                   "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
         volumeMounts:
         - name: config-volume
@@ -49,7 +52,7 @@ spec:
       - name: sync-cluster-resources
         image: docker.io/lyft/flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml", "clusterresource", "sync"]
+        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
         volumeMounts:
         - name: resource-templates 
           mountPath: /etc/flyte/clusterresource/templates

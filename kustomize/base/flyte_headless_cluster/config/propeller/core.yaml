@@ -1,5 +1,5 @@
 propeller:
-  rawoutput-prefix: s3://my-container/
+  rawoutput-prefix: s3://my-s3-bucket/
   metadata-prefix: metadata/propeller
   workers: 4
   max-workflow-retries: 30
@@ -29,29 +29,9 @@ propeller:
       type: bucket
       rate: 10
       capacity: 100
-logger:
-  show-source: true
-  level: 5
-storage:
-  connection:
-    access-key: minio
-    auth-type: accesskey
-    disable-ssl: true
-    endpoint: http://minio.flyte.svc.cluster.local:9000
-    region: us-east-1
-    secret-key: miniostorage
-  type: minio
-  container: my-s3-bucket
-event:
-  type: admin
-  rate: 500
-  capacity: 1000
-admin:
-  endpoint: flyteadmin:81
-  insecure: true
-tasks:
-  task-plugins:
-    enabled-plugins:
-      - container
-      - sidecar
-      - k8s-array
+  resourcemanager:
+    type: redis
+    resourceMaxQuota: 10000
+    redis:
+      hostPath: redis-resource-manager:6379
+      hostKey: mypassword

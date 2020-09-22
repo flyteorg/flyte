@@ -1,0 +1,7 @@
+# TODO set any custom env vars
+plugins:
+  k8s:
+    default-env-vars:
+      - SOME_ENV_VARS: "These get passed to all containers"
+    default-cpus: 100m
+    default-memory: 100Mi
