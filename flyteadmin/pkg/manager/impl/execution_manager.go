@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
 
 	"github.com/golang/protobuf/ptypes"
@@ -263,6 +265,41 @@ func assignResourcesIfUnset(ctx context.Context, identifier *core.Identifier,
 	return resourceEntries
 }
 
+func checkTaskRequestsLessThanLimits(ctx context.Context, identifier *core.Identifier,
+	taskResources *core.Resources) {
+	// We choose the minimum of the platform request defaults or the limit itself for every resource request.
+	// Otherwise we can find ourselves in confusing scenarios where the injected platform request defaults exceed a
+	// user-specified limit
+	resourceLimits := make(map[core.Resources_ResourceName]string)
+	for _, resourceEntry := range taskResources.Limits {
+		resourceLimits[resourceEntry.Name] = resourceEntry.Value
+	}
+
+	finalizedResourceRequests := make([]*core.Resources_ResourceEntry, 0, len(taskResources.Requests))
+	for _, resourceEntry := range taskResources.Requests {
+		value := resourceEntry.Value
+		quantity := resource.MustParse(resourceEntry.Value)
+		limitValue, ok := resourceLimits[resourceEntry.Name]
+		if !ok {
+			// Unexpected - at this stage both requests and limits should be populated.
+			logger.Warningf(ctx, "No limit specified for [%v] resource [%s] although request was set", identifier,
+				resourceEntry.Name)
+			continue
+		}
+		if quantity.Cmp(resource.MustParse(limitValue)) == 1 {
+			// The quantity is greater than the limit! Course correct below.
+			logger.Infof(ctx, "Updating requested value for task [%+v] resource [%s]. Overriding to smaller limit value [%s] from original request [%s]",
+				identifier, resourceEntry.Name, limitValue, value)
+			value = limitValue
+		}
+		finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
+			Name:  resourceEntry.Name,
+			Value: value,
+		})
+	}
+	taskResources.Requests = finalizedResourceRequests
+}
+
 // Assumes input contains a compiled task with a valid container resource execConfig.
 //
 // Note: The system will assign a system-default value for request but for limit it will deduce it from the request
@@ -305,6 +342,7 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 	task.Template.GetContainer().Resources.Limits = assignResourcesIfUnset(
 		ctx, task.Template.Id, createTaskDefaultLimits(ctx, task), task.Template.GetContainer().Resources.Limits,
 		taskResourceSpec)
+	checkTaskRequestsLessThanLimits(ctx, task.Template.Id, task.Template.GetContainer().Resources)
 }
 
 func (m *ExecutionManager) launchSingleTaskExecution(

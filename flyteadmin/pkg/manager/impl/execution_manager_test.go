@@ -2464,6 +2464,111 @@ func TestAssignResourcesIfUnset(t *testing.T) {
 	}, assignedResources)
 }
 
+func TestCheckTaskRequestsLessThanLimits(t *testing.T) {
+	ctx := context.Background()
+	identifier := &core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Project:      project,
+		Domain:       domain,
+		Name:         name,
+		Version:      version,
+	}
+	t.Run("use_limit", func(t *testing.T) {
+		resources := &core.Resources{
+			Requests: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "1",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "2",
+				},
+			},
+			Limits: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "2",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1",
+				},
+			},
+		}
+		checkTaskRequestsLessThanLimits(ctx, identifier, resources)
+		assert.True(t, proto.Equal(&core.Resources{
+			Requests: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "1",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1",
+				},
+			},
+			Limits: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "2",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1",
+				},
+			},
+		}, resources))
+	})
+	t.Run("nothing_to_override", func(t *testing.T) {
+		resources := &core.Resources{
+			Requests: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "2",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1",
+				},
+			},
+			Limits: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "2",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1.5",
+				},
+			},
+		}
+		checkTaskRequestsLessThanLimits(ctx, identifier, resources)
+		assert.True(t, proto.Equal(&core.Resources{
+			Requests: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "2",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1",
+				},
+			},
+			Limits: []*core.Resources_ResourceEntry{
+				{
+					Name:  core.Resources_CPU,
+					Value: "2",
+				},
+				{
+					Name:  core.Resources_MEMORY,
+					Value: "1.5",
+				},
+			},
+		}, resources))
+	})
+}
+
 func TestSetDefaults(t *testing.T) {
 	task := &core.CompiledTask{
 		Template: &core.TaskTemplate{
