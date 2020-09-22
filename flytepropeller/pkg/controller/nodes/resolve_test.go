@@ -160,6 +160,10 @@ func (d *dummyBaseWorkflow) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.Executable
 	return d.GetNodeCb(nodeID)
 }
 
+func (d *dummyBaseWorkflow) GetExecutionConfig() v1alpha1.ExecutionConfig {
+	return v1alpha1.ExecutionConfig{}
+}
+
 func createDummyBaseWorkflow(dataStore *storage.DataStore) *dummyBaseWorkflow {
 	return &dummyBaseWorkflow{
 		ID: "w1",

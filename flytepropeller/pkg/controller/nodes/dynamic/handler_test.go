@@ -542,15 +542,15 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), tt.args.validErr, nil)
+				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), tt.args.validErr, nil)
 			} else {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"}}), nil, nil)
+				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"}}), nil, nil)
 			}
 			n := &executorMocks.Node{}
 			if tt.args.isErr {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executors.NodeStatusUndefined, fmt.Errorf("error"))
+				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(executors.NodeStatusUndefined, fmt.Errorf("error"))
 			} else {
-				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
+				n.OnRecursiveNodeHandlerMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(tt.args.s, nil)
 			}
 			if tt.args.generateOutputs {
 				endF := v1alpha1.GetOutputsFile("end-node")
@@ -562,6 +562,7 @@ func Test_dynamicNodeHandler_Handle_SubTaskV1(t *testing.T) {
 			immutableParentInfo.OnGetUniqueID().Return("c1")
 			immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
 			execContext.OnGetParentInfo().Return(&immutableParentInfo)
+			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.OnExecutionContext().Return(&execContext)
 			d := New(h, n, mockLPLauncher, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)
@@ -729,9 +730,9 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			mockLPLauncher := &lpMocks.Reader{}
 			h := &mocks.TaskNodeHandler{}
 			if tt.args.validErr != nil {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), tt.args.validErr, nil)
+				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), tt.args.validErr, nil)
 			} else {
-				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"}}), nil, nil)
+				h.OnValidateOutputAndCacheAddMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, &core.CatalogMetadata{ArtifactTag: &core.CatalogArtifactTag{Name: "name", ArtifactId: "id"}}), nil, nil)
 			}
 			n := &executorMocks.Node{}
 			if tt.args.isErr {
@@ -746,6 +747,7 @@ func Test_dynamicNodeHandler_Handle_SubTask(t *testing.T) {
 			execContext := executorMocks.ExecutionContext{}
 			execContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 			execContext.OnGetParentInfo().Return(nil)
+			execContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 			nCtx.OnExecutionContext().Return(&execContext)
 			d := New(h, n, mockLPLauncher, promutils.NewTestScope())
 			got, err := d.Handle(context.TODO(), nCtx)

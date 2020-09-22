@@ -457,6 +457,7 @@ type ExecutableWorkflow interface {
 	ExecutableSubWorkflow
 	MetaExtended
 	NodeStatusGetter
+	GetExecutionConfig() ExecutionConfig
 }
 
 type NodeStatusGetter interface {

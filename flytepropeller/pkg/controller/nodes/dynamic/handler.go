@@ -33,7 +33,8 @@ const dynamicNodeID = "dynamic-node"
 
 type TaskNodeHandler interface {
 	handler.Node
-	ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter,
+	ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
+		r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
 		tr pluginCore.TaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error)
 }
 
@@ -116,9 +117,10 @@ func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, n
 		outputPaths := ioutils.NewRemoteFileOutputPaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir(), nil)
 		execID := task.GetTaskExecutionIdentifier(nCtx)
 		outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
-		status, ee, err := d.TaskNodeHandler.ValidateOutputAndCacheAdd(ctx, nCtx.NodeID(), nCtx.InputReader(), outputReader, nil, nCtx.TaskReader(), catalog.Metadata{
-			TaskExecutionIdentifier: execID,
-		})
+		status, ee, err := d.TaskNodeHandler.ValidateOutputAndCacheAdd(ctx, nCtx.NodeID(), nCtx.InputReader(),
+			outputReader, nil, nCtx.ExecutionContext().GetExecutionConfig(), nCtx.TaskReader(), catalog.Metadata{
+				TaskExecutionIdentifier: execID,
+			})
 
 		if err != nil {
 			return handler.UnknownTransition, prevState, err
