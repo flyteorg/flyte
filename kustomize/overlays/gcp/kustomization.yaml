@@ -65,6 +65,13 @@ configMapGenerator:
   - ./config/datacatalog/db.yaml
   name: datacatalog-config
 
+###########
+# Use this to record the password for the Google CloudSQL Database
+secretGenerator:
+- name: db-pass
+  literals:
+  - pass.txt="awesomesauce"
+
 # Images that should be used
 images:
   # FlyteAdmin

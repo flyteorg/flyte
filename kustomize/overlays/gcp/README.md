@@ -1,3 +1,4 @@
+[All Overlays](./)
 # Google Cloud Platform Overlay
 
 This overlay serves as an example to bootstrap Flyte setup on Google Cloud Platform (GCP). It is not
