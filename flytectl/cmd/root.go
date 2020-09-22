@@ -16,7 +16,6 @@ var (
 	configAccessor = viper.NewAccessor(stdConfig.Options{StrictMode: true})
 )
 
-
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		PersistentPreRunE: initConfig,
@@ -31,6 +30,7 @@ func newRootCmd() *cobra.Command {
 	// --root.project, this adds a convenience on top to allow --project to be used
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Project), "project", "p", "", "Specifies the Flyte project.")
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Domain), "domain", "d", "", "Specifies the Flyte project's domain.")
+	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Output), "output", "o", "table", "Specifies the output type")
 
 	rootCmd.AddCommand(viper.GetConfigCommand())
 	rootCmd.AddCommand(versionCmd)
