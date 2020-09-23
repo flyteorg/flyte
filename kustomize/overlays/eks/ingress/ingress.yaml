@@ -1,0 +1,10 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: flytesystem
+  namespace: flyte
+  annotations:
+    # TODO ALB can only be used for REST non grpc endpoints
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/tags: service_instance=production
+    alb.ingress.kubernetes.io/scheme: internet-facing

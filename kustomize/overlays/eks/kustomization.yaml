@@ -8,8 +8,6 @@ bases:
 - ../../base/flyte_single_cluster
 
 # All the resources that make up the deployment
-- datacatalog/service.yaml
-- propeller/service.yaml
   ########
   # Operators to be enabled
   #############
@@ -21,15 +19,19 @@ bases:
 resources:
 - ../../base/operators/spark
 - ../../base/operators/kfoperators/pytorch
-- ./dependencies/cloudsqlproxy
+  # TODO Fix deployment of alb_ingress controller
+  #- ./dependencies/alb_ingress
   # Optional dependency
 - ./dependencies/redis
 
 patchesStrategicMerge:
 - admin/deployment.yaml
 - admin/service.yaml
+- admin/serviceaccount.yaml
 - datacatalog/deployment.yaml
 - propeller/deployment.yaml
+- propeller/serviceaccount.yaml
+- ingress/ingress.yaml
 - console/service.yaml
 
 # Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".

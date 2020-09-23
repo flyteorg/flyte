@@ -1,0 +1,16 @@
+plugins:
+  spark:
+    spark-config-default:
+      - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+      - spark.kubernetes.allocation.batch.size: "50"
+      - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+      - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+      - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+      - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+      - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+      - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+      - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+      - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+      - spark.blacklist.enabled: "true"
+      - spark.blacklist.timeout: "5m"
+      - spark.task.maxfailures: "8"
