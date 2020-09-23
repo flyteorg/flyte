@@ -25,8 +25,4 @@ jobs:
         uses: stefanprodan/kube-tools@v1
         with:
           kustomize: 3.5.5
-        command: |
-          SCRIPT=script/generate_kustomize.sh
-          echo "Running Kustomizer"
-          ./${SCRIPT}
-          echo "Kustomizer run completed"
+        run: script/generate_kustomize.sh
