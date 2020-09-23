@@ -25,4 +25,4 @@ jobs:
         uses: stefanprodan/kube-tools@v1
         with:
           kustomize: 3.5.5
-        run: script/generate_kustomize.sh
+          command: script/generate_kustomize.sh
