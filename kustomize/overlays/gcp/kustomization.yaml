@@ -69,8 +69,9 @@ configMapGenerator:
 # Use this to record the password for the Google CloudSQL Database
 secretGenerator:
 - name: db-pass
+  behavior: merge
   literals:
-  - pass.txt="awesomesauce"
+  - pass.txt="yourpassword"
 
 # Images that should be used
 images:

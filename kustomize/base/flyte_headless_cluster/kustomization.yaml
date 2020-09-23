@@ -17,6 +17,7 @@ configMapGenerator:
 - name: flyte-admin-config
   files:
     - ./config/admin/server.yaml
+    - ./config/admin/domain.yaml
     - ./config/admin/db.yaml
     - ./config/admin/cluster_resources.yaml
     - ./config/admin/remote_data.yaml

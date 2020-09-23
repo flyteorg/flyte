@@ -5,15 +5,11 @@ kind: Kustomization
 namespace: flyte
 
 bases:
-- ../../base/flyte_single_cluster
+- ../../base/flyte_headless_cluster
 
 
 # All the resources that make up the deployment
 resources:
-  ########
-  # Operators to be enabled
-- ../../base/operators/spark
-- ../../base/operators/kfoperators/pytorch
   #############
   # Dependencies to be configured
 - ./dependencies/database
@@ -23,19 +19,7 @@ resources:
 - ./dependencies/redis
   # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
 - ./dependencies/contour_ingress_controller
-  # Add node ports for ease of use locally
-- ./dependencies/nodeport-services.yaml
 
-##############################################  
-# Generate Configs
-# For each component exactly one config is generated
-# For every component required configs are
-# 1. logger.yaml
-# 2. storage.yaml
-# 3. component.yaml
-#
-# db.yaml is required for FlyteAdmin and DataCatalog
-# ############################################
 configMapGenerator:
 # the main admin configmap
 - name: flyte-admin-config
