@@ -53,6 +53,24 @@ func getWorkflowCreateRequest() admin.WorkflowCreateRequest {
 						},
 					},
 				},
+				Nodes: []*core.Node{
+					{
+						Id: "I'm a node",
+						Target: &core.Node_TaskNode{
+							TaskNode: &core.TaskNode{
+								Reference: &core.TaskNode_ReferenceId{
+									ReferenceId: &core.Identifier{
+										ResourceType: core.ResourceType_TASK,
+										Project:      "admintests",
+										Domain:       "development",
+										Name:         "name_a",
+										Version:      "123",
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
@@ -163,6 +181,7 @@ func TestCreateLaunchPlan(t *testing.T) {
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
+	insertTasksForTests(t, client)
 
 	createWorkflowReq := getWorkflowCreateRequest()
 
@@ -180,6 +199,7 @@ func TestGetLaunchPlanHTTP(t *testing.T) {
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
+	insertTasksForTests(t, client)
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
@@ -213,6 +233,7 @@ func TestEnableDisableLaunchPlan(t *testing.T) {
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
+	insertTasksForTests(t, client)
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
@@ -268,6 +289,7 @@ func TestUpdateActiveLaunchPlanVersion(t *testing.T) {
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
 
+	insertTasksForTests(t, client)
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
@@ -322,6 +344,7 @@ func TestListLaunchPlans(t *testing.T) {
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 
+	insertTasksForTests(t, client)
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)
@@ -391,6 +414,7 @@ func TestListLaunchPlansFilterOnSchedule(t *testing.T) {
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 
+	insertTasksForTests(t, client)
 	createWorkflowReq := getWorkflowCreateRequest()
 
 	_, err := client.CreateWorkflow(ctx, &createWorkflowReq)

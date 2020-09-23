@@ -82,6 +82,24 @@ func insertWorkflowsForTests(t *testing.T, client service.AdminServiceClient) {
 										},
 									},
 								},
+								Nodes: []*core.Node{
+									{
+										Id: "I'm a node",
+										Target: &core.Node_TaskNode{
+											TaskNode: &core.TaskNode{
+												Reference: &core.TaskNode_ReferenceId{
+													ReferenceId: &core.Identifier{
+														ResourceType: core.ResourceType_TASK,
+														Project:      project,
+														Domain:       domain,
+														Name:         name,
+														Version:      version,
+													},
+												},
+											},
+										},
+									},
+								},
 							},
 						},
 					}

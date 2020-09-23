@@ -305,6 +305,7 @@ func TestUpdateNamedEntityState(t *testing.T) {
 	ctx := context.Background()
 
 	defer conn.Close()
+	insertTasksForTests(t, client)
 	insertWorkflowsForTests(t, client)
 
 	result, err := client.ListNamedEntities(ctx, &admin.NamedEntityListRequest{
