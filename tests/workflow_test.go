@@ -5,6 +5,7 @@ package tests
 import (
 	"context"
 	"fmt"
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	"io/ioutil"
 	"net/http"
 	"testing"
@@ -17,9 +18,18 @@ import (
 )
 
 func TestCreateWorkflow(t *testing.T) {
+	truncateAllTablesForTestingOnly()
 	ctx := context.Background()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
+
+	taskCreateReq := testutils.GetValidTaskRequest()
+	taskCreateReq.Id.Project = "admintests"
+	taskCreateReq.Id.Domain = "development"
+	taskCreateReq.Id.Name = "simple task"
+	_, err := client.CreateTask(ctx, &taskCreateReq)
+	assert.NoError(t, err)
+
 
 	identifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
@@ -34,11 +44,23 @@ func TestCreateWorkflow(t *testing.T) {
 			Template: &core.WorkflowTemplate{
 				Id:        &identifier,
 				Interface: &core.TypedInterface{},
+				Nodes: []*core.Node{
+					{
+						Id: "I'm a node",
+						Target: &core.Node_TaskNode{
+							TaskNode: &core.TaskNode{
+								Reference: &core.TaskNode_ReferenceId{
+									ReferenceId: taskCreateReq.Id,
+								},
+							},
+						},
+					},
+				},
 			},
 		},
 	}
 
-	_, err := client.CreateWorkflow(ctx, &req)
+	_, err = client.CreateWorkflow(ctx, &req)
 	assert.Nil(t, err)
 }
 
@@ -46,6 +68,7 @@ func TestGetWorkflows(t *testing.T) {
 	truncateAllTablesForTestingOnly()
 	client, conn := GetTestAdminServiceClient()
 	defer conn.Close()
+	insertTasksForTests(t, client)
 	insertWorkflowsForTests(t, client)
 
 	t.Run("TestGetWorkflowGrpc", testGetWorkflowGrpc)
