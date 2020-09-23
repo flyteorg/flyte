@@ -4,9 +4,9 @@ kind: Kustomization
 # All the resources that make up the deployment
 resources:
 # global resources
-- ../flyte_headless_cluster
-- ../admindeployment/clustersync
-- ../console
+- ../headless
+- ../../admindeployment/clustersync
+- ../../console
 
 # configMapGenerator:
 # TODO Flyte Console Configuration

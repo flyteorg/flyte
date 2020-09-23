@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: flyte
 
 bases:
-- ../../base/flyte_headless_cluster
+- ../../base/single_cluster/headless
 
 
 # All the resources that make up the deployment

@@ -5,7 +5,7 @@ kind: Kustomization
 namespace: flyte
 
 bases:
-- ../../base/flyte_single_cluster
+- ../../base/single_cluster/complete
 
 # All the resources that make up the deployment
 - datacatalog/service.yaml

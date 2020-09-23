@@ -4,13 +4,13 @@ kind: Kustomization
 # All the resources that make up the deployment
 resources:
 # global resources
-- ../namespace
-- ../ingress
-- ../admindeployment
-- ../datacatalog
-- ../wf_crd
-- ../propeller
-- ../adminserviceaccount
+- ../../namespace
+- ../../ingress
+- ../../admindeployment
+- ../../datacatalog
+- ../../wf_crd
+- ../../propeller
+- ../../adminserviceaccount
 
 configMapGenerator:
 # the main admin configmap
