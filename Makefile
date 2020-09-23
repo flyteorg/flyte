@@ -1,6 +1,6 @@
 .PHONY: kustomize
 kustomize:
-	bash script/kustomize.sh
+	bash script/generate_kustomize.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox:
