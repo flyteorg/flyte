@@ -5,7 +5,7 @@ set -ex
 DEPLOYMENT=${1:-sandbox test eks gcp}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-KUSTOMIZE_IMAGE="lyft/kustomizer:v3.1.0"
+KUSTOMIZE_IMAGE="lyft/kustomizer:v3.3.0"
 
 for deployment in ${DEPLOYMENT}; do
     docker run -v "${DIR}/../kustomize":/kustomize "$KUSTOMIZE_IMAGE" kustomize build \
