@@ -1,7 +1,11 @@
 package transformers
 
 import (
+	"context"
+
 	"github.com/golang/protobuf/proto"
+	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
@@ -22,6 +26,61 @@ func WorkflowAttributesToResourceModel(attributes admin.WorkflowAttributes, reso
 		Priority:     models.ResourcePriorityWorkflowLevel,
 		Attributes:   attributeBytes,
 	}, nil
+}
+
+func mergeUpdatePluginOverrides(existingAttributes admin.MatchingAttributes,
+	newMatchingAttributes *admin.MatchingAttributes) *admin.MatchingAttributes {
+	taskPluginOverrides := make(map[string]*admin.PluginOverride)
+	if existingAttributes.GetPluginOverrides() != nil && len(existingAttributes.GetPluginOverrides().Overrides) > 0 {
+		for _, pluginOverride := range existingAttributes.GetPluginOverrides().Overrides {
+			taskPluginOverrides[pluginOverride.TaskType] = pluginOverride
+		}
+	}
+	if newMatchingAttributes.GetPluginOverrides() != nil &&
+		len(newMatchingAttributes.GetPluginOverrides().Overrides) > 0 {
+		for _, pluginOverride := range newMatchingAttributes.GetPluginOverrides().Overrides {
+			taskPluginOverrides[pluginOverride.TaskType] = pluginOverride
+		}
+	}
+
+	updatedPluginOverrides := make([]*admin.PluginOverride, 0, len(taskPluginOverrides))
+	for _, pluginOverride := range taskPluginOverrides {
+		updatedPluginOverrides = append(updatedPluginOverrides, pluginOverride)
+	}
+	return &admin.MatchingAttributes{
+		Target: &admin.MatchingAttributes_PluginOverrides{
+			PluginOverrides: &admin.PluginOverrides{
+				Overrides: updatedPluginOverrides,
+			},
+		},
+	}
+}
+
+func MergeUpdateWorkflowAttributes(ctx context.Context, model models.Resource, resource admin.MatchableResource,
+	resourceID *repoInterfaces.ResourceID, workflowAttributes *admin.WorkflowAttributes) (models.Resource, error) {
+	switch resource {
+	case admin.MatchableResource_PLUGIN_OVERRIDE:
+		var existingAttributes admin.MatchingAttributes
+		err := proto.Unmarshal(model.Attributes, &existingAttributes)
+		if err != nil {
+			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
+				"Unable to unmarshal existing resource attributes for [%+v] with err: %v", resourceID, err)
+		}
+		updatedAttributes := mergeUpdatePluginOverrides(existingAttributes, workflowAttributes.GetMatchingAttributes())
+		marshaledAttributes, err := proto.Marshal(updatedAttributes)
+		if err != nil {
+			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
+				"Failed to marshal merge-updated attributes for [%+v] with err: %v", resourceID, err)
+		}
+		model.Attributes = marshaledAttributes
+		return model, nil
+	default:
+		logger.Warningf(ctx, "Tried to merge-update an unsupported resource type [%s] for [%+v]",
+			resource.String(), resourceID)
+		return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
+			"Tried to merge-update an unsupported resource type [%s] for [%+v]",
+			resource.String(), resourceID)
+	}
 }
 
 func FromResourceModelToWorkflowAttributes(model models.Resource) (admin.WorkflowAttributes, error) {
@@ -51,6 +110,33 @@ func ProjectDomainAttributesToResourceModel(attributes admin.ProjectDomainAttrib
 		Priority:     models.ResourcePriorityProjectDomainLevel,
 		Attributes:   attributeBytes,
 	}, nil
+}
+
+func MergeUpdateProjectDomainAttributes(ctx context.Context, model models.Resource, resource admin.MatchableResource,
+	resourceID *repoInterfaces.ResourceID, attributes *admin.ProjectDomainAttributes) (models.Resource, error) {
+	switch resource {
+	case admin.MatchableResource_PLUGIN_OVERRIDE:
+		var existingAttributes admin.MatchingAttributes
+		err := proto.Unmarshal(model.Attributes, &existingAttributes)
+		if err != nil {
+			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
+				"Unable to unmarshal existing resource attributes for [%+v] with err: %v", resourceID, err)
+		}
+		updatedAttributes := mergeUpdatePluginOverrides(existingAttributes, attributes.GetMatchingAttributes())
+		marshaledAttributes, err := proto.Marshal(updatedAttributes)
+		if err != nil {
+			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
+				"Failed to marshal merge-updated attributes for [%+v] with err: %v", resourceID, err)
+		}
+		model.Attributes = marshaledAttributes
+		return model, nil
+	default:
+		logger.Warningf(ctx, "Tried to merge-update an unsupported resource type [%s] for [%+v]",
+			resource.String(), resourceID)
+		return models.Resource{}, errors.NewFlyteAdminErrorf(codes.Internal,
+			"Tried to merge-update an unsupported resource type [%s] for [%+v]",
+			resource.String(), resourceID)
+	}
 }
 
 func FromResourceModelToProjectDomainAttributes(model models.Resource) (admin.ProjectDomainAttributes, error) {

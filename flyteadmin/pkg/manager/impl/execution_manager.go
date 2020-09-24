@@ -173,6 +173,27 @@ func (m *ExecutionManager) addLabelsAndAnnotations(requestSpec *admin.ExecutionS
 	return nil
 }
 
+func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
+	workflowName, launchPlanName string, partiallyPopulatedInputs *workflowengineInterfaces.ExecuteWorkflowInput) error {
+	override, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Project:      executionID.Project,
+		Domain:       executionID.Domain,
+		Workflow:     workflowName,
+		LaunchPlan:   launchPlanName,
+		ResourceType: admin.MatchableResource_PLUGIN_OVERRIDE,
+	})
+	if err != nil {
+		ec, ok := err.(errors.FlyteAdminError)
+		if !ok || ec.Code() != codes.NotFound {
+			return err
+		}
+	}
+	if override != nil && override.Attributes != nil && override.Attributes.GetPluginOverrides() != nil {
+		partiallyPopulatedInputs.TaskPluginOverrides = override.Attributes.GetPluginOverrides().Overrides
+	}
+	return nil
+}
+
 func (m *ExecutionManager) offloadInputs(ctx context.Context, literalMap *core.LiteralMap, identifier *core.WorkflowExecutionIdentifier, key string) (storage.DataReference, error) {
 	if literalMap == nil {
 		literalMap = &core.LiteralMap{}
@@ -608,6 +629,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		QueueingBudget: qualityOfService.QueuingBudget,
 	}
 	err = m.addLabelsAndAnnotations(request.Spec, &executeWorkflowInputs)
+	if err != nil {
+		return nil, nil, err
+	}
+	err = m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name,
+		&executeWorkflowInputs)
 	if err != nil {
 		return nil, nil, err
 	}

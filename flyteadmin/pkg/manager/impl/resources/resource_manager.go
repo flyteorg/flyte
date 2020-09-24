@@ -3,6 +3,8 @@ package resources
 import (
 	"context"
 
+	"github.com/lyft/flyteadmin/pkg/repositories/models"
+
 	"github.com/gogo/protobuf/proto"
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flytestdlib/contextutils"
@@ -54,6 +56,41 @@ func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.Re
 	}, nil
 }
 
+func (m *ResourceManager) createOrMergeUpdateWorkflowAttributes(
+	ctx context.Context, request admin.WorkflowAttributesUpdateRequest, model models.Resource,
+	resourceType admin.MatchableResource) (*admin.WorkflowAttributesUpdateResponse, error) {
+	resourceID := repo_interface.ResourceID{
+		Project:      model.Project,
+		Domain:       model.Domain,
+		Workflow:     model.Workflow,
+		LaunchPlan:   model.LaunchPlan,
+		ResourceType: model.ResourceType,
+	}
+	existing, err := m.db.ResourceRepo().GetRaw(ctx, resourceID)
+	if err != nil {
+		ec, ok := err.(errors.FlyteAdminError)
+		if ok && ec.Code() == codes.NotFound {
+			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
+			err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+			if err != nil {
+				return nil, err
+			}
+			return &admin.WorkflowAttributesUpdateResponse{}, nil
+		}
+		return nil, err
+	}
+	updatedModel, err := transformers.MergeUpdateWorkflowAttributes(
+		ctx, existing, resourceType, &resourceID, request.Attributes)
+	if err != nil {
+		return nil, err
+	}
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, updatedModel)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.WorkflowAttributesUpdateResponse{}, nil
+}
+
 func (m *ResourceManager) UpdateWorkflowAttributes(
 	ctx context.Context, request admin.WorkflowAttributesUpdateRequest) (
 	*admin.WorkflowAttributesUpdateResponse, error) {
@@ -66,6 +103,9 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 	model, err := transformers.WorkflowAttributesToResourceModel(*request.Attributes, resource)
 	if err != nil {
 		return nil, err
+	}
+	if request.Attributes.GetMatchingAttributes().GetPluginOverrides() != nil {
+		return m.createOrMergeUpdateWorkflowAttributes(ctx, request, model, admin.MatchableResource_PLUGIN_OVERRIDE)
 	}
 	err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
 	if err != nil {
@@ -109,6 +149,41 @@ func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
 	return &admin.WorkflowAttributesDeleteResponse{}, nil
 }
 
+func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
+	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest, model models.Resource,
+	resourceType admin.MatchableResource) (*admin.ProjectDomainAttributesUpdateResponse, error) {
+	resourceID := repo_interface.ResourceID{
+		Project:      model.Project,
+		Domain:       model.Domain,
+		Workflow:     model.Workflow,
+		LaunchPlan:   model.LaunchPlan,
+		ResourceType: model.ResourceType,
+	}
+	existing, err := m.db.ResourceRepo().GetRaw(ctx, resourceID)
+	if err != nil {
+		ec, ok := err.(errors.FlyteAdminError)
+		if ok && ec.Code() == codes.NotFound {
+			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
+			err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+			if err != nil {
+				return nil, err
+			}
+			return &admin.ProjectDomainAttributesUpdateResponse{}, nil
+		}
+		return nil, err
+	}
+	updatedModel, err := transformers.MergeUpdateProjectDomainAttributes(
+		ctx, existing, resourceType, &resourceID, request.Attributes)
+	if err != nil {
+		return nil, err
+	}
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, updatedModel)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.ProjectDomainAttributesUpdateResponse{}, nil
+}
+
 func (m *ResourceManager) UpdateProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest) (
 	*admin.ProjectDomainAttributesUpdateResponse, error) {
@@ -122,6 +197,9 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 	model, err := transformers.ProjectDomainAttributesToResourceModel(*request.Attributes, resource)
 	if err != nil {
 		return nil, err
+	}
+	if request.Attributes.GetMatchingAttributes().GetPluginOverrides() != nil {
+		return m.createOrMergeUpdateProjectDomainAttributes(ctx, request, model, admin.MatchableResource_PLUGIN_OVERRIDE)
 	}
 	err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
 	if err != nil {

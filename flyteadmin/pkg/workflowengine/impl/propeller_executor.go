@@ -91,6 +91,23 @@ func (c *FlytePropeller) addPermissions(launchPlan admin.LaunchPlan, flyteWf *v1
 	}
 }
 
+func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride, flyteWf *v1alpha1.FlyteWorkflow) {
+	executionConfig := v1alpha1.ExecutionConfig{
+		TaskPluginImpls: make(map[string]v1alpha1.TaskPluginOverride),
+	}
+	if len(taskPluginOverrides) == 0 {
+		return
+	}
+	for _, override := range taskPluginOverrides {
+		executionConfig.TaskPluginImpls[override.TaskType] = v1alpha1.TaskPluginOverride{
+			PluginIDs:             override.PluginId,
+			MissingPluginBehavior: override.MissingPluginBehavior,
+		}
+
+	}
+	flyteWf.ExecutionConfig = executionConfig
+}
+
 func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.ExecuteWorkflowInput) (*interfaces.ExecutionInfo, error) {
 	if input.ExecutionID == nil {
 		c.metrics.InvalidExecutionID.Inc()
@@ -121,6 +138,7 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
+	addExecutionOverrides(input.TaskPluginOverrides, flyteWf)
 
 	if input.Reference.Spec.RawOutputDataConfig != nil {
 		flyteWf.RawOutputDataConfig = v1alpha1.RawOutputDataConfig{
