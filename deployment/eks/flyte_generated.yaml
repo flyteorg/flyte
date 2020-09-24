@@ -2,11 +2,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: flyte
-spec:
-  finalizers:
-  - kubernetes
-status:
-  phase: Active
 ---
 apiVersion: v1
 kind: Namespace
@@ -116,13 +111,13 @@ metadata:
     app: pytorch-operator
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -417,7 +412,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -430,6 +425,15 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: sparkoperator
+  namespace: sparkoperator
+---
+apiVersion: v1
+data:
+  BASE_URL: /console
+  CONFIG_DIR: /etc/flyte/config
+kind: ConfigMap
+metadata:
+  name: flyte-console-config
   namespace: flyte
 ---
 apiVersion: v1
@@ -498,8 +502,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: clusterresource-template-kf62ttf64k
-  namespace: flyte
+  name: clusterresource-template-tkdkkt4cb5
 ---
 apiVersion: v1
 data:
@@ -547,8 +550,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: datacatalog-config-2tbm82k5t8
-  namespace: flyte
+  name: datacatalog-config-2bb94tc5b5
 ---
 apiVersion: v1
 data:
@@ -656,17 +658,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-admin-config-7dc4c2gt9f
-  namespace: flyte
----
-apiVersion: v1
-data:
-  BASE_URL: /console
-  CONFIG_DIR: /etc/flyte/config
-kind: ConfigMap
-metadata:
-  name: flyte-console-config
-  namespace: flyte
+  name: flyte-admin-config-g79597h75m
 ---
 apiVersion: v1
 data:
@@ -814,8 +806,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-9mmhk7f684
-  namespace: flyte
+  name: flyte-propeller-config-fgt6tg929g
 ---
 apiVersion: v1
 data:
@@ -824,8 +815,7 @@ kind: Secret
 metadata:
   annotations: {}
   labels: {}
-  name: db-pass-kdm4d5fcfb
-  namespace: flyte
+  name: db-pass-bthd2588cc
 type: Opaque
 ---
 apiVersion: v1
@@ -898,28 +888,6 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    prometheus.io/path: /metrics
-    prometheus.io/port: "8443"
-    prometheus.io/scrape: "true"
-  labels:
-    app: pytorch-operator
-    kustomize.component: pytorch-operator
-  name: pytorch-operator
-  namespace: flyte
-spec:
-  ports:
-  - name: monitoring-port
-    port: 8443
-    targetPort: 8443
-  selector:
-    kustomize.component: pytorch-operator
-    name: pytorch-operator
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
   labels:
     app: redis-resource-manager
   name: redis-resource-manager
@@ -937,8 +905,30 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8443"
+    prometheus.io/scrape: "true"
+  labels:
+    app: pytorch-operator
+    kustomize.component: pytorch-operator
+  name: pytorch-operator
+  namespace: kubeflow
+spec:
+  ports:
+  - name: monitoring-port
+    port: 8443
+    targetPort: 8443
+  selector:
+    kustomize.component: pytorch-operator
+    name: pytorch-operator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: spark-webhook
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   ports:
   - name: webhook
@@ -1012,13 +1002,14 @@ spec:
           name: db-pass
       serviceAccountName: datacatalog
       volumes:
-      - name: shared-data
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: datacatalog-config-2tbm82k5t8
+          name: datacatalog-config
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-kdm4d5fcfb
+          secretName: db-pass
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1141,16 +1132,17 @@ spec:
           name: db-pass
       serviceAccountName: flyteadmin
       volumes:
-      - name: shared-data
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: flyte-admin-config-7dc4c2gt9f
+          name: flyte-admin-config
         name: config-volume
       - configMap:
-          name: clusterresource-template-kf62ttf64k
+          name: clusterresource-template
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-kdm4d5fcfb
+          secretName: db-pass
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1235,7 +1227,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-9mmhk7f684
+          name: flyte-propeller-config
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1244,7 +1236,7 @@ metadata:
   labels:
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 spec:
   replicas: 1
   selector:
@@ -1283,7 +1275,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.0-v1beta1
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   replicas: 1
   selector:
@@ -1422,14 +1414,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-kf62ttf64k
+              name: clusterresource-template
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-7dc4c2gt9f
+              name: flyte-admin-config
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-kdm4d5fcfb
+              secretName: db-pass
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1
@@ -1439,7 +1431,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.0-v1beta1
   name: sparkoperator-init
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   backoffLimit: 3
   template:
@@ -1452,7 +1444,7 @@ spec:
       - command:
         - /usr/bin/gencerts.sh
         - --namespace
-        - flyte
+        - sparkoperator
         - -p
         image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
         imagePullPolicy: IfNotPresent

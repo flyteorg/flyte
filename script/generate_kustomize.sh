@@ -2,15 +2,22 @@
 
 set -ex
 
-echo "Install Kustomize"
+echo "Installing Kustomize"
+mkdir -p _bin; cd _bin; rm kustomize;
 curl -s "https://raw.githubusercontent.com/\
 kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+cd -
 
+# All the overlays to be built
 DEPLOYMENT=${1:-sandbox test eks gcp}
+
+KUSTOMIZE=_bin/kustomize
+KUSTOMIZE_OVERLAYS_ROOT=kustomize/overlays
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 for deployment in ${DEPLOYMENT}; do
-    kustomize build kustomize/overlays/${deployment} > ${DIR}/../deployment/${deployment}/flyte_generated.yaml
+    ${KUSTOMIZE} build ${KUSTOMIZE_OVERLAYS_ROOT}/${deployment} > ${DIR}/../deployment/${deployment}/flyte_generated.yaml
 done
 
 # This section is used by GitHub workflow to ensure that the generation step was run

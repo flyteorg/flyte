@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 # Override the namespace
-namespace: flyte
+#namespace: flyte
 
 bases:
 - ../../base/single_cluster/complete
@@ -27,28 +27,6 @@ resources:
 
 patchesStrategicMerge:
 - admin/deployment.yaml
-
-##############################################  
-# Generate Configs
-# For each component exactly one config is generated
-# For every component required configs are
-# 1. logger.yaml
-# 2. storage.yaml
-# 3. component.yaml
-#
-# db.yaml is required for FlyteAdmin and DataCatalog
-# ############################################
-# the main admin configmap
-      
-# cluster resource templates
-# Files are read in alphabetical order. To ensure that we create the namespace first, prefix the file name with "aa".
-
-# Flyte Propeller Configuration
-
-# TODO Flyte Console Configuration
-#- name: flyte-console-config
-#  files:
-#    - ./config/console.yaml
 
 configMapGenerator:
 - behavior: merge
