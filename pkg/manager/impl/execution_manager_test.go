@@ -25,6 +25,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	notificationMocks "github.com/lyft/flyteadmin/pkg/async/notifications/mocks"
+	commonTestUtils "github.com/lyft/flyteadmin/pkg/common/testutils"
 	dataMocks "github.com/lyft/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/executions"
@@ -2102,6 +2103,80 @@ func TestAddLabelsAndAnnotationsRuntimeLimitsObserved(t *testing.T) {
 		},
 	})
 	assert.EqualError(t, err, "Labels has too many entries [2 > 1]")
+}
+
+func TestAddPluginOverrides(t *testing.T) {
+	executionID := &core.WorkflowExecutionIdentifier{
+		Project: project,
+		Domain:  domain,
+		Name:    "unused",
+	}
+	workflowName := "workflow_name"
+	launchPlanName := "launch_plan_name"
+
+	db := repositoryMocks.NewMockRepository()
+	db.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (
+		models.Resource, error) {
+		assert.Equal(t, project, ID.Project)
+		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, workflowName, ID.Workflow)
+		assert.Equal(t, launchPlanName, ID.LaunchPlan)
+		existingAttributes := commonTestUtils.GetPluginOverridesAttributes(map[string][]string{
+			"python": {"plugin a"},
+			"hive":   {"plugin b"},
+		})
+		bytes, err := proto.Marshal(existingAttributes)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return models.Resource{
+			Project:    project,
+			Domain:     domain,
+			Attributes: bytes,
+		}, nil
+	}
+	partiallyPopulatedInputs := workflowengineInterfaces.ExecuteWorkflowInput{}
+
+	execManager := NewExecutionManager(
+		db, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
+		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
+
+	err := execManager.(*ExecutionManager).addPluginOverrides(
+		context.Background(), executionID, workflowName, launchPlanName, &partiallyPopulatedInputs)
+	assert.NoError(t, err)
+	assert.Len(t, partiallyPopulatedInputs.TaskPluginOverrides, 2)
+	for _, override := range partiallyPopulatedInputs.TaskPluginOverrides {
+		if override.TaskType == "python" {
+			assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
+		} else if override.TaskType == "hive" {
+			assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
+		} else {
+			t.Errorf("Unexpected task type [%s] plugin override committed to db", override.TaskType)
+		}
+	}
+}
+
+func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
+	executionID := &core.WorkflowExecutionIdentifier{
+		Project: project,
+		Domain:  domain,
+		Name:    "unused",
+	}
+	workflowName := "workflow_name"
+	launchPlanName := "launch_plan_name"
+
+	db := repositoryMocks.NewMockRepository()
+	db.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (
+		models.Resource, error) {
+		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.Aborted, "uh oh")
+	}
+	execManager := NewExecutionManager(
+		db, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
+		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
+
+	err := execManager.(*ExecutionManager).addPluginOverrides(
+		context.Background(), executionID, workflowName, launchPlanName, &workflowengineInterfaces.ExecuteWorkflowInput{})
+	assert.Error(t, err, "uh oh")
 }
 
 func TestGetExecution_Legacy(t *testing.T) {

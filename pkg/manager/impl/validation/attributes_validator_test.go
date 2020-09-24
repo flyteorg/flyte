@@ -68,6 +68,23 @@ func TestValidateMatchingAttributes(t *testing.T) {
 			admin.MatchableResource_EXECUTION_QUEUE,
 			nil,
 		},
+		{
+			&admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_PluginOverrides{
+					PluginOverrides: &admin.PluginOverrides{
+						Overrides: []*admin.PluginOverride{
+							{
+								TaskType: "python",
+								PluginId: []string{"foo"},
+							},
+						},
+					},
+				},
+			},
+			"foo",
+			admin.MatchableResource_PLUGIN_OVERRIDE,
+			nil,
+		},
 	}
 	for _, tc := range testCases {
 		matchableResource, err := validateMatchingAttributes(tc.attributes, tc.identifier)

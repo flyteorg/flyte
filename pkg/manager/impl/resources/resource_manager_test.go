@@ -2,12 +2,17 @@ package resources
 
 import (
 	"context"
+	"fmt"
 	"testing"
+
+	"github.com/lyft/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
 
 	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 
 	"github.com/golang/protobuf/proto"
+	commonTestUtils "github.com/lyft/flyteadmin/pkg/common/testutils"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/lyft/flyteadmin/pkg/repositories/mocks"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
@@ -45,6 +50,97 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 	_, err := manager.UpdateWorkflowAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
+}
+
+func TestUpdateWorkflowAttributes_CreateOrMerge(t *testing.T) {
+	request := admin.WorkflowAttributesUpdateRequest{
+		Attributes: &admin.WorkflowAttributes{
+			Project:            project,
+			Domain:             domain,
+			Workflow:           workflow,
+			MatchingAttributes: commonTestUtils.GetPluginOverridesAttributes(map[string][]string{"python": {"plugin a"}}),
+		},
+	}
+
+	t.Run("create only", func(t *testing.T) {
+		db := mocks.NewMockRepository()
+		db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID repoInterfaces.ResourceID) (
+			models.Resource, error) {
+			return models.Resource{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
+		}
+		var createOrUpdateCalled bool
+		db.ResourceRepo().(*mocks.MockResourceRepo).CreateOrUpdateFunction = func(ctx context.Context, input models.Resource) error {
+			assert.Equal(t, project, input.Project)
+			assert.Equal(t, domain, input.Domain)
+			assert.Equal(t, workflow, input.Workflow)
+
+			var attributesToBeSaved admin.MatchingAttributes
+			err := proto.Unmarshal(input.Attributes, &attributesToBeSaved)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 1)
+			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().Overrides[0], &admin.PluginOverride{
+				TaskType: "python",
+				PluginId: []string{"plugin a"}}))
+
+			createOrUpdateCalled = true
+			return nil
+		}
+		manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
+		_, err := manager.UpdateWorkflowAttributes(context.Background(), request)
+		assert.NoError(t, err)
+		assert.True(t, createOrUpdateCalled)
+	})
+	t.Run("merge update", func(t *testing.T) {
+		db := mocks.NewMockRepository()
+		db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID repoInterfaces.ResourceID) (
+			models.Resource, error) {
+			existingAttributes := commonTestUtils.GetPluginOverridesAttributes(map[string][]string{
+				"hive":   {"plugin b"},
+				"python": {"plugin c"},
+			})
+			bytes, err := proto.Marshal(existingAttributes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			return models.Resource{
+				Project:    project,
+				Domain:     domain,
+				Workflow:   workflow,
+				Attributes: bytes,
+			}, nil
+		}
+		var createOrUpdateCalled bool
+		db.ResourceRepo().(*mocks.MockResourceRepo).CreateOrUpdateFunction = func(ctx context.Context, input models.Resource) error {
+			assert.Equal(t, project, input.Project)
+			assert.Equal(t, domain, input.Domain)
+			assert.Equal(t, workflow, input.Workflow)
+
+			var attributesToBeSaved admin.MatchingAttributes
+			err := proto.Unmarshal(input.Attributes, &attributesToBeSaved)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 2)
+			for _, override := range attributesToBeSaved.GetPluginOverrides().Overrides {
+				if override.TaskType == "python" {
+					assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
+				} else if override.TaskType == "hive" {
+					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
+				} else {
+					t.Error(fmt.Sprintf("Unexpected task type [%s] plugin override committed to db", override.TaskType))
+				}
+			}
+			createOrUpdateCalled = true
+			return nil
+		}
+		manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
+		_, err := manager.UpdateWorkflowAttributes(context.Background(), request)
+		assert.NoError(t, err)
+		assert.True(t, createOrUpdateCalled)
+	})
 }
 
 func TestGetWorkflowAttributes(t *testing.T) {
@@ -129,6 +225,93 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	_, err := manager.UpdateProjectDomainAttributes(context.Background(), request)
 	assert.Nil(t, err)
 	assert.True(t, createOrUpdateCalled)
+}
+
+func TestUpdateProjectDomainAttributes_CreateOrMerge(t *testing.T) {
+	request := admin.ProjectDomainAttributesUpdateRequest{
+		Attributes: &admin.ProjectDomainAttributes{
+			Project:            project,
+			Domain:             domain,
+			MatchingAttributes: commonTestUtils.GetPluginOverridesAttributes(map[string][]string{"python": {"plugin a"}}),
+		},
+	}
+
+	t.Run("create only", func(t *testing.T) {
+		db := mocks.NewMockRepository()
+		db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID repoInterfaces.ResourceID) (
+			models.Resource, error) {
+			return models.Resource{}, errors.NewFlyteAdminError(codes.NotFound, "foo")
+		}
+		var createOrUpdateCalled bool
+		db.ResourceRepo().(*mocks.MockResourceRepo).CreateOrUpdateFunction = func(ctx context.Context, input models.Resource) error {
+			assert.Equal(t, project, input.Project)
+			assert.Equal(t, domain, input.Domain)
+
+			var attributesToBeSaved admin.MatchingAttributes
+			err := proto.Unmarshal(input.Attributes, &attributesToBeSaved)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 1)
+			assert.True(t, proto.Equal(attributesToBeSaved.GetPluginOverrides().Overrides[0], &admin.PluginOverride{
+				TaskType: "python",
+				PluginId: []string{"plugin a"}}))
+
+			createOrUpdateCalled = true
+			return nil
+		}
+		manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
+		_, err := manager.UpdateProjectDomainAttributes(context.Background(), request)
+		assert.NoError(t, err)
+		assert.True(t, createOrUpdateCalled)
+	})
+	t.Run("merge update", func(t *testing.T) {
+		db := mocks.NewMockRepository()
+		db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID repoInterfaces.ResourceID) (
+			models.Resource, error) {
+			existingAttributes := commonTestUtils.GetPluginOverridesAttributes(map[string][]string{
+				"hive":   {"plugin b"},
+				"python": {"plugin c"},
+			})
+			bytes, err := proto.Marshal(existingAttributes)
+			if err != nil {
+				t.Fatal(err)
+			}
+			return models.Resource{
+				Project:    project,
+				Domain:     domain,
+				Attributes: bytes,
+			}, nil
+		}
+		var createOrUpdateCalled bool
+		db.ResourceRepo().(*mocks.MockResourceRepo).CreateOrUpdateFunction = func(ctx context.Context, input models.Resource) error {
+			assert.Equal(t, project, input.Project)
+			assert.Equal(t, domain, input.Domain)
+
+			var attributesToBeSaved admin.MatchingAttributes
+			err := proto.Unmarshal(input.Attributes, &attributesToBeSaved)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Len(t, attributesToBeSaved.GetPluginOverrides().Overrides, 2)
+			for _, override := range attributesToBeSaved.GetPluginOverrides().Overrides {
+				if override.TaskType == "python" {
+					assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
+				} else if override.TaskType == "hive" {
+					assert.EqualValues(t, []string{"plugin b"}, override.PluginId)
+				} else {
+					t.Error(fmt.Sprintf("Unexpected task type [%s] plugin override committed to db", override.TaskType))
+				}
+			}
+			createOrUpdateCalled = true
+			return nil
+		}
+		manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
+		_, err := manager.UpdateProjectDomainAttributes(context.Background(), request)
+		assert.NoError(t, err)
+		assert.True(t, createOrUpdateCalled)
+	})
 }
 
 func TestGetProjectDomainAttributes(t *testing.T) {

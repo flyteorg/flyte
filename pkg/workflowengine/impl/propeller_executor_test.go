@@ -147,6 +147,13 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 				"customannotation":       "annotationval",
 			}
 			assert.EqualValues(t, expectedAnnotations, workflow.Annotations)
+
+			assert.EqualValues(t, map[string]v1alpha1.TaskPluginOverride{
+				"python": {
+					PluginIDs:             []string{"plugin a"},
+					MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
+				},
+			}, workflow.ExecutionConfig.TaskPluginImpls)
 			return nil, nil
 		},
 	}
@@ -183,6 +190,13 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 			},
 			Annotations: map[string]string{
 				"customannotation": "annotationval",
+			},
+			TaskPluginOverrides: []*admin.PluginOverride{
+				{
+					TaskType:              "python",
+					PluginId:              []string{"plugin a"},
+					MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
+				},
 			},
 		})
 	assert.Nil(t, err)
