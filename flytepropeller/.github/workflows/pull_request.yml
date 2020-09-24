@@ -8,39 +8,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Push Docker Image to Github Registry
-        uses: whoan/docker-build-with-cache-action@v5
+        name: "Checkout"
+      - id: cache-docker
+        uses: actions/cache@v1
         with:
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
-          image_name: ${{ secrets.flytegithub_repo }}/flytepropeller
-          image_tag: ${{ github.sha }}
-          push_git_tag: true
-          registry: docker.pkg.github.com
+          path: /tmp//tmp/docker-images
+          key: /tmp/docker-images-${{ hashFiles('Dockerfile') }}
+      - run: docker load -i /tmp//tmp/docker-images/snapshot-builder.tar || true
+        if: steps.cache-docker.outputs.cache-hit == 'true'
+      - run: |
+          docker build -t lyft/flytepropeller:${{ github.sha }} . --target builder --cache-from=flytepropeller-cache
+          docker build -t lyft/flytepropeller:${{ github.sha }} .
+
+      - run: docker tag lyft/flytepropeller:${{ github.sha }} flytepropeller-cache && mkdir -p /tmp//tmp/docker-images && docker save flytepropeller-cache -o /tmp//tmp/docker-images/snapshot.tar && ls -lh /tmp//tmp/docker-images || true
+        if: always() && steps.cache-docker.outputs.cache-hit != 'true'
+
       - uses: engineerd/setup-kind@v0.4.0
       - name: End2End
-        env:
-          DOCKER_USERNAME: ${{ github.actor }}
-          DOCKER_PASSWORD: "${{ secrets.GITHUB_TOKEN }}"
         run: |
           kubectl cluster-info
           kubectl get pods -n kube-system
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
-          PROPELLER=${{ secrets.flytegithub_repo }}/flytepropeller:${{ github.sha }} make end2end_execute
-  push-dockerhub:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Push Docker Image to Dockerhub
-        uses: whoan/docker-build-with-cache-action@v5
-        with:
-          username: "${{ secrets.DOCKERHUB_USERNAME }}"
-          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
-          image_name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-          image_tag: ${{ github.sha }}
-          push_git_tag: true
-          build_extra_args: "--compress=true"
+          PROPELLER=lyft/flytepropeller:${{ github.sha }} make end2end_execute
+
   tests-lint:
     runs-on: ubuntu-latest
     steps:
