@@ -682,6 +682,10 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
   selector:
     app: flyteadmin
 ---
@@ -839,12 +843,17 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.6
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
         - containerPort: 8088
         - containerPort: 8089
+        resources:
+          limits:
+            cpu: "0.1"
+            ephemeral-storage: 100Mi
+            memory: 200Mi
         volumeMounts:
         - mountPath: /srv/flyte
           name: shared-data
@@ -880,7 +889,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.6
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -898,7 +907,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: docker.io/lyft/flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.6
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -913,7 +922,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.3.5
+        image: docker.io/lyft/flyteadmin:v0.3.6
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -923,6 +932,12 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+      - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+        image: postgres:10.1
+        name: check-db-ready
       serviceAccountName: flyteadmin
       volumes:
       - emptyDir: {}

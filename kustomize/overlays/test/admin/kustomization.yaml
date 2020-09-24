@@ -1,6 +1,0 @@
-bases:
-- ../../admindeployment
-- ../../admindeployment/clustersync
-
-patches:
-- deployment.yaml

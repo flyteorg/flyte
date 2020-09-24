@@ -20,6 +20,9 @@ resources:
   # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
 - ./dependencies/contour_ingress_controller
 
+patches:
+  - ./admin/deployment.yaml
+
 configMapGenerator:
 # the main admin configmap
 - name: flyte-admin-config
