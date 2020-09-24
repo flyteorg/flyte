@@ -1,11 +1,6 @@
 [Back to Base components menu](../)
 # Flyte Single cluster deployment mode
-This allows flyte to be deployed in one Kubernetes cluster.
-All components are deployed and can be configured to use dependencies based on the environment.
+This provides a complete deployment of Flyte onto a single K8s cluster
 
-To understand configuration of dependencies refer to sandbox or any cloud deployments
-
-## Overlays using the single cluster mode
-1. [Sandbox Overlay](../../overlays/sandbox)
-1. [GCP SingleCluster Overlay](../../overlays/gcp)
-1. [EKS SingleCluster Overlay](../../overlays/eks)
+# Configuration
+all the configs are in ./config folder

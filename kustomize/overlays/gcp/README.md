@@ -1,5 +1,5 @@
 [All Overlays](./)
-# Google Cloud Platform Overlay
+# :construction: Google Cloud Platform Overlay
 
 This overlay serves as an example to bootstrap Flyte setup on Google Cloud Platform (GCP). It is not
 designed to work out of the box due to the need of GCP resources. Please follow the instruction
