@@ -3,7 +3,12 @@
 set -ex
 
 echo "Installing Kustomize"
-mkdir -p _bin; cd _bin; rm kustomize;
+KUSTOMIZE=_bin/kustomize
+
+if [ -f ${KUSTOMIZE} ]; then
+  rm ${KUSTOMIZE}
+fi
+mkdir -p _bin; cd _bin 
 curl -s "https://raw.githubusercontent.com/\
 kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
 cd -
@@ -11,7 +16,6 @@ cd -
 # All the overlays to be built
 DEPLOYMENT=${1:-sandbox test eks gcp}
 
-KUSTOMIZE=_bin/kustomize
 KUSTOMIZE_OVERLAYS_ROOT=kustomize/overlays
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
