@@ -55,3 +55,22 @@ configMapGenerator:
     - ./config/datacatalog/db.yaml
     - ./config/common/storage.yaml
     - ./config/common/logger.yaml
+
+# Images that should be used
+images:
+  # FlyteAdmin
+  - name: flyteadmin # match images with this name
+    newTag: v0.3.5 # override the tag
+    newName: docker.io/lyft/flyteadmin # override the name
+  # FlyteConsole
+  - name: flyteconsole # match images with this name
+    newTag: v0.11.0 # override the tag
+    newName: docker.io/lyft/flyteconsole # override the namep 
+  # Flyte DataCatalog
+  - name: datacatalog # match images with this name
+    newTag: v0.2.2 # override the tag
+    newName: docker.io/lyft/datacatalog # override the name
+  # FlytePropeller
+  - name: flytepropeller # match images with this name
+    newTag: v0.3.12 # override the tag
+    newName: docker.io/lyft/flytepropeller # override the name
