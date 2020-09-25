@@ -1,5 +1,5 @@
 [All Overlays](./)
-# :construction: Google Cloud Platform Overlay
+# :beta: Google Cloud Platform Overlay
 
 This overlay serves as an example to bootstrap Flyte setup on Google Cloud Platform (GCP). It is not
 designed to work out of the box due to the need of GCP resources. Please follow the instruction
@@ -16,8 +16,7 @@ A few things are required for this overlay to function:
 
 * Two databases named as `flyte` and `datacatalog`
 * A database user named as `flyte`
-* Password of the database user should be uploaded to GKE as a k8s secret named as `db-user-pass`
-  containing of a file named as `db_pwd.txt`of which the content is the plain text password
+* Password of the database user can be added to either to [kustomization.yaml](kustomization.yaml) or you can create a new file and change the secretGenerator tag to use files. (Refer to kustomize documentation)
 * Service account(s) associated with `flyteadmin` and `datacatalog` pods (either as GKE cluster
   service account or through workload identity) should have `Cloud SQL Editor` role
 
@@ -25,75 +24,68 @@ To securely access Cloud SQL instance, [Cloud SQL
 Proxy](https://cloud.google.com/sql/docs/postgres/connect-admin-proxy) is launched as a pod sitting
 in between Flyte and Cloud SQL instance.
 
-The kustomization files can be found under [cloudsqlproxy](cloudsqlproxy). Please note that one
+The kustomization files can be found under [cloudsqlproxy](dependencies/cloudsqlproxy/). Please note that one
 needs to replace `<project-id>` and `<region>` accordingly in
-[cloudsqlproxy/deployment.yaml](cloudsqlproxy/deployment.yaml).
+[dependencies/cloudsqlproxy/deployment.yaml](cloudsqlproxy/deployment.yaml).
+
+## Create GCS Storage
+1. Create a GCS bucket named as `flyte` in a GCP project.
+1. Replace `<project-id>` in [config/common/storage.yaml](config/common/storage.yaml) with the GCP project ID and if using a bucket other than Flyte then replace the bucket name too
 
 ## flyteadmin
 
-flyteadmin configuration is kept as similar as [sandbox](../sandbox) overlay, with only necessary
-modifications such as database, storage and CORS.
+flyteadmin configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](config/admin/db.yaml)
 
 If one has followed [Cloud SQL](#cloud-sql) section, there is nothing to be done for database.
 
-For storage layer, a few things needs to be done:
+**Advanced / OPTIONAL**
+1. The default CORS setting in flyteAdmin allows cross origin requests. A more secure way would be to allow requests only from the expected domain. To do this, you will have to create a new *server.yaml*
+similar to [base/single_cluster/headless/config](../../base/single_cluster/headless/config) under config/admin and then set
+`server -> security -> allowedOrigins`.
 
-* Create a GCS bucket named as `flyte` in a GCP project
-* Replace `<project-id>` in [admin/flyteadmin_config.yaml](admin/flyteadmin_config.yaml) with the
-  GCP project ID
-
-For CORS to work properly, one needs to use real origin in
-[admin/flyteadmin_config.yaml](admin/flyteadmin_config.yaml) `server -> security -> allowedOrigins`.
-
-flyteadmin (including metrics endpoint) is exposed as a service using [internal load
-balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
+1. flyteadmin (including metrics endpoint) is exposed as a service using [internal load balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
 
 ## flyteconsole
 
-[flyteconsole configmap](console/configmap.yaml) needs to be updated with flyteadmin internal load
+[flyteconsole configmap](console/config.yaml) needs to be updated with flyteadmin internal load
 balancer IP address or the DNS name associated with it if any.
 
-flyteconsole is exposed as a service using [internal load
-balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
+flyteconsole is exposed as a service using [internal load balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
 
 ## flytepropeller
 
-flytepropeller configuration is kept as similar as [sandbox](../sandbox) overlay, with only
-necessary modifications such as storage.
+flytepropeller configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to the config for performance tuning and logs
+For logs configuration Replace `<project-id>` in [config/propeller/plugins/task_logs.yaml](config/propeller/plugins/task_logs.yaml) with the GCP project ID
 
-For storage layer, a few things needs to be done:
+Some important points
 
-* Create a GCS bucket named as `flyte` in a GCP project (skip this if already done)
-* Replace `<project-id>` in [propeller/config.yaml](propeller/config.yaml) with the
-  GCP project ID
-* Replace `<project-id>` in [propeller/plugins/config.yaml](propeller/plugins/config.yaml) with the
-  GCP project ID
+* Storage configuration is shared with Admin and Catalog. Ideally in production Propeller should have its own configuration with real high cache size.
 
-By default, three plugins are enabled:
+* By default, three plugins are enabled:
+1. container
+2. k8s-array
+3. sidecar
 
-* container
-* k8s-array
-* sidecar
-
-flytepropeller metrics endpoint is exposed as a service using [internal load
-balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
+* flytepropeller metrics endpoint is exposed as a service using [internal load balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
 
 ## datacatalog
 
-datacatalog configuration is kept as similar as [sandbox](../sandbox) overlay, with only
-necessary modifications such as database and storage.
+datacatalog configuration is derived from the [single cluster](../../base/single_cluster) overlay, with only modification to [database configuration db.yaml](config/datacatalog/db.yaml)
 
 If one has followed [Cloud SQL](#cloud-sql) section, there is nothing to be done for database.
-
-For storage layer, a few things needs to be done:
-
-* Create a GCS bucket named as `flyte` in a GCP project (skip this if already done)
-* Replace `<project-id>` in [datacatalog/datacatalog_config.yaml](propeller/config.yaml) with the
-  GCP project ID
 
 datacatalog metrics endpoint is exposed as a service using [internal load
 balancer](https://cloud.google.com/kubernetes-engine/docs/how-to/internal-load-balancing).
 
+
+## How to build your overlay
+To build your overlay there are 2 options
+1. Build it in your own repo Example coming soon :construction:
+1. hack it in your clone of Flyte repo in place of GCP overlay. In this case just navigate to the root of the repo and run
+```bash
+$ make kustomize
+```
+If all goes well a new overlay composite should be generated in [<root>/deployment/gcp/flyte_generated.yaml](../../../deployment/gcp/flyte_generated.yaml)
 
 ## Now ship it
 
