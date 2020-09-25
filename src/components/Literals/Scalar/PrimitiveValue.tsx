@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { formatDate, protobufDurationToHMS } from 'common/formatters';
+import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { Primitive } from 'models';
 
@@ -10,7 +10,7 @@ function primitiveToString(primitive: Primitive): string {
         case 'boolean':
             return !!primitive.boolean ? 'true' : 'false';
         case 'datetime':
-            return formatDate(timestampToDate(primitive.datetime!));
+            return formatDateUTC(timestampToDate(primitive.datetime!));
         case 'duration':
             return protobufDurationToHMS(primitive.duration!);
         default:
