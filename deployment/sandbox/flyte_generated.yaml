@@ -225,6 +225,12 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: contour
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: datacatalog
   namespace: flyte
 ---
@@ -243,23 +249,17 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: contour
-  namespace: heptio-contour
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
   labels:
     app: pytorch-operator
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: kubeflow
+  namespace: flyte
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sparkoperator
-  namespace: sparkoperator
+  namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -601,7 +601,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: contour
-  namespace: heptio-contour
+  namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -617,7 +617,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: pytorch-operator
-  namespace: kubeflow
+  namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -630,15 +630,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: sparkoperator
-  namespace: sparkoperator
----
-apiVersion: v1
-data:
-  BASE_URL: /console
-  CONFIG_DIR: /etc/flyte/config
-kind: ConfigMap
-metadata:
-  name: flyte-console-config
   namespace: flyte
 ---
 apiVersion: v1
@@ -708,6 +699,7 @@ metadata:
   annotations: {}
   labels: {}
   name: clusterresource-template-tkdkkt4cb5
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -746,6 +738,7 @@ metadata:
   annotations: {}
   labels: {}
   name: datacatalog-config-64k8dg9gck
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -843,6 +836,16 @@ metadata:
   annotations: {}
   labels: {}
   name: flyte-admin-config-c96tt5m6b7
+  namespace: flyte
+---
+apiVersion: v1
+data:
+  BASE_URL: /console
+  CONFIG_DIR: /etc/flyte/config
+kind: ConfigMap
+metadata:
+  name: flyte-console-config
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -971,6 +974,7 @@ metadata:
   annotations: {}
   labels: {}
   name: flyte-propeller-config-88kbgkkfbd
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -978,7 +982,24 @@ data:
 kind: Secret
 metadata:
   name: db-pass-9dgchhk2bm
+  namespace: flyte
 type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: flyte
+spec:
+  ports:
+  - nodePort: 30081
+    port: 80
+    protocol: TCP
+  selector:
+    app: contour
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
@@ -1095,6 +1116,28 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8443"
+    prometheus.io/scrape: "true"
+  labels:
+    app: pytorch-operator
+    kustomize.component: pytorch-operator
+  name: pytorch-operator
+  namespace: flyte
+spec:
+  ports:
+  - name: monitoring-port
+    port: 8443
+    targetPort: 8443
+  selector:
+    kustomize.component: pytorch-operator
+    name: pytorch-operator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
   labels:
     app: redis-resource-manager
   name: redis-resource-manager
@@ -1112,46 +1155,8 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  labels:
-    app: contour
-  name: contour
-  namespace: heptio-contour
-spec:
-  ports:
-  - nodePort: 30081
-    port: 80
-    protocol: TCP
-  selector:
-    app: contour
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations:
-    prometheus.io/path: /metrics
-    prometheus.io/port: "8443"
-    prometheus.io/scrape: "true"
-  labels:
-    app: pytorch-operator
-    kustomize.component: pytorch-operator
-  name: pytorch-operator
-  namespace: kubeflow
-spec:
-  ports:
-  - name: monitoring-port
-    port: 8443
-    targetPort: 8443
-  selector:
-    kustomize.component: pytorch-operator
-    name: pytorch-operator
-  type: ClusterIP
----
-apiVersion: v1
-kind: Service
-metadata:
   name: spark-webhook
-  namespace: sparkoperator
+  namespace: flyte
 spec:
   ports:
   - name: webhook
@@ -1160,6 +1165,88 @@ spec:
   selector:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.0-v1beta1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: flyte
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: contour
+  template:
+    metadata:
+      annotations:
+        prometheus.io/format: prometheus
+        prometheus.io/path: /stats
+        prometheus.io/port: "8002"
+        prometheus.io/scrape: "true"
+      labels:
+        app: contour
+    spec:
+      containers:
+      - args:
+        - -c
+        - /config/contour.yaml
+        - --service-cluster
+        - cluster0
+        - --service-node
+        - node0
+        command:
+        - envoy
+        image: docker.io/envoyproxy/envoy-alpine:v1.6.0
+        name: envoy-envoyingressv1
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 8002
+          name: statsd
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /config
+          name: contour-config
+      - args:
+        - serve
+        - --incluster
+        - --envoy-http-port=80
+        - --debug-http-port=6069
+        command:
+        - contour
+        image: gcr.io/heptio-images/contour:v0.6.1
+        imagePullPolicy: Always
+        name: contour-unknown
+        ports:
+        - containerPort: 8000
+          name: contour
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - args:
+        - bootstrap
+        - /config/contour.yaml
+        - --statsd-enabled
+        command:
+        - contour
+        image: gcr.io/heptio-images/contour:v0.6.1
+        imagePullPolicy: Always
+        name: envoy-initconfig
+        volumeMounts:
+        - mountPath: /config
+          name: contour-config
+      serviceAccountName: contour
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: contour-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1223,11 +1310,11 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config
+          name: datacatalog-config-64k8dg9gck
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass
+          secretName: db-pass-9dgchhk2bm
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1359,14 +1446,14 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config
+          name: flyte-admin-config-c96tt5m6b7
         name: config-volume
       - configMap:
-          name: clusterresource-template
+          name: clusterresource-template-tkdkkt4cb5
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass
+          secretName: db-pass-9dgchhk2bm
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1446,7 +1533,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config
+          name: flyte-propeller-config-88kbgkkfbd
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1515,91 +1602,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: contour
-  name: contour
-  namespace: heptio-contour
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: contour
-  template:
-    metadata:
-      annotations:
-        prometheus.io/format: prometheus
-        prometheus.io/path: /stats
-        prometheus.io/port: "8002"
-        prometheus.io/scrape: "true"
-      labels:
-        app: contour
-    spec:
-      containers:
-      - args:
-        - -c
-        - /config/contour.yaml
-        - --service-cluster
-        - cluster0
-        - --service-node
-        - node0
-        command:
-        - envoy
-        image: docker.io/envoyproxy/envoy-alpine:v1.6.0
-        name: envoy-envoyingressv1
-        ports:
-        - containerPort: 80
-          name: http
-        - containerPort: 8002
-          name: statsd
-        resources:
-          limits:
-            cpu: 100m
-            memory: 100Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        volumeMounts:
-        - mountPath: /config
-          name: contour-config
-      - args:
-        - serve
-        - --incluster
-        - --envoy-http-port=80
-        - --debug-http-port=6069
-        command:
-        - contour
-        image: gcr.io/heptio-images/contour:v0.6.1
-        imagePullPolicy: Always
-        name: contour-unknown
-        ports:
-        - containerPort: 8000
-          name: contour
-      dnsPolicy: ClusterFirst
-      initContainers:
-      - args:
-        - bootstrap
-        - /config/contour.yaml
-        - --statsd-enabled
-        command:
-        - contour
-        image: gcr.io/heptio-images/contour:v0.6.1
-        imagePullPolicy: Always
-        name: envoy-initconfig
-        volumeMounts:
-        - mountPath: /config
-          name: contour-config
-      serviceAccountName: contour
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - emptyDir: {}
-        name: contour-config
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: kubeflow
+  namespace: flyte
 spec:
   replicas: 1
   selector:
@@ -1638,7 +1643,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.0-v1beta1
   name: sparkoperator
-  namespace: sparkoperator
+  namespace: flyte
 spec:
   replicas: 1
   selector:
@@ -1763,7 +1768,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.3.6
+            image: flyteadmin:v0.3.5
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -1777,14 +1782,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template
+              name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config
+              name: flyte-admin-config-c96tt5m6b7
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass
+              secretName: db-pass-9dgchhk2bm
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1
@@ -1794,7 +1799,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.0-v1beta1
   name: sparkoperator-init
-  namespace: sparkoperator
+  namespace: flyte
 spec:
   backoffLimit: 3
   template:
@@ -1807,7 +1812,7 @@ spec:
       - command:
         - /usr/bin/gencerts.sh
         - --namespace
-        - sparkoperator
+        - flyte
         - -p
         image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
         imagePullPolicy: IfNotPresent

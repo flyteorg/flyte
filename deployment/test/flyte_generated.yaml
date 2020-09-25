@@ -161,6 +161,12 @@ spec:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: contour
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: datacatalog
   namespace: flyte
 ---
@@ -175,12 +181,6 @@ kind: ServiceAccount
 metadata:
   name: flytepropeller
   namespace: flyte
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: contour
-  namespace: heptio-contour
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -356,7 +356,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: contour
-  namespace: heptio-contour
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -393,6 +393,7 @@ metadata:
   annotations: {}
   labels: {}
   name: clusterresource-template-dtg8ff28mt
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -431,6 +432,7 @@ metadata:
   annotations: {}
   labels: {}
   name: datacatalog-config-64k8dg9gck
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -528,6 +530,7 @@ metadata:
   annotations: {}
   labels: {}
   name: flyte-admin-config-c96tt5m6b7
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -636,6 +639,7 @@ metadata:
   annotations: {}
   labels: {}
   name: flyte-propeller-config-tdbd9tb7dh
+  namespace: flyte
 ---
 apiVersion: v1
 data:
@@ -643,7 +647,24 @@ data:
 kind: Secret
 metadata:
   name: db-pass-9dgchhk2bm
+  namespace: flyte
 type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: flyte
+spec:
+  ports:
+  - nodePort: 30081
+    port: 80
+    protocol: TCP
+  selector:
+    app: contour
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
@@ -729,21 +750,87 @@ spec:
     app: redis-resource-manager
   type: ClusterIP
 ---
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
     app: contour
   name: contour
-  namespace: heptio-contour
+  namespace: flyte
 spec:
-  ports:
-  - nodePort: 30081
-    port: 80
-    protocol: TCP
+  replicas: 1
   selector:
-    app: contour
-  type: NodePort
+    matchLabels:
+      app: contour
+  template:
+    metadata:
+      annotations:
+        prometheus.io/format: prometheus
+        prometheus.io/path: /stats
+        prometheus.io/port: "8002"
+        prometheus.io/scrape: "true"
+      labels:
+        app: contour
+    spec:
+      containers:
+      - args:
+        - -c
+        - /config/contour.yaml
+        - --service-cluster
+        - cluster0
+        - --service-node
+        - node0
+        command:
+        - envoy
+        image: docker.io/envoyproxy/envoy-alpine:v1.6.0
+        name: envoy-envoyingressv1
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 8002
+          name: statsd
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /config
+          name: contour-config
+      - args:
+        - serve
+        - --incluster
+        - --envoy-http-port=80
+        - --debug-http-port=6069
+        command:
+        - contour
+        image: gcr.io/heptio-images/contour:v0.6.1
+        imagePullPolicy: Always
+        name: contour-unknown
+        ports:
+        - containerPort: 8000
+          name: contour
+      dnsPolicy: ClusterFirst
+      initContainers:
+      - args:
+        - bootstrap
+        - /config/contour.yaml
+        - --statsd-enabled
+        command:
+        - contour
+        image: gcr.io/heptio-images/contour:v0.6.1
+        imagePullPolicy: Always
+        name: envoy-initconfig
+        volumeMounts:
+        - mountPath: /config
+          name: contour-config
+      serviceAccountName: contour
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: contour-config
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -807,11 +894,11 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config
+          name: datacatalog-config-64k8dg9gck
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass
+          secretName: db-pass-9dgchhk2bm
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -943,14 +1030,14 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config
+          name: flyte-admin-config-c96tt5m6b7
         name: config-volume
       - configMap:
-          name: clusterresource-template
+          name: clusterresource-template-dtg8ff28mt
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass
+          secretName: db-pass-9dgchhk2bm
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -996,7 +1083,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config
+          name: flyte-propeller-config-tdbd9tb7dh
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1060,88 +1147,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: postgres-storage
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app: contour
-  name: contour
-  namespace: heptio-contour
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: contour
-  template:
-    metadata:
-      annotations:
-        prometheus.io/format: prometheus
-        prometheus.io/path: /stats
-        prometheus.io/port: "8002"
-        prometheus.io/scrape: "true"
-      labels:
-        app: contour
-    spec:
-      containers:
-      - args:
-        - -c
-        - /config/contour.yaml
-        - --service-cluster
-        - cluster0
-        - --service-node
-        - node0
-        command:
-        - envoy
-        image: docker.io/envoyproxy/envoy-alpine:v1.6.0
-        name: envoy-envoyingressv1
-        ports:
-        - containerPort: 80
-          name: http
-        - containerPort: 8002
-          name: statsd
-        resources:
-          limits:
-            cpu: 100m
-            memory: 100Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        volumeMounts:
-        - mountPath: /config
-          name: contour-config
-      - args:
-        - serve
-        - --incluster
-        - --envoy-http-port=80
-        - --debug-http-port=6069
-        command:
-        - contour
-        image: gcr.io/heptio-images/contour:v0.6.1
-        imagePullPolicy: Always
-        name: contour-unknown
-        ports:
-        - containerPort: 8000
-          name: contour
-      dnsPolicy: ClusterFirst
-      initContainers:
-      - args:
-        - bootstrap
-        - /config/contour.yaml
-        - --statsd-enabled
-        command:
-        - contour
-        image: gcr.io/heptio-images/contour:v0.6.1
-        imagePullPolicy: Always
-        name: envoy-initconfig
-        volumeMounts:
-        - mountPath: /config
-          name: contour-config
-      serviceAccountName: contour
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - emptyDir: {}
-        name: contour-config
 ---
 apiVersion: apps/v1
 kind: StatefulSet

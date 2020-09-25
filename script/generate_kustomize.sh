@@ -4,13 +4,14 @@ set -ex
 
 echo "Installing Kustomize"
 KUSTOMIZE=_bin/kustomize
+KUSTOMIZE_VERSION=${KUSTOMIZE_VERSION:-3.8.1}
 
 if [ -f ${KUSTOMIZE} ]; then
   rm ${KUSTOMIZE}
 fi
 mkdir -p _bin; cd _bin 
 curl -s "https://raw.githubusercontent.com/\
-kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash -s ${KUSTOMIZE_VERSION}
 cd -
 
 # All the overlays to be built
