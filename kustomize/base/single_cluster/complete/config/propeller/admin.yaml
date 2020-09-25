@@ -1,7 +1,0 @@
-event:
-  type: admin
-  rate: 500
-  capacity: 1000
-admin:
-  endpoint: flyteadmin:81
-  insecure: true

@@ -1,6 +1,0 @@
-# TODO This should be changed for the right storage option - e.g.
-# hosted blob stores like S3, GCS, AFS etc
-# k8s blob store like minio
-# For all supported options look at https://github.com/lyft/flytestdlib/blob/master/storage/config.go
-storage:
-  type: mem

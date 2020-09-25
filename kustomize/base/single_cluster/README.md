@@ -11,3 +11,5 @@ Overlays using the single cluster mode
 1. [EKS SingleCluster Overlay](../../overlays/eks)
 
 These overlays are based on [Flyte Single Cluster deployment Configuration base](./complete)
+
+The complete per component configuration for Flyte can be found [here](./headless/config)
