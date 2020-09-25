@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.1](http://github.com/lyft/flyteconsole/compare/v0.12.0...v0.12.1) (2020-09-25)
+
+
+### Bug Fixes
+
+* Render timestamp of protobuf in UTC ([#98](http://github.com/lyft/flyteconsole/issues/98)) ([37604a0](http://github.com/lyft/flyteconsole/commit/37604a07f434878cb4177699be27b41923a3af00))
+
 # [0.12.0](http://github.com/lyft/flyteconsole/compare/v0.11.0...v0.12.0) (2020-09-22)
 
 
