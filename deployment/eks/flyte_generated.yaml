@@ -803,13 +803,19 @@ data:
   task_logs.yaml: |
     plugins:
       logs:
-        kubernetes-enabled: true
-        kubernetes-url: "http://localhost:30082"
+        # Log links can link to multiple options
+        # #1 Kubernetes dashboard is disabled in GCP
+        kubernetes-enabled: false
+        # #2 AWS Cloudwatch
+        cloudwatch-enabled: true
+          # TODO Add region and log group
+        cloudwatch-region: <region>
+        cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-fgt6tg929g
+  name: flyte-propeller-config-9fctd4tc4f
   namespace: flyte
 ---
 apiVersion: v1
@@ -1232,7 +1238,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-fgt6tg929g
+          name: flyte-propeller-config-9fctd4tc4f
         name: config-volume
 ---
 apiVersion: apps/v1

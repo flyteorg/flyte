@@ -794,13 +794,19 @@ data:
   task_logs.yaml: |
     plugins:
       logs:
-        kubernetes-enabled: true
-        kubernetes-url: "http://localhost:30082"
+        # Log links can link to multiple options
+        # #1 Kubernetes dashboard is disabled in GCP
+        kubernetes-enabled: false
+        # #2 GCP stackdriver
+        stackdriver-enabled: true
+        # TODO: replace <project-id> with the GCP project ID
+        gcp-project: <project-id>
+        stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-fgt6tg929g
+  name: flyte-propeller-config-6tcff5htc2
   namespace: flyte
 ---
 apiVersion: v1
@@ -1300,7 +1306,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-fgt6tg929g
+          name: flyte-propeller-config-6tcff5htc2
         name: config-volume
 ---
 apiVersion: apps/v1
