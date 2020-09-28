@@ -16,3 +16,4 @@ Flyte Features
     roles
     single_task_execution
     on_failure_policy
+    interruptible
