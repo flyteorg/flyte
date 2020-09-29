@@ -1,4 +1,4 @@
-flytekit[sidecar,schema]==0.12.1
+flytekit[sidecar,schema]==0.12.8
 pytest
 statsd
 opencv-python==3.4.4.19

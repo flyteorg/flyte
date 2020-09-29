@@ -3,6 +3,7 @@ from flytekit.common import schedules as _schedules, notifications as _notificat
 from flytekit.models.core import execution as _execution
 from flytekit.models.common import Labels, Annotations
 from datetime import timedelta
+from recipes.multi_schedules.scheduled_workflow import ScheduledWorkflow
 
 # A Workflow can have multiple schedules. One per launch plan
 
@@ -34,3 +35,6 @@ scale_rotate_fixedRateScheduled_launchplan = workflows.ScaleAndRotateWorkflow.cr
     schedule=_schedules.FixedRate(duration=timedelta(hours=1)), )
 
 # Example 3: Execution time is implicitly passed as an input
+scheduled_time_lp = ScheduledWorkflow.create_launch_plan(
+     schedule=_schedules.CronSchedule("0/30 * * * ? *", kickoff_time_input_arg='trigger_time')
+)

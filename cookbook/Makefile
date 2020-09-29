@@ -31,7 +31,7 @@ in_container_register_sandbox:
 
 .PHONY: register_sandbox
 register_sandbox: docker_build
-	docker run ${FULL_IMAGE_NAME}:${VERSION} /usr/local/bin/flytekit_venv make in_container_register_sandbox
+	docker run --rm --network=host ${FULL_IMAGE_NAME}:${VERSION} /usr/local/bin/flytekit_venv make in_container_register_sandbox
 
 .PHONY: in_container_serialize_sandbox
 in_container_serialize_sandbox:
