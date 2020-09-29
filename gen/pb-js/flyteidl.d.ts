@@ -5258,6 +5258,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent phaseVersion */
             phaseVersion?: (number|null);
+
+            /** TaskExecutionEvent metadata */
+            metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
         }
 
         /** Represents a TaskExecutionEvent. */
@@ -5305,6 +5308,9 @@ export namespace flyteidl {
             /** TaskExecutionEvent phaseVersion. */
             public phaseVersion: number;
 
+            /** TaskExecutionEvent metadata. */
+            public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
+
             /** TaskExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error");
 
@@ -5339,6 +5345,67 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskExecutionMetadata. */
+        interface ITaskExecutionMetadata {
+
+            /** TaskExecutionMetadata instanceClass */
+            instanceClass?: (flyteidl.event.TaskExecutionMetadata.InstanceClass|null);
+        }
+
+        /** Represents a TaskExecutionMetadata. */
+        class TaskExecutionMetadata implements ITaskExecutionMetadata {
+
+            /**
+             * Constructs a new TaskExecutionMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.ITaskExecutionMetadata);
+
+            /** TaskExecutionMetadata instanceClass. */
+            public instanceClass: flyteidl.event.TaskExecutionMetadata.InstanceClass;
+
+            /**
+             * Creates a new TaskExecutionMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskExecutionMetadata instance
+             */
+            public static create(properties?: flyteidl.event.ITaskExecutionMetadata): flyteidl.event.TaskExecutionMetadata;
+
+            /**
+             * Encodes the specified TaskExecutionMetadata message. Does not implicitly {@link flyteidl.event.TaskExecutionMetadata.verify|verify} messages.
+             * @param message TaskExecutionMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.ITaskExecutionMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskExecutionMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.TaskExecutionMetadata;
+
+            /**
+             * Verifies a TaskExecutionMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace TaskExecutionMetadata {
+
+            /** InstanceClass enum. */
+            enum InstanceClass {
+                DEFAULT = 0,
+                INTERRUPTIBLE = 1
+            }
         }
     }
 

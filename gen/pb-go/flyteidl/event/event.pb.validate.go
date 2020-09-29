@@ -697,6 +697,16 @@ func (m *TaskExecutionEvent) Validate() error {
 
 	// no validation rules for PhaseVersion
 
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskExecutionEventValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	switch m.OutputResult.(type) {
 
 	case *TaskExecutionEvent_OutputUri:
@@ -774,3 +784,72 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskExecutionEventValidationError{}
+
+// Validate checks the field values on TaskExecutionMetadata with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *TaskExecutionMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for InstanceClass
+
+	return nil
+}
+
+// TaskExecutionMetadataValidationError is the validation error returned by
+// TaskExecutionMetadata.Validate if the designated constraints aren't met.
+type TaskExecutionMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TaskExecutionMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TaskExecutionMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TaskExecutionMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TaskExecutionMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TaskExecutionMetadataValidationError) ErrorName() string {
+	return "TaskExecutionMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TaskExecutionMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTaskExecutionMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TaskExecutionMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TaskExecutionMetadataValidationError{}

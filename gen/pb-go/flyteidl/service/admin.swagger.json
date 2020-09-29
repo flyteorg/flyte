@@ -2889,6 +2889,15 @@
       ],
       "default": "DESCENDING"
     },
+    "TaskExecutionMetadataInstanceClass": {
+      "type": "string",
+      "enum": [
+        "DEFAULT",
+        "INTERRUPTIBLE"
+      ],
+      "default": "DEFAULT",
+      "description": "Includes the broad cateogry of machine used for this specific task execution.\n\n - DEFAULT: The default instance class configured for the flyte application platform.\n - INTERRUPTIBLE: The instance class configured for interruptible tasks."
+    },
     "TaskLogMessageFormat": {
       "type": "string",
       "enum": [
@@ -5727,9 +5736,22 @@
           "type": "integer",
           "format": "int64",
           "description": "Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc)\nthat should be recorded regardless of the lack of phase change.\nThe version field should be incremented when metadata changes across the duration of an individual phase."
+        },
+        "metadata": {
+          "$ref": "#/definitions/eventTaskExecutionMetadata",
+          "description": "Metadata around how a task was executed."
         }
       },
       "description": "Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob."
+    },
+    "eventTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "instance_class": {
+          "$ref": "#/definitions/TaskExecutionMetadataInstanceClass"
+        }
+      },
+      "description": "Holds metadata around how a task was executed.\nTODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325)."
     },
     "eventWorkflowExecutionEvent": {
       "type": "object",
