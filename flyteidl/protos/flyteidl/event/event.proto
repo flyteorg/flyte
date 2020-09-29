@@ -150,4 +150,21 @@ message TaskExecutionEvent {
     // that should be recorded regardless of the lack of phase change.
     // The version field should be incremented when metadata changes across the duration of an individual phase.
     uint32 phase_version                  = 12;    
+
+    // Metadata around how a task was executed.
+    TaskExecutionMetadata metadata        = 16;
+}
+
+// Holds metadata around how a task was executed.
+// TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+message TaskExecutionMetadata {
+    // Includes the broad cateogry of machine used for this specific task execution. 
+    enum InstanceClass {
+        // The default instance class configured for the flyte application platform.
+        DEFAULT = 0; 
+
+        // The instance class configured for interruptible tasks.
+        INTERRUPTIBLE = 1;
+    }
+    InstanceClass instance_class = 16;
 }

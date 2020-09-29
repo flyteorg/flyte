@@ -313,7 +313,8 @@ Plugin specific execution event information. For tasks like Python, Hive, Spark,
     "output_uri": "...",
     "error": "{...}",
     "custom_info": "{...}",
-    "phase_version": "..."
+    "phase_version": "...",
+    "metadata": "{...}"
   }
 
 .. _api_field_flyteidl.event.TaskExecutionEvent.task_id:
@@ -401,4 +402,54 @@ phase_version
   The version field should be incremented when metadata changes across the duration of an individual phase.
   
   
+.. _api_field_flyteidl.event.TaskExecutionEvent.metadata:
 
+metadata
+  (:ref:`flyteidl.event.TaskExecutionMetadata <api_msg_flyteidl.event.TaskExecutionMetadata>`) Metadata around how a task was executed.
+  
+  
+
+
+.. _api_msg_flyteidl.event.TaskExecutionMetadata:
+
+flyteidl.event.TaskExecutionMetadata
+------------------------------------
+
+`[flyteidl.event.TaskExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L159>`_
+
+Holds metadata around how a task was executed.
+TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+
+.. code-block:: json
+
+  {
+    "instance_class": "..."
+  }
+
+.. _api_field_flyteidl.event.TaskExecutionMetadata.instance_class:
+
+instance_class
+  (:ref:`flyteidl.event.TaskExecutionMetadata.InstanceClass <api_enum_flyteidl.event.TaskExecutionMetadata.InstanceClass>`) 
+  
+
+.. _api_enum_flyteidl.event.TaskExecutionMetadata.InstanceClass:
+
+Enum flyteidl.event.TaskExecutionMetadata.InstanceClass
+-------------------------------------------------------
+
+`[flyteidl.event.TaskExecutionMetadata.InstanceClass proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L161>`_
+
+Includes the broad cateogry of machine used for this specific task execution. 
+
+.. _api_enum_value_flyteidl.event.TaskExecutionMetadata.InstanceClass.DEFAULT:
+
+DEFAULT
+  *(DEFAULT)* ⁣The default instance class configured for the flyte application platform.
+  
+  
+.. _api_enum_value_flyteidl.event.TaskExecutionMetadata.InstanceClass.INTERRUPTIBLE:
+
+INTERRUPTIBLE
+  ⁣The instance class configured for interruptible tasks.
+  
+  
