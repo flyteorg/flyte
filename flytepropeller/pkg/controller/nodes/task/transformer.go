@@ -50,7 +50,8 @@ func trimErrorMessage(original string, maxLength int) string {
 	return original[0:maxLength/2] + original[len(original)-maxLength/2:]
 }
 
-func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputFilePaths, out io.OutputFilePaths, info pluginCore.PhaseInfo) (*event.TaskExecutionEvent, error) {
+func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputFilePaths, out io.OutputFilePaths, info pluginCore.PhaseInfo,
+	nodeExecutionMetadata handler.NodeExecutionMetadata) (*event.TaskExecutionEvent, error) {
 	// Transitions to a new phase
 
 	tm := ptypes.TimestampNow()
@@ -88,6 +89,12 @@ func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputF
 	if info.Info() != nil {
 		tev.Logs = info.Info().Logs
 		tev.CustomInfo = info.Info().CustomInfo
+	}
+
+	if nodeExecutionMetadata.IsInterruptible() {
+		tev.Metadata = &event.TaskExecutionMetadata{InstanceClass: event.TaskExecutionMetadata_INTERRUPTIBLE}
+	} else {
+		tev.Metadata = &event.TaskExecutionMetadata{InstanceClass: event.TaskExecutionMetadata_DEFAULT}
 	}
 
 	return tev, nil
