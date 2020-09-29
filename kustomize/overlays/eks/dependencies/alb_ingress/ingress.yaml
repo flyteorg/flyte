@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "flytesystem"
+  namespace: "flyte"
+  annotations:
+    # TODO ALB can only be used for REST non grpc endpoints
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/tags: service_instance=production
+    alb.ingress.kubernetes.io/scheme: internet-facing
+  labels:
+    app: flyteadmin
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /console
+        backend:
+          serviceName: flyteconsole
+          servicePort: 80
+      - path: /console/*
+        backend:
+          serviceName: flyteconsole
+          servicePort: 80
+      - path: /api/*
+        backend:
+          serviceName: flyteadmin
+          servicePort: 80
+      - path: /healthcheck
+        backend:
+          serviceName: flyteadmin
+          servicePort: 80
+      - path: /v1/*
+        backend:
+          serviceName: flyteadmin
+          servicePort: 80
+      # NOTE: Port 81 in flyteadmin is the GRPC server port for
+      # FlyteAdmin.
+      - path: /flyteidl.service.AdminService/*
+        backend:
+          serviceName: flyteadmin
+          servicePort: 81
+      # Port 87 in FlyteAdmin maps to the redoc container.
+      - path: /openapi/*
+        backend:
+          serviceName: flyteadmin
+          servicePort: 87

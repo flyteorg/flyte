@@ -1,0 +1,10 @@
+# This should be replaced with the db endpoint
+# This can be a postgres data base in the cloud like AWS Aurora / AWS RDS, Google Cloud SQL, etc
+# Or can be a self hosted Postgres in the cluster
+database:
+  port: 5432
+  username: postgres
+  host: postgres
+  dbname: datacatalog
+  options: sslmode=disable
+  passwordPath: /etc/db/pass.txt

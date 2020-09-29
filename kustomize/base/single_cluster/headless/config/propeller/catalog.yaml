@@ -1,0 +1,4 @@
+catalog-cache:
+  endpoint: datacatalog:89
+  type: datacatalog
+  insecure: true

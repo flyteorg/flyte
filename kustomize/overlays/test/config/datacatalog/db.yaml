@@ -1,0 +1,6 @@
+database:
+  port: 5432
+  username: postgres
+  host: postgres
+  dbname: datacatalog
+  options: sslmode=disable

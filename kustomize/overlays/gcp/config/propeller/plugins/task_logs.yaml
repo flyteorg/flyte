@@ -1,0 +1,10 @@
+plugins:
+  logs:
+    # Log links can link to multiple options
+    # #1 Kubernetes dashboard is disabled in GCP
+    kubernetes-enabled: false
+    # #2 GCP stackdriver
+    stackdriver-enabled: true
+    # TODO: replace <project-id> with the GCP project ID
+    gcp-project: <project-id>
+    stackdriver-logresourcename: k8s_container

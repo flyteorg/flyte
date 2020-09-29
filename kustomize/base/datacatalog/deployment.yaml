@@ -28,22 +28,29 @@ spec:
       - name: config-volume
         configMap:
           name: datacatalog-config
+      - name: db-pass
+        secret:
+          secretName: db-pass
       initContainers:
       - name: run-migrations
-        image: docker.io/lyft/datacatalog:v0.2.2
+        image: datacatalog:v0.2.2
         imagePullPolicy: IfNotPresent
-        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "migrate", "run"]
+        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/*.yaml", "migrate", "run"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/datacatalog/config
+        - name: db-pass
+          mountPath: /etc/db
       containers:
       - name: datacatalog
-        image: docker.io/lyft/datacatalog:v0.2.2
+        image: datacatalog:v0.2.2
         imagePullPolicy: IfNotPresent
-        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/datacatalog_config.yaml", "serve"]
+        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/*.yaml", "serve"]
         ports:
         - containerPort: 8088
         - containerPort: 8089
         volumeMounts:
         - name: config-volume
           mountPath: /etc/datacatalog/config
+        - name: db-pass
+          mountPath: /etc/db
