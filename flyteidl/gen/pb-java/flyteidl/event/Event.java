@@ -8088,6 +8088,31 @@ public final class Event {
      */
     int getPhaseVersion();
 
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    boolean hasMetadata();
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    flyteidl.event.Event.TaskExecutionMetadata getMetadata();
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder();
+
     public flyteidl.event.Event.TaskExecutionEvent.OutputResultCase getOutputResultCase();
   }
   /**
@@ -8244,6 +8269,19 @@ public final class Event {
             case 96: {
 
               phaseVersion_ = input.readUInt32();
+              break;
+            }
+            case 130: {
+              flyteidl.event.Event.TaskExecutionMetadata.Builder subBuilder = null;
+              if (metadata_ != null) {
+                subBuilder = metadata_.toBuilder();
+              }
+              metadata_ = input.readMessage(flyteidl.event.Event.TaskExecutionMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(metadata_);
+                metadata_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -8746,6 +8784,39 @@ public final class Event {
       return phaseVersion_;
     }
 
+    public static final int METADATA_FIELD_NUMBER = 16;
+    private flyteidl.event.Event.TaskExecutionMetadata metadata_;
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    public boolean hasMetadata() {
+      return metadata_ != null;
+    }
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    public flyteidl.event.Event.TaskExecutionMetadata getMetadata() {
+      return metadata_ == null ? flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance() : metadata_;
+    }
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    public flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder() {
+      return getMetadata();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -8795,6 +8866,9 @@ public final class Event {
       }
       if (phaseVersion_ != 0) {
         output.writeUInt32(12, phaseVersion_);
+      }
+      if (metadata_ != null) {
+        output.writeMessage(16, getMetadata());
       }
       unknownFields.writeTo(output);
     }
@@ -8850,6 +8924,10 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(12, phaseVersion_);
       }
+      if (metadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, getMetadata());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -8896,6 +8974,11 @@ public final class Event {
       }
       if (getPhaseVersion()
           != other.getPhaseVersion()) return false;
+      if (hasMetadata() != other.hasMetadata()) return false;
+      if (hasMetadata()) {
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
+      }
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
         case 9:
@@ -8950,6 +9033,10 @@ public final class Event {
       }
       hash = (37 * hash) + PHASE_VERSION_FIELD_NUMBER;
       hash = (53 * hash) + getPhaseVersion();
+      if (hasMetadata()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadata().hashCode();
+      }
       switch (outputResultCase_) {
         case 9:
           hash = (37 * hash) + OUTPUT_URI_FIELD_NUMBER;
@@ -9140,6 +9227,12 @@ public final class Event {
         }
         phaseVersion_ = 0;
 
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
         outputResultCase_ = 0;
         outputResult_ = null;
         return this;
@@ -9214,6 +9307,11 @@ public final class Event {
           result.customInfo_ = customInfoBuilder_.build();
         }
         result.phaseVersion_ = phaseVersion_;
+        if (metadataBuilder_ == null) {
+          result.metadata_ = metadata_;
+        } else {
+          result.metadata_ = metadataBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         result.outputResultCase_ = outputResultCase_;
         onBuilt();
@@ -9318,6 +9416,9 @@ public final class Event {
         }
         if (other.getPhaseVersion() != 0) {
           setPhaseVersion(other.getPhaseVersion());
+        }
+        if (other.hasMetadata()) {
+          mergeMetadata(other.getMetadata());
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -10936,6 +11037,159 @@ public final class Event {
         onChanged();
         return this;
       }
+
+      private flyteidl.event.Event.TaskExecutionMetadata metadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.event.Event.TaskExecutionMetadata, flyteidl.event.Event.TaskExecutionMetadata.Builder, flyteidl.event.Event.TaskExecutionMetadataOrBuilder> metadataBuilder_;
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public boolean hasMetadata() {
+        return metadataBuilder_ != null || metadata_ != null;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadata getMetadata() {
+        if (metadataBuilder_ == null) {
+          return metadata_ == null ? flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance() : metadata_;
+        } else {
+          return metadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder setMetadata(flyteidl.event.Event.TaskExecutionMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          metadata_ = value;
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder setMetadata(
+          flyteidl.event.Event.TaskExecutionMetadata.Builder builderForValue) {
+        if (metadataBuilder_ == null) {
+          metadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder mergeMetadata(flyteidl.event.Event.TaskExecutionMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (metadata_ != null) {
+            metadata_ =
+              flyteidl.event.Event.TaskExecutionMetadata.newBuilder(metadata_).mergeFrom(value).buildPartial();
+          } else {
+            metadata_ = value;
+          }
+          onChanged();
+        } else {
+          metadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder clearMetadata() {
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+          onChanged();
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadata.Builder getMetadataBuilder() {
+        
+        onChanged();
+        return getMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder() {
+        if (metadataBuilder_ != null) {
+          return metadataBuilder_.getMessageOrBuilder();
+        } else {
+          return metadata_ == null ?
+              flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance() : metadata_;
+        }
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.event.Event.TaskExecutionMetadata, flyteidl.event.Event.TaskExecutionMetadata.Builder, flyteidl.event.Event.TaskExecutionMetadataOrBuilder> 
+          getMetadataFieldBuilder() {
+        if (metadataBuilder_ == null) {
+          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.event.Event.TaskExecutionMetadata, flyteidl.event.Event.TaskExecutionMetadata.Builder, flyteidl.event.Event.TaskExecutionMetadataOrBuilder>(
+                  getMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          metadata_ = null;
+        }
+        return metadataBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -10989,6 +11243,640 @@ public final class Event {
 
   }
 
+  public interface TaskExecutionMetadataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.event.TaskExecutionMetadata)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+     */
+    int getInstanceClassValue();
+    /**
+     * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+     */
+    flyteidl.event.Event.TaskExecutionMetadata.InstanceClass getInstanceClass();
+  }
+  /**
+   * <pre>
+   * Holds metadata around how a task was executed.
+   * TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.event.TaskExecutionMetadata}
+   */
+  public  static final class TaskExecutionMetadata extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.event.TaskExecutionMetadata)
+      TaskExecutionMetadataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use TaskExecutionMetadata.newBuilder() to construct.
+    private TaskExecutionMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TaskExecutionMetadata() {
+      instanceClass_ = 0;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TaskExecutionMetadata(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 128: {
+              int rawValue = input.readEnum();
+
+              instanceClass_ = rawValue;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.event.Event.internal_static_flyteidl_event_TaskExecutionMetadata_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.event.Event.internal_static_flyteidl_event_TaskExecutionMetadata_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.event.Event.TaskExecutionMetadata.class, flyteidl.event.Event.TaskExecutionMetadata.Builder.class);
+    }
+
+    /**
+     * <pre>
+     * Includes the broad cateogry of machine used for this specific task execution. 
+     * </pre>
+     *
+     * Protobuf enum {@code flyteidl.event.TaskExecutionMetadata.InstanceClass}
+     */
+    public enum InstanceClass
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <pre>
+       * The default instance class configured for the flyte application platform.
+       * </pre>
+       *
+       * <code>DEFAULT = 0;</code>
+       */
+      DEFAULT(0),
+      /**
+       * <pre>
+       * The instance class configured for interruptible tasks.
+       * </pre>
+       *
+       * <code>INTERRUPTIBLE = 1;</code>
+       */
+      INTERRUPTIBLE(1),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <pre>
+       * The default instance class configured for the flyte application platform.
+       * </pre>
+       *
+       * <code>DEFAULT = 0;</code>
+       */
+      public static final int DEFAULT_VALUE = 0;
+      /**
+       * <pre>
+       * The instance class configured for interruptible tasks.
+       * </pre>
+       *
+       * <code>INTERRUPTIBLE = 1;</code>
+       */
+      public static final int INTERRUPTIBLE_VALUE = 1;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static InstanceClass valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static InstanceClass forNumber(int value) {
+        switch (value) {
+          case 0: return DEFAULT;
+          case 1: return INTERRUPTIBLE;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<InstanceClass>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          InstanceClass> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<InstanceClass>() {
+              public InstanceClass findValueByNumber(int number) {
+                return InstanceClass.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.event.Event.TaskExecutionMetadata.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final InstanceClass[] VALUES = values();
+
+      public static InstanceClass valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private InstanceClass(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.event.TaskExecutionMetadata.InstanceClass)
+    }
+
+    public static final int INSTANCE_CLASS_FIELD_NUMBER = 16;
+    private int instanceClass_;
+    /**
+     * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+     */
+    public int getInstanceClassValue() {
+      return instanceClass_;
+    }
+    /**
+     * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+     */
+    public flyteidl.event.Event.TaskExecutionMetadata.InstanceClass getInstanceClass() {
+      @SuppressWarnings("deprecation")
+      flyteidl.event.Event.TaskExecutionMetadata.InstanceClass result = flyteidl.event.Event.TaskExecutionMetadata.InstanceClass.valueOf(instanceClass_);
+      return result == null ? flyteidl.event.Event.TaskExecutionMetadata.InstanceClass.UNRECOGNIZED : result;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (instanceClass_ != flyteidl.event.Event.TaskExecutionMetadata.InstanceClass.DEFAULT.getNumber()) {
+        output.writeEnum(16, instanceClass_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (instanceClass_ != flyteidl.event.Event.TaskExecutionMetadata.InstanceClass.DEFAULT.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(16, instanceClass_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.event.Event.TaskExecutionMetadata)) {
+        return super.equals(obj);
+      }
+      flyteidl.event.Event.TaskExecutionMetadata other = (flyteidl.event.Event.TaskExecutionMetadata) obj;
+
+      if (instanceClass_ != other.instanceClass_) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INSTANCE_CLASS_FIELD_NUMBER;
+      hash = (53 * hash) + instanceClass_;
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.TaskExecutionMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.event.Event.TaskExecutionMetadata prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Holds metadata around how a task was executed.
+     * TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.event.TaskExecutionMetadata}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.event.TaskExecutionMetadata)
+        flyteidl.event.Event.TaskExecutionMetadataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_TaskExecutionMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_TaskExecutionMetadata_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.event.Event.TaskExecutionMetadata.class, flyteidl.event.Event.TaskExecutionMetadata.Builder.class);
+      }
+
+      // Construct using flyteidl.event.Event.TaskExecutionMetadata.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        instanceClass_ = 0;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_TaskExecutionMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.TaskExecutionMetadata getDefaultInstanceForType() {
+        return flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.TaskExecutionMetadata build() {
+        flyteidl.event.Event.TaskExecutionMetadata result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.TaskExecutionMetadata buildPartial() {
+        flyteidl.event.Event.TaskExecutionMetadata result = new flyteidl.event.Event.TaskExecutionMetadata(this);
+        result.instanceClass_ = instanceClass_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.event.Event.TaskExecutionMetadata) {
+          return mergeFrom((flyteidl.event.Event.TaskExecutionMetadata)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.event.Event.TaskExecutionMetadata other) {
+        if (other == flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance()) return this;
+        if (other.instanceClass_ != 0) {
+          setInstanceClassValue(other.getInstanceClassValue());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.event.Event.TaskExecutionMetadata parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.event.Event.TaskExecutionMetadata) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private int instanceClass_ = 0;
+      /**
+       * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+       */
+      public int getInstanceClassValue() {
+        return instanceClass_;
+      }
+      /**
+       * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+       */
+      public Builder setInstanceClassValue(int value) {
+        instanceClass_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadata.InstanceClass getInstanceClass() {
+        @SuppressWarnings("deprecation")
+        flyteidl.event.Event.TaskExecutionMetadata.InstanceClass result = flyteidl.event.Event.TaskExecutionMetadata.InstanceClass.valueOf(instanceClass_);
+        return result == null ? flyteidl.event.Event.TaskExecutionMetadata.InstanceClass.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+       */
+      public Builder setInstanceClass(flyteidl.event.Event.TaskExecutionMetadata.InstanceClass value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        instanceClass_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;</code>
+       */
+      public Builder clearInstanceClass() {
+        
+        instanceClass_ = 0;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.event.TaskExecutionMetadata)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.event.TaskExecutionMetadata)
+    private static final flyteidl.event.Event.TaskExecutionMetadata DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.event.Event.TaskExecutionMetadata();
+    }
+
+    public static flyteidl.event.Event.TaskExecutionMetadata getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<TaskExecutionMetadata>
+        PARSER = new com.google.protobuf.AbstractParser<TaskExecutionMetadata>() {
+      @java.lang.Override
+      public TaskExecutionMetadata parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TaskExecutionMetadata(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TaskExecutionMetadata> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TaskExecutionMetadata> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.event.Event.TaskExecutionMetadata getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_event_WorkflowExecutionEvent_descriptor;
   private static final 
@@ -11024,6 +11912,11 @@ public final class Event {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_event_TaskExecutionEvent_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_event_TaskExecutionMetadata_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_event_TaskExecutionMetadata_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -11071,7 +11964,7 @@ public final class Event {
       "rentTaskExecutionMetadata\0222\n\002id\030\001 \001(\0132&." +
       "flyteidl.core.TaskExecutionIdentifier\".\n" +
       "\033ParentNodeExecutionMetadata\022\017\n\007node_id\030" +
-      "\001 \001(\t\"\357\003\n\022TaskExecutionEvent\022*\n\007task_id\030" +
+      "\001 \001(\t\"\250\004\n\022TaskExecutionEvent\022*\n\007task_id\030" +
       "\001 \001(\0132\031.flyteidl.core.Identifier\022H\n\030pare" +
       "nt_node_execution_id\030\002 \001(\0132&.flyteidl.co" +
       "re.NodeExecutionIdentifier\022\025\n\rretry_atte" +
@@ -11083,9 +11976,14 @@ public final class Event {
       "i\030\t \001(\tH\000\022.\n\005error\030\n \001(\0132\035.flyteidl.core" +
       ".ExecutionErrorH\000\022,\n\013custom_info\030\013 \001(\0132\027" +
       ".google.protobuf.Struct\022\025\n\rphase_version" +
-      "\030\014 \001(\rB\017\n\routput_resultB3Z1github.com/ly" +
-      "ft/flyteidl/gen/pb-go/flyteidl/eventb\006pr" +
-      "oto3"
+      "\030\014 \001(\r\0227\n\010metadata\030\020 \001(\0132%.flyteidl.even" +
+      "t.TaskExecutionMetadataB\017\n\routput_result" +
+      "\"\225\001\n\025TaskExecutionMetadata\022K\n\016instance_c" +
+      "lass\030\020 \001(\01623.flyteidl.event.TaskExecutio" +
+      "nMetadata.InstanceClass\"/\n\rInstanceClass" +
+      "\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B3Z1gith" +
+      "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/" +
+      "eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11145,7 +12043,13 @@ public final class Event {
     internal_static_flyteidl_event_TaskExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionEvent_descriptor,
-        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "OutputUri", "Error", "CustomInfo", "PhaseVersion", "OutputResult", });
+        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "OutputUri", "Error", "CustomInfo", "PhaseVersion", "Metadata", "OutputResult", });
+    internal_static_flyteidl_event_TaskExecutionMetadata_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_flyteidl_event_TaskExecutionMetadata_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_event_TaskExecutionMetadata_descriptor,
+        new java.lang.String[] { "InstanceClass", });
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Catalog.getDescriptor();

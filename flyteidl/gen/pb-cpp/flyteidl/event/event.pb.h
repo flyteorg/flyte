@@ -30,6 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/identifier.pb.h"
@@ -46,7 +47,7 @@ struct TableStruct_flyteidl_2fevent_2fevent_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -67,6 +68,9 @@ extern ParentTaskExecutionMetadataDefaultTypeInternal _ParentTaskExecutionMetada
 class TaskExecutionEvent;
 class TaskExecutionEventDefaultTypeInternal;
 extern TaskExecutionEventDefaultTypeInternal _TaskExecutionEvent_default_instance_;
+class TaskExecutionMetadata;
+class TaskExecutionMetadataDefaultTypeInternal;
+extern TaskExecutionMetadataDefaultTypeInternal _TaskExecutionMetadata_default_instance_;
 class TaskNodeMetadata;
 class TaskNodeMetadataDefaultTypeInternal;
 extern TaskNodeMetadataDefaultTypeInternal _TaskNodeMetadata_default_instance_;
@@ -84,6 +88,7 @@ template<> ::flyteidl::event::NodeExecutionEvent* Arena::CreateMaybeMessage<::fl
 template<> ::flyteidl::event::ParentNodeExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::event::ParentNodeExecutionMetadata>(Arena*);
 template<> ::flyteidl::event::ParentTaskExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::event::ParentTaskExecutionMetadata>(Arena*);
 template<> ::flyteidl::event::TaskExecutionEvent* Arena::CreateMaybeMessage<::flyteidl::event::TaskExecutionEvent>(Arena*);
+template<> ::flyteidl::event::TaskExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::event::TaskExecutionMetadata>(Arena*);
 template<> ::flyteidl::event::TaskNodeMetadata* Arena::CreateMaybeMessage<::flyteidl::event::TaskNodeMetadata>(Arena*);
 template<> ::flyteidl::event::WorkflowExecutionEvent* Arena::CreateMaybeMessage<::flyteidl::event::WorkflowExecutionEvent>(Arena*);
 template<> ::flyteidl::event::WorkflowNodeMetadata* Arena::CreateMaybeMessage<::flyteidl::event::WorkflowNodeMetadata>(Arena*);
@@ -92,6 +97,27 @@ template<> ::flyteidl::event::WorkflowNodeMetadata* Arena::CreateMaybeMessage<::
 namespace flyteidl {
 namespace event {
 
+enum TaskExecutionMetadata_InstanceClass {
+  TaskExecutionMetadata_InstanceClass_DEFAULT = 0,
+  TaskExecutionMetadata_InstanceClass_INTERRUPTIBLE = 1,
+  TaskExecutionMetadata_InstanceClass_TaskExecutionMetadata_InstanceClass_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  TaskExecutionMetadata_InstanceClass_TaskExecutionMetadata_InstanceClass_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool TaskExecutionMetadata_InstanceClass_IsValid(int value);
+const TaskExecutionMetadata_InstanceClass TaskExecutionMetadata_InstanceClass_InstanceClass_MIN = TaskExecutionMetadata_InstanceClass_DEFAULT;
+const TaskExecutionMetadata_InstanceClass TaskExecutionMetadata_InstanceClass_InstanceClass_MAX = TaskExecutionMetadata_InstanceClass_INTERRUPTIBLE;
+const int TaskExecutionMetadata_InstanceClass_InstanceClass_ARRAYSIZE = TaskExecutionMetadata_InstanceClass_InstanceClass_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* TaskExecutionMetadata_InstanceClass_descriptor();
+inline const ::std::string& TaskExecutionMetadata_InstanceClass_Name(TaskExecutionMetadata_InstanceClass value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    TaskExecutionMetadata_InstanceClass_descriptor(), value);
+}
+inline bool TaskExecutionMetadata_InstanceClass_Parse(
+    const ::std::string& name, TaskExecutionMetadata_InstanceClass* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<TaskExecutionMetadata_InstanceClass>(
+    TaskExecutionMetadata_InstanceClass_descriptor(), name, value);
+}
 // ===================================================================
 
 class WorkflowExecutionEvent final :
@@ -1245,6 +1271,15 @@ class TaskExecutionEvent final :
   ::google::protobuf::Struct* mutable_custom_info();
   void set_allocated_custom_info(::google::protobuf::Struct* custom_info);
 
+  // .flyteidl.event.TaskExecutionMetadata metadata = 16;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 16;
+  const ::flyteidl::event::TaskExecutionMetadata& metadata() const;
+  ::flyteidl::event::TaskExecutionMetadata* release_metadata();
+  ::flyteidl::event::TaskExecutionMetadata* mutable_metadata();
+  void set_allocated_metadata(::flyteidl::event::TaskExecutionMetadata* metadata);
+
   // uint32 retry_attempt = 3;
   void clear_retry_attempt();
   static const int kRetryAttemptFieldNumber = 3;
@@ -1308,6 +1343,7 @@ class TaskExecutionEvent final :
   ::flyteidl::core::NodeExecutionIdentifier* parent_node_execution_id_;
   ::google::protobuf::Timestamp* occurred_at_;
   ::google::protobuf::Struct* custom_info_;
+  ::flyteidl::event::TaskExecutionMetadata* metadata_;
   ::google::protobuf::uint32 retry_attempt_;
   int phase_;
   ::google::protobuf::uint32 phase_version_;
@@ -1319,6 +1355,144 @@ class TaskExecutionEvent final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
+  friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
+};
+// -------------------------------------------------------------------
+
+class TaskExecutionMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.event.TaskExecutionMetadata) */ {
+ public:
+  TaskExecutionMetadata();
+  virtual ~TaskExecutionMetadata();
+
+  TaskExecutionMetadata(const TaskExecutionMetadata& from);
+
+  inline TaskExecutionMetadata& operator=(const TaskExecutionMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  TaskExecutionMetadata(TaskExecutionMetadata&& from) noexcept
+    : TaskExecutionMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline TaskExecutionMetadata& operator=(TaskExecutionMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const TaskExecutionMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const TaskExecutionMetadata* internal_default_instance() {
+    return reinterpret_cast<const TaskExecutionMetadata*>(
+               &_TaskExecutionMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(TaskExecutionMetadata* other);
+  friend void swap(TaskExecutionMetadata& a, TaskExecutionMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TaskExecutionMetadata* New() const final {
+    return CreateMaybeMessage<TaskExecutionMetadata>(nullptr);
+  }
+
+  TaskExecutionMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<TaskExecutionMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const TaskExecutionMetadata& from);
+  void MergeFrom(const TaskExecutionMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TaskExecutionMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef TaskExecutionMetadata_InstanceClass InstanceClass;
+  static const InstanceClass DEFAULT =
+    TaskExecutionMetadata_InstanceClass_DEFAULT;
+  static const InstanceClass INTERRUPTIBLE =
+    TaskExecutionMetadata_InstanceClass_INTERRUPTIBLE;
+  static inline bool InstanceClass_IsValid(int value) {
+    return TaskExecutionMetadata_InstanceClass_IsValid(value);
+  }
+  static const InstanceClass InstanceClass_MIN =
+    TaskExecutionMetadata_InstanceClass_InstanceClass_MIN;
+  static const InstanceClass InstanceClass_MAX =
+    TaskExecutionMetadata_InstanceClass_InstanceClass_MAX;
+  static const int InstanceClass_ARRAYSIZE =
+    TaskExecutionMetadata_InstanceClass_InstanceClass_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  InstanceClass_descriptor() {
+    return TaskExecutionMetadata_InstanceClass_descriptor();
+  }
+  static inline const ::std::string& InstanceClass_Name(InstanceClass value) {
+    return TaskExecutionMetadata_InstanceClass_Name(value);
+  }
+  static inline bool InstanceClass_Parse(const ::std::string& name,
+      InstanceClass* value) {
+    return TaskExecutionMetadata_InstanceClass_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;
+  void clear_instance_class();
+  static const int kInstanceClassFieldNumber = 16;
+  ::flyteidl::event::TaskExecutionMetadata_InstanceClass instance_class() const;
+  void set_instance_class(::flyteidl::event::TaskExecutionMetadata_InstanceClass value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.event.TaskExecutionMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  int instance_class_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
 };
 // ===================================================================
@@ -3035,6 +3209,57 @@ inline void TaskExecutionEvent::set_phase_version(::google::protobuf::uint32 val
   // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.phase_version)
 }
 
+// .flyteidl.event.TaskExecutionMetadata metadata = 16;
+inline bool TaskExecutionEvent::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void TaskExecutionEvent::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::flyteidl::event::TaskExecutionMetadata& TaskExecutionEvent::metadata() const {
+  const ::flyteidl::event::TaskExecutionMetadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::event::TaskExecutionMetadata*>(
+      &::flyteidl::event::_TaskExecutionMetadata_default_instance_);
+}
+inline ::flyteidl::event::TaskExecutionMetadata* TaskExecutionEvent::release_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.metadata)
+  
+  ::flyteidl::event::TaskExecutionMetadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::event::TaskExecutionMetadata* TaskExecutionEvent::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::event::TaskExecutionMetadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.metadata)
+  return metadata_;
+}
+inline void TaskExecutionEvent::set_allocated_metadata(::flyteidl::event::TaskExecutionMetadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskExecutionEvent.metadata)
+}
+
 inline bool TaskExecutionEvent::has_output_result() const {
   return output_result_case() != OUTPUT_RESULT_NOT_SET;
 }
@@ -3044,9 +3269,29 @@ inline void TaskExecutionEvent::clear_has_output_result() {
 inline TaskExecutionEvent::OutputResultCase TaskExecutionEvent::output_result_case() const {
   return TaskExecutionEvent::OutputResultCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// TaskExecutionMetadata
+
+// .flyteidl.event.TaskExecutionMetadata.InstanceClass instance_class = 16;
+inline void TaskExecutionMetadata::clear_instance_class() {
+  instance_class_ = 0;
+}
+inline ::flyteidl::event::TaskExecutionMetadata_InstanceClass TaskExecutionMetadata::instance_class() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionMetadata.instance_class)
+  return static_cast< ::flyteidl::event::TaskExecutionMetadata_InstanceClass >(instance_class_);
+}
+inline void TaskExecutionMetadata::set_instance_class(::flyteidl::event::TaskExecutionMetadata_InstanceClass value) {
+  
+  instance_class_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionMetadata.instance_class)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -3064,6 +3309,18 @@ inline TaskExecutionEvent::OutputResultCase TaskExecutionEvent::output_result_ca
 
 }  // namespace event
 }  // namespace flyteidl
+
+namespace google {
+namespace protobuf {
+
+template <> struct is_proto_enum< ::flyteidl::event::TaskExecutionMetadata_InstanceClass> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::event::TaskExecutionMetadata_InstanceClass>() {
+  return ::flyteidl::event::TaskExecutionMetadata_InstanceClass_descriptor();
+}
+
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

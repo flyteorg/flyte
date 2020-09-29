@@ -298,6 +298,7 @@ Class | Method | HTTP request | Description
  - [EventParentNodeExecutionMetadata](docs/EventParentNodeExecutionMetadata.md)
  - [EventParentTaskExecutionMetadata](docs/EventParentTaskExecutionMetadata.md)
  - [EventTaskExecutionEvent](docs/EventTaskExecutionEvent.md)
+ - [EventTaskExecutionMetadata](docs/EventTaskExecutionMetadata.md)
  - [EventWorkflowExecutionEvent](docs/EventWorkflowExecutionEvent.md)
  - [ExecutionErrorErrorKind](docs/ExecutionErrorErrorKind.md)
  - [ExecutionMetadataExecutionMode](docs/ExecutionMetadataExecutionMode.md)
@@ -322,6 +323,7 @@ Class | Method | HTTP request | Description
  - [SchemaColumnSchemaColumnType](docs/SchemaColumnSchemaColumnType.md)
  - [SchemaTypeSchemaColumn](docs/SchemaTypeSchemaColumn.md)
  - [SortDirection](docs/SortDirection.md)
+ - [TaskExecutionMetadataInstanceClass](docs/TaskExecutionMetadataInstanceClass.md)
  - [TaskLogMessageFormat](docs/TaskLogMessageFormat.md)
  - [WorkflowMetadataOnFailurePolicy](docs/WorkflowMetadataOnFailurePolicy.md)
 

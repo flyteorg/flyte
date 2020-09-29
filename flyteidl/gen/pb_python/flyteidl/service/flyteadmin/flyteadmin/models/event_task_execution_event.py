@@ -21,6 +21,7 @@ from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
+from flyteadmin.models.event_task_execution_metadata import EventTaskExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -49,7 +50,8 @@ class EventTaskExecutionEvent(object):
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'custom_info': 'ProtobufStruct',
-        'phase_version': 'int'
+        'phase_version': 'int',
+        'metadata': 'EventTaskExecutionMetadata'
     }
 
     attribute_map = {
@@ -64,10 +66,11 @@ class EventTaskExecutionEvent(object):
         'output_uri': 'output_uri',
         'error': 'error',
         'custom_info': 'custom_info',
-        'phase_version': 'phase_version'
+        'phase_version': 'phase_version',
+        'metadata': 'metadata'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, custom_info=None, phase_version=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, output_uri=None, error=None, custom_info=None, phase_version=None, metadata=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._task_id = None
@@ -82,6 +85,7 @@ class EventTaskExecutionEvent(object):
         self._error = None
         self._custom_info = None
         self._phase_version = None
+        self._metadata = None
         self.discriminator = None
 
         if task_id is not None:
@@ -108,6 +112,8 @@ class EventTaskExecutionEvent(object):
             self.custom_info = custom_info
         if phase_version is not None:
             self.phase_version = phase_version
+        if metadata is not None:
+            self.metadata = metadata
 
     @property
     def task_id(self):
@@ -372,6 +378,29 @@ class EventTaskExecutionEvent(object):
         """
 
         self._phase_version = phase_version
+
+    @property
+    def metadata(self):
+        """Gets the metadata of this EventTaskExecutionEvent.  # noqa: E501
+
+        Metadata around how a task was executed.  # noqa: E501
+
+        :return: The metadata of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: EventTaskExecutionMetadata
+        """
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, metadata):
+        """Sets the metadata of this EventTaskExecutionEvent.
+
+        Metadata around how a task was executed.  # noqa: E501
+
+        :param metadata: The metadata of this EventTaskExecutionEvent.  # noqa: E501
+        :type: EventTaskExecutionMetadata
+        """
+
+        self._metadata = metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -12612,6 +12612,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.IExecutionError|null} [error] TaskExecutionEvent error
              * @property {google.protobuf.IStruct|null} [customInfo] TaskExecutionEvent customInfo
              * @property {number|null} [phaseVersion] TaskExecutionEvent phaseVersion
+             * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionEvent metadata
              */
 
             /**
@@ -12726,6 +12727,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskExecutionEvent.prototype.phaseVersion = 0;
 
+            /**
+             * TaskExecutionEvent metadata.
+             * @member {flyteidl.event.ITaskExecutionMetadata|null|undefined} metadata
+             * @memberof flyteidl.event.TaskExecutionEvent
+             * @instance
+             */
+            TaskExecutionEvent.prototype.metadata = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -12789,6 +12798,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                 if (message.phaseVersion != null && message.hasOwnProperty("phaseVersion"))
                     writer.uint32(/* id 12, wireType 0 =*/96).uint32(message.phaseVersion);
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.event.TaskExecutionMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -12847,6 +12858,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 12:
                         message.phaseVersion = reader.uint32();
+                        break;
+                    case 16:
+                        message.metadata = $root.flyteidl.event.TaskExecutionMetadata.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -12938,10 +12952,144 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.phaseVersion != null && message.hasOwnProperty("phaseVersion"))
                     if (!$util.isInteger(message.phaseVersion))
                         return "phaseVersion: integer expected";
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.event.TaskExecutionMetadata.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
+                }
                 return null;
             };
 
             return TaskExecutionEvent;
+        })();
+
+        event.TaskExecutionMetadata = (function() {
+
+            /**
+             * Properties of a TaskExecutionMetadata.
+             * @memberof flyteidl.event
+             * @interface ITaskExecutionMetadata
+             * @property {flyteidl.event.TaskExecutionMetadata.InstanceClass|null} [instanceClass] TaskExecutionMetadata instanceClass
+             */
+
+            /**
+             * Constructs a new TaskExecutionMetadata.
+             * @memberof flyteidl.event
+             * @classdesc Represents a TaskExecutionMetadata.
+             * @implements ITaskExecutionMetadata
+             * @constructor
+             * @param {flyteidl.event.ITaskExecutionMetadata=} [properties] Properties to set
+             */
+            function TaskExecutionMetadata(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * TaskExecutionMetadata instanceClass.
+             * @member {flyteidl.event.TaskExecutionMetadata.InstanceClass} instanceClass
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @instance
+             */
+            TaskExecutionMetadata.prototype.instanceClass = 0;
+
+            /**
+             * Creates a new TaskExecutionMetadata instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @static
+             * @param {flyteidl.event.ITaskExecutionMetadata=} [properties] Properties to set
+             * @returns {flyteidl.event.TaskExecutionMetadata} TaskExecutionMetadata instance
+             */
+            TaskExecutionMetadata.create = function create(properties) {
+                return new TaskExecutionMetadata(properties);
+            };
+
+            /**
+             * Encodes the specified TaskExecutionMetadata message. Does not implicitly {@link flyteidl.event.TaskExecutionMetadata.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @static
+             * @param {flyteidl.event.ITaskExecutionMetadata} message TaskExecutionMetadata message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            TaskExecutionMetadata.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.instanceClass != null && message.hasOwnProperty("instanceClass"))
+                    writer.uint32(/* id 16, wireType 0 =*/128).int32(message.instanceClass);
+                return writer;
+            };
+
+            /**
+             * Decodes a TaskExecutionMetadata message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.event.TaskExecutionMetadata} TaskExecutionMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            TaskExecutionMetadata.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.TaskExecutionMetadata();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 16:
+                        message.instanceClass = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a TaskExecutionMetadata message.
+             * @function verify
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            TaskExecutionMetadata.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.instanceClass != null && message.hasOwnProperty("instanceClass"))
+                    switch (message.instanceClass) {
+                    default:
+                        return "instanceClass: enum value expected";
+                    case 0:
+                    case 1:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * InstanceClass enum.
+             * @name flyteidl.event.TaskExecutionMetadata.InstanceClass
+             * @enum {string}
+             * @property {number} DEFAULT=0 DEFAULT value
+             * @property {number} INTERRUPTIBLE=1 INTERRUPTIBLE value
+             */
+            TaskExecutionMetadata.InstanceClass = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "DEFAULT"] = 0;
+                values[valuesById[1] = "INTERRUPTIBLE"] = 1;
+                return values;
+            })();
+
+            return TaskExecutionMetadata;
         })();
 
         return event;

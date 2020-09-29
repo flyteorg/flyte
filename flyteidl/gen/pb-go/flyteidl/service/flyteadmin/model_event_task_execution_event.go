@@ -33,4 +33,6 @@ type EventTaskExecutionEvent struct {
 	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`
 	// Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc) that should be recorded regardless of the lack of phase change. The version field should be incremented when metadata changes across the duration of an individual phase.
 	PhaseVersion int64 `json:"phase_version,omitempty"`
+	// Metadata around how a task was executed.
+	Metadata *EventTaskExecutionMetadata `json:"metadata,omitempty"`
 }
