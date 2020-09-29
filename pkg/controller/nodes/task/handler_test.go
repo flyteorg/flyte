@@ -359,6 +359,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(false)
 
 		tk := &core.TaskTemplate{
 			Id:   &core.Identifier{ResourceType: core.ResourceType_TASK, Project: "proj", Domain: "dom", Version: "ver"},
@@ -680,6 +681,7 @@ func Test_task_Handle_Catalog(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(true)
 
 		taskID := &core.Identifier{}
 		tk := &core.TaskTemplate{
@@ -902,6 +904,7 @@ func Test_task_Handle_Barrier(t *testing.T) {
 			Kind: "sample",
 			Name: "name",
 		})
+		nm.OnIsInterruptible().Return(true)
 
 		taskID := &core.Identifier{}
 		tk := &core.TaskTemplate{

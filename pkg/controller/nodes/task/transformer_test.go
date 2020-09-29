@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -13,6 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
+	handlerMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
 
 func TestToTaskEventPhase(t *testing.T) {
@@ -68,7 +71,10 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	const outputPath = "out"
 	out.On("GetOutputPath").Return(storage.DataReference(outputPath))
 
-	tev, err := ToTaskExecutionEvent(id, in, out, pluginCore.PhaseInfoWaitingForResources(n, 0, "reason"))
+	nodeExecutionMetadata := handlerMocks.NodeExecutionMetadata{}
+	nodeExecutionMetadata.OnIsInterruptible().Return(true)
+	tev, err := ToTaskExecutionEvent(id, in, out, pluginCore.PhaseInfoWaitingForResources(n, 0, "reason"),
+		&nodeExecutionMetadata)
 	assert.NoError(t, err)
 	assert.Nil(t, tev.Logs)
 	assert.Equal(t, core.TaskExecution_WAITING_FOR_RESOURCES, tev.Phase)
@@ -78,6 +84,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
 	assert.Equal(t, inputPath, tev.InputUri)
 	assert.Nil(t, tev.OutputResult)
+	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
 
 	l := []*core.TaskLog{
 		{Uri: "x", Name: "y", MessageFormat: core.TaskLog_JSON},
@@ -87,7 +94,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 		OccurredAt: &n,
 		Logs:       l,
 		CustomInfo: c,
-	}))
+	}), &nodeExecutionMetadata)
 	assert.NoError(t, err)
 	assert.Equal(t, core.TaskExecution_RUNNING, tev.Phase)
 	assert.Equal(t, uint32(1), tev.PhaseVersion)
@@ -98,12 +105,15 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.Equal(t, nodeID, tev.ParentNodeExecutionId)
 	assert.Equal(t, inputPath, tev.InputUri)
 	assert.Nil(t, tev.OutputResult)
+	assert.Equal(t, event.TaskExecutionMetadata_INTERRUPTIBLE, tev.Metadata.InstanceClass)
 
+	defaultNodeExecutionMetadata := handlerMocks.NodeExecutionMetadata{}
+	defaultNodeExecutionMetadata.OnIsInterruptible().Return(false)
 	tev, err = ToTaskExecutionEvent(id, in, out, pluginCore.PhaseInfoSuccess(&pluginCore.TaskInfo{
 		OccurredAt: &n,
 		Logs:       l,
 		CustomInfo: c,
-	}))
+	}), &defaultNodeExecutionMetadata)
 	assert.NoError(t, err)
 	assert.Equal(t, core.TaskExecution_SUCCEEDED, tev.Phase)
 	assert.Equal(t, uint32(0), tev.PhaseVersion)
@@ -116,6 +126,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	assert.NotNil(t, tev.OutputResult)
 	assert.Equal(t, inputPath, tev.InputUri)
 	assert.Equal(t, outputPath, tev.GetOutputUri())
+	assert.Empty(t, event.TaskExecutionMetadata_DEFAULT, tev.Metadata.InstanceClass)
 }
 
 func TestToTransitionType(t *testing.T) {
