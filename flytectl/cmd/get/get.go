@@ -1,7 +1,7 @@
 package get
 
 import (
-	"github.com/lyft/flytectl/cmd/core"
+	cmdcore "github.com/lyft/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
 )
@@ -12,10 +12,10 @@ func CreateGetCommand() *cobra.Command {
 		Short: "Retrieve various resource.",
 	}
 
-	getResourcesFuncs := map[string]cmdcore.CommandFunc{
-		"projects":  getProjectsFunc,
-		"tasks":     getTaskFunc,
-		"workflows": getWorkflowFunc,
+	getResourcesFuncs := map[string]cmdcore.CommandEntry{
+		"projects":  {CmdFunc: getProjectsFunc, ProjectDomainNotRequired: true},
+		"tasks":     {CmdFunc: getTaskFunc},
+		"workflows": {CmdFunc: getWorkflowFunc},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)

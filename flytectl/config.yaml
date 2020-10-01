@@ -1,5 +1,7 @@
 admin:
+  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
   endpoint: http://localhost:30082
+  # endpoint: dns:///flyte.lyft.net
   insecure: true
 logger:
   show-source: true

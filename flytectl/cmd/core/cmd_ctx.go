@@ -19,3 +19,7 @@ func (c CommandContext) AdminClient() service.AdminServiceClient {
 func (c CommandContext) OutputPipe() io.Writer {
 	return c.out
 }
+
+func (c CommandContext) InputPipe() io.Reader {
+	return c.in
+}
