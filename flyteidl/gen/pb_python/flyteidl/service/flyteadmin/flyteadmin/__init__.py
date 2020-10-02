@@ -27,6 +27,7 @@ from flyteadmin.models.admin_annotations import AdminAnnotations
 from flyteadmin.models.admin_auth import AdminAuth
 from flyteadmin.models.admin_auth_role import AdminAuthRole
 from flyteadmin.models.admin_cluster_resource_attributes import AdminClusterResourceAttributes
+from flyteadmin.models.admin_cron_schedule import AdminCronSchedule
 from flyteadmin.models.admin_domain import AdminDomain
 from flyteadmin.models.admin_email_notification import AdminEmailNotification
 from flyteadmin.models.admin_execution import AdminExecution

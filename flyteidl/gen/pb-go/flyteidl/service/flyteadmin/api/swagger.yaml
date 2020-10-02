@@ -2645,6 +2645,21 @@ definitions:
     example:
       attributes:
         key: "attributes"
+  adminCronSchedule:
+    type: "object"
+    properties:
+      schedule:
+        type: "string"
+        title: "Standard/default cron implementation as described by https://en.wikipedia.org/wiki/Cron#CRON_expression;\n\
+          Also supports nonstandard predefined scheduling definitions\nas described\
+          \ by https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions\n\
+          except @reboot"
+      offset:
+        type: "string"
+        title: "ISO 8601 duration as described by https://en.wikipedia.org/wiki/ISO_8601#Durations"
+    example:
+      schedule: "schedule"
+      offset: "offset"
   adminDomain:
     type: "object"
     properties:
@@ -3646,6 +3661,9 @@ definitions:
         entity_metadata:
           schedule:
             kickoff_time_input_arg: "kickoff_time_input_arg"
+            cron_schedule:
+              schedule: "schedule"
+              offset: "offset"
             cron_expression: "cron_expression"
             rate:
               unit: {}
@@ -4059,6 +4077,9 @@ definitions:
           entity_metadata:
             schedule:
               kickoff_time_input_arg: "kickoff_time_input_arg"
+              cron_schedule:
+                schedule: "schedule"
+                offset: "offset"
               cron_expression: "cron_expression"
               rate:
                 unit: {}
@@ -4311,6 +4332,9 @@ definitions:
           entity_metadata:
             schedule:
               kickoff_time_input_arg: "kickoff_time_input_arg"
+              cron_schedule:
+                schedule: "schedule"
+                offset: "offset"
               cron_expression: "cron_expression"
               rate:
                 unit: {}
@@ -4447,6 +4471,9 @@ definitions:
     example:
       schedule:
         kickoff_time_input_arg: "kickoff_time_input_arg"
+        cron_schedule:
+          schedule: "schedule"
+          offset: "offset"
         cron_expression: "cron_expression"
         rate:
           unit: {}
@@ -4540,6 +4567,9 @@ definitions:
       entity_metadata:
         schedule:
           kickoff_time_input_arg: "kickoff_time_input_arg"
+          cron_schedule:
+            schedule: "schedule"
+            offset: "offset"
           cron_expression: "cron_expression"
           rate:
             unit: {}
@@ -5667,6 +5697,8 @@ definitions:
           \ne.g. for a schedule that runs every 15 minutes: \"0/15 * * * ? *\""
       rate:
         $ref: "#/definitions/adminFixedRate"
+      cron_schedule:
+        $ref: "#/definitions/adminCronSchedule"
       kickoff_time_input_arg:
         type: "string"
         description: "Name of the input variable that the kickoff time will be supplied\
@@ -5675,6 +5707,9 @@ definitions:
       \ on a schedule."
     example:
       kickoff_time_input_arg: "kickoff_time_input_arg"
+      cron_schedule:
+        schedule: "schedule"
+        offset: "offset"
       cron_expression: "cron_expression"
       rate:
         unit: {}

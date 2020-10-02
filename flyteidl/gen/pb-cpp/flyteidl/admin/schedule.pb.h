@@ -42,7 +42,7 @@ struct TableStruct_flyteidl_2fadmin_2fschedule_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -51,6 +51,9 @@ struct TableStruct_flyteidl_2fadmin_2fschedule_2eproto {
 void AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto();
 namespace flyteidl {
 namespace admin {
+class CronSchedule;
+class CronScheduleDefaultTypeInternal;
+extern CronScheduleDefaultTypeInternal _CronSchedule_default_instance_;
 class FixedRate;
 class FixedRateDefaultTypeInternal;
 extern FixedRateDefaultTypeInternal _FixedRate_default_instance_;
@@ -61,6 +64,7 @@ extern ScheduleDefaultTypeInternal _Schedule_default_instance_;
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::admin::CronSchedule* Arena::CreateMaybeMessage<::flyteidl::admin::CronSchedule>(Arena*);
 template<> ::flyteidl::admin::FixedRate* Arena::CreateMaybeMessage<::flyteidl::admin::FixedRate>(Arena*);
 template<> ::flyteidl::admin::Schedule* Arena::CreateMaybeMessage<::flyteidl::admin::Schedule>(Arena*);
 }  // namespace protobuf
@@ -211,6 +215,141 @@ class FixedRate final :
 };
 // -------------------------------------------------------------------
 
+class CronSchedule final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.CronSchedule) */ {
+ public:
+  CronSchedule();
+  virtual ~CronSchedule();
+
+  CronSchedule(const CronSchedule& from);
+
+  inline CronSchedule& operator=(const CronSchedule& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CronSchedule(CronSchedule&& from) noexcept
+    : CronSchedule() {
+    *this = ::std::move(from);
+  }
+
+  inline CronSchedule& operator=(CronSchedule&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CronSchedule& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CronSchedule* internal_default_instance() {
+    return reinterpret_cast<const CronSchedule*>(
+               &_CronSchedule_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(CronSchedule* other);
+  friend void swap(CronSchedule& a, CronSchedule& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CronSchedule* New() const final {
+    return CreateMaybeMessage<CronSchedule>(nullptr);
+  }
+
+  CronSchedule* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CronSchedule>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CronSchedule& from);
+  void MergeFrom(const CronSchedule& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CronSchedule* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string schedule = 1;
+  void clear_schedule();
+  static const int kScheduleFieldNumber = 1;
+  const ::std::string& schedule() const;
+  void set_schedule(const ::std::string& value);
+  #if LANG_CXX11
+  void set_schedule(::std::string&& value);
+  #endif
+  void set_schedule(const char* value);
+  void set_schedule(const char* value, size_t size);
+  ::std::string* mutable_schedule();
+  ::std::string* release_schedule();
+  void set_allocated_schedule(::std::string* schedule);
+
+  // string offset = 2;
+  void clear_offset();
+  static const int kOffsetFieldNumber = 2;
+  const ::std::string& offset() const;
+  void set_offset(const ::std::string& value);
+  #if LANG_CXX11
+  void set_offset(::std::string&& value);
+  #endif
+  void set_offset(const char* value);
+  void set_offset(const char* value, size_t size);
+  ::std::string* mutable_offset();
+  ::std::string* release_offset();
+  void set_allocated_offset(::std::string* offset);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.CronSchedule)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr schedule_;
+  ::google::protobuf::internal::ArenaStringPtr offset_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fschedule_2eproto;
+};
+// -------------------------------------------------------------------
+
 class Schedule final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Schedule) */ {
  public:
@@ -246,6 +385,7 @@ class Schedule final :
   enum ScheduleExpressionCase {
     kCronExpression = 1,
     kRate = 2,
+    kCronSchedule = 4,
     SCHEDULEEXPRESSION_NOT_SET = 0,
   };
 
@@ -255,7 +395,7 @@ class Schedule final :
                &_Schedule_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   void Swap(Schedule* other);
   friend void swap(Schedule& a, Schedule& b) {
@@ -326,22 +466,22 @@ class Schedule final :
   ::std::string* release_kickoff_time_input_arg();
   void set_allocated_kickoff_time_input_arg(::std::string* kickoff_time_input_arg);
 
-  // string cron_expression = 1;
+  // string cron_expression = 1 [deprecated = true];
   private:
   bool has_cron_expression() const;
   public:
-  void clear_cron_expression();
-  static const int kCronExpressionFieldNumber = 1;
-  const ::std::string& cron_expression() const;
-  void set_cron_expression(const ::std::string& value);
+  PROTOBUF_DEPRECATED void clear_cron_expression();
+  PROTOBUF_DEPRECATED static const int kCronExpressionFieldNumber = 1;
+  PROTOBUF_DEPRECATED const ::std::string& cron_expression() const;
+  PROTOBUF_DEPRECATED void set_cron_expression(const ::std::string& value);
   #if LANG_CXX11
-  void set_cron_expression(::std::string&& value);
+  PROTOBUF_DEPRECATED void set_cron_expression(::std::string&& value);
   #endif
-  void set_cron_expression(const char* value);
-  void set_cron_expression(const char* value, size_t size);
-  ::std::string* mutable_cron_expression();
-  ::std::string* release_cron_expression();
-  void set_allocated_cron_expression(::std::string* cron_expression);
+  PROTOBUF_DEPRECATED void set_cron_expression(const char* value);
+  PROTOBUF_DEPRECATED void set_cron_expression(const char* value, size_t size);
+  PROTOBUF_DEPRECATED ::std::string* mutable_cron_expression();
+  PROTOBUF_DEPRECATED ::std::string* release_cron_expression();
+  PROTOBUF_DEPRECATED void set_allocated_cron_expression(::std::string* cron_expression);
 
   // .flyteidl.admin.FixedRate rate = 2;
   bool has_rate() const;
@@ -352,6 +492,15 @@ class Schedule final :
   ::flyteidl::admin::FixedRate* mutable_rate();
   void set_allocated_rate(::flyteidl::admin::FixedRate* rate);
 
+  // .flyteidl.admin.CronSchedule cron_schedule = 4;
+  bool has_cron_schedule() const;
+  void clear_cron_schedule();
+  static const int kCronScheduleFieldNumber = 4;
+  const ::flyteidl::admin::CronSchedule& cron_schedule() const;
+  ::flyteidl::admin::CronSchedule* release_cron_schedule();
+  ::flyteidl::admin::CronSchedule* mutable_cron_schedule();
+  void set_allocated_cron_schedule(::flyteidl::admin::CronSchedule* cron_schedule);
+
   void clear_ScheduleExpression();
   ScheduleExpressionCase ScheduleExpression_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Schedule)
@@ -359,6 +508,7 @@ class Schedule final :
   class HasBitSetters;
   void set_has_cron_expression();
   void set_has_rate();
+  void set_has_cron_schedule();
 
   inline bool has_ScheduleExpression() const;
   inline void clear_has_ScheduleExpression();
@@ -369,6 +519,7 @@ class Schedule final :
     ScheduleExpressionUnion() {}
     ::google::protobuf::internal::ArenaStringPtr cron_expression_;
     ::flyteidl::admin::FixedRate* rate_;
+    ::flyteidl::admin::CronSchedule* cron_schedule_;
   } ScheduleExpression_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -416,9 +567,119 @@ inline void FixedRate::set_unit(::flyteidl::admin::FixedRateUnit value) {
 
 // -------------------------------------------------------------------
 
+// CronSchedule
+
+// string schedule = 1;
+inline void CronSchedule::clear_schedule() {
+  schedule_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CronSchedule::schedule() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.CronSchedule.schedule)
+  return schedule_.GetNoArena();
+}
+inline void CronSchedule::set_schedule(const ::std::string& value) {
+  
+  schedule_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.CronSchedule.schedule)
+}
+#if LANG_CXX11
+inline void CronSchedule::set_schedule(::std::string&& value) {
+  
+  schedule_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.CronSchedule.schedule)
+}
+#endif
+inline void CronSchedule::set_schedule(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  schedule_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.CronSchedule.schedule)
+}
+inline void CronSchedule::set_schedule(const char* value, size_t size) {
+  
+  schedule_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.CronSchedule.schedule)
+}
+inline ::std::string* CronSchedule::mutable_schedule() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.CronSchedule.schedule)
+  return schedule_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CronSchedule::release_schedule() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.CronSchedule.schedule)
+  
+  return schedule_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CronSchedule::set_allocated_schedule(::std::string* schedule) {
+  if (schedule != nullptr) {
+    
+  } else {
+    
+  }
+  schedule_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), schedule);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.CronSchedule.schedule)
+}
+
+// string offset = 2;
+inline void CronSchedule::clear_offset() {
+  offset_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CronSchedule::offset() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.CronSchedule.offset)
+  return offset_.GetNoArena();
+}
+inline void CronSchedule::set_offset(const ::std::string& value) {
+  
+  offset_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.CronSchedule.offset)
+}
+#if LANG_CXX11
+inline void CronSchedule::set_offset(::std::string&& value) {
+  
+  offset_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.CronSchedule.offset)
+}
+#endif
+inline void CronSchedule::set_offset(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  offset_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.CronSchedule.offset)
+}
+inline void CronSchedule::set_offset(const char* value, size_t size) {
+  
+  offset_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.CronSchedule.offset)
+}
+inline ::std::string* CronSchedule::mutable_offset() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.CronSchedule.offset)
+  return offset_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CronSchedule::release_offset() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.CronSchedule.offset)
+  
+  return offset_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CronSchedule::set_allocated_offset(::std::string* offset) {
+  if (offset != nullptr) {
+    
+  } else {
+    
+  }
+  offset_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), offset);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.CronSchedule.offset)
+}
+
+// -------------------------------------------------------------------
+
 // Schedule
 
-// string cron_expression = 1;
+// string cron_expression = 1 [deprecated = true];
 inline bool Schedule::has_cron_expression() const {
   return ScheduleExpression_case() == kCronExpression;
 }
@@ -551,6 +812,47 @@ inline ::flyteidl::admin::FixedRate* Schedule::mutable_rate() {
   return ScheduleExpression_.rate_;
 }
 
+// .flyteidl.admin.CronSchedule cron_schedule = 4;
+inline bool Schedule::has_cron_schedule() const {
+  return ScheduleExpression_case() == kCronSchedule;
+}
+inline void Schedule::set_has_cron_schedule() {
+  _oneof_case_[0] = kCronSchedule;
+}
+inline void Schedule::clear_cron_schedule() {
+  if (has_cron_schedule()) {
+    delete ScheduleExpression_.cron_schedule_;
+    clear_has_ScheduleExpression();
+  }
+}
+inline ::flyteidl::admin::CronSchedule* Schedule::release_cron_schedule() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Schedule.cron_schedule)
+  if (has_cron_schedule()) {
+    clear_has_ScheduleExpression();
+      ::flyteidl::admin::CronSchedule* temp = ScheduleExpression_.cron_schedule_;
+    ScheduleExpression_.cron_schedule_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::CronSchedule& Schedule::cron_schedule() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Schedule.cron_schedule)
+  return has_cron_schedule()
+      ? *ScheduleExpression_.cron_schedule_
+      : *reinterpret_cast< ::flyteidl::admin::CronSchedule*>(&::flyteidl::admin::_CronSchedule_default_instance_);
+}
+inline ::flyteidl::admin::CronSchedule* Schedule::mutable_cron_schedule() {
+  if (!has_cron_schedule()) {
+    clear_ScheduleExpression();
+    set_has_cron_schedule();
+    ScheduleExpression_.cron_schedule_ = CreateMaybeMessage< ::flyteidl::admin::CronSchedule >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Schedule.cron_schedule)
+  return ScheduleExpression_.cron_schedule_;
+}
+
 // string kickoff_time_input_arg = 3;
 inline void Schedule::clear_kickoff_time_input_arg() {
   kickoff_time_input_arg_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -616,6 +918,8 @@ inline Schedule::ScheduleExpressionCase Schedule::ScheduleExpression_case() cons
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

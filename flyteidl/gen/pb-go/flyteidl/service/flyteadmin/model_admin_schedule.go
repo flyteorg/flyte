@@ -13,6 +13,7 @@ package flyteadmin
 type AdminSchedule struct {
 	CronExpression string `json:"cron_expression,omitempty"`
 	Rate *AdminFixedRate `json:"rate,omitempty"`
+	CronSchedule *AdminCronSchedule `json:"cron_schedule,omitempty"`
 	// Name of the input variable that the kickoff time will be supplied to when the workflow is kicked off.
 	KickoffTimeInputArg string `json:"kickoff_time_input_arg,omitempty"`
 }

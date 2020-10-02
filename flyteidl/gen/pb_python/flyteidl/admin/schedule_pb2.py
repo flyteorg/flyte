@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\x1d\x66lyteidl/admin/schedule.proto\x12\x0e\x66lyteidl.admin\"G\n\tFixedRate\x12\r\n\x05value\x18\x01 \x01(\r\x12+\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl.admin.FixedRateUnit\"\x86\x01\n\x08Schedule\x12\x19\n\x0f\x63ron_expression\x18\x01 \x01(\tH\x00\x12)\n\x04rate\x18\x02 \x01(\x0b\x32\x19.flyteidl.admin.FixedRateH\x00\x12\x1e\n\x16kickoff_time_input_arg\x18\x03 \x01(\tB\x14\n\x12ScheduleExpression*.\n\rFixedRateUnit\x12\n\n\x06MINUTE\x10\x00\x12\x08\n\x04HOUR\x10\x01\x12\x07\n\x03\x44\x41Y\x10\x02\x42\x33Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\x1d\x66lyteidl/admin/schedule.proto\x12\x0e\x66lyteidl.admin\"G\n\tFixedRate\x12\r\n\x05value\x18\x01 \x01(\r\x12+\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl.admin.FixedRateUnit\"0\n\x0c\x43ronSchedule\x12\x10\n\x08schedule\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\t\"\xc1\x01\n\x08Schedule\x12\x1d\n\x0f\x63ron_expression\x18\x01 \x01(\tB\x02\x18\x01H\x00\x12)\n\x04rate\x18\x02 \x01(\x0b\x32\x19.flyteidl.admin.FixedRateH\x00\x12\x35\n\rcron_schedule\x18\x04 \x01(\x0b\x32\x1c.flyteidl.admin.CronScheduleH\x00\x12\x1e\n\x16kickoff_time_input_arg\x18\x03 \x01(\tB\x14\n\x12ScheduleExpression*.\n\rFixedRateUnit\x12\n\n\x06MINUTE\x10\x00\x12\x08\n\x04HOUR\x10\x01\x12\x07\n\x03\x44\x41Y\x10\x02\x42\x33Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
 )
 
 _FIXEDRATEUNIT = _descriptor.EnumDescriptor(
@@ -45,8 +45,8 @@ _FIXEDRATEUNIT = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=259,
-  serialized_end=305,
+  serialized_start=368,
+  serialized_end=414,
 )
 _sym_db.RegisterEnumDescriptor(_FIXEDRATEUNIT)
 
@@ -95,6 +95,44 @@ _FIXEDRATE = _descriptor.Descriptor(
 )
 
 
+_CRONSCHEDULE = _descriptor.Descriptor(
+  name='CronSchedule',
+  full_name='flyteidl.admin.CronSchedule',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='schedule', full_name='flyteidl.admin.CronSchedule.schedule', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='offset', full_name='flyteidl.admin.CronSchedule.offset', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=122,
+  serialized_end=170,
+)
+
+
 _SCHEDULE = _descriptor.Descriptor(
   name='Schedule',
   full_name='flyteidl.admin.Schedule',
@@ -108,7 +146,7 @@ _SCHEDULE = _descriptor.Descriptor(
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
+      serialized_options=_b('\030\001'), file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
       name='rate', full_name='flyteidl.admin.Schedule.rate', index=1,
       number=2, type=11, cpp_type=10, label=1,
@@ -117,7 +155,14 @@ _SCHEDULE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='kickoff_time_input_arg', full_name='flyteidl.admin.Schedule.kickoff_time_input_arg', index=2,
+      name='cron_schedule', full_name='flyteidl.admin.Schedule.cron_schedule', index=2,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='kickoff_time_input_arg', full_name='flyteidl.admin.Schedule.kickoff_time_input_arg', index=3,
       number=3, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -138,19 +183,24 @@ _SCHEDULE = _descriptor.Descriptor(
       name='ScheduleExpression', full_name='flyteidl.admin.Schedule.ScheduleExpression',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=123,
-  serialized_end=257,
+  serialized_start=173,
+  serialized_end=366,
 )
 
 _FIXEDRATE.fields_by_name['unit'].enum_type = _FIXEDRATEUNIT
 _SCHEDULE.fields_by_name['rate'].message_type = _FIXEDRATE
+_SCHEDULE.fields_by_name['cron_schedule'].message_type = _CRONSCHEDULE
 _SCHEDULE.oneofs_by_name['ScheduleExpression'].fields.append(
   _SCHEDULE.fields_by_name['cron_expression'])
 _SCHEDULE.fields_by_name['cron_expression'].containing_oneof = _SCHEDULE.oneofs_by_name['ScheduleExpression']
 _SCHEDULE.oneofs_by_name['ScheduleExpression'].fields.append(
   _SCHEDULE.fields_by_name['rate'])
 _SCHEDULE.fields_by_name['rate'].containing_oneof = _SCHEDULE.oneofs_by_name['ScheduleExpression']
+_SCHEDULE.oneofs_by_name['ScheduleExpression'].fields.append(
+  _SCHEDULE.fields_by_name['cron_schedule'])
+_SCHEDULE.fields_by_name['cron_schedule'].containing_oneof = _SCHEDULE.oneofs_by_name['ScheduleExpression']
 DESCRIPTOR.message_types_by_name['FixedRate'] = _FIXEDRATE
+DESCRIPTOR.message_types_by_name['CronSchedule'] = _CRONSCHEDULE
 DESCRIPTOR.message_types_by_name['Schedule'] = _SCHEDULE
 DESCRIPTOR.enum_types_by_name['FixedRateUnit'] = _FIXEDRATEUNIT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
@@ -162,6 +212,13 @@ FixedRate = _reflection.GeneratedProtocolMessageType('FixedRate', (_message.Mess
   ))
 _sym_db.RegisterMessage(FixedRate)
 
+CronSchedule = _reflection.GeneratedProtocolMessageType('CronSchedule', (_message.Message,), dict(
+  DESCRIPTOR = _CRONSCHEDULE,
+  __module__ = 'flyteidl.admin.schedule_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.CronSchedule)
+  ))
+_sym_db.RegisterMessage(CronSchedule)
+
 Schedule = _reflection.GeneratedProtocolMessageType('Schedule', (_message.Message,), dict(
   DESCRIPTOR = _SCHEDULE,
   __module__ = 'flyteidl.admin.schedule_pb2'
@@ -171,4 +228,5 @@ _sym_db.RegisterMessage(Schedule)
 
 
 DESCRIPTOR._options = None
+_SCHEDULE.fields_by_name['cron_expression']._options = None
 # @@protoc_insertion_point(module_scope)
