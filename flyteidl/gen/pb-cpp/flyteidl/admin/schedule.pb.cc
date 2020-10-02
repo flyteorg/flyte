@@ -16,6 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fschedule_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_CronSchedule_flyteidl_2fadmin_2fschedule_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fschedule_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto;
 namespace flyteidl {
 namespace admin {
@@ -23,11 +24,16 @@ class FixedRateDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<FixedRate> _instance;
 } _FixedRate_default_instance_;
+class CronScheduleDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<CronSchedule> _instance;
+} _CronSchedule_default_instance_;
 class ScheduleDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Schedule> _instance;
   ::google::protobuf::internal::ArenaStringPtr cron_expression_;
   const ::flyteidl::admin::FixedRate* rate_;
+  const ::flyteidl::admin::CronSchedule* cron_schedule_;
 } _Schedule_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
@@ -45,6 +51,20 @@ static void InitDefaultsFixedRate_flyteidl_2fadmin_2fschedule_2eproto() {
 ::google::protobuf::internal::SCCInfo<0> scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsFixedRate_flyteidl_2fadmin_2fschedule_2eproto}, {}};
 
+static void InitDefaultsCronSchedule_flyteidl_2fadmin_2fschedule_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::admin::_CronSchedule_default_instance_;
+    new (ptr) ::flyteidl::admin::CronSchedule();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::admin::CronSchedule::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_CronSchedule_flyteidl_2fadmin_2fschedule_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCronSchedule_flyteidl_2fadmin_2fschedule_2eproto}, {}};
+
 static void InitDefaultsSchedule_flyteidl_2fadmin_2fschedule_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -56,16 +76,18 @@ static void InitDefaultsSchedule_flyteidl_2fadmin_2fschedule_2eproto() {
   ::flyteidl::admin::Schedule::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsSchedule_flyteidl_2fadmin_2fschedule_2eproto}, {
-      &scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsSchedule_flyteidl_2fadmin_2fschedule_2eproto}, {
+      &scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto.base,
+      &scc_info_CronSchedule_flyteidl_2fadmin_2fschedule_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fadmin_2fschedule_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_FixedRate_flyteidl_2fadmin_2fschedule_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_CronSchedule_flyteidl_2fadmin_2fschedule_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Schedule_flyteidl_2fadmin_2fschedule_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto[2];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto[3];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fadmin_2fschedule_2eproto[1];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fadmin_2fschedule_2eproto = nullptr;
 
@@ -78,47 +100,59 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fschedule_2eproto
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::FixedRate, value_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::FixedRate, unit_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CronSchedule, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CronSchedule, schedule_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CronSchedule, offset_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, _internal_metadata_),
   ~0u,  // no _extensions_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   offsetof(::flyteidl::admin::ScheduleDefaultTypeInternal, cron_expression_),
   offsetof(::flyteidl::admin::ScheduleDefaultTypeInternal, rate_),
+  offsetof(::flyteidl::admin::ScheduleDefaultTypeInternal, cron_schedule_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, kickoff_time_input_arg_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Schedule, ScheduleExpression_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::FixedRate)},
-  { 7, -1, sizeof(::flyteidl::admin::Schedule)},
+  { 7, -1, sizeof(::flyteidl::admin::CronSchedule)},
+  { 14, -1, sizeof(::flyteidl::admin::Schedule)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_FixedRate_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_CronSchedule_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_Schedule_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto = {
   {}, AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto, "flyteidl/admin/schedule.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fadmin_2fschedule_2eproto::offsets,
-  file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto, 2, file_level_enum_descriptors_flyteidl_2fadmin_2fschedule_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fschedule_2eproto,
+  file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto, 3, file_level_enum_descriptors_flyteidl_2fadmin_2fschedule_2eproto, file_level_service_descriptors_flyteidl_2fadmin_2fschedule_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fschedule_2eproto[] =
   "\n\035flyteidl/admin/schedule.proto\022\016flyteid"
   "l.admin\"G\n\tFixedRate\022\r\n\005value\030\001 \001(\r\022+\n\004u"
   "nit\030\002 \001(\0162\035.flyteidl.admin.FixedRateUnit"
-  "\"\206\001\n\010Schedule\022\031\n\017cron_expression\030\001 \001(\tH\000"
-  "\022)\n\004rate\030\002 \001(\0132\031.flyteidl.admin.FixedRat"
-  "eH\000\022\036\n\026kickoff_time_input_arg\030\003 \001(\tB\024\n\022S"
-  "cheduleExpression*.\n\rFixedRateUnit\022\n\n\006MI"
-  "NUTE\020\000\022\010\n\004HOUR\020\001\022\007\n\003DAY\020\002B3Z1github.com/"
-  "lyft/flyteidl/gen/pb-go/flyteidl/adminb\006"
-  "proto3"
+  "\"0\n\014CronSchedule\022\020\n\010schedule\030\001 \001(\t\022\016\n\006of"
+  "fset\030\002 \001(\t\"\301\001\n\010Schedule\022\035\n\017cron_expressi"
+  "on\030\001 \001(\tB\002\030\001H\000\022)\n\004rate\030\002 \001(\0132\031.flyteidl."
+  "admin.FixedRateH\000\0225\n\rcron_schedule\030\004 \001(\013"
+  "2\034.flyteidl.admin.CronScheduleH\000\022\036\n\026kick"
+  "off_time_input_arg\030\003 \001(\tB\024\n\022ScheduleExpr"
+  "ession*.\n\rFixedRateUnit\022\n\n\006MINUTE\020\000\022\010\n\004H"
+  "OUR\020\001\022\007\n\003DAY\020\002B3Z1github.com/lyft/flytei"
+  "dl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fschedule_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fschedule_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fschedule_2eproto,
-  "flyteidl/admin/schedule.proto", &assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto, 366,
+  "flyteidl/admin/schedule.proto", &assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto, 475,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto() {
@@ -461,20 +495,397 @@ void FixedRate::InternalSwap(FixedRate* other) {
 
 // ===================================================================
 
+void CronSchedule::InitAsDefaultInstance() {
+}
+class CronSchedule::HasBitSetters {
+ public:
+};
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int CronSchedule::kScheduleFieldNumber;
+const int CronSchedule::kOffsetFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+CronSchedule::CronSchedule()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.admin.CronSchedule)
+}
+CronSchedule::CronSchedule(const CronSchedule& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  schedule_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.schedule().size() > 0) {
+    schedule_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.schedule_);
+  }
+  offset_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.offset().size() > 0) {
+    offset_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.offset_);
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.admin.CronSchedule)
+}
+
+void CronSchedule::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_CronSchedule_flyteidl_2fadmin_2fschedule_2eproto.base);
+  schedule_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  offset_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+CronSchedule::~CronSchedule() {
+  // @@protoc_insertion_point(destructor:flyteidl.admin.CronSchedule)
+  SharedDtor();
+}
+
+void CronSchedule::SharedDtor() {
+  schedule_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  offset_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+
+void CronSchedule::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const CronSchedule& CronSchedule::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_CronSchedule_flyteidl_2fadmin_2fschedule_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void CronSchedule::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.admin.CronSchedule)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  schedule_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  offset_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* CronSchedule::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<CronSchedule*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string schedule = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.CronSchedule.schedule");
+        object = msg->mutable_schedule();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string offset = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.CronSchedule.offset");
+        object = msg->mutable_offset();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool CronSchedule::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.admin.CronSchedule)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string schedule = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_schedule()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->schedule().data(), static_cast<int>(this->schedule().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.CronSchedule.schedule"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string offset = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_offset()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->offset().data(), static_cast<int>(this->offset().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.CronSchedule.offset"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.admin.CronSchedule)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.admin.CronSchedule)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void CronSchedule::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.admin.CronSchedule)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string schedule = 1;
+  if (this->schedule().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->schedule().data(), static_cast<int>(this->schedule().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.CronSchedule.schedule");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->schedule(), output);
+  }
+
+  // string offset = 2;
+  if (this->offset().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->offset().data(), static_cast<int>(this->offset().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.CronSchedule.offset");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->offset(), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.admin.CronSchedule)
+}
+
+::google::protobuf::uint8* CronSchedule::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.CronSchedule)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string schedule = 1;
+  if (this->schedule().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->schedule().data(), static_cast<int>(this->schedule().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.CronSchedule.schedule");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->schedule(), target);
+  }
+
+  // string offset = 2;
+  if (this->offset().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->offset().data(), static_cast<int>(this->offset().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.CronSchedule.offset");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->offset(), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.admin.CronSchedule)
+  return target;
+}
+
+size_t CronSchedule::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.admin.CronSchedule)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string schedule = 1;
+  if (this->schedule().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->schedule());
+  }
+
+  // string offset = 2;
+  if (this->offset().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->offset());
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void CronSchedule::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.admin.CronSchedule)
+  GOOGLE_DCHECK_NE(&from, this);
+  const CronSchedule* source =
+      ::google::protobuf::DynamicCastToGenerated<CronSchedule>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.admin.CronSchedule)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.admin.CronSchedule)
+    MergeFrom(*source);
+  }
+}
+
+void CronSchedule::MergeFrom(const CronSchedule& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.admin.CronSchedule)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.schedule().size() > 0) {
+
+    schedule_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.schedule_);
+  }
+  if (from.offset().size() > 0) {
+
+    offset_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.offset_);
+  }
+}
+
+void CronSchedule::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.admin.CronSchedule)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CronSchedule::CopyFrom(const CronSchedule& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.admin.CronSchedule)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CronSchedule::IsInitialized() const {
+  return true;
+}
+
+void CronSchedule::Swap(CronSchedule* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void CronSchedule::InternalSwap(CronSchedule* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  schedule_.Swap(&other->schedule_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  offset_.Swap(&other->offset_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+}
+
+::google::protobuf::Metadata CronSchedule::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto);
+  return ::file_level_metadata_flyteidl_2fadmin_2fschedule_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void Schedule::InitAsDefaultInstance() {
   ::flyteidl::admin::_Schedule_default_instance_.cron_expression_.UnsafeSetDefault(
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::flyteidl::admin::_Schedule_default_instance_.rate_ = const_cast< ::flyteidl::admin::FixedRate*>(
       ::flyteidl::admin::FixedRate::internal_default_instance());
+  ::flyteidl::admin::_Schedule_default_instance_.cron_schedule_ = const_cast< ::flyteidl::admin::CronSchedule*>(
+      ::flyteidl::admin::CronSchedule::internal_default_instance());
 }
 class Schedule::HasBitSetters {
  public:
   static const ::flyteidl::admin::FixedRate& rate(const Schedule* msg);
+  static const ::flyteidl::admin::CronSchedule& cron_schedule(const Schedule* msg);
 };
 
 const ::flyteidl::admin::FixedRate&
 Schedule::HasBitSetters::rate(const Schedule* msg) {
   return *msg->ScheduleExpression_.rate_;
+}
+const ::flyteidl::admin::CronSchedule&
+Schedule::HasBitSetters::cron_schedule(const Schedule* msg) {
+  return *msg->ScheduleExpression_.cron_schedule_;
 }
 void Schedule::set_allocated_rate(::flyteidl::admin::FixedRate* rate) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
@@ -490,9 +901,24 @@ void Schedule::set_allocated_rate(::flyteidl::admin::FixedRate* rate) {
   }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Schedule.rate)
 }
+void Schedule::set_allocated_cron_schedule(::flyteidl::admin::CronSchedule* cron_schedule) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  clear_ScheduleExpression();
+  if (cron_schedule) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      cron_schedule = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, cron_schedule, submessage_arena);
+    }
+    set_has_cron_schedule();
+    ScheduleExpression_.cron_schedule_ = cron_schedule;
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Schedule.cron_schedule)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Schedule::kCronExpressionFieldNumber;
 const int Schedule::kRateFieldNumber;
+const int Schedule::kCronScheduleFieldNumber;
 const int Schedule::kKickoffTimeInputArgFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -517,6 +943,10 @@ Schedule::Schedule(const Schedule& from)
     }
     case kRate: {
       mutable_rate()->::flyteidl::admin::FixedRate::MergeFrom(from.rate());
+      break;
+    }
+    case kCronSchedule: {
+      mutable_cron_schedule()->::flyteidl::admin::CronSchedule::MergeFrom(from.cron_schedule());
       break;
     }
     case SCHEDULEEXPRESSION_NOT_SET: {
@@ -565,6 +995,10 @@ void Schedule::clear_ScheduleExpression() {
       delete ScheduleExpression_.rate_;
       break;
     }
+    case kCronSchedule: {
+      delete ScheduleExpression_.cron_schedule_;
+      break;
+    }
     case SCHEDULEEXPRESSION_NOT_SET: {
       break;
     }
@@ -597,7 +1031,7 @@ const char* Schedule::_InternalParse(const char* begin, const char* end, void* o
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // string cron_expression = 1;
+      // string cron_expression = 1 [deprecated = true];
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -642,6 +1076,19 @@ const char* Schedule::_InternalParse(const char* begin, const char* end, void* o
         ptr += size;
         break;
       }
+      // .flyteidl.admin.CronSchedule cron_schedule = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::CronSchedule::_InternalParse;
+        object = msg->mutable_cron_schedule();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -676,7 +1123,7 @@ bool Schedule::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string cron_expression = 1;
+      // string cron_expression = 1 [deprecated = true];
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
@@ -717,6 +1164,17 @@ bool Schedule::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.admin.CronSchedule cron_schedule = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_cron_schedule()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -744,7 +1202,7 @@ void Schedule::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string cron_expression = 1;
+  // string cron_expression = 1 [deprecated = true];
   if (has_cron_expression()) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->cron_expression().data(), static_cast<int>(this->cron_expression().length()),
@@ -770,6 +1228,12 @@ void Schedule::SerializeWithCachedSizes(
       3, this->kickoff_time_input_arg(), output);
   }
 
+  // .flyteidl.admin.CronSchedule cron_schedule = 4;
+  if (has_cron_schedule()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, HasBitSetters::cron_schedule(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -783,7 +1247,7 @@ void Schedule::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string cron_expression = 1;
+  // string cron_expression = 1 [deprecated = true];
   if (has_cron_expression()) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
       this->cron_expression().data(), static_cast<int>(this->cron_expression().length()),
@@ -810,6 +1274,13 @@ void Schedule::SerializeWithCachedSizes(
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
         3, this->kickoff_time_input_arg(), target);
+  }
+
+  // .flyteidl.admin.CronSchedule cron_schedule = 4;
+  if (has_cron_schedule()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, HasBitSetters::cron_schedule(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -841,7 +1312,7 @@ size_t Schedule::ByteSizeLong() const {
   }
 
   switch (ScheduleExpression_case()) {
-    // string cron_expression = 1;
+    // string cron_expression = 1 [deprecated = true];
     case kCronExpression: {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -853,6 +1324,13 @@ size_t Schedule::ByteSizeLong() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::MessageSize(
           *ScheduleExpression_.rate_);
+      break;
+    }
+    // .flyteidl.admin.CronSchedule cron_schedule = 4;
+    case kCronSchedule: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          *ScheduleExpression_.cron_schedule_);
       break;
     }
     case SCHEDULEEXPRESSION_NOT_SET: {
@@ -897,6 +1375,10 @@ void Schedule::MergeFrom(const Schedule& from) {
     }
     case kRate: {
       mutable_rate()->::flyteidl::admin::FixedRate::MergeFrom(from.rate());
+      break;
+    }
+    case kCronSchedule: {
+      mutable_cron_schedule()->::flyteidl::admin::CronSchedule::MergeFrom(from.cron_schedule());
       break;
     }
     case SCHEDULEEXPRESSION_NOT_SET: {
@@ -949,6 +1431,9 @@ namespace google {
 namespace protobuf {
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::FixedRate* Arena::CreateMaybeMessage< ::flyteidl::admin::FixedRate >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::FixedRate >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::CronSchedule* Arena::CreateMaybeMessage< ::flyteidl::admin::CronSchedule >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::CronSchedule >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::Schedule* Arena::CreateMaybeMessage< ::flyteidl::admin::Schedule >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::Schedule >(arena);

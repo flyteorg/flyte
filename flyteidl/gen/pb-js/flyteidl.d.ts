@@ -9146,6 +9146,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a CronSchedule. */
+        interface ICronSchedule {
+
+            /** CronSchedule schedule */
+            schedule?: (string|null);
+
+            /** CronSchedule offset */
+            offset?: (string|null);
+        }
+
+        /** Represents a CronSchedule. */
+        class CronSchedule implements ICronSchedule {
+
+            /**
+             * Constructs a new CronSchedule.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ICronSchedule);
+
+            /** CronSchedule schedule. */
+            public schedule: string;
+
+            /** CronSchedule offset. */
+            public offset: string;
+
+            /**
+             * Creates a new CronSchedule instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CronSchedule instance
+             */
+            public static create(properties?: flyteidl.admin.ICronSchedule): flyteidl.admin.CronSchedule;
+
+            /**
+             * Encodes the specified CronSchedule message. Does not implicitly {@link flyteidl.admin.CronSchedule.verify|verify} messages.
+             * @param message CronSchedule message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ICronSchedule, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CronSchedule message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CronSchedule
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.CronSchedule;
+
+            /**
+             * Verifies a CronSchedule message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Schedule. */
         interface ISchedule {
 
@@ -9154,6 +9212,9 @@ export namespace flyteidl {
 
             /** Schedule rate */
             rate?: (flyteidl.admin.IFixedRate|null);
+
+            /** Schedule cronSchedule */
+            cronSchedule?: (flyteidl.admin.ICronSchedule|null);
 
             /** Schedule kickoffTimeInputArg */
             kickoffTimeInputArg?: (string|null);
@@ -9174,11 +9235,14 @@ export namespace flyteidl {
             /** Schedule rate. */
             public rate?: (flyteidl.admin.IFixedRate|null);
 
+            /** Schedule cronSchedule. */
+            public cronSchedule?: (flyteidl.admin.ICronSchedule|null);
+
             /** Schedule kickoffTimeInputArg. */
             public kickoffTimeInputArg: string;
 
             /** Schedule ScheduleExpression. */
-            public ScheduleExpression?: ("cronExpression"|"rate");
+            public ScheduleExpression?: ("cronExpression"|"rate"|"cronSchedule");
 
             /**
              * Creates a new Schedule instance using the specified properties.
