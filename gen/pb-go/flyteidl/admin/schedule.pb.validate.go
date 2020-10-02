@@ -104,6 +104,75 @@ var _ interface {
 	ErrorName() string
 } = FixedRateValidationError{}
 
+// Validate checks the field values on CronSchedule with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *CronSchedule) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Schedule
+
+	// no validation rules for Offset
+
+	return nil
+}
+
+// CronScheduleValidationError is the validation error returned by
+// CronSchedule.Validate if the designated constraints aren't met.
+type CronScheduleValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CronScheduleValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CronScheduleValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CronScheduleValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CronScheduleValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CronScheduleValidationError) ErrorName() string { return "CronScheduleValidationError" }
+
+// Error satisfies the builtin error interface
+func (e CronScheduleValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCronSchedule.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CronScheduleValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CronScheduleValidationError{}
+
 // Validate checks the field values on Schedule with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Schedule) Validate() error {
@@ -124,6 +193,18 @@ func (m *Schedule) Validate() error {
 			if err := v.Validate(); err != nil {
 				return ScheduleValidationError{
 					field:  "Rate",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Schedule_CronSchedule:
+
+		if v, ok := interface{}(m.GetCronSchedule()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ScheduleValidationError{
+					field:  "CronSchedule",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
