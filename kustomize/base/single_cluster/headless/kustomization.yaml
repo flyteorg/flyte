@@ -4,7 +4,6 @@ kind: Kustomization
 # All the resources that make up the deployment
 resources:
 # global resources
-- ../../namespace
 - ../../ingress
 - ../../admindeployment
 - ../../datacatalog
