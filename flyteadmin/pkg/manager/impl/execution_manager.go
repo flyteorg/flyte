@@ -467,6 +467,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if request.Spec.Labels != nil {
 		executeTaskInputs.Labels = request.Spec.Labels.Values
 	}
+	executeTaskInputs.Labels, err = m.addProjectLabels(ctx, request.Project, executeTaskInputs.Labels)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	if request.Spec.Annotations != nil {
 		executeTaskInputs.Annotations = request.Spec.Annotations.Values
 	}
@@ -632,6 +637,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		return nil, nil, err
 	}
+	executeWorkflowInputs.Labels, err = m.addProjectLabels(ctx, request.Project, executeWorkflowInputs.Labels)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	err = m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name,
 		&executeWorkflowInputs)
 	if err != nil {
@@ -1345,4 +1355,26 @@ func NewExecutionManager(
 		resourceManager:           resourceManager,
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),
 	}
+}
+
+// Adds project labels with higher precedence to workflow labels. Project labels are ignored if a corresponding label is set on the workflow.
+func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName string, initialLabels map[string]string) (map[string]string, error) {
+	project, err := m.db.ProjectRepo().Get(ctx, projectName)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get project for [%+v] with error: %v", project, err)
+		return nil, err
+	}
+	// passing nil domain as not needed to retrieve labels
+	projectLabels := transformers.FromProjectModel(project, nil).Labels.GetValues()
+
+	if initialLabels == nil {
+		initialLabels = make(map[string]string)
+	}
+
+	for k, v := range projectLabels {
+		if _, ok := initialLabels[k]; !ok {
+			initialLabels[k] = v
+		}
+	}
+	return initialLabels, nil
 }
