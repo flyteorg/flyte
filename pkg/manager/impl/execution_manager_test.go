@@ -35,6 +35,7 @@ import (
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 	runtimeIFaceMocks "github.com/lyft/flyteadmin/pkg/runtime/interfaces/mocks"
 	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
@@ -198,6 +199,17 @@ func getMockRepositoryForExecTest() repositories.RepositoryInterface {
 
 func TestCreateExecution(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
+	labels := admin.Labels{
+		Values: map[string]string{
+			"label3": "3",
+			"label2": "1", // common label, will be dropped
+		}}
+	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return transformers.CreateProjectModel(&admin.Project{
+			Labels: &labels}), nil
+	}
+
 	principal := "principal"
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 		func(ctx context.Context, input models.Execution) error {
@@ -214,6 +226,7 @@ func TestCreateExecution(t *testing.T) {
 			assert.EqualValues(t, map[string]string{
 				"label1": "1",
 				"label2": "2",
+				"label3": "3",
 			}, inputs.Labels)
 			assert.EqualValues(t, map[string]string{
 				"annotation3": "3",
