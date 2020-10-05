@@ -21,7 +21,7 @@ import (
 func TestGetExecutionEnvVars(t *testing.T) {
 	mock := mockTaskExecutionIdentifier{}
 	envVars := GetExecutionEnvVars(mock)
-	assert.Len(t, envVars, 11)
+	assert.Len(t, envVars, 12)
 }
 
 func TestGetTolerationsForResources(t *testing.T) {
@@ -204,6 +204,7 @@ var testTaskExecutionIdentifier = core.TaskExecutionIdentifier{
 		Domain:       "domain",
 		Name:         "name",
 	},
+	RetryAttempt: 1,
 	NodeExecutionId: &core.NodeExecutionIdentifier{
 		NodeId: "nodeId",
 		ExecutionId: &core.WorkflowExecutionIdentifier{
