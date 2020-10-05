@@ -3,6 +3,7 @@ package flytek8s
 import (
 	"context"
 	"os"
+	"strconv"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
@@ -41,6 +42,7 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 
 	// Execution level env variables.
 	nodeExecutionID := id.GetID().NodeExecutionId.ExecutionId
+	attemptNumber := strconv.Itoa(int(id.GetID().RetryAttempt))
 	envVars := []v1.EnvVar{
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_ID",
@@ -53,6 +55,10 @@ func GetExecutionEnvVars(id pluginsCore.TaskExecutionID) []v1.EnvVar {
 		{
 			Name:  "FLYTE_INTERNAL_EXECUTION_DOMAIN",
 			Value: nodeExecutionID.Domain,
+		},
+		{
+			Name:  "FLYTE_ATTEMPT_NUMBER",
+			Value: attemptNumber,
 		},
 		// TODO: Fill in these
 		// {
