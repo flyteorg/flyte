@@ -12,5 +12,6 @@
 
 ## Flytekit
 - Dynamic overridable Spark configuration for spark tasks
+- New Tensorflow task
 - Formally removed python 2.x support. Supports only 3.6+
 - Refactor - getting ready for enhanced auto-typed flytekit
