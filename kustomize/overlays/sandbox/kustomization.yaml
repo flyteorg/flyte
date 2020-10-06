@@ -22,7 +22,7 @@ resources:
 - ./dependencies/database
 - ./dependencies/storage
 - ./dependencies/redis
-  #- ./dependencies/contour_ingress_controller
+- ./dependencies/contour_ingress_controller
 - ./dependencies/nodeport-services.yaml
 
 patchesStrategicMerge:
