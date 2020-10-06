@@ -1241,7 +1241,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.11.0
+        image: docker.io/lyft/flyteconsole:v0.12.1
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -1285,7 +1285,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.3.12
+        image: docker.io/lyft/flytepropeller:v0.4.2
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
