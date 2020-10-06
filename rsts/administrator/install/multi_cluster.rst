@@ -13,10 +13,13 @@ This protects you from a failure in a single kubernetes cluster, and increases s
 
 First, you'll need to create additional kubernetes clusters. For this example, we'll assume you have 3 kubernetes clusters, and can access them all with ``kubectl``. We'll call these clusters "cluster1", "cluster2", and "cluster3".
 
-We want to deploy **just** the Data Plane to these clusters. To do this, we'll remove the DataPlane components from the ``flyte`` overlay, and create a new overlay containing **ony** the dataplane resources.
+We want to deploy **just** the Data Plane to these clusters. To do this, we'll remove the DataPlane components from the ``flyte`` overlay, and create a new overlay containing **only** the dataplane resources.
 
 Data Plane Deployment
 *********************
+
+NOTE:
+  With v0.8.0 and the entire setup overhaul, this section is getting revisited. Keep on the lookout for an update soon
 
 To create the "Data Plane only" overlay, lets make a ``dataplane`` subdirectory inside our main deployment directory (my-flyte-deployment). This directory will contain contain only the dataplane resources. ::
 
