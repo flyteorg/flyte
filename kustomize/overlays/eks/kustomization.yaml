@@ -80,7 +80,7 @@ secretGenerator:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.3.6 # override the tag
+    newTag: v0.3.7 # override the tag
     newName: docker.io/lyft/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
