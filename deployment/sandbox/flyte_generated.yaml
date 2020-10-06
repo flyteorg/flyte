@@ -3,16 +3,6 @@ kind: Namespace
 metadata:
   name: flyte
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: heptio-contour
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: sparkoperator
----
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -1768,7 +1758,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: flyteadmin:v0.3.5
+            image: docker.io/lyft/flyteadmin:v0.3.6
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
