@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.clients package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -488,10 +488,10 @@ entries on the second page that also appeared on the first.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project</strong> (<em>Text</em>) – </p></li>
 <li><p><strong>domain</strong> (<em>Text</em>) – </p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
 page size is determined by the Flyte Admin Service configuration.  If limit is greater than the maximum
 page size, an exception will be raised.</p></li>
-<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
 If you previously retrieved a page response with token=”foo” and you want the next page,
 specify token=”foo”. Please see the notes for this function about the caveats of the paginated API.</p></li>
 <li><p><strong>sort_by</strong> (<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.common.Sort" title="flytekit.models.admin.common.Sort"><em>flytekit.models.admin.common.Sort</em></a>) – [Optional] If provided, the results will be sorted.</p></li>
@@ -501,7 +501,7 @@ specify token=”foo”. Please see the notes for this function about the caveat
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.launch_plan.LaunchPlan" title="flytekit.models.launch_plan.LaunchPlan">flytekit.models.launch_plan.LaunchPlan</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.launch_plan.LaunchPlan" title="flytekit.models.launch_plan.LaunchPlan">flytekit.models.launch_plan.LaunchPlan</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -525,13 +525,13 @@ entries on the second page that also appeared on the first.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project</strong> (<em>Text</em>) – Project in which to list executions.</p></li>
 <li><p><strong>domain</strong> (<em>Text</em>) – Project in which to list executions.</p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
 page size is determined by the Flyte Admin Service configuration.  If limit is greater than the maximum
 page size, an exception will be raised.</p></li>
 <li><p><strong>token</strong> (<em>Text</em>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
 If you previously retrieved a page response with token=”foo” and you want the next page,
 specify token=”foo”. Please see the notes for this function about the caveats of the paginated API.</p></li>
-<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
 the query.  If the filter is not supported, an exception will be raised.</p></li>
 <li><p><strong>sort_by</strong> (<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.common.Sort" title="flytekit.models.admin.common.Sort"><em>flytekit.models.admin.common.Sort</em></a>) – [Optional] If provided, the results will be sorted.</p></li>
 </ul>
@@ -540,7 +540,7 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.execution.Execution" title="flytekit.models.execution.Execution">flytekit.models.execution.Execution</a>], Text)</p>
+<dd class="field-odd"><p>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.execution.Execution" title="flytekit.models.execution.Execution">flytekit.models.execution.Execution</a>], Text)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -584,7 +584,7 @@ specify token=”foo”. Please see the notes for this function about the caveat
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier">flytekit.models.common.NamedEntityIdentifier</a>], Text</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier">flytekit.models.common.NamedEntityIdentifier</a>], Text</p>
 </dd>
 </dl>
 </dd></dl>
@@ -608,13 +608,13 @@ entries on the second page that also appeared on the first.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>identifier</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier"><em>flytekit.models.common.NamedEntityIdentifier</em></a>) – NamedEntityIdentifier to list.</p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
 page size is determined by the Flyte Admin Service configuration.  If limit is greater than the maximum
 page size, an exception will be raised.</p></li>
-<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
 If you previously retrieved a page response with token=”foo” and you want the next page,
 specify token=”foo”. Please see the notes for this function about the caveats of the paginated API.</p></li>
-<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
 the query.  If the filter is not supported, an exception will be raised.</p></li>
 <li><p><strong>sort_by</strong> (<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.common.Sort" title="flytekit.models.admin.common.Sort"><em>flytekit.models.admin.common.Sort</em></a>) – [Optional] If provided, the results will be sorted.</p></li>
 </ul>
@@ -623,7 +623,7 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.launch_plan.LaunchPlan" title="flytekit.models.launch_plan.LaunchPlan">flytekit.models.launch_plan.LaunchPlan</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.launch_plan.LaunchPlan" title="flytekit.models.launch_plan.LaunchPlan">flytekit.models.launch_plan.LaunchPlan</a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -671,7 +671,7 @@ specify token=”foo”.
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>node_execution_identifier</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.NodeExecutionIdentifier" title="flytekit.models.core.identifier.NodeExecutionIdentifier"><em>flytekit.models.core.identifier.NodeExecutionIdentifier</em></a>) – </p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p></li>
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
 <li><p><strong>token</strong> (<em>Text</em>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.</p></li>
 </ul>
 </dd>
@@ -703,7 +703,7 @@ entries on the second page that also appeared on the first.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project</strong> (<em>Text</em>) – The namespace of the project to list.</p></li>
 <li><p><strong>domain</strong> (<em>Text</em>) – The domain space of the project to list.</p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
 page size is determined by the Flyte Admin Service configuration.  If limit is greater than the maximum
 page size, an exception will be raised.</p></li>
 <li><p><strong>token</strong> (<em>Text</em>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
@@ -716,7 +716,7 @@ specify token=”foo”. Please see the notes for this function about the caveat
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier">flytekit.models.common.NamedEntityIdentifier</a>], Text</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier">flytekit.models.common.NamedEntityIdentifier</a>], Text</p>
 </dd>
 </dl>
 </dd></dl>
@@ -740,13 +740,13 @@ entries on the second page that also appeared on the first.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>identifier</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier"><em>flytekit.models.common.NamedEntityIdentifier</em></a>) – NamedEntityIdentifier to list.</p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
 page size is determined by the Flyte Admin Service configuration.  If limit is greater than the maximum
 page size, an exception will be raised.</p></li>
-<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
 If you previously retrieved a page response with token=”foo” and you want the next page,
 specify token=”foo”. Please see the notes for this function about the caveats of the paginated API.</p></li>
-<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
 the query.  If the filter is not supported, an exception will be raised.</p></li>
 <li><p><strong>sort_by</strong> (<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.common.Sort" title="flytekit.models.admin.common.Sort"><em>flytekit.models.admin.common.Sort</em></a>) – [Optional] If provided, the results will be sorted.</p></li>
 </ul>
@@ -755,7 +755,7 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.task.Task" title="flytekit.models.task.Task">flytekit.models.task.Task</a>], Text</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.task.Task" title="flytekit.models.task.Task">flytekit.models.task.Task</a>], Text</p>
 </dd>
 </dl>
 </dd></dl>
@@ -799,7 +799,7 @@ specify token=”foo”. Please see the notes for this function about the caveat
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier">flytekit.models.common.NamedEntityIdentifier</a>], Text</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier">flytekit.models.common.NamedEntityIdentifier</a>], Text</p>
 </dd>
 </dl>
 </dd></dl>
@@ -823,13 +823,13 @@ entries on the second page that also appeared on the first.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>identifier</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.NamedEntityIdentifier" title="flytekit.models.common.NamedEntityIdentifier"><em>flytekit.models.common.NamedEntityIdentifier</em></a>) – NamedEntityIdentifier to list.</p></li>
-<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
+<li><p><strong>limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] The maximum number of entries to return.  Must be greater than 0.  The maximum
 page size is determined by the Flyte Admin Service configuration.  If limit is greater than the maximum
 page size, an exception will be raised.</p></li>
-<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [Optional] If specified, this specifies where in the rows of results to skip before reading.
 If you previously retrieved a page response with token=”foo” and you want the next page,
 specify token=”foo”. Please see the notes for this function about the caveats of the paginated API.</p></li>
-<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
+<li><p><strong>filters</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.models.html#flytekit.models.filters.Filter" title="flytekit.models.filters.Filter"><em>flytekit.models.filters.Filter</em></a><em>]</em>) – [Optional] If specified, the filters will be applied to
 the query.  If the filter is not supported, an exception will be raised.</p></li>
 <li><p><strong>sort_by</strong> (<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.common.Sort" title="flytekit.models.admin.common.Sort"><em>flytekit.models.admin.common.Sort</em></a>) – [Optional] If provided, the results will be sorted.</p></li>
 </ul>
@@ -838,7 +838,7 @@ the query.  If the filter is not supported, an exception will be raised.</p></li
 <dd class="field-even"><p>TODO</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow" title="flytekit.models.admin.workflow.Workflow">flytekit.models.admin.workflow.Workflow</a>], Text</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[<a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow" title="flytekit.models.admin.workflow.Workflow">flytekit.models.admin.workflow.Workflow</a>], Text</p>
 </dd>
 </dl>
 </dd></dl>
@@ -902,7 +902,7 @@ INACTIVE in one transaction.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a>) – identifier for launch plan to update</p></li>
-<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Enum value from flytekit.models.launch_plan.LaunchPlanState</p></li>
+<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Enum value from flytekit.models.launch_plan.LaunchPlanState</p></li>
 </ul>
 </dd>
 </dl>
@@ -916,7 +916,7 @@ task or launch plan specified by {project, domain, name} across all versions of 
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resource_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Enum value from flytekit.models.identifier.ResourceType</p></li>
+<li><p><strong>resource_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Enum value from flytekit.models.identifier.ResourceType</p></li>
 <li><p><strong>id</strong> (<em>flytekit.models.admin.named_entity.NamedEntityIdentifier</em>) – identifier for named entity to update</p></li>
 <li><p><strong>metadata</strong> (<em>flytekit.models.admin.named_entity.NamedEntityIdentifierMetadata</em>) – </p></li>
 </ul>
@@ -979,7 +979,7 @@ task or launch plan specified by {project, domain, name} across all versions of 
 <dl class="class">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.clients.raw.</code><code class="sig-name descname">RawSynchronousFlyteClient</code><span class="sig-paren">(</span><em class="sig-param">url</em>, <em class="sig-param">insecure=False</em>, <em class="sig-param">credentials=None</em>, <em class="sig-param">options=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>This is a thin synchronous wrapper around the auto-generated GRPC stubs for communicating with the admin service.</p>
 <p>This client should be usable regardless of environment in which this is used. In other words, configurations should
 be explicit as opposed to inferred from the environment or a configuration file.</p>

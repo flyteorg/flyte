@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.sdk package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -224,7 +224,7 @@ will fail without additional retries.</p>
 <dl class="class">
 <dt id="flytekit.sdk.spark_types.SparkType">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.sdk.spark_types.</code><code class="sig-name descname">SparkType</code><a class="reference internal" href="../_modules/flytekit/sdk/spark_types.html#SparkType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.spark_types.SparkType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
 <p>An enumeration.</p>
 <dl class="attribute">
 <dt id="flytekit.sdk.spark_types.SparkType.JAVA">
@@ -260,52 +260,69 @@ sub-tasks, or workflows. This task will execute the primary task alongside
 the specified kubernetes PodSpec. Custom primary task container attributes
 can be defined in the PodSpec by defining a container whose name matches
 the primary_container_name. These container attributes will be applied to
-the container brought up to execute the primary task definition.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_pod_spec_for_task</span><span class="p">():</span>
-    <span class="n">pod_spec</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">PodSpec</span><span class="p">()</span>
-    <span class="n">secondary_container</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;alpine&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">secondary_container</span><span class="o">.</span><span class="n">command</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;/bin/sh&quot;</span><span class="p">])</span>
-    <span class="n">secondary_container</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;echo hi sidecar world &gt; /data/message.txt&quot;</span><span class="p">])</span>
-    <span class="n">shared_volume_mount</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">VolumeMount</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;shared-data&quot;</span><span class="p">,</span>
-        <span class="n">mountPath</span><span class="o">=</span><span class="s2">&quot;/data&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">secondary_container</span><span class="o">.</span><span class="n">volumeMounts</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">shared_volume_mount</span><span class="p">])</span>
-
-    <span class="n">primary_container</span> <span class="o">=</span> <span class="n">generated_pb2</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">)</span>
-    <span class="n">primary_container</span><span class="o">.</span><span class="n">volumeMounts</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">shared_volume_mount</span><span class="p">])</span>
-
-    <span class="n">pod_spec</span><span class="o">.</span><span class="n">volumes</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">generated_pb2</span><span class="o">.</span><span class="n">Volume</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;shared-data&quot;</span><span class="p">,</span>
-        <span class="n">volumeSource</span><span class="o">=</span><span class="n">generated_pb2</span><span class="o">.</span><span class="n">VolumeSource</span><span class="p">(</span>
-            <span class="n">emptyDir</span><span class="o">=</span><span class="n">generated_pb2</span><span class="o">.</span><span class="n">EmptyDirVolumeSource</span><span class="p">(</span>
-                <span class="n">medium</span><span class="o">=</span><span class="s2">&quot;Memory&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="p">)])</span>
-    <span class="n">pod_spec</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">primary_container</span><span class="p">,</span> <span class="n">secondary_container</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">pod_spec</span>
-
-<span class="nd">@outputs</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">)</span>
-<span class="nd">@python_task</span>
-<span class="k">def</span> <span class="nf">my_sub_task</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">randint</span><span class="p">())</span>
-
-<span class="nd">@outputs</span><span class="p">(</span><span class="n">out</span><span class="o">=</span><span class="p">[</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">])</span>
-<span class="nd">@dynamic_sidecar_task</span><span class="p">(</span>
-    <span class="n">pod_spec</span><span class="o">=</span><span class="n">generate_pod_spec_for_task</span><span class="p">(),</span>
-    <span class="n">primary_container_name</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="k">def</span> <span class="nf">my_task</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">out</span><span class="p">):</span>
-    <span class="n">out_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
-        <span class="n">out_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">my_sub_task</span><span class="p">()</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">out_list</span><span class="p">)</span>
-</pre></div>
-</div>
+the container brought up to execute the primary task definition.
+.. code-block:: python</p>
+<blockquote>
+<div><dl>
+<dt>def generate_pod_spec_for_task():</dt><dd><p>pod_spec = generated_pb2.PodSpec()
+secondary_container = generated_pb2.Container(</p>
+<blockquote>
+<div><p>name=”secondary”,
+image=”alpine”,</p>
+</div></blockquote>
+<p>)
+secondary_container.command.extend([“/bin/sh”])
+secondary_container.args.extend([“-c”, “echo hi sidecar world &gt; /data/message.txt”])
+shared_volume_mount = generated_pb2.VolumeMount(</p>
+<blockquote>
+<div><p>name=”shared-data”,
+mountPath=”/data”,</p>
+</div></blockquote>
+<p>)
+secondary_container.volumeMounts.extend([shared_volume_mount])
+primary_container = generated_pb2.Container(name=”primary”)
+primary_container.volumeMounts.extend([shared_volume_mount])
+pod_spec.volumes.extend([generated_pb2.Volume(</p>
+<blockquote>
+<div><p>name=”shared-data”,
+volumeSource=generated_pb2.VolumeSource(</p>
+<blockquote>
+<div><dl class="simple">
+<dt>emptyDir=generated_pb2.EmptyDirVolumeSource(</dt><dd><p>medium=”Memory”,</p>
+</dd>
+</dl>
+<p>)</p>
+</div></blockquote>
+<p>)</p>
+</div></blockquote>
+<p>)])
+pod_spec.containers.extend([primary_container, secondary_container])
+return pod_spec</p>
+</dd>
+</dl>
+<p>&#64;outputs(out=Types.Integer)
+&#64;python_task
+def my_sub_task(wf_params, out):</p>
+<blockquote>
+<div><p>out.set(randint())</p>
+</div></blockquote>
+<p>&#64;outputs(out=[Types.Integer])
+&#64;dynamic_sidecar_task(</p>
+<blockquote>
+<div><p>pod_spec=generate_pod_spec_for_task(),
+primary_container_name=”primary”,</p>
+</div></blockquote>
+<p>)
+def my_task(wf_params, out):</p>
+<blockquote>
+<div><p>out_list = []
+for i in xrange(100):</p>
+<blockquote>
+<div><p>out_list.append(my_sub_task().outputs.out)</p>
+</div></blockquote>
+<p>out.set(out_list)</p>
+</div></blockquote>
+</div></blockquote>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>All outputs of a batch task must be a list.  This is because the individual outputs of sub-tasks should be
@@ -321,29 +338,29 @@ returned from the task in a list.  If this isn’t done, the sub-task will not b
 take a first argument, and then named arguments matching those defined in &#64;inputs and &#64;outputs.  No keyword
 arguments are allowed.</p></li>
 <li><p><strong>cache_version</strong> (<em>Text</em>) – <p>[optional] string representing logical version for discovery.  This field should be
-updated whenever the underlying algorithm changes.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
+updated whenever the underlying algorithm changes.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>This argument is required to be a non-empty string if `cache` is True.
+</pre></div>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
-to 0.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is
-strongly recommended that tasks are written to be idempotent.</p>
+to 0.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">If</span> <span class="n">retries</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">the</span> <span class="n">task</span> <span class="n">must</span> <span class="n">be</span> <span class="n">able</span> <span class="n">to</span> <span class="n">recover</span> <span class="kn">from</span> <span class="nn">any</span> <span class="n">remote</span> <span class="n">state</span> <span class="n">created</span> <span class="n">within</span> <span class="n">the</span> <span class="n">user</span> <span class="n">code</span><span class="o">.</span>  <span class="n">It</span> <span class="ow">is</span>
+<span class="n">strongly</span> <span class="n">recommended</span> <span class="n">that</span> <span class="n">tasks</span> <span class="n">are</span> <span class="n">written</span> <span class="n">to</span> <span class="n">be</span> <span class="n">idempotent</span><span class="o">.</span>
+</pre></div>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
-for the task to run.  Default is set by platform-level configuration.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is currently not supported by the platform.</p>
+for the task to run.  Default is set by platform-level configuration.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">currently</span> <span class="ow">not</span> <span class="n">supported</span> <span class="n">by</span> <span class="n">the</span> <span class="n">platform</span><span class="o">.</span>
+</pre></div>
 </div>
 </p></li>
 <li><p><strong>cpu_request</strong> (<em>Text</em>) – [optional] Kubernetes resource string for lower-bound of cores for the task to execute.
@@ -356,10 +373,10 @@ TODO: Add links to resource string documentation for Kubernetes</p></li>
 necessary for the task to execute.  Default is set by platform-level configuration.
 TODO: Add links to resource string documentation for Kubernetes</p></li>
 <li><p><strong>storage_limit</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for upper-bound of disk storage space
-for the task to run.  This amount is not guaranteed!  If not specified, it is set equal to storage_request.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This is currently not supported by the platform.</p>
+for the task to run.  This amount is not guaranteed!  If not specified, it is set equal to storage_request.
+.. note:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">currently</span> <span class="ow">not</span> <span class="n">supported</span> <span class="n">by</span> <span class="n">the</span> <span class="n">platform</span><span class="o">.</span>
+</pre></div>
 </div>
 </p></li>
 <li><p><strong>cpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of cores for the task to execute.
@@ -370,20 +387,20 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>allowed_failure_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – [optional] float value describing the ratio of sub-tasks that may fail before
+<li><p><strong>allowed_failure_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – [optional] float value describing the ratio of sub-tasks that may fail before
 the master batch task considers itself a failure.  By default, the value is 0 so if any task fails, the master
 batch task will be marked a failure.  If specified, the value must be between 0 and 1 inclusive.  In the event a
 non-zero value is specified, downstream tasks must be able to accept None values as outputs from individual
 sub-tasks because the output values will be set to None for any sub-task that fails.</p></li>
-<li><p><strong>max_concurrency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [optional] integer value describing the maximum number of tasks to run concurrently.
+<li><p><strong>max_concurrency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [optional] integer value describing the maximum number of tasks to run concurrently.
 This is a stand-in pending better concurrency controls for special use-cases.  The existence of this parameter
 is not guaranteed between versions and therefore it is NOT recommended that it be used.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>pod_spec</strong> (<em>k8s.io.api.core.v1.generated_pb2.PodSpec</em>) – PodSpec to bring up alongside task execution.</p></li>
 <li><p><strong>primary_container_name</strong> (<em>Text</em>) – primary container to monitor for the duration of the task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
@@ -438,7 +455,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -447,7 +464,7 @@ to 0.</p>
 strongly recommended that tasks are written to be idempotent.</p>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
@@ -481,20 +498,20 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>allowed_failure_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – [optional] float value describing the ratio of sub-tasks that may fail before
+<li><p><strong>allowed_failure_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – [optional] float value describing the ratio of sub-tasks that may fail before
 the master batch task considers itself a failure.  By default, the value is 0 so if any task fails, the master
 batch task will be marked a failure.  If specified, the value must be between 0 and 1 inclusive.  In the event a
 non-zero value is specified, downstream tasks must be able to accept None values as outputs from individual
 sub-tasks because the output values will be set to None for any sub-task that fails.</p></li>
-<li><p><strong>max_concurrency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – [optional] integer value describing the maximum number of tasks to run concurrently.
+<li><p><strong>max_concurrency</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – [optional] integer value describing the maximum number of tasks to run concurrently.
 This is a stand-in pending better concurrency controls for special use-cases.  The existence of this parameter
 is not guaranteed between versions and therefore it is NOT recommended that it be used.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  Generally, it should be a
 subclass of flytekit.common.tasks.sdk_dynamic.SdkDynamicTask.  A user can use this parameter to inject bespoke
@@ -552,7 +569,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.common.exceptions.RecoverableException</span></code> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -561,7 +578,7 @@ to 0.</p>
 strongly recommended that tasks are written to be idempotent.</p>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if task is interruptible.</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if task is interruptible.</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
@@ -595,12 +612,12 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – Environment variables to set for the execution of the query-generating
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – Environment variables to set for the execution of the query-generating
 container.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided should be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask. Generally, it should be
@@ -634,7 +651,7 @@ the base Flyte programming model.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_task_template</strong> (<a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><em>flytekit.common.tasks.sdk_runnable.SdkRunnableTask</em></a>) – Do not declare directly.  This is the
 decorated task template.</p></li>
-<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType" title="flytekit.common.types.base_sdk_types.FlyteSdkType"><em>flytekit.common.types.base_sdk_types.FlyteSdkType</em></a><em>]</em>) – Arbitrary keyword arguments for input
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType" title="flytekit.common.types.base_sdk_types.FlyteSdkType"><em>flytekit.common.types.base_sdk_types.FlyteSdkType</em></a><em>]</em>) – Arbitrary keyword arguments for input
 name and type.</p></li>
 </ul>
 </dd>
@@ -664,7 +681,7 @@ name and type.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_task_template</strong> (<a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask"><em>flytekit.common.tasks.sdk_runnable.SdkRunnableTask</em></a>) – Do not declare directly.  This is the
 decorated task template.</p></li>
-<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType" title="flytekit.common.types.base_sdk_types.FlyteSdkType"><em>flytekit.common.types.base_sdk_types.FlyteSdkType</em></a><em>]</em>) – Arbitrary keyword arguments for input
+<li><p><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType" title="flytekit.common.types.base_sdk_types.FlyteSdkType"><em>flytekit.common.types.base_sdk_types.FlyteSdkType</em></a><em>]</em>) – Arbitrary keyword arguments for input
 name and type.</p></li>
 </ul>
 </dd>
@@ -698,7 +715,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -707,7 +724,7 @@ to 0.</p>
 strongly recommended that tasks are written to be idempotent.</p>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
@@ -744,12 +761,12 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
 inject bespoke logic into the base Flyte programming model.</p></li>
@@ -794,7 +811,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -803,15 +820,15 @@ to 0.</p>
 strongly recommended that tasks are written to be idempotent.</p>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>workers_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – integer determining the number of worker replicas spawned in the cluster for this job
+<li><p><strong>workers_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – integer determining the number of worker replicas spawned in the cluster for this job
 (in addition to 1 master).</p></li>
 <li><p><strong>per_replica_storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
 for each replica spawned for this job (i.e. both for master and workers).  Default is set by platform-level configuration.</p>
@@ -852,7 +869,7 @@ This amount is not guaranteed!  If not specified, it is set equal to gpu_request
 <li><p><strong>per_replica_memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for each replica spawned for this job (i.e. both for master and workers).
 This amount is not guaranteed!  If not specified, it is set equal to memory_request.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
 inject bespoke logic into the base Flyte programming model.</p></li>
@@ -899,7 +916,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.common.exceptions.RecoverableException</span></code> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -908,7 +925,7 @@ to 0.</p>
 strongly recommended that tasks are written to be idempotent.</p>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if task is interruptible.</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if task is interruptible.</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
@@ -942,15 +959,15 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
 <li><p><strong>cluster_label</strong> – The qubole cluster label where the query is to be executed</p></li>
-<li><p><strong>tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>Text</em><em>]</em>) – User defined tags(key-value pairs) defined by the user for the queries. These tags are
+<li><p><strong>tags</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><em>Text</em><em>]</em>) – User defined tags(key-value pairs) defined by the user for the queries. These tags are
 passed to Qubole.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – Environment variables to set for the execution of the query-generating
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – Environment variables to set for the execution of the query-generating
 container.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided should be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask. Generally, it should be
@@ -1031,7 +1048,7 @@ updated whenever the underlying algorithm changes.
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a href="#id1"><span class="problematic" id="id2">:py:ex:`flytekit.sdk.exceptions.RecoverableException`</span></a> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -1040,7 +1057,7 @@ to 0.</p>
 strongly recommended that tasks are written to be idempotent.</p>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specify whether task is interruptible</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Specify whether task is interruptible</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
@@ -1079,12 +1096,12 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be discoverable and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be discoverable and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>pod_spec</strong> (<em>k8s.io.api.core.v1.generated_pb2.PodSpec</em>) – [optional] PodSpec to bring up alongside task execution.</p></li>
 <li><p><strong>primary_container_name</strong> (<em>Text</em>) – primary container to monitor for the duration of the task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
@@ -1128,7 +1145,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -1139,18 +1156,124 @@ strongly recommended that tasks are written to be idempotent.</p>
 </p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>spark_conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – A definition of key-value pairs for spark config for the job.</p></li>
-<li><p><strong>hadoop_conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – A definition of key-value pairs for hadoop config for the job.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>spark_conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – A definition of key-value pairs for spark config for the job.</p></li>
+<li><p><strong>hadoop_conf</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – A definition of key-value pairs for hadoop config for the job.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  Generally, it should be a
 subclass of flytekit.common.tasks.spark_task.SdkSparkTask.  A user can use this parameter to inject bespoke
 logic into the base Flyte programming model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask" title="flytekit.common.tasks.sdk_runnable.SdkRunnableTask">flytekit.common.tasks.sdk_runnable.SdkRunnableTask</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.sdk.tasks.tensorflow_task">
+<code class="sig-prename descclassname">flytekit.sdk.tasks.</code><code class="sig-name descname">tensorflow_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">cache_version=''</em>, <em class="sig-param">retries=0</em>, <em class="sig-param">interruptible=False</em>, <em class="sig-param">deprecated=''</em>, <em class="sig-param">cache=False</em>, <em class="sig-param">timeout=None</em>, <em class="sig-param">workers_count=1</em>, <em class="sig-param">ps_replicas_count=None</em>, <em class="sig-param">chief_replicas_count=None</em>, <em class="sig-param">per_replica_storage_request=''</em>, <em class="sig-param">per_replica_cpu_request=''</em>, <em class="sig-param">per_replica_gpu_request=''</em>, <em class="sig-param">per_replica_memory_request=''</em>, <em class="sig-param">per_replica_storage_limit=''</em>, <em class="sig-param">per_replica_cpu_limit=''</em>, <em class="sig-param">per_replica_gpu_limit=''</em>, <em class="sig-param">per_replica_memory_limit=''</em>, <em class="sig-param">environment=None</em>, <em class="sig-param">cls=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/tasks.html#tensorflow_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.tasks.tensorflow_task" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Decorator to create a Tensorflow Task definition. This task will submit TFJob (see <a class="reference external" href="https://github.com/kubeflow/tf-operator">https://github.com/kubeflow/tf-operator</a>)</dt><dd><p>defined by the code within the _task_function to k8s cluster.</p>
+</dd>
+</dl>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@inputs</span><span class="p">(</span><span class="n">int_list</span><span class="o">=</span><span class="p">[</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">])</span>
+<span class="nd">@outputs</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span>
+<span class="nd">@tensorflow_task</span><span class="p">(</span>
+    <span class="n">workers_count</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">ps_replicas_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">chief_replicas_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">per_replica_cpu_request</span><span class="o">=</span><span class="s2">&quot;500m&quot;</span><span class="p">,</span>
+    <span class="n">per_replica_memory_request</span><span class="o">=</span><span class="s2">&quot;4Gi&quot;</span><span class="p">,</span>
+    <span class="n">per_replica_memory_limit</span><span class="o">=</span><span class="s2">&quot;8Gi&quot;</span><span class="p">,</span>
+    <span class="n">per_replica_gpu_limit</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">my_tensorflow_job</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">int_list</span><span class="p">,</span> <span class="n">result</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_task_function</strong> – this is the decorated method and shouldn’t be declared explicitly.  The function must
+take a first argument, and then named arguments matching those defined in &#64;inputs and &#64;outputs.  No keyword
+arguments are allowed for wrapped task functions.</p></li>
+<li><p><strong>cache_version</strong> (<em>Text</em>) – <p>[optional] string representing logical version for discovery.  This field should be
+updated whenever the underlying algorithm changes.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
+</div>
+</p></li>
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<a class="reference internal" href="#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
+to 0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If retries &gt; 0, the task must be able to recover from any remote state created within the user code.  It is
+strongly recommended that tasks are written to be idempotent.</p>
+</div>
+</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the task is interruptible.</p></li>
+<li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
+will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+re-usable.</p></li>
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
+indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
+<li><p><strong>workers_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – integer determining the number of worker replicas spawned in the cluster for this job</p></li>
+<li><p><strong>ps_replicas_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – integer determining the number of parameter server replicas spawned in the cluster for this job</p></li>
+<li><p><strong>chief_replicas_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – integer determining the number of chief server replicas spawned in the cluster for this job</p></li>
+<li><p><strong>per_replica_storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
+for each replica spawned for this job (i.e. both for parameter, chief server and workers).  Default is set by platform-level configuration.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is currently not supported by the platform.</p>
+</div>
+</p></li>
+<li><p><strong>per_replica_cpu_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of cores for each replica
+spawned for this job (i.e. both for parameter, chief server and workers).
+This can be set to a fractional portion of a CPU. Default is set by platform-level configuration.</p>
+<p>TODO: Add links to resource string documentation for Kubernetes</p>
+</p></li>
+<li><p><strong>per_replica_gpu_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of desired GPUs for each
+replica spawned for this job (i.e. both for parameter, chief server and workers).
+Default is set by platform-level configuration.</p>
+<p>TODO: Add links to resource string documentation for Kubernetes</p>
+</p></li>
+<li><p><strong>per_replica_memory_request</strong> (<em>Text</em>) – <p>[optional]  Kubernetes resource string for lower-bound of physical memory
+necessary for each replica spawned for this job (i.e. both for parameter, chief server and workers).  Default is set by platform-level configuration.</p>
+<p>TODO: Add links to resource string documentation for Kubernetes</p>
+</p></li>
+<li><p><strong>per_replica_storage_limit</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for upper-bound of disk storage space
+for each replica spawned for this job (i.e. both for parameter, chief server and workers).
+This amount is not guaranteed!  If not specified, it is set equal to storage_request.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is currently not supported by the platform.</p>
+</div>
+</p></li>
+<li><p><strong>per_replica_cpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of cores for each replica
+spawned for this job (i.e. both for parameter, chief server and workers).
+This can be set to a fractional portion of a CPU. This amount is not guaranteed!  If not specified,
+it is set equal to cpu_request.</p></li>
+<li><p><strong>per_replica_gpu_limit</strong> (<em>Text</em>) – [optional] Kubernetes resource string for upper-bound of desired GPUs for each
+replica spawned for this job (i.e. both for parameter, chief server and workers).
+This amount is not guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
+<li><p><strong>per_replica_memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
+necessary for each replica spawned for this job (i.e. both for parameter, chief server and workers).
+This amount is not guaranteed!  If not specified, it is set equal to memory_request.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
+provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
+inject bespoke logic into the base Flyte programming model.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -1165,7 +1288,7 @@ logic into the base Flyte programming model.</p></li>
 <dl class="class">
 <dt id="flytekit.sdk.test_utils.LocalTestFileSystem">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.sdk.test_utils.</code><code class="sig-name descname">LocalTestFileSystem</code><a class="reference internal" href="../_modules/flytekit/sdk/test_utils.html#LocalTestFileSystem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.test_utils.LocalTestFileSystem" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Context manager for creating a temporary test file system locally for the purpose of unit testing and grabbing
 remote objects.  This scratch space will be automatically cleaned up as long as sys.exit() is not called from
 within the context.  This context need only be used in user scripts and tests–all task executions are guaranteed
@@ -1236,7 +1359,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dl class="class">
 <dt id="flytekit.sdk.types.Types">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.sdk.types.</code><code class="sig-name descname">Types</code><a class="reference internal" href="../_modules/flytekit/sdk/types.html#Types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.types.Types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="class">
 <dt id="flytekit.sdk.types.Types.Blob">
 <em class="property">class </em><code class="sig-name descname">Blob</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Blob" title="Permalink to this definition">¶</a></dt>
@@ -1278,7 +1401,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1374,7 +1497,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1422,7 +1545,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Boolean.to_python_std" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1470,7 +1593,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1546,7 +1669,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1594,7 +1717,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Datetime.to_python_std" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.8)">datetime.datetime</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.9)">datetime.datetime</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1642,7 +1765,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1690,7 +1813,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Float.to_python_std" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1738,7 +1861,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1796,7 +1919,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Generic.to_python_std" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>[Text, T]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a>[Text, T]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1844,7 +1967,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1892,7 +2015,7 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 <code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Integer.to_python_std" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1982,7 +2105,7 @@ nested list.  Syntax for nesting is <cite>[[[Types.Integer]]]</cite> to create a
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2078,7 +2201,7 @@ nested list.  Syntax for nesting is <cite>[[[Types.Integer]]]</cite> to create a
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2247,7 +2370,7 @@ executing–either by being downloaded from an accessible remote location like s
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2353,7 +2476,7 @@ executing–either by being downloaded from an accessible remote location like s
 <dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2401,7 +2524,7 @@ executing–either by being downloaded from an accessible remote location like s
 <code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Timedelta.to_python_std" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)">datetime.timedelta</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)">datetime.timedelta</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2424,14 +2547,14 @@ executing–either by being downloaded from an accessible remote location like s
 <dl class="class">
 <dt id="flytekit.sdk.workflow.Output">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">Output</code><span class="sig-paren">(</span><em class="sig-param">value</em>, <em class="sig-param">sdk_type=None</em>, <em class="sig-param">help=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#Output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.Output" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.Output" title="flytekit.common.workflow.Output"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.Output</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="flytekit.common.html#flytekit.common.local_workflow.Output" title="flytekit.common.local_workflow.Output"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.local_workflow.Output</span></code></a></p>
 <p>This object should be used to specify outputs. It can be used in conjunction with
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">flytekit.common.workflow.workflow()</span></code> and <code class="xref py py-meth docutils literal notranslate"><span class="pre">flytekit.common.workflow.workflow_class()</span></code></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="flytekit.sdk.workflow.workflow">
-<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow</code><span class="sig-paren">(</span><em class="sig-param">nodes</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">outputs=None</em>, <em class="sig-param">cls=None</em>, <em class="sig-param">on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.workflow.</code><code class="sig-name descname">workflow</code><span class="sig-paren">(</span><em class="sig-param">nodes: Dict[str, flytekit.common.nodes.SdkNode], inputs=None, outputs=None, cls=None, on_failure=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/workflow.html#workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.workflow.workflow" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function provides a user-friendly interface for authoring workflows.</p>
 <blockquote>
 <div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">input_a</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Tell me something&quot;</span><span class="p">)</span>
@@ -2460,17 +2583,17 @@ executing–either by being downloaded from an accessible remote location like s
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.html#flytekit.common.nodes.SdkNode" title="flytekit.common.nodes.SdkNode"><em>flytekit.common.nodes.SdkNode</em></a><em>]</em>) – A list of nodes to put inside the workflow.</p></li>
-<li><p><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.html#flytekit.common.promise.Input" title="flytekit.common.promise.Input"><em>Input</em></a><em>]</em>) – [Optional] A dictionary of input descriptors for the workflow.</p></li>
-<li><p><strong>outputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.Output" title="flytekit.common.workflow.Output"><em>Output</em></a><em>]</em>) – [Optional] A dictionary of output descriptors for a workflow.</p></li>
+<li><p><strong>nodes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.html#flytekit.common.nodes.SdkNode" title="flytekit.common.nodes.SdkNode"><em>flytekit.common.nodes.SdkNode</em></a><em>]</em>) – A list of nodes to put inside the workflow.</p></li>
+<li><p><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.html#flytekit.common.promise.Input" title="flytekit.common.promise.Input"><em>Input</em></a><em>]</em>) – [Optional] A dictionary of input descriptors for the workflow.</p></li>
+<li><p><strong>outputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><a class="reference internal" href="flytekit.common.html#flytekit.common.local_workflow.Output" title="flytekit.common.local_workflow.Output"><em>Output</em></a><em>]</em>) – [Optional] A dictionary of output descriptors for a workflow.</p></li>
 <li><p><strong>cls</strong> (<em>T</em>) – This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used
 by users extending the base Flyte programming model. If set, it must be a subclass of
-<a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
+<code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.local_workflow.PythonWorkflow</span></code>.</p></li>
 <li><p><strong>on_failure</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy" title="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy"><em>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</em></a>) – [Optional] The execution policy when the workflow detects a failure.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow">flytekit.common.workflow.SdkWorkflow</a></p>
+<dd class="field-even"><p><a class="reference internal" href="flytekit.common.html#flytekit.common.local_workflow.SdkRunnableWorkflow" title="flytekit.common.local_workflow.SdkRunnableWorkflow">flytekit.common.local_workflow.SdkRunnableWorkflow</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2495,12 +2618,12 @@ by users extending the base Flyte programming model. If set, it must be a subcla
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>_workflow_metaclass</strong> (<em>T</em>) – Do NOT specify this parameter directly.  This is the class that is being
 wrapped by this decorator.</p></li>
-<li><p><strong>cls</strong> – This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used
-by users extending the base Flyte programming model. If set, it must be a subclass of
-<a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.workflow.SdkWorkflow</span></code></a>.</p></li>
 <li><p><strong>on_failure</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy" title="flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy"><em>flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy</em></a>) – [Optional] The execution policy
 when the workflow detects a failure.</p></li>
-<li><p><strong>disable_default_launch_plan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Determines whether to create a default launch plan for the workflow or not.</p></li>
+<li><p><strong>disable_default_launch_plan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Determines whether to create a default launch plan for the workflow or not.</p></li>
+<li><p><strong>cls</strong> – This is the class that will be instantiated from the inputs, outputs, and nodes. This will be used
+by users extending the base Flyte programming model. If set, it must be a subclass of
+<code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.local_workflow.PythonWorkflow</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.common &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.engines.common &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,16 +160,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.engines.common</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span></span><span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
 
 
-<div class="viewcode-block" id="BaseWorkflowExecutor"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseWorkflowExecutor">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflowExecutor</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseWorkflowExecutor"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseWorkflowExecutor">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflowExecutor</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class must be implemented for any engine to create, interact with, and execute workflows using the</span>
 <span class="sd">    FlyteKit SDK.</span>
@@ -197,7 +193,7 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="BaseWorkflowExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseWorkflowExecution">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflowExecution</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseWorkflowExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseWorkflowExecution">[docs]</a><span class="k">class</span> <span class="nc">BaseWorkflowExecution</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class must be implemented for any engine to track and interact with the executions of workflows.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -252,7 +248,7 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="BaseNodeExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseNodeExecution">[docs]</a><span class="k">class</span> <span class="nc">BaseNodeExecution</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseNodeExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseNodeExecution">[docs]</a><span class="k">class</span> <span class="nc">BaseNodeExecution</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_execution</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.nodes.SdkNodeExecution node_execution:</span>
@@ -302,7 +298,7 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="BaseTaskExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseTaskExecution">[docs]</a><span class="k">class</span> <span class="nc">BaseTaskExecution</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseTaskExecution"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseTaskExecution">[docs]</a><span class="k">class</span> <span class="nc">BaseTaskExecution</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_exec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.tasks.executions.SdkTaskExecution task_exec:</span>
@@ -346,7 +342,7 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="BaseLaunchPlanLauncher"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseLaunchPlanLauncher">[docs]</a><span class="k">class</span> <span class="nc">BaseLaunchPlanLauncher</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseLaunchPlanLauncher"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseLaunchPlanLauncher">[docs]</a><span class="k">class</span> <span class="nc">BaseLaunchPlanLauncher</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.launch_plan.SdkLaunchPlan sdk_launch_plan:</span>
@@ -402,7 +398,7 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="BaseTaskExecutor"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseTaskExecutor">[docs]</a><span class="k">class</span> <span class="nc">BaseTaskExecutor</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseTaskExecutor"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseTaskExecutor">[docs]</a><span class="k">class</span> <span class="nc">BaseTaskExecutor</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.tasks.task.SdkTask sdk_task:</span>
@@ -459,18 +455,10 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="BaseExecutionEngineFactory"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory">[docs]</a><span class="k">class</span> <span class="nc">BaseExecutionEngineFactory</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="BaseExecutionEngineFactory"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory">[docs]</a><span class="k">class</span> <span class="nc">BaseExecutionEngineFactory</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This object should be implemented to satisfy the basic engine interface.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="BaseExecutionEngineFactory.get_workflow"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.get_workflow">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">get_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_workflow</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>
-<span class="sd">        :rtype: BaseWorkflowExecutor</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="BaseExecutionEngineFactory.get_task"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.get_task">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">):</span>
@@ -535,24 +523,6 @@
 <span class="sd">        Fetches the latest task</span>
 <span class="sd">        :param flytekit.models.common.NamedEntityIdentifier named_task: NamedEntityIdentifier to fetch</span>
 <span class="sd">        :rtype: flytekit.models.task.Task</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="BaseExecutionEngineFactory.fetch_launch_plan"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.fetch_launch_plan">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">fetch_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.models.core.identifier.Identifier launch_plan_id: This identifier should have a resource</span>
-<span class="sd">            type of kind LaunchPlan.</span>
-<span class="sd">        :rtype: flytekit.models.launch_plan.LaunchPlan</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="BaseExecutionEngineFactory.fetch_workflow"><a class="viewcode-back" href="../../../flytekit/flytekit.engines.html#flytekit.engines.common.BaseExecutionEngineFactory.fetch_workflow">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">fetch_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.models.core.identifier.Identifier workflow_id: This identifier should have a resource</span>
-<span class="sd">            type of kind workflow.</span>
-<span class="sd">        :rtype: flytekit.models.admin.workflow.Workflow</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 

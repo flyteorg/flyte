@@ -47,6 +47,14 @@ flytekit.common.launch\_plan module
    :undoc-members:
    :show-inheritance:
 
+flytekit.common.local\_workflow module
+--------------------------------------
+
+.. automodule:: flytekit.common.local_workflow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.common.nodes module
 ----------------------------
 

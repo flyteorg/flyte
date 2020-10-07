@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.mixins.registerable &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.mixins.registerable &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,14 +160,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.mixins.registerable</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
+<span></span><span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
 <span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importlib</span>
 <span class="kn">import</span> <span class="nn">inspect</span> <span class="k">as</span> <span class="nn">_inspect</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Set</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">_utils</span>
@@ -201,36 +198,9 @@
         <span class="k">return</span> <span class="n">o</span>
 
 
-<div class="viewcode-block" id="RegisterableEntity"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity">[docs]</a><span class="k">class</span> <span class="nc">RegisterableEntity</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_InstanceTracker</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RegisterableEntity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<div class="viewcode-block" id="RegisterableEntity.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.register">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param Text project: The project in which to register this task.</span>
-<span class="sd">        :param Text domain: The domain in which to register this task.</span>
-<span class="sd">        :param Text name: The name to give this task.</span>
-<span class="sd">        :param Text version: The version in which to register this task.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="RegisterableEntity.serialize"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.serialize">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Registerable entities also are required to be serialized. This allows flytekit to separate serialization from</span>
-<span class="sd">        the network call to Admin (mostly at least, if a Launch Plan is fetched for instance as part of another</span>
-<span class="sd">        workflow, it will still hit Admin.</span>
-
-<span class="sd">        :param Text project: The project in which to serialize this task.</span>
-<span class="sd">        :param Text domain: The domain in which to serialize this task.</span>
-<span class="sd">        :param Text name: The name to give this task.</span>
-<span class="sd">        :param Text version: The version in which to serialize this task.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
-
-    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+<div class="viewcode-block" id="FlyteEntity"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.FlyteEntity">[docs]</a><span class="k">class</span> <span class="nc">FlyteEntity</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
+    <span class="nd">@property</span>
+    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">resource_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Integer from _identifier.ResourceType enum</span>
@@ -238,20 +208,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
 
-    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractproperty</span>
+    <span class="nd">@property</span>
+    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">entity_type_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: Rename to resource type text</span>
 <span class="sd">        :rtype: Text</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
+        <span class="k">pass</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">upstream_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Task, workflow, and launch plan that need to be registered in advance of this workflow.</span>
-<span class="sd">        :rtype: set[RegisterableEntity]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span>
+
+<div class="viewcode-block" id="TrackableEntity"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.TrackableEntity">[docs]</a><span class="k">class</span> <span class="nc">TrackableEntity</span><span class="p">(</span><span class="n">FlyteEntity</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_InstanceTracker</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TrackableEntity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instantiated_in</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -259,7 +229,7 @@
 <span class="sd">        If found, we try to specify the module where the task was first instantiated.</span>
 <span class="sd">        :rtype: Optional[Text]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instantiated_in</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_instantiated_in</span>  <span class="c1"># Set in metaclass</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_valid_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -275,7 +245,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span>
 
-<div class="viewcode-block" id="RegisterableEntity.auto_assign_name"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.auto_assign_name">[docs]</a>    <span class="k">def</span> <span class="nf">auto_assign_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TrackableEntity.assign_name"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.TrackableEntity.assign_name">[docs]</a>    <span class="k">def</span> <span class="nf">assign_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span> <span class="o">=</span> <span class="n">name</span></div>
+
+<div class="viewcode-block" id="TrackableEntity.auto_assign_name"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.TrackableEntity.auto_assign_name">[docs]</a>    <span class="k">def</span> <span class="nf">auto_assign_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function is a bit of trickster Python code that goes hand in hand with the _InstanceTracker metaclass</span>
 <span class="sd">        defined above. Thanks @matthewphsmith for this bit of ingenuity.</span>
@@ -309,7 +282,7 @@
 <span class="sd">        When Flytekit calls the module loader and loads the task, the name of the task is the name of the function</span>
 <span class="sd">        itself.  It&#39;s known at time of creation. In contrast, when</span>
 
-<span class="sd">            xyz = SomeWorflow.create_launch_plan()</span>
+<span class="sd">            xyz = SomeWorkflow.create_launch_plan()</span>
 
 <span class="sd">        is called, the name of the launch plan isn&#39;t known until after creation, it&#39;s not &quot;SomeWorkflow&quot;, it&#39;s &quot;xyz&quot;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -318,7 +291,7 @@
 
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span> <span class="o">=</span> <span class="n">_utils</span><span class="o">.</span><span class="n">fqdn</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">entity_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_type</span><span class="p">)</span>
                     <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Auto-assigning name to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_platform_valid_name</span><span class="p">))</span>
                     <span class="k">return</span>
@@ -333,6 +306,55 @@
 
         <span class="n">_logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not auto-assign name&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">_system_exceptions</span><span class="o">.</span><span class="n">FlyteSystemException</span><span class="p">(</span><span class="s2">&quot;Error looking for object while auto-assigning name.&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="RegisterableEntity"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity">[docs]</a><span class="k">class</span> <span class="nc">RegisterableEntity</span><span class="p">(</span><span class="n">TrackableEntity</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_registered</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RegisterableEntity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RegisterableEntity.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.register">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text project: The project in which to register this task.</span>
+<span class="sd">        :param Text domain: The domain in which to register this task.</span>
+<span class="sd">        :param Text name: The name to give this task.</span>
+<span class="sd">        :param Text version: The version in which to register this task.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="RegisterableEntity.serialize"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.serialize">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Registerable entities also are required to be serialized. This allows flytekit to separate serialization from</span>
+<span class="sd">        the network call to Admin (mostly at least, if a Launch Plan is fetched for instance as part of another</span>
+<span class="sd">        workflow, it will still hit Admin).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_registered</span></div>
+
+
+<div class="viewcode-block" id="HasDependencies"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.HasDependencies">[docs]</a><span class="k">class</span> <span class="nc">HasDependencies</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This interface is meant to describe Flyte entities that can have upstream dependencies. For instance, currently a</span>
+<span class="sd">    launch plan depends on the underlying workflow, and a workflow is dependent on its tasks, and other launch plans,</span>
+<span class="sd">    and subworkflows.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HasDependencies</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">upstream_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="n">RegisterableEntity</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Task, workflow, and launch plan that need to be registered in advance of this workflow.</span>
+<span class="sd">        :rtype: set[RegisterableEntity]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span></div>
 </pre></div>
 
            </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.mixins package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.mixins package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -201,7 +201,7 @@
 <dl class="class">
 <dt id="flytekit.common.mixins.artifact.ExecutionArtifact">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.artifact.</code><code class="sig-name descname">ExecutionArtifact</code><a class="reference internal" href="../_modules/flytekit/common/mixins/artifact.html#ExecutionArtifact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.artifact.ExecutionArtifact" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.common.mixins.artifact.ExecutionArtifact.error">
 <em class="property">abstract property </em><code class="sig-name descname">error</code><a class="headerlink" href="#flytekit.common.mixins.artifact.ExecutionArtifact.error" title="Permalink to this definition">¶</a></dt>
@@ -245,13 +245,13 @@ execution ended in error or the execution is in progress, an exception will be r
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – Amount of time to wait until the execution has completed before timing
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – Amount of time to wait until the execution has completed before timing
 out. If not set or set to None, this method will wait for infinite.</p></li>
-<li><p><strong>poll_interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – Duration to wait between polling for a completion update.</p></li>
+<li><p><strong>poll_interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – Duration to wait between polling for a completion update.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,7 +264,7 @@ out. If not set or set to None, this method will wait for infinite.</p></li>
 <dl class="class">
 <dt id="flytekit.common.mixins.hash.HashOnReferenceMixin">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.hash.</code><code class="sig-name descname">HashOnReferenceMixin</code><a class="reference internal" href="../_modules/flytekit/common/mixins/hash.html#HashOnReferenceMixin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.hash.HashOnReferenceMixin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 </dd></dl>
 
 </div>
@@ -273,7 +273,7 @@ out. If not set or set to None, this method will wait for infinite.</p></li>
 <dl class="class">
 <dt id="flytekit.common.mixins.launchable.LaunchableEntity">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.launchable.</code><code class="sig-name descname">LaunchableEntity</code><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.common.mixins.launchable.LaunchableEntity.execute">
 <code class="sig-name descname">execute</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">inputs=None</em>, <em class="sig-param">name=None</em>, <em class="sig-param">notification_overrides=None</em>, <em class="sig-param">label_overrides=None</em>, <em class="sig-param">annotation_overrides=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/launchable.html#LaunchableEntity.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.launchable.LaunchableEntity.execute" title="Permalink to this definition">¶</a></dt>
@@ -296,11 +296,11 @@ This version of launch is meant for when inputs are specified as Python native t
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>project</strong> (<em>Text</em>) – </p></li>
 <li><p><strong>domain</strong> (<em>Text</em>) – </p></li>
-<li><p><strong>Any</strong><strong>] </strong><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em>) – A dictionary of Python standard inputs that will be type-checked, then compiled
+<li><p><strong>Any</strong><strong>] </strong><strong>inputs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em>) – A dictionary of Python standard inputs that will be type-checked, then compiled
 to a LiteralMap.</p></li>
 <li><p><strong>name</strong> (<em>Text</em>) – [Optional] If specified, an execution will be created with this name.  Note: the name must
 be unique within the context of the project and domain.</p></li>
-<li><p><strong>notification_overrides</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.common.html#flytekit.common.notifications.Notification" title="flytekit.common.notifications.Notification"><em>flytekit.common.notifications.Notification</em></a><em>]</em>) – [Optional] If specified, these
+<li><p><strong>notification_overrides</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.common.html#flytekit.common.notifications.Notification" title="flytekit.common.notifications.Notification"><em>flytekit.common.notifications.Notification</em></a><em>]</em>) – [Optional] If specified, these
 are the notifications that will be honored for this execution.  An empty list signals to disable all
 notifications.</p></li>
 <li><p><strong>label_overrides</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.Labels" title="flytekit.models.common.Labels"><em>flytekit.models.common.Labels</em></a>) – </p></li>
@@ -326,7 +326,7 @@ you already have a LiteralMap of inputs.</p>
 <li><p><strong>literal_inputs</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.literals.LiteralMap" title="flytekit.models.literals.LiteralMap"><em>flytekit.models.literals.LiteralMap</em></a>) – Inputs to the execution.</p></li>
 <li><p><strong>name</strong> (<em>Text</em>) – [Optional] If specified, an execution will be created with this name.  Note: the name must
 be unique within the context of the project and domain.</p></li>
-<li><p><strong>notification_overrides</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.common.html#flytekit.common.notifications.Notification" title="flytekit.common.notifications.Notification"><em>flytekit.common.notifications.Notification</em></a><em>]</em>) – [Optional] If specified, these
+<li><p><strong>notification_overrides</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><a class="reference internal" href="flytekit.common.html#flytekit.common.notifications.Notification" title="flytekit.common.notifications.Notification"><em>flytekit.common.notifications.Notification</em></a><em>]</em>) – [Optional] If specified, these
 are the notifications that will be honored for this execution.  An empty list signals to disable all
 notifications.</p></li>
 <li><p><strong>label_overrides</strong> (<a class="reference internal" href="flytekit.models.html#flytekit.models.common.Labels" title="flytekit.models.common.Labels"><em>flytekit.models.common.Labels</em></a>) – </p></li>
@@ -345,12 +345,87 @@ notifications.</p></li>
 <div class="section" id="module-flytekit.common.mixins.registerable">
 <span id="flytekit-common-mixins-registerable-module"></span><h2>flytekit.common.mixins.registerable module<a class="headerlink" href="#module-flytekit.common.mixins.registerable" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="flytekit.common.mixins.registerable.FlyteEntity">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.registerable.</code><code class="sig-name descname">FlyteEntity</code><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#FlyteEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.FlyteEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.FlyteEntity.entity_type_text">
+<em class="property">abstract property </em><code class="sig-name descname">entity_type_text</code><a class="headerlink" href="#flytekit.common.mixins.registerable.FlyteEntity.entity_type_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO: Rename to resource type text
+:rtype: Text</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.FlyteEntity.resource_type">
+<em class="property">abstract property </em><code class="sig-name descname">resource_type</code><a class="headerlink" href="#flytekit.common.mixins.registerable.FlyteEntity.resource_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Integer from _identifier.ResourceType enum
+:rtype: int</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.common.mixins.registerable.HasDependencies">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.registerable.</code><code class="sig-name descname">HasDependencies</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#HasDependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.HasDependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This interface is meant to describe Flyte entities that can have upstream dependencies. For instance, currently a
+launch plan depends on the underlying workflow, and a workflow is dependent on its tasks, and other launch plans,
+and subworkflows.</p>
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.HasDependencies.upstream_entities">
+<em class="property">property </em><code class="sig-name descname">upstream_entities</code><a class="headerlink" href="#flytekit.common.mixins.registerable.HasDependencies.upstream_entities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Task, workflow, and launch plan that need to be registered in advance of this workflow.
+:rtype: set[RegisterableEntity]</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="flytekit.common.mixins.registerable.RegisterableEntity">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.registerable.</code><code class="sig-name descname">RegisterableEntity</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.mixins.registerable.TrackableEntity" title="flytekit.common.mixins.registerable.TrackableEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.registerable.TrackableEntity</span></code></a></p>
 <dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.auto_assign_name">
-<code class="sig-name descname">auto_assign_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.auto_assign_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.auto_assign_name" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.has_registered">
+<em class="property">property </em><code class="sig-name descname">has_registered</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.has_registered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.register">
+<em class="property">abstract </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.register" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – The project in which to register this task.</p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – The domain in which to register this task.</p></li>
+<li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
+<li><p><strong>version</strong> (<em>Text</em>) – The version in which to register this task.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.RegisterableEntity.serialize">
+<em class="property">abstract </em><code class="sig-name descname">serialize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registerable entities also are required to be serialized. This allows flytekit to separate serialization from
+the network call to Admin (mostly at least, if a Launch Plan is fetched for instance as part of another
+workflow, it will still hit Admin).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.common.mixins.registerable.TrackableEntity">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.mixins.registerable.</code><code class="sig-name descname">TrackableEntity</code><span class="sig-paren">(</span><em class="sig-param">*args</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#TrackableEntity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.TrackableEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.mixins.registerable.FlyteEntity" title="flytekit.common.mixins.registerable.FlyteEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.mixins.registerable.FlyteEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.TrackableEntity.assign_name">
+<code class="sig-name descname">assign_name</code><span class="sig-paren">(</span><em class="sig-param">name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#TrackableEntity.assign_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.TrackableEntity.assign_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.mixins.registerable.TrackableEntity.auto_assign_name">
+<code class="sig-name descname">auto_assign_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#TrackableEntity.auto_assign_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.TrackableEntity.auto_assign_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>This function is a bit of trickster Python code that goes hand in hand with the _InstanceTracker metaclass
 defined above. Thanks &#64;matthewphsmith for this bit of ingenuity.</p>
 <p>For instance, if a user has code that looks like this:</p>
@@ -381,93 +456,36 @@ def some_task()</p>
 <p>When Flytekit calls the module loader and loads the task, the name of the task is the name of the function
 itself.  It’s known at time of creation. In contrast, when</p>
 <blockquote>
-<div><p>xyz = SomeWorflow.create_launch_plan()</p>
+<div><p>xyz = SomeWorkflow.create_launch_plan()</p>
 </div></blockquote>
 <p>is called, the name of the launch plan isn’t known until after creation, it’s not “SomeWorkflow”, it’s “xyz”</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.entity_type_text">
-<em class="property">abstract property </em><code class="sig-name descname">entity_type_text</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.entity_type_text" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.mixins.registerable.TrackableEntity.has_valid_name">
+<em class="property">property </em><code class="sig-name descname">has_valid_name</code><a class="headerlink" href="#flytekit.common.mixins.registerable.TrackableEntity.has_valid_name" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>Text</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.has_valid_name">
-<em class="property">property </em><code class="sig-name descname">has_valid_name</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.has_valid_name" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.instantiated_in">
-<em class="property">property </em><code class="sig-name descname">instantiated_in</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.instantiated_in" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.mixins.registerable.TrackableEntity.instantiated_in">
+<em class="property">property </em><code class="sig-name descname">instantiated_in</code><a class="headerlink" href="#flytekit.common.mixins.registerable.TrackableEntity.instantiated_in" title="Permalink to this definition">¶</a></dt>
 <dd><p>If found, we try to specify the module where the task was first instantiated.
 :rtype: Optional[Text]</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.platform_valid_name">
-<em class="property">property </em><code class="sig-name descname">platform_valid_name</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.platform_valid_name" title="Permalink to this definition">¶</a></dt>
+<dt id="flytekit.common.mixins.registerable.TrackableEntity.platform_valid_name">
+<em class="property">property </em><code class="sig-name descname">platform_valid_name</code><a class="headerlink" href="#flytekit.common.mixins.registerable.TrackableEntity.platform_valid_name" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>Text</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.register">
-<em class="property">abstract </em><code class="sig-name descname">register</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.register" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>project</strong> (<em>Text</em>) – The project in which to register this task.</p></li>
-<li><p><strong>domain</strong> (<em>Text</em>) – The domain in which to register this task.</p></li>
-<li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
-<li><p><strong>version</strong> (<em>Text</em>) – The version in which to register this task.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.resource_type">
-<em class="property">abstract property </em><code class="sig-name descname">resource_type</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.resource_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Integer from _identifier.ResourceType enum
-:rtype: int</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.serialize">
-<em class="property">abstract </em><code class="sig-name descname">serialize</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">version</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/mixins/registerable.html#RegisterableEntity.serialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.serialize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Registerable entities also are required to be serialized. This allows flytekit to separate serialization from
-the network call to Admin (mostly at least, if a Launch Plan is fetched for instance as part of another
-workflow, it will still hit Admin.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>project</strong> (<em>Text</em>) – The project in which to serialize this task.</p></li>
-<li><p><strong>domain</strong> (<em>Text</em>) – The domain in which to serialize this task.</p></li>
-<li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
-<li><p><strong>version</strong> (<em>Text</em>) – The version in which to serialize this task.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="flytekit.common.mixins.registerable.RegisterableEntity.upstream_entities">
-<em class="property">property </em><code class="sig-name descname">upstream_entities</code><a class="headerlink" href="#flytekit.common.mixins.registerable.RegisterableEntity.upstream_entities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Task, workflow, and launch plan that need to be registered in advance of this workflow.
-:rtype: set[RegisterableEntity]</p>
 </dd></dl>
 
 </dd></dl>

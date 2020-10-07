@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.unit.engine &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.engines.unit.engine &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.engines.unit.engine</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
 
@@ -356,6 +354,11 @@
                 <span class="n">task</span> <span class="o">=</span> <span class="n">tasks_map</span><span class="p">[</span><span class="n">future_node</span><span class="o">.</span><span class="n">task_node</span><span class="o">.</span><span class="n">reference_id</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_sdk_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">CONTAINER_ARRAY_TASK</span><span class="p">:</span>
                     <span class="n">sub_task_output</span> <span class="o">=</span> <span class="n">DynamicTask</span><span class="o">.</span><span class="n">execute_array_task</span><span class="p">(</span><span class="n">future_node</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">task</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_sdk_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">SPARK_TASK</span><span class="p">:</span>
+                    <span class="c1"># This is required because `_transform_for_user_output` function about is invoked which</span>
+                    <span class="c1"># checks for outputs</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_has_workflow_node</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">return</span> <span class="n">results</span>
                 <span class="k">elif</span> <span class="n">task</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">_sdk_constants</span><span class="o">.</span><span class="n">SdkTaskType</span><span class="o">.</span><span class="n">HIVE_JOB</span><span class="p">:</span>
                     <span class="c1"># TODO: futures.outputs should have the Schema instances.</span>
                     <span class="c1"># After schema is implemented, fill out random data into the random locations</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Scaling Beyond Kubernetes &mdash; Flyte 0.7.0 documentation</title>
+  <title>Scaling Beyond Kubernetes &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -194,9 +194,13 @@ To address this, you can deploy the Data Plane to several isolated kubernetes cl
 The Control Plane (FlyteAdmin) can be configured to load-balance workflows across these isolated Data Planes.
 This protects you from a failure in a single kubernetes cluster, and increases scalability.</p>
 <p>First, you’ll need to create additional kubernetes clusters. For this example, we’ll assume you have 3 kubernetes clusters, and can access them all with <code class="docutils literal notranslate"><span class="pre">kubectl</span></code>. We’ll call these clusters “cluster1”, “cluster2”, and “cluster3”.</p>
-<p>We want to deploy <strong>just</strong> the Data Plane to these clusters. To do this, we’ll remove the DataPlane components from the <code class="docutils literal notranslate"><span class="pre">flyte</span></code> overlay, and create a new overlay containing <strong>ony</strong> the dataplane resources.</p>
+<p>We want to deploy <strong>just</strong> the Data Plane to these clusters. To do this, we’ll remove the DataPlane components from the <code class="docutils literal notranslate"><span class="pre">flyte</span></code> overlay, and create a new overlay containing <strong>only</strong> the dataplane resources.</p>
 <div class="section" id="data-plane-deployment">
 <h2>Data Plane Deployment<a class="headerlink" href="#data-plane-deployment" title="Permalink to this headline">¶</a></h2>
+<dl class="simple">
+<dt>NOTE:</dt><dd><p>With v0.8.0 and the entire setup overhaul, this section is getting revisited. Keep on the lookout for an update soon</p>
+</dd>
+</dl>
 <p>To create the “Data Plane only” overlay, lets make a <code class="docutils literal notranslate"><span class="pre">dataplane</span></code> subdirectory inside our main deployment directory (my-flyte-deployment). This directory will contain contain only the dataplane resources.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mkdir</span> <span class="n">dataplane</span>
 </pre></div>

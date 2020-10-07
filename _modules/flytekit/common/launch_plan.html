@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.launch_plan &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.launch_plan &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.launch_plan</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
+<span></span><span class="kn">import</span> <span class="nn">datetime</span> <span class="k">as</span> <span class="nn">_datetime</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
 
@@ -183,8 +181,9 @@
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">auth</span> <span class="k">as</span> <span class="n">_auth_config</span>
 <span class="kn">from</span> <span class="nn">flytekit.configuration</span> <span class="k">import</span> <span class="n">sdk</span> <span class="k">as</span> <span class="n">_sdk_config</span>
-<span class="kn">from</span> <span class="nn">flytekit.engines</span> <span class="k">import</span> <span class="n">loader</span> <span class="k">as</span> <span class="n">_engine_loader</span>
+<span class="kn">from</span> <span class="nn">flytekit.engines.flyte</span> <span class="k">import</span> <span class="n">engine</span> <span class="k">as</span> <span class="n">_flyte_engine</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common_models</span>
+<span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">execution</span> <span class="k">as</span> <span class="n">_execution_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">launch_plan</span> <span class="k">as</span> <span class="n">_launch_plan_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
@@ -194,9 +193,11 @@
 
 
 <div class="viewcode-block" id="SdkLaunchPlan"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">SdkLaunchPlan</span><span class="p">(</span>
-    <span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span>
-        <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">LaunchPlanSpec</span><span class="p">,</span> <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
-    <span class="p">)</span>
+    <span class="n">_launchable_mixin</span><span class="o">.</span><span class="n">LaunchableEntity</span><span class="p">,</span>
+    <span class="n">_registerable</span><span class="o">.</span><span class="n">HasDependencies</span><span class="p">,</span>
+    <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">,</span>
+    <span class="n">_launch_plan_models</span><span class="o">.</span><span class="n">LaunchPlanSpec</span><span class="p">,</span>
+    <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -207,7 +208,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="SdkLaunchPlan.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SdkLaunchPlan&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.launch_plan.LaunchPlanSpec model:</span>
 <span class="sd">        :rtype: SdkLaunchPlan</span>
@@ -228,6 +229,27 @@
             <span class="n">raw_output_data_config</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">raw_output_data_config</span><span class="p">,</span>
         <span class="p">)</span></div>
 
+<div class="viewcode-block" id="SdkLaunchPlan.register"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.register">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text project:</span>
+<span class="sd">        :param Text domain:</span>
+<span class="sd">        :param Text name:</span>
+<span class="sd">        :param Text version:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="n">id_to_register</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
+            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
+        <span class="p">)</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">_flyte_engine</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">client</span><span class="o">.</span><span class="n">create_launch_plan</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteEntityAlreadyExistsException</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="SdkLaunchPlan.fetch"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.fetch">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
     <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -245,7 +267,15 @@
         <span class="n">launch_plan_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
             <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
         <span class="p">)</span>
-        <span class="n">lp</span> <span class="o">=</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">fetch_launch_plan</span><span class="p">(</span><span class="n">launch_plan_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">launch_plan_id</span><span class="o">.</span><span class="n">version</span><span class="p">:</span>
+            <span class="n">lp</span> <span class="o">=</span> <span class="n">_flyte_engine</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="n">launch_plan_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">named_entity_id</span> <span class="o">=</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">NamedEntityIdentifier</span><span class="p">(</span>
+                <span class="n">launch_plan_id</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+            <span class="n">lp</span> <span class="o">=</span> <span class="n">_flyte_engine</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">get_active_launch_plan</span><span class="p">(</span><span class="n">named_entity_id</span><span class="p">)</span>
+
         <span class="n">sdk_lp</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">lp</span><span class="o">.</span><span class="n">spec</span><span class="p">)</span>
         <span class="n">sdk_lp</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">lp</span><span class="o">.</span><span class="n">id</span>
 
@@ -253,7 +283,16 @@
         <span class="n">wf_id</span> <span class="o">=</span> <span class="n">sdk_lp</span><span class="o">.</span><span class="n">workflow_id</span>
         <span class="n">lp_wf</span> <span class="o">=</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">wf_id</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="n">wf_id</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="n">wf_id</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">wf_id</span><span class="o">.</span><span class="n">version</span><span class="p">)</span>
         <span class="n">sdk_lp</span><span class="o">.</span><span class="n">_interface</span> <span class="o">=</span> <span class="n">lp_wf</span><span class="o">.</span><span class="n">interface</span>
+        <span class="n">sdk_lp</span><span class="o">.</span><span class="n">_has_registered</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="n">sdk_lp</span></div>
+
+<div class="viewcode-block" id="SdkLaunchPlan.serialize"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.serialize">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Unlike the SdkWorkflow serialize call, nothing special needs to be done here.</span>
+<span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanSpec</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -270,6 +309,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_metadata</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">cron_expression</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_metadata</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">rate</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_metadata</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_metadata</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">cron_schedule</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_metadata</span><span class="o">.</span><span class="n">schedule</span><span class="o">.</span><span class="n">cron_schedule</span><span class="o">.</span><span class="n">schedule</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -290,7 +331,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">assumable_iam_role</span> <span class="ow">or</span> <span class="n">kubernetes_service_account</span><span class="p">):</span>
             <span class="n">_logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Using deprecated `role` from config. &quot;</span> <span class="s2">&quot;Please update your config to use `assumable_iam_role` instead&quot;</span>
+                <span class="s2">&quot;Using deprecated `role` from config. Please update your config to use `assumable_iam_role` instead&quot;</span>
             <span class="p">)</span>
             <span class="n">assumable_iam_role</span> <span class="o">=</span> <span class="n">_sdk_config</span><span class="o">.</span><span class="n">ROLE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">_common_models</span><span class="o">.</span><span class="n">AuthRole</span><span class="p">(</span>
@@ -298,8 +339,18 @@
         <span class="p">)</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workflow_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flytekit.common.core.identifier.Identifier</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_id</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The interface is not technically part of the admin.LaunchPlanSpec in the IDL, however the workflow ID is, and</span>
+<span class="sd">        from the workflow ID, fetch will fill in the interface. This is nice because then you can __call__ the=</span>
+<span class="sd">        object and get a node.</span>
 <span class="sd">        :rtype: flytekit.common.interface.TypedInterface</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span>
@@ -346,7 +397,7 @@
                 <span class="s2">&quot;Failed to update launch plan because the launch plan&#39;s ID is not set. Please call register to fetch &quot;</span>
                 <span class="s2">&quot;or register the identifier first&quot;</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_flyte_engine</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span><span class="o">.</span><span class="n">update_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_python_std_input_map_to_literal_map</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -406,19 +457,36 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Kubernetes requires names starting with an alphabet for some resources.</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="n">_uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">19</span><span class="p">]</span>
-        <span class="n">execution</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span>
-            <span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+        <span class="n">disable_all</span> <span class="o">=</span> <span class="n">notification_overrides</span> <span class="o">==</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">disable_all</span><span class="p">:</span>
+            <span class="n">notification_overrides</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">notification_overrides</span> <span class="o">=</span> <span class="n">_execution_models</span><span class="o">.</span><span class="n">NotificationList</span><span class="p">(</span><span class="n">notification_overrides</span> <span class="ow">or</span> <span class="p">[])</span>
+            <span class="n">disable_all</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">_flyte_engine</span><span class="o">.</span><span class="n">get_client</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">exec_id</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">create_execution</span><span class="p">(</span>
                 <span class="n">project</span><span class="p">,</span>
                 <span class="n">domain</span><span class="p">,</span>
                 <span class="n">name</span><span class="p">,</span>
+                <span class="n">_execution_models</span><span class="o">.</span><span class="n">ExecutionSpec</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">_execution_models</span><span class="o">.</span><span class="n">ExecutionMetadata</span><span class="p">(</span>
+                        <span class="n">_execution_models</span><span class="o">.</span><span class="n">ExecutionMetadata</span><span class="o">.</span><span class="n">ExecutionMode</span><span class="o">.</span><span class="n">MANUAL</span><span class="p">,</span>
+                        <span class="s2">&quot;sdk&quot;</span><span class="p">,</span>  <span class="c1"># TODO: get principle</span>
+                        <span class="mi">0</span><span class="p">,</span>  <span class="c1"># TODO: Detect nesting</span>
+                    <span class="p">),</span>
+                    <span class="n">notifications</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
+                    <span class="n">disable_all</span><span class="o">=</span><span class="n">disable_all</span><span class="p">,</span>
+                    <span class="n">labels</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
+                    <span class="n">annotations</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
+                <span class="p">),</span>
                 <span class="n">literal_inputs</span><span class="p">,</span>
-                <span class="n">notification_overrides</span><span class="o">=</span><span class="n">notification_overrides</span><span class="p">,</span>
-                <span class="n">label_overrides</span><span class="o">=</span><span class="n">label_overrides</span><span class="p">,</span>
-                <span class="n">annotation_overrides</span><span class="o">=</span><span class="n">annotation_overrides</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">except</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteEntityAlreadyExistsException</span><span class="p">:</span>
+            <span class="n">exec_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">execution</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_execution</span><span class="p">(</span><span class="n">exec_id</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">_workflow_execution</span><span class="o">.</span><span class="n">SdkWorkflowExecution</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">execution</span><span class="p">)</span></div>
 
     <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
@@ -457,9 +525,7 @@
 
 <span class="c1"># The difference between this and the SdkLaunchPlan class is that this runnable class is supposed to only be used for</span>
 <span class="c1"># launch plans loaded alongside the current Python interpreter.</span>
-<div class="viewcode-block" id="SdkRunnableLaunchPlan"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">SdkRunnableLaunchPlan</span><span class="p">(</span>
-    <span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">SdkLaunchPlan</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">,</span>
-<span class="p">):</span>
+<div class="viewcode-block" id="SdkRunnableLaunchPlan"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">SdkRunnableLaunchPlan</span><span class="p">(</span><span class="n">_hash_mixin</span><span class="o">.</span><span class="n">HashOnReferenceMixin</span><span class="p">,</span> <span class="n">SdkLaunchPlan</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">sdk_workflow</span><span class="p">,</span>
@@ -474,7 +540,7 @@
         <span class="n">raw_output_data_config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>
+<span class="sd">        :param flytekit.common.local_workflow.SdkRunnableWorkflow sdk_workflow:</span>
 <span class="sd">        :param dict[Text,flytekit.common.promise.Input] default_inputs:</span>
 <span class="sd">        :param dict[Text,Any] fixed_inputs: These inputs will be fixed and not need to be set when executing this</span>
 <span class="sd">            launch plan.</span>
@@ -529,30 +595,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span> <span class="o">=</span> <span class="p">{</span><span class="n">sdk_workflow</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_workflow</span> <span class="o">=</span> <span class="n">sdk_workflow</span>
 
-<div class="viewcode-block" id="SdkRunnableLaunchPlan.register"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan.register">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param Text project:</span>
-<span class="sd">        :param Text domain:</span>
-<span class="sd">        :param Text name:</span>
-<span class="sd">        :param Text version:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
-        <span class="n">id_to_register</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
-            <span class="n">_identifier_model</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">version</span>
-        <span class="p">)</span>
-        <span class="n">_engine_loader</span><span class="o">.</span><span class="n">get_engine</span><span class="p">()</span><span class="o">.</span><span class="n">get_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">id_to_register</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">id_to_register</span>
-        <span class="k">return</span> <span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="SdkRunnableLaunchPlan.serialize"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan.serialize">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
-    <span class="k">def</span> <span class="nf">serialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Unlike the SdkWorkflow serialize call, nothing special needs to be done here.</span>
-<span class="sd">        :rtype: flyteidl.admin.launch_plan_pb2.LaunchPlanSpec</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span></div>
-
 <div class="viewcode-block" id="SdkRunnableLaunchPlan.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">_</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
@@ -561,10 +603,6 @@
 
 <div class="viewcode-block" id="SdkRunnableLaunchPlan.promote_from_model"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkRunnableLaunchPlan.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param flytekit.models.launch_plan.LaunchPlanSpec model:</span>
-<span class="sd">        :rtype: SdkRunnableLaunchPlan</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
             <span class="s2">&quot;An SdkRunnableLaunchPlan must be created from a reference to local Python code only.&quot;</span>
         <span class="p">)</span></div>
@@ -583,21 +621,6 @@
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
             <span class="s2">&quot;An SdkRunnableLaunchPlan must be created from a reference to local Python code only.&quot;</span>
         <span class="p">)</span></div>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">interface</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: flytekit.common.interface.TypedInterface</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interface</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">upstream_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Task, workflow, and launch plan that need to be registered in advance of this workflow.</span>
-<span class="sd">        :rtype: set[_registerable.RegisterableEntity]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_entities</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">workflow_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

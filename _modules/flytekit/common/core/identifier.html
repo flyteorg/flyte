@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.core.identifier &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.core.identifier &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,16 +160,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.core.identifier</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span></span><span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">identifier</span> <span class="k">as</span> <span class="n">_core_identifier</span>
 
 
-<div class="viewcode-block" id="Identifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.Identifier">[docs]</a><span class="k">class</span> <span class="nc">Identifier</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_core_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">)):</span>
+<div class="viewcode-block" id="Identifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.Identifier">[docs]</a><span class="k">class</span> <span class="nc">Identifier</span><span class="p">(</span><span class="n">_core_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
 
     <span class="n">_STRING_TO_TYPE_MAP</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;lp&quot;</span><span class="p">:</span> <span class="n">_core_identifier</span><span class="o">.</span><span class="n">ResourceType</span><span class="o">.</span><span class="n">LAUNCH_PLAN</span><span class="p">,</span>
@@ -223,9 +221,7 @@
         <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="WorkflowExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.WorkflowExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">WorkflowExecutionIdentifier</span><span class="p">(</span>
-    <span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_core_identifier</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">)</span>
-<span class="p">):</span>
+<div class="viewcode-block" id="WorkflowExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.WorkflowExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">WorkflowExecutionIdentifier</span><span class="p">(</span><span class="n">_core_identifier</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
 <div class="viewcode-block" id="WorkflowExecutionIdentifier.promote_from_model"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.WorkflowExecutionIdentifier.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -263,9 +259,7 @@
         <span class="k">return</span> <span class="s2">&quot;ex:</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="TaskExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.TaskExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">TaskExecutionIdentifier</span><span class="p">(</span>
-    <span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_core_identifier</span><span class="o">.</span><span class="n">TaskExecutionIdentifier</span><span class="p">)</span>
-<span class="p">):</span>
+<div class="viewcode-block" id="TaskExecutionIdentifier"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.TaskExecutionIdentifier">[docs]</a><span class="k">class</span> <span class="nc">TaskExecutionIdentifier</span><span class="p">(</span><span class="n">_core_identifier</span><span class="o">.</span><span class="n">TaskExecutionIdentifier</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
 <div class="viewcode-block" id="TaskExecutionIdentifier.promote_from_model"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.core.html#flytekit.common.core.identifier.TaskExecutionIdentifier.promote_from_model">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">base_model</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

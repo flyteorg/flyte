@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools.module_loader &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.tools.module_loader &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,16 +160,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.tools.module_loader</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">importlib</span>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
 <span class="kn">import</span> <span class="nn">pkgutil</span>
 
 <span class="kn">import</span> <span class="nn">six</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.local_workflow</span> <span class="k">import</span> <span class="n">SdkRunnableWorkflow</span> <span class="k">as</span> <span class="n">_SdkRunnableWorkflow</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.mixins</span> <span class="k">import</span> <span class="n">registerable</span> <span class="k">as</span> <span class="n">_registerable</span>
-<span class="kn">from</span> <span class="nn">flytekit.common.workflow</span> <span class="k">import</span> <span class="n">SdkWorkflow</span> <span class="k">as</span> <span class="n">_SdkWorkflow</span>
 
 
 <div class="viewcode-block" id="iterate_modules"><a class="viewcode-back" href="../../../flytekit/flytekit.tools.html#flytekit.tools.module_loader.iterate_modules">[docs]</a><span class="k">def</span> <span class="nf">iterate_modules</span><span class="p">(</span><span class="n">pkgs</span><span class="p">):</span>
@@ -211,19 +209,21 @@
         <span class="p">)</span>
     <span class="n">recursion_set</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">recursion_stack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 
-    <span class="k">for</span> <span class="n">upstream</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">upstream_entities</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">upstream</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span> <span class="ow">in</span> <span class="n">_topo_sort_helper</span><span class="p">(</span>
-                <span class="n">upstream</span><span class="p">,</span>
-                <span class="n">entity_to_module_key</span><span class="p">,</span>
-                <span class="n">visited</span><span class="p">,</span>
-                <span class="n">recursion_set</span><span class="p">,</span>
-                <span class="n">recursion_stack</span><span class="p">,</span>
-                <span class="n">include_entities</span><span class="p">,</span>
-                <span class="n">ignore_entities</span><span class="p">,</span>
-                <span class="n">detect_unreferenced_entities</span><span class="p">,</span>
-            <span class="p">):</span>
-                <span class="k">yield</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">HasDependencies</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">upstream</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">upstream_entities</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">upstream</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span> <span class="ow">in</span> <span class="n">_topo_sort_helper</span><span class="p">(</span>
+                    <span class="n">upstream</span><span class="p">,</span>
+                    <span class="n">entity_to_module_key</span><span class="p">,</span>
+                    <span class="n">visited</span><span class="p">,</span>
+                    <span class="n">recursion_set</span><span class="p">,</span>
+                    <span class="n">recursion_stack</span><span class="p">,</span>
+                    <span class="n">include_entities</span><span class="p">,</span>
+                    <span class="n">ignore_entities</span><span class="p">,</span>
+                    <span class="n">detect_unreferenced_entities</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">o1</span><span class="o">.</span><span class="n">has_registered</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span>
 
     <span class="n">recursion_stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
     <span class="k">del</span> <span class="n">recursion_set</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span>
@@ -272,7 +272,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">instantiated_in</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
                     <span class="n">entity_to_module_key</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_SdkWorkflow</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">should_create_default_launch_plan</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_SdkRunnableWorkflow</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">should_create_default_launch_plan</span><span class="p">:</span>
                         <span class="c1"># SDK should create a default launch plan for a workflow.  This is a special-case to simplify</span>
                         <span class="c1"># authoring of workflows.</span>
                         <span class="n">entity_to_module_key</span><span class="p">[</span><span class="n">o</span><span class="o">.</span><span class="n">create_launch_plan</span><span class="p">()]</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>

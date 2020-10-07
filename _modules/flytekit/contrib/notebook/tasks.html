@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.contrib.notebook.tasks &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.contrib.notebook.tasks &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -527,41 +527,11 @@
         <span class="n">gpu_limit</span> <span class="o">=</span> <span class="n">gpu_limit</span> <span class="ow">or</span> <span class="n">gpu_request</span>
         <span class="n">memory_limit</span> <span class="o">=</span> <span class="n">memory_limit</span> <span class="ow">or</span> <span class="n">memory_request</span>
 
-        <span class="n">requests</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">storage_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_request</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">cpu_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">gpu_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">memory_request</span><span class="p">:</span>
-            <span class="n">requests</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">)</span>
-            <span class="p">)</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableContainer</span><span class="o">.</span><span class="n">get_resources</span><span class="p">(</span>
+            <span class="n">storage_request</span><span class="p">,</span> <span class="n">cpu_request</span><span class="p">,</span> <span class="n">gpu_request</span><span class="p">,</span> <span class="n">memory_request</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">,</span> <span class="n">cpu_limit</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">,</span> <span class="n">memory_limit</span>
+        <span class="p">)</span>
 
-        <span class="n">limits</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">storage_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">STORAGE</span><span class="p">,</span> <span class="n">storage_limit</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">cpu_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">CPU</span><span class="p">,</span> <span class="n">cpu_limit</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">gpu_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span> <span class="n">gpu_limit</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">memory_limit</span><span class="p">:</span>
-            <span class="n">limits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceEntry</span><span class="p">(</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="o">.</span><span class="n">ResourceName</span><span class="o">.</span><span class="n">MEMORY</span><span class="p">,</span> <span class="n">memory_limit</span><span class="p">)</span>
-            <span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableContainer</span><span class="p">(</span>
-            <span class="n">command</span><span class="o">=</span><span class="p">[],</span>
-            <span class="n">args</span><span class="o">=</span><span class="p">[],</span>
-            <span class="n">resources</span><span class="o">=</span><span class="n">_task_models</span><span class="o">.</span><span class="n">Resources</span><span class="p">(</span><span class="n">limits</span><span class="o">=</span><span class="n">limits</span><span class="p">,</span> <span class="n">requests</span><span class="o">=</span><span class="n">requests</span><span class="p">),</span>
-            <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="p">{},</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">SdkRunnableContainer</span><span class="p">(</span><span class="n">command</span><span class="o">=</span><span class="p">[],</span> <span class="n">args</span><span class="o">=</span><span class="p">[],</span> <span class="n">resources</span><span class="o">=</span><span class="n">resources</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{},)</span></div>
 
 
 <div class="viewcode-block" id="spark_notebook"><a class="viewcode-back" href="../../../../flytekit/flytekit.contrib.notebook.html#flytekit.contrib.notebook.tasks.spark_notebook">[docs]</a><span class="k">def</span> <span class="nf">spark_notebook</span><span class="p">(</span>

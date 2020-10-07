@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sdk_dynamic &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.tasks.sdk_dynamic &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.tasks.sdk_dynamic</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">_itertools</span>
+<span></span><span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">_itertools</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 
@@ -259,10 +257,14 @@
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_add_upstream_entities</span><span class="p">(</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="n">sub_workflows</span><span class="p">,</span> <span class="n">tasks</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">upstream_entity</span> <span class="ow">in</span> <span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">upstream_entities</span><span class="p">:</span>
+        <span class="n">upstream_entities</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">executable_sdk_object</span><span class="p">,</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="p">):</span>
+            <span class="n">upstream_entities</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">executable_sdk_object</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">executable_sdk_object</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">upstream_entity</span> <span class="ow">in</span> <span class="n">upstream_entities</span><span class="p">:</span>
             <span class="c1"># If the upstream entity is either a Workflow or a Task, yield them in the</span>
             <span class="c1"># dynamic job spec. Otherwise (e.g. a LaunchPlan), we will assume it already</span>
-            <span class="c1"># is registered (can&#39;t be dynamically created). Thi will cause a runtime error</span>
+            <span class="c1"># is registered (can&#39;t be dynamically created). This will cause a runtime error</span>
             <span class="c1"># if it&#39;s not already registered with the control plane.</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">,</span> <span class="n">_workflow</span><span class="o">.</span><span class="n">SdkWorkflow</span><span class="p">):</span>
                 <span class="n">sub_workflows</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">upstream_entity</span><span class="p">)</span>
@@ -327,7 +329,7 @@
             <span class="c1"># If the executable object that we&#39;re dealing with is registerable (ie, SdkRunnableLaunchPlan, SdkWorkflow</span>
             <span class="c1"># SdkTask, or SdkRunnableTask), then it should have the ability to give itself a name. After assigning</span>
             <span class="c1"># itself the name, also make sure the id is properly set according to current config values.</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">TrackableEntity</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">executable</span><span class="o">.</span><span class="n">has_valid_name</span><span class="p">:</span>
                 <span class="n">executable</span><span class="o">.</span><span class="n">auto_assign_name</span><span class="p">()</span>
                 <span class="n">executable</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">Identifier</span><span class="p">(</span>
                     <span class="n">executable</span><span class="o">.</span><span class="n">resource_type</span><span class="p">,</span>

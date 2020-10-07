@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.matchable_resource &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.models.matchable_resource &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -171,6 +171,7 @@
     <span class="n">EXECUTION_QUEUE</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">EXECUTION_QUEUE</span>
     <span class="n">EXECUTION_CLUSTER_LABEL</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">EXECUTION_CLUSTER_LABEL</span>
     <span class="n">QUALITY_OF_SERVICE_SPECIFICATION</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">QUALITY_OF_SERVICE_SPECIFICATION</span>
+    <span class="n">PLUGIN_OVERRIDE</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">PLUGIN_OVERRIDE</span>
 
 <div class="viewcode-block" id="MatchableResource.enum_to_string"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchableResource.enum_to_string">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">enum_to_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
@@ -307,9 +308,115 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">value</span><span class="p">,)</span></div></div>
 
 
+<div class="viewcode-block" id="PluginOverride"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverride">[docs]</a><span class="k">class</span> <span class="nc">PluginOverride</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="n">FAIL</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">PluginOverride</span><span class="o">.</span><span class="n">FAIL</span>
+    <span class="n">USE_DEFAULT</span> <span class="o">=</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">PluginOverride</span><span class="o">.</span><span class="n">USE_DEFAULT</span>
+
+<div class="viewcode-block" id="PluginOverride.string_to_enum"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverride.string_to_enum">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">string_to_enum</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param Text val:</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;FAIL&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">FAIL</span>
+        <span class="k">elif</span> <span class="n">val</span> <span class="o">==</span> <span class="s2">&quot;USE_DEFAULT&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">USE_DEFAULT</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&lt;UNKNOWN&gt;&quot;</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_type</span><span class="p">,</span> <span class="n">plugin_id</span><span class="p">,</span> <span class="n">missing_plugin_behavior</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Alternate plugin implementations requested for a specific task type.</span>
+
+<span class="sd">        :param Text task_type:</span>
+<span class="sd">        :param: list[Text] plugin_id:</span>
+<span class="sd">        :param int missing_plugin_behavior</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_task_type</span> <span class="o">=</span> <span class="n">task_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_id</span> <span class="o">=</span> <span class="n">plugin_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_missing_plugin_behavior</span> <span class="o">=</span> <span class="n">missing_plugin_behavior</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">task_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: Text</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_task_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plugin_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: list[Text]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">missing_plugin_behavior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_missing_plugin_behavior</span>
+
+<div class="viewcode-block" id="PluginOverride.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverride.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.PluginOverride</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">PluginOverride</span><span class="p">(</span>
+            <span class="n">task_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">task_type</span><span class="p">,</span> <span class="n">plugin_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">plugin_id</span><span class="p">,</span> <span class="n">missing_plugin_behavior</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">missing_plugin_behavior</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="PluginOverride.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverride.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flyteidl.admin.matchable_resource_pb2.PluginOverride pb2_object:</span>
+<span class="sd">        :rtype: PluginOverride</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">task_type</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">task_type</span><span class="p">,</span>
+            <span class="n">plugin_id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">plugin_id</span><span class="p">,</span>
+            <span class="n">missing_plugin_behavior</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">missing_plugin_behavior</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="PluginOverrides"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverrides">[docs]</a><span class="k">class</span> <span class="nc">PluginOverrides</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">overrides</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Alternate plugin implementations for designated task types.</span>
+
+<span class="sd">        :param list[PluginOverride] overrides:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_overrides</span> <span class="o">=</span> <span class="n">overrides</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">overrides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: list[PluginOverride]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_overrides</span>
+
+<div class="viewcode-block" id="PluginOverrides.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverrides.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.PluginOverrides</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_matchable_resource</span><span class="o">.</span><span class="n">PluginOverrides</span><span class="p">(</span><span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="n">override</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">for</span> <span class="n">override</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">overrides</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="PluginOverrides.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.PluginOverrides.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param flyteidl.admin.matchable_resource_pb2.PluginOverrides pb2_object:</span>
+<span class="sd">        :rtype: PluginOverrides</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="n">PluginOverride</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">override</span><span class="p">)</span> <span class="k">for</span> <span class="n">override</span> <span class="ow">in</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">overrides</span><span class="p">])</span></div></div>
+
+
 <div class="viewcode-block" id="MatchingAttributes"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes">[docs]</a><span class="k">class</span> <span class="nc">MatchingAttributes</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">execution_cluster_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cluster_resource_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">execution_queue_attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">execution_cluster_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">plugin_overrides</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        At most one target from cluster_resource_attributes, execution_queue_attributes or execution_cluster_label</span>
@@ -317,16 +424,20 @@
 <span class="sd">        :param ClusterResourceAttributes cluster_resource_attributes:</span>
 <span class="sd">        :param ExecutionQueueAttributes execution_queue_attributes:</span>
 <span class="sd">        :param ExecutionClusterLabel execution_cluster_label:</span>
+<span class="sd">        :param PluginOverrides plugin_overrides:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">cluster_resource_attributes</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">execution_queue_attributes</span> <span class="ow">or</span> <span class="n">execution_cluster_label</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">execution_queue_attributes</span> <span class="ow">or</span> <span class="n">execution_cluster_label</span> <span class="ow">or</span> <span class="n">plugin_overrides</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one target can be set&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">execution_queue_attributes</span> <span class="ow">and</span> <span class="n">execution_cluster_label</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">execution_queue_attributes</span> <span class="ow">and</span> <span class="p">(</span><span class="n">execution_cluster_label</span> <span class="ow">or</span> <span class="n">plugin_overrides</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one target can be set&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">execution_cluster_label</span> <span class="ow">and</span> <span class="n">plugin_overrides</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one target can be set&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_resource_attributes</span> <span class="o">=</span> <span class="n">cluster_resource_attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_execution_queue_attributes</span> <span class="o">=</span> <span class="n">execution_queue_attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_execution_cluster_label</span> <span class="o">=</span> <span class="n">execution_cluster_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_overrides</span> <span class="o">=</span> <span class="n">plugin_overrides</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">cluster_resource_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -352,6 +463,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execution_cluster_label</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">plugin_overrides</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plugin implementation overrides for specific task types.</span>
+<span class="sd">        :rtype: PluginOverrides</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plugin_overrides</span>
+
 <div class="viewcode-block" id="MatchingAttributes.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.matchable_resource_pb2.MatchingAttributes</span>
@@ -366,6 +485,7 @@
             <span class="n">execution_cluster_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">execution_cluster_label</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">execution_cluster_label</span>
             <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">plugin_overrides</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">plugin_overrides</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plugin_overrides</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="MatchingAttributes.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.matchable_resource.MatchingAttributes.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -383,6 +503,9 @@
             <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">execution_cluster_label</span><span class="o">=</span><span class="n">ExecutionClusterLabel</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">execution_cluster_label</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;execution_cluster_label&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">plugin_overrides</span><span class="o">=</span><span class="n">PluginOverrides</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">plugin_overrides</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">pb2_object</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;plugin_overrides&quot;</span><span class="p">)</span>
             <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 </pre></div>

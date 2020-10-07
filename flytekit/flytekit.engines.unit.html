@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.unit package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.engines.unit package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -216,7 +216,7 @@ fulfilled_promises</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>binding_data</strong> (<em>_interface.BindingData</em>) – </p></li>
-<li><p><strong>fulfilled_promises</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>T</em><em>]</em>) – </p></li>
+<li><p><strong>fulfilled_promises</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>T</em><em>]</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>
@@ -230,7 +230,7 @@ fulfilled_promises</p>
 <em class="property">property </em><code class="sig-name descname">has_workflow_node</code><a class="headerlink" href="#flytekit.engines.unit.engine.DynamicTask.has_workflow_node" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,16 +264,7 @@ fulfilled_promises</p>
 <dl class="method">
 <dt id="flytekit.engines.unit.engine.UnitTestEngineFactory.fetch_launch_plan">
 <code class="sig-name descname">fetch_launch_plan</code><span class="sig-paren">(</span><em class="sig-param">_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/unit/engine.html#UnitTestEngineFactory.fetch_launch_plan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.unit.engine.UnitTestEngineFactory.fetch_launch_plan" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>launch_plan_id</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a>) – This identifier should have a resource
-type of kind LaunchPlan.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.launch_plan.LaunchPlan" title="flytekit.models.launch_plan.LaunchPlan">flytekit.models.launch_plan.LaunchPlan</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.engines.unit.engine.UnitTestEngineFactory.fetch_task">
@@ -292,16 +283,7 @@ Task.</p>
 <dl class="method">
 <dt id="flytekit.engines.unit.engine.UnitTestEngineFactory.fetch_workflow">
 <code class="sig-name descname">fetch_workflow</code><span class="sig-paren">(</span><em class="sig-param">_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/unit/engine.html#UnitTestEngineFactory.fetch_workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.unit.engine.UnitTestEngineFactory.fetch_workflow" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>workflow_id</strong> (<a class="reference internal" href="flytekit.models.core.html#flytekit.models.core.identifier.Identifier" title="flytekit.models.core.identifier.Identifier"><em>flytekit.models.core.identifier.Identifier</em></a>) – This identifier should have a resource
-type of kind workflow.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="flytekit.models.admin.html#flytekit.models.admin.workflow.Workflow" title="flytekit.models.admin.workflow.Workflow">flytekit.models.admin.workflow.Workflow</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.engines.unit.engine.UnitTestEngineFactory.fetch_workflow_execution">
@@ -371,15 +353,7 @@ type of kind workflow.</p>
 <dl class="method">
 <dt id="flytekit.engines.unit.engine.UnitTestEngineFactory.get_workflow">
 <code class="sig-name descname">get_workflow</code><span class="sig-paren">(</span><em class="sig-param">_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/unit/engine.html#UnitTestEngineFactory.get_workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.unit.engine.UnitTestEngineFactory.get_workflow" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>sdk_workflow</strong> (<a class="reference internal" href="flytekit.common.html#flytekit.common.workflow.SdkWorkflow" title="flytekit.common.workflow.SdkWorkflow"><em>flytekit.common.workflow.SdkWorkflow</em></a>) – </p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="flytekit.engines.html#flytekit.engines.common.BaseWorkflowExecutor" title="flytekit.engines.common.BaseWorkflowExecutor">BaseWorkflowExecutor</a></p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.engines.unit.engine.UnitTestEngineFactory.get_workflow_execution">
@@ -450,7 +424,7 @@ type of kind workflow.</p>
 <dl class="class">
 <dt id="flytekit.engines.unit.mock_stats.MockStats">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.engines.unit.mock_stats.</code><code class="sig-name descname">MockStats</code><span class="sig-paren">(</span><em class="sig-param">scope=''</em>, <em class="sig-param">tags=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/unit/mock_stats.html#MockStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.unit.mock_stats.MockStats" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.engines.unit.mock_stats.MockStats.current_tags">
 <code class="sig-name descname">current_tags</code><span class="sig-paren">(</span><em class="sig-param">metric</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/engines/unit/mock_stats.html#MockStats.current_tags"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.engines.unit.mock_stats.MockStats.current_tags" title="Permalink to this definition">¶</a></dt>

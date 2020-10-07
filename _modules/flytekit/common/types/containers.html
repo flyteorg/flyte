@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.containers &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.types.containers &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.types.containers</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
@@ -205,12 +203,12 @@
     <span class="k">return</span> <span class="n">TList</span></div>
 
 
-<div class="viewcode-block" id="ListImpl"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.containers.ListImpl">[docs]</a><span class="k">class</span> <span class="nc">ListImpl</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">CollectionType</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkValue</span><span class="p">)):</span>
+<div class="viewcode-block" id="ListImpl"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.containers.ListImpl">[docs]</a><span class="k">class</span> <span class="nc">ListImpl</span><span class="p">(</span><span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkValue</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">CollectionType</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">literals</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="TypedListImpl"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.containers.TypedListImpl">[docs]</a><span class="k">class</span> <span class="nc">TypedListImpl</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">TypedCollectionType</span><span class="p">,</span> <span class="n">ListImpl</span><span class="p">)):</span>
+<div class="viewcode-block" id="TypedListImpl"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.containers.TypedListImpl">[docs]</a><span class="k">class</span> <span class="nc">TypedListImpl</span><span class="p">(</span><span class="n">ListImpl</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">TypedCollectionType</span><span class="p">):</span>
 <div class="viewcode-block" id="TypedListImpl.from_string"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.containers.TypedListImpl.from_string">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string_value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.proto &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.types.proto &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.types.proto</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">base64</span> <span class="k">as</span> <span class="nn">_base64</span>
+<span></span><span class="kn">import</span> <span class="nn">base64</span> <span class="k">as</span> <span class="nn">_base64</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">reflection</span> <span class="k">as</span> <span class="n">_proto_reflection</span>
@@ -214,7 +212,7 @@
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Protobuf</span><span class="o">.</span><span class="n">TAG_PREFIX</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">descriptor</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Protobuf"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf">[docs]</a><span class="k">class</span> <span class="nc">Protobuf</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">ProtobufType</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkValue</span><span class="p">)):</span>
+<div class="viewcode-block" id="Protobuf"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf">[docs]</a><span class="k">class</span> <span class="nc">Protobuf</span><span class="p">(</span><span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkValue</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ProtobufType</span><span class="p">):</span>
 
     <span class="n">PB_FIELD_KEY</span> <span class="o">=</span> <span class="s2">&quot;pb_type&quot;</span>
     <span class="n">TAG_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">=&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">PB_FIELD_KEY</span><span class="p">)</span>

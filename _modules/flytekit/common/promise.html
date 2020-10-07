@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.promise &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.promise &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,11 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.promise</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
-
-<span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
+<span></span><span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">_constants</span>
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">helpers</span> <span class="k">as</span> <span class="n">_type_helpers</span>
@@ -172,7 +168,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_type_models</span>
 
 
-<div class="viewcode-block" id="Input"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.Input">[docs]</a><span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_interface_models</span><span class="o">.</span><span class="n">Parameter</span><span class="p">)):</span>
+<div class="viewcode-block" id="Input"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.Input">[docs]</a><span class="k">class</span> <span class="nc">Input</span><span class="p">(</span><span class="n">_interface_models</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text name:</span>
@@ -269,7 +265,7 @@
     <span class="k">def</span> <span class="nf">promote_from_model</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.interface.Parameter model:</span>
-<span class="sd">        :rtype: Parameter</span>
+<span class="sd">        :rtype: Input</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sdk_type</span> <span class="o">=</span> <span class="n">_type_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
 
@@ -280,7 +276,7 @@
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="NodeOutput"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.NodeOutput">[docs]</a><span class="k">class</span> <span class="nc">NodeOutput</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">)):</span>
+<div class="viewcode-block" id="NodeOutput"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.promise.NodeOutput">[docs]</a><span class="k">class</span> <span class="nc">NodeOutput</span><span class="p">(</span><span class="n">_type_models</span><span class="o">.</span><span class="n">OutputReference</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_node</span><span class="p">,</span> <span class="n">sdk_type</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.nodes.SdkNode sdk_node:</span>
@@ -325,6 +321,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_type</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO: fix this so that if upstream node ids have any None&#39;s in it, this still prints instead of erroring.</span>
         <span class="k">return</span> <span class="s2">&quot;NodeOutput(</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">var</span><span class="p">)</span></div>
 </pre></div>
 
