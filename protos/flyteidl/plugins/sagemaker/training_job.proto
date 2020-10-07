@@ -80,6 +80,21 @@ message AlgorithmSpecification {
     InputContentType.Value input_content_type = 5;
 }
 
+// When enabling distributed training on a training job, the user should use this message to tell Flyte and SageMaker
+// what kind of distributed protocol he/she wants to use to distribute the work.
+message DistributedProtocol {
+    enum Value {
+        // Use this value if the user wishes to use framework-native distributed training interfaces.
+        // If this value is used, Flyte won't configure SageMaker to initialize unnecessary components such as
+        // OpenMPI or Parameter Server.
+        UNSPECIFIED = 0;
+        // Use this value if the user wishes to use MPI as the underlying protocol for her distributed training job
+        // MPI is a framework-agnostic distributed protocol. It has multiple implementations. Currently, we have only
+        // tested the OpenMPI implementation, which is the recommended implementation for Horovod.
+        MPI = 1;
+    }
+}
+
 // TrainingJobResourceConfig is a pass-through, specifying the instance type to use for the training job, the
 // number of instances to launch, and the size of the ML storage volume the user wants to provision
 // Refer to SageMaker official doc for more details: https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html
@@ -90,6 +105,10 @@ message TrainingJobResourceConfig {
     string instance_type = 2;
     // The size of the ML storage volume that you want to provision.
     int64 volume_size_in_gb = 3;
+    // When users specify an instance_count > 1, Flyte will try to configure SageMaker to enable distributed training.
+    // If the users wish to use framework-agnostic distributed protocol such as MPI or Parameter Server, this
+    // field should be set to the corresponding enum value
+    DistributedProtocol.Value distributed_protocol = 4;
 }
 
 // The spec of a training job. This is mostly a pass-through object
