@@ -63,11 +63,11 @@ configMapGenerator:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.3.6 # override the tag
+    newTag: v0.3.7 # override the tag
     newName: docker.io/lyft/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v0.11.0 # override the tag
+    newTag: v0.12.1 # override the tag
     newName: docker.io/lyft/flyteconsole # override the namep 
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
@@ -75,5 +75,5 @@ images:
     newName: docker.io/lyft/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.3.12 # override the tag
+    newTag: v0.4.2 # override the tag
     newName: docker.io/lyft/flytepropeller # override the name
