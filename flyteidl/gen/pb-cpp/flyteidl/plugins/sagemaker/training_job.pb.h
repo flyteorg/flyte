@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fplugins_2fsagemaker_2ftraining_5fjob_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -59,6 +59,9 @@ extern AlgorithmNameDefaultTypeInternal _AlgorithmName_default_instance_;
 class AlgorithmSpecification;
 class AlgorithmSpecificationDefaultTypeInternal;
 extern AlgorithmSpecificationDefaultTypeInternal _AlgorithmSpecification_default_instance_;
+class DistributedProtocol;
+class DistributedProtocolDefaultTypeInternal;
+extern DistributedProtocolDefaultTypeInternal _DistributedProtocol_default_instance_;
 class InputContentType;
 class InputContentTypeDefaultTypeInternal;
 extern InputContentTypeDefaultTypeInternal _InputContentType_default_instance_;
@@ -81,6 +84,7 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::plugins::sagemaker::AlgorithmName* Arena::CreateMaybeMessage<::flyteidl::plugins::sagemaker::AlgorithmName>(Arena*);
 template<> ::flyteidl::plugins::sagemaker::AlgorithmSpecification* Arena::CreateMaybeMessage<::flyteidl::plugins::sagemaker::AlgorithmSpecification>(Arena*);
+template<> ::flyteidl::plugins::sagemaker::DistributedProtocol* Arena::CreateMaybeMessage<::flyteidl::plugins::sagemaker::DistributedProtocol>(Arena*);
 template<> ::flyteidl::plugins::sagemaker::InputContentType* Arena::CreateMaybeMessage<::flyteidl::plugins::sagemaker::InputContentType>(Arena*);
 template<> ::flyteidl::plugins::sagemaker::InputMode* Arena::CreateMaybeMessage<::flyteidl::plugins::sagemaker::InputMode>(Arena*);
 template<> ::flyteidl::plugins::sagemaker::MetricDefinition* Arena::CreateMaybeMessage<::flyteidl::plugins::sagemaker::MetricDefinition>(Arena*);
@@ -153,6 +157,27 @@ inline bool InputContentType_Value_Parse(
     const ::std::string& name, InputContentType_Value* value) {
   return ::google::protobuf::internal::ParseNamedEnum<InputContentType_Value>(
     InputContentType_Value_descriptor(), name, value);
+}
+enum DistributedProtocol_Value {
+  DistributedProtocol_Value_UNSPECIFIED = 0,
+  DistributedProtocol_Value_MPI = 1,
+  DistributedProtocol_Value_DistributedProtocol_Value_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  DistributedProtocol_Value_DistributedProtocol_Value_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool DistributedProtocol_Value_IsValid(int value);
+const DistributedProtocol_Value DistributedProtocol_Value_Value_MIN = DistributedProtocol_Value_UNSPECIFIED;
+const DistributedProtocol_Value DistributedProtocol_Value_Value_MAX = DistributedProtocol_Value_MPI;
+const int DistributedProtocol_Value_Value_ARRAYSIZE = DistributedProtocol_Value_Value_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* DistributedProtocol_Value_descriptor();
+inline const ::std::string& DistributedProtocol_Value_Name(DistributedProtocol_Value value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    DistributedProtocol_Value_descriptor(), value);
+}
+inline bool DistributedProtocol_Value_Parse(
+    const ::std::string& name, DistributedProtocol_Value* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<DistributedProtocol_Value>(
+    DistributedProtocol_Value_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -836,6 +861,137 @@ class AlgorithmSpecification final :
 };
 // -------------------------------------------------------------------
 
+class DistributedProtocol final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.plugins.sagemaker.DistributedProtocol) */ {
+ public:
+  DistributedProtocol();
+  virtual ~DistributedProtocol();
+
+  DistributedProtocol(const DistributedProtocol& from);
+
+  inline DistributedProtocol& operator=(const DistributedProtocol& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DistributedProtocol(DistributedProtocol&& from) noexcept
+    : DistributedProtocol() {
+    *this = ::std::move(from);
+  }
+
+  inline DistributedProtocol& operator=(DistributedProtocol&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DistributedProtocol& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DistributedProtocol* internal_default_instance() {
+    return reinterpret_cast<const DistributedProtocol*>(
+               &_DistributedProtocol_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(DistributedProtocol* other);
+  friend void swap(DistributedProtocol& a, DistributedProtocol& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DistributedProtocol* New() const final {
+    return CreateMaybeMessage<DistributedProtocol>(nullptr);
+  }
+
+  DistributedProtocol* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DistributedProtocol>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DistributedProtocol& from);
+  void MergeFrom(const DistributedProtocol& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DistributedProtocol* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  typedef DistributedProtocol_Value Value;
+  static const Value UNSPECIFIED =
+    DistributedProtocol_Value_UNSPECIFIED;
+  static const Value MPI =
+    DistributedProtocol_Value_MPI;
+  static inline bool Value_IsValid(int value) {
+    return DistributedProtocol_Value_IsValid(value);
+  }
+  static const Value Value_MIN =
+    DistributedProtocol_Value_Value_MIN;
+  static const Value Value_MAX =
+    DistributedProtocol_Value_Value_MAX;
+  static const int Value_ARRAYSIZE =
+    DistributedProtocol_Value_Value_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Value_descriptor() {
+    return DistributedProtocol_Value_descriptor();
+  }
+  static inline const ::std::string& Value_Name(Value value) {
+    return DistributedProtocol_Value_Name(value);
+  }
+  static inline bool Value_Parse(const ::std::string& name,
+      Value* value) {
+    return DistributedProtocol_Value_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:flyteidl.plugins.sagemaker.DistributedProtocol)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fplugins_2fsagemaker_2ftraining_5fjob_2eproto;
+};
+// -------------------------------------------------------------------
+
 class TrainingJobResourceConfig final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.plugins.sagemaker.TrainingJobResourceConfig) */ {
  public:
@@ -874,7 +1030,7 @@ class TrainingJobResourceConfig final :
                &_TrainingJobResourceConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(TrainingJobResourceConfig* other);
   friend void swap(TrainingJobResourceConfig& a, TrainingJobResourceConfig& b) {
@@ -957,6 +1113,12 @@ class TrainingJobResourceConfig final :
   ::google::protobuf::int64 volume_size_in_gb() const;
   void set_volume_size_in_gb(::google::protobuf::int64 value);
 
+  // .flyteidl.plugins.sagemaker.DistributedProtocol.Value distributed_protocol = 4;
+  void clear_distributed_protocol();
+  static const int kDistributedProtocolFieldNumber = 4;
+  ::flyteidl::plugins::sagemaker::DistributedProtocol_Value distributed_protocol() const;
+  void set_distributed_protocol(::flyteidl::plugins::sagemaker::DistributedProtocol_Value value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.sagemaker.TrainingJobResourceConfig)
  private:
   class HasBitSetters;
@@ -965,6 +1127,7 @@ class TrainingJobResourceConfig final :
   ::google::protobuf::internal::ArenaStringPtr instance_type_;
   ::google::protobuf::int64 instance_count_;
   ::google::protobuf::int64 volume_size_in_gb_;
+  int distributed_protocol_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fplugins_2fsagemaker_2ftraining_5fjob_2eproto;
 };
@@ -1008,7 +1171,7 @@ class TrainingJob final :
                &_TrainingJob_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(TrainingJob* other);
   friend void swap(TrainingJob& a, TrainingJob& b) {
@@ -1353,6 +1516,10 @@ inline void AlgorithmSpecification::set_input_content_type(::flyteidl::plugins::
 
 // -------------------------------------------------------------------
 
+// DistributedProtocol
+
+// -------------------------------------------------------------------
+
 // TrainingJobResourceConfig
 
 // int64 instance_count = 1;
@@ -1434,6 +1601,20 @@ inline void TrainingJobResourceConfig::set_volume_size_in_gb(::google::protobuf:
   
   volume_size_in_gb_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.plugins.sagemaker.TrainingJobResourceConfig.volume_size_in_gb)
+}
+
+// .flyteidl.plugins.sagemaker.DistributedProtocol.Value distributed_protocol = 4;
+inline void TrainingJobResourceConfig::clear_distributed_protocol() {
+  distributed_protocol_ = 0;
+}
+inline ::flyteidl::plugins::sagemaker::DistributedProtocol_Value TrainingJobResourceConfig::distributed_protocol() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.sagemaker.TrainingJobResourceConfig.distributed_protocol)
+  return static_cast< ::flyteidl::plugins::sagemaker::DistributedProtocol_Value >(distributed_protocol_);
+}
+inline void TrainingJobResourceConfig::set_distributed_protocol(::flyteidl::plugins::sagemaker::DistributedProtocol_Value value) {
+  
+  distributed_protocol_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.sagemaker.TrainingJobResourceConfig.distributed_protocol)
 }
 
 // -------------------------------------------------------------------
@@ -1557,6 +1738,8 @@ inline void TrainingJob::set_allocated_training_job_resource_config(::flyteidl::
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -1581,6 +1764,11 @@ template <> struct is_proto_enum< ::flyteidl::plugins::sagemaker::InputContentTy
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::plugins::sagemaker::InputContentType_Value>() {
   return ::flyteidl::plugins::sagemaker::InputContentType_Value_descriptor();
+}
+template <> struct is_proto_enum< ::flyteidl::plugins::sagemaker::DistributedProtocol_Value> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::plugins::sagemaker::DistributedProtocol_Value>() {
+  return ::flyteidl::plugins::sagemaker::DistributedProtocol_Value_descriptor();
 }
 
 }  // namespace protobuf
