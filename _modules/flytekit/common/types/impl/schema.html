@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.impl.schema &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.types.impl.schema &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.types.impl.schema</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">collections</span> <span class="k">as</span> <span class="nn">_collections</span>
+<span></span><span class="kn">import</span> <span class="nn">collections</span> <span class="k">as</span> <span class="nn">_collections</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">uuid</span> <span class="k">as</span> <span class="nn">_uuid</span>
 
@@ -557,7 +555,7 @@
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">_SchemaBackingMpBlob</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SchemaType"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.SchemaType">[docs]</a><span class="k">class</span> <span class="nc">SchemaType</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="p">)):</span>
+<div class="viewcode-block" id="SchemaType"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.SchemaType">[docs]</a><span class="k">class</span> <span class="nc">SchemaType</span><span class="p">(</span><span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
     <span class="n">_LITERAL_TYPE_TO_PROTO_ENUM</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">_primitives</span><span class="o">.</span><span class="n">Integer</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">,</span>
         <span class="n">_primitives</span><span class="o">.</span><span class="n">Float</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">():</span> <span class="n">_type_models</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">SchemaColumn</span><span class="o">.</span><span class="n">SchemaColumnType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span>
@@ -672,7 +670,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_sdk_columns</span> <span class="o">=</span> <span class="n">_collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Schema"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema">[docs]</a><span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">Schema</span><span class="p">)):</span>
+<div class="viewcode-block" id="Schema"><a class="viewcode-back" href="../../../../../flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema">[docs]</a><span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Schema</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">,</span> <span class="n">schema_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text remote_path:</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.tools package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -199,10 +199,10 @@
 <dl class="class">
 <dt id="flytekit.tools.lazy_loader.LazyLoadPlugin">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.tools.lazy_loader.</code><code class="sig-name descname">LazyLoadPlugin</code><span class="sig-paren">(</span><em class="sig-param">plugin_name</em>, <em class="sig-param">plugin_requirements</em>, <em class="sig-param">related_modules</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/tools/lazy_loader.html#LazyLoadPlugin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
 <dt id="flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS">
-<code class="sig-name descname">LAZY_LOADING_PLUGINS</code><em class="property"> = {'hive_sensor': ['hmsclient&gt;=0.0.1,&lt;1.0.0'], 'pytorch': ['torch&gt;=1.0.0,&lt;2.0.0'], 'schema': ['numpy&gt;=1.14.0,&lt;2.0.0', 'pandas&gt;=0.22.0,&lt;2.0.0', 'pyarrow&gt;=0.11.0,&lt;1.0.0'], 'sidecar': ['k8s-proto&gt;=0.0.3,&lt;1.0.0'], 'spark': ['pyspark&gt;=2.4.0,&lt;3.0.0'], 'spark3': ['pyspark&gt;=3.0.0']}</em><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">LAZY_LOADING_PLUGINS</code><em class="property"> = {'hive_sensor': ['hmsclient&gt;=0.0.1,&lt;1.0.0'], 'pytorch': ['torch&gt;=1.0.0,&lt;2.0.0'], 'schema': ['numpy&gt;=1.14.0,&lt;2.0.0', 'pandas&gt;=0.22.0,&lt;2.0.0', 'pyarrow&gt;=0.11.0,&lt;1.0.0'], 'sidecar': ['k8s-proto&gt;=0.0.3,&lt;1.0.0'], 'spark': ['pyspark&gt;=2.4.0,&lt;3.0.0'], 'spark3': ['pyspark&gt;=3.0.0'], 'tensorflow': ['tensorflow&gt;=2.0.0,&lt;3.0.0']}</em><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -210,7 +210,7 @@
 <em class="property">classmethod </em><code class="sig-name descname">get_extras_require</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/tools/lazy_loader.html#LazyLoadPlugin.get_extras_require"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.get_extras_require" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a>[Text,<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a>[Text]]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a>[Text,<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a>[Text]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -252,9 +252,9 @@ can reference other workflows and launch plans.
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>include_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.8)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.8)"><em>type</em></a><em>]</em>) – If specified, include these entities while doing a topological sort.  All
+<li><p><strong>include_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)"><em>set</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.9)"><em>type</em></a><em>]</em>) – If specified, include these entities while doing a topological sort.  All
 other entities will be ignored.  Only one of ignore_entities or include_entities can be set.</p></li>
-<li><p><strong>detect_unreferenced_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – If true, we will raise exceptions on entities not included in the package
+<li><p><strong>detect_unreferenced_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – If true, we will raise exceptions on entities not included in the package
 configuration.</p></li>
 </ul>
 </dd>
@@ -270,7 +270,7 @@ configuration.</p></li>
 <dd><p>Load all modules and packages at and under the given package.  Used for finding workflows/tasks to register.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pkgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>[</em><em>Text</em><em>]</em>) – List of dot separated string containing paths folders (packages) containing
+<dd class="field-odd"><p><strong>pkgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>[</em><em>Text</em><em>]</em>) – List of dot separated string containing paths folders (packages) containing
 the modules (python files)</p>
 </dd>
 </dl>

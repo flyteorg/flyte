@@ -54,6 +54,9 @@ Before you create a custom deployment, you'll need to `install kustomize <https:
 
 The simplest way to create your own custom deployment is to clone the sandbox deploy and modify it to your liking.
 
+NOTE:
+ This section is getting updated to use the new kustomize installation of Flyte. Link to kustomize
+
 To do this, check out the ``flyte`` repo ::
 
   git clone https://github.com/lyft/flyte.git

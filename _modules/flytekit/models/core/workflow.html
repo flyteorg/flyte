@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.core.workflow &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.models.core.workflow &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.models.core.workflow</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">workflow_pb2</span> <span class="k">as</span> <span class="n">_core_workflow</span>
+<span></span><span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">workflow_pb2</span> <span class="k">as</span> <span class="n">_core_workflow</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">interface</span> <span class="k">as</span> <span class="n">_interface</span>
@@ -202,7 +200,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.core.workflow_pb2.IfBlock</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">IfBlock</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">then_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">then_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),)</span></div>
+        <span class="k">return</span> <span class="n">_core_workflow</span><span class="o">.</span><span class="n">IfBlock</span><span class="p">(</span><span class="n">condition</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">condition</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span> <span class="n">then_node</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">then_node</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="IfBlock.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.core.html#flytekit.models.core.workflow.IfBlock.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -410,6 +408,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_metadata</span> <span class="o">=</span> <span class="n">metadata</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span> <span class="o">=</span> <span class="n">inputs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_upstream_node_ids</span> <span class="o">=</span> <span class="n">upstream_node_ids</span>
+        <span class="c1"># TODO: For proper graph handling, we need to keep track of the node objects themselves, not just the node IDs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_output_aliases</span> <span class="o">=</span> <span class="n">output_aliases</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_task_node</span> <span class="o">=</span> <span class="n">task_node</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_node</span> <span class="o">=</span> <span class="n">workflow_node</span>
@@ -444,7 +443,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">upstream_node_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        [Optional] Specifies execution depdendency for this node ensuring it will</span>
+<span class="sd">        [Optional] Specifies execution dependency for this node ensuring it will</span>
 <span class="sd">        only get scheduled to run after all its upstream nodes have completed. This node will have</span>
 <span class="sd">        an implicit dependency on any node that appears in inputs field.</span>
 <span class="sd">        :rtype: list[Text]</span>
@@ -643,7 +642,6 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_failure</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Metadata for the workflow.</span>
-
 <span class="sd">        :param on_failure flytekit.models.core.workflow.WorkflowMetadata.OnFailurePolicy: [Optional] The execution policy when the workflow detects a failure.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_failure</span> <span class="o">=</span> <span class="n">on_failure</span>

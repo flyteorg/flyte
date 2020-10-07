@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.interfaces.data.s3.s3proxy &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.interfaces.data.s3.s3proxy &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.interfaces.data.s3.s3proxy</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">re</span> <span class="k">as</span> <span class="nn">_re</span>
 <span class="kn">import</span> <span class="nn">string</span> <span class="k">as</span> <span class="nn">_string</span>
@@ -203,17 +201,18 @@
         <span class="n">env</span><span class="p">[</span><span class="n">_aws_config</span><span class="o">.</span><span class="n">S3_SECRET_ACCESS_KEY_ENV_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="n">_aws_config</span><span class="o">.</span><span class="n">S3_SECRET_ACCESS_KEY</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
 
     <span class="n">retry</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Exception when trying to execute </span><span class="si">{}</span><span class="s2">, reason: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
-        <span class="n">retry</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="n">retry</span> <span class="o">&gt;</span> <span class="n">_aws_config</span><span class="o">.</span><span class="n">RETRIES</span><span class="p">:</span>
-            <span class="k">raise</span>
-        <span class="n">secs</span> <span class="o">=</span> <span class="n">_aws_config</span><span class="o">.</span><span class="n">BACKOFF_SECONDS</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Sleeping before retrying again, after </span><span class="si">{}</span><span class="s2"> seconds&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">secs</span><span class="p">))</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrying again&quot;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_subprocess</span><span class="o">.</span><span class="n">check_call</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Exception when trying to execute </span><span class="si">{cmd}</span><span class="s2">, reason: {str(e)}&quot;</span><span class="p">)</span>
+            <span class="n">retry</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">retry</span> <span class="o">&gt;</span> <span class="n">_aws_config</span><span class="o">.</span><span class="n">RETRIES</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="k">raise</span>
+            <span class="n">secs</span> <span class="o">=</span> <span class="n">_aws_config</span><span class="o">.</span><span class="n">BACKOFF_SECONDS</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Sleeping before retrying again, after </span><span class="si">{secs}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">secs</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Retrying again&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_extra_args</span><span class="p">(</span><span class="n">extra_args</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

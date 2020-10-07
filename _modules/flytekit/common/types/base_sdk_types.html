@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.base_sdk_types &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.types.base_sdk_types &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,11 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.types.base_sdk_types</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span></span><span class="kn">import</span> <span class="nn">abc</span> <span class="k">as</span> <span class="nn">_abc</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
@@ -172,7 +168,7 @@
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literal_models</span>
 
 
-<div class="viewcode-block" id="FlyteSdkType"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType">[docs]</a><span class="k">class</span> <span class="nc">FlyteSdkType</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">)):</span>
+<div class="viewcode-block" id="FlyteSdkType"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType">[docs]</a><span class="k">class</span> <span class="nc">FlyteSdkType</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
 <div class="viewcode-block" id="FlyteSdkType.is_castable_from"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkType.is_castable_from">[docs]</a>    <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">is_castable_from</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -218,7 +214,7 @@
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="FlyteSdkValue"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkValue">[docs]</a><span class="k">class</span> <span class="nc">FlyteSdkValue</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">FlyteSdkType</span><span class="p">,</span> <span class="n">_literal_models</span><span class="o">.</span><span class="n">Literal</span><span class="p">)):</span>
+<div class="viewcode-block" id="FlyteSdkValue"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkValue">[docs]</a><span class="k">class</span> <span class="nc">FlyteSdkValue</span><span class="p">(</span><span class="n">_literal_models</span><span class="o">.</span><span class="n">Literal</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">FlyteSdkType</span><span class="p">):</span>
 <div class="viewcode-block" id="FlyteSdkValue.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.FlyteSdkValue.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -235,7 +231,7 @@
         <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="InstantiableType"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.InstantiableType">[docs]</a><span class="k">class</span> <span class="nc">InstantiableType</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">,</span> <span class="n">FlyteSdkType</span><span class="p">)):</span>
+<div class="viewcode-block" id="InstantiableType"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.base_sdk_types.InstantiableType">[docs]</a><span class="k">class</span> <span class="nc">InstantiableType</span><span class="p">(</span><span class="n">FlyteSdkType</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_common_models</span><span class="o">.</span><span class="n">FlyteABCMeta</span><span class="p">):</span>
     <span class="nd">@_abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.component_nodes &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.component_nodes &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,18 +160,14 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.component_nodes</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common</span> <span class="k">import</span> <span class="n">sdk_bases</span> <span class="k">as</span> <span class="n">_sdk_bases</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">workflow</span> <span class="k">as</span> <span class="n">_workflow_model</span>
 
 
-<div class="viewcode-block" id="SdkTaskNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.component_nodes.SdkTaskNode">[docs]</a><span class="k">class</span> <span class="nc">SdkTaskNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">TaskNode</span><span class="p">)):</span>
+<div class="viewcode-block" id="SdkTaskNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.component_nodes.SdkTaskNode">[docs]</a><span class="k">class</span> <span class="nc">SdkTaskNode</span><span class="p">(</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">TaskNode</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_task</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.tasks.task.SdkTask sdk_task:</span>
@@ -222,7 +218,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sdk_task</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="SdkWorkflowNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.component_nodes.SdkWorkflowNode">[docs]</a><span class="k">class</span> <span class="nc">SdkWorkflowNode</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">,</span> <span class="n">_workflow_model</span><span class="o">.</span><span class="n">WorkflowNode</span><span class="p">)):</span>
+<div class="viewcode-block" id="SdkWorkflowNode"><a class="viewcode-back" href="../../../flytekit/flytekit.common.html#flytekit.common.component_nodes.SdkWorkflowNode">[docs]</a><span class="k">class</span> <span class="nc">SdkWorkflowNode</span><span class="p">(</span><span class="n">_workflow_model</span><span class="o">.</span><span class="n">WorkflowNode</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">_sdk_bases</span><span class="o">.</span><span class="n">ExtendedSdkType</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_workflow</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sdk_launch_plan</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.common.workflow.SdkWorkflow sdk_workflow:</span>

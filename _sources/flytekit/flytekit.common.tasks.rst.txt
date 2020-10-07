@@ -107,6 +107,14 @@ flytekit.common.tasks.task module
    :undoc-members:
    :show-inheritance:
 
+flytekit.common.tasks.tensorflow\_task module
+---------------------------------------------
+
+.. automodule:: flytekit.common.tasks.tensorflow_task
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 
 Module contents
 ---------------

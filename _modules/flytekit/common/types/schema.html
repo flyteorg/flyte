@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types.schema &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.common.types.schema &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,11 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.types.schema</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
-
-<span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
+<span></span><span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types</span> <span class="k">import</span> <span class="n">base_sdk_types</span> <span class="k">as</span> <span class="n">_base_sdk_types</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.types.impl</span> <span class="k">import</span> <span class="n">schema</span> <span class="k">as</span> <span class="n">_schema_impl</span>
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">literals</span> <span class="k">as</span> <span class="n">_literals</span>
@@ -243,7 +239,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">schema_type</span><span class="o">.</span><span class="n">sdk_columns</span></div>
 
 
-<div class="viewcode-block" id="Schema"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.schema.Schema">[docs]</a><span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">SchemaInstantiator</span><span class="p">,</span> <span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkValue</span><span class="p">)):</span>
+<div class="viewcode-block" id="Schema"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.schema.Schema">[docs]</a><span class="k">class</span> <span class="nc">Schema</span><span class="p">(</span><span class="n">_base_sdk_types</span><span class="o">.</span><span class="n">FlyteSdkValue</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">SchemaInstantiator</span><span class="p">):</span>
 <div class="viewcode-block" id="Schema.from_string"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.types.html#flytekit.common.types.schema.Schema.from_string">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string_value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -331,7 +327,7 @@
             <span class="s2">&quot;When specifying a Schema type with a known set of columns, a non-empty list must be provided as &quot;</span> <span class="s2">&quot;inputs&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">class</span> <span class="nc">_Schema</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">SchemaInstantiator</span><span class="p">,</span> <span class="n">Schema</span><span class="p">)):</span>
+    <span class="k">class</span> <span class="nc">_Schema</span><span class="p">(</span><span class="n">Schema</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">SchemaInstantiator</span><span class="p">):</span>
         <span class="n">_schema_type</span> <span class="o">=</span> <span class="n">_schema_impl</span><span class="o">.</span><span class="n">SchemaType</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_Schema</span></div>
@@ -343,7 +339,7 @@
 <span class="sd">    :rtype: SchemaInstantiator</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">class</span> <span class="nc">_Schema</span><span class="p">(</span><span class="n">_six</span><span class="o">.</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">SchemaInstantiator</span><span class="p">,</span> <span class="n">Schema</span><span class="p">)):</span>
+    <span class="k">class</span> <span class="nc">_Schema</span><span class="p">(</span><span class="n">Schema</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">SchemaInstantiator</span><span class="p">):</span>
         <span class="n">_schema_type</span> <span class="o">=</span> <span class="n">_schema_impl</span><span class="o">.</span><span class="n">SchemaType</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">schema_type</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_Schema</span></div>

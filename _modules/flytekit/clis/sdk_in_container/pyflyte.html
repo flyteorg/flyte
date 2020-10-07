@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clis.sdk_in_container.pyflyte &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.clis.sdk_in_container.pyflyte &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,17 +160,11 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.clis.sdk_in_container.pyflyte</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
-
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">click</span>
-
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">pathlib2</span> <span class="k">import</span> <span class="n">Path</span>  <span class="c1"># python 2 backport</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.constants</span> <span class="k">import</span> <span class="n">CTX_DOMAIN</span><span class="p">,</span> <span class="n">CTX_PACKAGES</span><span class="p">,</span> <span class="n">CTX_PROJECT</span><span class="p">,</span> <span class="n">CTX_VERSION</span>
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.launch_plan</span> <span class="k">import</span> <span class="n">launch_plans</span>

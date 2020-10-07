@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.sagemaker package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.sdk.sagemaker package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -224,7 +224,7 @@ updated whenever the underlying algorithm changes.</p>
 <p>This argument is required to be a non-empty string if <cite>cache</cite> is True.</p>
 </div>
 </p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="flytekit.sdk.html#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
 to 0.</p>
 <div class="admonition note">
@@ -269,12 +269,12 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
+<li><p><strong>cache</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – [optional] boolean describing if the outputs of this task should be cached and
 re-usable.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
 inject bespoke logic into the base Flyte programming model.</p></li>

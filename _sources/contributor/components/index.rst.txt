@@ -12,3 +12,4 @@ These sections provide implementation details about specific flyte components. T
    admin_service
    catalog
    console
+   customizable_resources

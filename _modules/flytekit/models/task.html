@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.task &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.models.task &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.models.task</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+<span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 <span class="kn">from</span> <span class="nn">flyteidl.admin</span> <span class="k">import</span> <span class="n">task_pb2</span> <span class="k">as</span> <span class="n">_admin_task</span>
@@ -171,6 +170,7 @@
 <span class="kn">from</span> <span class="nn">flyteidl.core</span> <span class="k">import</span> <span class="n">tasks_pb2</span> <span class="k">as</span> <span class="n">_core_task</span>
 <span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">pytorch_pb2</span> <span class="k">as</span> <span class="n">_pytorch_task</span>
 <span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">spark_pb2</span> <span class="k">as</span> <span class="n">_spark_task</span>
+<span class="kn">from</span> <span class="nn">flyteidl.plugins</span> <span class="k">import</span> <span class="n">tensorflow_pb2</span> <span class="k">as</span> <span class="n">_tensorflow_task</span>
 <span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">json_format</span> <span class="k">as</span> <span class="n">_json_format</span>
 <span class="kn">from</span> <span class="nn">google.protobuf</span> <span class="k">import</span> <span class="n">struct_pb2</span> <span class="k">as</span> <span class="n">_struct</span>
 
@@ -701,6 +701,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_spark_conf</span> <span class="o">=</span> <span class="n">spark_conf</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hadoop_conf</span> <span class="o">=</span> <span class="n">hadoop_conf</span>
 
+<div class="viewcode-block" id="SparkJob.with_overrides"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.SparkJob.with_overrides">[docs]</a>    <span class="k">def</span> <span class="nf">with_overrides</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">new_spark_conf</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">new_hadoop_conf</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SparkJob&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_spark_conf</span><span class="p">:</span>
+            <span class="n">new_spark_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spark_conf</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_hadoop_conf</span><span class="p">:</span>
+            <span class="n">new_hadoop_conf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hadoop_conf</span>
+
+        <span class="k">return</span> <span class="n">SparkJob</span><span class="p">(</span>
+            <span class="n">spark_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spark_type</span><span class="p">,</span>
+            <span class="n">application_file</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application_file</span><span class="p">,</span>
+            <span class="n">main_class</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_class</span><span class="p">,</span>
+            <span class="n">spark_conf</span><span class="o">=</span><span class="n">new_spark_conf</span><span class="p">,</span>
+            <span class="n">hadoop_conf</span><span class="o">=</span><span class="n">new_hadoop_conf</span><span class="p">,</span>
+            <span class="n">executor_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">executor_path</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">main_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -864,8 +882,7 @@
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataLoadingConfig.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.DataLoadingConfig.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">):</span>
-        <span class="c1"># TODO use python 3.7+ only and then https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel -&gt; DataLoadingConfig:</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2</span><span class="p">:</span> <span class="n">_core_task</span><span class="o">.</span><span class="n">DataLoadingConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;DataLoadingConfig&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pb2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
@@ -1046,6 +1063,38 @@
 <div class="viewcode-block" id="PyTorchJob.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.PyTorchJob.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">workers_count</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">workers</span><span class="p">,)</span></div></div>
+
+
+<div class="viewcode-block" id="TensorFlowJob"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.TensorFlowJob">[docs]</a><span class="k">class</span> <span class="nc">TensorFlowJob</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workers_count</span><span class="p">,</span> <span class="n">ps_replicas_count</span><span class="p">,</span> <span class="n">chief_replicas_count</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workers_count</span> <span class="o">=</span> <span class="n">workers_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ps_replicas_count</span> <span class="o">=</span> <span class="n">ps_replicas_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chief_replicas_count</span> <span class="o">=</span> <span class="n">chief_replicas_count</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">workers_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workers_count</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ps_replicas_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ps_replicas_count</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chief_replicas_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chief_replicas_count</span>
+
+<div class="viewcode-block" id="TensorFlowJob.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.TensorFlowJob.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_tensorflow_task</span><span class="o">.</span><span class="n">DistributedTensorflowTrainingTask</span><span class="p">(</span>
+            <span class="n">workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workers_count</span><span class="p">,</span> <span class="n">ps_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ps_replicas_count</span><span class="p">,</span> <span class="n">chief_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chief_replicas_count</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TensorFlowJob.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.task.TensorFlowJob.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">workers_count</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">workers</span><span class="p">,</span>
+            <span class="n">ps_replicas_count</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">ps_replicas</span><span class="p">,</span>
+            <span class="n">chief_replicas_count</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">chief_replicas</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.engines.flyte.engine &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.engines.flyte.engine &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -160,9 +160,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.engines.flyte.engine</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">absolute_import</span>
-
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">traceback</span> <span class="k">as</span> <span class="nn">_traceback</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
@@ -214,6 +212,12 @@
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_CLIENT</span>
 
 
+<span class="c1"># This is a simple helper function that ties the client together with the configuration construct.</span>
+<span class="c1"># This will be refactored away when we move to a heavier context object.</span>
+<div class="viewcode-block" id="get_client"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.get_client">[docs]</a><span class="k">def</span> <span class="nf">get_client</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">_SynchronousFlyteClient</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span></div>
+
+
 <div class="viewcode-block" id="FlyteEngineFactory"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory">[docs]</a><span class="k">class</span> <span class="nc">FlyteEngineFactory</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseExecutionEngineFactory</span><span class="p">):</span>
 <div class="viewcode-block" id="FlyteEngineFactory.get_workflow"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.get_workflow">[docs]</a>    <span class="k">def</span> <span class="nf">get_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sdk_workflow</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -257,7 +261,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">FlyteWorkflowExecution</span><span class="p">(</span><span class="n">wf_exec</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteEngineFactory.fetch_workflow_execution"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_workflow_execution">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_workflow_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wf_exec_id</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteEngineFactory.fetch_workflow_execution"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_workflow_execution">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fetch_workflow_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wf_exec_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.WorkflowExecutionIdentifier wf_exec_id:</span>
 <span class="sd">        :rtype: flytekit.models.execution.Execution</span>
@@ -266,7 +273,10 @@
             <span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="p">)</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_execution</span><span class="p">(</span><span class="n">wf_exec_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteEngineFactory.fetch_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_task">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteEngineFactory.fetch_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_task">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fetch_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Queries Admin for an existing Admin task</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier task_id:</span>
@@ -276,7 +286,10 @@
             <span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
         <span class="p">)</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_task</span><span class="p">(</span><span class="n">task_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteEngineFactory.fetch_latest_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_latest_task">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_latest_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">named_task</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteEngineFactory.fetch_latest_task"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_latest_task">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fetch_latest_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">named_task</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fetches the latest task</span>
 <span class="sd">        :param flytekit.models.common.NamedEntityIdentifier named_task: NamedEntityIdentifier to fetch</span>
@@ -289,7 +302,10 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">task_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">task_list</span> <span class="k">else</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="FlyteEngineFactory.fetch_launch_plan"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_launch_plan">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteEngineFactory.fetch_launch_plan"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_launch_plan">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fetch_launch_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">launch_plan_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier launch_plan_id: This identifier should have a resource</span>
 <span class="sd">            type of kind LaunchPlan.</span>
@@ -307,7 +323,10 @@
                 <span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
             <span class="p">)</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get_active_launch_plan</span><span class="p">(</span><span class="n">named_entity_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteEngineFactory.fetch_workflow"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_workflow">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteEngineFactory.fetch_workflow"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteEngineFactory.fetch_workflow">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">fetch_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier workflow_id: This identifier should have a resource</span>
 <span class="sd">            type of kind LaunchPlan.</span>
@@ -319,7 +338,10 @@
 
 
 <div class="viewcode-block" id="FlyteLaunchPlan"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan">[docs]</a><span class="k">class</span> <span class="nc">FlyteLaunchPlan</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseLaunchPlanLauncher</span><span class="p">):</span>
-<div class="viewcode-block" id="FlyteLaunchPlan.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteLaunchPlan.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan.register">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">client</span><span class="o">.</span><span class="n">create_launch_plan</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_launch_plan</span><span class="p">)</span>
@@ -344,7 +366,10 @@
             <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">notification_overrides</span><span class="p">,</span> <span class="n">label_overrides</span><span class="p">,</span> <span class="n">annotation_overrides</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteLaunchPlan.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+<div class="viewcode-block" id="FlyteLaunchPlan.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan.launch">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">project</span><span class="p">,</span>
         <span class="n">domain</span><span class="p">,</span>
@@ -397,7 +422,10 @@
             <span class="n">exec_id</span> <span class="o">=</span> <span class="n">_identifier</span><span class="o">.</span><span class="n">WorkflowExecutionIdentifier</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">get_execution</span><span class="p">(</span><span class="n">exec_id</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteLaunchPlan.update"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteLaunchPlan.update"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan.update">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param flytekit.models.core.identifier.Identifier identifier: Identifier for launch plan to update</span>
 <span class="sd">        :param int state: Enum value from flytekit.models.launch_plan.LaunchPlanState</span>
@@ -408,7 +436,10 @@
 
 
 <div class="viewcode-block" id="FlyteWorkflow"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflow">[docs]</a><span class="k">class</span> <span class="nc">FlyteWorkflow</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseWorkflowExecutor</span><span class="p">):</span>
-<div class="viewcode-block" id="FlyteWorkflow.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflow.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteWorkflow.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflow.register">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">sub_workflows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow</span><span class="o">.</span><span class="n">get_sub_workflows</span><span class="p">()</span>
@@ -418,7 +449,10 @@
 
 
 <div class="viewcode-block" id="FlyteTask"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTask">[docs]</a><span class="k">class</span> <span class="nc">FlyteTask</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseTaskExecutor</span><span class="p">):</span>
-<div class="viewcode-block" id="FlyteTask.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTask.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteTask.register"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTask.register">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">client</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">_task_models</span><span class="o">.</span><span class="n">TaskSpec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_task</span><span class="p">))</span>
@@ -503,7 +537,10 @@
                                 <span class="n">temp_dir</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;output_prefix&quot;</span><span class="p">],</span> <span class="n">is_multipart</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteTask.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTask.launch">[docs]</a>    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
+<div class="viewcode-block" id="FlyteTask.launch"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTask.launch">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">launch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">project</span><span class="p">,</span>
         <span class="n">domain</span><span class="p">,</span>
@@ -576,7 +613,10 @@
 
 
 <div class="viewcode-block" id="FlyteWorkflowExecution"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution">[docs]</a><span class="k">class</span> <span class="nc">FlyteWorkflowExecution</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseWorkflowExecution</span><span class="p">):</span>
-<div class="viewcode-block" id="FlyteWorkflowExecution.get_node_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_node_executions">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteWorkflowExecution.get_node_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_node_executions">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_node_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[flytekit.models.filters.Filter] filters:</span>
 <span class="sd">        :rtype: dict[Text, flytekit.common.nodes.SdkNodeExecution]</span>
@@ -586,14 +626,20 @@
             <span class="n">v</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">node_id</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_iterate_node_executions</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow_execution</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="n">filters</span><span class="p">)</span>
         <span class="p">}</span></div>
 
-<div class="viewcode-block" id="FlyteWorkflowExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.sync">[docs]</a>    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteWorkflowExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.sync">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow_execution</span><span class="o">.</span><span class="n">_closure</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_execution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_workflow_execution</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">closure</span></div>
 
-<div class="viewcode-block" id="FlyteWorkflowExecution.get_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteWorkflowExecution.get_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_inputs">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -613,7 +659,10 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">({})</span></div>
 
-<div class="viewcode-block" id="FlyteWorkflowExecution.get_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_outputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteWorkflowExecution.get_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.get_outputs">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -633,7 +682,10 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">({})</span></div>
 
-<div class="viewcode-block" id="FlyteWorkflowExecution.terminate"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.terminate">[docs]</a>    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteWorkflowExecution.terminate"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteWorkflowExecution.terminate">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">terminate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cause</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param Text cause:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -643,20 +695,29 @@
 
 
 <div class="viewcode-block" id="FlyteNodeExecution"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution">[docs]</a><span class="k">class</span> <span class="nc">FlyteNodeExecution</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseNodeExecution</span><span class="p">):</span>
-<div class="viewcode-block" id="FlyteNodeExecution.get_task_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_task_executions">[docs]</a>    <span class="k">def</span> <span class="nf">get_task_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteNodeExecution.get_task_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_task_executions">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_task_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: list[flytekit.common.tasks.executions.SdkTaskExecution]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_iterate_task_executions</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sdk_node_execution</span><span class="o">.</span><span class="n">id</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="FlyteNodeExecution.get_subworkflow_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_subworkflow_executions">[docs]</a>    <span class="k">def</span> <span class="nf">get_subworkflow_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteNodeExecution.get_subworkflow_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_subworkflow_executions">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_subworkflow_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: list[flytekit.common.workflow_execution.SdkWorkflowExecution]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot retrieve sub-workflow information from a node execution yet.&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FlyteNodeExecution.get_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteNodeExecution.get_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_inputs">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -676,7 +737,10 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">({})</span></div>
 
-<div class="viewcode-block" id="FlyteNodeExecution.get_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_outputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteNodeExecution.get_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.get_outputs">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -696,7 +760,10 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">({})</span></div>
 
-<div class="viewcode-block" id="FlyteNodeExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.sync">[docs]</a>    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteNodeExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution.sync">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -705,7 +772,10 @@
 
 
 <div class="viewcode-block" id="FlyteTaskExecution"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution">[docs]</a><span class="k">class</span> <span class="nc">FlyteTaskExecution</span><span class="p">(</span><span class="n">_common_engine</span><span class="o">.</span><span class="n">BaseTaskExecution</span><span class="p">):</span>
-<div class="viewcode-block" id="FlyteTaskExecution.get_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.get_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteTaskExecution.get_inputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.get_inputs">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -725,7 +795,10 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">({})</span></div>
 
-<div class="viewcode-block" id="FlyteTaskExecution.get_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.get_outputs">[docs]</a>    <span class="k">def</span> <span class="nf">get_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteTaskExecution.get_outputs"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.get_outputs">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_outputs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flytekit.models.literals.LiteralMap</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -745,14 +818,20 @@
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">_literals</span><span class="o">.</span><span class="n">LiteralMap</span><span class="p">({})</span></div>
 
-<div class="viewcode-block" id="FlyteTaskExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.sync">[docs]</a>    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteTaskExecution.sync"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.sync">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">sync</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">_FlyteClientManager</span><span class="p">(</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">URL</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">insecure</span><span class="o">=</span><span class="n">_platform_config</span><span class="o">.</span><span class="n">INSECURE</span><span class="o">.</span><span class="n">get</span><span class="p">())</span><span class="o">.</span><span class="n">client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sdk_task_execution</span><span class="o">.</span><span class="n">_closure</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_task_execution</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sdk_task_execution</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">closure</span></div>
 
-<div class="viewcode-block" id="FlyteTaskExecution.get_child_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.get_child_executions">[docs]</a>    <span class="k">def</span> <span class="nf">get_child_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FlyteTaskExecution.get_child_executions"><a class="viewcode-back" href="../../../../flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteTaskExecution.get_child_executions">[docs]</a>    <span class="nd">@_deprecated</span><span class="p">(</span>
+        <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Objects should access client directly, will be removed by 1.0&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.13.0&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_child_executions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param list[flytekit.models.filters.Filter] filters:</span>
 <span class="sd">        :rtype: dict[Text, flytekit.common.nodes.SdkNodeExecution]</span>

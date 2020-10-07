@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.contrib.sensors package &mdash; Flyte 0.7.0 documentation</title>
+  <title>flytekit.contrib.sensors package &mdash; Flyte 0.8.0 documentation</title>
   
 
   
@@ -201,7 +201,7 @@
 <dl class="class">
 <dt id="flytekit.contrib.sensors.base_sensor.Sensor">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.contrib.sensors.base_sensor.</code><code class="sig-name descname">Sensor</code><span class="sig-paren">(</span><em class="sig-param">evaluation_interval=None</em>, <em class="sig-param">max_failures=0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/contrib/sensors/base_sensor.html#Sensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.contrib.sensors.base_sensor.Sensor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.contrib.sensors.base_sensor.Sensor.sense">
 <code class="sig-name descname">sense</code><span class="sig-paren">(</span><em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/contrib/sensors/base_sensor.html#Sensor.sense"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.contrib.sensors.base_sensor.Sensor.sense" title="Permalink to this definition">¶</a></dt>
@@ -261,7 +261,7 @@ should sleep before trying again.
 <li><p><strong>_task_function</strong> – this is the decorated method and shouldn’t be declared explicitly.  The function must
 take a first argument, and then named arguments matching those defined in &#64;inputs.  No keyword
 arguments are allowed for wrapped task functions.</p></li>
-<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
+<li><p><strong>retries</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – <p>[optional] integer determining number of times task can be retried on
 <a class="reference internal" href="flytekit.sdk.html#flytekit.sdk.exceptions.RecoverableException" title="flytekit.sdk.exceptions.RecoverableException"><code class="xref py py-exc docutils literal notranslate"><span class="pre">flytekit.sdk.exceptions.RecoverableException</span></code></a> or transient platform failures.  Defaults
 to 0.
 .. note:</p>
@@ -270,7 +270,7 @@ to 0.
 </pre></div>
 </div>
 </p></li>
-<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specify whether task is interruptible</p></li>
+<li><p><strong>interruptible</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – Specify whether task is interruptible</p></li>
 <li><p><strong>deprecated</strong> (<em>Text</em>) – [optional] string that should be provided if this task is deprecated.  The string
 will be logged as a warning so it should contain information regarding how to update to a newer task.</p></li>
 <li><p><strong>storage_request</strong> (<em>Text</em>) – <p>[optional] Kubernetes resource string for lower-bound of disk storage space
@@ -304,10 +304,10 @@ guaranteed!  If not specified, it is set equal to gpu_request.</p></li>
 <li><p><strong>memory_limit</strong> (<em>Text</em>) – [optional]  Kubernetes resource string for upper-bound of physical memory
 necessary for the task to execute.  This amount is not guaranteed!  If not specified, it is set equal to
 memory_request.</p></li>
-<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.8)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
+<li><p><strong>timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.9)"><em>datetime.timedelta</em></a>) – [optional] describes how long the task should be allowed to
 run at max before triggering a retry (if retries are enabled).  By default, tasks are allowed to run
 indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the task will not timeout.</p></li>
-<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
+<li><p><strong>environment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>[</em><em>Text</em><em>,</em><em>Text</em><em>]</em>) – [optional] environment variables to set when executing this task.</p></li>
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
 inject bespoke logic into the base Flyte programming model. Ideally, should be a sub-class of SensorTask or
