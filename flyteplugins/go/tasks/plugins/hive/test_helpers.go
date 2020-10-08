@@ -87,6 +87,7 @@ func GetMockTaskExecutionMetadata() core.TaskExecutionMetadata {
 				Domain:  "my_wf_exec_domain",
 			},
 		},
+		RetryAttempt: 1,
 	})
 	tID.On("GetGeneratedName").Return("my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name")
 	taskMetadata.On("GetTaskExecutionID").Return(tID)
