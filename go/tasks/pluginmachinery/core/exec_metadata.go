@@ -30,6 +30,7 @@ type TaskExecutionMetadata interface {
 	GetOwnerReference() v12.OwnerReference
 	GetOverrides() TaskOverrides
 	GetLabels() map[string]string
+	GetMaxAttempts() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
 	IsInterruptible() bool
