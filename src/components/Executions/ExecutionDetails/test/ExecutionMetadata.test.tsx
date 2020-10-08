@@ -1,8 +1,10 @@
 import { render } from '@testing-library/react';
 import { dashedValueString } from 'common/constants';
-import { Execution } from 'models';
+import { Execution, WorkflowExecutionIdentifier } from 'models';
 import { createMockExecution } from 'models/__mocks__/executionsData';
 import * as React from 'react';
+import { MemoryRouter } from 'react-router';
+import { Routes } from 'routes';
 import { ExecutionMetadataLabels } from '../constants';
 import { ExecutionMetadata } from '../ExecutionMetadata';
 
@@ -17,7 +19,11 @@ describe('ExecutionMetadata', () => {
     });
 
     const renderMetadata = () =>
-        render(<ExecutionMetadata execution={execution} />);
+        render(
+            <MemoryRouter>
+                <ExecutionMetadata execution={execution} />
+            </MemoryRouter>
+        );
 
     it('shows cluster name if available', () => {
         const { getByTestId } = renderMetadata();
@@ -55,6 +61,20 @@ describe('ExecutionMetadata', () => {
         const { getByTestId } = renderMetadata();
         expect(getByTestId(durationTestId)).toHaveTextContent(
             dashedValueString
+        );
+    });
+
+    it('shows reference execution if it exists', () => {
+        const referenceExecution: WorkflowExecutionIdentifier = {
+            project: 'project',
+            domain: 'domain',
+            name: '123abc'
+        };
+        execution.spec.metadata.referenceExecution = referenceExecution;
+        const { getByText } = renderMetadata();
+        expect(getByText(referenceExecution.name)).toHaveAttribute(
+            'href',
+            Routes.ExecutionDetails.makeUrl(referenceExecution)
         );
     });
 });

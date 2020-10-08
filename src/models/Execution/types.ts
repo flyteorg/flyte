@@ -42,6 +42,7 @@ export interface ExecutionMetadata extends Admin.IExecutionMetadata {
     mode: ExecutionMode;
     principal: string;
     nesting: number;
+    referenceExecution?: WorkflowExecutionIdentifier;
     parentNodeExecution?: NodeExecutionIdentifier;
 }
 

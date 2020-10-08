@@ -3,6 +3,7 @@ export enum ExecutionMetadataLabels {
     domain = 'Domain',
     duration = 'Duration',
     time = 'Time',
+    relatedTo = 'Related to',
     version = 'Version'
 }
 
@@ -20,3 +21,5 @@ export const tabs = {
 export const executionActionStrings = {
     clone: 'Clone Execution'
 };
+
+export const backLinkTitle = 'Back to parent';

@@ -11,13 +11,13 @@ import { interactiveTextDisabledColor } from 'components/Theme';
 import { Execution } from 'models';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Routes } from 'routes';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { TerminateExecutionButton } from '../TerminateExecution';
 import { executionIsTerminal } from '../utils';
-import { executionActionStrings } from './constants';
+import { backLinkTitle, executionActionStrings } from './constants';
 import { RelaunchExecutionForm } from './RelaunchExecutionForm';
+import { getExecutionBackLink, getExecutionSourceId } from './utils';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -77,14 +77,9 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     const [showInputsOutputs, setShowInputsOutputs] = React.useState(false);
     const [showRelaunchForm, setShowRelaunchForm] = React.useState(false);
     const { domain, name, project } = execution.id;
-    const { phase, workflowId } = execution.closure;
-    const {
-        backLink = Routes.WorkflowDetails.makeUrl(
-            workflowId.project,
-            workflowId.domain,
-            workflowId.name
-        )
-    } = useLocationState();
+    const { phase } = execution.closure;
+    const sourceId = getExecutionSourceId(execution);
+    const { backLink = getExecutionBackLink(execution) } = useLocationState();
     const isTerminal = executionIsTerminal(execution);
     const onClickShowInputsOutputs = () => setShowInputsOutputs(true);
     const onClickRelaunch = () => setShowRelaunchForm(true);
@@ -136,7 +131,11 @@ export const ExecutionDetailsAppBarContent: React.FC<{
         <>
             <NavBarContent>
                 <div className={styles.container}>
-                    <RouterLink className={styles.backLink} to={backLink}>
+                    <RouterLink
+                        title={backLinkTitle}
+                        className={styles.backLink}
+                        to={backLink}
+                    >
                         <ArrowBack />
                     </RouterLink>
                     <ExecutionStatusBadge phase={phase} type="workflow" />
@@ -149,7 +148,7 @@ export const ExecutionDetailsAppBarContent: React.FC<{
                             )}
                         >
                             <span>
-                                {`${project}/${domain}/${workflowId.name}/`}
+                                {`${project}/${domain}/${sourceId.name}/`}
                                 <strong>{`${name}`}</strong>
                             </span>
                         </Typography>

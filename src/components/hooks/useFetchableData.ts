@@ -2,6 +2,7 @@ import { useMachine } from '@xstate/react';
 import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
 import { CacheContext, getCacheKey, ValueCache } from 'components/Cache';
+import { defaultStateMachineConfig } from 'components/common/constants';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { NotAuthorizedError } from 'errors';
 import { useContext, useEffect, useMemo, useRef } from 'react';
@@ -144,7 +145,7 @@ export function useFetchableData<T extends object, DataType>(
         FetchStateContext<T>,
         FetchEventObject
     >(fetchMachine as FetchMachine<T>, {
-        devTools: env.NODE_ENV === 'development',
+        ...defaultStateMachineConfig,
         context: {
             debugName,
             defaultValue,

@@ -8,6 +8,8 @@ import { useCommonStyles } from 'components/common/styles';
 import { secondaryBackgroundColor } from 'components/Theme';
 import { Execution } from 'models';
 import * as React from 'react';
+import { Link as RouterLink } from 'react-router-dom';
+import { Routes } from 'routes/routes';
 import { ExpandableExecutionError } from '../Tables/ExpandableExecutionError';
 import { ExecutionMetadataLabels } from './constants';
 
@@ -65,7 +67,7 @@ export const ExecutionMetadata: React.FC<{
 
     const { domain } = execution.id;
     const { duration, error, startedAt, workflowId } = execution.closure;
-    const { systemMetadata } = execution.spec.metadata;
+    const { referenceExecution, systemMetadata } = execution.spec.metadata;
     const cluster = systemMetadata?.executionCluster ?? dashedValueString;
 
     const details: DetailItem[] = [
@@ -92,6 +94,20 @@ export const ExecutionMetadata: React.FC<{
                 : dashedValueString
         }
     ];
+
+    if (referenceExecution != null) {
+        details.push({
+            label: ExecutionMetadataLabels.relatedTo,
+            value: (
+                <RouterLink
+                    className={commonStyles.primaryLink}
+                    to={Routes.ExecutionDetails.makeUrl(referenceExecution)}
+                >
+                    {referenceExecution.name}
+                </RouterLink>
+            )
+        });
+    }
 
     return (
         <div className={styles.container}>

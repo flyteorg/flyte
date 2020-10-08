@@ -89,6 +89,7 @@ export interface CreateWorkflowExecutionArguments {
     inputs: Core.ILiteralMap;
     launchPlanId: Identifier;
     project: string;
+    referenceExecutionId?: WorkflowExecutionIdentifier;
 }
 /** Submits a request to create a new `WorkflowExecution` using the provided
  * LaunchPlan and input values.
@@ -98,7 +99,8 @@ export const createWorkflowExecution = (
         domain,
         inputs,
         launchPlanId: launchPlan,
-        project
+        project,
+        referenceExecutionId: referenceExecution
     }: CreateWorkflowExecutionArguments,
     config?: RequestConfig
 ) =>
@@ -113,7 +115,10 @@ export const createWorkflowExecution = (
                 spec: {
                     inputs,
                     launchPlan,
-                    metadata: { principal: defaultExecutionPrincipal }
+                    metadata: {
+                        referenceExecution,
+                        principal: defaultExecutionPrincipal
+                    }
                 }
             },
             path: endpointPrefixes.execution,

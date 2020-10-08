@@ -1,5 +1,6 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import ChevronRight from '@material-ui/icons/ChevronRight';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import * as classnames from 'classnames';
 import { noDescriptionString } from 'common/constants';
@@ -15,6 +16,8 @@ import { NamedEntity } from 'models';
 import * as React from 'react';
 import { IntersectionOptions, useInView } from 'react-intersection-observer';
 import reactLoadingSkeleton from 'react-loading-skeleton';
+import { Link } from 'react-router-dom';
+import { Routes } from 'routes/routes';
 import { SimpleTaskInterface } from './SimpleTaskInterface';
 import { useLatestTaskVersion } from './useLatestTask';
 const Skeleton = reactLoadingSkeleton;
@@ -91,6 +94,7 @@ const TaskNameRow: React.FC<TaskNameRowProps> = ({ label, entityName }) => {
                 </Typography>
                 {!!inView && <TaskInterface taskName={entityName} />}
             </div>
+            <ChevronRight className={listStyles.itemChevron} />
         </div>
     );
 };
@@ -100,14 +104,23 @@ export const SearchableTaskNameList: React.FC<Omit<
     SearchableNamedEntityListProps,
     'renderItem'
 >> = props => {
+    const commonStyles = useCommonStyles();
     const renderItem = ({
         key,
         value,
         content
     }: SearchResult<SearchableNamedEntity>) => (
-        <li key={key}>
+        <Link
+            key={key}
+            className={commonStyles.linkUnstyled}
+            to={Routes.TaskDetails.makeUrl(
+                value.id.project,
+                value.id.domain,
+                value.id.name
+            )}
+        >
             <TaskNameRow label={content} entityName={value} />
-        </li>
+        </Link>
     );
     return <SearchableNamedEntityList {...props} renderItem={renderItem} />;
 };

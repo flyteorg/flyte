@@ -6,7 +6,7 @@ import { useCommonStyles } from 'components/common/styles';
 import {
     formatType,
     getInputDefintionForLiteralType
-} from 'components/Launch/LaunchWorkflowForm/utils';
+} from 'components/Launch/LaunchForm/utils';
 import { Task, Variable } from 'models';
 import * as React from 'react';
 

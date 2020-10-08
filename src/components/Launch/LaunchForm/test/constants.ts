@@ -1,0 +1,9 @@
+export const booleanInputName = 'simpleBoolean';
+export const stringInputName = 'simpleString';
+export const stringNoLabelName = 'stringNoLabel';
+export const floatInputName = 'simpleFloat';
+export const durationInputName = 'simpleDuration';
+export const datetimeInputName = 'simpleDatetime';
+export const integerInputName = 'simpleInteger';
+export const binaryInputName = 'simpleBinary';
+export const errorInputName = 'simpleError';

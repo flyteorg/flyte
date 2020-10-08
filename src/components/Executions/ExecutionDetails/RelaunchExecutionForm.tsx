@@ -1,44 +1,129 @@
 import { WaitForData } from 'components/common';
-import { useWorkflow } from 'components/hooks';
-import { LaunchWorkflowForm } from 'components/Launch/LaunchWorkflowForm/LaunchWorkflowForm';
-import { useExecutionLaunchConfiguration } from 'components/Launch/LaunchWorkflowForm/useExecutionLaunchConfiguration';
-import { getWorkflowInputs } from 'components/Launch/LaunchWorkflowForm/utils';
-import { Execution, Workflow } from 'models';
+import { useAPIContext } from 'components/data/apiContext';
+import { fetchStates, useFetchableData } from 'components/hooks';
+import { LaunchForm } from 'components/Launch/LaunchForm/LaunchForm';
+import {
+    TaskInitialLaunchParameters,
+    WorkflowInitialLaunchParameters
+} from 'components/Launch/LaunchForm/types';
+import { fetchAndMapExecutionInputValues } from 'components/Launch/LaunchForm/useMappedExecutionInputValues';
+import {
+    getTaskInputs,
+    getWorkflowInputs
+} from 'components/Launch/LaunchForm/utils';
+import { Execution } from 'models';
 import * as React from 'react';
+import { isSingleTaskExecution } from './utils';
 
 export interface RelaunchExecutionFormProps {
     execution: Execution;
     onClose(): void;
 }
 
-const RenderForm: React.FC<RelaunchExecutionFormProps & {
-    workflow: Workflow;
-}> = ({ execution, onClose, workflow }) => {
-    const { workflowId } = execution.closure;
-    const workflowInputs = getWorkflowInputs(workflow);
-    const launchConfiguration = useExecutionLaunchConfiguration({
-        execution,
-        workflowInputs
-    });
+function useRelaunchWorkflowFormState({
+    execution
+}: RelaunchExecutionFormProps) {
+    const apiContext = useAPIContext();
+    const initialParameters = useFetchableData<
+        WorkflowInitialLaunchParameters,
+        Execution
+    >(
+        {
+            defaultValue: {} as WorkflowInitialLaunchParameters,
+            doFetch: async execution => {
+                const {
+                    closure: { workflowId },
+                    spec: { launchPlan }
+                } = execution;
+                const workflow = await apiContext.getWorkflow(workflowId);
+                const inputDefinitions = getWorkflowInputs(workflow);
+                const values = await fetchAndMapExecutionInputValues(
+                    {
+                        execution,
+                        inputDefinitions
+                    },
+                    apiContext
+                );
+                return { values, launchPlan, workflowId };
+            }
+        },
+        execution
+    );
+    return { initialParameters };
+}
+
+function useRelaunchTaskFormState({ execution }: RelaunchExecutionFormProps) {
+    const apiContext = useAPIContext();
+    const initialParameters = useFetchableData<
+        TaskInitialLaunchParameters,
+        Execution
+    >(
+        {
+            defaultValue: {} as TaskInitialLaunchParameters,
+            doFetch: async execution => {
+                const {
+                    spec: { launchPlan: taskId }
+                } = execution;
+                const task = await apiContext.getTask(taskId);
+                const inputDefinitions = getTaskInputs(task);
+                const values = await fetchAndMapExecutionInputValues(
+                    {
+                        execution,
+                        inputDefinitions
+                    },
+                    apiContext
+                );
+                return { values, taskId };
+            }
+        },
+        execution
+    );
+    return { initialParameters };
+}
+
+const RelaunchTaskForm: React.FC<RelaunchExecutionFormProps> = props => {
+    const { initialParameters } = useRelaunchTaskFormState(props);
+    const {
+        spec: { launchPlan: taskId }
+    } = props.execution;
     return (
-        <WaitForData {...launchConfiguration}>
-            <LaunchWorkflowForm
-                initialParameters={launchConfiguration.value}
-                onClose={onClose}
-                workflowId={workflowId}
-            />
+        <WaitForData {...initialParameters}>
+            {initialParameters.state.matches(fetchStates.LOADED) ? (
+                <LaunchForm
+                    initialParameters={initialParameters.value}
+                    onClose={props.onClose}
+                    referenceExecutionId={props.execution.id}
+                    taskId={taskId}
+                />
+            ) : null}
+        </WaitForData>
+    );
+};
+const RelaunchWorkflowForm: React.FC<RelaunchExecutionFormProps> = props => {
+    const { initialParameters } = useRelaunchWorkflowFormState(props);
+    const {
+        closure: { workflowId }
+    } = props.execution;
+    return (
+        <WaitForData {...initialParameters}>
+            {initialParameters.state.matches(fetchStates.LOADED) ? (
+                <LaunchForm
+                    initialParameters={initialParameters.value}
+                    onClose={props.onClose}
+                    referenceExecutionId={props.execution.id}
+                    workflowId={workflowId}
+                />
+            ) : null}
         </WaitForData>
     );
 };
 
-/** For a given execution, fetches the associated workflow and renders a
- * `LaunchWorkflowForm` based on the workflow, launch plan, and inputs of the
- * execution. */
+/** For a given execution, fetches the associated Workflow/Task and renders a
+ * `LaunchForm` based on the same source with input values taken from the execution. */
 export const RelaunchExecutionForm: React.FC<RelaunchExecutionFormProps> = props => {
-    const workflow = useWorkflow(props.execution.closure.workflowId);
-    return (
-        <WaitForData {...workflow}>
-            {() => <RenderForm {...props} workflow={workflow.value} />}
-        </WaitForData>
+    return isSingleTaskExecution(props.execution) ? (
+        <RelaunchTaskForm {...props} />
+    ) : (
+        <RelaunchWorkflowForm {...props} />
     );
 };

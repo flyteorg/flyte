@@ -20,6 +20,10 @@ export interface Identifier extends Core.IIdentifier {
 
 export interface NamedEntityIdentifier
     extends RequiredNonNullable<Admin.INamedEntityIdentifier> {}
+export interface ResourceIdentifier extends NamedEntityIdentifier {
+    resourceType: Core.ResourceType;
+}
+
 export interface NamedEntityMetadata
     extends RequiredNonNullable<Admin.INamedEntityMetadata> {}
 

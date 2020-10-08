@@ -1,5 +1,5 @@
 import { pickBy } from 'lodash';
-import { parse, stringify } from 'query-string';
+import { parse, ParsedQuery, stringify } from 'query-string';
 import { useEffect, useState } from 'react';
 import { history } from 'routes/history';
 
@@ -7,7 +7,7 @@ import { history } from 'routes/history';
  * It will attach a listener to history so that components using query params
  * are updated whenever the path/query changes.
  */
-export const useQueryState = <T extends {}>() => {
+export const useQueryState = <T extends ParsedQuery>() => {
     const [params, setParams] = useState<Partial<T>>(
         parse(history.location.search) as Partial<T>
     );
