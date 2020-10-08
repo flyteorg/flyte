@@ -116,6 +116,38 @@ func (_m *TaskExecutionMetadata) GetLabels() map[string]string {
 	return r0
 }
 
+type TaskExecutionMetadata_GetMaxAttempts struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetMaxAttempts) Return(_a0 uint32) *TaskExecutionMetadata_GetMaxAttempts {
+	return &TaskExecutionMetadata_GetMaxAttempts{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetMaxAttempts() *TaskExecutionMetadata_GetMaxAttempts {
+	c := _m.On("GetMaxAttempts")
+	return &TaskExecutionMetadata_GetMaxAttempts{Call: c}
+}
+
+func (_m *TaskExecutionMetadata) OnGetMaxAttemptsMatch(matchers ...interface{}) *TaskExecutionMetadata_GetMaxAttempts {
+	c := _m.On("GetMaxAttempts", matchers...)
+	return &TaskExecutionMetadata_GetMaxAttempts{Call: c}
+}
+
+// GetMaxAttempts provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetMaxAttempts() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type TaskExecutionMetadata_GetNamespace struct {
 	*mock.Call
 }
