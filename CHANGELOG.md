@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0](http://github.com/lyft/flyteconsole/compare/v0.12.1...v0.13.0) (2020-10-08)
+
+
+### Features
+
+* Improve UX for Single Task Executions ([#103](http://github.com/lyft/flyteconsole/issues/103)) ([d0335dc](http://github.com/lyft/flyteconsole/commit/d0335dc1f86b98b30011e63d686b8168262d3bbd)), closes [#96](http://github.com/lyft/flyteconsole/issues/96) [#97](http://github.com/lyft/flyteconsole/issues/97) [#99](http://github.com/lyft/flyteconsole/issues/99) [#100](http://github.com/lyft/flyteconsole/issues/100) [#101](http://github.com/lyft/flyteconsole/issues/101) [#102](http://github.com/lyft/flyteconsole/issues/102)
+
 ## [0.12.1](http://github.com/lyft/flyteconsole/compare/v0.12.0...v0.12.1) (2020-09-25)
 
 
