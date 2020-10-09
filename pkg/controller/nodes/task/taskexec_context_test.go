@@ -16,6 +16,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 	nodeMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
@@ -58,6 +59,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	res := &v12.ResourceRequirements{}
 	n := &flyteMocks.ExecutableNode{}
 	n.OnGetResources().Return(res)
+	ma := 5
+	n.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
 
 	ir := &ioMocks.InputReader{}
 	nCtx := &nodeMocks.NodeExecutionContext{}
