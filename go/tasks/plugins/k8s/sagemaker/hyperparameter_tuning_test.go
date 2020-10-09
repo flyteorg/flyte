@@ -29,7 +29,7 @@ func Test_awsSagemakerPlugin_BuildResourceForHyperparameterTuningJob(t *testing.
 
 	tjObj := generateMockTrainingJobCustomObj(
 		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 	htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
 	taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
 	hpoJobResource, err := awsSageMakerHPOJobHandler.BuildResource(ctx, generateMockHyperparameterTuningJobTaskContext(taskTemplate))
@@ -74,7 +74,7 @@ func Test_awsSagemakerPlugin_getEventInfoForHyperparameterTuningJob(t *testing.T
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
 		taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
 		taskCtx := generateMockHyperparameterTuningJobTaskContext(taskTemplate)

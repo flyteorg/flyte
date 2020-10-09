@@ -44,7 +44,7 @@ func Test_awsSagemakerPlugin_BuildResourceForCustomTrainingJob(t *testing.T) {
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockCustomTrainingJobTaskContext(taskTemplate, false))
@@ -66,6 +66,7 @@ func Test_awsSagemakerPlugin_BuildResourceForCustomTrainingJob(t *testing.T) {
 			{Name: fmt.Sprintf("%s%d_%s%s", FlyteSageMakerCmdKeyPrefix, 6, "--test-flag", FlyteSageMakerKeySuffix), Value: FlyteSageMakerCmdDummyValue},
 			{Name: fmt.Sprintf("%s%s%s", FlyteSageMakerEnvVarKeyPrefix, "Env_Var", FlyteSageMakerKeySuffix), Value: "Env_Val"},
 			{Name: fmt.Sprintf("%s%s%s", FlyteSageMakerEnvVarKeyPrefix, FlyteSageMakerEnvVarKeyStatsdDisabled, FlyteSageMakerKeySuffix), Value: strconv.FormatBool(true)},
+			{Name: SageMakerMpiEnableEnvVarName, Value: strconv.FormatBool(false)},
 		}
 		assert.Equal(t, len(expectedHPs), len(trainingJob.Spec.HyperParameters))
 		for i := range expectedHPs {
@@ -74,6 +75,85 @@ func Test_awsSagemakerPlugin_BuildResourceForCustomTrainingJob(t *testing.T) {
 		}
 
 		assert.Equal(t, testImage, *trainingJob.Spec.AlgorithmSpecification.TrainingImage)
+
+		// Since the distributed protocol is UNSPECIFIED, we should find sagemaker_mpi_enabled=false in the hyperparameters
+		count := 0
+		for i := range trainingJob.Spec.HyperParameters {
+			if trainingJob.Spec.HyperParameters[i].Name == SageMakerMpiEnableEnvVarName && trainingJob.Spec.HyperParameters[i].Value == strconv.FormatBool(false) {
+				count++
+			}
+		}
+		assert.Equal(t, 1, count)
+	})
+
+	t.Run("In a custom training job when users specify the MPI distributed protocol, even when the instance count is 1, we should find sagemaker_mpi_enabled=true in the hyperparameters", func(t *testing.T) {
+		// Injecting a config which contains a mismatched roleAnnotationKey -> expecting to get the role from the config
+		configAccessor := viper.NewAccessor(stdConfig.Options{
+			StrictMode: true,
+			// Use a different
+			SearchPaths: []string{"testdata/config2.yaml"},
+		})
+
+		err := configAccessor.UpdateConfig(context.TODO())
+		assert.NoError(t, err)
+
+		awsSageMakerTrainingJobHandler := awsSagemakerPlugin{TaskType: customTrainingJobTaskType}
+
+		tjObj := generateMockTrainingJobCustomObj(
+			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "0.90", []*sagemakerIdl.MetricDefinition{},
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_MPI)
+		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
+
+		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockCustomTrainingJobTaskContext(taskTemplate, false))
+		assert.NoError(t, err)
+		assert.NotNil(t, trainingJobResource)
+
+		trainingJob, ok := trainingJobResource.(*trainingjobv1.TrainingJob)
+		assert.True(t, ok)
+
+		count := 0
+		for i := range trainingJob.Spec.HyperParameters {
+			if trainingJob.Spec.HyperParameters[i].Name == SageMakerMpiEnableEnvVarName {
+				count++
+				assert.Equal(t, trainingJob.Spec.HyperParameters[i].Value, strconv.FormatBool(true))
+			}
+		}
+		assert.Equal(t, 1, count)
+	})
+
+	t.Run("When users specify the MPI distributed protocol, we should find sagemaker_mpi_enabled=true in the hyperparameters", func(t *testing.T) {
+		// Injecting a config which contains a mismatched roleAnnotationKey -> expecting to get the role from the config
+		configAccessor := viper.NewAccessor(stdConfig.Options{
+			StrictMode: true,
+			// Use a different
+			SearchPaths: []string{"testdata/config2.yaml"},
+		})
+
+		err := configAccessor.UpdateConfig(context.TODO())
+		assert.NoError(t, err)
+
+		awsSageMakerTrainingJobHandler := awsSagemakerPlugin{TaskType: customTrainingJobTaskType}
+
+		tjObj := generateMockTrainingJobCustomObj(
+			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "0.90", []*sagemakerIdl.MetricDefinition{},
+			sagemakerIdl.InputContentType_TEXT_CSV, 2, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_MPI)
+		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
+
+		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockCustomTrainingJobTaskContext(taskTemplate, false))
+		assert.NoError(t, err)
+		assert.NotNil(t, trainingJobResource)
+
+		trainingJob, ok := trainingJobResource.(*trainingjobv1.TrainingJob)
+		assert.True(t, ok)
+
+		count := 0
+		for i := range trainingJob.Spec.HyperParameters {
+			if trainingJob.Spec.HyperParameters[i].Name == SageMakerMpiEnableEnvVarName {
+				count++
+				assert.Equal(t, trainingJob.Spec.HyperParameters[i].Value, strconv.FormatBool(true))
+			}
+		}
+		assert.Equal(t, 1, count)
 	})
 }
 
@@ -94,7 +174,7 @@ func Test_awsSagemakerPlugin_GetTaskPhaseForCustomTrainingJob(t *testing.T) {
 	t.Run("TrainingJobStatusCompleted", func(t *testing.T) {
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 		taskCtx := generateMockCustomTrainingJobTaskContext(taskTemplate, false)
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, taskCtx)
@@ -105,7 +185,7 @@ func Test_awsSagemakerPlugin_GetTaskPhaseForCustomTrainingJob(t *testing.T) {
 	t.Run("TrainingJobStatusCompleted", func(t *testing.T) {
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 		taskCtx := generateMockCustomTrainingJobTaskContext(taskTemplate, false)
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, taskCtx)
@@ -123,7 +203,7 @@ func Test_awsSagemakerPlugin_GetTaskPhaseForCustomTrainingJob(t *testing.T) {
 	t.Run("OutputWriter.Put returns an error", func(t *testing.T) {
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 		taskCtx := generateMockCustomTrainingJobTaskContext(taskTemplate, true)
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, taskCtx)
@@ -163,7 +243,7 @@ func Test_awsSagemakerPlugin_getEventInfoForCustomTrainingJob(t *testing.T) {
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 		taskCtx := generateMockCustomTrainingJobTaskContext(taskTemplate, false)
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, taskCtx)

@@ -46,7 +46,7 @@ func Test_awsSagemakerPlugin_BuildResourceForTrainingJob(t *testing.T) {
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job x", tjObj)
 
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockTrainingJobTaskContext(taskTemplate, false))
@@ -73,7 +73,7 @@ func Test_awsSagemakerPlugin_BuildResourceForTrainingJob(t *testing.T) {
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job y", tjObj)
 
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockTrainingJobTaskContext(taskTemplate, false))
@@ -100,7 +100,7 @@ func Test_awsSagemakerPlugin_BuildResourceForTrainingJob(t *testing.T) {
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, generateMockTrainingJobTaskContext(taskTemplate, false))
@@ -150,7 +150,7 @@ func Test_awsSagemakerPlugin_GetTaskPhaseForTrainingJob(t *testing.T) {
 
 	tjObj := generateMockTrainingJobCustomObj(
 		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 	taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 	taskCtx := generateMockTrainingJobTaskContext(taskTemplate, false)
 	trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, taskCtx)
@@ -220,7 +220,7 @@ func Test_awsSagemakerPlugin_getEventInfoForTrainingJob(t *testing.T) {
 
 		tjObj := generateMockTrainingJobCustomObj(
 			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25)
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 		taskCtx := generateMockTrainingJobTaskContext(taskTemplate, false)
 		trainingJobResource, err := awsSageMakerTrainingJobHandler.BuildResource(ctx, taskCtx)

@@ -397,7 +397,7 @@ func genMockTaskExecutionMetadata() *mocks.TaskExecutionMetadata {
 func generateMockTrainingJobCustomObj(
 	inputMode sagemakerIdl.InputMode_Value, algName sagemakerIdl.AlgorithmName_Value, algVersion string,
 	metricDefinitions []*sagemakerIdl.MetricDefinition, contentType sagemakerIdl.InputContentType_Value,
-	instanceCount int64, instanceType string, volumeSizeInGB int64) *sagemakerIdl.TrainingJob {
+	instanceCount int64, instanceType string, volumeSizeInGB int64, protocol sagemakerIdl.DistributedProtocol_Value) *sagemakerIdl.TrainingJob {
 	return &sagemakerIdl.TrainingJob{
 		AlgorithmSpecification: &sagemakerIdl.AlgorithmSpecification{
 			InputMode:         inputMode,
@@ -407,9 +407,10 @@ func generateMockTrainingJobCustomObj(
 			InputContentType:  contentType,
 		},
 		TrainingJobResourceConfig: &sagemakerIdl.TrainingJobResourceConfig{
-			InstanceCount:  instanceCount,
-			InstanceType:   instanceType,
-			VolumeSizeInGb: volumeSizeInGB,
+			InstanceCount:       instanceCount,
+			InstanceType:        instanceType,
+			VolumeSizeInGb:      volumeSizeInGB,
+			DistributedProtocol: protocol,
 		},
 	}
 }
