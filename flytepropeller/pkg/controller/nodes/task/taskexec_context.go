@@ -26,6 +26,7 @@ var (
 )
 
 const IDMaxLength = 50
+const DefaultMaxAttempts = 1
 
 type taskExecutionID struct {
 	execName string
@@ -42,8 +43,9 @@ func (te taskExecutionID) GetGeneratedName() string {
 
 type taskExecutionMetadata struct {
 	handler.NodeExecutionMetadata
-	taskExecID taskExecutionID
-	o          pluginCore.TaskOverrides
+	taskExecID  taskExecutionID
+	o           pluginCore.TaskOverrides
+	maxAttempts uint32
 }
 
 func (t taskExecutionMetadata) GetTaskExecutionID() pluginCore.TaskExecutionID {
@@ -52,6 +54,10 @@ func (t taskExecutionMetadata) GetTaskExecutionID() pluginCore.TaskExecutionID {
 
 func (t taskExecutionMetadata) GetOverrides() pluginCore.TaskOverrides {
 	return t.o
+}
+
+func (t taskExecutionMetadata) GetMaxAttempts() uint32 {
+	return t.maxAttempts
 }
 
 type taskExecutionContext struct {
@@ -140,6 +146,10 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 	}
 
 	resourceNamespacePrefix := pluginCore.ResourceNamespace(t.resourceManager.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(pluginID))
+	maxAttempts := uint32(DefaultMaxAttempts)
+	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
+		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
+	}
 
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
@@ -147,6 +157,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
 			taskExecID:            taskExecutionID{execName: uniqueID, id: id},
 			o:                     nCtx.Node(),
+			maxAttempts:           maxAttempts,
 		},
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),
