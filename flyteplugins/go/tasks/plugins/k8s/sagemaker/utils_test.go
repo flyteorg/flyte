@@ -347,7 +347,8 @@ func Test_getTrainingJobImage(t *testing.T) {
 			flyteSagemakerIdl.InputContentType_TEXT_CSV,
 			1,
 			"ml.m4.xlarge",
-			25)
+			25,
+			flyteSagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		taskTemplate := generateMockTrainingJobTaskTemplate("the job", tjObj)
 		taskCtx := generateMockTrainingJobTaskContext(taskTemplate, false)
 		sagemakerTrainingJob := flyteSagemakerIdl.TrainingJob{}
