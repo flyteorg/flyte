@@ -44,11 +44,12 @@ type QuboleCommandDetails struct {
 }
 
 type CommandMetadata struct {
-	TaskName     string
-	Domain       string
-	Project      string
-	Labels       map[string]string
-	RetryAttempt uint32
+	TaskName      string
+	Domain        string
+	Project       string
+	Labels        map[string]string
+	AttemptNumber uint32
+	MaxAttempts   uint32
 }
 
 // QuboleClient API Request Body, meant to be passed into JSON.marshal
