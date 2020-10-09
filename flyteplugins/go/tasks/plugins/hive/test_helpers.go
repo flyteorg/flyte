@@ -64,6 +64,7 @@ func GetMockTaskExecutionMetadata() core.TaskExecutionMetadata {
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
 	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
+	taskMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",

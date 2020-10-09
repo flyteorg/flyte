@@ -263,6 +263,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExec
 		Name: "blah",
 	})
 	taskExecutionMetadata.On("IsInterruptible").Return(true)
+	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
 }
@@ -327,6 +328,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.driver.limit.cores"])
 	assert.Equal(t, dummySparkConf["spark.executor.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.executor.limit.cores"])
 
+	assert.Equal(t, len(sparkApp.Spec.Driver.EnvVars["FLYTE_MAX_ATTEMPTS"]), 1)
 	// Case2: Invalid Spark Task-Template
 	taskTemplate.Custom = nil
 	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate))
