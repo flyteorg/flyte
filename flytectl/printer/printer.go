@@ -29,6 +29,11 @@ func OutputFormats() []string {
 	return v
 }
 
+type Column struct {
+	Header   string
+	JSONPath string
+}
+
 type Printer struct{}
 
 const (
@@ -36,32 +41,69 @@ const (
 	tab   = "\t"
 )
 
-func (p Printer) projectColumns(input []interface{}, column map[string]string, printTransform func(data []byte) (interface{}, error)) ([]interface{}, error) {
-	responses := make([]interface{}, 0, len(input))
-	for _, data := range input {
-		tableData := make(map[string]interface{})
+// Projects the columns in one row of data from the given JSON using the []Column map
+func extractRow(data interface{}, columns []Column) []string {
+	if columns == nil || data == nil {
+		return nil
+	}
+	tableData := make([]string, 0, len(columns))
 
-		for k := range column {
-			out, err := jsonpath.Read(data, column[k])
-			if err != nil {
-				out = nil
-			}
-			tableData[k] = out
-		}
-		jsonbody, err := json.Marshal(tableData)
+	for _, c := range columns {
+		out, err := jsonpath.Read(data, c.JSONPath)
 		if err != nil {
-			return responses, err
+			out = ""
 		}
-		response, err := printTransform(jsonbody)
-		if err != nil {
-			return responses, err
-		}
-		responses = append(responses, response)
+		tableData = append(tableData, fmt.Sprintf("%s", out))
+	}
+	return tableData
+}
+
+// Projects the columns from the given list of JSON elements using the []Column map
+// Potential performance problem, as it returns all the rows in memory.
+// We could use the render row, but that may lead to misalignment.
+// TODO figure out a more optimal way
+func projectColumns(input []interface{}, column []Column) ([][]string, error) {
+	responses := make([][]string, 0, len(input))
+	for _, data := range input {
+		responses = append(responses, extractRow(data, column))
 	}
 	return responses, nil
 }
 
-func (p Printer) Print(format OutputFormat, i interface{}, column map[string]string, printTransform func(data []byte) (interface{}, error)) error {
+func JSONToTable(b []byte, columns []Column) error {
+	var jsonRows []interface{}
+	err := json.Unmarshal(b, &jsonRows)
+	if err != nil {
+		return err
+	}
+	if jsonRows == nil {
+		return nil
+	}
+	rows, err := projectColumns(jsonRows, columns)
+	if err != nil {
+		return err
+	}
+	printer := tableprinter.New(os.Stdout)
+	// TODO make this configurable
+	printer.AutoWrapText = false
+	printer.BorderLeft = true
+	printer.BorderRight = true
+	printer.ColumnSeparator = "|"
+	printer.HeaderBgColor = tablewriter.BgHiWhiteColor
+	headers := make([]string, 0, len(columns))
+	positions := make([]int, 0, len(columns))
+	for _, c := range columns {
+		headers = append(headers, c.Header)
+		positions = append(positions, 30)
+	}
+	if r := printer.Render(headers, rows, positions, true); r == -1 {
+		return fmt.Errorf("failed to render table")
+	}
+	fmt.Printf("%d rows\n", len(rows))
+	return nil
+}
+
+func (p Printer) Print(format OutputFormat, i interface{}, columns []Column) error {
 
 	buf := new(bytes.Buffer)
 	encoder := json.NewEncoder(buf)
@@ -83,28 +125,7 @@ func (p Printer) Print(format OutputFormat, i interface{}, column map[string]str
 		}
 		fmt.Println(string(v))
 	default: // Print table
-		var rows []interface{}
-		err := json.Unmarshal(buf.Bytes(), &rows)
-		if err != nil {
-			return err
-		}
-		if rows == nil {
-			return nil
-		}
-		response, err := p.projectColumns(rows, column, printTransform)
-		if err != nil {
-			return err
-		}
-		printer := tableprinter.New(os.Stdout)
-		printer.AutoWrapText = false
-		printer.BorderLeft = true
-		printer.BorderRight = true
-		printer.ColumnSeparator = "|"
-		printer.HeaderBgColor = tablewriter.BgHiWhiteColor
-		if printer.Print(response) == -1 {
-			return fmt.Errorf("failed to print table data")
-		}
-		fmt.Printf("%d rows\n", len(rows))
+		return JSONToTable(buf.Bytes(), columns)
 	}
 	return nil
 }

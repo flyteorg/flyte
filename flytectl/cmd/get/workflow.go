@@ -2,7 +2,6 @@ package get
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/lyft/flytestdlib/logger"
 
@@ -14,22 +13,9 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-var workflowStructure = map[string]string{
-	"Version": "$.id.version",
-	"Name":    "$.id.name",
-}
-
-type PrintableWorkflow struct {
-	Name    string `header:"Name"`
-	Version string `header:"Version"`
-}
-
-var transformWorkflow = func(jsonbody []byte) (interface{}, error) {
-	results := PrintableWorkflow{}
-	if err := json.Unmarshal(jsonbody, &results); err != nil {
-		return results, err
-	}
-	return results, nil
+var workflowColumns = []printer.Column{
+	{"Version", "$.id.version"},
+	{"Name", "$.id.name"},
 }
 
 func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
@@ -48,7 +34,7 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		}
 		logger.Debugf(ctx, "Retrieved %v workflows", len(workflows.Workflows))
 
-		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflows.Workflows, workflowStructure, transformWorkflow)
+		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflows.Workflows, workflowColumns)
 	}
 
 	workflows, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListWorkflowIds, adminutils.ListRequest{Project: config.GetConfig().Project, Domain: config.GetConfig().Domain})
@@ -56,5 +42,5 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		return err
 	}
 	logger.Debugf(ctx, "Retrieved %v workflows", len(workflows))
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflows, entityStructure, transformTaskEntity)
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflows, entityColumns)
 }
