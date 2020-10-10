@@ -186,6 +186,8 @@ github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFB
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
+github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27 h1:O664tckOIC4smyHDDJPXAh/YBYYc0Y1O8S5wmZDm3d8=
+github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27/go.mod h1:f0X1c0za3TbET/rl5ThtCSel0+G3/yZ8iuU9BxnyVK0=
 github.com/landoop/tableprinter v0.0.0-20200104100433-ae9249991eb1 h1:SH30nioTpP0VaCYafgUw+iS1EfJTDbtAeBcByEFqFrY=
 github.com/landoop/tableprinter v0.0.0-20200104100433-ae9249991eb1/go.mod h1:f0X1c0za3TbET/rl5ThtCSel0+G3/yZ8iuU9BxnyVK0=
 github.com/lyft/flyteidl v0.18.1 h1:COKkZi5k6bQvUYOk5gE70+FJX9/NUn0WOQ1uMrw3Qio=
