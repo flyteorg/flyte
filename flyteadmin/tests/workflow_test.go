@@ -5,10 +5,11 @@ package tests
 import (
 	"context"
 	"fmt"
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 
 	"github.com/golang/protobuf/proto"
 
@@ -29,7 +30,6 @@ func TestCreateWorkflow(t *testing.T) {
 	taskCreateReq.Id.Name = "simple task"
 	_, err := client.CreateTask(ctx, &taskCreateReq)
 	assert.NoError(t, err)
-
 
 	identifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,

@@ -22,6 +22,9 @@ type ListResourceInput struct {
 	// pq driver value substitution.
 	MapFilters    []common.MapFilter
 	SortParameter common.SortParameter
+	// A set of the entities (besides the primary table being queries) that should be joined with when performing
+	// the list query. This enables filtering on non-primary entity attributes.
+	JoinTableEntities map[common.Entity]bool
 }
 
 // Describes a set of resources for which to apply attribute updates.

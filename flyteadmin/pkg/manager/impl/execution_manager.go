@@ -1153,11 +1153,16 @@ func (m *ExecutionManager) ListExecutions(
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid pagination token %s for ListExecutions",
 			request.Token)
 	}
+	joinTableEntities := make(map[common.Entity]bool)
+	for _, filter := range filters {
+		joinTableEntities[filter.GetEntity()] = true
+	}
 	listExecutionsInput := repositoryInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:             int(request.Limit),
+		Offset:            offset,
+		InlineFilters:     filters,
+		SortParameter:     sortParameter,
+		JoinTableEntities: joinTableEntities,
 	}
 	output, err := m.db.ExecutionRepo().List(ctx, listExecutionsInput)
 	if err != nil {
