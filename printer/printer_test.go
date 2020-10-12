@@ -13,6 +13,7 @@ type Inner struct {
 	Y *time.Time `json:"y"`
 }
 
+// TODO Convert this to a Testable Example. For some reason the comparison fails
 func TestJSONToTable(t *testing.T) {
 	d := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 	j := []struct {
@@ -34,7 +35,7 @@ func TestJSONToTable(t *testing.T) {
 	// Output:
 	// | A     | S                    |
 	// ------- ----------------------
-	// | hello | %!s(<nil>)           |
+	// | hello |                      |
 	// | hello | 2020-01-01T00:00:00Z |
 	// | hello |                      |
 	// 3 rows

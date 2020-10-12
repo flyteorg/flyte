@@ -50,7 +50,7 @@ func extractRow(data interface{}, columns []Column) []string {
 
 	for _, c := range columns {
 		out, err := jsonpath.Read(data, c.JSONPath)
-		if err != nil {
+		if err != nil || out == nil {
 			out = ""
 		}
 		tableData = append(tableData, fmt.Sprintf("%s", out))
