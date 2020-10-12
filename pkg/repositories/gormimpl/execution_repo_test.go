@@ -375,10 +375,11 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 	executions = append(executions, execution)
 
 	GlobalMock := mocket.Catcher.Reset()
-	query := `SELECT "executions".* FROM "executions" INNER JOIN launch_plans ON executions.launch_plan_id = ` +
-		`launch_plans.id INNER JOIN workflows ON executions.workflow_id = workflows.id WHERE "executions"."deleted_at"` +
-		` IS NULL AND ((executions.execution_project = project) AND (executions.execution_domain = domain) AND ` +
-		`(executions.execution_name = 1) AND (workflows.name = workflow_name)) LIMIT 20 OFFSET 0`
+	query := `SELECT "executions".* FROM "executions" INNER JOIN workflows ON executions.workflow_id = workflows.id ` +
+		`INNER JOIN tasks ON executions.task_id = tasks.id WHERE "executions"."deleted_at" IS NULL AND ` +
+		`((executions.execution_project = project) AND (executions.execution_domain = domain) AND ` +
+		`(executions.execution_name = 1) AND (workflows.name = workflow_name) AND (tasks.name = task_name)) ` +
+		`LIMIT 20 OFFSET 0`
 	GlobalMock.NewMock().WithQuery(query).WithReply(executions)
 
 	collection, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
@@ -387,8 +388,13 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 			getEqualityFilter(common.Execution, "domain", domain),
 			getEqualityFilter(common.Execution, "name", "1"),
 			getEqualityFilter(common.Workflow, "name", "workflow_name"),
+			getEqualityFilter(common.Task, "name", "task_name"),
 		},
 		Limit: 20,
+		JoinTableEntities: map[common.Entity]bool{
+			common.Workflow: true,
+			common.Task:     true,
+		},
 	})
 	assert.NoError(t, err)
 	assert.NotEmpty(t, collection)

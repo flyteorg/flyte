@@ -1462,6 +1462,9 @@ func TestListExecutions(t *testing.T) {
 		assert.Equal(t, limit, input.Limit)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
 		assert.Equal(t, 2, input.Offset)
+		assert.EqualValues(t, map[common.Entity]bool{
+			common.Execution: true,
+		}, input.JoinTableEntities)
 		return interfaces.ExecutionCollectionOutput{
 			Executions: []models.Execution{
 				{
