@@ -1,0 +1,59 @@
+{{- if .Values.sparkoperator.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "sparkoperator.name" . }}
+  namespace: {{ template "sparkoperator.namespace" . }}
+  labels: {{ include "sparkoperator.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.sparkoperator.replicaCount }}
+  selector:
+    matchLabels: {{ include "sparkoperator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.sparkoperator.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{ include "sparkoperator.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: "{{ .Values.sparkoperator.image.repository }}:{{ .Values.sparkoperator.image.tag }}"
+        imagePullPolicy: "{{ .Values.sparkoperator.image.pullPolicy }}"
+        name: sparkoperator
+        command:
+        - /usr/bin/spark-operator
+        args:
+        - -logtostderr
+        - -v=2
+        - -controller-threads=20
+        - -enable-metrics=true
+        - "-metrics-prefix=service:"
+        - -metrics-labels=task_name
+        - -metrics-labels=workflow_name
+        - -enable-webhook=true
+        - -webhook-svc-namespace=sparkoperator
+        env:
+        - name: GOMAXPROCS
+          value: "16"
+        ports:
+        - containerPort: 10254
+        - containerPort: 8080
+        resources: {{ toYaml .Values.sparkoperator.resources | nindent 10 }}
+        volumeMounts:
+        - name: webhook-certs
+          mountPath: /etc/webhook-certs
+      serviceAccountName: {{ template "sparkoperator.name" . }}
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: spark-webhook-certs
+      {{- with .Values.sparkoperator.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sparkoperator.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sparkoperator.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "flyteconsole.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteconsole.labels" . | nindent 4 }}
+  {{- with .Values.flyteconsole.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.flyteconsole.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector: {{ include "flyteconsole.selectorLabels" . | nindent 4 }}

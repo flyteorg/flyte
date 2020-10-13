@@ -1,0 +1,6 @@
+{{- if .Values.pytorchoperator.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ template "pytorch-operator.namespace" . }}
+{{- end }}
