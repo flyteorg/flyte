@@ -12,7 +12,6 @@ require (
 	github.com/go-test/deep v1.0.5
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.3.5
-	github.com/googleapis/gnostic v0.4.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/kubeflow/pytorch-operator v0.6.0
 	github.com/kubeflow/tf-operator v0.5.3
@@ -27,19 +26,16 @@ require (
 	github.com/spf13/cobra v0.0.6
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.6.1
-	go.opencensus.io v0.22.3 // indirect
 	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
 	golang.org/x/tools v0.0.0-20200304193943-95d2e580d8eb
 	google.golang.org/grpc v1.28.0
 	gopkg.in/yaml.v2 v2.2.8
-	gopkg.in/yaml.v3 v3.0.0-20200605160147-a5ece683394c // indirect
 	gotest.tools v2.2.0+incompatible
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v11.0.1-0.20190918222721-c0e3722d5cf0+incompatible
 	k8s.io/klog v1.0.0
 	sigs.k8s.io/controller-runtime v0.5.1
-	sigs.k8s.io/yaml v1.2.0 // indirect
 )
 
 // Pin the version of client-go to something that's compatible with katrogan's fork of api and apimachinery

@@ -226,6 +226,7 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 	totalSuccesses := int64(0)
 	totalFailures := int64(0)
 	totalRunning := int64(0)
+	totalWaitingForResources := int64(0)
 	for phase, count := range summary {
 		totalCount += count
 		if phase.IsTerminal() {
@@ -238,6 +239,8 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 				// TODO: preferable to auto-combine to array tasks for now.
 				totalFailures += count
 			}
+		} else if phase.IsWaitingForResources() {
+			totalWaitingForResources += count
 		} else {
 			totalRunning += count
 		}
@@ -249,12 +252,16 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 	}
 
 	// No chance to reach the required success numbers.
-	if totalRunning+totalSuccesses < minSuccesses {
-		logger.Infof(ctx, "Array failed early because totalRunning[%v] + totalSuccesses[%v] < minSuccesses[%v]",
-			totalRunning, totalSuccesses, minSuccesses)
+	if totalRunning+totalSuccesses+totalWaitingForResources < minSuccesses {
+		logger.Infof(ctx, "Array failed early because total failures > minSuccesses[%v]. Snapshot totalRunning[%v] + totalSuccesses[%v] + totalWaitingForResource[%v]",
+			totalRunning, totalSuccesses, totalWaitingForResources, minSuccesses)
 		return PhaseWriteToDiscoveryThenFail
 	}
 
+	if totalWaitingForResources > 0 {
+		logger.Infof(ctx, "Array is still running and waiting for resources totalWaitingForResources[%v]", totalWaitingForResources)
+		return PhaseWaitingForResources
+	}
 	if totalSuccesses >= minSuccesses && totalRunning == 0 {
 		logger.Infof(ctx, "Array succeeded because totalSuccesses[%v] >= minSuccesses[%v]", totalSuccesses, minSuccesses)
 		return PhaseWriteToDiscovery

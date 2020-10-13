@@ -6,9 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
-
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
 
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
 
@@ -24,7 +23,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/errors"
+	errors2 "github.com/lyft/flytestdlib/errors"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/lyft/flyteplugins/go/tasks/logs"
@@ -32,27 +31,47 @@ import (
 )
 
 const (
-	ErrCheckPodStatus errors.ErrorCode = "CHECK_POD_FAILED"
+	ErrCheckPodStatus errors2.ErrorCode = "CHECK_POD_FAILED"
 )
 
-func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient,
-	dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference, currentState *arrayCore.State) (
+func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient,
+	config *Config, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference, currentState *arrayCore.State) (
 	newState *arrayCore.State, logLinks []*idlCore.TaskLog, err error) {
+	if int64(currentState.GetExecutionArraySize()) > config.MaxArrayJobSize {
+		ee := fmt.Errorf("array size > max allowed. Requested [%v]. Allowed [%v]", currentState.GetExecutionArraySize(), config.MaxArrayJobSize)
+		logger.Info(ctx, ee)
+		currentState = currentState.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason(ee.Error())
+		return currentState, logLinks, nil
+	}
 
 	logLinks = make([]*idlCore.TaskLog, 0, 4)
 	newState = currentState
-
 	msg := errorcollector.NewErrorMessageCollector()
-	newArrayStatus := arraystatus.ArrayStatus{
+	newArrayStatus := &arraystatus.ArrayStatus{
 		Summary:  arraystatus.ArraySummary{},
 		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
 	}
 
+	// If we have arrived at this state for the first time then currentState has not been
+	// initialized with number of sub tasks.
+	if len(currentState.GetArrayStatus().Detailed.GetItems()) == 0 {
+		currentState.ArrayStatus = *newArrayStatus
+	}
+
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
 		existingPhase := core.Phases[existingPhaseIdx]
+		indexStr := strconv.Itoa(childIdx)
+		podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 		if existingPhase.IsTerminal() {
 			// If we get here it means we have already "processed" this terminal phase since we will only persist
 			// the phase after all processing is done (e.g. check outputs/errors file, record events... etc.).
+
+			// Since we know we have already "processed" this terminal phase we can safely deallocate resource
+			err = deallocateResource(ctx, tCtx, config, childIdx)
+			if err != nil {
+				logger.Errorf(ctx, "Error releasing allocation token [%s] in LaunchAndCheckSubTasks [%s]", podName, err)
+				return currentState, logLinks, errors2.Wrapf(ErrCheckPodStatus, err, "Error releasing allocation token.")
+			}
 			newArrayStatus.Summary.Inc(existingPhase)
 			newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(existingPhase))
 
@@ -60,37 +79,49 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, kub
 			continue
 		}
 
-		phaseInfo, err := CheckPodStatus(ctx, kubeClient,
-			k8sTypes.NamespacedName{
-				Name:      formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), strconv.Itoa(childIdx)),
-				Namespace: tCtx.TaskExecutionMetadata().GetNamespace(),
-			})
+		task := &Task{
+			LogLinks:         logLinks,
+			State:            newState,
+			NewArrayStatus:   newArrayStatus,
+			Config:           config,
+			ChildIdx:         childIdx,
+			MessageCollector: &msg,
+		}
+
+		// The first time we enter this state we will launch every subtask. On subsequent rounds, the pod
+		// has already been created so we return a Success value and continue with the Monitor step.
+		var launchResult LaunchResult
+		launchResult, err = task.Launch(ctx, tCtx, kubeClient)
 		if err != nil {
-			return currentState, logLinks, errors.Wrapf(ErrCheckPodStatus, err, "Failed to check pod status")
+			logger.Errorf(ctx, "K8s array - Launch error %v", err)
+			return currentState, logLinks, err
 		}
 
-		if phaseInfo.Info() != nil {
-			logLinks = append(logLinks, phaseInfo.Info().Logs...)
+		switch launchResult {
+		case LaunchSuccess:
+			// Continue with execution if successful
+		case LaunchError:
+			return currentState, logLinks, err
+		// If Resource manager is enabled and there are currently not enough resources we can skip this round
+		// for a subtask and wait until there are enough resources.
+		case LaunchWaiting:
+			continue
+		case LaunchReturnState:
+			return currentState, logLinks, nil
 		}
 
-		if phaseInfo.Err() != nil {
-			msg.Collect(childIdx, phaseInfo.Err().String())
-		}
+		var monitorResult MonitorResult
+		monitorResult, err = task.Monitor(ctx, tCtx, kubeClient, dataStore, outputPrefix, baseOutputDataSandbox)
 
-		actualPhase := phaseInfo.Phase()
-		if phaseInfo.Phase().IsSuccess() {
-			originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
-			actualPhase, err = array.CheckTaskOutput(ctx, dataStore, outputPrefix, baseOutputDataSandbox, childIdx, originalIdx)
+		if monitorResult != MonitorSuccess {
 			if err != nil {
-				return nil, nil, err
+				logger.Errorf(ctx, "K8s array - Monitor error %v", err)
 			}
+			return currentState, logLinks, err
 		}
-
-		newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(actualPhase))
-		newArrayStatus.Summary.Inc(actualPhase)
 	}
 
-	newState = newState.SetArrayStatus(newArrayStatus)
+	newState = newState.SetArrayStatus(*newArrayStatus)
 
 	// Check that the taskTemplate is valid
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -108,6 +139,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, kub
 
 	if phase == arrayCore.PhaseCheckingSubTaskExecutions {
 		newPhaseVersion := uint32(0)
+
 		// For now, the only changes to PhaseVersion and PreviousSummary occur for running array jobs.
 		for phase, count := range newState.GetArrayStatus().Summary {
 			newPhaseVersion += uint32(phase) * uint32(count)

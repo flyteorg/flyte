@@ -60,6 +60,10 @@ func (p Phase) IsSuccess() bool {
 	return p == PhaseSuccess
 }
 
+func (p Phase) IsWaitingForResources() bool {
+	return p == PhaseWaitingForResources
+}
+
 type TaskInfo struct {
 	// log information for the task execution
 	Logs []*core.TaskLog

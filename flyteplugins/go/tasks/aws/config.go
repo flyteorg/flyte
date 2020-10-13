@@ -7,8 +7,9 @@ package aws
 import (
 	"time"
 
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
 	"github.com/lyft/flytestdlib/config"
+
+	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
 )
 
 //go:generate pflags Config --default-var defaultConfig
