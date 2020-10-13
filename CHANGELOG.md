@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.1](http://github.com/lyft/flyteconsole/compare/v0.13.0...v0.13.1) (2020-10-13)
+
+
+### Bug Fixes
+
+* use correct filter for single task executions ([#104](http://github.com/lyft/flyteconsole/issues/104)) ([8529858](http://github.com/lyft/flyteconsole/commit/8529858abf5e67fc6b278bfd1209822671df8c11))
+
 # [0.13.0](http://github.com/lyft/flyteconsole/compare/v0.12.1...v0.13.0) (2020-10-08)
 
 
