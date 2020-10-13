@@ -1,7 +1,5 @@
 {{/* vim: set filetype=mustache: */}}
 
-
-
 {{- define "flyte.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -13,7 +11,6 @@
 {{- define "flyte.namespace" -}}
 {{- default .Release.Namespace .Values.forceNamespace | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
-
 
 
 {{- define "flyteadmin.name" -}}
@@ -32,7 +29,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 
-
 {{- define "datacatalog.name" -}}
 datacatalog
 {{- end -}}
@@ -47,7 +43,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
-
 
 
 {{- define "flytepropeller.name" -}}
@@ -66,7 +61,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 
-
 {{- define "flyteconsole.name" -}}
 flyteconsole
 {{- end -}}
@@ -81,7 +75,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
-
 
 
 {{- define "redis.name" -}}
@@ -100,7 +93,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 
-
 {{- define "postgres.name" -}}
 postgres
 {{- end -}}
@@ -115,7 +107,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
-
 
 
 {{- define "minio.name" -}}
@@ -154,7 +145,6 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 
-
 {{- define "sparkoperator.name" -}}
 sparkoperator
 {{- end -}}
@@ -173,7 +163,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
-
 
 
 {{- define "pytorch-operator.name" -}}
@@ -195,10 +184,7 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-
-#
-# SECRET
-#
+# Optional blocks for secret mount 
 
 {{- define "databaseSecret.volume" -}}
 {{- with .Values.common.databaseSecret.name -}}
