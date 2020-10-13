@@ -1,0 +1,645 @@
+
+#
+# FLYTEADMIN
+#
+
+flyteadmin:
+  replicaCount: 2
+  image:
+    repository: docker.io/lyft/flyteadmin
+    tag: v0.3.7
+    pullPolicy: IfNotPresent
+
+  # IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+  serviceAccountAnnotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 200Mi
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 200Mi
+      memory: 200Mi
+
+  configPath: /etc/flyte/config/*.yaml
+  service:
+    annotations:
+      contour.heptio.com/upstream-protocol.h2c: grpc
+  
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flyteadmin
+          topologyKey: kubernetes.io/hostname
+
+#
+# DATACATALOG
+#
+
+datacatalog:
+  replicaCount: 2
+  image:
+    repository: docker.io/lyft/datacatalog
+    tag: v0.2.2
+    pullPolicy: IfNotPresent
+
+  # IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+  serviceAccountAnnotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 200Mi
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 200Mi
+      memory: 200Mi
+
+  configPath: /etc/datacatalog/config/*.yaml
+
+  service:
+    annotations:
+      contour.heptio.com/upstream-protocol.h2c: grpc
+  
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: datacatalog
+          topologyKey: kubernetes.io/hostname
+
+#
+# FLYTEPROPELLER
+#
+
+flytepropeller:
+  replicaCount: 2
+  image:
+    repository: docker.io/lyft/flytepropeller
+    tag: v0.4.2
+    pullPolicy: IfNotPresent
+
+  # IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+  serviceAccountAnnotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 200Mi
+      memory: 500Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 200Mi
+      memory: 200Mi
+  configPath: /etc/flyte/config*/*.yaml
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flytepropeller
+          topologyKey: kubernetes.io/hostname
+
+#
+# FLYTECONSOLE
+#
+
+flyteconsole:
+  replicaCount: 2
+  image:
+    repository: docker.io/lyft/flyteconsole
+    tag: v0.12.1
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 250m
+      memory: 250Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flyteconsole
+          topologyKey: kubernetes.io/hostname
+
+#
+# REDIS
+#
+
+redis:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: docker.io/bitnami/redis
+    tag: 4.0.2-r1
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 100m
+      memory: 250Mi
+
+#
+# POSTGRES
+#
+
+postgres:
+  enabled: false  # recommended adding managed RDS host to the config
+
+#
+# MINIO
+#
+
+minio:
+  enabled: false  # Use AWS S3 bucket instead
+
+#
+# CONTOUR
+#
+
+contour:
+  enabled: true
+  replicaCount: 2
+  contour:
+    image:
+      repository: gcr.io/heptio-images/contour
+      tag: v0.6.1
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 2000m
+        memory: 1000Mi
+  envoy:
+    image:
+      repository: docker.io/envoyproxy/envoy-alpine
+      tag: v1.6.0
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 2000m
+        memory: 1000Mi
+
+  service:
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: flyte.examlple.com
+      service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:<ACCOUNT-NUMBER>:certificate/<CERT-ARN>"
+      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+      service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "443"
+    type: LoadBalancer
+    ports:
+    - name: tcp
+      protocol: TCP
+      port: 80
+    - name: tls
+      protocol: TCP
+      port: 443
+      targetPort: 80
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: contour
+          topologyKey: kubernetes.io/hostname
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: gcr.io/spark-operator/spark-operator
+    tag: v2.4.0-v1beta1-0.9.0
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: gcr.io/kubeflow-images-public/pytorch-operator
+    tag: v1.0.0-g047cf0f
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+#
+# COMMON
+#
+
+common:
+  databaseSecret:
+    name: db-pass
+    secretManifest:
+      # # Leave it empty if your secret already exists
+
+      # # Else you can create your own secret object: 
+      # # Necessary dependencies:
+      # # - https://github.com/hashicorp/vault
+      # # - https://github.com/godaddy/kubernetes-external-secrets
+
+      # apiVersion: kubernetes-client.io/v1
+      # kind: ExternalSecret
+      # metadata:
+      #   name: db-pass
+      #   namespace: flyte
+      # spec:
+      #   backendType: vault
+      #   vaultMountPoint: <MOUNT_PATH>
+      #   vaultRole: <VAULT-ROLE>
+      #   data:
+      #   - name: pass.txt
+      #     key: k8s/data/path/to/secret
+      #     property: password
+
+#
+# CONFIGMAPS
+#
+
+configmap:
+
+  console:
+    BASE_URL: /console
+    CONFIG_DIR: /etc/flyte/config
+
+  cluster_resources:
+    cluster_resources:
+      templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        production:
+          - projectQuotaCpu:
+              value: "5"
+          - projectQuotaMemory:
+              value: "4000Mi"
+        staging:
+          - projectQuotaCpu:
+              value: "2"
+          - projectQuotaMemory:
+              value: "3000Mi"
+        development:
+          - projectQuotaCpu:
+              value: "4"
+          - projectQuotaMemory:
+              value: "3000Mi"
+      refresh: 5m
+
+  db:
+    database:
+      port: 5432
+      username: postgres
+      host: <DB-NAME>
+      dbname: flyte-development
+      passwordPath: /etc/db/pass.txt
+
+  domain:
+    domains:
+    - id: development
+      name: development
+    - id: staging
+      name: staging
+    - id: production
+      name: production
+
+  remote_data:
+    remoteData:
+      region: us-east-1
+      scheme: aws
+      signedUrls:
+        durationMinutes: 3
+
+  server:
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      security:
+        secure: false
+        useAuth: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+    flyteadmin:
+      roleNameKey: "iam.amazonaws.com/role"
+      profilerPort: 10254
+      metricsScope: "flyte:"
+      metadataStoragePrefix:
+        - "metadata"
+        - "admin"
+      testing:
+        host: http://flyteadmin
+    scheduler:
+      eventScheduler:
+        scheme: aws
+        region: us-east-1
+        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:us-east-1:<ACCOUNT-NUMBER>:flyte-cron-scheduler-queue
+        scheduleNamePrefix: flyte
+      workflowExecutor:
+        scheme: aws
+        region: us-east-1
+        scheduleQueueName: flyte-cron-scheduler-queue
+        accountId: <ACCOUNT-NUMBER>
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30
+    notifications:
+      type: aws
+      region: us-east-1
+      publisher:
+        topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
+      processor:
+        queueName: flyte-notifications-queue
+        accountId: <ACCOUNT-NUMBER>
+      emailer:
+        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+        sender:  "flyte@example.com"
+        body: |
+          Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+          Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+          {{ error }}
+    task_type_whitelist:
+      spark:
+        - project: flytetester
+        - project: spark-workflows
+  
+      
+  datacatalogServer:
+    datacatalog:
+      storage-prefix: metadata/datacatalog
+      metrics-scope: datacatalog
+      profiler-port: 10254
+
+  storage:
+    storage:
+      type: s3
+      container: s3-bucket-for-flyte
+      connection:
+        auth-type: iam
+        region: us-east-1
+
+  task_resource_defaults:
+    task_resources:
+      defaults:
+        cpu: 100m
+        memory: 1000Mi
+        storage: 5Mi
+      limits:
+        cpu: 15000m
+        memory: 100Gi
+        storage: 400Gi
+
+  admin:
+    event:
+      type: admin
+      rate: 500
+      capacity: 1000
+    admin:
+      endpoint: flyteadmin:81
+      insecure: true
+
+  catalog:
+    catalog-cache:
+      endpoint: datacatalog:89
+      type: datacatalog
+      insecure: true
+
+  catalog_cache:
+    plugins:
+      catalogCache:
+        reader:
+          maxItems: 10000
+        writer:
+          maxItems: 10000
+
+  copilot:
+    plugins:
+      k8s:
+        co-pilot:
+          name: flyte-copilot-
+          image: docker.io/lyft/flytecopilot:v0.3.35
+          start-timeout: 30s
+
+  core:
+    propeller:
+      rawoutput-prefix: s3://s3-bucket-for-flyte/
+      metadata-prefix: metadata/propeller
+      workers: 40
+      gc-interval: 12h
+      max-workflow-retries: 50
+      workflow-reeval-duration: 30s
+      downstream-eval-duration: 30s
+      limit-namespace: "all"
+      prof-port: 10254
+      metrics-prefix: flyte
+      enable-admin-launcher: true
+      leader-election:
+        lock-config-map:
+          name: propeller-leader
+          namespace: flyte
+        enabled: true
+        lease-duration: 15s
+        renew-deadline: 10s
+        retry-period: 2s
+      kube-client-config:
+        qps: 100
+        burst: 25
+        timeout: 30s
+      queue:
+        type: batch
+        batching-interval: 2s
+        batch-size: -1
+        queue:
+          type: maxof
+          rate: 100
+          capacity: 1000
+          base-delay: 5s
+          max-delay: 120s
+        sub-queue:
+          type: bucket
+          rate: 100
+          capacity: 1000
+      workflowStore:
+        policy: "ResourceVersionCache"
+
+  enabled_plugins:
+    tasks:
+      max-plugin-phase-versions: 1000000
+      task-plugins:
+        enabled-plugins:
+          - container
+          - sidecar
+          - spark
+          - k8s-array
+          - pytorch
+
+  k8s:
+    plugins:
+      k8s:
+        default-cpus: 100m
+        default-memory: 100Mi
+  
+  logger:
+    logger:
+      show-source: true
+      level: 5
+
+  qubole:
+    plugins:
+      qubole:
+        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
+
+  resource_manager:
+    propeller:
+      resourcemanager:
+        type: redis
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: redis-resource-manager:6379
+          hostKey: mypassword
+
+  spark:
+    plugins:
+      spark:
+        spark-config-default:
+          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+          - spark.kubernetes.allocation.batch.size: "50"
+          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+          - spark.blacklist.enabled: "true"
+          - spark.blacklist.timeout: "5m"
+          - spark.task.maxfailures: "8"
+
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: false
+
+  aa_namespace: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+
+  ab_project_resource_quota: |
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }} 
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }} 
+        limits.memory: {{ projectQuotaMemory }}
+
+  ac_project_copilot_dataconfig: |
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: flyte-data-config
+      namespace: {{ namespace }}
+    data:
+      config.yaml: |
+        storage:
+          connection:
+            auth-type: iam
+            region: us-east-1
+          type: s3
+          container: my-s3-bucket
+          enable-multicontainer: true
+
+  ad_spark_role: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: Role
+    metadata:
+      name: spark-role
+      namespace: {{ namespace }}
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - services
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - '*'
+
+  ae_spark_service_account: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: spark
+      namespace: {{ namespace }}
+
+  af_spark_role_binding: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: RoleBinding
+    metadata:
+      name: spark-role-binding
+      namespace: {{ namespace }} 
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: spark-role
+    subjects:
+    - kind: ServiceAccount
+      name: spark
+      namespace: {{ namespace }}

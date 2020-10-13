@@ -1,0 +1,40 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "flyte.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  {{- with .Values.common.ingressAnnotations }}
+  annotations: {{ toYaml . | nindent 4}}
+  {{- end }}
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /console
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /__webpack_hmr
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /api
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /healthcheck
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /v1
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 81
+        path: /flyteidl.service.AdminService
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 87
+        path: /openapi
