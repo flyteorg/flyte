@@ -1,0 +1,146 @@
+
+#
+# FLYTEADMIN
+#
+
+flyteadmin: {} # use default config
+
+#
+# DATACATALOG
+#
+
+datacatalog: {}
+
+#
+# FLYTEPROPELLER
+#
+
+flytepropeller: {}
+
+#
+# FLYTECONSOLE
+#
+
+flyteconsole: {}
+
+#
+# REDIS
+#
+
+redis: {}
+
+#
+# POSTGRES
+#
+
+postgres: {}
+
+#
+# MINIO
+#
+
+minio: {}
+
+#
+# CONTOUR
+#
+
+contour: {}
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator: {}
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator: {}
+
+#
+# COMMON
+#
+
+common: {}
+
+#
+# CONFIGMAPS
+#
+
+configmap:
+
+  db:
+    database:
+      port: 5432
+      username: postgres
+      host: postgres
+      dbname: flyte
+
+  storage:
+    storage:
+      type: minio
+      container: my-s3-bucket
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        secret-key: miniostorage
+        disable-ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
+        region: us-east-1
+
+  enabled_plugins:
+    tasks:
+      max-plugin-phase-versions: 1000000
+      task-plugins:
+        enabled-plugins:
+        - container
+        - sidecar
+        - spark
+        - k8s-array
+        - pytorch
+
+  k8s:
+    plugins:
+      k8s:
+        default-env-vars:
+        - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
+        - FLYTE_AWS_ACCESS_KEY_ID: minio
+        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+  
+  logger:
+    logger:
+      show-source: true
+      level: 5
+
+  ab_project_resource_quota: |
+    apiVersion: v1
+    kind: ResourceQuota
+    metadata:
+      name: project-quota
+      namespace: {{ namespace }} 
+    spec:
+      hard:
+        limits.cpu: {{ projectQuotaCpu }} 
+        limits.memory: {{ projectQuotaMemory }}
+
+  ac_project_copilot_dataconfig: |
+    kind: ConfigMap
+    apiVersion: v1
+    metadata:
+      name: flyte-data-config
+      namespace: {{ namespace }}
+    data:
+      config.yaml: |
+        storage:
+          connection:
+            access-key: minio
+            auth-type: accesskey
+            disable-ssl: true
+            endpoint: http://minio.flyte.svc.cluster.local:9000
+            region: us-east-1
+            secret-key: miniostorage
+          type: minio
+          container: my-s3-bucket
+          enable-multicontainer: true

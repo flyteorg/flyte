@@ -1,0 +1,550 @@
+
+#
+# FLYTEADMIN
+#
+
+flyteadmin:
+  replicaCount: 1
+  image:
+    repository: docker.io/lyft/flyteadmin
+    tag: v0.3.7
+    pullPolicy: IfNotPresent
+  serviceAccountAnnotations: {}
+  resources:
+    limits:
+      cpu: 250m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  configPath: /etc/flyte/config/*.yaml
+  service:
+    annotations:
+      contour.heptio.com/upstream-protocol.h2c: grpc
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# DATACATALOG
+#
+
+datacatalog:
+  replicaCount: 1
+  image:
+    repository: docker.io/lyft/datacatalog
+    tag: v0.2.2
+    pullPolicy: IfNotPresent
+  serviceAccountAnnotations: {}
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 100Mi
+      memory: 500Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  configPath: /etc/datacatalog/config/*.yaml
+  service:
+    annotations:
+      contour.heptio.com/upstream-protocol.h2c: grpc
+    type: NodePort
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# FLYTEPROPELLER
+#
+
+flytepropeller:
+  replicaCount: 1
+  image:
+    repository: docker.io/lyft/flytepropeller
+    tag: v0.4.2
+    pullPolicy: IfNotPresent
+  serviceAccountAnnotations: {}
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 100Mi
+      memory: 200Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 50Mi
+  configPath: /etc/flyte/config/*.yaml
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# FLYTECONSOLE
+#
+
+flyteconsole:
+  replicaCount: 1
+  image:
+    repository: docker.io/lyft/flyteconsole
+    tag: v0.12.1
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 250Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+  service: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# REDIS
+#
+
+redis:
+  enabled: true   # Set false to define malternative redis
+  replicaCount: 1
+  image:
+    repository: docker.io/bitnami/redis
+    tag: 4.0.2-r1
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 10m
+      memory: 50Mi
+  service: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# POSTGRES
+#
+
+postgres:
+  enabled: true   # Set false if you are going to use RDS
+  replicaCount: 1
+  image:
+    repository: postgres
+    tag: "10.1"
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+  service: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# MINIO
+#
+
+minio:
+  enabled: true   # Set false if you'd like using S3
+  replicaCount: 1
+  image:
+    repository: minio/minio
+    tag: RELEASE.2019-06-04T01-15-58Z
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+  service: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# CONTOUR
+#
+
+contour:
+  enabled: true   # Set false if you have alternative ingress controller like Istio or Ingress-Nginx
+  replicaCount: 1
+  contour:
+    image:
+      repository: gcr.io/heptio-images/contour
+      tag: v0.6.1
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 100m
+        memory: 100Mi
+  envoy:
+    image:
+      repository: docker.io/envoyproxy/envoy-alpine
+      tag: v1.6.0
+      pullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 10m
+        memory: 50Mi
+      limits:
+        cpu: 100m
+        memory: 100Mi
+  service:
+    annotations:
+    type: NodePort
+    ports:
+    - protocol: TCP
+      port: 80
+      nodePort: 30081
+  serviceAccountAnnotations: {}
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator:
+  enabled: true   # Set false to disable
+  replicaCount: 1
+  image:
+    repository: gcr.io/spark-operator/spark-operator
+    tag: v2.4.0-v1beta1-0.9.0
+    pullPolicy: IfNotPresent
+  serviceAccountAnnotations: {}
+  securityContext: {}
+  service: {}
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 500M
+    requests:
+      cpu: 10m
+      memory: 50M
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: true   # Set false to disable
+  replicaCount: 1
+  image:
+    repository: gcr.io/kubeflow-images-public/pytorch-operator
+    tag: v1.0.0-g047cf0f
+    pullPolicy: IfNotPresent
+  serviceAccountAnnotations: {}
+  service: {}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1000M
+    requests:
+      cpu: 10m
+      memory: 50M
+  podAnnotations: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+#
+# COMMON
+#
+
+common:
+  databaseSecret:
+    create: false
+    name: 
+  ingressAnnotations: {}
+    # nginx.ingress.kubernetes.io/ssl-redirect: "false"
+
+#
+# CONFIGMAPS
+#
+
+configmap:
+
+  console:
+    BASE_URL: /console
+    CONFIG_DIR: /etc/flyte/config
+
+  cluster_resources:
+    cluster_resources:
+      templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        production:
+          - projectQuotaCpu:
+              value: "5"
+          - projectQuotaMemory:
+              value: "4000Mi"
+        staging:
+          - projectQuotaCpu:
+              value: "2"
+          - projectQuotaMemory:
+              value: "3000Mi"
+        development:
+          - projectQuotaCpu:
+              value: "4"
+          - projectQuotaMemory:
+              value: "3000Mi"
+      refresh: 5m
+
+  db:
+    database: {}
+
+  domain:
+    domains:
+    - id: development
+      name: development
+    - id: staging
+      name: staging
+    - id: production
+      name: production
+
+  remote_data:
+    remoteData:
+      region: us-east-1
+      scheme: local
+      signedUrls:
+        durationMinutes: 3
+
+  server:
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      security:
+        secure: false
+        useAuth: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+    flyteadmin:
+      roleNameKey: "iam.amazonaws.com/role"
+      profilerPort: 10254
+      metricsScope: "flyte:"
+      metadataStoragePrefix:
+        - "metadata"
+        - "admin"
+      testing:
+        host: http://flyteadmin
+  
+  datacatalogServer:
+    datacatalog:
+      storage-prefix: metadata/datacatalog
+      metrics-scope: datacatalog
+      profiler-port: 10254
+
+  storage:
+    storage:
+      type: minio
+      container: my-s3-bucket
+      connection:
+        auth-type: accesskey
+        region: us-east-1
+
+  task_resource_defaults:
+    task_resources:
+      defaults:
+        cpu: 100m
+        memory: 1000Mi
+        storage: 5Mi
+      limits:
+        cpu: 15000m
+        memory: 100Gi
+        storage: 400Gi
+
+  admin:
+    event:
+      type: admin
+      rate: 500
+      capacity: 1000
+    admin:
+      endpoint: flyteadmin:81
+      insecure: true
+
+  catalog:
+    catalog-cache:
+      endpoint: datacatalog:89
+      type: datacatalog
+      insecure: true
+
+  catalog_cache:
+    plugins:
+      catalogCache:
+        reader:
+          maxItems: 10000
+        writer:
+          maxItems: 10000
+
+  copilot:
+    plugins:
+      k8s:
+        co-pilot:
+          name: flyte-copilot-
+          image: docker.io/lyft/flytecopilot:v0.3.35
+          start-timeout: 30s
+
+  core:
+    propeller:
+      rawoutput-prefix: s3://my-s3-bucket/
+      metadata-prefix: metadata/propeller
+      workers: 4
+      max-workflow-retries: 30
+      workflow-reeval-duration: 30s
+      downstream-eval-duration: 30s
+      limit-namespace: "all"
+      prof-port: 10254
+      metrics-prefix: flyte
+      enable-admin-launcher: true
+      leader-election:
+        lock-config-map:
+          name: propeller-leader
+          namespace: flyte
+        enabled: true
+        lease-duration: 15s
+        renew-deadline: 10s
+        retry-period: 2s
+      queue:
+        type: batch
+        batching-interval: 2s
+        batch-size: -1
+        queue:
+          type: bucket
+          rate: 10
+          capacity: 100
+        sub-queue:
+          type: bucket
+          rate: 10
+          capacity: 100
+
+  enabled_plugins:
+    tasks:
+      max-plugin-phase-versions: 1000000
+      task-plugins:
+        enabled-plugins: []
+
+  k8s:
+    plugins:
+      k8s:
+        default-cpus: 100m
+        default-memory: 100Mi
+  
+  logger:
+    logger:
+      show-source: true
+      level: 4
+
+  qubole:
+    plugins:
+      qubole:
+        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
+
+  resource_manager:
+    propeller:
+      resourcemanager:
+        type: redis
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: redis-resource-manager:6379
+          hostKey: mypassword
+
+  spark:
+    plugins:
+      spark:
+        spark-config-default:
+          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+          - spark.kubernetes.allocation.batch.size: "50"
+          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+          - spark.blacklist.enabled: "true"
+          - spark.blacklist.timeout: "5m"
+          - spark.task.maxfailures: "8"
+
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: true
+
+  aa_namespace: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: {{ namespace }}
+    spec:
+      finalizers:
+      - kubernetes
+
+  ad_spark_role: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: Role
+    metadata:
+      name: spark-role
+      namespace: {{ namespace }}
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - services
+      verbs:
+      - '*'
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - '*'
+
+  ae_spark_service_account: |
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: spark
+      namespace: {{ namespace }}
+
+  af_spark_role_binding: |
+    apiVersion: rbac.authorization.k8s.io/v1beta1
+    kind: RoleBinding
+    metadata:
+      name: spark-role-binding
+      namespace: {{ namespace }} 
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: spark-role
+    subjects:
+    - kind: ServiceAccount
+      name: spark
+      namespace: {{ namespace }}
