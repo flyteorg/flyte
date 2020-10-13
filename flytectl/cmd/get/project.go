@@ -3,6 +3,7 @@ package get
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flytestdlib/logger"
 
@@ -17,6 +18,14 @@ var projectColumns = []printer.Column{
 	{"Description", "$.description"},
 }
 
+func ProjectToProtoMessages(l []*admin.Project) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
+}
+
 func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	adminPrinter := printer.Printer{}
 
@@ -29,7 +38,7 @@ func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
 		for _, v := range projects.Projects {
 			if v.Name == name {
-				err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), v, projectColumns)
+				err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, v)
 				if err != nil {
 					return err
 				}
@@ -43,5 +52,5 @@ func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		return err
 	}
 	logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), projects.Projects, projectColumns)
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, ProjectToProtoMessages(projects.Projects)...)
 }
