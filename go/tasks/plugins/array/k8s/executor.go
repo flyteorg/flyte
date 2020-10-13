@@ -3,10 +3,14 @@ package k8s
 import (
 	"context"
 
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/promutils"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
@@ -23,6 +27,24 @@ type Executor struct {
 	kubeClient       core.KubeClient
 	outputsAssembler array.OutputAssembler
 	errorAssembler   array.OutputAssembler
+}
+
+type KubeClientObj struct {
+	client client.Client
+}
+
+func (k KubeClientObj) GetClient() client.Client {
+	return k.client
+}
+
+func (k KubeClientObj) GetCache() cache.Cache {
+	return nil
+}
+
+func NewKubeClientObj(c client.Client) core.KubeClient {
+	return &KubeClientObj{
+		client: c,
+	}
 }
 
 func NewExecutor(kubeClient core.KubeClient, cfg *Config, scope promutils.Scope) (Executor, error) {
@@ -77,11 +99,15 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		fallthrough
 
 	case arrayCore.PhaseLaunch:
-		nextState, err = LaunchSubTasks(ctx, tCtx, e.kubeClient, pluginConfig, pluginState)
+		// In order to maintain backwards compatibility with the state transitions
+		// in the aws batch plugin. Forward to PhaseCheckingSubTasksExecutions where the launching
+		// is actually occurring.
+		nextState = pluginState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, core.DefaultPhaseVersion).SetReason("Nothing to do in Launch phase.")
+		err = nil
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
-		nextState, logLinks, err = CheckSubTasksState(ctx, tCtx, e.kubeClient, tCtx.DataStore(),
-			tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), pluginState)
+		nextState, logLinks, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
+			tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), pluginState)
 
 	case arrayCore.PhaseAssembleFinalOutput:
 		nextState, err = array.AssembleFinalOutputs(ctx, e.outputsAssembler, tCtx, arrayCore.PhaseSuccess, pluginState)
@@ -128,8 +154,7 @@ func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
 	}
 
-	return TerminateSubTasks(ctx, tCtx.TaskExecutionMetadata(), e.kubeClient, pluginConfig.MaxErrorStringLength,
-		pluginState)
+	return TerminateSubTasks(ctx, tCtx, e.kubeClient, pluginConfig, pluginState)
 }
 
 func (e Executor) Start(ctx context.Context) error {
@@ -155,13 +180,34 @@ func init() {
 }
 
 func GetNewExecutorPlugin(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
-	exec, err := NewExecutor(iCtx.KubeClient(), GetConfig(), iCtx.MetricsScope())
+	var kubeClient core.KubeClient
+	remoteClusterConfig := GetConfig().RemoteClusterConfig
+	if remoteClusterConfig.Enabled {
+		client, err := GetK8sClient(remoteClusterConfig)
+		if err != nil {
+			return nil, err
+		}
+		kubeClient = NewKubeClientObj(client)
+	} else {
+		kubeClient = iCtx.KubeClient()
+	}
+	exec, err := NewExecutor(kubeClient, GetConfig(), iCtx.MetricsScope())
 	if err != nil {
 		return nil, err
 	}
 
 	if err = exec.Start(ctx); err != nil {
 		return nil, err
+	}
+
+	resourceConfig := GetConfig().ResourceConfig
+	if IsResourceConfigSet(resourceConfig) {
+		primaryLabel := resourceConfig.PrimaryLabel
+		limit := resourceConfig.Limit
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, core.ResourceNamespace(primaryLabel), limit); err != nil {
+			logger.Errorf(ctx, "Token Resource registration for [%v] failed due to error [%v]", primaryLabel, err)
+			return nil, err
+		}
 	}
 
 	return exec, nil

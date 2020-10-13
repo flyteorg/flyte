@@ -165,6 +165,182 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_resourceConfig.primaryLabel", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("resourceConfig.primaryLabel"); err == nil {
+				assert.Equal(t, string(defaultConfig.ResourceConfig.PrimaryLabel), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("resourceConfig.primaryLabel", testValue)
+			if vString, err := cmdFlags.GetString("resourceConfig.primaryLabel"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ResourceConfig.PrimaryLabel)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_resourceConfig.limit", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("resourceConfig.limit"); err == nil {
+				assert.Equal(t, int(defaultConfig.ResourceConfig.Limit), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("resourceConfig.limit", testValue)
+			if vInt, err := cmdFlags.GetInt("resourceConfig.limit"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ResourceConfig.Limit)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.name", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.name"); err == nil {
+				assert.Equal(t, string(defaultConfig.RemoteClusterConfig.Name), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.name", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.name"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Name)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.endpoint", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.endpoint"); err == nil {
+				assert.Equal(t, string(defaultConfig.RemoteClusterConfig.Endpoint), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.endpoint", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.endpoint"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Endpoint)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.auth.type", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.auth.type"); err == nil {
+				assert.Equal(t, string(defaultConfig.RemoteClusterConfig.Auth.Type), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.auth.type", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.auth.type"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Auth.Type)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.auth.tokenPath", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.auth.tokenPath"); err == nil {
+				assert.Equal(t, string(defaultConfig.RemoteClusterConfig.Auth.TokenPath), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.auth.tokenPath", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.auth.tokenPath"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Auth.TokenPath)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.auth.certPath", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.auth.certPath"); err == nil {
+				assert.Equal(t, string(defaultConfig.RemoteClusterConfig.Auth.CertPath), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.auth.certPath", testValue)
+			if vString, err := cmdFlags.GetString("remoteClusterConfig.auth.certPath"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.RemoteClusterConfig.Auth.CertPath)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_remoteClusterConfig.enabled", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("remoteClusterConfig.enabled"); err == nil {
+				assert.Equal(t, bool(defaultConfig.RemoteClusterConfig.Enabled), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("remoteClusterConfig.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("remoteClusterConfig.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.RemoteClusterConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_OutputAssembler.workers", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly

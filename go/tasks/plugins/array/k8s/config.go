@@ -5,10 +5,16 @@
 package k8s
 
 import (
-	v1 "k8s.io/api/core/v1"
+	"fmt"
+	"io/ioutil"
 
+	"github.com/pkg/errors"
+	v1 "k8s.io/api/core/v1"
+	restclient "k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/lyft/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -31,14 +37,80 @@ var (
 		},
 	}
 
-	configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
+	configSection = pluginsConfig.MustRegisterSubSection(configSectionKey, defaultConfig)
 )
+
+type ResourceConfig struct {
+	PrimaryLabel string `json:"primaryLabel" pflag:",PrimaryLabel of a given service cluster"`
+	Limit        int    `json:"limit" pflag:",Resource quota (in the number of outstanding requests) for the cluster"`
+}
+
+type ClusterConfig struct {
+	Name     string `json:"name" pflag:",Friendly name of the remote cluster"`
+	Endpoint string `json:"endpoint" pflag:", Remote K8s cluster endpoint"`
+	Auth     Auth   `json:"auth" pflag:"-, Auth setting for the cluster"`
+	Enabled  bool   `json:"enabled" pflag:", Boolean flag to enable or disable"`
+}
+
+type Auth struct {
+	Type      string `json:"type" pflag:", Authentication type"`
+	TokenPath string `json:"tokenPath" pflag:", Token path"`
+	CertPath  string `json:"certPath" pflag:", Certificate path"`
+}
+
+func (auth Auth) GetCA() ([]byte, error) {
+	cert, err := ioutil.ReadFile(auth.CertPath)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read k8s CA cert from configured path")
+	}
+	return cert, nil
+}
+
+func (auth Auth) GetToken() (string, error) {
+	token, err := ioutil.ReadFile(auth.TokenPath)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to read k8s bearer token from configured path")
+	}
+	return string(token), nil
+}
+
+// TODO: Move logic to flytestdlib
+// Reads secret values from paths specified in the config to initialize a Kubernetes rest client Config.
+func RemoteClusterConfig(host string, auth Auth) (*restclient.Config, error) {
+	tokenString, err := auth.GetToken()
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to get auth token: %+v", err))
+	}
+
+	caCert, err := auth.GetCA()
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Failed to get auth CA: %+v", err))
+	}
+
+	tlsClientConfig := restclient.TLSClientConfig{}
+	tlsClientConfig.CAData = caCert
+	return &restclient.Config{
+		Host:            host,
+		TLSClientConfig: tlsClientConfig,
+		BearerToken:     tokenString,
+	}, nil
+}
+
+func GetK8sClient(config ClusterConfig) (client.Client, error) {
+	kubeConf, err := RemoteClusterConfig(config.Endpoint, config.Auth)
+	if err != nil {
+		return nil, err
+	}
+	return client.New(kubeConf, client.Options{})
+}
 
 // Defines custom config for K8s Array plugin
 type Config struct {
 	DefaultScheduler     string            `json:"scheduler" pflag:",Decides the scheduler to use when launching array-pods."`
-	MaxErrorStringLength int               `json:"maxErrLength" pflag:",Determines the maximum length of the error string returned for the array."`
+	MaxErrorStringLength int               `json:"maxErrorLength" pflag:",Determines the maximum length of the error string returned for the array."`
 	MaxArrayJobSize      int64             `json:"maxArrayJobSize" pflag:",Maximum size of array job."`
+	ResourceConfig       ResourceConfig    `json:"resourceConfig" pflag:"-,ResourceConfiguration to limit number of resources used by k8s-array."`
+	RemoteClusterConfig  ClusterConfig     `json:"remoteClusterConfig" pflag:"-,Configuration of remote K8s cluster for array jobs"`
 	NodeSelector         map[string]string `json:"node-selector" pflag:"-,Defines a set of node selector labels to add to the pod."`
 	Tolerations          []v1.Toleration   `json:"tolerations"  pflag:"-,Tolerations to be applied for k8s-array pods"`
 	OutputAssembler      workqueue.Config
@@ -47,4 +119,9 @@ type Config struct {
 
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
+}
+
+func IsResourceConfigSet(resourceConfig ResourceConfig) bool {
+	emptyResouceConfig := ResourceConfig{}
+	return resourceConfig != emptyResouceConfig
 }
