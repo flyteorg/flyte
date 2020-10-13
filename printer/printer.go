@@ -7,8 +7,11 @@ import (
 	"os"
 
 	"github.com/ghodss/yaml"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/kataras/tablewriter"
 	"github.com/landoop/tableprinter"
+	"github.com/lyft/flytestdlib/errors"
 	"github.com/yalp/jsonpath"
 )
 
@@ -62,24 +65,23 @@ func extractRow(data interface{}, columns []Column) []string {
 // Potential performance problem, as it returns all the rows in memory.
 // We could use the render row, but that may lead to misalignment.
 // TODO figure out a more optimal way
-func projectColumns(input []interface{}, column []Column) ([][]string, error) {
-	responses := make([][]string, 0, len(input))
-	for _, data := range input {
-		responses = append(responses, extractRow(data, column))
+func projectColumns(rows []interface{}, column []Column) ([][]string, error) {
+	responses := make([][]string, 0, len(rows))
+	for _, row := range rows {
+		responses = append(responses, extractRow(row, column))
 	}
 	return responses, nil
 }
 
-func JSONToTable(b []byte, columns []Column) error {
-	var jsonRows []interface{}
-	err := json.Unmarshal(b, &jsonRows)
-	if err != nil {
-		return err
+func JSONToTable(jsonRows []byte, columns []Column) error {
+	var rawRows []interface{}
+	if err := json.Unmarshal(jsonRows, &rawRows); err != nil {
+		return errors.Wrapf("JSONUnmarshalFailure", err, "failed to unmarshal into []interface{} from json")
 	}
-	if jsonRows == nil {
-		return nil
+	if rawRows == nil {
+		return errors.Errorf("JSONUnmarshalNil", "expected one row or empty rows, received nil")
 	}
-	rows, err := projectColumns(jsonRows, columns)
+	rows, err := projectColumns(rawRows, columns)
 	if err != nil {
 		return err
 	}
@@ -103,29 +105,60 @@ func JSONToTable(b []byte, columns []Column) error {
 	return nil
 }
 
-func (p Printer) Print(format OutputFormat, i interface{}, columns []Column) error {
+func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.Message) error {
 
-	buf := new(bytes.Buffer)
-	encoder := json.NewEncoder(buf)
-	encoder.SetIndent(empty, tab)
-
-	err := encoder.Encode(i)
-	if err != nil {
-		return err
+	printableMessages := make([]*PrintableProto, 0, len(messages))
+	for _, m := range messages {
+		printableMessages = append(printableMessages, &PrintableProto{Message: m})
 	}
 
 	// Factory Method for all printer
 	switch format {
-	case OutputFormatJSON: // Print protobuf to json
-		fmt.Println(buf.String())
-	case OutputFormatYAML:
-		v, err := yaml.JSONToYAML(buf.Bytes())
+	case OutputFormatJSON, OutputFormatYAML: // Print protobuf to json
+		buf := new(bytes.Buffer)
+		encoder := json.NewEncoder(buf)
+		encoder.SetIndent(empty, tab)
+		var err error
+		if len(printableMessages) == 1 {
+			err = encoder.Encode(printableMessages[0])
+		} else {
+			err = encoder.Encode(printableMessages)
+		}
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(v))
+		if format == OutputFormatJSON {
+			fmt.Println(buf.String())
+		} else {
+			v, err := yaml.JSONToYAML(buf.Bytes())
+			if err != nil {
+				return err
+			}
+			fmt.Println(string(v))
+		}
 	default: // Print table
-		return JSONToTable(buf.Bytes(), columns)
+		rows, err := json.Marshal(printableMessages)
+		if err != nil {
+			return errors.Wrapf("ProtoToJSONFailure", err, "failed to marshal proto messages")
+		}
+		return JSONToTable(rows, columns)
 	}
 	return nil
+}
+
+type PrintableProto struct {
+	proto.Message
+}
+
+var marshaller = jsonpb.Marshaler{
+	Indent: tab,
+}
+
+func (p PrintableProto) MarshalJSON() ([]byte, error) {
+	buf := new(bytes.Buffer)
+	err := marshaller.Marshal(buf, p.Message)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }

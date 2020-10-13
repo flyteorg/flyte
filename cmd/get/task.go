@@ -3,6 +3,7 @@ package get
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flytectl/adminutils"
@@ -19,7 +20,16 @@ var taskColumns = []printer.Column{
 	{"Name", "$.id.name"},
 	{"Type", "$.closure.compiledTask.template.type"},
 	{"Discoverable", "$.closure.compiledTask.template.metadata.discoverable"},
-	{"DiscoveryVersion", "$.closure.compiledTask.template.metadata.discovery_version"},
+	{"Discovery Version", "$.closure.compiledTask.template.metadata.discoveryVersion"},
+	{"Created At", "$.closure.createdAt"},
+}
+
+func TaskToProtoMessages(l []*admin.Task) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
 }
 
 func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
@@ -33,19 +43,24 @@ func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 				Domain:  config.GetConfig().Domain,
 				Name:    args[0],
 			},
-			Limit: 1,
+			// TODO Sorting and limits should be parameters
+			SortBy: &admin.Sort{
+				Key: "created_at",
+				Direction: admin.Sort_DESCENDING,
+			},
+			Limit: 100,
 		})
 		if err != nil {
 			return err
 		}
 		logger.Debugf(ctx, "Retrieved Task", task.Tasks)
 
-		return taskPrinter.Print(config.GetConfig().MustOutputFormat(), task.Tasks, taskColumns)
+		return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(task.Tasks)...)
 	}
 	tasks, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListTaskIds, adminutils.ListRequest{Project: config.GetConfig().Project, Domain: config.GetConfig().Domain})
 	if err != nil {
 		return err
 	}
 	logger.Debugf(ctx, "Retrieved %v Task", len(tasks))
-	return taskPrinter.Print(config.GetConfig().MustOutputFormat(), tasks, entityColumns)
+	return taskPrinter.Print(config.GetConfig().MustOutputFormat(), entityColumns, adminutils.NamedEntityToProtoMessage(tasks)...)
 }

@@ -3,6 +3,7 @@ package get
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytestdlib/logger"
 
 	"github.com/lyft/flytectl/adminutils"
@@ -16,6 +17,15 @@ import (
 var workflowColumns = []printer.Column{
 	{"Version", "$.id.version"},
 	{"Name", "$.id.name"},
+	{"Created At", "$.closure.createdAt"},
+}
+
+func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
 }
 
 func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
@@ -27,14 +37,19 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 				Domain:  config.GetConfig().Domain,
 				Name:    args[0],
 			},
-			Limit: 1,
+			// TODO Sorting and limits should be parameters
+			SortBy: &admin.Sort{
+				Key: "created_at",
+				Direction: admin.Sort_DESCENDING,
+			},
+			Limit: 100,
 		})
 		if err != nil {
 			return err
 		}
 		logger.Debugf(ctx, "Retrieved %v workflows", len(workflows.Workflows))
 
-		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflows.Workflows, workflowColumns)
+		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToProtoMessages(workflows.Workflows)...)
 	}
 
 	workflows, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListWorkflowIds, adminutils.ListRequest{Project: config.GetConfig().Project, Domain: config.GetConfig().Domain})
@@ -42,5 +57,5 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		return err
 	}
 	logger.Debugf(ctx, "Retrieved %v workflows", len(workflows))
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflows, entityColumns)
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), entityColumns, adminutils.NamedEntityToProtoMessage(workflows)...)
 }

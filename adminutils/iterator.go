@@ -3,6 +3,7 @@ package adminutils
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc"
 )
@@ -59,4 +60,12 @@ func GetAllNamedEntities(ctx context.Context, lister NamedEntityIDLister, req Li
 		return nil, err
 	}
 	return allEntities, nil
+}
+
+func NamedEntityToProtoMessage(l []*admin.NamedEntityIdentifier) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
 }
