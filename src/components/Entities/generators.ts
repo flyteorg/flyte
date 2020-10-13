@@ -15,7 +15,7 @@ export const executionFilterGenerator: {
     [ResourceType.LAUNCH_PLAN]: noFilters,
     [ResourceType.TASK]: ({ name }) => [
         {
-            key: 'launch_plan.name',
+            key: 'task.name',
             operation: FilterOperationName.EQ,
             value: name
         }
