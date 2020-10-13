@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-admin-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data:
+  cluster_resources.yaml: | {{ toYaml .Values.configmap.cluster_resources | nindent 4 }}
+
+  db.yaml: | {{ toYaml .Values.configmap.db | nindent 4 }}
+
+  domain.yaml: | {{ toYaml .Values.configmap.domain | nindent 4 }}
+
+  logger.yaml: | {{ toYaml .Values.configmap.logger | nindent 4 }}
+
+  remote_data.yaml: | {{ toYaml .Values.configmap.remote_data | nindent 4 }}
+
+  server.yaml: | {{ toYaml .Values.configmap.server | nindent 4 }}
+
+  storage.yaml: | {{ toYaml .Values.configmap.storage | nindent 4 }}
+
+  task_resource_defaults.yaml: | {{ toYaml .Values.configmap.task_resource_defaults | nindent 4 }}

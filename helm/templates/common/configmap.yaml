@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clusterresource-template
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data:
+{{- with .Values.configmap.aa_namespace }}
+  aa_namespace.yaml: | {{ . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.ab_project_resource_quota }}
+  ab_project-resource-quota.yaml: | {{ . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.ac_project_copilot_dataconfig }}
+  ac_project-copilot-dataconfig.yaml: | {{ . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.ad_spark_role }}
+  ad_spark-role.yaml: | {{ . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.ae_spark_service_account }}
+  ae_spark-service-account.yaml: | {{ . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.af_spark_role_binding }}
+  af_spark-role-binding.yaml: | {{ . | nindent 4 }}
+{{- end }}

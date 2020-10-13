@@ -1,0 +1,28 @@
+{{- if .Values.sparkoperator.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "sparkoperator.name" . }}-init
+  namespace: {{ template "sparkoperator.namespace" . }}
+  labels: {{ include "sparkoperator.labels" . | nindent 4 }}
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      {{- with .Values.sparkoperator.podAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      labels: {{ include "sparkoperator.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: "{{ .Values.sparkoperator.image.repository }}:{{ .Values.sparkoperator.image.tag }}"
+        imagePullPolicy: "{{ .Values.sparkoperator.image.pullPolicy }}"
+        name: sparkoperator
+        command:
+        - /usr/bin/gencerts.sh
+        - --namespace
+        - sparkoperator
+        - -p
+      restartPolicy: Never
+      serviceAccountName: {{ template "sparkoperator.name" . }}
+{{- end }}

@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flyteconsole.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteconsole.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.flyteconsole.replicaCount }}
+  selector:
+    matchLabels: {{ include "flyteconsole.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/console/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flyteconsole.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flyteconsole.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - image: "{{ .Values.flyteconsole.image.repository }}:{{ .Values.flyteconsole.image.tag }}"
+        imagePullPolicy: "{{ .Values.flyteconsole.image.pullPolicy }}"
+        name: flyteconsole
+        envFrom:
+        - configMapRef:
+            name: flyte-console-config
+        ports:
+        - containerPort: 8080
+        resources: {{ toYaml .Values.flyteconsole.resources | nindent 10 }}
+        volumeMounts:
+        - mountPath: /srv/flyte
+          name: shared-data
+      volumes:
+      - emptyDir: {}
+        name: shared-data
+      {{- with .Values.flyteconsole.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteconsole.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flyteconsole.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}

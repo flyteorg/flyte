@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flyte-propeller-config
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data:
+  admin.yaml: | {{ toYaml .Values.configmap.admin | nindent 4 }}
+
+  catalog.yaml: | {{ toYaml .Values.configmap.catalog | nindent 4 }}
+
+  catalog_cache.yaml: | {{ toYaml .Values.configmap.catalog_cache | nindent 4 }}
+
+  copilot.yaml: | {{ toYaml .Values.configmap.copilot | nindent 4 }}
+
+  core.yaml: | {{ toYaml .Values.configmap.core | nindent 4 }}
+
+  enabled_plugins.yaml: | {{ toYaml .Values.configmap.enabled_plugins | nindent 4 }}
+
+  k8s.yaml: | {{ toYaml .Values.configmap.k8s | nindent 4 }}
+
+  logger.yaml: | {{ toYaml .Values.configmap.logger | nindent 4 }}
+
+  qubole.yaml: | {{ toYaml .Values.configmap.qubole | nindent 4 }}
+
+  resource_manager.yaml: | {{ toYaml .Values.configmap.resource_manager | nindent 4 }}
+
+  spark.yaml: | {{ toYaml .Values.configmap.spark | nindent 4 }}
+
+  storage.yaml: | {{ toYaml .Values.configmap.storage | nindent 4 }}
+
+  task_logs.yaml: | {{ toYaml .Values.configmap.task_logs | nindent 4 }}
