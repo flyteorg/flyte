@@ -63,7 +63,10 @@ pytorchoperator: {}
 # COMMON
 #
 
-common: {}
+common:
+  databaseSecret: {}
+  ingress: {}
+  flyteNamespaceTemplate: {}
 
 #
 # CONFIGMAPS
@@ -76,7 +79,7 @@ configmap:
       port: 5432
       username: postgres
       host: postgres
-      dbname: flyte
+      dbname: flyte_development
 
   storage:
     storage:
@@ -109,6 +112,12 @@ configmap:
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: true
+        kubernetes-url: http://localhost:30082
+
   logger:
     logger:
       show-source: true
