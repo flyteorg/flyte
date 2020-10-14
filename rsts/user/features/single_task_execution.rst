@@ -25,7 +25,7 @@ After you've built an image with your updated task code, create an execution usi
          ...
 
 
-     my_single_task_execution = my_task.launch(project="my_flyte_projext", domain="development", inputs={'plant': 'ficus'})
+     my_single_task_execution = my_task.launch(project="my_flyte_project", domain="development", inputs={'plant': 'ficus'})
      print("Created {}".format(my_single_task_execution.id))
 
 Just like workflow executions, you can optionally pass a user-defined name, labels, annotations, and/or notifications when launching a single task.
@@ -80,11 +80,11 @@ A certain category of tasks don't rely on custom containers with registered imag
 
     containerless_task = SdkPrestoTask(
         task_inputs=inputs(ds=Types.String, count=Types.Integer, rg=Types.String),
-        statement="SELECT * FROM flyte.widgets WHERE ds = '{{ .Inputs.ds}}' LIMIT '{{ .Inputs.count}}'",
+        statement="SELECT * FROM flyte.widgets WHERE ds = '{{ .Inputs.ds}}' LIMIT {{ .Inputs.count}}",
         output_schema=Types.Schema([("a", Types.String), ("b", Types.Integer)]),
         routing_group="{{ .Inputs.rg }}",
     )
 
-    my_single_task_execution = containerless_task.register_and_launch(project="my_flyte_projext", domain="development",
+    my_single_task_execution = containerless_task.register_and_launch(project="my_flyte_project", domain="development",
         inputs={'ds': '2020-02-29', 'count': 10, 'rg': 'my_routing_group'})
 
