@@ -1,9 +1,10 @@
+{{- if .Values.common.ingress.enabled }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ template "flyte.name" . }}
   namespace: {{ template "flyte.namespace" . }}
-  {{- with .Values.common.ingressAnnotations }}
+  {{- with .Values.common.ingress.annotations }}
   annotations: {{ toYaml . | nindent 4}}
   {{- end }}
 spec:
@@ -38,3 +39,4 @@ spec:
           serviceName: flyteadmin
           servicePort: 87
         path: /openapi
+{{- end }}

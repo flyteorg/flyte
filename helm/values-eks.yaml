@@ -67,7 +67,7 @@ datacatalog:
   service:
     annotations:
       contour.heptio.com/upstream-protocol.h2c: grpc
-  
+
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -155,14 +155,14 @@ redis:
 #
 
 postgres:
-  enabled: false  # recommended adding managed RDS host to the config
+  enabled: false
 
 #
 # MINIO
 #
 
 minio:
-  enabled: false  # Use AWS S3 bucket instead
+  enabled: false
 
 #
 # CONTOUR

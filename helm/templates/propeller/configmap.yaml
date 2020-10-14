@@ -5,28 +5,42 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
-  admin.yaml: | {{ toYaml .Values.configmap.admin | nindent 4 }}
-
-  catalog.yaml: | {{ toYaml .Values.configmap.catalog | nindent 4 }}
-
-  catalog_cache.yaml: | {{ toYaml .Values.configmap.catalog_cache | nindent 4 }}
-
-  copilot.yaml: | {{ toYaml .Values.configmap.copilot | nindent 4 }}
-
-  core.yaml: | {{ toYaml .Values.configmap.core | nindent 4 }}
-
-  enabled_plugins.yaml: | {{ toYaml .Values.configmap.enabled_plugins | nindent 4 }}
-
-  k8s.yaml: | {{ toYaml .Values.configmap.k8s | nindent 4 }}
-
-  logger.yaml: | {{ toYaml .Values.configmap.logger | nindent 4 }}
-
-  qubole.yaml: | {{ toYaml .Values.configmap.qubole | nindent 4 }}
-
-  resource_manager.yaml: | {{ toYaml .Values.configmap.resource_manager | nindent 4 }}
-
-  spark.yaml: | {{ toYaml .Values.configmap.spark | nindent 4 }}
-
-  storage.yaml: | {{ toYaml .Values.configmap.storage | nindent 4 }}
-
-  task_logs.yaml: | {{ toYaml .Values.configmap.task_logs | nindent 4 }}
+{{- with .Values.configmap.admin }}
+  admin.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.catalog }}
+  catalog.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.catalog_cache }}
+  catalog_cache.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.copilot }}
+  copilot.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.core }}
+  core.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.enabled_plugins }}
+  enabled_plugins.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.k8s }}
+  k8s.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.logger }}
+  logger.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.qubole }}
+  qubole.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.resource_manager }}
+  resource_manager.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.spark }}
+  spark.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.storage }}
+  storage.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.task_logs }}
+  task_logs.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
