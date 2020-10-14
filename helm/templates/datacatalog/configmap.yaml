@@ -5,10 +5,15 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "datacatalog.labels" . | nindent 4 }}
 data:
-  db.yaml: | {{ toYaml .Values.configmap.db | nindent 4 }}
-
-  logger.yaml: | {{ toYaml .Values.configmap.logger | nindent 4 }}
-
-  server.yaml: | {{ toYaml .Values.configmap.datacatalogServer | nindent 4 }}
-
-  storage.yaml: | {{ toYaml .Values.configmap.storage | nindent 4 }}
+{{- with .Values.configmap.db }}
+  db.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.logger }}
+  logger.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.datacatalogServer }}
+  server.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- with .Values.configmap.storage }}
+  storage.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
