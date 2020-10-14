@@ -80,14 +80,67 @@ func dummyInputReader() io.InputReader {
 	return inputReader
 }
 
-func TestToK8sPodIterruptible(t *testing.T) {
-	ctx := context.TODO()
+func TestPodSetup(t *testing.T) {
 	configAccessor := viper.NewAccessor(config1.Options{
 		StrictMode:  true,
 		SearchPaths: []string{"testdata/config.yaml"},
 	})
 	err := configAccessor.UpdateConfig(context.TODO())
 	assert.NoError(t, err)
+
+	t.Run("UpdatePod", updatePod)
+	t.Run("ToK8sPodInterruptible", toK8sPodInterruptible)
+}
+
+func updatePod(t *testing.T) {
+	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
+		Limits: v1.ResourceList{
+			v1.ResourceCPU:     resource.MustParse("1024m"),
+			v1.ResourceStorage: resource.MustParse("100M"),
+		},
+		Requests: v1.ResourceList{
+			v1.ResourceCPU:     resource.MustParse("1024m"),
+			v1.ResourceStorage: resource.MustParse("100M"),
+		},
+	})
+
+	pod := &v1.Pod{
+		Spec: v1.PodSpec{
+			Tolerations: []v1.Toleration{
+				{
+					Key:   "my toleration key",
+					Value: "my toleration value",
+				},
+			},
+			NodeSelector: map[string]string{
+				"user": "also configured",
+			},
+		},
+	}
+	UpdatePod(taskExecutionMetadata, []v1.ResourceRequirements{}, &pod.Spec)
+	assert.Equal(t, v1.RestartPolicyNever, pod.Spec.RestartPolicy)
+	for _, tol := range pod.Spec.Tolerations {
+		if tol.Key == "x/flyte" {
+			assert.Equal(t, tol.Value, "interruptible")
+			assert.Equal(t, tol.Operator, v1.TolerationOperator("Equal"))
+			assert.Equal(t, tol.Effect, v1.TaintEffect("NoSchedule"))
+		} else if tol.Key == "my toleration key" {
+			assert.Equal(t, tol.Value, "my toleration value")
+		} else {
+			t.Fatalf("unexpected toleration [%+v]", tol)
+		}
+	}
+	assert.Equal(t, "service-account", pod.Spec.ServiceAccountName)
+	assert.Equal(t, "flyte-scheduler", pod.Spec.SchedulerName)
+	assert.Len(t, pod.Spec.Tolerations, 2)
+	assert.EqualValues(t, map[string]string{
+		"x/interruptible": "true",
+		"user":            "also configured",
+	}, pod.Spec.NodeSelector)
+}
+
+func toK8sPodInterruptible(t *testing.T) {
+	ctx := context.TODO()
 
 	op := &pluginsIOMock.OutputFilePaths{}
 	op.On("GetOutputPrefixPath").Return(storage.DataReference(""))

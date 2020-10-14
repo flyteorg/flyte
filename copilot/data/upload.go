@@ -12,9 +12,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/futures"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
-	"github.com/lyft/flytestdlib/futures"
 	"github.com/pkg/errors"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"

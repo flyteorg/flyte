@@ -181,19 +181,17 @@ func TestBuildSidecarResource(t *testing.T) {
 
 	// Assert user-specified tolerations don't get overridden
 	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 2)
-	expectedTolerations := []v1.Toleration{
-		{
-			Key:      "flyte/gpu",
-			Operator: "Equal",
-			Value:    "dedicated",
-			Effect:   "NoSchedule",
-		},
-		{
-			Key:   "my toleration key",
-			Value: "my toleration value",
-		},
+	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
+		if tol.Key == "flyte/gpu" {
+			assert.Equal(t, tol.Value, "dedicated")
+			assert.Equal(t, tol.Operator, v1.TolerationOperator("Equal"))
+			assert.Equal(t, tol.Effect, v1.TaintEffect("NoSchedule"))
+		} else if tol.Key == "my toleration key" {
+			assert.Equal(t, tol.Value, "my toleration value")
+		} else {
+			t.Fatalf("unexpected toleration [%+v]", tol)
+		}
 	}
-	assert.EqualValues(t, expectedTolerations, res.(*v1.Pod).Spec.Tolerations)
 }
 
 func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
