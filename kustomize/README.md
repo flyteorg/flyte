@@ -10,4 +10,4 @@ The *Single Cluster* configuration on its own is not deployable. But indiviudal 
 
 Refer to
 1. [Base Components](./base): If you want to build your own overlay start here
-1. [overlays](./Overlays): If you want to build on top of an existing overlay start here
+1. [overlays](./overlays): If you want to build on top of an existing overlay start here
