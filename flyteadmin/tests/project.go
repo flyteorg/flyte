@@ -160,3 +160,40 @@ func TestUpdateProjectLabels(t *testing.T) {
 	assert.Equal(t, barExists, true)
 	assert.Equal(t, barVal, "baz")
 }
+
+func TestUpdateProjectLabels_BadLabels(t *testing.T) {
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	// Create a new project.
+	req := admin.ProjectRegisterRequest{
+		Project: &admin.Project{
+			Id:   "potato",
+			Name: "spud",
+		},
+	}
+	_, err := client.RegisterProject(ctx, &req)
+	assert.Nil(t, err)
+
+	// Verify the project has been registered.
+	projects, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
+	assert.Nil(t, err)
+	assert.NotEmpty(t, projects.Projects)
+
+	// Attempt to modify the name of the Project. Labels and name should be
+	// modified.
+	_, err = client.UpdateProject(ctx, &admin.Project{
+		Id:   "potato",
+		Name: "foobar",
+		Labels: &admin.Labels{
+			Values: map[string]string{
+				"foo": "#bar",
+				"bar": "baz",
+			},
+		},
+	})
+
+	// Assert that update went through without an error.
+	assert.EqualError(t, err, "invalid label value [#bar]: [a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]")
+}

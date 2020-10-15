@@ -70,6 +70,12 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 		return nil, err
 	}
 
+	// Run validation on the request, specifically checking for labels, and return err if validation does not succeed.
+	err = validation.ValidateProjectLabels(projectUpdate)
+	if err != nil {
+		return nil, err
+	}
+
 	// Transform the provided project into a model and apply to the DB.
 	projectUpdateModel := transformers.CreateProjectModel(&projectUpdate)
 	err = projectRepo.UpdateProject(ctx, projectUpdateModel)
