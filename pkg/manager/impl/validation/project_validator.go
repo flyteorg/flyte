@@ -24,6 +24,9 @@ func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error 
 	if err := ValidateEmptyStringField(request.Project.Id, projectID); err != nil {
 		return err
 	}
+	if err := ValidateProjectLabels(*request.Project); err != nil {
+		return err
+	}
 	if errs := validation.IsDNS1123Label(request.Project.Id); len(errs) > 0 {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid project id [%s]: %v", request.Project.Id, errs)
 	}
@@ -36,6 +39,13 @@ func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error 
 	if request.Project.Domains != nil {
 		return errors.NewFlyteAdminError(codes.InvalidArgument,
 			"Domains are currently only set system wide. Please retry without domains included in your request.")
+	}
+	return nil
+}
+
+func ValidateProjectLabels(request admin.Project) error {
+	if err := ValidateProjectLabelsAlphanumeric(request); err != nil {
+		return err
 	}
 	return nil
 }
@@ -59,6 +69,23 @@ func ValidateProjectAndDomain(
 	}
 	if !validDomain {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "domain [%s] is unrecognized by system", domainID)
+	}
+	return nil
+}
+
+// Given an admin.Project, checks if the project has labels and if it does, checks if the labels are K8s compliant,
+// i.e. alphanumeric + - and _
+func ValidateProjectLabelsAlphanumeric(request admin.Project) error {
+	if request.Labels == nil || len(request.Labels.Values) == 0 {
+		return nil
+	}
+	for key, value := range request.Labels.Values {
+		if errs := validation.IsDNS1123Label(key); len(errs) > 0 {
+			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label key [%s]: %v", key, errs)
+		}
+		if errs := validation.IsDNS1123Label(value); len(errs) > 0 {
+			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid label value [%s]: %v", value, errs)
+		}
 	}
 	return nil
 }

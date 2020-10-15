@@ -124,3 +124,37 @@ func TestProjectManager_CreateProjectError(t *testing.T) {
 	})
 	assert.EqualError(t, err, "Domains are currently only set system wide. Please retry without domains included in your request.")
 }
+
+func TestProjectManager_CreateProjectErrorDueToBadLabels(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).CreateFunction = func(
+		ctx context.Context, namespace models.Project) error {
+		return errors.New("uh oh")
+	}
+	projectManager := NewProjectManager(mockRepository,
+		runtimeMocks.NewMockConfigurationProvider(
+			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+	_, err := projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+		Project: &admin.Project{
+			Id:          "flyte-project-id",
+			Name:        "flyte-project-name",
+			Description: "flyte-project-description",
+		},
+	})
+	assert.EqualError(t, err, "uh oh")
+
+	_, err = projectManager.CreateProject(context.Background(), admin.ProjectRegisterRequest{
+		Project: &admin.Project{
+			Id:          "flyte-project-id",
+			Name:        "flyte-project-name",
+			Description: "flyte-project-description",
+			Labels: &admin.Labels{
+				Values: map[string]string{
+					"foo": "#badlabel",
+					"bar": "baz",
+				},
+			},
+		},
+	})
+	assert.EqualError(t, err, "invalid label value [#badlabel]: [a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]")
+}
