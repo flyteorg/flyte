@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+
 	"github.com/stretchr/testify/mock"
 
 	"github.com/lyft/flytestdlib/storage"
@@ -24,6 +26,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/stretchr/testify/assert"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -222,7 +225,7 @@ func dummySparkTaskTemplate(id string) *core.TaskTemplate {
 	}
 }
 
-func dummySparkTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
+func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
@@ -262,7 +265,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExec
 		Kind: "node",
 		Name: "blah",
 	})
-	taskExecutionMetadata.On("IsInterruptible").Return(true)
+	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
 	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
@@ -287,7 +290,22 @@ func TestBuildResourceSpark(t *testing.T) {
 			},
 		},
 	}))
-	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate))
+
+	// Set Interruptible Config
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		InterruptibleNodeSelector: map[string]string{
+			"x/interruptible": "true",
+		},
+		InterruptibleTolerations: []corev1.Toleration{
+			{
+				Key:      "x/flyte",
+				Value:    "interruptible",
+				Operator: "Equal",
+				Effect:   "NoSchedule",
+			},
+		}}),
+	)
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true))
 	assert.Nil(t, err)
 
 	assert.NotNil(t, resource)
@@ -298,6 +316,19 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, sj.PythonApplicationType, sparkApp.Spec.Type)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
+	// Validate Interruptible Toleration and NodeSelector set for Executor but not Driver.
+	assert.Equal(t, 0, len(sparkApp.Spec.Driver.Tolerations))
+	assert.Equal(t, 0, len(sparkApp.Spec.Driver.NodeSelector))
+
+	assert.Equal(t, 1, len(sparkApp.Spec.Executor.Tolerations))
+	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
+
+	tol := sparkApp.Spec.Executor.Tolerations[0]
+	assert.Equal(t, tol.Key, "x/flyte")
+	assert.Equal(t, tol.Value, "interruptible")
+	assert.Equal(t, tol.Operator, corev1.TolerationOperator("Equal"))
+	assert.Equal(t, tol.Effect, corev1.TaintEffect("NoSchedule"))
+	assert.Equal(t, "true", sparkApp.Spec.Executor.NodeSelector["x/interruptible"])
 
 	for confKey, confVal := range dummySparkConf {
 		exists := false
@@ -329,9 +360,23 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.executor.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.executor.limit.cores"])
 
 	assert.Equal(t, len(sparkApp.Spec.Driver.EnvVars["FLYTE_MAX_ATTEMPTS"]), 1)
+
+	// Case 2: Interruptible False
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok = resource.(*sj.SparkApplication)
+	assert.True(t, ok)
+
+	// Validate Interruptible Toleration and NodeSelector not set  for both Driver and Executors.
+	assert.Equal(t, 0, len(sparkApp.Spec.Driver.Tolerations))
+	assert.Equal(t, 0, len(sparkApp.Spec.Driver.NodeSelector))
+	assert.Equal(t, 0, len(sparkApp.Spec.Executor.Tolerations))
+	assert.Equal(t, 0, len(sparkApp.Spec.Executor.NodeSelector))
+
 	// Case2: Invalid Spark Task-Template
 	taskTemplate.Custom = nil
-	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate))
+	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.NotNil(t, err)
 	assert.Nil(t, resource)
 }
