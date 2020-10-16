@@ -1,9 +1,12 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { CacheContext, getCacheKey } from 'components/Cache';
+import { CacheContext } from 'components/Cache';
 import { RequestConfig } from 'models';
-
-import { FetchFn, PaginatedFetchableData, PaginatedFetchFn } from './types';
+import { useContext, useMemo } from 'react';
+import {
+    FetchFn,
+    PaginatedFetchableData,
+    PaginatedFetchFn,
+    PaginationValue
+} from './types';
 import { useFetchableData } from './useFetchableData';
 
 export interface PaginationConfig<FetchArgType> extends RequestConfig {
@@ -33,52 +36,46 @@ export function usePagination<T, FetchArgType>(
     doFetch: PaginatedFetchFn<T, FetchArgType>
 ): PaginatedFetchableData<T> {
     const { cacheItems = false, debugName } = config;
-    const cacheKey = getCacheKey(config);
-    const [token, setToken] = useState('');
-    const [moreItemsAvailable, setMoreItemsAvailable] = useState(false);
     const cache = useContext(CacheContext);
 
-    // Reset our state if the pagination config changes
-    useEffect(() => {
-        setToken('');
-        setMoreItemsAvailable(false);
-    }, [cacheKey]);
+    const fetch: FetchFn<
+        PaginationValue<T>,
+        PaginationConfig<FetchArgType>
+    > = useMemo(
+        () => async (params, currentValue) => {
+            const { token: previousToken = '', items: previousItems = [] } =
+                currentValue || {};
+            const { fetchArg, ...requestConfig } = params;
 
-    const fetch: FetchFn<T[], PaginationConfig<FetchArgType>> = async (
-        params,
-        currentValue = []
-    ) => {
-        const { fetchArg, ...requestConfig } = params;
+            // If our last fetch call returned a token,
+            // we have to pass that along in order to retrieve the next page
+            const finalConfig = { ...requestConfig, token: previousToken };
 
-        // If our last fetch call returned a token,
-        // we have to pass that along in order to retrieve the next page
-        if (token) {
-            requestConfig.token = token;
-        }
+            const { entities, token } = await doFetch(fetchArg, finalConfig);
+            const result = cacheItems ? cache.mergeArray(entities) : entities;
 
-        const { entities, token: newToken } = await doFetch(
-            fetchArg,
-            requestConfig
-        );
-        const values = cacheItems ? cache.mergeArray(entities) : entities;
+            const items = previousItems.concat(result);
+            return {
+                items,
+                token
+            };
+        },
+        [cache, cacheItems]
+    );
 
-        if (newToken) {
-            setToken(newToken);
-        }
-        const newValue = currentValue.concat(values);
-        setMoreItemsAvailable(!!newToken);
-        return newValue;
-    };
+    const fetchable = useFetchableData(
+        {
+            debugName,
+            defaultValue: { token: '', items: [] },
+            doFetch: fetch
+        },
+        config
+    );
 
+    const { items: value, token } = fetchable.value;
     return {
-        ...useFetchableData(
-            {
-                debugName,
-                defaultValue: [],
-                doFetch: fetch
-            },
-            config
-        ),
-        moreItemsAvailable
+        ...fetchable,
+        value,
+        moreItemsAvailable: !!token
     };
 }

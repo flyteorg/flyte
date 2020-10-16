@@ -56,7 +56,7 @@ export interface FetchableData<T> {
     debugName: string;
     fetch(): void;
     lastError: Error | null;
-    state: FetchableState<T>;
+    state: FetchableState<any>;
     value: T;
 }
 
@@ -65,6 +65,10 @@ export interface FetchableExecution {
     terminateExecution(cause: string): Promise<void>;
 }
 
+export interface PaginationValue<T> {
+    token?: string;
+    items: T[];
+}
 export interface PaginatedFetchableData<T> extends FetchableData<T[]> {
     /** Whether or not a fetch would yield more items. Useful for determining if
      * a "load more" button should be shown
