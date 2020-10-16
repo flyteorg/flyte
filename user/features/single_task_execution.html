@@ -50,15 +50,15 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> Flyte
+            <a href="../../index.html">
           
 
+          
+            
+            <img src="../../_static/flyte_lockup_on_dark.png" class="logo" alt="Logo"/>
           
           </a>
 
-          
-            
-            
           
 
           
@@ -211,7 +211,7 @@ executions can be used to easily iterate on task logic.</p>
     <span class="o">...</span>
 
 
-<span class="n">my_single_task_execution</span> <span class="o">=</span> <span class="n">my_task</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">&quot;my_flyte_projext&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;development&quot;</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;plant&#39;</span><span class="p">:</span> <span class="s1">&#39;ficus&#39;</span><span class="p">})</span>
+<span class="n">my_single_task_execution</span> <span class="o">=</span> <span class="n">my_task</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">&quot;my_flyte_project&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;development&quot;</span><span class="p">,</span> <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;plant&#39;</span><span class="p">:</span> <span class="s1">&#39;ficus&#39;</span><span class="p">})</span>
 <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Created {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">my_single_task_execution</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -252,12 +252,12 @@ your execution. Log links and status changes will be available as your execution
 <code class="docutils literal notranslate"><span class="pre">register_and_launch</span></code> on a task definition to immediately launch a single task execution, like so:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">containerless_task</span> <span class="o">=</span> <span class="n">SdkPrestoTask</span><span class="p">(</span>
     <span class="n">task_inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">(</span><span class="n">ds</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">String</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">rg</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">String</span><span class="p">),</span>
-    <span class="n">statement</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM flyte.widgets WHERE ds = &#39;{{ .Inputs.ds}}&#39; LIMIT &#39;{{ .Inputs.count}}&#39;&quot;</span><span class="p">,</span>
+    <span class="n">statement</span><span class="o">=</span><span class="s2">&quot;SELECT * FROM flyte.widgets WHERE ds = &#39;{{ .Inputs.ds}}&#39; LIMIT {{ .Inputs.count}}&quot;</span><span class="p">,</span>
     <span class="n">output_schema</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Schema</span><span class="p">([(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">Types</span><span class="o">.</span><span class="n">String</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">)]),</span>
     <span class="n">routing_group</span><span class="o">=</span><span class="s2">&quot;{{ .Inputs.rg }}&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">my_single_task_execution</span> <span class="o">=</span> <span class="n">containerless_task</span><span class="o">.</span><span class="n">register_and_launch</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">&quot;my_flyte_projext&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;development&quot;</span><span class="p">,</span>
+<span class="n">my_single_task_execution</span> <span class="o">=</span> <span class="n">containerless_task</span><span class="o">.</span><span class="n">register_and_launch</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">&quot;my_flyte_project&quot;</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="s2">&quot;development&quot;</span><span class="p">,</span>
     <span class="n">inputs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ds&#39;</span><span class="p">:</span> <span class="s1">&#39;2020-02-29&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;rg&#39;</span><span class="p">:</span> <span class="s1">&#39;my_routing_group&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
