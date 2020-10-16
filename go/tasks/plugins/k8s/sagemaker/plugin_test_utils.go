@@ -2,7 +2,6 @@ package sagemaker
 
 import (
 	"github.com/lyft/flytestdlib/promutils"
-
 	"github.com/pkg/errors"
 
 	"github.com/golang/protobuf/proto"
@@ -314,19 +313,6 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	shp := map[string]string{"a": "1", "b": "2"}
 	shpStructObj, _ := utils.MarshalObjToStruct(shp)
 	hpoJobConfig := sagemakerIdl.HyperparameterTuningJobConfig{
-		HyperparameterRanges: &sagemakerIdl.ParameterRanges{
-			ParameterRangeMap: map[string]*sagemakerIdl.ParameterRangeOneOf{
-				"a": {
-					ParameterRangeType: &sagemakerIdl.ParameterRangeOneOf_IntegerParameterRange{
-						IntegerParameterRange: &sagemakerIdl.IntegerParameterRange{
-							MaxValue:    2,
-							MinValue:    1,
-							ScalingType: sagemakerIdl.HyperparameterScalingType_LINEAR,
-						},
-					},
-				},
-			},
-		},
 		TuningStrategy: sagemakerIdl.HyperparameterTuningStrategy_BAYESIAN,
 		TuningObjective: &sagemakerIdl.HyperparameterTuningObjective{
 			ObjectiveType: sagemakerIdl.HyperparameterTuningObjectiveType_MINIMIZE,
@@ -336,6 +322,21 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	}
 	hpoJobConfigByteArray, _ := proto.Marshal(&hpoJobConfig)
 
+	intParamRange := &structpb.Struct{}
+	err := utils.MarshalStruct(&sagemakerIdl.ParameterRangeOneOf{
+		ParameterRangeType: &sagemakerIdl.ParameterRangeOneOf_IntegerParameterRange{
+			IntegerParameterRange: &sagemakerIdl.IntegerParameterRange{
+				MaxValue:    2,
+				MinValue:    1,
+				ScalingType: sagemakerIdl.HyperparameterScalingType_LINEAR,
+			},
+		},
+	}, intParamRange)
+
+	if err != nil {
+		panic(err)
+	}
+
 	inputReader.OnGetMatch(mock.Anything).Return(
 		&flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
@@ -343,6 +344,7 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 				"validation":                       generateMockBlobLiteral(validationBlobLoc),
 				"static_hyperparameters":           utils.MakeGenericLiteral(shpStructObj),
 				"hyperparameter_tuning_job_config": utils.MakeBinaryLiteral(hpoJobConfigByteArray),
+				"a":                                utils.MakeGenericLiteral(intParamRange),
 			},
 		}, nil)
 	taskCtx.OnInputReader().Return(inputReader)

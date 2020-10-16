@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
-
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
@@ -22,14 +21,18 @@ import (
 	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	flyteSagemakerIdl "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
-	"github.com/pkg/errors"
+	"github.com/lyft/flytestdlib/errors"
+)
+
+const (
+	ErrSagemaker = "SAGEMAKER_ERROR"
 )
 
 func getAPIContentType(fileType flyteSagemakerIdl.InputContentType_Value) (string, error) {
 	if fileType == flyteSagemakerIdl.InputContentType_TEXT_CSV {
 		return TEXTCSVInputContentType, nil
 	}
-	return "", errors.Errorf("Unsupported input file type [%v]", fileType.String())
+	return "", errors.Errorf(ErrSagemaker, "Unsupported input file type [%v]", fileType.String())
 }
 
 func getLatestTrainingImage(versionConfigs []config.VersionConfig) (string, error) {
@@ -38,7 +41,7 @@ func getLatestTrainingImage(versionConfigs []config.VersionConfig) (string, erro
 	for _, verCfg := range versionConfigs {
 		semVer, err := semver.NewVersion(verCfg.Version)
 		if err != nil {
-			return "", errors.Wrapf(err, "Failed to cast version [%v] to a semver", verCfg.Version)
+			return "", errors.Wrapf(ErrSagemaker, err, "Failed to cast version [%v] to a semver", verCfg.Version)
 		}
 		if semVer.GreaterThan(latestSemVer) {
 			latestSemVer = semVer
@@ -46,7 +49,7 @@ func getLatestTrainingImage(versionConfigs []config.VersionConfig) (string, erro
 		}
 	}
 	if latestImg == "" {
-		return "", errors.Errorf("Failed to find the latest image")
+		return "", errors.Errorf(ErrSagemaker, "Failed to find the latest image")
 	}
 	return latestImg, nil
 }
@@ -54,7 +57,7 @@ func getLatestTrainingImage(versionConfigs []config.VersionConfig) (string, erro
 func getTrainingJobImage(ctx context.Context, _ pluginsCore.TaskExecutionContext, job *flyteSagemakerIdl.TrainingJob) (string, error) {
 	image, err := getPrebuiltTrainingImage(ctx, job)
 	if err != nil {
-		return "", errors.Wrapf(err, "Failed to get prebuilt image for job [%v]", *job)
+		return "", errors.Wrapf(ErrSagemaker, err, "Failed to get prebuilt image for job [%v]", *job)
 	}
 	return image, nil
 }
@@ -77,7 +80,7 @@ func getPrebuiltTrainingImage(ctx context.Context, job *flyteSagemakerIdl.Traini
 			}
 		}
 		if foundAlgorithmCfg == nil {
-			return "", errors.Errorf("Failed to find an image for algorithm [%v]", apiAlgorithmName)
+			return "", errors.Errorf(ErrSagemaker, "Failed to find an image for algorithm [%v]", apiAlgorithmName)
 		}
 
 		for _, regionalCfg := range foundAlgorithmCfg.RegionalConfig {
@@ -87,7 +90,7 @@ func getPrebuiltTrainingImage(ctx context.Context, job *flyteSagemakerIdl.Traini
 			}
 		}
 		if foundRegionalCfg == nil {
-			return "", errors.Errorf("Failed to find an image for algorithm [%v] region [%v]",
+			return "", errors.Errorf(ErrSagemaker, "Failed to find an image for algorithm [%v] region [%v]",
 				job.GetAlgorithmSpecification().GetAlgorithmName(), cfg.Region)
 		}
 
@@ -98,7 +101,7 @@ func getPrebuiltTrainingImage(ctx context.Context, job *flyteSagemakerIdl.Traini
 				"The plugin will try to pick the latest version available for the algorithm-region combination.", userSpecifiedVer, apiAlgorithmName, cfg.Region)
 			latestTrainingImage, err := getLatestTrainingImage(foundRegionalCfg.VersionConfigs)
 			if err != nil {
-				return "", errors.Wrapf(err, "Failed to identify the latest image for algorithm:region [%v:%v]",
+				return "", errors.Wrapf(ErrSagemaker, err, "Failed to identify the latest image for algorithm:region [%v:%v]",
 					apiAlgorithmName, cfg.Region)
 			}
 			return latestTrainingImage, nil
@@ -107,11 +110,11 @@ func getPrebuiltTrainingImage(ctx context.Context, job *flyteSagemakerIdl.Traini
 		for _, versionCfg := range foundRegionalCfg.VersionConfigs {
 			configSemVer, err := semver.NewVersion(versionCfg.Version)
 			if err != nil {
-				return "", errors.Wrapf(err, "Unable to cast version listed in the config [%v] to a semver", versionCfg.Version)
+				return "", errors.Wrapf(ErrSagemaker, err, "Unable to cast version listed in the config [%v] to a semver", versionCfg.Version)
 			}
 			userSpecifiedSemVer, err := semver.NewVersion(userSpecifiedVer)
 			if err != nil {
-				return "", errors.Wrapf(err, "Unable to cast version specified by the user [%v] to a semver", userSpecifiedVer)
+				return "", errors.Wrapf(ErrSagemaker, err, "Unable to cast version specified by the user [%v] to a semver", userSpecifiedVer)
 			}
 			if configSemVer.Equal(userSpecifiedSemVer) {
 				logger.Infof(ctx, "Image [%v] is picked for algorithm [%v] region [%v] version [%v] ",
@@ -122,75 +125,104 @@ func getPrebuiltTrainingImage(ctx context.Context, job *flyteSagemakerIdl.Traini
 		logger.Errorf(ctx, "Failed to find an image for [%v]:[%v]:[%v]",
 			job.GetAlgorithmSpecification().GetAlgorithmName(), cfg.Region, job.GetAlgorithmSpecification().GetAlgorithmVersion())
 
-		return "", errors.Errorf("Failed to find an image for [%v]:[%v]:[%v]",
+		return "", errors.Errorf(ErrSagemaker, "Failed to find an image for [%v]:[%v]:[%v]",
 			job.GetAlgorithmSpecification().GetAlgorithmName(), cfg.Region, job.GetAlgorithmSpecification().GetAlgorithmVersion())
 	}
 	// Custom image
-	return "", errors.Errorf("It is invalid to try getting a prebuilt image for AlgorithmName == CUSTOM ")
+	return "", errors.Errorf(ErrSagemaker, "It is invalid to try getting a prebuilt image for AlgorithmName == CUSTOM ")
 }
 
-func buildParameterRanges(hpoJobConfig *flyteSagemakerIdl.HyperparameterTuningJobConfig) *commonv1.ParameterRanges {
-	prMap := hpoJobConfig.GetHyperparameterRanges().GetParameterRangeMap()
+func buildParameterRanges(ctx context.Context, literals map[string]*core.Literal) *commonv1.ParameterRanges {
 	var retValue = &commonv1.ParameterRanges{
 		CategoricalParameterRanges: []commonv1.CategoricalParameterRange{},
 		ContinuousParameterRanges:  []commonv1.ContinuousParameterRange{},
 		IntegerParameterRanges:     []commonv1.IntegerParameterRange{},
 	}
 
-	for prName, pr := range prMap {
-		scalingTypeString := strings.Title(strings.ToLower(pr.GetContinuousParameterRange().GetScalingType().String()))
-		switch pr.GetParameterRangeType().(type) {
+	for name, literal := range literals {
+		if literal.GetScalar() == nil || literal.GetScalar().GetGeneric() == nil {
+			logger.Infof(ctx, "Input [%v] is not of type Generic, won't be considered for parameter ranges.", name)
+			continue
+		}
+
+		p := &flyteSagemakerIdl.ParameterRangeOneOf{}
+		err := utils.UnmarshalStruct(literal.GetScalar().GetGeneric(), p)
+		if err != nil {
+			logger.Infof(ctx, "Failed to unmarshal input [%v] as a ParameterRangeOneOf. Skipping. Error: %v", name, err)
+			continue
+		}
+
+		switch p.GetParameterRangeType().(type) {
 		case *flyteSagemakerIdl.ParameterRangeOneOf_CategoricalParameterRange:
 			var newElem = commonv1.CategoricalParameterRange{
-				Name:   awssagemaker.ToStringPtr(prName),
-				Values: pr.GetCategoricalParameterRange().GetValues(),
+				Name:   awssagemaker.ToStringPtr(name),
+				Values: p.GetCategoricalParameterRange().GetValues(),
 			}
+
 			retValue.CategoricalParameterRanges = append(retValue.CategoricalParameterRanges, newElem)
 
 		case *flyteSagemakerIdl.ParameterRangeOneOf_ContinuousParameterRange:
+			scalingTypeString := strings.Title(strings.ToLower(p.GetContinuousParameterRange().GetScalingType().String()))
 			var newElem = commonv1.ContinuousParameterRange{
-				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", pr.GetContinuousParameterRange().GetMaxValue())),
-				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", pr.GetContinuousParameterRange().GetMinValue())),
-				Name:        awssagemaker.ToStringPtr(prName),
+				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", p.GetContinuousParameterRange().GetMaxValue())),
+				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", p.GetContinuousParameterRange().GetMinValue())),
+				Name:        awssagemaker.ToStringPtr(name),
 				ScalingType: commonv1.HyperParameterScalingType(scalingTypeString),
 			}
+
 			retValue.ContinuousParameterRanges = append(retValue.ContinuousParameterRanges, newElem)
 
 		case *flyteSagemakerIdl.ParameterRangeOneOf_IntegerParameterRange:
+			scalingTypeString := strings.Title(strings.ToLower(p.GetIntegerParameterRange().GetScalingType().String()))
 			var newElem = commonv1.IntegerParameterRange{
-				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", pr.GetIntegerParameterRange().GetMaxValue())),
-				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", pr.GetIntegerParameterRange().GetMinValue())),
-				Name:        awssagemaker.ToStringPtr(prName),
+				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", p.GetIntegerParameterRange().GetMaxValue())),
+				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", p.GetIntegerParameterRange().GetMinValue())),
+				Name:        awssagemaker.ToStringPtr(name),
 				ScalingType: commonv1.HyperParameterScalingType(scalingTypeString),
 			}
+
 			retValue.IntegerParameterRanges = append(retValue.IntegerParameterRanges, newElem)
 		}
 	}
 
+	// TODO: Inspect input interface to determine the inputs of type ParameterRange and fail if any of them is not
+	// marshalled correctly. This is currently not easy to do because there is no universal way to compactly refer to a
+	// protobuf type and version. This might be a useful addition to Flyte's programming language for advanced usecases.
 	return retValue
 }
 
 func convertHyperparameterTuningJobConfigToSpecType(hpoJobConfigLiteral *core.Literal) (*flyteSagemakerIdl.HyperparameterTuningJobConfig, error) {
 	var retValue = &flyteSagemakerIdl.HyperparameterTuningJobConfig{}
-	if hpoJobConfigLiteral.GetScalar() == nil || hpoJobConfigLiteral.GetScalar().GetBinary() == nil {
-		return nil, errors.Errorf("[Hyperparameters] should be of type [Scalar.Binary]")
+	if hpoJobConfigLiteral.GetScalar() == nil {
+		return nil, errors.Errorf(ErrSagemaker, "[Hyperparameters] should not be nil.")
 	}
-	hpoJobConfigByteArray := hpoJobConfigLiteral.GetScalar().GetBinary().GetValue()
-	err := proto.Unmarshal(hpoJobConfigByteArray, retValue)
+
+	var err error
+	switch v := hpoJobConfigLiteral.GetScalar().GetValue().(type) {
+	case *core.Scalar_Generic:
+		err = utils.UnmarshalStruct(v.Generic, retValue)
+	case *core.Scalar_Binary:
+		err = proto.Unmarshal(v.Binary.GetValue(), retValue)
+	default:
+		err = errors.Errorf(ErrSagemaker, "[Hyperparameter Tuning Job Config should be set to a struct.")
+	}
+
 	if err != nil {
-		return nil, errors.Errorf("Hyperparameter Tuning Job Config Literal in input cannot be unmarshalled into spec type")
+		return nil, errors.Wrapf(ErrSagemaker, err, "Hyperparameter Tuning Job Config Literal in input cannot"+
+			" be unmarshalled into spec type")
 	}
+
 	return retValue, nil
 }
 
 func convertStaticHyperparamsLiteralToSpecType(hyperparamLiteral *core.Literal) ([]*commonv1.KeyValuePair, error) {
 	var retValue []*commonv1.KeyValuePair
 	if hyperparamLiteral.GetScalar() == nil || hyperparamLiteral.GetScalar().GetGeneric() == nil {
-		return nil, errors.Errorf("[Hyperparameters] should be of type [Scalar.Generic]")
+		return nil, errors.Errorf(ErrSagemaker, "[Hyperparameters] should be of type [Scalar.Generic]")
 	}
 	hyperFields := hyperparamLiteral.GetScalar().GetGeneric().GetFields()
 	if hyperFields == nil {
-		return nil, errors.Errorf("Failed to get the static hyperparameters field from the literal")
+		return nil, errors.Errorf(ErrSagemaker, "Failed to get the static hyperparameters field from the literal")
 	}
 
 	keys := make([]string, 0)
@@ -271,11 +303,11 @@ func makeHyperparametersKeysValuesFromArgs(_ context.Context, args []string) []*
 
 func injectTaskTemplateEnvVarToHyperparameters(ctx context.Context, taskTemplate *flyteIdlCore.TaskTemplate, hps []*commonv1.KeyValuePair) ([]*commonv1.KeyValuePair, error) {
 	if taskTemplate == nil || taskTemplate.GetContainer() == nil {
-		return hps, errors.Errorf("The taskTemplate is nil or the container is nil")
+		return hps, errors.Errorf(ErrSagemaker, "The taskTemplate is nil or the container is nil")
 	}
 
 	if hps == nil {
-		return nil, errors.Errorf("A nil slice of hyperparameters is passed in")
+		return nil, errors.Errorf(ErrSagemaker, "A nil slice of hyperparameters is passed in")
 	}
 
 	for _, ev := range taskTemplate.GetContainer().GetEnv() {
@@ -293,12 +325,12 @@ func injectArgsAndEnvVars(ctx context.Context, taskCtx pluginsCore.TaskExecution
 	templateArgs := taskTemplate.GetContainer().GetArgs()
 	templateArgs, err := utils.ReplaceTemplateCommandArgs(ctx, templateArgs, taskCtx.InputReader(), taskCtx.OutputWriter())
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to de-template the hyperparameter values")
+		return nil, errors.Wrapf(ErrSagemaker, err, "Failed to de-template the hyperparameter values")
 	}
 	hyperParameters := makeHyperparametersKeysValuesFromArgs(ctx, templateArgs)
 	hyperParameters, err = injectTaskTemplateEnvVarToHyperparameters(ctx, taskTemplate, hyperParameters)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to inject the task template's container env vars to the hyperparameter list")
+		return nil, errors.Wrapf(ErrSagemaker, err, "Failed to inject the task template's container env vars to the hyperparameter list")
 	}
 	return hyperParameters, nil
 }
@@ -307,7 +339,7 @@ func checkIfRequiredInputLiteralsExist(inputLiterals map[string]*flyteIdlCore.Li
 	for _, inputKey := range inputKeys {
 		_, ok := inputLiterals[inputKey]
 		if !ok {
-			return errors.Errorf("Required input not specified: [%v]", inputKey)
+			return errors.Errorf(ErrSagemaker, "Required input not specified: [%v]", inputKey)
 		}
 	}
 	return nil
@@ -316,9 +348,9 @@ func checkIfRequiredInputLiteralsExist(inputLiterals map[string]*flyteIdlCore.Li
 func getTaskTemplate(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (*flyteIdlCore.TaskTemplate, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "unable to fetch task specification")
+		return nil, errors.Wrapf(ErrSagemaker, err, "unable to fetch task specification")
 	} else if taskTemplate == nil {
-		return nil, errors.Errorf("nil task specification")
+		return nil, errors.Errorf(ErrSagemaker, "nil task specification")
 	}
 	return taskTemplate, nil
 }
@@ -346,7 +378,7 @@ func createTaskInfo(_ context.Context, jobRegion string, jobName string, jobType
 
 	customInfo, err := utils.MarshalObjToStruct(customInfoMap)
 	if err != nil {
-		return nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err, "Unable to create a custom info object")
+		return nil, errors.Wrapf(pluginErrors.RuntimeFailure, err, "Unable to create a custom info object")
 	}
 
 	return &pluginsCore.TaskInfo{

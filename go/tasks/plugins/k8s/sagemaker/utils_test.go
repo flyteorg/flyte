@@ -7,6 +7,9 @@ import (
 	"strconv"
 	"testing"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
@@ -20,6 +23,34 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	sagemakerConfig "github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )
+
+func makeGenericLiteral(st *structpb.Struct) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Generic{
+					Generic: st,
+				},
+			},
+		},
+	}
+}
+
+func generateParameterRangeInputs() map[string]*core.Literal {
+	hpMap := generateMockTunableHPMap()
+	res := map[string]*core.Literal{}
+	for name, paramRange := range hpMap {
+		st := structpb.Struct{}
+		err := utils.MarshalStruct(paramRange, &st)
+		if err != nil {
+			panic(err)
+		}
+
+		res[name] = makeGenericLiteral(&st)
+	}
+
+	return res
+}
 
 func generateMockTunableHPMap() map[string]*sagemakerSpec.ParameterRangeOneOf {
 	ret := map[string]*sagemakerSpec.ParameterRangeOneOf{
@@ -61,18 +92,6 @@ func generateNonConflictingStaticHPs() []*commonv1.KeyValuePair {
 		{Name: "hp7", Value: "ddd,eee"},
 	}
 	return ret
-}
-
-func generateMockHyperparameterTuningJobConfig() *sagemakerSpec.HyperparameterTuningJobConfig {
-	return &sagemakerSpec.HyperparameterTuningJobConfig{
-		HyperparameterRanges: &sagemakerSpec.ParameterRanges{ParameterRangeMap: generateMockTunableHPMap()},
-		TuningStrategy:       sagemakerSpec.HyperparameterTuningStrategy_BAYESIAN,
-		TuningObjective: &sagemakerSpec.HyperparameterTuningObjective{
-			ObjectiveType: sagemakerSpec.HyperparameterTuningObjectiveType_MINIMIZE,
-			MetricName:    "validate:mse",
-		},
-		TrainingJobEarlyStoppingType: sagemakerSpec.TrainingJobEarlyStoppingType_AUTO,
-	}
 }
 
 func generateMockSageMakerConfig() *sagemakerConfig.Config {
@@ -139,7 +158,7 @@ func Test_deleteConflictingStaticHyperparameters(t *testing.T) {
 
 func Test_buildParameterRanges(t *testing.T) {
 	type args struct {
-		hpoJobConfig *sagemakerSpec.HyperparameterTuningJobConfig
+		inputs map[string]*core.Literal
 	}
 	tests := []struct {
 		name string
@@ -147,7 +166,7 @@ func Test_buildParameterRanges(t *testing.T) {
 		want *commonv1.ParameterRanges
 	}{
 		{name: "Building a list of a mixture of all three types of parameter ranges",
-			args: args{hpoJobConfig: generateMockHyperparameterTuningJobConfig()},
+			args: args{inputs: generateParameterRangeInputs()},
 			want: &commonv1.ParameterRanges{
 				CategoricalParameterRanges: []commonv1.CategoricalParameterRange{{Name: ToStringPtr("hp3"), Values: []string{"AAA", "BBB", "CCC"}}},
 				ContinuousParameterRanges:  []commonv1.ContinuousParameterRange{{Name: ToStringPtr("hp2"), MinValue: ToStringPtr("3.0"), MaxValue: ToStringPtr("5.0")}},
@@ -157,8 +176,7 @@ func Test_buildParameterRanges(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := buildParameterRanges(tt.args.hpoJobConfig)
-
+			got := buildParameterRanges(context.TODO(), tt.args.inputs)
 			wantCatPr := tt.want.CategoricalParameterRanges[0]
 			gotCatPr := got.CategoricalParameterRanges[0]
 			if *wantCatPr.Name != *gotCatPr.Name || !reflect.DeepEqual(wantCatPr.Values, gotCatPr.Values) {
