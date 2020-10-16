@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.2](http://github.com/lyft/flyteconsole/compare/v0.13.1...v0.13.2) (2020-10-16)
+
+
+### Bug Fixes
+
+* race condition with pagination token ([#105](http://github.com/lyft/flyteconsole/issues/105)) ([a5a9240](http://github.com/lyft/flyteconsole/commit/a5a92406567160dfb07238d30472786c15f34cb4))
+
 ## [0.13.1](http://github.com/lyft/flyteconsole/compare/v0.13.0...v0.13.1) (2020-10-13)
 
 
