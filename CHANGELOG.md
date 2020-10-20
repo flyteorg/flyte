@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](http://github.com/lyft/flyteconsole/compare/v0.13.2...v0.14.0) (2020-10-20)
+
+
+### Features
+
+* Fetch Node Executions directly if possible ([#109](http://github.com/lyft/flyteconsole/issues/109)) ([c740b83](http://github.com/lyft/flyteconsole/commit/c740b83c08b0d9da94c3b54d88481fb5817cd71c))
+
 ## [0.13.2](http://github.com/lyft/flyteconsole/compare/v0.13.1...v0.13.2) (2020-10-16)
 
 
