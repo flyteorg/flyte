@@ -81,10 +81,17 @@ export interface NodeExecutionIdentifier extends Core.INodeExecutionIdentifier {
     executionId: WorkflowExecutionIdentifier;
 }
 
+export interface NodeExecutionMetadata extends Admin.INodeExecutionMetaData {
+    retryGroup?: string;
+    isParentNode?: boolean;
+    specNodeId?: string;
+}
+
 export interface NodeExecution extends Admin.INodeExecution {
     id: NodeExecutionIdentifier;
     inputUri: string;
     closure: NodeExecutionClosure;
+    metadata?: NodeExecutionMetadata;
 }
 export interface NodeExecutionClosure extends Admin.INodeExecutionClosure {
     createdAt: Protobuf.ITimestamp;

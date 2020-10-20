@@ -2,6 +2,7 @@ import { IconButton } from '@material-ui/core';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import * as React from 'react';
+import { titleStrings } from './constants';
 
 /** A simple expand/collapse arrow to be rendered next to row items. */
 export const RowExpander: React.FC<{
@@ -12,6 +13,7 @@ export const RowExpander: React.FC<{
         disableRipple={true}
         disableTouchRipple={true}
         size="small"
+        title={titleStrings.expandRow}
         onClick={onClick}
     >
         {expanded ? <ExpandMore /> : <ChevronRight />}

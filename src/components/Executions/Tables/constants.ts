@@ -15,3 +15,8 @@ export const nodeExecutionsTableColumnWidths = {
     phase: 150,
     startedAt: 200
 };
+
+export const titleStrings = {
+    expandRow: 'Expand row',
+    groupName: 'Group name'
+};

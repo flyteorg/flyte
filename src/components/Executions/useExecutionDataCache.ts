@@ -14,7 +14,9 @@ import {
     Execution,
     GloballyUniqueNode,
     Identifier,
+    NodeExecution,
     NodeExecutionIdentifier,
+    nodeExecutionQueryParams,
     NodeId,
     RequestConfig,
     TaskExecutionIdentifier,
@@ -26,6 +28,7 @@ import {
 import { useState } from 'react';
 import { ExecutionDataCache } from './types';
 import { fetchTaskExecutions } from './useTaskExecutions';
+import { getNodeExecutionSpecId } from './utils';
 
 function cacheItems<T extends { id: object | string }>(
     map: Map<string, T>,
@@ -94,10 +97,9 @@ export function createExecutionDataCache(
         return node;
     };
 
-    const getNodeForNodeExecution = ({
-        executionId,
-        nodeId
-    }: NodeExecutionIdentifier) => {
+    const getNodeForNodeExecution = (nodeExecution: NodeExecution) => {
+        const { executionId } = nodeExecution.id;
+        const nodeId = getNodeExecutionSpecId(nodeExecution);
         const workflowExecutionKey = getCacheKey(executionId);
         if (!workflowExecutionIdToWorkflowId.has(workflowExecutionKey)) {
             log.error(
@@ -123,6 +125,34 @@ export function createExecutionDataCache(
             fetchNodeExecutions({ config, id }, apiContext)
         ]);
         return nodeExecutions;
+    };
+
+    const getNodeExecutionsForParentNode = async (
+        { executionId, nodeId }: NodeExecutionIdentifier,
+        config: RequestConfig
+    ) => {
+        const childrenPromise = fetchNodeExecutions(
+            {
+                config: {
+                    ...config,
+                    params: {
+                        ...config.params,
+                        [nodeExecutionQueryParams.parentNodeId]: nodeId
+                    }
+                },
+                id: executionId
+            },
+            apiContext
+        );
+        const workflowPromise = getWorkflowIdForWorkflowExecution(
+            executionId
+        ).then(workflowId => getWorkflow(workflowId));
+
+        const [children] = await Promise.all([
+            childrenPromise,
+            workflowPromise
+        ]);
+        return children;
     };
 
     const getTaskTemplate = (id: Identifier) => {
@@ -220,6 +250,7 @@ export function createExecutionDataCache(
         getNode,
         getNodeForNodeExecution,
         getNodeExecutions,
+        getNodeExecutionsForParentNode,
         getTaskExecutions,
         getTaskExecutionChildren,
         getTaskTemplate,

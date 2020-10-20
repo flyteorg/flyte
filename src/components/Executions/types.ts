@@ -11,6 +11,7 @@ import {
     Execution,
     NodeExecution,
     NodeExecutionIdentifier,
+    NodeExecutionMetadata,
     TaskExecution,
     TaskExecutionIdentifier,
     WorkflowExecutionIdentifier
@@ -47,6 +48,12 @@ export interface NodeInformation {
     node: CompiledNode;
 }
 
+export interface ParentNodeExecution extends NodeExecution {
+    metadata: NodeExecutionMetadata & {
+        isParentNode: boolean;
+    };
+}
+
 /** An interface combining a NodeExecution with data pulled from the
  * corresponding Workflow Node structure.
  */
@@ -73,10 +80,14 @@ export interface DetailedNodeExecutionGroup extends NodeExecutionGroup {
 export interface ExecutionDataCache {
     getNode(id: NodeId): GloballyUniqueNode | undefined;
     getNodeForNodeExecution(
-        nodeExecutionId: NodeExecutionIdentifier
+        nodeExecution: NodeExecution
     ): GloballyUniqueNode | null | undefined;
     getNodeExecutions(
         workflowExecutionId: WorkflowExecutionIdentifier,
+        config: RequestConfig
+    ): Promise<NodeExecution[]>;
+    getNodeExecutionsForParentNode(
+        id: NodeExecutionIdentifier,
         config: RequestConfig
     ): Promise<NodeExecution[]>;
     getTaskExecutions(

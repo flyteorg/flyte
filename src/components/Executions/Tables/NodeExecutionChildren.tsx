@@ -40,13 +40,14 @@ export const NodeExecutionChildren: React.FC<NodeExecutionChildrenProps> = ({
                 ));
                 const key = `group-${name}`;
                 return showNames ? (
-                    <div key={key}>
+                    <div key={key} role="list">
                         <div
                             className={classnames(
                                 { [tableStyles.borderTop]: groupIndex > 0 },
                                 tableStyles.borderBottom,
                                 tableStyles.childGroupLabel
                             )}
+                            title={name}
                             style={childGroupLabelStyle}
                         >
                             <Typography
@@ -59,7 +60,9 @@ export const NodeExecutionChildren: React.FC<NodeExecutionChildrenProps> = ({
                         <div>{rows}</div>
                     </div>
                 ) : (
-                    <div key={key}>{rows}</div>
+                    <div key={key} role="list">
+                        {rows}
+                    </div>
                 );
             })}
         </>

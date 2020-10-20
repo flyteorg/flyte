@@ -32,7 +32,8 @@ import {
     DetailedNodeExecution,
     ExecutionDataCache,
     ExecutionPhaseConstants,
-    NodeExecutionDisplayType
+    NodeExecutionDisplayType,
+    ParentNodeExecution
 } from './types';
 
 /** Given an execution phase, returns a set of constants (i.e. color, display
@@ -109,14 +110,21 @@ export const taskExecutionIsTerminal = (taskExecution: TaskExecution) =>
     taskExecution.closure &&
     terminalTaskExecutionStates.includes(taskExecution.closure.phase);
 
+export function getNodeExecutionSpecId(nodeExecution: NodeExecution): string {
+    return nodeExecution.metadata?.specNodeId || nodeExecution.id.nodeId;
+}
+
 /** Populates a NodeExecution with extended information read from an `ExecutionDataCache` */
 export function populateNodeExecutionDetails(
     nodeExecution: NodeExecution,
     dataCache: ExecutionDataCache
 ) {
-    const { nodeId } = nodeExecution.id;
+    // Use `spec_node_id` if available to look up the node in the graph (needed to
+    // distinguish nodes in sub-workflow scenarios). But this may not exist, so
+    // fall back to id.nodeId in those cases.
+    const nodeId = getNodeExecutionSpecId(nodeExecution);
     const cacheKey = getCacheKey(nodeExecution.id);
-    const nodeInfo = dataCache.getNodeForNodeExecution(nodeExecution.id);
+    const nodeInfo = dataCache.getNodeForNodeExecution(nodeExecution);
 
     let displayId = nodeId;
     let displayType = NodeExecutionDisplayType.Unknown;
@@ -218,6 +226,19 @@ function getExecutionTimingMS({
         timestampToDate(startedAt).getTime() - createdAtDate.getTime();
 
     return { duration: durationMS, queued: queuedMS };
+}
+
+/** Indicates the presence of metadata for parent node status. Older executions
+ * may be missing this field and require additional API calls to determine if
+ * their are children.
+ */
+export function hasParentNodeField(
+    nodeExecution: NodeExecution
+): nodeExecution is ParentNodeExecution {
+    return (
+        nodeExecution.metadata != null &&
+        nodeExecution.metadata.isParentNode != null
+    );
 }
 
 /** Returns timing information (duration, queue time, ...) for a WorkflowExecution */

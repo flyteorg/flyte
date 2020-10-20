@@ -93,6 +93,7 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
 
     return (
         <div
+            role="listitem"
             className={classnames(tableStyles.row, {
                 [selectedClassName]: selected
             })}

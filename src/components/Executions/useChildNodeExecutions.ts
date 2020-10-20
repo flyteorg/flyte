@@ -3,6 +3,7 @@ import { useFetchableData } from 'components/hooks/useFetchableData';
 import { isEqual } from 'lodash';
 import {
     Execution,
+    FilterOperationName,
     NodeExecution,
     RequestConfig,
     TaskExecutionIdentifier,
@@ -12,6 +13,7 @@ import { useContext } from 'react';
 import { ExecutionContext, ExecutionDataCacheContext } from './contexts';
 import { formatRetryAttempt } from './TaskExecutionsList/utils';
 import { ExecutionDataCache, NodeExecutionGroup } from './types';
+import { hasParentNodeField } from './utils';
 
 interface FetchGroupForTaskExecutionArgs {
     config: RequestConfig;
@@ -109,6 +111,31 @@ async function fetchGroupsForWorkflowExecutionNode({
     return group.nodeExecutions.length > 0 ? [group] : [];
 }
 
+async function fetchGroupsForParentNodeExecution({
+    config,
+    dataCache,
+    nodeExecution
+}: FetchNodeExecutionGroupArgs): Promise<NodeExecutionGroup[]> {
+    const children = await dataCache.getNodeExecutionsForParentNode(
+        nodeExecution.id,
+        config
+    );
+    const groupsByName = children.reduce<Map<string, NodeExecutionGroup>>(
+        (out, child) => {
+            const retryAttempt = formatRetryAttempt(child.metadata?.retryGroup);
+            let group = out.get(retryAttempt);
+            if (!group) {
+                group = { name: retryAttempt, nodeExecutions: [] };
+                out.set(retryAttempt, group);
+            }
+            group.nodeExecutions.push(child);
+            return out;
+        },
+        new Map()
+    );
+    return Array.from(groupsByName.values());
+}
+
 export interface UseChildNodeExecutionsArgs {
     requestConfig: RequestConfig;
     nodeExecution: NodeExecution;
@@ -136,9 +163,17 @@ export function useChildNodeExecutions({
                     nodeExecution: data
                 };
 
-                // Nested NodeExecutions will sometimes have `workflowNodeMetadata` that
-                // points to the parent WorkflowExecution. We're only interested in
-                // showing children if this node is a sub-workflow.
+                // Newer NodeExecution structures can directly indicate their parent
+                // status and have their children fetched in bulk. If the field
+                // is present but false, we can just return an empty list.
+                if (hasParentNodeField(nodeExecution)) {
+                    return nodeExecution.metadata.isParentNode
+                        ? fetchGroupsForParentNodeExecution(fetchArgs)
+                        : [];
+                }
+                // Otherwise, we need to determine the type of the node and
+                // recursively fetch NodeExecutions for the corresponding Workflow
+                // or Task executions.
                 if (
                     workflowNodeMetadata &&
                     !isEqual(workflowNodeMetadata.executionId, topExecution.id)

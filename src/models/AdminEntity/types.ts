@@ -71,7 +71,7 @@ export interface RequestConfig {
     data?: unknown;
     filter?: FilterOperationList;
     limit?: number;
-    params?: object;
+    params?: Record<string, any>;
     token?: string;
     sort?: Sort;
 }

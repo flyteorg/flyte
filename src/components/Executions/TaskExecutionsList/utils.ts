@@ -13,7 +13,17 @@ export function getUniqueTaskExecutionName({ id }: TaskExecution) {
     return `${name}${suffix}`;
 }
 
-export function formatRetryAttempt(attempt: number): string {
+export function formatRetryAttempt(
+    attempt: number | string | undefined
+): string {
+    let parsed =
+        typeof attempt === 'number'
+            ? attempt
+            : Number.parseInt(`${attempt}`, 10);
+    if (Number.isNaN(parsed)) {
+        parsed = 0;
+    }
+
     // Retry attempts are zero-based, so incrementing before formatting
-    return `Attempt ${leftPaddedNumber(attempt + 1, 2)}`;
+    return `Attempt ${leftPaddedNumber(parsed + 1, 2)}`;
 }

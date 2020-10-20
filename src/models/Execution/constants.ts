@@ -30,4 +30,8 @@ export const executionSortFields = {
     startedAt: 'started_at'
 };
 
+export const nodeExecutionQueryParams = {
+    parentNodeId: 'uniqueParentId'
+};
+
 export const defaultExecutionPrincipal = 'flyteconsole';
