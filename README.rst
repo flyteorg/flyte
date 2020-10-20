@@ -31,6 +31,8 @@ can be installed by running ``yarn`` in the project directory.
 Environment variables
 ======================
 Before we can run the server, we need to set up an environment variable or two.
+Environment variables can be set either in the current shell or persisted in
+``.env`` file stored under the root of the repository.
 
 ``ADMIN_API_URL`` (default: `window.location.origin <https://developer.mozilla.org/en-US/docs/Web/API/Window/location>`_)
 
@@ -61,7 +63,7 @@ usually not needed, so the default behavior is to run without a prefix.
 
 ``CORS_PROXY_PREFIX`` (default: ``/cors_proxy``)
 
-Sets the local endpoint for `CORS request proxying <cors-proxy_>`_.
+Sets the local endpoint for `CORS request proxying <cors-proxying_>`_.
 
 ===============
 Run the server
@@ -112,7 +114,7 @@ a single module, you can specify that one specifically
 (ex. ``localStorage.debug = 'flyte:adminEntity'`` to only see decoded Flyte
 Admin API requests).
 
-.. _cors-proxy:
+.. _cors-proxying:
 
 ==============
 CORS Proxying
@@ -126,7 +128,9 @@ hosting the Admin API on a different domain than the console. Another example is
 when fetching execution data from external storage such as S3. This is done to
 minimize the amount of extra configuration required for ingress to the Admin API
 and data storage, as well as to simplify local development of the console without
-the need to grant CORS access to ``localhost``.
+the need to grant CORS access to ``localhost``. To proxy requests for local
+development, set ``ADMIN_API_URL`` to
+``http://localhost:3000/cors_proxy/http://<admin-host>:<admin-port>``.
 
 The requests and responses are piped through the NodeJS server with minimal
 overhead. However, it is still recommended to host the Admin API and console on
