@@ -80,5 +80,6 @@ func init() {
 			ResourceToWatch:     &v1.Pod{},
 			Plugin:              Plugin{},
 			IsDefault:           true,
+			DefaultForTaskTypes: []pluginsCore.TaskType{containerTaskType},
 		})
 }

@@ -192,6 +192,7 @@ func init() {
 			RegisteredTaskTypes: []core.TaskType{arrayTaskType},
 			LoadPlugin:          createNewExecutorPlugin,
 			IsDefault:           false,
+			DefaultForTaskTypes: []core.TaskType{arrayTaskType},
 		})
 }
 

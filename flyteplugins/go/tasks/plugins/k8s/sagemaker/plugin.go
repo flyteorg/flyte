@@ -75,6 +75,7 @@ func init() {
 			ResourceToWatch:     &hpojobv1.HyperparameterTuningJob{},
 			Plugin:              awsSagemakerPlugin{TaskType: hyperparameterTuningJobTaskType},
 			IsDefault:           false,
+			DefaultForTaskTypes: []pluginsCore.TaskType{hyperparameterTuningJobTaskType},
 		})
 
 	// Registering the plugin for standalone TrainingJob
@@ -85,6 +86,7 @@ func init() {
 			ResourceToWatch:     &trainingjobv1.TrainingJob{},
 			Plugin:              awsSagemakerPlugin{TaskType: trainingJobTaskType},
 			IsDefault:           false,
+			DefaultForTaskTypes: []pluginsCore.TaskType{trainingJobTaskType},
 		})
 
 	// Registering the plugin for custom TrainingJob
@@ -95,5 +97,6 @@ func init() {
 			ResourceToWatch:     &trainingjobv1.TrainingJob{},
 			Plugin:              awsSagemakerPlugin{TaskType: customTrainingJobTaskType},
 			IsDefault:           false,
+			DefaultForTaskTypes: []pluginsCore.TaskType{customTrainingJobTaskType},
 		})
 }

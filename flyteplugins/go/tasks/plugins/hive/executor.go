@@ -163,5 +163,6 @@ func init() {
 			RegisteredTaskTypes: []core.TaskType{hiveTaskType},
 			LoadPlugin:          QuboleHiveExecutorLoader,
 			IsDefault:           false,
+			DefaultForTaskTypes: []core.TaskType{hiveTaskType},
 		})
 }
