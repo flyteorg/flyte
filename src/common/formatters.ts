@@ -93,6 +93,54 @@ export function millisecondsToHMS(valueMS: number): string {
     return parts.length ? parts.join(' ') : unknownValueString;
 }
 
+/** Outputs a value in moment.Duration in (Y M D H M S) format (ex. 1y 1M 1d 2h 3m 30s) */
+export function durationToYMWDHMS(duration: moment.Duration): string {
+    if (duration.asSeconds() === 0) {
+        return '';
+    }
+
+    const parts = [];
+
+    if (duration.years() !== 0) {
+        parts.push(`${Math.abs(duration.years())}y`);
+    }
+
+    if (duration.months() !== 0) {
+        parts.push(`${Math.abs(duration.months())}M`);
+    }
+
+    // ISO-8601 does not permit mixing between the PnYnMnD and PnW formats.
+    // Any week-based input is multiplied by 7 and treated as a number of days.
+    // However moment can parse the mixture resulting both a number of weeks and a number of days.
+    // For example both P8D and P1W1D result duration.weeks() == 1 and duration.days() == 8.
+    // Here we skip showing weeks and only take the total number of days.
+    if (duration.days() !== 0) {
+        parts.push(`${Math.abs(duration.days())}d`);
+    }
+
+    if (duration.hours() !== 0) {
+        parts.push(`${Math.abs(duration.hours())}h`);
+    }
+
+    if (duration.minutes() !== 0) {
+        parts.push(`${Math.abs(duration.minutes())}m`);
+    }
+
+    if (duration.seconds() !== 0) {
+        parts.push(`${Math.abs(duration.seconds())}s`);
+    }
+
+    const now = moment();
+    const sign = now
+        .clone()
+        .add(duration)
+        .isBefore(now)
+        ? '-'
+        : '+';
+
+    return `(${sign}) ${parts.join(' ')}`;
+}
+
 /** Converts a protobuf Duration value to (H M S) format (ex. 2h 3m 30s)*/
 export function protobufDurationToHMS(duration: Protobuf.IDuration) {
     return millisecondsToHMS(durationToMilliseconds(duration));
@@ -122,6 +170,31 @@ export function fixedRateToString({ value, unit }: Admin.IFixedRate): string {
     return `Every ${value} ${fixedRateUnitStrings[unit]}`;
 }
 
+const hourlyAliases = ['@hourly', 'hourly', 'hours'];
+const dailyAliases = ['@daily', 'daily', 'days'];
+const weeklyAliases = ['@weekly', 'weekly', 'weeks'];
+const monthlyAliases = ['@monthly', 'monthly', 'months'];
+const yearlyAliases = ['@yearly', 'yearly', 'years', '@annually', 'annually'];
+
+export function getScheduleFrequencyStringFromAlias(schedule: string) {
+    if (hourlyAliases.includes(schedule)) {
+        return 'Every hour';
+    }
+    if (dailyAliases.includes(schedule)) {
+        return 'Every day';
+    }
+    if (weeklyAliases.includes(schedule)) {
+        return 'Every week';
+    }
+    if (monthlyAliases.includes(schedule)) {
+        return 'Every month';
+    }
+    if (yearlyAliases.includes(schedule)) {
+        return 'Every year';
+    }
+    return '';
+}
+
 export function getScheduleFrequencyString(schedule?: Admin.ISchedule) {
     if (schedule == null) {
         return '';
@@ -133,6 +206,23 @@ export function getScheduleFrequencyString(schedule?: Admin.ISchedule) {
     }
     if (schedule.rate) {
         return fixedRateToString(schedule.rate);
+    }
+    if (schedule.cronSchedule && schedule.cronSchedule.schedule) {
+        return (
+            getScheduleFrequencyStringFromAlias(
+                schedule.cronSchedule.schedule
+            ) || cronstrue.toString(schedule.cronSchedule.schedule)
+        );
+    }
+    return '';
+}
+
+export function getScheduleOffsetString(schedule?: Admin.ISchedule) {
+    if (schedule == null) {
+        return '';
+    }
+    if (schedule.cronSchedule && schedule.cronSchedule.offset) {
+        return durationToYMWDHMS(moment.duration(schedule.cronSchedule.offset));
     }
     return '';
 }

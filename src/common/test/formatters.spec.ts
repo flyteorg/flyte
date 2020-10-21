@@ -1,4 +1,6 @@
 import { millisecondsToDuration } from 'common/utils';
+import { Admin } from 'flyteidl';
+import * as moment from 'moment-timezone';
 import {
     subSecondString,
     unknownValueString,
@@ -8,10 +10,13 @@ import {
     dateDiffString,
     dateFromNow,
     dateWithFromNow,
+    durationToYMWDHMS,
     ensureUrlWithProtocol,
     formatDate,
     formatDateLocalTimezone,
     formatDateUTC,
+    getScheduleFrequencyString,
+    getScheduleOffsetString,
     leftPaddedNumber,
     millisecondsToHMS,
     protobufDurationToHMS
@@ -156,6 +161,89 @@ describe('millisecondsToHMS', () => {
     millisecondToHMSTestCases.forEach(([ms, expected]) =>
         it(`should convert ${ms}ms to ${expected}`, () => {
             expect(millisecondsToHMS(ms)).toBe(expected);
+        })
+    );
+});
+
+describe('durationToYMWDHMS', () => {
+    // input and expected result
+    const cases: [string, string][] = [
+        ['P1Y1M1W1D', '(+) 1y 1M 8d'],
+        ['P1Y1M1W1DT1H1M1S', '(+) 1y 1M 8d 1h 1m 1s'],
+        ['P1Y1M1DT1H1M1S', '(+) 1y 1M 1d 1h 1m 1s'],
+        ['P1M1DT1H1M1S', '(+) 1M 1d 1h 1m 1s'],
+        ['P1DT1H1M1S', '(+) 1d 1h 1m 1s'],
+        ['PT1H1M1S', '(+) 1h 1m 1s'],
+        ['PT1M1S', '(+) 1m 1s'],
+        ['PT1S', '(+) 1s'],
+        ['PT1M-1S', '(+) 59s'],
+        ['-P1Y1M1W1D', '(-) 1y 1M 8d'],
+        ['-P1Y1M1W1DT1H1M1S', '(-) 1y 1M 8d 1h 1m 1s'],
+        ['-P1Y1M1DT1H1M1S', '(-) 1y 1M 1d 1h 1m 1s'],
+        ['-P1M1DT1H1M1S', '(-) 1M 1d 1h 1m 1s'],
+        ['-P1DT1H1M1S', '(-) 1d 1h 1m 1s'],
+        ['-PT1H1M1S', '(-) 1h 1m 1s'],
+        ['-PT1M1S', '(-) 1m 1s'],
+        ['-PT1S', '(-) 1s'],
+        ['PT-1M1S', '(-) 59s'],
+        ['', '']
+    ];
+    cases.forEach(([input, expected]) =>
+        it(`should produce ${expected} with input ${input}`, () => {
+            expect(durationToYMWDHMS(moment.duration(input))).toEqual(expected);
+        })
+    );
+});
+
+describe('getScheduleFrequencyString', () => {
+    // input and expected result
+    const cases: [Admin.ISchedule, string][] = [
+        [{ cronExpression: '* * * * *' }, 'Every minute'],
+        [
+            { rate: { value: 1, unit: Admin.FixedRateUnit.MINUTE } },
+            'Every 1 minutes'
+        ],
+        [{ cronSchedule: { schedule: '* * * * *' } }, 'Every minute'],
+        [{ cronSchedule: { schedule: '@hourly' } }, 'Every hour'],
+        [{ cronSchedule: { schedule: 'hourly' } }, 'Every hour'],
+        [{ cronSchedule: { schedule: 'hours' } }, 'Every hour'],
+        [{ cronSchedule: { schedule: '@daily' } }, 'Every day'],
+        [{ cronSchedule: { schedule: 'daily' } }, 'Every day'],
+        [{ cronSchedule: { schedule: 'days' } }, 'Every day'],
+        [{ cronSchedule: { schedule: '@weekly' } }, 'Every week'],
+        [{ cronSchedule: { schedule: 'weekly' } }, 'Every week'],
+        [{ cronSchedule: { schedule: 'weeks' } }, 'Every week'],
+        [{ cronSchedule: { schedule: '@monthly' } }, 'Every month'],
+        [{ cronSchedule: { schedule: 'monthly' } }, 'Every month'],
+        [{ cronSchedule: { schedule: 'months' } }, 'Every month'],
+        [{ cronSchedule: { schedule: '@yearly' } }, 'Every year'],
+        [{ cronSchedule: { schedule: 'yearly' } }, 'Every year'],
+        [{ cronSchedule: { schedule: 'years' } }, 'Every year'],
+        [{ cronSchedule: { schedule: '@annually' } }, 'Every year'],
+        [{ cronSchedule: { schedule: 'annually' } }, 'Every year'],
+        [null!, ''],
+        [{ cronSchedule: { schedule: '' } }, '']
+    ];
+
+    cases.forEach(([input, expected]) =>
+        it(`should produce ${expected} with input ${input}`, () => {
+            expect(getScheduleFrequencyString(input)).toEqual(expected);
+        })
+    );
+});
+
+describe('getScheduleOffsetString', () => {
+    // input and expected result
+    const cases: [Admin.ISchedule, string][] = [
+        [{ cronSchedule: { offset: 'P1D' } }, '(+) 1d'],
+        [{ cronSchedule: { offset: 'P-1D' } }, '(-) 1d'],
+        [null!, ''],
+        [{ cronSchedule: { offset: '' } }, '']
+    ];
+
+    cases.forEach(([input, expected]) =>
+        it(`should produce ${expected} with input ${input}`, () => {
+            expect(getScheduleOffsetString(input)).toEqual(expected);
         })
     );
 });

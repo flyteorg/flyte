@@ -1,6 +1,9 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { getScheduleFrequencyString } from 'common/formatters';
+import {
+    getScheduleFrequencyString,
+    getScheduleOffsetString
+} from 'common/formatters';
 import { WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { useWorkflowSchedules } from 'components/hooks';
@@ -23,7 +26,11 @@ const RenderSchedules: React.FC<{
             {launchPlans.map((launchPlan, idx) => {
                 const { schedule } = launchPlan.spec.entityMetadata;
                 const frequencyString = getScheduleFrequencyString(schedule);
-                return <li key={idx}>{frequencyString}</li>;
+                const offsetString = getScheduleOffsetString(schedule);
+                const scheduleString = offsetString
+                    ? `${frequencyString} (offset by ${offsetString})`
+                    : frequencyString;
+                return <li key={idx}>{scheduleString}</li>;
             })}
         </ul>
     );
