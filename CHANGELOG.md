@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](http://github.com/lyft/flyteconsole/compare/v0.14.0...v0.15.0) (2020-10-21)
+
+
+### Features
+
+* render CronSchedule ([#107](http://github.com/lyft/flyteconsole/issues/107)) ([c3c5d5d](http://github.com/lyft/flyteconsole/commit/c3c5d5d347fb1921af3cc7311deecda0b0c72295))
+
 # [0.14.0](http://github.com/lyft/flyteconsole/compare/v0.13.2...v0.14.0) (2020-10-20)
 
 
