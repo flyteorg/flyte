@@ -175,5 +175,6 @@ func init() {
 			ResourceToWatch:     &k8sv1.Pod{},
 			Plugin:              sidecarResourceHandler{},
 			IsDefault:           false,
+			DefaultForTaskTypes: []pluginsCore.TaskType{sidecarTaskType},
 		})
 }
