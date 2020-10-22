@@ -1,8 +1,12 @@
 import { Core } from 'flyteidl';
 import * as Long from 'long';
 import { BlobDimensionality } from 'models';
-import { primitiveLiteral } from '../../__mocks__/utils';
-import { InputProps, InputType } from '../../types';
+import {
+    collectionInputTypeDefinition,
+    nestedCollectionInputTypeDefinition,
+    primitiveLiteral
+} from '../../__mocks__/utils';
+import { InputProps, InputType, InputTypeDefinition } from '../../types';
 import { literalNone } from '../constants';
 import { getHelperForInput } from '../getHelperForInput';
 import {
@@ -12,6 +16,7 @@ import {
 } from '../inputHelpers';
 import { collectionChildToString } from '../utils';
 import {
+    inputTypes,
     literalTestCases,
     literalToInputTestCases,
     supportedPrimitives,
@@ -25,69 +30,80 @@ const baseInputProps: InputProps = {
     name: '',
     onChange: () => {},
     required: false,
-    typeDefinition: { type: InputType.Unknown }
+    typeDefinition: inputTypes.unknown
 };
 
-function makeSimpleInput(type: InputType, value: any): InputProps {
-    return { ...baseInputProps, value, typeDefinition: { type } };
+function makeSimpleInput(
+    typeDefinition: InputTypeDefinition,
+    value: any
+): InputProps {
+    return { ...baseInputProps, value, typeDefinition };
 }
 
-function makeCollectionInput(type: InputType, value: string): InputProps {
+function makeCollectionInput(
+    typeDefinition: InputTypeDefinition,
+    value: string
+): InputProps {
     return {
         ...baseInputProps,
         value,
-        typeDefinition: { type: InputType.Collection, subtype: { type } }
+        typeDefinition: collectionInputTypeDefinition(typeDefinition)
     };
 }
 
-function makeNestedCollectionInput(type: InputType, value: string): InputProps {
+function makeNestedCollectionInput(
+    typeDefinition: InputTypeDefinition,
+    value: string
+): InputProps {
     return {
         ...baseInputProps,
         value,
-        typeDefinition: {
-            type: InputType.Collection,
-            subtype: { type: InputType.Collection, subtype: { type } }
-        }
+        typeDefinition: nestedCollectionInputTypeDefinition(typeDefinition)
     };
 }
 
 describe('literalToInputValue', () => {
     describe('Primitives', () => {
-        literalToInputTestCases.map(([type, input, output]) =>
-            it(`should correctly convert ${type}: ${JSON.stringify(
-                input
-            )}`, () =>
-                expect(literalToInputValue({ type }, input)).toEqual(output))
+        literalToInputTestCases.map(([typeDefinition, input, output]) =>
+            it(`should correctly convert ${
+                typeDefinition.type
+            }: ${JSON.stringify(input)}`, () =>
+                expect(literalToInputValue(typeDefinition, input)).toEqual(
+                    output
+                ))
         );
 
-        supportedPrimitives.map(type =>
-            it(`should convert None value for ${type} to undefined`, () =>
+        supportedPrimitives.map(typeDefinition =>
+            it(`should convert None value for ${typeDefinition.type} to undefined`, () =>
                 expect(
-                    literalToInputValue({ type }, literalNone())
+                    literalToInputValue(typeDefinition, literalNone())
                 ).toBeUndefined())
         );
 
         it('should correctly convert noneType to undefined', () =>
-            expect(
-                literalToInputValue({ type: InputType.None }, literalNone())
-            ).toEqual(undefined));
+            expect(literalToInputValue(inputTypes.none, literalNone())).toEqual(
+                undefined
+            ));
     });
 
     describe('Collections', () => {
-        literalToInputTestCases.map(([type, input, output]) => {
-            it(`should correctly convert collection of ${type}: ${JSON.stringify(
-                input
-            )}`, () => {
+        literalToInputTestCases.map(([typeDefinition, input, output]) => {
+            it(`should correctly convert collection of ${
+                typeDefinition.type
+            }: ${JSON.stringify(input)}`, () => {
                 const collection: Core.ILiteral = {
                     collection: {
                         // Duplicate it to test comma separation
                         literals: [input, input]
                     }
                 };
-                const stringifiedValue = collectionChildToString(type, output);
+                const stringifiedValue = collectionChildToString(
+                    typeDefinition.type,
+                    output
+                );
                 const expectedString = `[${stringifiedValue},${stringifiedValue}]`;
                 const result = literalToInputValue(
-                    { type: InputType.Collection, subtype: { type } },
+                    collectionInputTypeDefinition(typeDefinition),
                     collection
                 );
                 expect(result).toEqual(expectedString);
@@ -102,12 +118,14 @@ describe('literalToInputValue', () => {
                 }
             };
 
+            const typeDefinition: InputTypeDefinition = {
+                literalType: { simple: Core.SimpleType.NONE },
+                type: InputType.None
+            };
+
             expect(
                 literalToInputValue(
-                    {
-                        type: InputType.Collection,
-                        subtype: { type: InputType.None }
-                    },
+                    collectionInputTypeDefinition(typeDefinition),
                     collection
                 )
             ).toEqual('[]');
@@ -118,7 +136,7 @@ describe('literalToInputValue', () => {
         const { defaultValue } = getHelperForInput(InputType.Boolean);
         expect(
             literalToInputValue(
-                { type: InputType.Boolean },
+                inputTypes.boolean,
                 // Invalid boolean input value because it uses the string field
                 { scalar: { primitive: { stringValue: 'whoops' } } }
             )
@@ -128,18 +146,18 @@ describe('literalToInputValue', () => {
 
 describe('inputToLiteral', () => {
     describe('Scalars', () => {
-        literalTestCases.map(([type, input, output]) => {
-            it(`should correctly convert ${type}: ${JSON.stringify(
-                input
-            )} (${typeof input})`, () =>
-                expect(inputToLiteral(makeSimpleInput(type, input))).toEqual(
-                    output
-                ));
+        literalTestCases.map(([typeDefinition, input, output]) => {
+            it(`should correctly convert ${
+                typeDefinition.type
+            }: ${JSON.stringify(input)} (${typeof input})`, () =>
+                expect(
+                    inputToLiteral(makeSimpleInput(typeDefinition, input))
+                ).toEqual(output));
         });
     });
 
     describe('Collections', () => {
-        literalTestCases.map(([type, input, output]) => {
+        literalTestCases.map(([typeDefinition, input, output]) => {
             let value: any;
             if (['boolean', 'number'].includes(typeof input)) {
                 value = input;
@@ -153,20 +171,20 @@ describe('inputToLiteral', () => {
                 value = JSON.stringify(input);
             }
 
-            it(`should correctly convert collection of type ${type}: [${JSON.stringify(
-                value
-            )}] (${typeof input})`, () => {
+            it(`should correctly convert collection of type ${
+                typeDefinition.type
+            }: [${JSON.stringify(value)}] (${typeof input})`, () => {
                 const result = inputToLiteral(
-                    makeCollectionInput(type, `[${value}]`)
+                    makeCollectionInput(typeDefinition, `[${value}]`)
                 );
                 expect(result.collection!.literals![0]).toEqual(output);
             });
 
-            it(`should correctly convert nested collection of type ${type}: [[${JSON.stringify(
-                value
-            )}]] (${typeof input})`, () => {
+            it(`should correctly convert nested collection of type ${
+                typeDefinition.type
+            }: [[${JSON.stringify(value)}]] (${typeof input})`, () => {
                 const result = inputToLiteral(
-                    makeNestedCollectionInput(type, `[[${value}]]`)
+                    makeNestedCollectionInput(typeDefinition, `[[${value}]]`)
                 );
                 expect(
                     result.collection!.literals![0].collection!.literals![0]
@@ -176,10 +194,10 @@ describe('inputToLiteral', () => {
     });
 
     describe('Unsupported Types', () => {
-        unsupportedTypes.map(type =>
-            it(`should return empty value for type: ${type}`, () => {
+        unsupportedTypes.map(typeDefinition =>
+            it(`should return empty value for type: ${typeDefinition.type}`, () => {
                 expect(
-                    inputToLiteral(makeSimpleInput(type, '')).scalar
+                    inputToLiteral(makeSimpleInput(typeDefinition, '')).scalar
                 ).toEqual({ noneType: {} });
             })
         );
@@ -187,7 +205,7 @@ describe('inputToLiteral', () => {
 
     it('Should return initial value for inputs with no value', () => {
         const simpleInput = makeSimpleInput(
-            InputType.String,
+            inputTypes.string,
             primitiveLiteral({ stringValue: '' })
         );
         const initialValue = primitiveLiteral({ stringValue: 'abcdefg' });
@@ -199,14 +217,14 @@ describe('inputToLiteral', () => {
 });
 
 function generateValidityTests(
-    type: InputType,
+    typeDefinition: InputTypeDefinition,
     { valid, invalid }: { valid: any[]; invalid: any[] }
 ) {
     valid.map(value =>
         it(`should treat ${JSON.stringify(
             value
         )} (${typeof value}) as valid`, () => {
-            const input = makeSimpleInput(type, value);
+            const input = makeSimpleInput(typeDefinition, value);
             expect(() => validateInput(input)).not.toThrowError();
         })
     );
@@ -214,38 +232,42 @@ function generateValidityTests(
         it(`should treat ${JSON.stringify(
             value
         )} (${typeof value}) as invalid`, () => {
-            const input = makeSimpleInput(type, value);
+            const input = makeSimpleInput(typeDefinition, value);
             expect(() => validateInput(input)).toThrowError();
         })
     );
 }
 describe('validateInput', () => {
     describe('boolean', () => {
-        generateValidityTests(InputType.Boolean, validityTestCases.boolean);
+        generateValidityTests(inputTypes.boolean, validityTestCases.boolean);
     });
 
     describe('blob', () => {
-        generateValidityTests(InputType.Blob, validityTestCases.blob);
+        generateValidityTests(inputTypes.blobSingle, validityTestCases.blob);
     });
 
     describe('datetime', () => {
-        generateValidityTests(InputType.Datetime, validityTestCases.datetime);
+        generateValidityTests(inputTypes.datetime, validityTestCases.datetime);
     });
 
     describe('duration', () => {
-        generateValidityTests(InputType.Duration, validityTestCases.duration);
+        generateValidityTests(inputTypes.duration, validityTestCases.duration);
     });
 
     describe('float', () => {
-        generateValidityTests(InputType.Float, validityTestCases.float);
+        generateValidityTests(inputTypes.float, validityTestCases.float);
     });
 
     describe('integer', () => {
-        generateValidityTests(InputType.Integer, validityTestCases.integer);
+        generateValidityTests(inputTypes.integer, validityTestCases.integer);
+    });
+
+    describe('schema', () => {
+        generateValidityTests(inputTypes.schema, validityTestCases.schema);
     });
 
     describe('string', () => {
-        generateValidityTests(InputType.String, validityTestCases.string);
+        generateValidityTests(inputTypes.string, validityTestCases.string);
     });
 
     it('should throw errors for missing required simple values', () => {
@@ -258,7 +280,7 @@ describe('validateInput', () => {
 
     it('should throw errors for missing required Blob values', () => {
         // URI is the only required, user-provided value with no default
-        const simpleInput = makeSimpleInput(InputType.Blob, {
+        const simpleInput = makeSimpleInput(inputTypes.blobSingle, {
             format: 'csv',
             dimensionality: BlobDimensionality.SINGLE
         });
@@ -268,7 +290,7 @@ describe('validateInput', () => {
 
     it('should not throw an error for a required input with an initial value and no value', () => {
         const simpleInput = makeSimpleInput(
-            InputType.String,
+            inputTypes.string,
             primitiveLiteral({ stringValue: '' })
         );
         simpleInput.required = true;

@@ -38,7 +38,6 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
         case InputType.Error:
         case InputType.Map:
         case InputType.None:
-        case InputType.Schema:
         case InputType.Struct:
         case InputType.Unknown:
             return false;
@@ -48,6 +47,7 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
         case InputType.Duration:
         case InputType.Float:
         case InputType.Integer:
+        case InputType.Schema:
         case InputType.String:
             return true;
         case InputType.Collection: {

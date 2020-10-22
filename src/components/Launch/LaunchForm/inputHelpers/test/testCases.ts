@@ -1,32 +1,118 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import { BlobDimensionality } from 'models';
+import { BlobDimensionality, SchemaColumnType } from 'models';
 import { blobLiteral, primitiveLiteral } from '../../__mocks__/utils';
-import { InputType, InputValue } from '../../types';
+import { InputType, InputTypeDefinition, InputValue } from '../../types';
 import { literalNone } from '../constants';
 
 // Defines type of value, input, and expected value of a `Core.ILiteral`
-type LiteralTestParams = [InputType, any, Core.ILiteral];
+type LiteralTestParams = [InputTypeDefinition, any, Core.ILiteral];
+
+type InputTypeKey =
+    | 'binary'
+    | 'boolean'
+    | 'blobSingle'
+    | 'blobMulti'
+    | 'datetime'
+    | 'duration'
+    | 'error'
+    | 'integer'
+    | 'float'
+    | 'map'
+    | 'none'
+    | 'schema'
+    | 'string'
+    | 'struct'
+    | 'unknown';
+export const inputTypes: Record<InputTypeKey, InputTypeDefinition> = {
+    binary: {
+        literalType: { simple: Core.SimpleType.BINARY },
+        type: InputType.Binary
+    },
+    boolean: {
+        literalType: { simple: Core.SimpleType.BOOLEAN },
+        type: InputType.Boolean
+    },
+    blobSingle: {
+        literalType: { blob: { dimensionality: BlobDimensionality.SINGLE } },
+        type: InputType.Blob
+    },
+    blobMulti: {
+        literalType: { blob: { dimensionality: BlobDimensionality.MULTIPART } },
+        type: InputType.Blob
+    },
+    datetime: {
+        literalType: { simple: Core.SimpleType.DATETIME },
+        type: InputType.Datetime
+    },
+    duration: {
+        literalType: { simple: Core.SimpleType.DURATION },
+        type: InputType.Duration
+    },
+    error: {
+        literalType: { simple: Core.SimpleType.ERROR },
+        type: InputType.Error
+    },
+    integer: {
+        literalType: { simple: Core.SimpleType.INTEGER },
+        type: InputType.Integer
+    },
+    float: {
+        literalType: { simple: Core.SimpleType.FLOAT },
+        type: InputType.Float
+    },
+    map: {
+        literalType: {
+            mapValueType: { simple: Core.SimpleType.STRING }
+        },
+        type: InputType.Map
+    },
+    none: {
+        literalType: { simple: Core.SimpleType.NONE },
+        type: InputType.None
+    },
+    schema: {
+        literalType: {
+            schema: {
+                columns: [{ name: 'column1', type: SchemaColumnType.STRING }]
+            }
+        },
+        type: InputType.Schema
+    },
+    string: {
+        literalType: { simple: Core.SimpleType.STRING },
+        type: InputType.String
+    },
+    struct: {
+        literalType: { simple: Core.SimpleType.STRUCT },
+        type: InputType.Struct
+    },
+    unknown: {
+        literalType: { simple: Core.SimpleType.NONE },
+        type: InputType.Unknown
+    }
+};
 
 const validDateString = '2019-01-10T00:00:00.000Z'; // Dec 1, 2019
 
-export const supportedPrimitives = [
-    InputType.Boolean,
-    InputType.Blob,
-    InputType.Datetime,
-    InputType.Duration,
-    InputType.Float,
-    InputType.Integer
+export const supportedPrimitives: InputTypeDefinition[] = [
+    inputTypes.boolean,
+    inputTypes.blobSingle,
+    inputTypes.blobMulti,
+    inputTypes.datetime,
+    inputTypes.duration,
+    inputTypes.float,
+    inputTypes.integer,
+    inputTypes.schema
 ];
 
-export const unsupportedTypes = [
-    InputType.Binary,
-    InputType.Error,
-    InputType.Map,
-    InputType.None,
-    InputType.Schema,
-    InputType.Struct
+export const unsupportedTypes: InputTypeDefinition[] = [
+    inputTypes.binary,
+    inputTypes.error,
+    inputTypes.map,
+    inputTypes.none,
+    inputTypes.struct
 ];
 
 export const validityTestCases = {
@@ -107,102 +193,141 @@ export const validityTestCases = {
             Long.MIN_VALUE
         ]
     },
+    // schema is just a specialized string input, so it has the same validity cases as string
+    schema: { invalid: [123, true, new Date(), {}], valid: ['', 'abcdefg'] },
     string: { invalid: [123, true, new Date(), {}], valid: ['', 'abcdefg'] }
 };
 
 export const literalTestCases: LiteralTestParams[] = [
-    [InputType.Boolean, true, primitiveLiteral({ boolean: true })],
-    [InputType.Boolean, 'true', primitiveLiteral({ boolean: true })],
-    [InputType.Boolean, 't', primitiveLiteral({ boolean: true })],
-    [InputType.Boolean, '1', primitiveLiteral({ boolean: true })],
-    [InputType.Boolean, 1, primitiveLiteral({ boolean: true })],
-    [InputType.Boolean, false, primitiveLiteral({ boolean: false })],
-    [InputType.Boolean, 'false', primitiveLiteral({ boolean: false })],
-    [InputType.Boolean, 'f', primitiveLiteral({ boolean: false })],
-    [InputType.Boolean, '0', primitiveLiteral({ boolean: false })],
-    [InputType.Boolean, 0, primitiveLiteral({ boolean: false })],
+    [inputTypes.boolean, true, primitiveLiteral({ boolean: true })],
+    [inputTypes.boolean, 'true', primitiveLiteral({ boolean: true })],
+    [inputTypes.boolean, 't', primitiveLiteral({ boolean: true })],
+    [inputTypes.boolean, '1', primitiveLiteral({ boolean: true })],
+    [inputTypes.boolean, 1, primitiveLiteral({ boolean: true })],
+    [inputTypes.boolean, false, primitiveLiteral({ boolean: false })],
+    [inputTypes.boolean, 'false', primitiveLiteral({ boolean: false })],
+    [inputTypes.boolean, 'f', primitiveLiteral({ boolean: false })],
+    [inputTypes.boolean, '0', primitiveLiteral({ boolean: false })],
+    [inputTypes.boolean, 0, primitiveLiteral({ boolean: false })],
     [
-        InputType.Datetime,
+        inputTypes.datetime,
         new Date(validDateString),
         primitiveLiteral({
             datetime: dateToTimestamp(new Date(validDateString))
         })
     ],
     [
-        InputType.Datetime,
+        inputTypes.datetime,
         validDateString,
         primitiveLiteral({
             datetime: dateToTimestamp(new Date(validDateString))
         })
     ],
     [
-        InputType.Duration,
+        inputTypes.duration,
         0,
         primitiveLiteral({ duration: millisecondsToDuration(0) })
     ],
     [
-        InputType.Duration,
+        inputTypes.duration,
         10000,
         primitiveLiteral({ duration: millisecondsToDuration(10000) })
     ],
-    [InputType.Float, 0, primitiveLiteral({ floatValue: 0 })],
-    [InputType.Float, '0', primitiveLiteral({ floatValue: 0 })],
-    [InputType.Float, -1.5, primitiveLiteral({ floatValue: -1.5 })],
-    [InputType.Float, '-1.5', primitiveLiteral({ floatValue: -1.5 })],
-    [InputType.Float, 1.5, primitiveLiteral({ floatValue: 1.5 })],
-    [InputType.Float, '1.5', primitiveLiteral({ floatValue: 1.5 })],
-    [InputType.Float, 1.25e10, primitiveLiteral({ floatValue: 1.25e10 })],
-    [InputType.Float, '1.25e10', primitiveLiteral({ floatValue: 1.25e10 })],
-    [InputType.Integer, 0, primitiveLiteral({ integer: Long.fromNumber(0) })],
+    [inputTypes.float, 0, primitiveLiteral({ floatValue: 0 })],
+    [inputTypes.float, '0', primitiveLiteral({ floatValue: 0 })],
+    [inputTypes.float, -1.5, primitiveLiteral({ floatValue: -1.5 })],
+    [inputTypes.float, '-1.5', primitiveLiteral({ floatValue: -1.5 })],
+    [inputTypes.float, 1.5, primitiveLiteral({ floatValue: 1.5 })],
+    [inputTypes.float, '1.5', primitiveLiteral({ floatValue: 1.5 })],
+    [inputTypes.float, 1.25e10, primitiveLiteral({ floatValue: 1.25e10 })],
+    [inputTypes.float, '1.25e10', primitiveLiteral({ floatValue: 1.25e10 })],
+    [inputTypes.integer, 0, primitiveLiteral({ integer: Long.fromNumber(0) })],
     [
-        InputType.Integer,
+        inputTypes.integer,
         Long.fromNumber(0),
         primitiveLiteral({ integer: Long.fromNumber(0) })
     ],
-    [InputType.Integer, '0', primitiveLiteral({ integer: Long.fromNumber(0) })],
-    [InputType.Integer, 1, primitiveLiteral({ integer: Long.fromNumber(1) })],
     [
-        InputType.Integer,
+        inputTypes.integer,
+        '0',
+        primitiveLiteral({ integer: Long.fromNumber(0) })
+    ],
+    [inputTypes.integer, 1, primitiveLiteral({ integer: Long.fromNumber(1) })],
+    [
+        inputTypes.integer,
         Long.fromNumber(1),
         primitiveLiteral({ integer: Long.fromNumber(1) })
     ],
-    [InputType.Integer, '1', primitiveLiteral({ integer: Long.fromNumber(1) })],
-    [InputType.Integer, -1, primitiveLiteral({ integer: Long.fromNumber(-1) })],
     [
-        InputType.Integer,
+        inputTypes.integer,
+        '1',
+        primitiveLiteral({ integer: Long.fromNumber(1) })
+    ],
+    [
+        inputTypes.integer,
+        -1,
+        primitiveLiteral({ integer: Long.fromNumber(-1) })
+    ],
+    [
+        inputTypes.integer,
         Long.fromNumber(-1),
         primitiveLiteral({ integer: Long.fromNumber(-1) })
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         '-1',
         primitiveLiteral({ integer: Long.fromNumber(-1) })
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         Long.MAX_VALUE.toString(),
         primitiveLiteral({ integer: Long.MAX_VALUE })
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         Long.MAX_VALUE,
         primitiveLiteral({ integer: Long.MAX_VALUE })
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         Long.MIN_VALUE.toString(),
         primitiveLiteral({ integer: Long.MIN_VALUE })
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         Long.MIN_VALUE,
         primitiveLiteral({ integer: Long.MIN_VALUE })
     ],
-    [InputType.String, '', primitiveLiteral({ stringValue: '' })],
-    [InputType.String, 'abcdefg', primitiveLiteral({ stringValue: 'abcdefg' })],
+    [
+        inputTypes.schema,
+        '',
+        {
+            scalar: {
+                schema: { type: inputTypes.schema.literalType.schema, uri: '' }
+            }
+        }
+    ],
+    [
+        inputTypes.schema,
+        's3://someUri',
+        {
+            scalar: {
+                schema: {
+                    type: inputTypes.schema.literalType.schema,
+                    uri: 's3://someUri'
+                }
+            }
+        }
+    ],
+    [inputTypes.string, '', primitiveLiteral({ stringValue: '' })],
+    [
+        inputTypes.string,
+        'abcdefg',
+        primitiveLiteral({ stringValue: 'abcdefg' })
+    ],
     // Standard Blob
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         {
             uri: 's3://somePath',
             format: 'csv',
@@ -216,7 +341,7 @@ export const literalTestCases: LiteralTestParams[] = [
     ],
     // Multi-part blob
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         {
             dimensionality: BlobDimensionality.MULTIPART,
             format: 'csv',
@@ -230,7 +355,7 @@ export const literalTestCases: LiteralTestParams[] = [
     ],
     // Blob with missing format
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         {
             dimensionality: BlobDimensionality.SINGLE,
             uri: 's3://somePath'
@@ -242,7 +367,7 @@ export const literalTestCases: LiteralTestParams[] = [
     ],
     // Blob with empty format string
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         {
             dimensionality: BlobDimensionality.SINGLE,
             format: '',
@@ -255,7 +380,7 @@ export const literalTestCases: LiteralTestParams[] = [
     ],
     // Blobs using lowercase string for dimensionality
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         {
             dimensionality: 'single',
             uri: 's3://somePath'
@@ -266,7 +391,7 @@ export const literalTestCases: LiteralTestParams[] = [
         })
     ],
     [
-        InputType.Blob,
+        inputTypes.blobMulti,
         {
             dimensionality: 'multipart',
             uri: 's3://somePath'
@@ -278,7 +403,7 @@ export const literalTestCases: LiteralTestParams[] = [
     ],
     // Blobs using uppercase string for dimensionality
     [
-        InputType.Blob,
+        inputTypes.blobMulti,
         {
             dimensionality: 'SINGLE',
             uri: 's3://somePath'
@@ -289,7 +414,7 @@ export const literalTestCases: LiteralTestParams[] = [
         })
     ],
     [
-        InputType.Blob,
+        inputTypes.blobMulti,
         {
             dimensionality: 'MULTIPART',
             uri: 's3://somePath'
@@ -301,7 +426,7 @@ export const literalTestCases: LiteralTestParams[] = [
     ],
     // Blob missing URI (results in None)
     [
-        InputType.Blob,
+        inputTypes.blobMulti,
         {
             format: 'csv',
             dimensionality: 'MULTIPART'
@@ -309,66 +434,84 @@ export const literalTestCases: LiteralTestParams[] = [
         literalNone()
     ],
     // Blob which is not an object (results in None)
-    [InputType.Blob, undefined, literalNone()]
+    [inputTypes.blobMulti, undefined, literalNone()]
 ];
 
 type InputToLiteralTestParams = [
-    InputType,
+    InputTypeDefinition,
     Core.ILiteral,
     InputValue | undefined
 ];
 export const literalToInputTestCases: InputToLiteralTestParams[] = [
-    [InputType.Boolean, primitiveLiteral({ boolean: true }), true],
-    [InputType.Boolean, primitiveLiteral({ boolean: false }), false],
+    [inputTypes.boolean, primitiveLiteral({ boolean: true }), true],
+    [inputTypes.boolean, primitiveLiteral({ boolean: false }), false],
     [
-        InputType.Datetime,
+        inputTypes.datetime,
         primitiveLiteral({
             datetime: dateToTimestamp(new Date(validDateString))
         }),
         validDateString
     ],
     [
-        InputType.Duration,
+        inputTypes.duration,
         primitiveLiteral({ duration: millisecondsToDuration(0) }),
         0
     ],
     [
-        InputType.Duration,
+        inputTypes.duration,
         primitiveLiteral({ duration: millisecondsToDuration(10000) }),
         10000
     ],
     [
-        InputType.Duration,
+        inputTypes.duration,
         primitiveLiteral({ duration: millisecondsToDuration(1.5) }),
         1.5
     ],
-    [InputType.Float, primitiveLiteral({ floatValue: 0 }), 0],
-    [InputType.Float, primitiveLiteral({ floatValue: -1.5 }), -1.5],
-    [InputType.Float, primitiveLiteral({ floatValue: 1.5 }), 1.5],
-    [InputType.Float, primitiveLiteral({ floatValue: 1.25e10 }), 1.25e10],
+    [inputTypes.float, primitiveLiteral({ floatValue: 0 }), 0],
+    [inputTypes.float, primitiveLiteral({ floatValue: -1.5 }), -1.5],
+    [inputTypes.float, primitiveLiteral({ floatValue: 1.5 }), 1.5],
+    [inputTypes.float, primitiveLiteral({ floatValue: 1.25e10 }), 1.25e10],
     // Integers will be returned as strings because they may overflow numbers
-    [InputType.Integer, primitiveLiteral({ integer: Long.fromNumber(0) }), '0'],
-    [InputType.Integer, primitiveLiteral({ integer: Long.fromNumber(1) }), '1'],
     [
-        InputType.Integer,
+        inputTypes.integer,
+        primitiveLiteral({ integer: Long.fromNumber(0) }),
+        '0'
+    ],
+    [
+        inputTypes.integer,
+        primitiveLiteral({ integer: Long.fromNumber(1) }),
+        '1'
+    ],
+    [
+        inputTypes.integer,
         primitiveLiteral({ integer: Long.fromNumber(-1) }),
         '-1'
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         primitiveLiteral({ integer: Long.MAX_VALUE }),
         Long.MAX_VALUE.toString()
     ],
     [
-        InputType.Integer,
+        inputTypes.integer,
         primitiveLiteral({ integer: Long.MIN_VALUE }),
         Long.MIN_VALUE.toString()
     ],
-    [InputType.String, primitiveLiteral({ stringValue: '' }), ''],
-    [InputType.String, primitiveLiteral({ stringValue: 'abcdefg' }), 'abcdefg'],
+    [inputTypes.schema, { scalar: { schema: { uri: '' } } }, ''],
+    [
+        inputTypes.schema,
+        { scalar: { schema: { uri: 's3://someUri' } } },
+        's3://someUri'
+    ],
+    [inputTypes.string, primitiveLiteral({ stringValue: '' }), ''],
+    [
+        inputTypes.string,
+        primitiveLiteral({ stringValue: 'abcdefg' }),
+        'abcdefg'
+    ],
     // Standard Blob case
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         blobLiteral({
             dimensionality: BlobDimensionality.SINGLE,
             format: 'csv',
@@ -382,7 +525,7 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
     ],
     // Multipart blob
     [
-        InputType.Blob,
+        inputTypes.blobMulti,
         blobLiteral({
             dimensionality: BlobDimensionality.MULTIPART,
             format: 'csv',
@@ -396,7 +539,7 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
     ],
     // Empty uri
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         blobLiteral({
             dimensionality: BlobDimensionality.SINGLE,
             format: 'csv'
@@ -409,7 +552,7 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
     ],
     // Empty format string
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         blobLiteral({
             dimensionality: BlobDimensionality.SINGLE,
             format: '',
@@ -422,7 +565,7 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
     ],
     // Missing dimensionality
     [
-        InputType.Blob,
+        inputTypes.blobSingle,
         blobLiteral({
             format: 'csv',
             uri: 's3://somePath'

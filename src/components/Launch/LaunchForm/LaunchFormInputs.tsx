@@ -23,7 +23,6 @@ function getComponentForInput(input: InputProps, showErrors: boolean) {
         case InputType.Collection:
             return <CollectionInput {...props} />;
         case InputType.Map:
-        case InputType.Schema:
         case InputType.Unknown:
         case InputType.None:
             return <UnsupportedInput {...props} />;

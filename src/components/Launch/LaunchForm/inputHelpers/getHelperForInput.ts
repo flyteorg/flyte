@@ -7,6 +7,7 @@ import { durationHelper } from './duration';
 import { floatHelper } from './float';
 import { integerHelper } from './integer';
 import { noneHelper } from './none';
+import { schemaHelper } from './schema';
 import { stringHelper } from './string';
 import { InputHelper } from './types';
 
@@ -25,7 +26,7 @@ const inputHelpers: Record<InputType, InputHelper> = {
     [InputType.Integer]: integerHelper,
     [InputType.Map]: unsupportedHelper,
     [InputType.None]: noneHelper,
-    [InputType.Schema]: unsupportedHelper,
+    [InputType.Schema]: schemaHelper,
     [InputType.String]: stringHelper,
     [InputType.Struct]: unsupportedHelper,
     [InputType.Unknown]: unsupportedHelper

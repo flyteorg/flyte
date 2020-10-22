@@ -36,7 +36,7 @@ export const typeLabels: { [k in InputType]: string } = {
     [InputType.Integer]: 'integer',
     [InputType.Map]: '',
     [InputType.None]: 'none',
-    [InputType.Schema]: 'schema',
+    [InputType.Schema]: 'schema - uri',
     [InputType.String]: 'string',
     [InputType.Struct]: 'struct',
     [InputType.Unknown]: 'unknown'

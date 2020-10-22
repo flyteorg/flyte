@@ -144,38 +144,34 @@ export function convertFormInputsToLiterals(
 }
 
 /** Converts a `LiteralType` to an `InputTypeDefintion` to assist with rendering
- * a type annotation.
+ * a type annotation and converting input values.
  */
 export function getInputDefintionForLiteralType(
     literalType: LiteralType
 ): InputTypeDefinition {
+    const result: InputTypeDefinition = {
+        literalType,
+        type: InputType.Unknown
+    };
+
     if (literalType.blob) {
-        return { type: InputType.Blob };
+        result.type = InputType.Blob;
+    } else if (literalType.collectionType) {
+        result.type = InputType.Collection;
+        result.subtype = getInputDefintionForLiteralType(
+            literalType.collectionType
+        );
+    } else if (literalType.mapValueType) {
+        result.type = InputType.Map;
+        result.subtype = getInputDefintionForLiteralType(
+            literalType.mapValueType
+        );
+    } else if (literalType.schema) {
+        result.type = InputType.Schema;
+    } else if (literalType.simple) {
+        result.type = simpleTypeToInputType[literalType.simple];
     }
-
-    if (literalType.collectionType) {
-        return {
-            type: InputType.Collection,
-            subtype: getInputDefintionForLiteralType(literalType.collectionType)
-        };
-    }
-
-    if (literalType.mapValueType) {
-        return {
-            type: InputType.Map,
-            subtype: getInputDefintionForLiteralType(literalType.mapValueType)
-        };
-    }
-
-    if (literalType.schema) {
-        return { type: InputType.Schema };
-    }
-
-    if (literalType.simple) {
-        return { type: simpleTypeToInputType[literalType.simple] };
-    }
-
-    return { type: InputType.Unknown };
+    return result;
 }
 
 export function getLaunchInputId(name: string): string {

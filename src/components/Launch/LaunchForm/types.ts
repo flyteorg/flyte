@@ -3,6 +3,7 @@ import {
     BlobDimensionality,
     Identifier,
     LaunchPlan,
+    LiteralType,
     NamedEntityIdentifier,
     Task,
     Workflow,
@@ -152,6 +153,7 @@ export enum InputType {
 }
 
 export interface InputTypeDefinition {
+    literalType: LiteralType;
     type: InputType;
     subtype?: InputTypeDefinition;
 }
