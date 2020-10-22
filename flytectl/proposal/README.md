@@ -85,45 +85,126 @@ This is a lower priority option as most entities in flyte are immutable and do n
 # Details of each resource
 
 ## Projects
-Support
+Projects are top level entity in Flyte. You can fetch multiple projects or one project using the CLI. Think about projects like namespaces.
+
  - create
+```bash
+$ flytectl create projects --name "Human readable Name of project" --id project-id --labels key=value --labels key=value --description "long string"
+Alternatively
+$ flytectl create project -f project.yaml
+```
+
+```yaml
+project.yaml
+name: Human readable project name
+id: project-x
+labels:
+  - k: v
+  - k1: v1
+description: |
+  Long description
+```
  - get
+```bash
+$ flytectl get projects [project-name] [-o yaml | -o json | default -o table]
+```
  - update
+```bash
+$ flytectl update projects --id project-x ...
+# You can only update one project at a time
+```
 
 ## Tasks
-Support
- - create
  - get
+```bash
+$ flytectl get tasks [task-name] [-o yaml | -o json | default -o table] [--filters...] [--sort-by...] [--selectors...]
+```
+ - get specific version and get a template to launch
+   Create an execution is complicated as the user needs to know all the input types and  way to simplify this could be to create a YAML template locally from the launchplan (the interface, etc)
+```bash
+$ flytectl get task task-name --execution-template -o YAML
+yaml.template (TBD)
+This is a special version of get launch-plan which can be executed by passing it to create execution.
+
+```
+ - create
+ - create
  - update
 
 ## Workflows
 Support
- - create
  - get
+```bash
+$ flytectl get workflows [workflow-name] [-o yaml | -o json | default -o table] [--filters...] [--sort-by...] [--selectors...]
+```
+ - create
  - update
 
 ## Launch Plans
 Support
- - create
  - get
+```bash
+$ flytectl get launch-plans [launchplan-name] [-o yaml | -o json | default -o table] [--filters...] [--sort-by...] [--selectors...]
+```
+ - get specific version and get a template to launch
+   Create an execution is complicated as the user needs to know all the input types and  way to simplify this could be to create a YAML template locally from the launchplan (the interface, etc)
+```bash
+$ flytectl get launch-plans launch-plan-name --execution-template -o YAML
+yaml.template (TBD)
+This is a special version of get launch-plan which can be executed by passing it to create execution.
+
+```
+ - create
  - update
 
 ## Execution
-Support
- - create
+Create or retrieve an execution. 
  - get
- - update
+Get all executions or get a single execution.
+```bash
+$ flytectl get execution [exec-name] [-o yaml | -o json | default -o table] [--filters...] [--sort-by...] [--selectors...]
+```
+An interesting feature in get-execution might be to filter within the execution only the execution of a node, or quickly find the ones that have failed. 
+Visualizing the execution is also challenging. We may want to visualize
+We could use https://graphviz.org/ to visualize the DAG.
+Within the DAG, NodeExecutions and corresponding task executions need to be fetched.
+ - create
+   Create an execution for a LaunchPlan or a Task. This is very interesting as it should accept inputs for the execution.
+```bash
+$ flytectl create execution -f template.yaml (see get-template command)
+OR
+$ flytectl create execution --launch-plan "name" --inputs "key=value"
+```
  - delete - here refers to terminate
 
 ## MatchableEntity
-Support
- - create
+Ability to retrieve matchable entity and edit its details
  - get
+ - create
  - update
 
 ## Outputs
 Support
- - create
  - get
+ - create
  - update
 
+# No resource interactions
+
+## Install all examples
+Today Flytesnacks houses a few examples for Flyte usage in python. When a user wants to get started with Flyte quickly it would be preferable that all Flytesnacks examples are serialized and stored as artifacts in flytesnacks for every checkin. This can be done for python flytekit using `pyflyte serialize` command. Once they are posted as serialized blobs, flytectl could easily retrieve them and register them in a specific project as desired by the user.
+
+```bash
+$ flytectl examples register-all [cookbook|plugins|--custom-path=remote-path] [--semver semantic-version-of-flytesnacks-examples] --target-project --target-domain
+```
+The remote has to follow a protocol. It should be an archive - `tar.gz` with two folders `example-set/ -tasks/*.pb -workflows/*.pb` All the workflows in this path will be installed to the target project / domain
+
+## Setup a repository with dockerfile for writing code for Flyte
+Maybe we should look at `boilr` or some other existing framework to do this
+```bash
+$ flytectl init project --archetype tensorflow-2.0
+$ flytectl init project --archetype spark-3.0
+$ flytectl init project --archetype xgboost
+...
+```
+For this to work, all these archetypes should be available in a separate repository. An archetype is essentially a template with dockerfile and folder setup with flytekit.config
