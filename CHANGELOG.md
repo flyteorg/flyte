@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.1](http://github.com/lyft/flyteconsole/compare/v0.16.0...v0.16.1) (2020-10-22)
+
+
+### Bug Fixes
+
+* remove not used constant ([#112](http://github.com/lyft/flyteconsole/issues/112)) ([8f6fdf7](http://github.com/lyft/flyteconsole/commit/8f6fdf781bf4087b6298ec3a54bd9fc8407ab910)), closes [#107](http://github.com/lyft/flyteconsole/issues/107)
+
 # [0.16.0](http://github.com/lyft/flyteconsole/compare/v0.15.1...v0.16.0) (2020-10-22)
 
 
