@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0](http://github.com/lyft/flyteconsole/compare/v0.15.1...v0.16.0) (2020-10-22)
+
+
+### Features
+
+* Support Schema type in the Launch form ([#110](http://github.com/lyft/flyteconsole/issues/110)) ([d5e92cd](http://github.com/lyft/flyteconsole/commit/d5e92cd0e3eaf0df9ebe09300a6cee6057a45396))
+
 ## [0.15.1](http://github.com/lyft/flyteconsole/compare/v0.15.0...v0.15.1) (2020-10-22)
 
 
