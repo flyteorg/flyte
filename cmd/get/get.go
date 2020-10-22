@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// CreateGetCommand will return get command
 func CreateGetCommand() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:   "get",
@@ -13,9 +14,10 @@ func CreateGetCommand() *cobra.Command {
 	}
 
 	getResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"projects":  {CmdFunc: getProjectsFunc, ProjectDomainNotRequired: true},
-		"tasks":     {CmdFunc: getTaskFunc},
-		"workflows": {CmdFunc: getWorkflowFunc},
+		"project":    {CmdFunc: getProjectsFunc, Aliases: []string{"projects"}, ProjectDomainNotRequired: true},
+		"task":       {CmdFunc: getTaskFunc, Aliases: []string{"tasks"}},
+		"workflow":   {CmdFunc: getWorkflowFunc, Aliases: []string{"workflows"}},
+		"launchplan": {CmdFunc: getLaunchPlanFunc, Aliases: []string{"launchplans"}},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)

@@ -2,12 +2,11 @@ package get
 
 import (
 	"context"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytestdlib/logger"
 
-	"github.com/lyft/flytectl/adminutils"
-	"github.com/lyft/flytectl/printer"
+	"github.com/lyft/flytectl/pkg/adminutils"
+	"github.com/lyft/flytectl/pkg/printer"
 
 	"github.com/lyft/flytectl/cmd/config"
 	cmdCore "github.com/lyft/flytectl/cmd/core"
@@ -45,7 +44,7 @@ func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 			},
 			// TODO Sorting and limits should be parameters
 			SortBy: &admin.Sort{
-				Key: "created_at",
+				Key:       "created_at",
 				Direction: admin.Sort_DESCENDING,
 			},
 			Limit: 100,

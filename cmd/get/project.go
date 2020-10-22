@@ -9,7 +9,7 @@ import (
 
 	"github.com/lyft/flytectl/cmd/config"
 	cmdCore "github.com/lyft/flytectl/cmd/core"
-	"github.com/lyft/flytectl/printer"
+	"github.com/lyft/flytectl/pkg/printer"
 )
 
 var projectColumns = []printer.Column{
@@ -28,10 +28,12 @@ func ProjectToProtoMessages(l []*admin.Project) []proto.Message {
 
 func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	adminPrinter := printer.Printer{}
-
+	projects, err := cmdCtx.AdminClient().ListProjects(ctx, &admin.ProjectListRequest{})
+	if err != nil {
+		return err
+	}
 	if len(args) == 1 {
 		name := args[0]
-		projects, err := cmdCtx.AdminClient().ListProjects(ctx, &admin.ProjectListRequest{})
 		if err != nil {
 			return err
 		}
@@ -46,10 +48,6 @@ func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 			}
 		}
 		return nil
-	}
-	projects, err := cmdCtx.AdminClient().ListProjects(ctx, &admin.ProjectListRequest{})
-	if err != nil {
-		return err
 	}
 	logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, ProjectToProtoMessages(projects.Projects)...)

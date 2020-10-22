@@ -12,6 +12,7 @@ require (
 	github.com/lyft/flytestdlib v0.3.10-0.20200619054107-45f341b716fa
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/pflag v1.0.5

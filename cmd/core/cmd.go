@@ -13,14 +13,16 @@ import (
 type CommandEntry struct {
 	ProjectDomainNotRequired bool
 	CmdFunc                  CommandFunc
+	Aliases                  []string
 }
 
 func AddCommands(rootCmd *cobra.Command, cmdFuncs map[string]CommandEntry) {
 	for resource, cmdEntry := range cmdFuncs {
 		cmd := &cobra.Command{
-			Use:   resource,
-			Short: fmt.Sprintf("Retrieves %v resources.", resource),
-			RunE:  generateCommandFunc(cmdEntry),
+			Use:     resource,
+			Short:   fmt.Sprintf("Retrieves %v resources.", resource),
+			Aliases: cmdEntry.Aliases,
+			RunE:    generateCommandFunc(cmdEntry),
 		}
 
 		rootCmd.AddCommand(cmd)
