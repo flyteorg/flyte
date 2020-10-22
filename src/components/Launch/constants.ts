@@ -7,6 +7,5 @@ export const launchPlansTableColumnWidths = {
 export const schedulesTableColumnsWidths = {
     active: 80,
     frequency: 300,
-    offset: 300,
     name: 250
 };
