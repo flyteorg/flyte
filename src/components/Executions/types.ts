@@ -50,7 +50,7 @@ export interface NodeInformation {
 
 export interface ParentNodeExecution extends NodeExecution {
     metadata: NodeExecutionMetadata & {
-        isParentNode: boolean;
+        isParentNode: true;
     };
 }
 
