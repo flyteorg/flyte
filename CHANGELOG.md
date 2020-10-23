@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.16.2](http://github.com/lyft/flyteconsole/compare/v0.16.1...v0.16.2) (2020-10-23)
+
+
+### Bug Fixes
+
+* missing state transition when fixing Launch validation errors ([#114](http://github.com/lyft/flyteconsole/issues/114)) ([e8173f6](http://github.com/lyft/flyteconsole/commit/e8173f6b7eeec26554ccb062bb6f9c657ce410b9))
+
 ## [0.16.1](http://github.com/lyft/flyteconsole/compare/v0.16.0...v0.16.1) (2020-10-22)
 
 
