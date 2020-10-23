@@ -1,4 +1,4 @@
-import { assertNever } from 'common/utils';
+import { assertNever, stringifyValue } from 'common/utils';
 import { Core } from 'flyteidl';
 import { get } from 'lodash';
 import { BlobDimensionality } from 'models';
@@ -25,7 +25,9 @@ export function collectionChildToString(type: InputType, value: any) {
     if (value === undefined) {
         return '';
     }
-    return type === InputType.Integer ? `${value}` : JSON.stringify(value);
+    return type === (InputType.Integer || InputType.Struct)
+        ? `${value}`
+        : stringifyValue(value);
 }
 
 /** Determines if a given input type, including all levels of nested types, is
@@ -38,7 +40,6 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
         case InputType.Error:
         case InputType.Map:
         case InputType.None:
-        case InputType.Struct:
         case InputType.Unknown:
             return false;
         case InputType.Boolean:
@@ -49,6 +50,7 @@ export function typeIsSupported(typeDefinition: InputTypeDefinition): boolean {
         case InputType.Integer:
         case InputType.Schema:
         case InputType.String:
+        case InputType.Struct:
             return true;
         case InputType.Collection: {
             if (!subtype) {

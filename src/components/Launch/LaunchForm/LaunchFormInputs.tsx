@@ -4,6 +4,7 @@ import { CollectionInput } from './CollectionInput';
 import { formStrings } from './constants';
 import { LaunchState } from './launchMachine';
 import { SimpleInput } from './SimpleInput';
+import { StructInput } from './StructInput';
 import { useStyles } from './styles';
 import {
     BaseInterpretedLaunchState,
@@ -22,6 +23,8 @@ function getComponentForInput(input: InputProps, showErrors: boolean) {
             return <BlobInput {...props} />;
         case InputType.Collection:
             return <CollectionInput {...props} />;
+        case InputType.Struct:
+            return <StructInput {...props} />;
         case InputType.Map:
         case InputType.Unknown:
         case InputType.None:

@@ -9,6 +9,7 @@ import { integerHelper } from './integer';
 import { noneHelper } from './none';
 import { schemaHelper } from './schema';
 import { stringHelper } from './string';
+import { structHelper } from './struct';
 import { InputHelper } from './types';
 
 const unsupportedHelper = noneHelper;
@@ -28,7 +29,7 @@ const inputHelpers: Record<InputType, InputHelper> = {
     [InputType.None]: noneHelper,
     [InputType.Schema]: schemaHelper,
     [InputType.String]: stringHelper,
-    [InputType.Struct]: unsupportedHelper,
+    [InputType.Struct]: structHelper,
     [InputType.Unknown]: unsupportedHelper
 };
 

@@ -1,13 +1,18 @@
-import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
+import {
+    dateToTimestamp,
+    millisecondsToDuration,
+    stringifyValue
+} from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
 import { BlobDimensionality, SchemaColumnType } from 'models';
 import { blobLiteral, primitiveLiteral } from '../../__mocks__/utils';
 import { InputType, InputTypeDefinition, InputValue } from '../../types';
 import { literalNone } from '../constants';
+import { structTestCases } from './structTestCases';
 
 // Defines type of value, input, and expected value of a `Core.ILiteral`
-type LiteralTestParams = [InputTypeDefinition, any, Core.ILiteral];
+type InputToLiteralTestParams = [InputTypeDefinition, any, Core.ILiteral];
 
 type InputTypeKey =
     | 'binary'
@@ -104,15 +109,15 @@ export const supportedPrimitives: InputTypeDefinition[] = [
     inputTypes.duration,
     inputTypes.float,
     inputTypes.integer,
-    inputTypes.schema
+    inputTypes.schema,
+    inputTypes.struct
 ];
 
 export const unsupportedTypes: InputTypeDefinition[] = [
     inputTypes.binary,
     inputTypes.error,
     inputTypes.map,
-    inputTypes.none,
-    inputTypes.struct
+    inputTypes.none
 ];
 
 export const validityTestCases = {
@@ -195,10 +200,34 @@ export const validityTestCases = {
     },
     // schema is just a specialized string input, so it has the same validity cases as string
     schema: { invalid: [123, true, new Date(), {}], valid: ['', 'abcdefg'] },
-    string: { invalid: [123, true, new Date(), {}], valid: ['', 'abcdefg'] }
+    string: { invalid: [123, true, new Date(), {}], valid: ['', 'abcdefg'] },
+    struct: {
+        invalid: [
+            123,
+            true,
+            new Date(),
+            {},
+            'nonObjectString',
+            '[]',
+            '{garbageobject}'
+        ],
+        valid: [
+            // Valid use case is any stringified POJO
+            stringifyValue({
+                someString: 'someValue',
+                someNumber: 123,
+                someBoolean: true,
+                nestedStruct: { someOtherString: 'someOtherValue' },
+                nestedList: [123, 'stringListValue'],
+                nullValue: null
+            })
+        ]
+    }
 };
 
-export const literalTestCases: LiteralTestParams[] = [
+/** Test cases for converting a *valid* input value to its corresponding ILiteral
+ * representation. */
+export const literalTestCases: InputToLiteralTestParams[] = [
     [inputTypes.boolean, true, primitiveLiteral({ boolean: true })],
     [inputTypes.boolean, 'true', primitiveLiteral({ boolean: true })],
     [inputTypes.boolean, 't', primitiveLiteral({ boolean: true })],
@@ -434,15 +463,24 @@ export const literalTestCases: LiteralTestParams[] = [
         literalNone()
     ],
     // Blob which is not an object (results in None)
-    [inputTypes.blobMulti, undefined, literalNone()]
+    [inputTypes.blobMulti, undefined, literalNone()],
+    ...structTestCases.map<InputToLiteralTestParams>(
+        ([stringValue, literalValue]) => [
+            inputTypes.struct,
+            stringValue,
+            literalValue
+        ]
+    )
 ];
 
-type InputToLiteralTestParams = [
+type LiteralToInputTestParams = [
     InputTypeDefinition,
     Core.ILiteral,
     InputValue | undefined
 ];
-export const literalToInputTestCases: InputToLiteralTestParams[] = [
+
+/** Test cases for converting a Core.ILiteral to a usable InputValue */
+export const literalToInputTestCases: LiteralToInputTestParams[] = [
     [inputTypes.boolean, primitiveLiteral({ boolean: true }), true],
     [inputTypes.boolean, primitiveLiteral({ boolean: false }), false],
     [
@@ -575,5 +613,12 @@ export const literalToInputTestCases: InputToLiteralTestParams[] = [
             format: 'csv',
             uri: 's3://somePath'
         }
-    ]
+    ],
+    ...structTestCases.map<LiteralToInputTestParams>(
+        ([stringValue, literalValue]) => [
+            inputTypes.struct,
+            literalValue,
+            stringValue
+        ]
+    )
 ];

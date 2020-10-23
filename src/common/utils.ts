@@ -126,3 +126,10 @@ export function toBoolean(value?: string): boolean {
     }
     return ['true', 'True', 'TRUE', '1'].includes(value);
 }
+
+/** Simple shared stringify function to ensure consistency in formatting with
+ * respect to spacing.
+ */
+export function stringifyValue(value: any): string {
+    return JSON.stringify(value, null, 2);
+}

@@ -1,3 +1,4 @@
+import { stringifyValue } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
 import { BlobDimensionality } from 'models';
@@ -67,7 +68,7 @@ describe('literalToInputValue', () => {
         literalToInputTestCases.map(([typeDefinition, input, output]) =>
             it(`should correctly convert ${
                 typeDefinition.type
-            }: ${JSON.stringify(input)}`, () =>
+            }: ${stringifyValue(input)}`, () =>
                 expect(literalToInputValue(typeDefinition, input)).toEqual(
                     output
                 ))
@@ -90,7 +91,7 @@ describe('literalToInputValue', () => {
         literalToInputTestCases.map(([typeDefinition, input, output]) => {
             it(`should correctly convert collection of ${
                 typeDefinition.type
-            }: ${JSON.stringify(input)}`, () => {
+            }: ${stringifyValue(input)}`, () => {
                 const collection: Core.ILiteral = {
                     collection: {
                         // Duplicate it to test comma separation
@@ -149,7 +150,7 @@ describe('inputToLiteral', () => {
         literalTestCases.map(([typeDefinition, input, output]) => {
             it(`should correctly convert ${
                 typeDefinition.type
-            }: ${JSON.stringify(input)} (${typeof input})`, () =>
+            }: ${stringifyValue(input)} (${typeof input})`, () =>
                 expect(
                     inputToLiteral(makeSimpleInput(typeDefinition, input))
                 ).toEqual(output));
@@ -158,33 +159,48 @@ describe('inputToLiteral', () => {
 
     describe('Collections', () => {
         literalTestCases.map(([typeDefinition, input, output]) => {
-            let value: any;
-            if (['boolean', 'number'].includes(typeof input)) {
-                value = input;
+            let singleCollectionValue: any;
+            let nestedCollectionValue: any;
+            if (typeDefinition.type === InputType.Struct) {
+                const objValue = JSON.parse(input);
+                singleCollectionValue = stringifyValue([objValue]);
+                nestedCollectionValue = stringifyValue([[objValue]]);
+            } else if (['boolean', 'number'].includes(typeof input)) {
+                singleCollectionValue = `[${input}]`;
+                nestedCollectionValue = `[[${input}]]`;
             } else if (input == null) {
-                value = 'null';
+                singleCollectionValue = '[null]';
+                nestedCollectionValue = '[[null]]';
             } else if (typeof input === 'string' || Long.isLong(input)) {
-                value = `"${input}"`;
+                singleCollectionValue = `["${input}"]`;
+                nestedCollectionValue = `[["${input}"]]`;
             } else if (input instanceof Date) {
-                value = `"${input.toISOString()}"`;
+                const dateString = input.toISOString();
+                singleCollectionValue = `["${dateString}"]`;
+                nestedCollectionValue = `[["${dateString}"]]`;
             } else {
-                value = JSON.stringify(input);
+                const stringValue = stringifyValue(input);
+                singleCollectionValue = `[${stringValue}]`;
+                nestedCollectionValue = `[[${stringValue}]]`;
             }
 
             it(`should correctly convert collection of type ${
                 typeDefinition.type
-            }: [${JSON.stringify(value)}] (${typeof input})`, () => {
+            }: ${singleCollectionValue} (${typeof input})`, () => {
                 const result = inputToLiteral(
-                    makeCollectionInput(typeDefinition, `[${value}]`)
+                    makeCollectionInput(typeDefinition, singleCollectionValue)
                 );
                 expect(result.collection!.literals![0]).toEqual(output);
             });
 
             it(`should correctly convert nested collection of type ${
                 typeDefinition.type
-            }: [[${JSON.stringify(value)}]] (${typeof input})`, () => {
+            }: ${nestedCollectionValue} (${typeof input})`, () => {
                 const result = inputToLiteral(
-                    makeNestedCollectionInput(typeDefinition, `[[${value}]]`)
+                    makeNestedCollectionInput(
+                        typeDefinition,
+                        nestedCollectionValue
+                    )
                 );
                 expect(
                     result.collection!.literals![0].collection!.literals![0]
@@ -221,7 +237,7 @@ function generateValidityTests(
     { valid, invalid }: { valid: any[]; invalid: any[] }
 ) {
     valid.map(value =>
-        it(`should treat ${JSON.stringify(
+        it(`should treat ${stringifyValue(
             value
         )} (${typeof value}) as valid`, () => {
             const input = makeSimpleInput(typeDefinition, value);
@@ -229,7 +245,7 @@ function generateValidityTests(
         })
     );
     invalid.map(value =>
-        it(`should treat ${JSON.stringify(
+        it(`should treat ${stringifyValue(
             value
         )} (${typeof value}) as invalid`, () => {
             const input = makeSimpleInput(typeDefinition, value);
