@@ -246,6 +246,30 @@ describe('LaunchForm: Task', () => {
             await waitFor(() => expect(integerInput).toBeValid());
         });
 
+        it('should allow submission after fixing validation errors', async () => {
+            const { container, getByLabelText } = renderForm();
+            await waitFor(() => {});
+
+            const integerInput = await waitFor(() =>
+                getByLabelText(integerInputName, {
+                    exact: false
+                })
+            );
+            fillInputs(container);
+            const submitButton = getSubmitButton(container);
+            fireEvent.change(integerInput, { target: { value: 'abc' } });
+            fireEvent.click(submitButton);
+            await waitFor(() => expect(integerInput).toBeInvalid());
+            expect(mockCreateWorkflowExecution).not.toHaveBeenCalled();
+
+            fireEvent.change(integerInput, { target: { value: '123' } });
+            await waitFor(() => expect(integerInput).toBeValid());
+            fireEvent.click(submitButton);
+            await waitFor(() =>
+                expect(mockCreateWorkflowExecution).toHaveBeenCalled()
+            );
+        });
+
         it('should update inputs when selecting a new task version', async () => {
             const { queryByLabelText, getByTitle } = renderForm();
             const taskVersionDiv = await waitFor(() =>

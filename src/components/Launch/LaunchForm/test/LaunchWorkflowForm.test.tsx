@@ -302,6 +302,29 @@ describe('LaunchForm: Workflow', () => {
             expect(integerInput).toBeValid();
         });
 
+        it('should allow submission after fixing validation errors', async () => {
+            const { container, getByLabelText } = renderForm();
+            await waitFor(() => {});
+
+            const integerInput = await waitFor(() =>
+                getByLabelText(integerInputName, {
+                    exact: false
+                })
+            );
+            const submitButton = getSubmitButton(container);
+            fireEvent.change(integerInput, { target: { value: 'abc' } });
+            fireEvent.click(submitButton);
+            await waitFor(() => expect(integerInput).toBeInvalid());
+            expect(mockCreateWorkflowExecution).not.toHaveBeenCalled();
+
+            fireEvent.change(integerInput, { target: { value: '123' } });
+            await waitFor(() => expect(integerInput).toBeValid());
+            fireEvent.click(submitButton);
+            await waitFor(() =>
+                expect(mockCreateWorkflowExecution).toHaveBeenCalled()
+            );
+        });
+
         it('should update launch plan when selecting a new workflow version', async () => {
             const { getByTitle } = renderForm();
             await waitFor(() => getByTitle(formStrings.launchPlan));

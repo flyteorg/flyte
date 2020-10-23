@@ -285,7 +285,8 @@ const baseStateConfig: StatesConfig<
     },
     [LaunchState.INVALID_INPUTS]: {
         on: {
-            VALIDATE: LaunchState.VALIDATING_INPUTS
+            VALIDATE: LaunchState.VALIDATING_INPUTS,
+            SUBMIT: LaunchState.SUBMIT_VALIDATING
         }
     },
     [LaunchState.SUBMIT_VALIDATING]: {
