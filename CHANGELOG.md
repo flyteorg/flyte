@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](http://github.com/lyft/flyteconsole/compare/v0.16.2...v0.17.0) (2020-10-23)
+
+
+### Features
+
+* support Struct as a Launch input type ([#113](http://github.com/lyft/flyteconsole/issues/113)) ([3eee332](http://github.com/lyft/flyteconsole/commit/3eee332896d29d3bc6ec54e4ee29170b233f83d3))
+
 ## [0.16.2](http://github.com/lyft/flyteconsole/compare/v0.16.1...v0.16.2) (2020-10-23)
 
 
