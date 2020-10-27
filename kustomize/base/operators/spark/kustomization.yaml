@@ -1,6 +1,7 @@
 resources:
 - spark-operator.yaml
-- spark-dummy-crd.yaml
+- sparkapplications-crd.yaml
+- scheduledsparkapplications-crd.yaml
 - deployment.yaml
 - webhook.yaml
 
