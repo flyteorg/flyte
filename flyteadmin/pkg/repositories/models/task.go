@@ -5,7 +5,7 @@ package models
 
 // Task primary key
 type TaskKey struct {
-	Project string `gorm:"primary_key;task_project_domain_name_idx,task_project_domain_idx"`
+	Project string `gorm:"primary_key;index:task_project_domain_name_idx,task_project_domain_idx"`
 	Domain  string `gorm:"primary_key;index:task_project_domain_name_idx,task_project_domain_idx"`
 	Name    string `gorm:"primary_key;index:task_project_domain_name_idx"`
 	Version string `gorm:"primary_key"`
