@@ -5,6 +5,12 @@ Flyte Concepts
 This section provides a quick overview of some important concepts in Flyte with links
 to deeper dives.
 
+Illustration of a workflow with tasks
+----------------------------------------
+
+.. image:: ./flyte_wf_tasks_high_level.png
+
+
 :ref:`Tasks <concepts-tasks>` are at the core of Flyte. A Task is any independent unit of
 processing. Tasks can be pure functions or functions with side-effects. Tasks also have
 configuration and requirements specification associated with each definition of the task.

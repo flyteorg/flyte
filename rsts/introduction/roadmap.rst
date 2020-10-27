@@ -12,35 +12,7 @@ we are proactively thinking about the evolution of the system and how we want to
 cases where we feel rapid prototyping would enable us to discover potential pitfalls or uncover hidden use cases we would proactively develop features, behind feature flags.
 
 We want to extend the same sense of customer obsession to our Open Source community. We would love to hear use cases that various teams are solving and see how we could adapt parts of Flyte to meet
-those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines.
-
-We will divide our roadmap into multiple sections. Please refer to each section's description to understand its goal.
-
-Continuous work
-=================
-This section highlights features and issues that are a continuous area of Focus and will always be in progress. 
-
-1. Documentation 
-----------------
-   Flyte's aim is to make it absolutely easy for any new user, administrator, contributor to read the documentation and complete their job successfully. We realize That we are not even close. This
-   effort will continue on an ongoing basis and we would love feedback on the top areas where we should improve.
-
-2. Bug Fixes & Reliability Improvements
-----------------------------------------   
-   As mentioned since Flyte is being actively used at Lyft and our scale is always increasing, there are always bugs that we want to squish. So Bugs, are always work in progress and most often then
-   not receive highest priority.
-
-3. Observability
-----------------
-   We are currently working on a one time Observability epic that will enable open source users to use dashboard templates exactly like we use within Lyft (as of April 2020). Going forward,
-   Observability is one of the pillars of Flyte. We will continue emphasizing on this aspect and improving it with every iteration.
-
-
-Living Roadmap
-===============
-We are trying to maintain a Living roadmap `here <https://docs.google.com/spreadsheets/d/1V8DQfcsX_02Zac5EfAo0UrGJtLwdMPcw3wuuigVIMZU/edit?usp=sharing>`_
-
-We also maintain a raw list of all the ideas `here <https://docs.google.com/document/d/1yq8pIlhlG3gci3GJQNjdAd9bzZ-KYyLfm6I5NVms9-4/edit?usp=sharing>`_
+those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines. 
 
 
 Milestones and Releases
@@ -59,10 +31,6 @@ To ensure that changes are trackable and the history is explainable, we use a sl
 - Every major change is associated with documentation
 - Owner files for all repositories
 
-Things to do
-- Unit test coverage should be above 60% for every repo by release 0.5.0
-- End to end tests should be run on an actual cluster.
-
 Release Train
 --------------
 - We will start tagging issues with milestones, every new issue will be associated with the next milestone. If the issue is not completed by the milestone, or the contributor feels it may slip the deadline, they should manually move it to the next milestone. Every issue not removed, will be moved to the next milestone.
@@ -71,6 +39,63 @@ Release Train
 - Flyte release are monthly
 - We may have patch releases eg. 0.1.x in between the monthly releases.
 
-Things to do
-- Golden Test Suite that is tested for every release train 
+Upcoming Features
+=================
 
+1. flytekit python overhaul.
+   Goal: Make flyte almost invisible to the user.
+   - Use python native typing system - 0 ramp to learn types
+   - Ability to execute everything locally (in some cases mocking out things)
+   - minimal imports - just one import for task and workflow
+   - simplified extensibility for types and task-types in flytekit
+
+
+Sneak Peek
+
+.. code-block:: python
+  :linenos:
+
+
+  from flytekit import task, workflow
+
+  @task
+  def t1(a: int) -> pandas.DataFrame:
+      return pandas.DataFrame(data={"col1": [a, 2], "col2": [a, 4]})
+
+  @task
+  def t2(df: pandas.DataFrame) -> pandas.DataFrame:
+      return df.append(pandas.DataFrame(data={"col1": [5, 10], "col2": [5, 10]}))
+
+  @workflow
+  def my_wf(a: int) -> pandas.DataFrame:
+      return t2(df=t1(a=a))
+
+  print(my_wf(a=20))
+
+Output
+
+::
+
+        col1  col2
+    0    20    20
+    1     2     4
+    0     5     5
+    1    10    10
+
+2. flytekit java feature complete
+
+3. flyte workflows and tasks inline documentation support and visualization
+
+4. Visualization of Blobs in UI/Console
+
+5. Performance visualization of Task execution
+
+6. Faster iteration support (no container building)
+
+7. Data Lineage and Provenance visualization
+
+8. More plugins
+
+9. Observability stack open source
+
+10. Getting started overhaul
