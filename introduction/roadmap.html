@@ -87,18 +87,12 @@
 <li class="toctree-l2"><a class="reference internal" href="docs_overview.html">How to read these docs?</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Roadmap</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#how-the-core-team-works">How the core team works</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#continuous-work">Continuous work</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#documentation">1. Documentation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#bug-fixes-reliability-improvements">2. Bug Fixes &amp; Reliability Improvements</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#observability">3. Observability</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#living-roadmap">Living Roadmap</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#milestones-and-releases">Milestones and Releases</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#change-management">Change management</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#release-train">Release Train</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#upcoming-features">Upcoming Features</a></li>
 </ul>
 </li>
 </ul>
@@ -113,8 +107,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Generated Documentation from Source</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../flytekit/index.html">Flytekit Python</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spotify/flytekit-java">Flytekit JAVA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../flyteidl/index.html">Flyte Language and API specification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../flytekit/index.html">Flytekit</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
@@ -195,37 +190,6 @@ we are proactively thinking about the evolution of the system and how we want to
 cases where we feel rapid prototyping would enable us to discover potential pitfalls or uncover hidden use cases we would proactively develop features, behind feature flags.</p>
 <p>We want to extend the same sense of customer obsession to our Open Source community. We would love to hear use cases that various teams are solving and see how we could adapt parts of Flyte to meet
 those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines.</p>
-<p>We will divide our roadmap into multiple sections. Please refer to each section’s description to understand its goal.</p>
-</div>
-<div class="section" id="continuous-work">
-<h2>Continuous work<a class="headerlink" href="#continuous-work" title="Permalink to this headline">¶</a></h2>
-<p>This section highlights features and issues that are a continuous area of Focus and will always be in progress.</p>
-<div class="section" id="documentation">
-<h3>1. Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div><p>Flyte’s aim is to make it absolutely easy for any new user, administrator, contributor to read the documentation and complete their job successfully. We realize That we are not even close. This
-effort will continue on an ongoing basis and we would love feedback on the top areas where we should improve.</p>
-</div></blockquote>
-</div>
-<div class="section" id="bug-fixes-reliability-improvements">
-<h3>2. Bug Fixes &amp; Reliability Improvements<a class="headerlink" href="#bug-fixes-reliability-improvements" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div><p>As mentioned since Flyte is being actively used at Lyft and our scale is always increasing, there are always bugs that we want to squish. So Bugs, are always work in progress and most often then
-not receive highest priority.</p>
-</div></blockquote>
-</div>
-<div class="section" id="observability">
-<h3>3. Observability<a class="headerlink" href="#observability" title="Permalink to this headline">¶</a></h3>
-<blockquote>
-<div><p>We are currently working on a one time Observability epic that will enable open source users to use dashboard templates exactly like we use within Lyft (as of April 2020). Going forward,
-Observability is one of the pillars of Flyte. We will continue emphasizing on this aspect and improving it with every iteration.</p>
-</div></blockquote>
-</div>
-</div>
-<div class="section" id="living-roadmap">
-<h2>Living Roadmap<a class="headerlink" href="#living-roadmap" title="Permalink to this headline">¶</a></h2>
-<p>We are trying to maintain a Living roadmap <a class="reference external" href="https://docs.google.com/spreadsheets/d/1V8DQfcsX_02Zac5EfAo0UrGJtLwdMPcw3wuuigVIMZU/edit?usp=sharing">here</a></p>
-<p>We also maintain a raw list of all the ideas <a class="reference external" href="https://docs.google.com/document/d/1yq8pIlhlG3gci3GJQNjdAd9bzZ-KYyLfm6I5NVms9-4/edit?usp=sharing">here</a></p>
 </div>
 <div class="section" id="milestones-and-releases">
 <h2>Milestones and Releases<a class="headerlink" href="#milestones-and-releases" title="Permalink to this headline">¶</a></h2>
@@ -240,9 +204,6 @@ communication medium.</p>
 - Large PR’s associated with Proposals
 - Every major change is associated with documentation
 - Owner files for all repositories</p>
-<p>Things to do
-- Unit test coverage should be above 60% for every repo by release 0.5.0
-- End to end tests should be run on an actual cluster.</p>
 </div>
 <div class="section" id="release-train">
 <h3>Release Train<a class="headerlink" href="#release-train" title="Permalink to this headline">¶</a></h3>
@@ -253,9 +214,69 @@ communication medium.</p>
 <li><p>Flyte release are monthly</p></li>
 <li><p>We may have patch releases eg. 0.1.x in between the monthly releases.</p></li>
 </ul>
-<p>Things to do
-- Golden Test Suite that is tested for every release train</p>
 </div>
+</div>
+<div class="section" id="upcoming-features">
+<h2>Upcoming Features<a class="headerlink" href="#upcoming-features" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>flytekit python overhaul.
+Goal: Make flyte almost invisible to the user.
+- Use python native typing system - 0 ramp to learn types
+- Ability to execute everything locally (in some cases mocking out things)
+- minimal imports - just one import for task and workflow
+- simplified extensibility for types and task-types in flytekit</p></li>
+</ol>
+<p>Sneak Peek</p>
+<div class="highlight-python notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">flytekit</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">workflow</span>
+
+<span class="nd">@task</span>
+<span class="k">def</span> <span class="nf">t1</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;col1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;col2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="mi">4</span><span class="p">]})</span>
+
+<span class="nd">@task</span>
+<span class="k">def</span> <span class="nf">t2</span><span class="p">(</span><span class="n">df</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;col1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="s2">&quot;col2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]}))</span>
+
+<span class="nd">@workflow</span>
+<span class="k">def</span> <span class="nf">my_wf</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">t2</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">t1</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">my_wf</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+</pre></div>
+</td></tr></table></div>
+<p>Output</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">col1</span>  <span class="n">col2</span>
+<span class="mi">0</span>    <span class="mi">20</span>    <span class="mi">20</span>
+<span class="mi">1</span>     <span class="mi">2</span>     <span class="mi">4</span>
+<span class="mi">0</span>     <span class="mi">5</span>     <span class="mi">5</span>
+<span class="mi">1</span>    <span class="mi">10</span>    <span class="mi">10</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>flytekit java feature complete</p></li>
+<li><p>flyte workflows and tasks inline documentation support and visualization</p></li>
+<li><p>Visualization of Blobs in UI/Console</p></li>
+<li><p>Performance visualization of Task execution</p></li>
+<li><p>Faster iteration support (no container building)</p></li>
+<li><p>Data Lineage and Provenance visualization</p></li>
+<li><p>More plugins</p></li>
+<li><p>Observability stack open source</p></li>
+<li><p>Getting started overhaul</p></li>
+</ol>
 </div>
 </div>
 

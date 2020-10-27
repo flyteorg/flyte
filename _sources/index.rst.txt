@@ -26,8 +26,9 @@ Welcome to the documentation hub for Flyte.
    :maxdepth: 1
    :name: sourcecodedocstoc
 
+   Flytekit Python<flytekit/index>
+   Flytekit JAVA  <https://github.com/spotify/flytekit-java>
    flyteidl/index
-   Flytekit <flytekit/index>
    FlytePropeller <https://pkg.go.dev/mod/github.com/lyft/flytepropeller>
    FlyteAdmin <https://pkg.go.dev/mod/github.com/lyft/flyteadmin>
    FlytePlugins <https://pkg.go.dev/mod/github.com/lyft/flyteplugins>

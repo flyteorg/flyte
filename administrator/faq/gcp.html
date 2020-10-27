@@ -91,8 +91,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Generated Documentation from Source</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit Python</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spotify/flytekit-java">Flytekit JAVA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../flyteidl/index.html">Flyte Language and API specification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
@@ -168,12 +169,9 @@
 <h1>I tried to run examples, but task fails with 401 error?<a class="headerlink" href="#i-tried-to-run-examples-but-task-fails-with-401-error" title="Permalink to this headline">¶</a></h1>
 <blockquote>
 <div><p>Steps:
-- Are you using Workload Identity, then you have to pass in the ServiceAccount when you create the launchplan. Docs here <a class="reference external" href="https://lyft.github.io/flyte/user/features/roles.html?highlight=serviceaccount#kubernetes-serviceaccount-examples">https://lyft.github.io/flyte/user/features/roles.html?highlight=serviceaccount#kubernetes-serviceaccount-examples</a></p>
-<blockquote>
-<div><p>More information about WorkloadIdentity at <a class="reference external" href="https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity">https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity</a></p>
-</div></blockquote>
+- Are you using Workload Identity, then you have to pass in the ServiceAccount when you create the launchplan. Docs here <a class="reference external" href="https://lyft.github.io/flyte/user/features/roles.html?highlight=serviceaccount#kubernetes-serviceaccount-examples">https://lyft.github.io/flyte/user/features/roles.html?highlight=serviceaccount#kubernetes-serviceaccount-examples</a> More information about WorkloadIdentity at <a class="reference external" href="https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity">https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity</a>
+- If you are just using a simple Nodepool wide permissions then check the cluster’s ServiceACcount for STorage permissions. Do they look fine?</p>
 <ul class="simple">
-<li><p>If you are just using a simple Nodepool wide permissions then check the cluster’s ServiceACcount for STorage permissions. Do they look fine?</p></li>
 <li><p>If not, then start a dummy pod in the intended namespace and check for</p></li>
 </ul>
 <blockquote>
