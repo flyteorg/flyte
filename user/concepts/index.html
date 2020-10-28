@@ -86,15 +86,18 @@
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">User docs</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="../getting_started/index.html">Getting Started</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Flyte Concepts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tasks.html">Tasks</a></li>
-<li class="toctree-l3"><a class="reference internal" href="workflows_nodes.html">Workflows</a></li>
-<li class="toctree-l3"><a class="reference internal" href="workflows_nodes.html#nodes">Nodes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="executions.html">Overview of the Execution of a Workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="launchplans_schedules.html">Launch plans</a></li>
-<li class="toctree-l3"><a class="reference internal" href="launchplans_schedules.html#schedules">Schedules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="projects.html">Projects</a></li>
-<li class="toctree-l3"><a class="reference internal" href="domains.html">Domains</a></li>
-<li class="toctree-l3"><a class="reference internal" href="registration.html">Understanding Registration process</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#illustration-of-a-workflow-with-tasks">Illustration of a workflow with tasks</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tasks.html">Tasks</a></li>
+<li class="toctree-l4"><a class="reference internal" href="workflows_nodes.html">Workflows</a></li>
+<li class="toctree-l4"><a class="reference internal" href="workflows_nodes.html#nodes">Nodes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="executions.html">Overview of the Execution of a Workflow</a></li>
+<li class="toctree-l4"><a class="reference internal" href="launchplans_schedules.html">Launch plans</a></li>
+<li class="toctree-l4"><a class="reference internal" href="launchplans_schedules.html#schedules">Schedules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html">Projects</a></li>
+<li class="toctree-l4"><a class="reference internal" href="domains.html">Domains</a></li>
+<li class="toctree-l4"><a class="reference internal" href="registration.html">Understanding Registration process</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../features/index.html">Flyte Features</a></li>
@@ -110,8 +113,9 @@
 </ul>
 <p class="caption"><span class="caption-text">Generated Documentation from Source</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit Python</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spotify/flytekit-java">Flytekit JAVA</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../flyteidl/index.html">Flyte Language and API specification</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../flytekit/index.html">Flytekit</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flytepropeller">FlytePropeller</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteadmin">FlyteAdmin</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://pkg.go.dev/mod/github.com/lyft/flyteplugins">FlytePlugins</a></li>
@@ -186,6 +190,9 @@
 <span id="concepts"></span><h1>Flyte Concepts<a class="headerlink" href="#flyte-concepts" title="Permalink to this headline">¶</a></h1>
 <p>This section provides a quick overview of some important concepts in Flyte with links
 to deeper dives.</p>
+<div class="section" id="illustration-of-a-workflow-with-tasks">
+<h2>Illustration of a workflow with tasks<a class="headerlink" href="#illustration-of-a-workflow-with-tasks" title="Permalink to this headline">¶</a></h2>
+<img alt="../../_images/flyte_wf_tasks_high_level.png" src="../../_images/flyte_wf_tasks_high_level.png" />
 <p><a class="reference internal" href="tasks.html#concepts-tasks"><span class="std std-ref">Tasks</span></a> are at the core of Flyte. A Task is any independent unit of
 processing. Tasks can be pure functions or functions with side-effects. Tasks also have
 configuration and requirements specification associated with each definition of the task.</p>
@@ -257,6 +264,7 @@ the registered entities.</p>
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 
