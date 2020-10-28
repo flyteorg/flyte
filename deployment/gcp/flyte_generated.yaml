@@ -8793,7 +8793,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.4.2
+        image: docker.io/lyft/flytepropeller:6ce6a297d53604a9ee734f12735a9e2ffadfbb7b
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
