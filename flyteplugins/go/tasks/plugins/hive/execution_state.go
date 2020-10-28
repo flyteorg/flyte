@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/lyft/flytestdlib/cache"
+	"github.com/lyft/flytestdlib/contextutils"
 
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -344,11 +345,13 @@ func KickOffQuery(ctx context.Context, tCtx core.TaskExecutionContext, currentSt
 
 	taskExecutionIdentifier := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	commandMetadata := client.CommandMetadata{TaskName: taskName,
-		Domain:        taskExecutionIdentifier.GetTaskId().GetDomain(),
-		Project:       taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetProject(),
-		Labels:        tCtx.TaskExecutionMetadata().GetLabels(),
-		AttemptNumber: taskExecutionIdentifier.GetRetryAttempt(),
-		MaxAttempts:   tCtx.TaskExecutionMetadata().GetMaxAttempts(),
+		Domain:              taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetDomain(),
+		Project:             taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetProject(),
+		Labels:              tCtx.TaskExecutionMetadata().GetLabels(),
+		AttemptNumber:       taskExecutionIdentifier.GetRetryAttempt(),
+		MaxAttempts:         tCtx.TaskExecutionMetadata().GetMaxAttempts(),
+		WorkflowExecutionID: taskExecutionIdentifier.GetNodeExecutionId().GetExecutionId().GetName(),
+		WorkflowID:          contextutils.Value(ctx, contextutils.WorkflowIDKey),
 	}
 
 	cmdDetails, err := quboleClient.ExecuteHiveCommand(ctx, query, timeoutSec,
