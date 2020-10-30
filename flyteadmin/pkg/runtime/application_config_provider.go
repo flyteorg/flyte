@@ -49,6 +49,7 @@ func (p *ApplicationConfigurationProvider) GetDbConfig() interfaces.DbConfig {
 		User:         dbConfigSection.User,
 		Password:     password,
 		ExtraOptions: dbConfigSection.ExtraOptions,
+		Debug:        dbConfigSection.Debug,
 	}
 }
 

@@ -66,6 +66,9 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 
 	dbConfigValues := configuration.ApplicationConfiguration().GetDbConfig()
 	dbConfig := repositoryConfig.DbConfig{
+		BaseConfig: repositoryConfig.BaseConfig{
+			IsDebug: dbConfigValues.Debug,
+		},
 		Host:         dbConfigValues.Host,
 		Port:         dbConfigValues.Port,
 		DbName:       dbConfigValues.DbName,
