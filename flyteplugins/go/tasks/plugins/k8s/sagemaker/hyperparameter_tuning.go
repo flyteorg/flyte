@@ -188,10 +188,6 @@ func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
 
 	jobName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
-	if len(hpoJobParameterRanges.CategoricalParameterRanges) == 0 && len(hpoJobParameterRanges.ContinuousParameterRanges) == 0 {
-
-	}
-
 	cfg := config.GetSagemakerConfig()
 
 	var metricDefinitions []commonv1.MetricDefinition
