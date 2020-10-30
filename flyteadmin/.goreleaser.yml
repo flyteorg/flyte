@@ -1,0 +1,40 @@
+project_name: flyteadmin
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: flyteadmin
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    binary: flyteadmin
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - id: flyteadmin-archive
+    name_template: |-
+      kyverno-cli_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+      {{- end -}}
+    builds:
+      - flyteadmin
+    replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'

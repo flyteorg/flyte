@@ -20,22 +20,22 @@ done
 echo "kubernetes started in $SECONDS seconds."
 echo ""
 
-# load the locally-built flyteadmin image
+# Load the locally-built flyteadmin image
 docker load -i /images/flyteadmin
 
-# start flyteadmin and dependencies
+# Start flyteadmin and dependencies
 kubectl create -f "${DIR}/integration.yaml"
 
-# in debug mode, run bash instead of running the tests
+# In debug mode, run bash instead of running the tests
 if [ -n "$DOCKERNETES_DEBUG" ]; then
   bash
 fi
 
-# wait for flyteadmin deployment to complete
+# Wait for flyteadmin deployment to complete
 kubectl -n flyte rollout status deployment flyteadmin
 
-# get the name of the flyteadmin pod
+# Get the name of the flyteadmin pod
 POD_NAME=$(kubectl get pods -n flyte -o go-template="{{range .items}}{{.metadata.name}}:{{end}}" | tr ":" "\n" | grep flyteadmin)
 
-# launch the integration tests
+# Launch the integration tests
 kubectl exec -it -n flyte "$POD_NAME" -- make -C /go/src/github.com/lyft/flyteadmin integration

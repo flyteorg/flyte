@@ -9,10 +9,8 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-echo "Loading github docker images into 'kind' cluster to workaround this issue: https://github.com/containerd/containerd/issues/3291#issuecomment-631746985"
-docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD} docker.pkg.github.com
-
-docker tag "my_awesome_image:latest" "flyteadmin:test"
+# TODO: load all images
+docker tag ${IMAGE} "flyteadmin:test"
 kind load docker-image flyteadmin:test
 
 # start flyteadmin and dependencies
