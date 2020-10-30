@@ -27,6 +27,7 @@ ENV PATH="/artifacts:${PATH}"
 FROM alpine:3.10
 COPY --from=builder /artifacts /bin
 
+# Ensure the latest CA certs are present to authenticate SSL connections.
 RUN apk --update add ca-certificates
 
 CMD ["flyteadmin"]
