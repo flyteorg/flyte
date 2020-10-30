@@ -52,6 +52,28 @@ func generateParameterRangeInputs() map[string]*core.Literal {
 	return res
 }
 
+func generateMockTunableHPs() *commonv1.ParameterRanges {
+	return &commonv1.ParameterRanges{
+		IntegerParameterRanges: []commonv1.IntegerParameterRange{
+			{
+				Name:        ToStringPtr("hp1"),
+				MaxValue:    ToStringPtr("10"),
+				MinValue:    ToStringPtr("0"),
+				ScalingType: commonv1.HyperParameterScalingType(sagemakerSpec.HyperparameterScalingType_AUTO.String()),
+			},
+		},
+		ContinuousParameterRanges: []commonv1.ContinuousParameterRange{
+			{
+				Name:        ToStringPtr("hp2"),
+				MaxValue:    ToStringPtr("5.0"),
+				MinValue:    ToStringPtr("3.0"),
+				ScalingType: commonv1.HyperParameterScalingType(sagemakerSpec.HyperparameterScalingType_LINEAR.String()),
+			},
+		},
+		CategoricalParameterRanges: []commonv1.CategoricalParameterRange{{Name: ToStringPtr("hp3"), Values: []string{"AAA", "BBB", "CCC"}}},
+	}
+}
+
 func generateMockTunableHPMap() map[string]*sagemakerSpec.ParameterRangeOneOf {
 	ret := map[string]*sagemakerSpec.ParameterRangeOneOf{
 		"hp1": {ParameterRangeType: &sagemakerSpec.ParameterRangeOneOf_IntegerParameterRange{
@@ -122,9 +144,9 @@ func generateMockSageMakerConfig() *sagemakerConfig.Config {
 func Test_deleteConflictingStaticHyperparameters(t *testing.T) {
 	mockCtx := context.TODO()
 	type args struct {
-		ctx          context.Context
-		staticHPs    []*commonv1.KeyValuePair
-		tunableHPMap map[string]*sagemakerSpec.ParameterRangeOneOf
+		ctx        context.Context
+		staticHPs  []*commonv1.KeyValuePair
+		tunableHPs *commonv1.ParameterRanges
 	}
 	tests := []struct {
 		name string
@@ -132,24 +154,24 @@ func Test_deleteConflictingStaticHyperparameters(t *testing.T) {
 		want []*commonv1.KeyValuePair
 	}{
 		{name: "Partially conflicting hyperparameter list", args: args{
-			ctx:          mockCtx,
-			staticHPs:    generatePartiallyConflictingStaticHPs(),
-			tunableHPMap: generateMockTunableHPMap(),
+			ctx:        mockCtx,
+			staticHPs:  generatePartiallyConflictingStaticHPs(),
+			tunableHPs: generateMockTunableHPs(),
 		}, want: []*commonv1.KeyValuePair{{Name: "hp4", Value: "0.5"}}},
 		{name: "Totally conflicting hyperparameter list", args: args{
-			ctx:          mockCtx,
-			staticHPs:    generateTotallyConflictingStaticHPs(),
-			tunableHPMap: generateMockTunableHPMap(),
+			ctx:        mockCtx,
+			staticHPs:  generateTotallyConflictingStaticHPs(),
+			tunableHPs: generateMockTunableHPs(),
 		}, want: []*commonv1.KeyValuePair{}},
 		{name: "Non-conflicting hyperparameter list", args: args{
-			ctx:          mockCtx,
-			staticHPs:    generateNonConflictingStaticHPs(),
-			tunableHPMap: generateMockTunableHPMap(),
+			ctx:        mockCtx,
+			staticHPs:  generateNonConflictingStaticHPs(),
+			tunableHPs: generateMockTunableHPs(),
 		}, want: []*commonv1.KeyValuePair{{Name: "hp5", Value: "100"}, {Name: "hp4", Value: "0.5"}, {Name: "hp7", Value: "ddd,eee"}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := deleteConflictingStaticHyperparameters(tt.args.ctx, tt.args.staticHPs, tt.args.tunableHPMap); !reflect.DeepEqual(got, tt.want) {
+			if got := deleteConflictingStaticHyperparameters(tt.args.ctx, tt.args.staticHPs, tt.args.tunableHPs); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("deleteConflictingStaticHyperparameters() = %v, want %v", got, tt.want)
 			}
 		})

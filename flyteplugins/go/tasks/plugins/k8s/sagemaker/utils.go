@@ -275,16 +275,33 @@ func ToFloat64Ptr(f float64) *float64 {
 func deleteConflictingStaticHyperparameters(
 	ctx context.Context,
 	staticHPs []*commonv1.KeyValuePair,
-	tunableHPMap map[string]*flyteSagemakerIdl.ParameterRangeOneOf) []*commonv1.KeyValuePair {
+	tunableHPs *commonv1.ParameterRanges) []*commonv1.KeyValuePair {
+	//tunableHPMap map[string]*flyteSagemakerIdl.ParameterRangeOneOf
 
 	resolvedStaticHPs := make([]*commonv1.KeyValuePair, 0, len(staticHPs))
 
-	for _, hp := range staticHPs {
-		if _, found := tunableHPMap[hp.Name]; !found {
-			resolvedStaticHPs = append(resolvedStaticHPs, hp)
+	for _, staticHP := range staticHPs {
+		conflict := false
+		for _, tunableHP := range tunableHPs.ContinuousParameterRanges {
+			if staticHP.Name == *tunableHP.Name {
+				conflict = true
+			}
+		}
+		for _, tunableHP := range tunableHPs.IntegerParameterRanges {
+			if staticHP.Name == *tunableHP.Name {
+				conflict = true
+			}
+		}
+		for _, tunableHP := range tunableHPs.CategoricalParameterRanges {
+			if staticHP.Name == *tunableHP.Name {
+				conflict = true
+			}
+		}
+		if !conflict {
+			resolvedStaticHPs = append(resolvedStaticHPs, staticHP)
 		} else {
 			logger.Infof(ctx,
-				"Static hyperparameter [%v] is removed because the same hyperparameter can be found in the map of tunable hyperparameters", hp.Name)
+				"Static hyperparameter [%v] is removed because the same hyperparameter can be found in the map of tunable hyperparameters", staticHP.Name)
 		}
 	}
 	return resolvedStaticHPs

@@ -25,30 +25,60 @@ func Test_awsSagemakerPlugin_BuildResourceForHyperparameterTuningJob(t *testing.
 		panic(err)
 	}
 	defaultCfg := config.GetSagemakerConfig()
-	awsSageMakerHPOJobHandler := awsSagemakerPlugin{TaskType: hyperparameterTuningJobTaskType}
+	defer func() {
+		_ = config.SetSagemakerConfig(defaultCfg)
+	}()
 
-	tjObj := generateMockTrainingJobCustomObj(
-		sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
-		sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
-	htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
-	taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
-	hpoJobResource, err := awsSageMakerHPOJobHandler.BuildResource(ctx, generateMockHyperparameterTuningJobTaskContext(taskTemplate))
-	assert.NoError(t, err)
-	assert.NotNil(t, hpoJobResource)
+	t.Run("hpo on built-in algorithm training", func(t *testing.T) {
+		awsSageMakerHPOJobHandler := awsSagemakerPlugin{TaskType: hyperparameterTuningJobTaskType}
 
-	hpoJob, ok := hpoJobResource.(*hpojobv1.HyperparameterTuningJob)
-	assert.True(t, ok)
-	assert.NotNil(t, hpoJob.Spec.TrainingJobDefinition)
-	assert.Equal(t, 1, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.IntegerParameterRanges))
-	assert.Equal(t, 0, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.ContinuousParameterRanges))
-	assert.Equal(t, 0, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.CategoricalParameterRanges))
-	assert.Equal(t, "us-east-1", *hpoJob.Spec.Region)
-	assert.Equal(t, "default_role", *hpoJob.Spec.TrainingJobDefinition.RoleArn)
+		tjObj := generateMockTrainingJobCustomObj(
+			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_XGBOOST, "0.90", []*sagemakerIdl.MetricDefinition{},
+			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
+		htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
+		taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
+		hpoJobResource, err := awsSageMakerHPOJobHandler.BuildResource(ctx, generateMockHyperparameterTuningJobTaskContext(taskTemplate, trainingJobTaskType))
+		assert.NoError(t, err)
+		assert.NotNil(t, hpoJobResource)
 
-	err = config.SetSagemakerConfig(defaultCfg)
-	if err != nil {
-		panic(err)
-	}
+		hpoJob, ok := hpoJobResource.(*hpojobv1.HyperparameterTuningJob)
+		assert.True(t, ok)
+		assert.NotNil(t, hpoJob.Spec.TrainingJobDefinition)
+		assert.Equal(t, 1, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.IntegerParameterRanges))
+		assert.Equal(t, 0, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.ContinuousParameterRanges))
+		assert.Equal(t, 0, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.CategoricalParameterRanges))
+		assert.Equal(t, "us-east-1", *hpoJob.Spec.Region)
+		assert.Equal(t, "default_role", *hpoJob.Spec.TrainingJobDefinition.RoleArn)
+		assert.NotNil(t, hpoJob.Spec.TrainingJobDefinition.InputDataConfig)
+		// Image uri should come from config
+		assert.Equal(t, defaultCfg.PrebuiltAlgorithms[0].RegionalConfig[0].VersionConfigs[0].Image, *hpoJob.Spec.TrainingJobDefinition.AlgorithmSpecification.TrainingImage)
+	})
+
+	t.Run("hpo on custom training", func(t *testing.T) {
+		awsSageMakerHPOJobHandler := awsSagemakerPlugin{TaskType: hyperparameterTuningJobTaskType}
+
+		tjObj := generateMockTrainingJobCustomObj(
+			sagemakerIdl.InputMode_FILE, sagemakerIdl.AlgorithmName_CUSTOM, "0.90", []*sagemakerIdl.MetricDefinition{},
+			sagemakerIdl.InputContentType_TEXT_CSV, 2, "ml.p3.2xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
+		htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
+		taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
+		taskContext := generateMockHyperparameterTuningJobTaskContext(taskTemplate, customTrainingJobTaskType)
+		hpoJobResource, err := awsSageMakerHPOJobHandler.BuildResource(ctx, taskContext)
+		assert.NoError(t, err)
+		assert.NotNil(t, hpoJobResource)
+
+		hpoJob, ok := hpoJobResource.(*hpojobv1.HyperparameterTuningJob)
+		assert.True(t, ok)
+		assert.NotNil(t, hpoJob.Spec.TrainingJobDefinition)
+		assert.Equal(t, 1, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.IntegerParameterRanges))
+		assert.Equal(t, 1, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.ContinuousParameterRanges))
+		assert.Equal(t, 1, len(hpoJob.Spec.HyperParameterTuningJobConfig.ParameterRanges.CategoricalParameterRanges))
+		assert.Equal(t, "us-east-1", *hpoJob.Spec.Region)
+		assert.Equal(t, "default_role", *hpoJob.Spec.TrainingJobDefinition.RoleArn)
+		assert.Nil(t, hpoJob.Spec.TrainingJobDefinition.InputDataConfig)
+		// Image uri should come from taskContext
+		assert.Equal(t, testImage, *hpoJob.Spec.TrainingJobDefinition.AlgorithmSpecification.TrainingImage)
+	})
 }
 
 func Test_awsSagemakerPlugin_getEventInfoForHyperparameterTuningJob(t *testing.T) {
@@ -77,7 +107,7 @@ func Test_awsSagemakerPlugin_getEventInfoForHyperparameterTuningJob(t *testing.T
 			sagemakerIdl.InputContentType_TEXT_CSV, 1, "ml.m4.xlarge", 25, sagemakerIdl.DistributedProtocol_UNSPECIFIED)
 		htObj := generateMockHyperparameterTuningJobCustomObj(tjObj, 10, 5)
 		taskTemplate := generateMockHyperparameterTuningJobTaskTemplate("the job", htObj)
-		taskCtx := generateMockHyperparameterTuningJobTaskContext(taskTemplate)
+		taskCtx := generateMockHyperparameterTuningJobTaskContext(taskTemplate, trainingJobTaskType)
 		hpoJobResource, err := awsSageMakerHPOJobHandler.BuildResource(ctx, taskCtx)
 		assert.NoError(t, err)
 		assert.NotNil(t, hpoJobResource)
