@@ -41,6 +41,9 @@ var controllerRunCmd = &cobra.Command{
 		scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
 		dbConfigValues := configuration.ApplicationConfiguration().GetDbConfig()
 		dbConfig := repositoryConfig.DbConfig{
+			BaseConfig: repositoryConfig.BaseConfig{
+				IsDebug: dbConfigValues.Debug,
+			},
 			Host:         dbConfigValues.Host,
 			Port:         dbConfigValues.Port,
 			DbName:       dbConfigValues.DbName,
@@ -74,6 +77,9 @@ var controllerSyncCmd = &cobra.Command{
 		scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
 		dbConfigValues := configuration.ApplicationConfiguration().GetDbConfig()
 		dbConfig := repositoryConfig.DbConfig{
+			BaseConfig: repositoryConfig.BaseConfig{
+				IsDebug: dbConfigValues.Debug,
+			},
 			Host:         dbConfigValues.Host,
 			Port:         dbConfigValues.Port,
 			DbName:       dbConfigValues.DbName,

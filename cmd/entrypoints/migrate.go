@@ -34,6 +34,9 @@ var migrateCmd = &cobra.Command{
 		configuration := runtime.NewConfigurationProvider()
 		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
 		postgresConfigProvider := config.NewPostgresConfigProvider(config.DbConfig{
+			BaseConfig: config.BaseConfig{
+				IsDebug: databaseConfig.Debug,
+			},
 			Host:         databaseConfig.Host,
 			Port:         databaseConfig.Port,
 			DbName:       databaseConfig.DbName,
@@ -68,6 +71,9 @@ var rollbackCmd = &cobra.Command{
 		configuration := runtime.NewConfigurationProvider()
 		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
 		postgresConfigProvider := config.NewPostgresConfigProvider(config.DbConfig{
+			BaseConfig: config.BaseConfig{
+				IsDebug: databaseConfig.Debug,
+			},
 			Host:         databaseConfig.Host,
 			Port:         databaseConfig.Port,
 			DbName:       databaseConfig.DbName,
@@ -104,6 +110,9 @@ var seedProjectsCmd = &cobra.Command{
 		configuration := runtime.NewConfigurationProvider()
 		databaseConfig := configuration.ApplicationConfiguration().GetDbConfig()
 		postgresConfigProvider := config.NewPostgresConfigProvider(config.DbConfig{
+			BaseConfig: config.BaseConfig{
+				IsDebug: databaseConfig.Debug,
+			},
 			Host:         databaseConfig.Host,
 			Port:         databaseConfig.Port,
 			DbName:       databaseConfig.DbName,

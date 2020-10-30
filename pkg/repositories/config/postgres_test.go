@@ -10,6 +10,9 @@ import (
 
 func TestConstructGormArgs(t *testing.T) {
 	postgresConfigProvider := NewPostgresConfigProvider(DbConfig{
+		BaseConfig: BaseConfig{
+			IsDebug: true,
+		},
 		Host:         "localhost",
 		Port:         5432,
 		DbName:       "postgres",
@@ -18,6 +21,7 @@ func TestConstructGormArgs(t *testing.T) {
 	}, mockScope.NewTestScope())
 
 	assert.Equal(t, "host=localhost port=5432 dbname=postgres user=postgres sslmode=disable", postgresConfigProvider.GetArgs())
+	assert.True(t, postgresConfigProvider.IsDebug())
 }
 
 func TestConstructGormArgsWithPassword(t *testing.T) {
