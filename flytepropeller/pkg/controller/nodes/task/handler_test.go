@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	pluginK8sMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
@@ -28,7 +30,6 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	pluginK8s "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
-	pluginK8sMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 	"github.com/lyft/flytestdlib/promutils"
 	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
@@ -150,41 +151,60 @@ func Test_task_Setup(t *testing.T) {
 		defaultPluginID string
 	}
 	tests := []struct {
-		name     string
-		registry PluginRegistryIface
-		fields   wantFields
-		wantErr  bool
+		name                string
+		registry            PluginRegistryIface
+		enabledPlugins      []string
+		defaultForTaskTypes map[string]string
+		fields              wantFields
+		wantErr             bool
 	}{
-		{"no-plugins", testPluginRegistry{}, wantFields{}, false},
+		{"no-plugins", testPluginRegistry{}, []string{}, map[string]string{}, wantFields{}, false},
 		{"no-default-only-core", testPluginRegistry{
 			core: []pluginCore.PluginEntry{corePluginEntry}, k8s: []pluginK8s.PluginEntry{},
-		}, wantFields{
-			pluginIDs: map[pluginCore.TaskType]string{corePluginType: corePluginType},
-		}, false},
+		}, []string{corePluginType}, map[string]string{
+			corePluginType: corePluginType},
+			wantFields{
+				pluginIDs: map[pluginCore.TaskType]string{corePluginType: corePluginType},
+			}, false},
 		{"no-default-only-k8s", testPluginRegistry{
 			core: []pluginCore.PluginEntry{}, k8s: []pluginK8s.PluginEntry{k8sPluginEntry},
+		}, []string{k8sPluginType}, map[string]string{
+			k8sPluginType: k8sPluginType},
+			wantFields{
+				pluginIDs: map[pluginCore.TaskType]string{k8sPluginType: k8sPluginType},
+			}, false},
+		{"no-default", testPluginRegistry{}, []string{corePluginType, k8sPluginType}, map[string]string{
+			corePluginType: corePluginType,
+			k8sPluginType:  k8sPluginType,
 		}, wantFields{
-			pluginIDs: map[pluginCore.TaskType]string{k8sPluginType: k8sPluginType},
-		}, false},
-		{"no-default", testPluginRegistry{
-			core: []pluginCore.PluginEntry{corePluginEntry}, k8s: []pluginK8s.PluginEntry{k8sPluginEntry},
-		}, wantFields{
-			pluginIDs: map[pluginCore.TaskType]string{corePluginType: corePluginType, k8sPluginType: k8sPluginType},
+			pluginIDs: map[pluginCore.TaskType]string{},
 		}, false},
 		{"only-default-core", testPluginRegistry{
 			core: []pluginCore.PluginEntry{corePluginEntry, corePluginEntryDefault}, k8s: []pluginK8s.PluginEntry{k8sPluginEntry},
+		}, []string{corePluginType, corePluginDefaultType, k8sPluginType}, map[string]string{
+			corePluginType:        corePluginType,
+			corePluginDefaultType: corePluginDefaultType,
+			k8sPluginType:         k8sPluginType,
 		}, wantFields{
 			pluginIDs:       map[pluginCore.TaskType]string{corePluginType: corePluginType, corePluginDefaultType: corePluginDefaultType, k8sPluginType: k8sPluginType},
 			defaultPluginID: corePluginDefaultType,
 		}, false},
 		{"only-default-k8s", testPluginRegistry{
 			core: []pluginCore.PluginEntry{corePluginEntry}, k8s: []pluginK8s.PluginEntry{k8sPluginEntryDefault},
+		}, []string{corePluginType, k8sPluginDefaultType}, map[string]string{
+			corePluginType:       corePluginType,
+			k8sPluginDefaultType: k8sPluginDefaultType,
 		}, wantFields{
 			pluginIDs:       map[pluginCore.TaskType]string{corePluginType: corePluginType, k8sPluginDefaultType: k8sPluginDefaultType},
 			defaultPluginID: k8sPluginDefaultType,
 		}, false},
 		{"default-both", testPluginRegistry{
 			core: []pluginCore.PluginEntry{corePluginEntry, corePluginEntryDefault}, k8s: []pluginK8s.PluginEntry{k8sPluginEntry, k8sPluginEntryDefault},
+		}, []string{corePluginType, corePluginDefaultType, k8sPluginType, k8sPluginDefaultType}, map[string]string{
+			corePluginType:        corePluginType,
+			corePluginDefaultType: corePluginDefaultType,
+			k8sPluginType:         k8sPluginType,
+			k8sPluginDefaultType:  k8sPluginDefaultType,
 		}, wantFields{
 			pluginIDs:       map[pluginCore.TaskType]string{corePluginType: corePluginType, corePluginDefaultType: corePluginDefaultType, k8sPluginType: k8sPluginType, k8sPluginDefaultType: k8sPluginDefaultType},
 			defaultPluginID: corePluginDefaultType,
@@ -200,6 +220,8 @@ func Test_task_Setup(t *testing.T) {
 			sCtx.On("MetricsScope").Return(promutils.NewTestScope())
 
 			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), &pluginCatalogMocks.Client{}, promutils.NewTestScope())
+			tk.cfg.TaskPlugins.EnabledPlugins = tt.enabledPlugins
+			tk.cfg.TaskPlugins.DefaultForTaskTypes = tt.defaultForTaskTypes
 			assert.NoError(t, err)
 			tk.pluginRegistry = tt.registry
 			if err := tk.Setup(context.TODO(), sCtx); err != nil {

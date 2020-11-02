@@ -153,6 +153,7 @@ type PluginRegistryIface interface {
 	GetK8sPlugins() []pluginK8s.PluginEntry
 }
 
+type taskType = string
 type pluginID = string
 
 type Handler struct {
@@ -204,21 +205,35 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 		return err
 	}
 
+	// Not every task type will have a default plugin specified in the flytepropeller config.
+	// That's fine, we resort to using the plugins' static RegisteredTaskTypes as a fallback further below.
+	fallbackTaskHandlerMap := make(map[taskType]map[pluginID]pluginCore.Plugin)
+
 	for _, p := range enabledPlugins {
 		// create a new resource registrar proxy for each plugin, and pass it into the plugin's LoadPlugin() via a setup context
 		pluginResourceNamespacePrefix := pluginCore.ResourceNamespace(newResourceManagerBuilder.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(p.ID))
 		sCtxFinal := newNameSpacedSetupCtx(
 			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix))
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
-		// cp, err := p.LoadPlugin(ctx, tSCtx)
 		cp, err := p.LoadPlugin(ctx, sCtxFinal)
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
+		// For every default plugin for a task type specified in flytepropeller config we validate that the plugin's
+		// static definition includes that task type as something it is registered to handle.
 		for _, tt := range p.RegisteredTaskTypes {
-			logger.Infof(ctx, "Plugin [%s] registered for TaskType [%s]", cp.GetID(), tt)
-			// TODO(katrogan): Make the default task plugin assignment more explicit (https://github.com/lyft/flyte/issues/516)
-			t.defaultPlugins[tt] = cp
+			for _, defaultTaskType := range p.DefaultForTaskTypes {
+				if defaultTaskType == tt {
+					if existingHandler, alreadyDefaulted := t.defaultPlugins[tt]; alreadyDefaulted && existingHandler.GetID() != cp.GetID() {
+						logger.Errorf(ctx, "TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
+							tt, existingHandler.GetID(), cp.GetID())
+						return regErrors.New(fmt.Sprintf("TaskType [%s] has multiple default handlers specified: [%s] and [%s]",
+							tt, existingHandler.GetID(), cp.GetID()))
+					}
+					logger.Infof(ctx, "Plugin [%s] registered for TaskType [%s]", cp.GetID(), tt)
+					t.defaultPlugins[tt] = cp
+				}
+			}
 
 			pluginsForTaskType, ok := t.pluginsForType[tt]
 			if !ok {
@@ -226,11 +241,32 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 			}
 			pluginsForTaskType[cp.GetID()] = cp
 			t.pluginsForType[tt] = pluginsForTaskType
+
+			fallbackMap, ok := fallbackTaskHandlerMap[tt]
+			if !ok {
+				fallbackMap = make(map[pluginID]pluginCore.Plugin)
+			}
+			fallbackMap[cp.GetID()] = cp
+			fallbackTaskHandlerMap[tt] = fallbackMap
 		}
 		if p.IsDefault {
 			if err := t.setDefault(ctx, cp); err != nil {
 				return err
 			}
+		}
+	}
+
+	// Read from the fallback task handler map for any remaining tasks without a defaultPlugins registered handler.
+	for taskType, registeredPlugins := range fallbackTaskHandlerMap {
+		if _, ok := t.defaultPlugins[taskType]; ok {
+			break
+		}
+		if len(registeredPlugins) != 1 {
+			logger.Errorf(ctx, "Multiple plugins registered to handle task type: %s. ([%+v])", taskType, registeredPlugins)
+			return regErrors.New(fmt.Sprintf("Multiple plugins registered to handle task type: %s. ([%+v]). Use default-for-task-type config option to choose the desired plugin.", taskType, registeredPlugins))
+		}
+		for _, plugin := range registeredPlugins {
+			t.defaultPlugins[taskType] = plugin
 		}
 	}
 
