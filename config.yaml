@@ -32,6 +32,9 @@ tasks:
       - container
       - K8S-ARRAY
       - qubole-hive-executor
+    default-for-task-type:
+      - container-array: k8s-array
+      - presto: my-presto
 # Uncomment to enable sagemaker plugin
 #      - sagemaker_training
 #      - sagemaker_hyperparameter_tuning
