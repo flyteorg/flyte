@@ -17,7 +17,7 @@ builds:
 archives:
   - id: kubectl-flyte-archive
     name_template: |-
-      kyverno-cli_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      kubectl-flyte_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
       {{- with .Arm -}}
       {{- if (eq . "6") -}}hf
       {{- else -}}v{{- . -}}
