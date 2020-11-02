@@ -13,19 +13,22 @@ OUT="${DIR}/tmp"
 rm -rf ${OUT}
 git clone https://github.com/lyft/flyte.git "${OUT}"
 
-# TODO: load all images
-kind  load docker-image ${PROPELLER}
-
-echo "Setup Kubectl"
-kubectl cluster-info
-kubectl get pods -n kube-system
-echo "current-context:" $(kubectl config current-context)
-echo "environment-kubeconfig:" ${KUBECONFIG}
-
 pushd ${OUT}
-# TODO: Only replace propeller if it's passed in
-# TODO: Support replacing other images too
-sed -i.bak -e "s_docker.io/lyft/flytepropeller:.*_${PROPELLER}_g" ${OUT}/kustomize/base/propeller/deployment.yaml
+
+if [ ! -z "$IMAGE" ]; 
+then
+  kind load docker-image ${IMAGE}
+  if [ ${IMAGE_NAME} -eq "flytepropeller" ]
+  then
+    sed -i.bak -e "s_${IMAGE_NAME}:.*_${IMAGE}_g" ${OUT}/kustomize/base/propeller/deployment.yaml
+  fi
+
+  if [ ${IMAGE} -eq "flyteadmin" ]
+  then
+    sed -i.bak -e "s_${IMAGE_NAME}:.*_${IMAGE}_g" ${OUT}/kustomize/base/admindeployment/deployment.yaml
+  fi
+fi
+
 make kustomize
 make end2end_execute
 popd
