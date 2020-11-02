@@ -15,7 +15,7 @@ builds:
 archives:
   - id: flyteadmin-archive
     name_template: |-
-      kyverno-cli_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      flyteadmin_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
       {{- with .Arm -}}
       {{- if (eq . "6") -}}hf
       {{- else -}}v{{- . -}}
