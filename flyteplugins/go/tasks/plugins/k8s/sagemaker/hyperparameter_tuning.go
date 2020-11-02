@@ -173,6 +173,10 @@ func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
 			return nil, pluginErrors.Wrapf(pluginErrors.BadTaskSpecification, err, "There has to be at least one input for a hyperparameter tuning job wrapping around a custom-training job")
 		}
 
+		if taskTemplate.GetContainer() == nil {
+			return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "The task template points to a nil container")
+		}
+
 		if taskTemplate.GetContainer().GetImage() == "" {
 			return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "Invalid image of the container")
 		}
@@ -205,6 +209,8 @@ func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
 	if role == "" {
 		role = cfg.RoleArn
 	}
+
+	maxTrainingJobRuntimeInSeconds := sagemakerHPOJob.GetTrainingJobMetadata().GetTimeout().GetSeconds()
 
 	hpoJob := &hpojobv1.HyperparameterTuningJob{
 		Spec: hpojobv1.HyperparameterTuningJobSpec{
@@ -243,7 +249,7 @@ func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
 				},
 				RoleArn: ToStringPtr(role),
 				StoppingCondition: &commonv1.StoppingCondition{
-					MaxRuntimeInSeconds:  ToInt64Ptr(86400),
+					MaxRuntimeInSeconds:  ToInt64Ptr(maxTrainingJobRuntimeInSeconds),
 					MaxWaitTimeInSeconds: nil, // We currently don't have a conclusion how to set a value for this
 				},
 			},
