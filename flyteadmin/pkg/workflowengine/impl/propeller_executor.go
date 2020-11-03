@@ -44,6 +44,7 @@ type FlytePropeller struct {
 	roleNameKey      string
 	metrics          propellerMetrics
 	config           runtimeInterfaces.NamespaceMappingConfiguration
+	eventVersion     v1alpha1.EventVersion
 }
 
 type FlyteWorkflowBuilder struct{}
@@ -138,6 +139,10 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
+	if flyteWf.WorkflowMeta == nil {
+		flyteWf.WorkflowMeta = &v1alpha1.WorkflowMeta{}
+	}
+	flyteWf.WorkflowMeta.EventVersion = c.eventVersion
 	addExecutionOverrides(input.TaskPluginOverrides, flyteWf)
 
 	if input.Reference.Spec.RawOutputDataConfig != nil {
@@ -301,7 +306,7 @@ func newPropellerMetrics(scope promutils.Scope) propellerMetrics {
 }
 
 func NewFlytePropeller(roleNameKey string, executionCluster interfaces2.ClusterInterface,
-	scope promutils.Scope, configuration runtimeInterfaces.NamespaceMappingConfiguration) interfaces.Executor {
+	scope promutils.Scope, configuration runtimeInterfaces.NamespaceMappingConfiguration, eventVersion int) interfaces.Executor {
 
 	return &FlytePropeller{
 		executionCluster: executionCluster,
@@ -309,5 +314,6 @@ func NewFlytePropeller(roleNameKey string, executionCluster interfaces2.ClusterI
 		roleNameKey:      roleNameKey,
 		metrics:          newPropellerMetrics(scope),
 		config:           configuration,
+		eventVersion:     v1alpha1.EventVersion(eventVersion),
 	}
 }

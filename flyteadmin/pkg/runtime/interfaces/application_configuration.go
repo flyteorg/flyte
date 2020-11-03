@@ -48,6 +48,8 @@ type ApplicationConfig struct {
 	// This defines the nested path on the configured external storage provider where workflow closures are remotely
 	// offloaded.
 	MetadataStoragePrefix []string `json:"metadataStoragePrefix"`
+	// Event version to be used for Flyte workflows
+	EventVersion int `json:"eventVersion"`
 }
 
 // This section holds common config for AWS
