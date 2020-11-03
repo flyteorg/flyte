@@ -900,6 +900,12 @@ data:
           - spark
           - k8s-array
           - pytorch
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          spark: spark
+          container_array: k8s-array
+          pytorch: pytorch
   k8s.yaml: |
     plugins:
       k8s:
@@ -963,7 +969,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-88kbgkkfbd
+  name: flyte-propeller-config-57md596t6f
   namespace: flyte
 ---
 apiVersion: v1
@@ -1512,7 +1518,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.4.2
+        image: docker.io/lyft/flytepropeller:v0.4.8
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1523,7 +1529,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-88kbgkkfbd
+          name: flyte-propeller-config-57md596t6f
         name: config-volume
 ---
 apiVersion: apps/v1
