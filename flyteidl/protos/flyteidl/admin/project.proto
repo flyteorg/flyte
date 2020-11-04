@@ -15,8 +15,21 @@ message Domain {
     string name  = 2;
 }
 
+
 // Top-level namespace used to classify different entities like workflows and executions.
 message Project {
+    // The state of the project is used to control its visibility in the UI and validity.
+    enum ProjectState {
+        // By default, all projects are considered active.
+        ACTIVE = 0;
+
+        // Archived projects are no longer visible in the UI and no longer valid.
+        ARCHIVED = 1;
+
+        // System generated projects that aren't explicitly created or managed by a user.
+        SYSTEM_GENERATED = 2;
+    }
+
     string id               = 1;
 
     // Display name.
@@ -29,6 +42,8 @@ message Project {
     // Leverage Labels from flyteidel.admin.common.proto to
     // tag projects with ownership information.
     Labels labels = 5;
+
+    ProjectState state = 6;
 }
 
 message Projects {
