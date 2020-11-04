@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.admin_domain import AdminDomain  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
+from flyteadmin.models.project_project_state import ProjectProjectState  # noqa: F401,E501
 
 
 class AdminProject(object):
@@ -38,7 +39,8 @@ class AdminProject(object):
         'name': 'str',
         'domains': 'list[AdminDomain]',
         'description': 'str',
-        'labels': 'AdminLabels'
+        'labels': 'AdminLabels',
+        'state': 'ProjectProjectState'
     }
 
     attribute_map = {
@@ -46,10 +48,11 @@ class AdminProject(object):
         'name': 'name',
         'domains': 'domains',
         'description': 'description',
-        'labels': 'labels'
+        'labels': 'labels',
+        'state': 'state'
     }
 
-    def __init__(self, id=None, name=None, domains=None, description=None, labels=None):  # noqa: E501
+    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None):  # noqa: E501
         """AdminProject - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -57,6 +60,7 @@ class AdminProject(object):
         self._domains = None
         self._description = None
         self._labels = None
+        self._state = None
         self.discriminator = None
 
         if id is not None:
@@ -69,6 +73,8 @@ class AdminProject(object):
             self.description = description
         if labels is not None:
             self.labels = labels
+        if state is not None:
+            self.state = state
 
     @property
     def id(self):
@@ -178,6 +184,27 @@ class AdminProject(object):
         """
 
         self._labels = labels
+
+    @property
+    def state(self):
+        """Gets the state of this AdminProject.  # noqa: E501
+
+
+        :return: The state of this AdminProject.  # noqa: E501
+        :rtype: ProjectProjectState
+        """
+        return self._state
+
+    @state.setter
+    def state(self, state):
+        """Sets the state of this AdminProject.
+
+
+        :param state: The state of this AdminProject.  # noqa: E501
+        :type: ProjectProjectState
+        """
+
+        self._state = state
 
     def to_dict(self):
         """Returns the model properties as a dict"""

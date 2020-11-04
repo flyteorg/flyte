@@ -10846,6 +10846,9 @@ export namespace flyteidl {
 
             /** Project labels */
             labels?: (flyteidl.admin.ILabels|null);
+
+            /** Project state */
+            state?: (flyteidl.admin.Project.ProjectState|null);
         }
 
         /** Represents a Project. */
@@ -10871,6 +10874,9 @@ export namespace flyteidl {
 
             /** Project labels. */
             public labels?: (flyteidl.admin.ILabels|null);
+
+            /** Project state. */
+            public state: flyteidl.admin.Project.ProjectState;
 
             /**
              * Creates a new Project instance using the specified properties.
@@ -10903,6 +10909,16 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Project {
+
+            /** ProjectState enum. */
+            enum ProjectState {
+                ACTIVE = 0,
+                ARCHIVED = 1,
+                SYSTEM_GENERATED = 2
+            }
         }
 
         /** Properties of a Projects. */

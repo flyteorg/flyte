@@ -215,6 +215,7 @@ from flyteadmin.models.flyteidlevent_workflow_node_metadata import Flyteidlevent
 from flyteadmin.models.io_strategy_download_mode import IOStrategyDownloadMode
 from flyteadmin.models.io_strategy_upload_mode import IOStrategyUploadMode
 from flyteadmin.models.plugin_override_missing_plugin_behavior import PluginOverrideMissingPluginBehavior
+from flyteadmin.models.project_project_state import ProjectProjectState
 from flyteadmin.models.protobuf_list_value import ProtobufListValue
 from flyteadmin.models.protobuf_null_value import ProtobufNullValue
 from flyteadmin.models.protobuf_struct import ProtobufStruct

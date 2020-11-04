@@ -2483,6 +2483,18 @@ definitions:
     - "FAIL"
     - "USE_DEFAULT"
     default: "FAIL"
+  ProjectProjectState:
+    type: "string"
+    description: "The state of the project is used to control its visibility in the\
+      \ UI and validity.\n\n - ACTIVE: By default, all projects are considered active.\n\
+      \ - ARCHIVED: Archived projects are no longer visible in the UI and no longer\
+      \ valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly\
+      \ created or managed by a user."
+    enum:
+    - "ACTIVE"
+    - "ARCHIVED"
+    - "SYSTEM_GENERATED"
+    default: "ACTIVE"
   QualityOfServiceTier:
     type: "string"
     description: " - UNDEFINED: Default: no quality of service specified."
@@ -5502,6 +5514,8 @@ definitions:
         description: "Leverage Labels from flyteidel.admin.common.proto to\ntag projects\
           \ with ownership information."
         $ref: "#/definitions/adminLabels"
+      state:
+        $ref: "#/definitions/ProjectProjectState"
     description: "Top-level namespace used to classify different entities like workflows\
       \ and executions."
     example:
@@ -5513,6 +5527,7 @@ definitions:
         id: "id"
       description: "description"
       id: "id"
+      state: {}
       labels:
         values:
           key: "values"
@@ -5662,6 +5677,7 @@ definitions:
           id: "id"
         description: "description"
         id: "id"
+        state: {}
         labels:
           values:
             key: "values"
@@ -5673,6 +5689,7 @@ definitions:
           id: "id"
         description: "description"
         id: "id"
+        state: {}
         labels:
           values:
             key: "values"
