@@ -25,6 +25,7 @@ To start, it’s recommended that you create a python virtual environment. Then 
   ```
   mkvirtualenv --python=python3 flyte-101
   pip install flytekit
+  flyte-cli setup-config -h flyte.lyft.net
   ```
 </details>
 
