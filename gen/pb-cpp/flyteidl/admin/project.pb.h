@@ -30,6 +30,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/admin/common.pb.h"
 // @@protoc_insertion_point(includes)
@@ -88,6 +89,28 @@ template<> ::flyteidl::admin::Projects* Arena::CreateMaybeMessage<::flyteidl::ad
 namespace flyteidl {
 namespace admin {
 
+enum Project_ProjectState {
+  Project_ProjectState_ACTIVE = 0,
+  Project_ProjectState_ARCHIVED = 1,
+  Project_ProjectState_SYSTEM_GENERATED = 2,
+  Project_ProjectState_Project_ProjectState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
+  Project_ProjectState_Project_ProjectState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
+};
+bool Project_ProjectState_IsValid(int value);
+const Project_ProjectState Project_ProjectState_ProjectState_MIN = Project_ProjectState_ACTIVE;
+const Project_ProjectState Project_ProjectState_ProjectState_MAX = Project_ProjectState_SYSTEM_GENERATED;
+const int Project_ProjectState_ProjectState_ARRAYSIZE = Project_ProjectState_ProjectState_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* Project_ProjectState_descriptor();
+inline const ::std::string& Project_ProjectState_Name(Project_ProjectState value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    Project_ProjectState_descriptor(), value);
+}
+inline bool Project_ProjectState_Parse(
+    const ::std::string& name, Project_ProjectState* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Project_ProjectState>(
+    Project_ProjectState_descriptor(), name, value);
+}
 // ===================================================================
 
 class Domain final :
@@ -318,6 +341,34 @@ class Project final :
 
   // nested types ----------------------------------------------------
 
+  typedef Project_ProjectState ProjectState;
+  static const ProjectState ACTIVE =
+    Project_ProjectState_ACTIVE;
+  static const ProjectState ARCHIVED =
+    Project_ProjectState_ARCHIVED;
+  static const ProjectState SYSTEM_GENERATED =
+    Project_ProjectState_SYSTEM_GENERATED;
+  static inline bool ProjectState_IsValid(int value) {
+    return Project_ProjectState_IsValid(value);
+  }
+  static const ProjectState ProjectState_MIN =
+    Project_ProjectState_ProjectState_MIN;
+  static const ProjectState ProjectState_MAX =
+    Project_ProjectState_ProjectState_MAX;
+  static const int ProjectState_ARRAYSIZE =
+    Project_ProjectState_ProjectState_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  ProjectState_descriptor() {
+    return Project_ProjectState_descriptor();
+  }
+  static inline const ::std::string& ProjectState_Name(ProjectState value) {
+    return Project_ProjectState_Name(value);
+  }
+  static inline bool ProjectState_Parse(const ::std::string& name,
+      ProjectState* value) {
+    return Project_ProjectState_Parse(name, value);
+  }
+
   // accessors -------------------------------------------------------
 
   // repeated .flyteidl.admin.Domain domains = 3;
@@ -383,6 +434,12 @@ class Project final :
   ::flyteidl::admin::Labels* mutable_labels();
   void set_allocated_labels(::flyteidl::admin::Labels* labels);
 
+  // .flyteidl.admin.Project.ProjectState state = 6;
+  void clear_state();
+  static const int kStateFieldNumber = 6;
+  ::flyteidl::admin::Project_ProjectState state() const;
+  void set_state(::flyteidl::admin::Project_ProjectState value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Project)
  private:
   class HasBitSetters;
@@ -393,6 +450,7 @@ class Project final :
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::internal::ArenaStringPtr description_;
   ::flyteidl::admin::Labels* labels_;
+  int state_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
 };
@@ -1299,6 +1357,20 @@ inline void Project::set_allocated_labels(::flyteidl::admin::Labels* labels) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Project.labels)
 }
 
+// .flyteidl.admin.Project.ProjectState state = 6;
+inline void Project::clear_state() {
+  state_ = 0;
+}
+inline ::flyteidl::admin::Project_ProjectState Project::state() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Project.state)
+  return static_cast< ::flyteidl::admin::Project_ProjectState >(state_);
+}
+inline void Project::set_state(::flyteidl::admin::Project_ProjectState value) {
+  
+  state_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Project.state)
+}
+
 // -------------------------------------------------------------------
 
 // Projects
@@ -1420,6 +1492,18 @@ inline void ProjectRegisterRequest::set_allocated_project(::flyteidl::admin::Pro
 
 }  // namespace admin
 }  // namespace flyteidl
+
+namespace google {
+namespace protobuf {
+
+template <> struct is_proto_enum< ::flyteidl::admin::Project_ProjectState> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::admin::Project_ProjectState>() {
+  return ::flyteidl::admin::Project_ProjectState_descriptor();
+}
+
+}  // namespace protobuf
+}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

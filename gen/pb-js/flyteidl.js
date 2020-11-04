@@ -25924,6 +25924,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {Array.<flyteidl.admin.IDomain>|null} [domains] Project domains
              * @property {string|null} [description] Project description
              * @property {flyteidl.admin.ILabels|null} [labels] Project labels
+             * @property {flyteidl.admin.Project.ProjectState|null} [state] Project state
              */
 
             /**
@@ -25983,6 +25984,14 @@ export const flyteidl = $root.flyteidl = (() => {
             Project.prototype.labels = null;
 
             /**
+             * Project state.
+             * @member {flyteidl.admin.Project.ProjectState} state
+             * @memberof flyteidl.admin.Project
+             * @instance
+             */
+            Project.prototype.state = 0;
+
+            /**
              * Creates a new Project instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.Project
@@ -26017,6 +26026,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 4, wireType 2 =*/34).string(message.description);
                 if (message.labels != null && message.hasOwnProperty("labels"))
                     $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                if (message.state != null && message.hasOwnProperty("state"))
+                    writer.uint32(/* id 6, wireType 0 =*/48).int32(message.state);
                 return writer;
             };
 
@@ -26054,6 +26065,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 5:
                         message.labels = $root.flyteidl.admin.Labels.decode(reader, reader.uint32());
+                        break;
+                    case 6:
+                        message.state = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -26097,8 +26111,33 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "labels." + error;
                 }
+                if (message.state != null && message.hasOwnProperty("state"))
+                    switch (message.state) {
+                    default:
+                        return "state: enum value expected";
+                    case 0:
+                    case 1:
+                    case 2:
+                        break;
+                    }
                 return null;
             };
+
+            /**
+             * ProjectState enum.
+             * @name flyteidl.admin.Project.ProjectState
+             * @enum {string}
+             * @property {number} ACTIVE=0 ACTIVE value
+             * @property {number} ARCHIVED=1 ARCHIVED value
+             * @property {number} SYSTEM_GENERATED=2 SYSTEM_GENERATED value
+             */
+            Project.ProjectState = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "ACTIVE"] = 0;
+                values[valuesById[1] = "ARCHIVED"] = 1;
+                values[valuesById[2] = "SYSTEM_GENERATED"] = 2;
+                return values;
+            })();
 
             return Project;
         })();
