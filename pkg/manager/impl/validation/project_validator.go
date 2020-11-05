@@ -53,11 +53,15 @@ func ValidateProjectLabels(request admin.Project) error {
 // Validates that a specified project and domain combination has been registered and exists in the db.
 func ValidateProjectAndDomain(
 	ctx context.Context, db repositories.RepositoryInterface, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID string) error {
-	_, err := db.ProjectRepo().Get(ctx, projectID)
+	project, err := db.ProjectRepo().Get(ctx, projectID)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] and domain [%s] are registered, err: [%+v]",
 			projectID, domainID, err)
+	}
+	if *project.State != int32(admin.Project_ACTIVE) {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"project [%s] is not active", projectID)
 	}
 	var validDomain bool
 	domains := config.GetDomainsConfig()

@@ -6,6 +6,7 @@ import (
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type CreateProjectFunction func(ctx context.Context, project models.Project) error
@@ -31,7 +32,11 @@ func (r *MockProjectRepo) Get(ctx context.Context, projectID string) (models.Pro
 	if r.GetFunction != nil {
 		return r.GetFunction(ctx, projectID)
 	}
-	return models.Project{}, nil
+	activeState := int32(admin.Project_ACTIVE)
+	return models.Project{
+		Identifier: projectID,
+		State:      &activeState,
+	}, nil
 }
 
 func (r *MockProjectRepo) ListAll(ctx context.Context, sortParameter common.SortParameter) ([]models.Project, error) {
