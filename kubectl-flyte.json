@@ -1,19 +1,19 @@
 {
-    "version": "0.4.13",
+    "version": "0.5.0",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/lyft/flytepropeller/releases/download/v0.4.13/kubectl-flyte_v0.4.13_windows_i386.zip",
+            "url": "https://github.com/lyft/flytepropeller/releases/download/v0.5.0/kubectl-flyte_v0.5.0_windows_i386.zip",
             "bin": [
                 "kubectl-flyte.exe"
             ],
-            "hash": "faf3c5a22b459262c274fd3e06271059abebda449397a9bc9721289f93c5c547"
+            "hash": "06f6b86ed3dd342050b36104a9a9740d2944fe85db5bb8386e0ffcf5a15e5c11"
         },
         "64bit": {
-            "url": "https://github.com/lyft/flytepropeller/releases/download/v0.4.13/kubectl-flyte_v0.4.13_windows_x86_64.zip",
+            "url": "https://github.com/lyft/flytepropeller/releases/download/v0.5.0/kubectl-flyte_v0.5.0_windows_x86_64.zip",
             "bin": [
                 "kubectl-flyte.exe"
             ],
-            "hash": "506fc5419f241689bb92827455dc0f84a28736790c64fe3c866b4fb6e6028cfd"
+            "hash": "14b2de9d81e878542832d66a16d19485724bf4626038bc88b72b2ec1c0f2a33d"
         }
     },
     "homepage": "https://godoc.org/github.com/lyft/flytepropeller",
