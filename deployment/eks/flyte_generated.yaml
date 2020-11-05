@@ -8241,6 +8241,12 @@ data:
           - spark
           - k8s-array
           - pytorch
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          spark: spark
+          container_array: k8s-array
+          pytorch: pytorch
   k8s.yaml: |
     plugins:
       k8s:
@@ -8319,7 +8325,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-9fctd4tc4f
+  name: flyte-propeller-config-6gc52f8d7m
   namespace: flyte
 ---
 apiVersion: v1
@@ -8741,7 +8747,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-9fctd4tc4f
+          name: flyte-propeller-config-6gc52f8d7m
         name: config-volume
 ---
 apiVersion: apps/v1
