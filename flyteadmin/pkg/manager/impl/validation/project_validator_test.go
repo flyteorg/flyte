@@ -107,18 +107,36 @@ func TestValidateProjectAndDomain(t *testing.T) {
 	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
 		ctx context.Context, projectID string) (models.Project, error) {
 		assert.Equal(t, projectID, "flyte-project-id")
-		return models.Project{}, nil
+		activeState := int32(admin.Project_ACTIVE)
+		return models.Project{State: &activeState}, nil
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project-id", "domain")
 	assert.Nil(t, err)
+}
 
+func TestValidateProjectAndDomainArchivedProject(t *testing.T) {
+	mockRepo := repositoryMocks.NewMockRepository()
+	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		archivedState := int32(admin.Project_ARCHIVED)
+		return models.Project{State: &archivedState}, nil
+	}
+
+	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
+		"flyte-project-id", "domain")
+	assert.EqualError(t, err,
+		"project [flyte-project-id] is not active")
+}
+
+func TestValidateProjectAndDomainError(t *testing.T) {
+	mockRepo := repositoryMocks.NewMockRepository()
 	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
 		ctx context.Context, projectID string) (models.Project, error) {
 		return models.Project{}, errors.New("foo")
 	}
 
-	err = ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
+	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project-id", "domain")
 	assert.EqualError(t, err,
 		"failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [foo]")

@@ -13,6 +13,7 @@ type CreateProjectModelInput struct {
 }
 
 func CreateProjectModel(project *admin.Project) models.Project {
+	stateInt := int32(project.State)
 	projectBytes, err := proto.Marshal(project)
 	if err != nil {
 		return models.Project{}
@@ -22,6 +23,7 @@ func CreateProjectModel(project *admin.Project) models.Project {
 		Name:        project.Name,
 		Description: project.Description,
 		Labels:      projectBytes,
+		State:       &stateInt,
 	}
 }
 
@@ -36,6 +38,7 @@ func FromProjectModel(projectModel models.Project, domains []*admin.Domain) admi
 		Name:        projectModel.Name,
 		Description: projectModel.Description,
 		Labels:      projectDeserialized.Labels,
+		State:       admin.Project_ProjectState(*projectModel.State),
 	}
 	project.Domains = domains
 	return project
