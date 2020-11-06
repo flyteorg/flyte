@@ -7,7 +7,7 @@ ENV LC_ALL C.UTF-8
 ENV PYTHONPATH /root
 
 RUN : \
-    && apt-get update && apt-get install -y python3.6 python3.6-venv python3.6-dev make build-essential libssl-dev python3-venv python3-pip curl
+    && apt-get update && apt-get install -y python3.6 python3.6-venv python3.6-dev make build-essential libssl-dev python3-venv python3-pip curl vim
 
 # This is necessary for opencv to work
 RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev
