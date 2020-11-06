@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.1](http://github.com/lyft/flyteconsole/compare/v0.17.0...v0.17.1) (2020-11-06)
+
+
+### Bug Fixes
+
+* recompute row heights when new items are appended to DataList ([#116](http://github.com/lyft/flyteconsole/issues/116)) ([04d456b](http://github.com/lyft/flyteconsole/commit/04d456b7aa4e39100955111dd803bb0d6aebc685))
+
 # [0.17.0](http://github.com/lyft/flyteconsole/compare/v0.16.2...v0.17.0) (2020-10-23)
 
 
