@@ -69,26 +69,6 @@ const DataListImplComponent: React.RefForwardingComponent<
     DataListRef,
     DataListImplProps
 > = (props, ref) => {
-    const styles = useStyles();
-    const listRef = React.useRef<List>(null);
-    /** We want the cache to persist across renders, which useState will do.
-     * But we also don't want to be needlessly creating new caches that are
-     * thrown away immediately. So we're using a creation function which useState
-     * will call to create the initial value.
-     */
-    const [cellCache] = React.useState(createCellMeasurerCache);
-    const theme = useTheme<Theme>();
-    React.useImperativeHandle(ref, () => ({
-        recomputeRowHeights: (rowIndex: number) => {
-            cellCache.clear(rowIndex, 0);
-            if (listRef.current !== null) {
-                listRef.current.recomputeRowHeights(rowIndex);
-            }
-        }
-    }));
-
-    const headerHeight = theme.spacing(headerGridHeight);
-    const listPadding = theme.spacing(tableGridPadding);
     const {
         height,
         value: items,
@@ -100,6 +80,44 @@ const DataListImplComponent: React.RefForwardingComponent<
         rowContentRenderer,
         width
     } = props;
+
+    const styles = useStyles();
+    const theme = useTheme<Theme>();
+    const lengthRef = React.useRef<number>(0);
+    const listRef = React.useRef<List>(null);
+    /** We want the cache to persist across renders, which useState will do.
+     * But we also don't want to be needlessly creating new caches that are
+     * thrown away immediately. So we're using a creation function which useState
+     * will call to create the initial value.
+     */
+    const [cellCache] = React.useState(createCellMeasurerCache);
+
+    const recomputeRow = React.useMemo(
+        () => (rowIndex: number) => {
+            cellCache.clear(rowIndex, 0);
+            if (listRef.current !== null) {
+                listRef.current.recomputeRowHeights(rowIndex);
+            }
+        },
+        [cellCache, listRef]
+    );
+    React.useImperativeHandle(
+        ref,
+        () => ({
+            recomputeRowHeights: recomputeRow
+        }),
+        [recomputeRow]
+    );
+
+    React.useLayoutEffect(() => {
+        if (lengthRef.current >= 0 && items.length > lengthRef.current) {
+            recomputeRow(lengthRef.current);
+        }
+        lengthRef.current = props.value.length;
+    }, [items.length]);
+
+    const headerHeight = theme.spacing(headerGridHeight);
+    const listPadding = theme.spacing(tableGridPadding);
     const showLoadMore = items.length && moreItemsAvailable;
 
     // We want the "load more" content to render at the end of the list.

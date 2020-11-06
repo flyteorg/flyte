@@ -239,7 +239,7 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
     const listRef = React.useRef<DataListRef>(null);
 
     // Reset error expansion states whenever list changes
-    React.useEffect(() => {
+    React.useLayoutEffect(() => {
         setExpandedErrors({});
     }, [executions]);
 
