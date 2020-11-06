@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.2](http://github.com/lyft/flyteconsole/compare/v0.17.1...v0.17.2) (2020-11-06)
+
+
+### Bug Fixes
+
+* stale selected item reference in NE details panel ([#115](http://github.com/lyft/flyteconsole/issues/115)) ([12c486f](http://github.com/lyft/flyteconsole/commit/12c486f86b2e06a81ed3415f6e60e0bf874a0b88))
+
 ## [0.17.1](http://github.com/lyft/flyteconsole/compare/v0.17.0...v0.17.1) (2020-11-06)
 
 
