@@ -169,6 +169,24 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	}
 	sparkConfig["spark.kubernetes.executor.podNamePrefix"] = taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 
+	// Add driver/executor defaults to CRD Driver/Executor Spec as well.
+	cores, err := strconv.Atoi(sparkConfig["spark.driver.cores"])
+	if err == nil {
+		driverSpec.Cores = intPtr(int32(cores))
+	}
+	driverSpec.Memory = strPtr(sparkConfig["spark.driver.memory"])
+
+	execCores, err := strconv.Atoi(sparkConfig["spark.executor.cores"])
+	if err == nil {
+		executorSpec.Cores = intPtr(int32(execCores))
+	}
+
+	execCount, err := strconv.Atoi(sparkConfig["spark.executor.instances"])
+	if err == nil {
+		executorSpec.Instances = intPtr(int32(execCount))
+	}
+	executorSpec.Memory = strPtr(sparkConfig["spark.executor.memory"])
+
 	j := &sparkOp.SparkApplication{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindSparkApplication,
@@ -391,4 +409,18 @@ func init() {
 			IsDefault:           false,
 			DefaultForTaskTypes: []pluginsCore.TaskType{sparkTaskType},
 		})
+}
+
+func strPtr(str string) *string {
+	if str == "" {
+		return nil
+	}
+	return &str
+}
+
+func intPtr(val int32) *int32 {
+	if val == 0 {
+		return nil
+	}
+	return &val
 }

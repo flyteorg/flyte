@@ -3,6 +3,7 @@ package spark
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -37,9 +38,9 @@ const sparkUIAddress = "spark-ui.flyte"
 
 var (
 	dummySparkConf = map[string]string{
-		"spark.driver.memory":          "500M",
+		"spark.driver.memory":          "200M",
 		"spark.driver.cores":           "1",
-		"spark.executor.cores":         "1",
+		"spark.executor.cores":         "2",
 		"spark.executor.instances":     "3",
 		"spark.executor.memory":        "500M",
 		"spark.flyte.feature1.enabled": "true",
@@ -316,6 +317,19 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, sj.PythonApplicationType, sparkApp.Spec.Type)
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
+
+	//Validate Driver/Executor Spec.
+
+	driverCores, _ := strconv.Atoi(dummySparkConf["spark.driver.cores"])
+	execCores, _ := strconv.Atoi(dummySparkConf["spark.executor.cores"])
+	execInstances, _ := strconv.Atoi(dummySparkConf["spark.executor.instances"])
+
+	assert.Equal(t, int32(driverCores), *sparkApp.Spec.Driver.Cores)
+	assert.Equal(t, int32(execCores), *sparkApp.Spec.Executor.Cores)
+	assert.Equal(t, int32(execInstances), *sparkApp.Spec.Executor.Instances)
+	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
+	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
+
 	// Validate Interruptible Toleration and NodeSelector set for Executor but not Driver.
 	assert.Equal(t, 0, len(sparkApp.Spec.Driver.Tolerations))
 	assert.Equal(t, 0, len(sparkApp.Spec.Driver.NodeSelector))
