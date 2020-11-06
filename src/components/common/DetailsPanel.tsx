@@ -41,6 +41,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({
     return (
         <Drawer
             anchor="right"
+            data-testid="details-panel"
             ModalProps={{
                 className: styles.modal,
                 hideBackdrop: true,

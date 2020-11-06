@@ -1,8 +1,10 @@
 import {
     fireEvent,
     getAllByRole,
+    getByText,
     getByTitle,
     render,
+    screen,
     waitFor
 } from '@testing-library/react';
 import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
@@ -45,6 +47,7 @@ import {
     listTaskExecutionChildren,
     listTaskExecutions
 } from 'models/Execution/api';
+import { NodeExecutionPhase } from 'models/Execution/enums';
 import { mockTasks } from 'models/Task/__mocks__/mockTaskData';
 import * as React from 'react';
 import { makeIdentifier } from 'test/modelUtils';
@@ -137,20 +140,19 @@ describe('NodeExecutionsTable', () => {
         };
     });
 
-    const renderTable = () =>
-        render(
-            <APIContext.Provider value={apiContext}>
-                <NodeExecutionsRequestConfigContext.Provider
-                    value={requestConfig}
-                >
-                    <ExecutionContext.Provider value={executionContext}>
-                        <ExecutionDataCacheContext.Provider value={dataCache}>
-                            <NodeExecutionsTable {...props} />
-                        </ExecutionDataCacheContext.Provider>
-                    </ExecutionContext.Provider>
-                </NodeExecutionsRequestConfigContext.Provider>
-            </APIContext.Provider>
-        );
+    const Table = (props: NodeExecutionsTableProps) => (
+        <APIContext.Provider value={apiContext}>
+            <NodeExecutionsRequestConfigContext.Provider value={requestConfig}>
+                <ExecutionContext.Provider value={executionContext}>
+                    <ExecutionDataCacheContext.Provider value={dataCache}>
+                        <NodeExecutionsTable {...props} />
+                    </ExecutionDataCacheContext.Provider>
+                </ExecutionContext.Provider>
+            </NodeExecutionsRequestConfigContext.Provider>
+        </APIContext.Provider>
+    );
+
+    const renderTable = () => render(<Table {...props} />);
 
     it('renders task name for task nodes', async () => {
         const { queryAllByText } = renderTable();
@@ -412,5 +414,33 @@ describe('NodeExecutionsTable', () => {
                 ).toBeNull();
             })
         );
+    });
+
+    describe('when rendering the DetailsPanel', () => {
+        const selectFirstNode = async (container: HTMLElement) => {
+            const { nodeId } = mockNodeExecutions[0].id;
+            const nodeNameAnchor = await waitFor(() =>
+                getByText(container, nodeId)
+            );
+            fireEvent.click(nodeNameAnchor);
+            // Wait for Details Panel to render and then for the nodeId header
+            const detailsPanel = await waitFor(() =>
+                screen.getByTestId('details-panel')
+            );
+            await waitFor(() => getByText(detailsPanel, nodeId));
+            return detailsPanel;
+        };
+        it('should render updated state if selected nodeExecution object changes', async () => {
+            mockNodeExecutions[0].closure.phase = NodeExecutionPhase.RUNNING;
+            // Render table, click first node
+            const { container, rerender } = renderTable();
+            const detailsPanel = await selectFirstNode(container);
+            await waitFor(() => getByText(detailsPanel, 'Running'));
+
+            props.value = cloneDeep(mockNodeExecutions);
+            props.value[0].closure.phase = NodeExecutionPhase.FAILED;
+            rerender(<Table {...props} />);
+            await waitFor(() => getByText(detailsPanel, 'Failed'));
+        });
     });
 });

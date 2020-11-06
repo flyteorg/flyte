@@ -14,10 +14,23 @@ export function useNodeExecutionsTableState({
         [value]
     );
 
-    const [
-        selectedExecution,
-        setSelectedExecution
-    ] = useState<DetailedNodeExecution | null>(null);
+    const [selectedExecutionKey, setSelectedExecutionKey] = useState<
+        string | null
+    >(null);
+
+    const selectedExecution = useMemo(
+        () =>
+            executions.find(
+                ({ cacheKey }) => cacheKey === selectedExecutionKey
+            ) || null,
+        [executions, selectedExecutionKey]
+    );
+
+    const setSelectedExecution = useMemo(
+        () => (newValue: DetailedNodeExecution | null) =>
+            setSelectedExecutionKey(newValue?.cacheKey ?? null),
+        [setSelectedExecutionKey]
+    );
 
     return {
         executions,
