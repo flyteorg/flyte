@@ -105,9 +105,10 @@ Interacting with Flyte
 
 Flyte fulfills tasks using docker images. You'll need to build a docker image from this code before it can run in Flyte. The repo has a make target to build the docker image for you ::
 
+  eval $(minikube -p minikube docker-env)  # If using the flyte sandbox via minikube
   make docker_build
 
-If you have the flyte sandbox installed on your local machine, the image will be accessible to to your Flyte system. If you're running a remote Flyte instance, you'll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system. 
+If you have the flyte sandbox installed on your local machine, the image will be accessible to your Flyte system. If you're running a remote Flyte instance, you'll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system.
 
 To upload to a remote registry (or even local registry), use ::
 
