@@ -413,6 +413,7 @@ configmap:
 
   # Configmap for ClusterResource parameters
   cluster_resources:
+    # -- ClusterResource parameters
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
@@ -460,7 +461,7 @@ configmap:
       signedUrls:
         durationMinutes: 3
 
-  # Flyteadmin server config
+  # -- Flyteadmin server config
   server:
     server:
       httpPort: 8088
@@ -469,11 +470,6 @@ configmap:
         secure: false
         useAuth: false
         allowCors: true
-        allowedOrigins:
-          # Accepting all domains for Sandbox installation
-          - "*"
-        allowedHeaders:
-          - "Content-Type"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -490,6 +486,10 @@ configmap:
       storage-prefix: metadata/datacatalog
       metrics-scope: datacatalog
       profiler-port: 10254
+    application:
+      grpcPort: 8089
+      httpPort: 8080
+      grpcServerReflection: true
 
   # Storage configuration
   storage:
@@ -502,6 +502,7 @@ configmap:
 
   # Task default resources configuration
   task_resource_defaults:
+    # -- Task default resources parameters
     task_resources:
       defaults:
         cpu: 100m
@@ -612,6 +613,7 @@ configmap:
 
   # Resource manager configuration
   resource_manager:
+    # -- resource manager configuration
     propeller:
       resourcemanager:
         type: redis
