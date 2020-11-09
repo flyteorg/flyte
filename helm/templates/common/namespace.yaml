@@ -3,4 +3,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: {{ template "flyte.namespace" . }}
+spec:
+  finalizers:
+  - kubernetes
 {{- end }}
