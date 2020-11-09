@@ -23,15 +23,16 @@ spec:
         command:
         - /usr/bin/spark-operator
         args:
+        - -webhook-svc-namespace
+        - sparkoperator
         - -logtostderr
         - -v=2
-        - -controller-threads=20
+        - -enable-webhook=true
+        - -controller-threads=5
         - -enable-metrics=true
         - "-metrics-prefix=service:"
         - -metrics-labels=task_name
         - -metrics-labels=workflow_name
-        - -enable-webhook=true
-        - -webhook-svc-namespace=sparkoperator
         env:
         - name: GOMAXPROCS
           value: "16"
