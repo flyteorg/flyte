@@ -17,12 +17,14 @@ spec:
       containers:
       - image: "{{ .Values.sparkoperator.image.repository }}:{{ .Values.sparkoperator.image.tag }}"
         imagePullPolicy: "{{ .Values.sparkoperator.image.pullPolicy }}"
-        name: sparkoperator
+        name: main
         command:
         - /usr/bin/gencerts.sh
         - --namespace
         - sparkoperator
-        - -p
+        - '--service'
+        - spark-webhook
+        - '--in-pod'
       restartPolicy: Never
       serviceAccountName: {{ template "sparkoperator.name" . }}
 {{- end }}
