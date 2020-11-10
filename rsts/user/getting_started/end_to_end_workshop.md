@@ -59,7 +59,7 @@ A typical setup for a new flyte project involves creating a new repo (using meta
 Find the [full guidance exist here](https://docs.lyft.net/eng/flyte/flyte2/user/getting_started_at_lyft/setting_up.html).
 
 For the purposes of this workshop, we will clone github.com/lyft/flyteplayground since it's already setup with everything you need.
-Go ahead and clone branch `workshop-exercise` from that repo! and while you are at it, rename [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L65) and [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L10) to the project identifier of the project you created above.
+Go ahead and clone branch `workshop-exercise` from that repo! and while you are at it, rename [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L10) to the project identifier of the project you created above.
 
 <details>
   <summary>Click to show the solution!</summary>
