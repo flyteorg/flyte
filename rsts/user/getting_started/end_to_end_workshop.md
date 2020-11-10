@@ -107,6 +107,11 @@ For this exercise, you will leverage the ability to run Hive queries and SageMak
 
 The goal of the model is to predict the number of rides per hour for a given time period.
 
+> **NOTE**
+> 
+> Since this task does not require code to run (i.e. all tasks are either queries or importing other tasks), you do not need a full PR/CI to register the workflows.
+> Running this command from the root of the repo directory: `FLYTE_PLATFORM_URL=flyte.lyft.net FLYTE_INTERNAL_IMAGE=blah:132 pyflyte -p <project id> -d development -c flyte_configs/staging.config register workflows` should register your workflows and tasks into your project.
+
 ### Tasks
 Using your favorite IDE, navigate to `workflows/workshop.py` to view the workflow we will be filling in.
 
