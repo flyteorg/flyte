@@ -118,6 +118,9 @@ Navigate around and start filling in the commented blocks.
   <summary>Code-block 1 Solution (10 mins)</summary>
 
   ```
+  from flytekit.common.tasks.presto_task import SdkPrestoTask
+  from flytekit.sdk.types import Types
+
   schema = Types.Schema([
       ("time", Types.Datetime),
       ("requests", Types.Integer)
@@ -146,6 +149,9 @@ Navigate around and start filling in the commented blocks.
   <summary>Code-block 3 Solution (5 mins)</summary>
 
   ```
+  from flytekit.common.tasks.task import SdkTask
+  from flytekit.sdk.tasks import inputs
+
   # Train, Validation, Test
   SPLIT_RATIOS = [0.6, 0.3, 0.1]
 
@@ -159,6 +165,9 @@ Navigate around and start filling in the commented blocks.
   <summary>Code-block 4 Solution (10 mins)</summary>
 
   ```
+  from flytekit.common.tasks.sagemaker import built_in_training_job_task
+  from flytekit.models.sagemaker import training_job as training_job_models
+
   # Defining the values of some hyperparameters, which will be used by the TrainingJob
   # these hyper-parameters are commonly used by the XGboost algorithm. Here we bootstrap them with some default Values
   # Usually the default values are selected or "tuned - refer to next section"
@@ -217,6 +226,11 @@ Navigate around and start filling in the commented blocks.
   <summary>Code-block 5 Solution (10 mins)</summary>
 
   ```
+  from datetime import datetime
+
+  import pytz
+  from flytekit.sdk.workflow import workflow_class, Input, Output
+
   @workflow_class
   class RideCountPredictor(object):
       # Define workflow inputs
