@@ -46,7 +46,7 @@ Create a _personal_ project (e.g. john-flyte-workshop). Provisioning the project
   <summary>Click to show the solution!</summary>
 
   ```
-  flyte-cli register-project --name "Jon's Workshop" --identifier flyte-workshop-john --descriptoin "My workshop solution"
+  flyte-cli register-project --name "Jon's Workshop" --identifier flyte-workshop-john --description "My workshop solution"
   ```
 </details>
 
