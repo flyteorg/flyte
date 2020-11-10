@@ -25,7 +25,7 @@ To start, it’s recommended that you create a python virtual environment. Then 
   ```
   mkvirtualenv --python=python3 flyte-101
   pip install flytekit
-  flyte-cli setup-config -h flyte.lyft.net
+  flyte-cli setup-config --host flyte.lyft.net
   ```
 </details>
 
@@ -39,13 +39,13 @@ The typical setup we have seen is that people create a single project per repo.
 
 ```flyte-cli``` is the user-facing command line tool that comes with flytekit to interact with the flyte system.
 
-Create a _personal_ project (e.g. john-flyte-workshop).
+Create a _personal_ project (e.g. john-flyte-workshop). Provisioning the project for the first time can take up to 2 minutes (it runs on a cron job).
 
 <details>
   <summary>Click to show the solution!</summary>
 
   ```
-  flyte-cli register-project --name "Haytham's Workshop" --identifier haytham-workshop-101
+  flyte-cli register-project --name "Jon's Workshop" --identifier flyte-workshop-john --descriptoin "My workshop solution"
   ```
 </details>
 
