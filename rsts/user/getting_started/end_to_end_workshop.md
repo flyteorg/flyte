@@ -104,4 +104,31 @@ Flyte is an orchestration platform. It has the capability to schedule and run a 
 
 For this exercise, you will leverage the ability to run Hive queries and SageMaker's built-in XGBoost Training tasks. You will then run batch predict on the generated model using a subset of the data you acquired.
 
-The goal of the model is to predict
+The goal of the model is to predict the number of rides per hour for a given time period.
+
+
+### Task 1
+Checkout branch `workshop-task` of `flyteplayground` repo to get the materials needed for the exercise.
+
+<details>
+  <summary>Solution</summary>
+
+  Navigate to the directory where you cloned `flyteplayground` repo.
+
+  ```
+  git checkout workshop-task
+  ```
+</details>
+
+### Task 2
+Using your favorite IDE, navigate to `workflows/workshop.py` to view the workflow we will be filling in.
+
+In that file, we've written out a skeleton of the workflow we will be writing. And some helper functions you might need.
+
+Navigate around and start filling in the commented blocks.
+
+<details>
+  <summary>Complete Solution</summary>
+
+  https://github.com/lyft/flyteplayground/blob/3e300321a26aff87da2be1f0fa5407e7dbb5bb65/workflows/workshop.py
+</details>
