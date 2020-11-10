@@ -219,10 +219,13 @@ Navigate around and start filling in the commented blocks.
   ```
   @workflow_class
   class RideCountPredictor(object):
+      # Define workflow inputs
       start_time = Input(Types.Datetime, default=datetime(year=2020, month=10, day=1, tzinfo=pytz.utc))
       end_time = Input(Types.Datetime, default=datetime(year=2020, month=10, day=10, tzinfo=pytz.utc))
       city = Input(Types.String, default='LAX', help="Enter city or region to train on")
       seed = Input(Types.Integer, default=8, help="Seed to use for data splitting")
+
+      # Define workflow steps. These steps will be paralellized if data flow permits.
       data_task = airport_requests(start=start_time, end=end_time, city=city)
       train_test_split_data = train_test_split_task(input_data=data_task.outputs.results, seed=seed, split=SPLIT_RATIOS)
       train_data = transform_parquet_to_csv(input_parquet=train_test_split_data.outputs.train)
@@ -232,6 +235,7 @@ Navigate around and start filling in the commented blocks.
                                       validation=validation_data.outputs.output_csv,
                                       static_hyperparameters=xgboost_hyperparameters)
 
+      # Finally define the output of the workflow.
       model = Output(model_task.outputs.model, sdk_type=Types.Blob)
   ```
 </details>
