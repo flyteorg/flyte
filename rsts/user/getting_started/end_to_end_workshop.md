@@ -118,6 +118,11 @@ Navigate around and start filling in the commented blocks.
   <summary>Code-block 1 Solution (10 mins)</summary>
 
   ```
+  schema = Types.Schema([
+      ("time", Types.Datetime),
+      ("requests", Types.Integer)
+  ])
+
   airport_requests = SdkPrestoTask(
       task_inputs=inputs(start=Types.Datetime, end=Types.Datetime, city=Types.String),
       statement="""SELECT date_trunc('hour',requested_at) as time
