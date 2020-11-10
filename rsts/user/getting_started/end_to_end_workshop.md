@@ -23,6 +23,7 @@ To start, it’s recommended that you create a python virtual environment. Then 
   <summary>Click to show the solution!</summary>
 
   ```
+  pip install virtualenvwrapper
   mkvirtualenv --python=python3 flyte-101
   pip install flytekit
   flyte-cli setup-config --host flyte.lyft.net
