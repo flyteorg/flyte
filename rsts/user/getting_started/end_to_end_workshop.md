@@ -74,7 +74,7 @@ Go ahead and clone branch `workshop-exercise` from that repo! and while you are 
 
 ## Step 4 Make sure it works! (10 mins)
 
-At this point your repo is ready to be used. To double check things are working fine. In order not to interfere with others doing the same exercise, please create your own branch then you can create a PR with the changes you just made and monitor the PR Checks to make sure everything is green.
+At this point your repo is ready to be used. In order not to interfere with others doing the same exercise, please create your own branch. To double check things are working fine, you can create a PR with the changes you just made and monitor the PR Checks to make sure everything is green.
 
 <details>
   <summary>Click to show the solution!</summary>
