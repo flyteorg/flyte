@@ -13,7 +13,7 @@ Welcome to Flyte 101 workshop. After completing this workshop, you will be able 
 >[Official Documentation](https://docs.lyft.net/eng/flyte/index.html) is your friend. Please consult with it before posting questions to [#flyte](https://join.slack.com/share/zt-ilb4zzrb-ZU5aOiQgJBLYXwrv21G_sg)
 
 -------------------------------
-## Step 1 Install flytekit
+## Step 1 Install flytekit (5 mins)
 
 Flytekit is the python SDK you will use to write and interact with flyte. It includes a few tools to help you build, test, register and run your workflows and tasks.
 
@@ -31,7 +31,7 @@ To start, it’s recommended that you create a python virtual environment. Then 
 
 ------------------------------
 
-## Step 2 Create a project
+## Step 2 Create a project (5 mins)
 
 Flyte projects are logical units to help you organize your tasks and workflows. A single repo can have multiple projects and many repos can contribute to the same project.
 
@@ -51,29 +51,29 @@ Create a _personal_ project (e.g. john-flyte-workshop). Provisioning the project
 
 -----------------------------
 
-## Step 3 Clone Playground repo
+## Step 3 Clone Playground repo (5 mins)
 
 A typical setup for a new flyte project involves creating a new repo (using metaservice) and applying the flyteworkflow yeoman generator.
 
 Find the [full guidance exist here](https://docs.lyft.net/eng/flyte/flyte2/user/getting_started_at_lyft/setting_up.html).
 
 For the purposes of this workshop, we will clone github.com/lyft/flyteplayground since it's already setup with everything you need.
-Go ahead and clone that repo! and while you are at it, rename [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L65) and [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L10) to the name of the project you created above.
+Go ahead and clone branch `workshop-exercise` from that repo! and while you are at it, rename [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L65) and [this](https://github.com/lyft/flyteplayground/blob/4f6133e996e42c8c7a429993d9f225af7d59d57a/Makefile#L10) to the name of the project you created above.
 
 <details>
   <summary>Click to show the solution!</summary>
 
   ```
-  git clone git@github.com:lyft/flyteplayground
+  git clone --branch workshop-exercise git@github.com:lyft/flyteplayground
   cd flyteplayground
   ```
 </details>
 
 -----------------------------
 
-## Step 4 Make sure it works!
+## Step 4 Make sure it works! (10 mins)
 
-At this point your repo is ready to be used. To double check things are working fine. You can create a PR with the changes you just made and monitor the PR Checks to make sure everything is green.
+At this point your repo is ready to be used. To double check things are working fine. In order not to interfere with others doing the same exercise, please create your own branch then you can create a PR with the changes you just made and monitor the PR Checks to make sure everything is green.
 
 <details>
   <summary>Click to show the solution!</summary>
@@ -89,7 +89,7 @@ At this point your repo is ready to be used. To double check things are working 
 
 -----------------------------
 
-## Step 5 Launch an existing Task/Workflow from the UI
+## Step 5 Launch an existing Task/Workflow from the UI (5 mins)
 
 After all PR checks succeed, your workflows should be registered into your project.
 If you visit the main [flyte console](https://flyte.lyft.net/console) and search for your project, you should see all registered workflows and tasks under the appropriate tab.
@@ -98,7 +98,7 @@ Go ahead and click on `workflows.simple_workflow.SimpleWorkflow` and click `Laun
 
 -----------------------------
 
-## Step 6 Train a model on Flyte!
+## Step 6 Train a model on Flyte! (35 mins)
 
 Flyte is an orchestration platform. It has the capability to schedule and run a magnitude of compute tasks (from simple Python tasks, to native mapping tasks to external services like Hive, Presto, SageMaker and many more).
 
@@ -106,21 +106,7 @@ For this exercise, you will leverage the ability to run Hive queries and SageMak
 
 The goal of the model is to predict the number of rides per hour for a given time period.
 
-
-### Task 1
-Checkout branch `workshop-task` of `flyteplayground` repo to get the materials needed for the exercise.
-
-<details>
-  <summary>Solution</summary>
-
-  Navigate to the directory where you cloned `flyteplayground` repo.
-
-  ```
-  git checkout workshop-task
-  ```
-</details>
-
-### Task 2
+### Tasks
 Using your favorite IDE, navigate to `workflows/workshop.py` to view the workflow we will be filling in.
 
 In that file, we've written out a skeleton of the workflow we will be writing. And some helper functions you might need.
@@ -128,19 +114,16 @@ In that file, we've written out a skeleton of the workflow we will be writing. A
 Navigate around and start filling in the commented blocks.
 
 <details>
-  <summary>Code-block 1 Solution</summary>
+  <summary>Code-block 1 Solution (10 mins)</summary>
 
   ```
-  # Train, Validation, Test
-  SPLIT_RATIOS = [0.6, 0.3, 0.1]
-
   airport_requests = SdkPrestoTask(
-      task_inputs=inputs(start=Types.Datetime, end=Types.Datetime),
+      task_inputs=inputs(start=Types.Datetime, end=Types.Datetime, city=Types.String),
       statement="""SELECT date_trunc('hour',requested_at) as time
                         ,COUNT() as requests
                   FROM city.fact_airport_rides
                   WHERE ds between '{{ .Inputs.start }}' and '{{ .Inputs.end }}'
-                    AND airport_code='LAX'
+                    AND airport_code='{{ .Inputs.city }}'
                   GROUP BY 1
                   ORDER BY 1""",
       output_schema=schema,
@@ -154,9 +137,12 @@ Navigate around and start filling in the commented blocks.
 </details>
 
 <details>
-  <summary>Code-block 3 Solution</summary>
+  <summary>Code-block 3 Solution (5 mins)</summary>
 
   ```
+  # Train, Validation, Test
+  SPLIT_RATIOS = [0.6, 0.3, 0.1]
+
   train_test_split_task = SdkTask.fetch(project="flyteplayground", domain="development",
                                         name="workflows.workshop.train_test_split_task",
                                         version="239ad82130e8d556f7480055b71feaad37d8d08a")
@@ -164,7 +150,7 @@ Navigate around and start filling in the commented blocks.
 </details>
 
 <details>
-  <summary>Code-block 4 Solution</summary>
+  <summary>Code-block 4 Solution (10 mins)</summary>
 
   ```
   # Defining the values of some hyperparameters, which will be used by the TrainingJob
@@ -222,15 +208,16 @@ Navigate around and start filling in the commented blocks.
 </details>
 
 <details>
-  <summary>Code-block 5 Solution</summary>
+  <summary>Code-block 5 Solution (10 mins)</summary>
 
   ```
   @workflow_class
   class RideCountPredictor(object):
       start_time = Input(Types.Datetime, default=datetime(year=2020, month=10, day=1, tzinfo=pytz.utc))
       end_time = Input(Types.Datetime, default=datetime(year=2020, month=10, day=10, tzinfo=pytz.utc))
+      city = Input(Types.String, default='LAX', help="Enter city or region to train on")
       seed = Input(Types.Integer, default=8, help="Seed to use for data splitting")
-      data_task = airport_requests(start=start_time, end=end_time)
+      data_task = airport_requests(start=start_time, end=end_time, city=city)
       train_test_split_data = train_test_split_task(input_data=data_task.outputs.results, seed=seed, split=SPLIT_RATIOS)
       train_data = transform_parquet_to_csv(input_parquet=train_test_split_data.outputs.train)
       validation_data = transform_parquet_to_csv(input_parquet=train_test_split_data.outputs.validation)
@@ -242,6 +229,16 @@ Navigate around and start filling in the commented blocks.
       model = Output(model_task.outputs.model, sdk_type=Types.Blob)
   ```
 </details>
+
+### Bonus 1
+Write a predict function that uses the test dataset produced by the split task and run it through the model to compute accuracy.
+
+Remember that, at least for the time being, you will need to create a PR with the function code in order to be able to run it as a task. This requirement will be lifted once Fast Registration ships.
+
+### Bonus 2
+Write unit tests for the new predict function.
+
+Unit tests for flyte tasks allow you to validate your changes before going through the, sometimes lengthy, process of creating and waiting for a PR. They can save you valuable time and allow you to iterate on your code much faster!
 
 -----------------------------
 
