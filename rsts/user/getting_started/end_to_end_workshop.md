@@ -127,6 +127,122 @@ In that file, we've written out a skeleton of the workflow we will be writing. A
 
 Navigate around and start filling in the commented blocks.
 
+<details>
+  <summary>Code-block 1 Solution</summary>
+
+  ```
+  # Train, Validation, Test
+  SPLIT_RATIOS = [0.6, 0.3, 0.1]
+
+  airport_requests = SdkPrestoTask(
+      task_inputs=inputs(start=Types.Datetime, end=Types.Datetime),
+      statement="""SELECT date_trunc('hour',requested_at) as time
+                        ,COUNT() as requests
+                  FROM city.fact_airport_rides
+                  WHERE ds between '{{ .Inputs.start }}' and '{{ .Inputs.end }}'
+                    AND airport_code='LAX'
+                  GROUP BY 1
+                  ORDER BY 1""",
+      output_schema=schema,
+      routing_group="adhoc",
+      catalog="hive",
+      schema="city",
+      discoverable=True,
+      discovery_version="1.0"
+  )
+  ```
+</details>
+
+<details>
+  <summary>Code-block 3 Solution</summary>
+
+  ```
+  train_test_split_task = SdkTask.fetch(project="flyteplayground", domain="development",
+                                        name="workflows.workshop.train_test_split_task",
+                                        version="239ad82130e8d556f7480055b71feaad37d8d08a")
+  ```
+</details>
+
+<details>
+  <summary>Code-block 4 Solution</summary>
+
+  ```
+  # Defining the values of some hyperparameters, which will be used by the TrainingJob
+  # these hyper-parameters are commonly used by the XGboost algorithm. Here we bootstrap them with some default Values
+  # Usually the default values are selected or "tuned - refer to next section"
+  xgboost_hyperparameters = {
+      "num_round": "100",
+      "base_score": "0.5",
+      "booster": "gbtree",
+      "csv_weights": "0",
+      "dsplit": "row",
+      "grow_policy": "depthwise",
+      "lambda_bias": "0.0",
+      "max_bin": "256",
+      "normalize_type": "tree",
+      "objective": "reg:linear",
+      "one_drop": "0",
+      # "prob_buffer_row": "1.0",
+      "process_type": "default",
+      "refresh_leaf": "1",
+      "sample_type": "uniform",
+      "scale_pos_weight": "1.0",
+      "silent": "0",
+      "skip_drop": "0.0",
+      "tree_method": "auto",
+      "tweedie_variance_power": "1.5",
+      "updater": "grow_colmaker,prune",
+  }
+
+  # Here we define the actual algorithm (XGBOOST) and version of the algorithm to use
+  alg_spec = training_job_models.AlgorithmSpecification(
+      input_mode=training_job_models.InputMode.FILE,
+      algorithm_name=training_job_models.AlgorithmName.XGBOOST,
+      algorithm_version="0.90",
+      input_content_type=training_job_models.InputContentType.TEXT_CSV,
+  )
+
+  # Finally lets use Flytekit plugin called SdkBuiltinAlgorithmTrainingJobTask, to create a task that wraps the algorithm.
+  # This task does not really have a user-defined function as the actual algorithm is pre-defined in Sagemaker.
+  # But, this task still has the same set of properties like any other FlyteTask
+  # - Caching
+  # - Resource specification
+  # - versioning etc
+  xgboost_train_task = built_in_training_job_task.SdkBuiltinAlgorithmTrainingJobTask(
+      training_job_resource_config=training_job_models.TrainingJobResourceConfig(
+          instance_type="ml.m4.xlarge",
+          instance_count=1,
+          volume_size_in_gb=25,
+      ),
+      algorithm_specification=alg_spec,
+      cache_version='blah9',
+      cacheable=True,
+  )
+  ```
+</details>
+
+<details>
+  <summary>Code-block 5 Solution</summary>
+
+  ```
+  @workflow_class
+  class RideCountPredictor(object):
+      start_time = Input(Types.Datetime, default=datetime(year=2020, month=10, day=1, tzinfo=pytz.utc))
+      end_time = Input(Types.Datetime, default=datetime(year=2020, month=10, day=10, tzinfo=pytz.utc))
+      seed = Input(Types.Integer, default=8, help="Seed to use for data splitting")
+      data_task = airport_requests(start=start_time, end=end_time)
+      train_test_split_data = train_test_split_task(input_data=data_task.outputs.results, seed=seed, split=SPLIT_RATIOS)
+      train_data = transform_parquet_to_csv(input_parquet=train_test_split_data.outputs.train)
+      validation_data = transform_parquet_to_csv(input_parquet=train_test_split_data.outputs.validation)
+      test_data = transform_parquet_to_csv(input_parquet=train_test_split_data.outputs.test)
+      model_task = xgboost_train_task(train=train_data.outputs.output_csv,
+                                      validation=validation_data.outputs.output_csv,
+                                      static_hyperparameters=xgboost_hyperparameters)
+
+      model = Output(model_task.outputs.model, sdk_type=Types.Blob)
+  ```
+</details>
+
 -----------------------------
 
 When you are done, compare what you have with this:
