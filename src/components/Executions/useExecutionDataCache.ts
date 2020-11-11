@@ -2,15 +2,12 @@ import { log } from 'common/log';
 import { getCacheKey } from 'components/Cache';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import {
-    fetchNodeExecutions,
-    fetchTaskExecutionChildren
-} from 'components/hooks';
-import {
     extractAndIdentifyNodes,
     extractTaskTemplates
 } from 'components/hooks/utils';
 import { NotFoundError } from 'errors';
 import {
+    endNodeId,
     Execution,
     GloballyUniqueNode,
     Identifier,
@@ -19,14 +16,25 @@ import {
     nodeExecutionQueryParams,
     NodeId,
     RequestConfig,
+    startNodeId,
     TaskExecutionIdentifier,
     TaskTemplate,
+    TaskType,
     Workflow,
     WorkflowExecutionIdentifier,
     WorkflowId
 } from 'models';
 import { useState } from 'react';
-import { ExecutionDataCache } from './types';
+import { taskTypeToNodeExecutionDisplayType } from './constants';
+import {
+    fetchNodeExecutions,
+    fetchTaskExecutionChildren
+} from './fetchNodeExecutions';
+import {
+    DetailedNodeExecution,
+    ExecutionDataCache,
+    NodeExecutionDisplayType
+} from './types';
 import { fetchTaskExecutions } from './useTaskExecutions';
 import { getNodeExecutionSpecId } from './utils';
 
@@ -44,6 +52,7 @@ export function createExecutionDataCache(
     apiContext: APIContextValue
 ): ExecutionDataCache {
     const workflowsById: Map<string, Workflow> = new Map();
+    const nodeExecutionsById: Map<string, DetailedNodeExecution> = new Map();
     const nodesById: Map<string, GloballyUniqueNode> = new Map();
     const taskTemplatesById: Map<string, TaskTemplate> = new Map();
     const workflowExecutionIdToWorkflowId: Map<string, WorkflowId> = new Map();
@@ -54,6 +63,10 @@ export function createExecutionDataCache(
 
     const insertTaskTemplates = (templates: TaskTemplate[]) => {
         cacheItems(taskTemplatesById, templates);
+    };
+
+    const insertNodeExecutions = (nodeExecutions: DetailedNodeExecution[]) => {
+        cacheItems(nodeExecutionsById, nodeExecutions);
     };
 
     const insertWorkflow = (workflow: Workflow) => {
@@ -114,6 +127,107 @@ export function createExecutionDataCache(
         return getNode({ nodeId, workflowId });
     };
 
+    const getTaskTemplate = (id: Identifier) => {
+        const template = taskTemplatesById.get(getCacheKey(id));
+        if (template === undefined) {
+            log.error('Unexpected TaskTemplate missing from cache:', id);
+        }
+        return template;
+    };
+
+    const getOrFetchTaskTemplate = async (id: Identifier) => {
+        const key = getCacheKey(id);
+        if (taskTemplatesById.has(key)) {
+            return taskTemplatesById.get(key);
+        }
+        try {
+            const { template } = (
+                await apiContext.getTask(id)
+            ).closure.compiledTask;
+            taskTemplatesById.set(key, template);
+            return template;
+        } catch (e) {
+            if (e instanceof NotFoundError) {
+                log.warn('No task template found for task: ', id);
+                return;
+            }
+            throw e;
+        }
+    };
+
+    /** Populates a NodeExecution with extended information read from an `ExecutionDataCache` */
+    const populateNodeExecutionDetails = (nodeExecution: NodeExecution) => {
+        // Use `spec_node_id` if available to look up the node in the graph (needed to
+        // distinguish nodes in sub-workflow scenarios). But this may not exist, so
+        // fall back to id.nodeId in those cases.
+        const nodeId = getNodeExecutionSpecId(nodeExecution);
+        const cacheKey = getCacheKey(nodeExecution.id);
+        const nodeInfo = getNodeForNodeExecution(nodeExecution);
+
+        let displayId = nodeId;
+        let displayType = NodeExecutionDisplayType.Unknown;
+        let taskTemplate: TaskTemplate | undefined = undefined;
+
+        if (nodeInfo == null) {
+            return { ...nodeExecution, cacheKey, displayId, displayType };
+        }
+        const { node } = nodeInfo;
+
+        if (node.branchNode) {
+            displayId = nodeId;
+            displayType = NodeExecutionDisplayType.BranchNode;
+        } else if (node.taskNode) {
+            displayType = NodeExecutionDisplayType.UnknownTask;
+            taskTemplate = getTaskTemplate(node.taskNode.referenceId);
+
+            if (!taskTemplate) {
+                displayType = NodeExecutionDisplayType.UnknownTask;
+            } else {
+                displayId = taskTemplate.id.name;
+                displayType =
+                    taskTypeToNodeExecutionDisplayType[
+                        taskTemplate.type as TaskType
+                    ];
+                if (!displayType) {
+                    displayType = NodeExecutionDisplayType.UnknownTask;
+                }
+            }
+        } else if (node.workflowNode) {
+            displayType = NodeExecutionDisplayType.Workflow;
+            const { launchplanRef, subWorkflowRef } = node.workflowNode;
+            const identifier = (launchplanRef
+                ? launchplanRef
+                : subWorkflowRef) as Identifier;
+            if (!identifier) {
+                log.warn(`Unexpected workflow node with no ref: ${nodeId}`);
+            } else {
+                displayId = identifier.name;
+            }
+        }
+
+        return {
+            ...nodeExecution,
+            cacheKey,
+            displayId,
+            displayType,
+            taskTemplate
+        };
+    };
+
+    /** Assigns display information to NodeExecutions. Each NodeExecution has an
+     * associated `nodeId`. Extended details are populated using the provided `ExecutionDataCache`
+     */
+    const mapNodeExecutionDetails = (executions: NodeExecution[]) =>
+        executions
+            .filter(execution => {
+                // Exclude the start/end nodes from the renderered list
+                const { nodeId } = execution.id;
+                return !(nodeId === startNodeId || nodeId === endNodeId);
+            })
+            .map<DetailedNodeExecution>(execution =>
+                populateNodeExecutionDetails(execution)
+            );
+
     const getNodeExecutions = async (
         id: WorkflowExecutionIdentifier,
         config: RequestConfig
@@ -124,7 +238,10 @@ export function createExecutionDataCache(
             getWorkflow(execution.closure.workflowId),
             fetchNodeExecutions({ config, id }, apiContext)
         ]);
-        return nodeExecutions;
+
+        const detailedNodeExecutions = mapNodeExecutionDetails(nodeExecutions);
+        insertNodeExecutions(detailedNodeExecutions);
+        return detailedNodeExecutions;
     };
 
     const getNodeExecutionsForParentNode = async (
@@ -152,35 +269,18 @@ export function createExecutionDataCache(
             childrenPromise,
             workflowPromise
         ]);
-        return children;
+
+        const detailedChildren = mapNodeExecutionDetails(children);
+        insertNodeExecutions(detailedChildren);
+        return detailedChildren;
     };
 
-    const getTaskTemplate = (id: Identifier) => {
-        const template = taskTemplatesById.get(getCacheKey(id));
-        if (template === undefined) {
-            log.error('Unexpected TaskTemplate missing from cache:', id);
+    const getNodeExecution = (id: string | NodeExecutionIdentifier) => {
+        const nodeExecution = nodeExecutionsById.get(getCacheKey(id));
+        if (nodeExecution === undefined) {
+            log.error('Unexpected NodeExecution missing from cache:', id);
         }
-        return template;
-    };
-
-    const getOrFetchTaskTemplate = async (id: Identifier) => {
-        const key = getCacheKey(id);
-        if (taskTemplatesById.has(key)) {
-            return taskTemplatesById.get(key);
-        }
-        try {
-            const { template } = (
-                await apiContext.getTask(id)
-            ).closure.compiledTask;
-            taskTemplatesById.set(key, template);
-            return template;
-        } catch (e) {
-            if (e instanceof NotFoundError) {
-                log.warn('No task template found for task: ', id);
-                return;
-            }
-            throw e;
-        }
+        return nodeExecution;
     };
 
     const getWorkflowExecution = async (id: WorkflowExecutionIdentifier) => {
@@ -243,12 +343,15 @@ export function createExecutionDataCache(
         }));
         insertNodes(nodes);
 
-        return children;
+        const detailedChildren = mapNodeExecutionDetails(children);
+        insertNodeExecutions(detailedChildren);
+        return detailedChildren;
     };
 
     return {
         getNode,
         getNodeForNodeExecution,
+        getNodeExecution,
         getNodeExecutions,
         getNodeExecutionsForParentNode,
         getTaskExecutions,
@@ -259,9 +362,12 @@ export function createExecutionDataCache(
         getWorkflowIdForWorkflowExecution,
         insertExecution,
         insertNodes,
+        insertNodeExecutions,
         insertTaskTemplates,
         insertWorkflow,
-        insertWorkflowExecutionReference
+        insertWorkflowExecutionReference,
+        mapNodeExecutionDetails,
+        populateNodeExecutionDetails
     };
 }
 

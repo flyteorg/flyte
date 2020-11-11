@@ -7,7 +7,6 @@ import {
 } from '../contexts';
 import { DetailedNodeExecution } from '../types';
 import { useChildNodeExecutions } from '../useChildNodeExecutions';
-import { useDetailedChildNodeExecutions } from '../useDetailedNodeExecutions';
 import { NodeExecutionsTableContext } from './contexts';
 import { ExpandableExecutionError } from './ExpandableExecutionError';
 import { NodeExecutionChildren } from './NodeExecutionChildren';
@@ -52,17 +51,13 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
 
     // TODO: Handle error case for loading children.
     // Maybe show an expander in that case and make the content the error?
-    const childNodeExecutions = useChildNodeExecutions({
+    const { value: childNodeExecutions } = useChildNodeExecutions({
         nodeExecution,
         requestConfig,
         workflowExecution
     });
 
-    const detailedChildNodeExecutions = useDetailedChildNodeExecutions(
-        childNodeExecutions.value
-    );
-
-    const isExpandable = detailedChildNodeExecutions.length > 0;
+    const isExpandable = childNodeExecutions.length > 0;
     const tableStyles = useExecutionTableStyles();
 
     const selected = state.selectedExecution
@@ -85,7 +80,7 @@ export const NodeExecutionRow: React.FC<NodeExecutionRowProps> = ({
             })}
         >
             <NodeExecutionChildren
-                childGroups={detailedChildNodeExecutions}
+                childGroups={childNodeExecutions}
                 level={level + 1}
             />
         </div>

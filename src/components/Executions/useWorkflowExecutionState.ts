@@ -1,25 +1,22 @@
-import {
-    useDataRefresher,
-    useFetchableData,
-    useNodeExecutions
-} from 'components/hooks';
+import { useDataRefresher, useFetchableData } from 'components/hooks';
 import { every } from 'lodash';
 import {
     Execution,
     executionSortFields,
     FilterOperation,
     limits,
+    RequestConfig,
     SortDirection,
     Workflow,
+    WorkflowExecutionIdentifier,
     WorkflowId
 } from 'models';
 import { useContext } from 'react';
-import {
-    executionIsTerminal,
-    executionRefreshIntervalMs,
-    nodeExecutionIsTerminal
-} from '.';
+import { executionRefreshIntervalMs } from './constants';
 import { ExecutionDataCacheContext } from './contexts';
+import { DetailedNodeExecution } from './types';
+import { useDetailedNodeExecutions } from './useDetailedNodeExecutions';
+import { executionIsTerminal, nodeExecutionIsTerminal } from './utils';
 
 /** Using a custom fetchable to make sure the related workflow is fetched
  * using an ExecutionDataCache, ensuring that the extended details for NodeExecutions
@@ -53,7 +50,8 @@ export function useWorkflowExecutionState(
         sort,
         limit: limits.NONE
     };
-    const nodeExecutions = useNodeExecutions(
+
+    const nodeExecutions = useDetailedNodeExecutions(
         execution.id,
         nodeExecutionsRequestConfig
     );

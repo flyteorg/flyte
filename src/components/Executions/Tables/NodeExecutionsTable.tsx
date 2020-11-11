@@ -2,9 +2,9 @@ import * as classnames from 'classnames';
 import { DetailsPanel, ListProps } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import * as scrollbarSize from 'dom-helpers/util/scrollbarSize';
-import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
 import { NodeExecutionDetails } from '../ExecutionDetails/NodeExecutionDetails';
+import { DetailedNodeExecution } from '../types';
 import { NodeExecutionsTableContext } from './contexts';
 import { ExecutionsTableHeader } from './ExecutionsTableHeader';
 import { generateColumns } from './nodeExecutionColumns';
@@ -13,7 +13,8 @@ import { NoExecutionsContent } from './NoExecutionsContent';
 import { useColumnStyles, useExecutionTableStyles } from './styles';
 import { useNodeExecutionsTableState } from './useNodeExecutionsTableState';
 
-export interface NodeExecutionsTableProps extends ListProps<NodeExecution> {}
+export interface NodeExecutionsTableProps
+    extends ListProps<DetailedNodeExecution> {}
 
 const scrollbarPadding = scrollbarSize();
 

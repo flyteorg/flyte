@@ -75,11 +75,15 @@ const apiContext = mockAPIContextValue({
 const dataCache = createExecutionDataCache(apiContext);
 dataCache.insertWorkflow(workflow);
 dataCache.insertWorkflowExecutionReference(workflowExecution.id, workflow.id);
+const detailedNodeExecutions = dataCache.mapNodeExecutionDetails(
+    nodeExecutions
+);
+dataCache.insertNodeExecutions(detailedNodeExecutions);
 
 const fetchAction = action('fetch');
 
 const props: NodeExecutionsTableProps = {
-    value: nodeExecutions,
+    value: detailedNodeExecutions,
     lastError: null,
     state: State.from(fetchStates.LOADED),
     moreItemsAvailable: false,

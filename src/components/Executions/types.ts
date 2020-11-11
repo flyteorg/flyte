@@ -85,18 +85,21 @@ export interface ExecutionDataCache {
     getNodeExecutions(
         workflowExecutionId: WorkflowExecutionIdentifier,
         config: RequestConfig
-    ): Promise<NodeExecution[]>;
+    ): Promise<DetailedNodeExecution[]>;
+    getNodeExecution(
+        id: string | NodeExecutionIdentifier
+    ): DetailedNodeExecution | undefined;
     getNodeExecutionsForParentNode(
         id: NodeExecutionIdentifier,
         config: RequestConfig
-    ): Promise<NodeExecution[]>;
+    ): Promise<DetailedNodeExecution[]>;
     getTaskExecutions(
         nodeExecutionId: NodeExecutionIdentifier
     ): Promise<TaskExecution[]>;
     getTaskExecutionChildren: (
         taskExecutionId: TaskExecutionIdentifier,
         config: RequestConfig
-    ) => Promise<NodeExecution[]>;
+    ) => Promise<DetailedNodeExecution[]>;
     getTaskTemplate: (taskId: Identifier) => TaskTemplate | undefined;
     getWorkflow: (workflowId: Identifier) => Promise<Workflow>;
     getWorkflowExecution: (
@@ -107,10 +110,17 @@ export interface ExecutionDataCache {
     ) => Promise<WorkflowId>;
     insertExecution(execution: Execution): void;
     insertNodes(nodes: GloballyUniqueNode[]): void;
+    insertNodeExecutions(nodeExecutions: DetailedNodeExecution[]): void;
     insertTaskTemplates(templates: TaskTemplate[]): void;
     insertWorkflow(workflow: Workflow): void;
     insertWorkflowExecutionReference(
         executionId: WorkflowExecutionIdentifier,
         workflowId: WorkflowId
     ): void;
+    populateNodeExecutionDetails(
+        nodeExecution: NodeExecution
+    ): DetailedNodeExecution;
+    mapNodeExecutionDetails(
+        nodeExecutions: NodeExecution[]
+    ): DetailedNodeExecution[];
 }

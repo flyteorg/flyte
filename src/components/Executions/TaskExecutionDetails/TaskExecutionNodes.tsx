@@ -7,7 +7,6 @@ import { every } from 'lodash';
 import {
     executionSortFields,
     limits,
-    NodeExecution,
     RequestConfig,
     SortDirection,
     TaskExecution,
@@ -19,6 +18,7 @@ import { ExecutionDataCacheContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
+import { DetailedNodeExecution } from '../types';
 import { taskExecutionIsTerminal } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -53,7 +53,7 @@ function useCachedTaskExecutionChildren(
 ) {
     const dataCache = React.useContext(ExecutionDataCacheContext);
     return useFetchableData<
-        NodeExecution[],
+        DetailedNodeExecution[],
         UseCachedTaskExecutionChildrenArgs
     >(
         {

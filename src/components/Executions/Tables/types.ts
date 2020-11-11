@@ -3,7 +3,7 @@ import { DetailedNodeExecution, DetailedTaskExecution } from '../types';
 
 export interface NodeExecutionsTableState {
     executions: DetailedNodeExecution[];
-    selectedExecution: DetailedNodeExecution | null;
+    selectedExecution?: DetailedNodeExecution | null;
     setSelectedExecution: (execution: DetailedNodeExecution | null) => void;
 }
 

@@ -1,12 +1,10 @@
-import { APIContextValue, useAPIContext } from 'components/data/apiContext';
+import { APIContextValue } from 'components/data/apiContext';
 import {
     limits,
-    NodeExecution,
     RequestConfig,
     TaskExecutionIdentifier,
     WorkflowExecutionIdentifier
 } from 'models';
-import { useFetchableData } from './useFetchableData';
 
 interface NodeExecutionsFetchData {
     id: WorkflowExecutionIdentifier;
@@ -34,24 +32,6 @@ export const fetchNodeExecutions = async (
     return entities;
 };
 
-/** Fetches all the child NodeExecutions of a WorkflowExecution, according to a
- * passed RequestConfig.
- */
-export function useNodeExecutions(
-    id: WorkflowExecutionIdentifier,
-    config: RequestConfig
-) {
-    const apiContext = useAPIContext();
-    return useFetchableData<NodeExecution[], NodeExecutionsFetchData>(
-        {
-            debugName: 'NodeExecutions',
-            defaultValue: [],
-            doFetch: data => fetchNodeExecutions(data, apiContext)
-        },
-        { id, config }
-    );
-}
-
 /** Fetches a list of `NodeExecution`s which are children of the given `TaskExecution`.
  * This function is meant to be consumed by hooks which are composing data.
  * If you're calling it from a component, consider using `useTaskExecutionChildren` instead.
@@ -67,19 +47,3 @@ export const fetchTaskExecutionChildren = async (
     });
     return entities;
 };
-
-/** Fetches the child `NodeExecutions` belonging to a `TaskExecution` */
-export function useTaskExecutionChildren(
-    taskExecutionId: TaskExecutionIdentifier,
-    config: RequestConfig
-) {
-    const apiContext = useAPIContext();
-    return useFetchableData<NodeExecution[], TaskExecutionChildrenFetchData>(
-        {
-            debugName: 'TaskExecutionChildren',
-            defaultValue: [],
-            doFetch: data => fetchTaskExecutionChildren(data, apiContext)
-        },
-        { taskExecutionId, config }
-    );
-}
