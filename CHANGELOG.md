@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.3](http://github.com/lyft/flyteconsole/compare/v0.17.2...v0.17.3) (2020-11-11)
+
+
+### Bug Fixes
+
+* broken selection of nested node executions ([#118](http://github.com/lyft/flyteconsole/issues/118)) ([3f8d9ce](http://github.com/lyft/flyteconsole/commit/3f8d9ced1c1ddcc6f578cd5a592446a88d4992d1))
+
 ## [0.17.2](http://github.com/lyft/flyteconsole/compare/v0.17.1...v0.17.2) (2020-11-06)
 
 
