@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.4](http://github.com/lyft/flyteconsole/compare/v0.17.3...v0.17.4) (2020-11-11)
+
+
+### Bug Fixes
+
+* handle null LiteralMap in RemoteLiteralMapViewer ([#117](http://github.com/lyft/flyteconsole/issues/117)) ([d174b24](http://github.com/lyft/flyteconsole/commit/d174b24db1087d4d23c279a0fd8b8a30af845bf6))
+
 ## [0.17.3](http://github.com/lyft/flyteconsole/compare/v0.17.2...v0.17.3) (2020-11-11)
 
 
