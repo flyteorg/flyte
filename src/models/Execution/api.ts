@@ -65,7 +65,9 @@ export const getExecution = (
 
 const emptyExecutionData: ExecutionData = {
     inputs: {},
-    outputs: {}
+    outputs: {},
+    fullInputs: null,
+    fullOutputs: null
 };
 /** Fetches data URLs for an `Execution` record */
 export const getExecutionData = (

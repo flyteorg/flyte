@@ -84,7 +84,9 @@ describe('RelaunchExecutionForm', () => {
         task = createMockTask('MyTask');
         executionData = {
             inputs: { url: 'http://somePath', bytes: long(1000) },
-            outputs: {}
+            outputs: {},
+            fullInputs: null,
+            fullOutputs: null
         };
 
         mockGetWorkflow = jest.fn().mockResolvedValue(workflow);

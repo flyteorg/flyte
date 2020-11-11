@@ -28,7 +28,7 @@ const BlobTooLarge: React.FC<{ url: string }> = ({ url }) => (
  */
 export const RemoteLiteralMapViewer: React.FC<{
     blob: UrlBlob;
-    map?: LiteralMap;
+    map: LiteralMap | null;
 }> = ({ blob, map }) => {
     if (!blob.url || !blob.bytes) {
         return (
@@ -38,7 +38,7 @@ export const RemoteLiteralMapViewer: React.FC<{
         );
     }
 
-    if (map !== undefined) {
+    if (map != null) {
         return <LiteralMapViewer map={map} />;
     }
 

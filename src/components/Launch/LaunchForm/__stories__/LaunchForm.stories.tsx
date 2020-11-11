@@ -67,7 +67,9 @@ const generateMocks = (variables: Record<string, Variable>) => {
 
     const mockExecutionData: ExecutionData = {
         inputs: { url: 'inputsUrl', bytes: Long.fromNumber(1000) },
-        outputs: { url: 'outputsUrl', bytes: Long.fromNumber(1000) }
+        outputs: { url: 'outputsUrl', bytes: Long.fromNumber(1000) },
+        fullInputs: null,
+        fullOutputs: null
     };
 
     const mockExecutionInputs: LiteralMap = Object.keys(

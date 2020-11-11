@@ -132,6 +132,6 @@ export interface TaskExecutionClosure extends Admin.ITaskExecutionClosure {
 export interface ExecutionData {
     inputs: UrlBlob;
     outputs: UrlBlob;
-    fullInputs?: LiteralMap;
-    fullOutputs?: LiteralMap;
+    fullInputs: LiteralMap | null;
+    fullOutputs: LiteralMap | null;
 }

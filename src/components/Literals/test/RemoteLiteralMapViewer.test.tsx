@@ -18,7 +18,7 @@ describe('RemoteLiteralMapViewer', () => {
         };
 
         const { getAllByText } = render(
-            <RemoteLiteralMapViewer map={undefined} blob={blob} />
+            <RemoteLiteralMapViewer map={null} blob={blob} />
         );
 
         const items = getAllByText('No data is available.');
@@ -45,7 +45,7 @@ describe('RemoteLiteralMapViewer', () => {
         expect(items.length).toBe(1);
     });
 
-    it('fetches blob if map is undefined', () => {
+    it('fetches blob if map is null', () => {
         const map: LiteralMap = {
             literals: {
                 input1: {}
@@ -65,7 +65,7 @@ describe('RemoteLiteralMapViewer', () => {
         };
 
         const { getAllByText } = render(
-            <RemoteLiteralMapViewer map={undefined} blob={blob} />
+            <RemoteLiteralMapViewer map={null} blob={blob} />
         );
 
         const items = getAllByText('input1:');

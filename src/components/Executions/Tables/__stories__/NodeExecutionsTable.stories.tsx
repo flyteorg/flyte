@@ -47,7 +47,13 @@ const nodeRetryAttempts = {
 
 const apiContext = mockAPIContextValue({
     getExecution: () => Promise.resolve(workflowExecution),
-    getNodeExecutionData: () => Promise.resolve({ inputs: {}, outputs: {} }),
+    getNodeExecutionData: () =>
+        Promise.resolve({
+            inputs: {},
+            outputs: {},
+            fullInputs: null,
+            fullOutputs: null
+        }),
     listTaskExecutions: nodeExecutionId => {
         const length = nodeRetryAttempts[nodeExecutionId.nodeId] || 1;
         const entities = Array.from({ length }, (_, retryAttempt) =>
