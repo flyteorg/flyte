@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
+
 	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
@@ -159,4 +161,74 @@ func TestProjectManager_CreateProjectErrorDueToBadLabels(t *testing.T) {
 		},
 	})
 	assert.EqualError(t, err, "invalid label value [#badlabel]: [a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]")
+}
+
+func TestProjectManager_UpdateProject(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	var updateFuncCalled bool
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{Identifier: "project-id", Name: "old-project-name", Description: "old-project-description"}, nil
+	}
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).UpdateProjectFunction = func(
+		ctx context.Context, projectUpdate models.Project) error {
+		updateFuncCalled = true
+		assert.Equal(t, "project-id", projectUpdate.Identifier)
+		assert.Equal(t, "new-project-name", projectUpdate.Name)
+		assert.Equal(t, "new-project-description", projectUpdate.Description)
+		return nil
+	}
+	projectManager := NewProjectManager(mockRepository,
+		runtimeMocks.NewMockConfigurationProvider(
+			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
+		Id:          "project-id",
+		Name:        "new-project-name",
+		Description: "new-project-description",
+	})
+	assert.Nil(t, err)
+	assert.True(t, updateFuncCalled)
+}
+
+func TestProjectManager_UpdateProject_ErrorDueToProjectNotFound(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.New(projectID + " not found")
+	}
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).UpdateProjectFunction = func(
+		ctx context.Context, projectUpdate models.Project) error {
+		assert.Fail(t, "No calls to UpdateProject were expected")
+		return nil
+	}
+	projectManager := NewProjectManager(mockRepository,
+		runtimeMocks.NewMockConfigurationProvider(
+			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
+		Id:          "not-found-project-id",
+		Name:        "not-found-project-name",
+		Description: "not-found-project-description",
+	})
+	assert.Equal(t, errors.New("not-found-project-id not found"), err)
+}
+
+func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
+		ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{Identifier: "project-id", Name: "old-project-name", Description: "old-project-description"}, nil
+	}
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).UpdateProjectFunction = func(
+		ctx context.Context, projectUpdate models.Project) error {
+		assert.Fail(t, "No calls to UpdateProject were expected")
+		return nil
+	}
+	projectManager := NewProjectManager(mockRepository,
+		runtimeMocks.NewMockConfigurationProvider(
+			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
+		Id: "project-id",
+		// No project name
+	})
+	assert.Equal(t, shared.GetMissingArgumentError("project_name"), err)
 }

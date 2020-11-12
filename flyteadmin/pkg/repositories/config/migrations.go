@@ -199,7 +199,7 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("ALTER TABLE workflows ADD COLUMN IF NOT EXISTS state integer;").Error
 		},
 	},
-	// Modify the executions & node_executison table, if necessary
+	// Modify the executions & node_execution table, if necessary
 	{
 		ID: "2020-04-29-executions",
 		Migrate: func(tx *gorm.DB) error {

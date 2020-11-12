@@ -34,6 +34,14 @@ func ValidateMaxLengthStringField(field string, fieldName string, limit int) err
 	return nil
 }
 
+// Validates that a map field does not exceed a certain amount of entries
+func ValidateMaxMapLengthField(m map[string]string, fieldName string, limit int) error {
+	if len(m) > limit {
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s map cannot exceed %d entries", fieldName, limit)
+	}
+	return nil
+}
+
 func ValidateIdentifierFieldsSet(id *core.Identifier) error {
 	if id == nil {
 		return shared.GetMissingArgumentError(shared.ID)

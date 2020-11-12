@@ -25,6 +25,17 @@ func TestValidateMaxLengthStringField(t *testing.T) {
 	assert.Equal(t, codes.InvalidArgument, err.(errors.FlyteAdminError).Code())
 }
 
+func TestValidateMaxMapLengthField(t *testing.T) {
+	labels := map[string]string{
+		"k1": "v1",
+		"k2": "v2",
+		"k3": "v3",
+	}
+	err := ValidateMaxMapLengthField(labels, "foo", 2)
+	assert.EqualError(t, err, "foo map cannot exceed 2 entries")
+	assert.Equal(t, codes.InvalidArgument, err.(errors.FlyteAdminError).Code())
+}
+
 func TestValidateIdentifier(t *testing.T) {
 	err := ValidateIdentifier(&core.Identifier{
 		ResourceType: core.ResourceType_TASK,
