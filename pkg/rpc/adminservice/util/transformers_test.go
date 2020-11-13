@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/lyft/flyteadmin/pkg/common"
+
 	adminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	mockScope "github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
@@ -37,4 +39,15 @@ func TestTransformError_BasicError(t *testing.T) {
 	transormerStatus, ok := status.FromError(transformedError)
 	assert.True(t, ok)
 	assert.Equal(t, codes.Internal, transormerStatus.Code())
+}
+
+func TestTruncateErrorMessage(t *testing.T) {
+	errorMessage := make([]byte, common.MaxResponseStatusBytes+1)
+	for i := 0; i <= common.MaxResponseStatusBytes; i++ {
+		errorMessage[i] = byte('a')
+	}
+
+	err := adminErrors.NewFlyteAdminError(codes.InvalidArgument, string(errorMessage))
+	transformedError := TransformAndRecordError(err, &testRequestMetrics)
+	assert.Len(t, transformedError.Error(), common.MaxResponseStatusBytes)
 }

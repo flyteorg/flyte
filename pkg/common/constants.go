@@ -9,3 +9,5 @@ const (
 	AuditFieldsContextKey contextutils.Key = "audit_fields"
 	PrincipalContextKey   contextutils.Key = "principal"
 )
+
+const MaxResponseStatusBytes = 32000
