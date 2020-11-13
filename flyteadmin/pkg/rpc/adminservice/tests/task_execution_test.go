@@ -5,7 +5,10 @@ import (
 	"errors"
 	"testing"
 
+	"google.golang.org/grpc/codes"
+
 	"github.com/golang/protobuf/proto"
+	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/manager/mocks"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -177,7 +180,8 @@ func TestTaskExecution(t *testing.T) {
 				RetryAttempt:    retryAttempt,
 			},
 		})
-		assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+		assert.EqualError(t, err, "expected error")
+		assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 		assert.Nil(t, resp)
 	})
 

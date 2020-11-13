@@ -6,6 +6,9 @@ import (
 	"testing"
 	"time"
 
+	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/golang/protobuf/proto"
@@ -178,7 +181,8 @@ func TestCreateWorkflowEventErr(t *testing.T) {
 			Phase:       core.WorkflowExecution_RUNNING,
 		},
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, resp)
 }
 
@@ -220,7 +224,7 @@ func TestGetExecutionError(t *testing.T) {
 	actualResponse, err := mockServer.GetExecution(context.Background(), &admin.WorkflowExecutionGetRequest{
 		Id: &workflowExecutionIdentifier,
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
 	assert.Nil(t, actualResponse)
 }
 
@@ -273,7 +277,8 @@ func TestListExecutionsError(t *testing.T) {
 		},
 		Limit: 1,
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, response)
 }
 
@@ -320,6 +325,7 @@ func TestTerminateExecution_Error(t *testing.T) {
 		Id:    &identifier,
 		Cause: abortCause,
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, response)
 }

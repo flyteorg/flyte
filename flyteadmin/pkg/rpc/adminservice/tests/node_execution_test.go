@@ -5,6 +5,9 @@ import (
 	"errors"
 	"testing"
 
+	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
+	"google.golang.org/grpc/codes"
+
 	"github.com/golang/protobuf/proto"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -68,7 +71,8 @@ func TestCreateNodeEventErr(t *testing.T) {
 			Phase: core.NodeExecution_SKIPPED,
 		},
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, resp)
 }
 
@@ -111,7 +115,8 @@ func TestGetNodeExecutionError(t *testing.T) {
 	actualResponse, err := mockServer.GetNodeExecution(context.Background(), &admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionID,
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, actualResponse)
 }
 
@@ -160,7 +165,8 @@ func TestListNodeExecutionsError(t *testing.T) {
 		Limit: 1,
 		Token: "20",
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, response)
 }
 
@@ -211,7 +217,8 @@ func TestListNodeExecutionsForTaskError(t *testing.T) {
 		Limit: 1,
 		Token: "20",
 	})
-	assert.EqualError(t, err, "rpc error: code = Internal desc = expected error")
+	assert.EqualError(t, err, "expected error")
+	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, response)
 }
 
