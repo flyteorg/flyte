@@ -1,11 +1,7 @@
 import { millisecondsToDuration } from 'common/utils';
 import { Admin } from 'flyteidl';
 import * as moment from 'moment-timezone';
-import {
-    subSecondString,
-    unknownValueString,
-    zeroSecondsString
-} from '../constants';
+import { unknownValueString, zeroSecondsString } from '../constants';
 import {
     dateDiffString,
     dateFromNow,
@@ -199,6 +195,7 @@ describe('getScheduleFrequencyString', () => {
     // input and expected result
     const cases: [Admin.ISchedule, string][] = [
         [{ cronExpression: '* * * * *' }, 'Every minute'],
+        [{ cronExpression: '0 20 ? * 3 *' }, 'At 08:00 PM, only on Tuesday'],
         [
             { rate: { value: 1, unit: Admin.FixedRateUnit.MINUTE } },
             'Every 1 minutes'

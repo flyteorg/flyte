@@ -1,11 +1,7 @@
 import cronstrue from 'cronstrue';
 import { Admin, Protobuf } from 'flyteidl';
 import * as moment from 'moment-timezone';
-import {
-    subSecondString,
-    unknownValueString,
-    zeroSecondsString
-} from './constants';
+import { unknownValueString, zeroSecondsString } from './constants';
 import { timezone } from './timezone';
 import { durationToMilliseconds, isValidDate } from './utils';
 
@@ -202,7 +198,9 @@ export function getScheduleFrequencyString(schedule?: Admin.ISchedule) {
     if (schedule.cronExpression) {
         // Need to add a leading 0 to get a valid CRON expression, because
         // ISchedule is using AWS-style expressions, which don't allow a `seconds` position
-        return cronstrue.toString(`0 ${schedule.cronExpression}`);
+        return cronstrue.toString(`0 ${schedule.cronExpression}`, {
+            dayOfWeekStartIndexZero: false
+        });
     }
     if (schedule.rate) {
         return fixedRateToString(schedule.rate);
