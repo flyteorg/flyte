@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.5](http://github.com/lyft/flyteconsole/compare/v0.17.4...v0.17.5) (2020-11-14)
+
+
+### Bug Fixes
+
+* use one-based day of week for aws cron expressions ([#120](http://github.com/lyft/flyteconsole/issues/120)) ([1cc0e1c](http://github.com/lyft/flyteconsole/commit/1cc0e1c5629af875ede6ac9b6d84f83df2cb5ac3))
+
 ## [0.17.4](http://github.com/lyft/flyteconsole/compare/v0.17.3...v0.17.4) (2020-11-11)
 
 
