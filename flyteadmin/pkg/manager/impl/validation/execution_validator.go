@@ -59,6 +59,11 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 			"Invalid reference entity resource type [%v], only [%+v] allowed",
 			request.Spec.LaunchPlan.ResourceType, acceptedReferenceLaunchTypes)
 	}
+	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
+		if err := validateLaunchSingleTaskExecutionReq(request); err != nil {
+			return err
+		}
+	}
 	if err := validateLiteralMap(request.Inputs, shared.Inputs); err != nil {
 		return err
 	}
@@ -154,6 +159,15 @@ func ValidateWorkflowExecutionIdentifier(identifier *core.WorkflowExecutionIdent
 	}
 	if err := ValidateEmptyStringField(identifier.Name, shared.Name); err != nil {
 		return err
+	}
+	return nil
+}
+
+// Because single task executions don't use launch plans, some parameters that are optional overrides for conventional
+// ExecutionCreateRequests are actually mandatory.
+func validateLaunchSingleTaskExecutionReq(request admin.ExecutionCreateRequest) error {
+	if request.Spec.AuthRole == nil || request.Spec.AuthRole.GetMethod() == nil {
+		return shared.GetMissingArgumentError(shared.AuthRole)
 	}
 	return nil
 }
