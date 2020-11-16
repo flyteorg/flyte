@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.6](http://github.com/lyft/flyteconsole/compare/v0.17.5...v0.17.6) (2020-11-16)
+
+
+### Bug Fixes
+
+* allow role specification for single task executions ([#119](http://github.com/lyft/flyteconsole/issues/119)) ([1ba0e01](http://github.com/lyft/flyteconsole/commit/1ba0e0184fa71d0d29a1ed0a19e3f851debec583))
+
 ## [0.17.5](http://github.com/lyft/flyteconsole/compare/v0.17.4...v0.17.5) (2020-11-14)
 
 
