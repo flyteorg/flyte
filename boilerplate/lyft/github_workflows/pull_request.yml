@@ -5,6 +5,7 @@ on:
 
 jobs:
   build-docker:
+    name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -53,6 +54,7 @@ jobs:
           IMAGE_NAME=${{ github.event.repository.name }} IMAGE=lyft/${{ github.event.repository.name }}:latest make end2end_execute
 
   integration:
+    name: Integration tests
     runs-on: ubuntu-latest
     needs: [build-docker]
     steps:
@@ -76,6 +78,7 @@ jobs:
           IMAGE_NAME=${{ github.event.repository.name }} IMAGE=lyft/${{ github.event.repository.name }}:builder make k8s_integration_execute
 
   tests-lint:
+    name: Run tests and lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
