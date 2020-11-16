@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.17.7](http://github.com/lyft/flyteconsole/compare/v0.17.6...v0.17.7) (2020-11-16)
+
+
+### Bug Fixes
+
+* convert empty array literals to empty collection literals ([#121](http://github.com/lyft/flyteconsole/issues/121)) ([7f42a11](http://github.com/lyft/flyteconsole/commit/7f42a114980f9c0f38786fbc30ee8131e6bb4814))
+
 ## [0.17.6](http://github.com/lyft/flyteconsole/compare/v0.17.5...v0.17.6) (2020-11-16)
 
 
