@@ -78,7 +78,7 @@ secretGenerator:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.3.7 # override the tag
+    newTag: v0.3.15 # override the tag
     newName: docker.io/lyft/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
@@ -90,5 +90,5 @@ images:
     newName: docker.io/lyft/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.4.8 # override the tag
+    newTag: v0.5.2 # override the tag
     newName: docker.io/lyft/flytepropeller # override the name
