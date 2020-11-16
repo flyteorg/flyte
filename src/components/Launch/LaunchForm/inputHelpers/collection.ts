@@ -64,9 +64,6 @@ function toLiteral({
             return literalNone();
         }
         parsed = parseCollection(stringValue);
-        if (!parsed.length) {
-            return literalNone();
-        }
     }
 
     const helper = getHelperForInput(subtype.type);

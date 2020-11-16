@@ -1,7 +1,7 @@
 import { stringifyValue } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import { BlobDimensionality } from 'models';
+import { BlobDimensionality, SimpleType } from 'models';
 import {
     collectionInputTypeDefinition,
     nestedCollectionInputTypeDefinition,
@@ -206,6 +206,34 @@ describe('inputToLiteral', () => {
                     result.collection!.literals![0].collection!.literals![0]
                 ).toEqual(output);
             });
+        });
+
+        it('should convert empty array string literal to empty collection', () => {
+            const input = makeCollectionInput(
+                {
+                    type: InputType.String,
+                    literalType: { simple: SimpleType.STRING }
+                },
+                '[]'
+            );
+            const expected: Core.ILiteral = {
+                collection: { literals: [] }
+            };
+            expect(inputToLiteral(input)).toEqual(expected);
+        });
+
+        it('should convert nested empty array string literal to nested empty collection', () => {
+            const input = makeNestedCollectionInput(
+                {
+                    type: InputType.String,
+                    literalType: { simple: SimpleType.STRING }
+                },
+                '[[]]'
+            );
+            const expected: Core.ILiteral = {
+                collection: { literals: [{ collection: { literals: [] } }] }
+            };
+            expect(inputToLiteral(input)).toEqual(expected);
         });
     });
 
