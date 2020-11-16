@@ -87,6 +87,7 @@ export const getExecutionData = (
     );
 
 export interface CreateWorkflowExecutionArguments {
+    authRole?: Admin.IAuthRole;
     domain: string;
     inputs: Core.ILiteralMap;
     launchPlanId: Identifier;
@@ -98,6 +99,7 @@ export interface CreateWorkflowExecutionArguments {
  */
 export const createWorkflowExecution = (
     {
+        authRole,
         domain,
         inputs,
         launchPlanId: launchPlan,
@@ -115,6 +117,7 @@ export const createWorkflowExecution = (
                 project,
                 domain,
                 spec: {
+                    authRole,
                     inputs,
                     launchPlan,
                     metadata: {

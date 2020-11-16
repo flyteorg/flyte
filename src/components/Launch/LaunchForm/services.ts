@@ -1,4 +1,5 @@
 import { RefObject } from 'react';
+import { correctInputErrors } from './constants';
 import { WorkflowLaunchContext } from './launchMachine';
 import { LaunchFormInputsRef } from './types';
 
@@ -11,8 +12,6 @@ export async function validate(
     }
 
     if (!formInputsRef.current.validate()) {
-        throw new Error(
-            'Some inputs have errors. Please correct them before submitting.'
-        );
+        throw new Error(correctInputErrors);
     }
 }

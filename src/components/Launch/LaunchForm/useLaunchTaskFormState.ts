@@ -11,6 +11,7 @@ import {
     WorkflowExecutionIdentifier
 } from 'models';
 import { RefObject, useEffect, useMemo, useRef } from 'react';
+import { correctInputErrors } from './constants';
 import { getInputsForTask } from './getInputs';
 import {
     LaunchState,
@@ -19,9 +20,10 @@ import {
     taskLaunchMachine,
     TaskLaunchTypestate
 } from './launchMachine';
-import { validate } from './services';
+import { validate as baseValidate } from './services';
 import {
     LaunchFormInputsRef,
+    LaunchRoleInputRef,
     LaunchTaskFormProps,
     LaunchTaskFormState,
     ParsedInput
@@ -93,9 +95,25 @@ async function loadInputs(
     };
 }
 
+async function validate(
+    formInputsRef: RefObject<LaunchFormInputsRef>,
+    roleInputRef: RefObject<LaunchRoleInputRef>,
+    context: any
+) {
+    if (roleInputRef.current === null) {
+        throw new Error('Unexpected empty role input ref');
+    }
+
+    if (!roleInputRef.current.validate()) {
+        throw new Error(correctInputErrors);
+    }
+    return baseValidate(formInputsRef, context);
+}
+
 async function submit(
     { createWorkflowExecution }: APIContextValue,
     formInputsRef: RefObject<LaunchFormInputsRef>,
+    roleInputRef: RefObject<LaunchRoleInputRef>,
     { referenceExecutionId, taskVersion }: TaskLaunchContext
 ) {
     if (!taskVersion) {
@@ -104,11 +122,17 @@ async function submit(
     if (formInputsRef.current === null) {
         throw new Error('Unexpected empty form inputs ref');
     }
+    if (roleInputRef.current === null) {
+        throw new Error('Unexpected empty role input ref');
+    }
+
+    const authRole = roleInputRef.current.getValue();
     const literals = formInputsRef.current.getValues();
     const launchPlanId = taskVersion;
     const { domain, project } = taskVersion;
 
     const response = await createWorkflowExecution({
+        authRole,
         domain,
         launchPlanId,
         project,
@@ -125,13 +149,14 @@ async function submit(
 
 function getServices(
     apiContext: APIContextValue,
-    formInputsRef: RefObject<LaunchFormInputsRef>
+    formInputsRef: RefObject<LaunchFormInputsRef>,
+    roleInputRef: RefObject<LaunchRoleInputRef>
 ) {
     return {
         loadTaskVersions: partial(loadTaskVersions, apiContext),
         loadInputs: partial(loadInputs, apiContext),
-        submit: partial(submit, apiContext, formInputsRef),
-        validate: partial(validate, formInputsRef)
+        submit: partial(submit, apiContext, formInputsRef, roleInputRef),
+        validate: partial(validate, formInputsRef, roleInputRef)
     };
 }
 
@@ -146,17 +171,19 @@ export function useLaunchTaskFormState({
     // These values will be used to auto-select items from the task
     // version/launch plan drop downs.
     const {
+        authRole: defaultAuthRole,
         taskId: preferredTaskId,
         values: defaultInputValues
     } = initialParameters;
 
     const apiContext = useAPIContext();
     const formInputsRef = useRef<LaunchFormInputsRef>(null);
+    const roleInputRef = useRef<LaunchRoleInputRef>(null);
 
-    const services = useMemo(() => getServices(apiContext, formInputsRef), [
-        apiContext,
-        formInputsRef
-    ]);
+    const services = useMemo(
+        () => getServices(apiContext, formInputsRef, roleInputRef),
+        [apiContext, formInputsRef, roleInputRef]
+    );
 
     const [state, sendEvent, service] = useMachine<
         TaskLaunchContext,
@@ -166,6 +193,7 @@ export function useLaunchTaskFormState({
         ...defaultStateMachineConfig,
         services,
         context: {
+            defaultAuthRole,
             defaultInputValues,
             preferredTaskId,
             referenceExecutionId,
@@ -222,6 +250,7 @@ export function useLaunchTaskFormState({
 
     return {
         formInputsRef,
+        roleInputRef,
         state,
         service,
         taskSourceSelectorState

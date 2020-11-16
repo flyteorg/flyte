@@ -1,4 +1,4 @@
-import { Core } from 'flyteidl';
+import { Admin, Core } from 'flyteidl';
 import {
     BlobDimensionality,
     Identifier,
@@ -64,6 +64,7 @@ export interface LaunchWorkflowFormProps extends BaseLaunchFormProps {
 export interface TaskInitialLaunchParameters
     extends BaseInitialLaunchParameters {
     taskId?: Identifier;
+    authRole?: Admin.IAuthRole;
 }
 export interface LaunchTaskFormProps extends BaseLaunchFormProps {
     taskId: NamedEntityIdentifier;
@@ -79,6 +80,10 @@ export interface LaunchWorkflowFormProps {
 
 export interface LaunchFormInputsRef {
     getValues(): Record<string, Core.ILiteral>;
+    validate(): boolean;
+}
+export interface LaunchRoleInputRef {
+    getValue(): Admin.IAuthRole;
     validate(): boolean;
 }
 
@@ -124,6 +129,7 @@ export interface LaunchWorkflowFormState {
 
 export interface LaunchTaskFormState {
     formInputsRef: React.RefObject<LaunchFormInputsRef>;
+    roleInputRef: React.RefObject<LaunchRoleInputRef>;
     state: State<TaskLaunchContext, TaskLaunchEvent, any, TaskLaunchTypestate>;
     service: Interpreter<
         TaskLaunchContext,
@@ -191,4 +197,12 @@ export interface ParsedInput
     > {
     /** Provides an initial value for the input, which can be changed by the user. */
     initialValue?: Core.ILiteral;
+}
+
+export type RoleTypeValue = keyof Admin.IAuthRole;
+export interface RoleType {
+    helperText: string;
+    inputLabel: string;
+    label: string;
+    value: RoleTypeValue;
 }

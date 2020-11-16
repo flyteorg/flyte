@@ -62,7 +62,7 @@ function useRelaunchTaskFormState({ execution }: RelaunchExecutionFormProps) {
             defaultValue: {} as TaskInitialLaunchParameters,
             doFetch: async execution => {
                 const {
-                    spec: { launchPlan: taskId }
+                    spec: { authRole, launchPlan: taskId }
                 } = execution;
                 const task = await apiContext.getTask(taskId);
                 const inputDefinitions = getTaskInputs(task);
@@ -73,7 +73,7 @@ function useRelaunchTaskFormState({ execution }: RelaunchExecutionFormProps) {
                     },
                     apiContext
                 );
-                return { values, taskId };
+                return { authRole, values, taskId };
             }
         },
         execution

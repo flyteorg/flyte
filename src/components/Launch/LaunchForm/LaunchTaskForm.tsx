@@ -6,6 +6,7 @@ import { LaunchFormActions } from './LaunchFormActions';
 import { LaunchFormHeader } from './LaunchFormHeader';
 import { LaunchFormInputs } from './LaunchFormInputs';
 import { LaunchState } from './launchMachine';
+import { LaunchRoleInput } from './LaunchRoleInput';
 import { SearchableSelector } from './SearchableSelector';
 import { useStyles } from './styles';
 import {
@@ -14,11 +15,13 @@ import {
     LaunchTaskFormProps
 } from './types';
 import { useLaunchTaskFormState } from './useLaunchTaskFormState';
+import { isEnterInputsState } from './utils';
 
 /** Renders the form for initiating a Launch request based on a Task */
 export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = props => {
     const {
         formInputsRef,
+        roleInputRef,
         state,
         service,
         taskSourceSelectorState
@@ -65,6 +68,13 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = props => {
                             selectedItem={selectedTask}
                         />
                     </section>
+                ) : null}
+                {isEnterInputsState(baseState) ? (
+                    <LaunchRoleInput
+                        initialValue={state.context.defaultAuthRole}
+                        ref={roleInputRef}
+                        showErrors={state.context.showErrors}
+                    />
                 ) : null}
                 <LaunchFormInputs
                     key={formKey}

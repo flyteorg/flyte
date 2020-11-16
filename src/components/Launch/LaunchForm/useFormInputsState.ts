@@ -1,6 +1,7 @@
 import { useDebouncedValue } from 'components/hooks/useDebouncedValue';
 import { Core } from 'flyteidl';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { launchInputDebouncDelay } from './constants';
 import {
     defaultValueForInputType,
     literalToInputValue,
@@ -9,8 +10,6 @@ import {
 import { useInputValueCacheContext } from './inputValueCache';
 import { InputProps, InputValue, ParsedInput } from './types';
 import { convertFormInputsToLiterals, createInputCacheKey } from './utils';
-
-const debounceDelay = 500;
 
 interface FormInputState extends InputProps {
     validate(): boolean;
@@ -42,7 +41,7 @@ function useFormInputState(parsedInput: ParsedInput): FormInputState {
     });
     const [error, setError] = useState<string>();
 
-    const validationValue = useDebouncedValue(value, debounceDelay);
+    const validationValue = useDebouncedValue(value, launchInputDebouncDelay);
 
     const validate = () => {
         try {

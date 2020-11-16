@@ -1,3 +1,4 @@
+import { Admin } from 'flyteidl';
 import {
     Identifier,
     LaunchPlan,
@@ -83,6 +84,7 @@ export interface WorkflowLaunchContext extends BaseLaunchContext {
 }
 
 export interface TaskLaunchContext extends BaseLaunchContext {
+    defaultAuthRole?: Admin.IAuthRole;
     preferredTaskId?: Identifier;
     taskVersion?: Identifier;
     taskVersionOptions?: Task[];

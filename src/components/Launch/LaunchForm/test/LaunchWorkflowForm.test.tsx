@@ -39,7 +39,9 @@ import {
 import {
     cannotLaunchWorkflowString,
     formStrings,
-    requiredInputSuffix
+    inputsDescription,
+    requiredInputSuffix,
+    workflowNoInputsString
 } from '../constants';
 import { LaunchForm } from '../LaunchForm';
 import { LaunchFormProps, WorkflowInitialLaunchParameters } from '../types';
@@ -183,6 +185,34 @@ describe('LaunchForm: Workflow', () => {
         expect(buttons.length).toBe(1);
         return buttons[0];
     };
+
+    describe('With No Inputs', () => {
+        beforeEach(() => {
+            variables = {};
+            createMocks();
+        });
+
+        it('should render info message', async () => {
+            const { container, getByText } = renderForm();
+            const submitButton = await waitFor(() =>
+                getSubmitButton(container)
+            );
+            await waitFor(() => expect(submitButton).toBeEnabled());
+
+            expect(getByText(workflowNoInputsString)).toBeInTheDocument();
+        });
+
+        it('should not render inputs header/description', async () => {
+            const { container, queryByText } = renderForm();
+            const submitButton = await waitFor(() =>
+                getSubmitButton(container)
+            );
+            await waitFor(() => expect(submitButton).toBeEnabled());
+
+            expect(queryByText(formStrings.inputs)).toBeNull();
+            expect(queryByText(inputsDescription)).toBeNull();
+        });
+    });
 
     describe('With Simple Inputs', () => {
         beforeEach(() => {

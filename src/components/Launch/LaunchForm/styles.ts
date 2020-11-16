@@ -24,5 +24,9 @@ export const useStyles = makeStyles((theme: Theme) => ({
         display: 'flex',
         flexDirection: 'column',
         width: '100%'
+    },
+    sectionHeader: {
+        marginBottom: theme.spacing(1),
+        marginTop: theme.spacing(1)
     }
 }));

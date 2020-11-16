@@ -7,21 +7,10 @@ import {
 } from '@material-ui/core';
 import * as React from 'react';
 import { DatetimeInput } from './DatetimeInput';
-import { InputChangeHandler, InputProps, InputType } from './types';
+import { makeStringChangeHandler, makeSwitchChangeHandler } from './handlers';
+import { InputProps, InputType } from './types';
 import { UnsupportedInput } from './UnsupportedInput';
 import { getLaunchInputId } from './utils';
-
-function switchChangeHandler(onChange: InputChangeHandler) {
-    return ({ target: { checked } }: React.ChangeEvent<HTMLInputElement>) => {
-        onChange(checked);
-    };
-}
-
-function stringChangeHandler(onChange: InputChangeHandler) {
-    return ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
-        onChange(value);
-    };
-}
 
 /** Handles rendering of the input component for any primitive-type input */
 export const SimpleInput: React.FC<InputProps> = props => {
@@ -44,7 +33,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
                             <Switch
                                 id={getLaunchInputId(name)}
                                 checked={!!value}
-                                onChange={switchChangeHandler(onChange)}
+                                onChange={makeSwitchChangeHandler(onChange)}
                                 value={name}
                             />
                         }
@@ -67,7 +56,7 @@ export const SimpleInput: React.FC<InputProps> = props => {
                     helperText={helperText}
                     fullWidth={true}
                     label={label}
-                    onChange={stringChangeHandler(onChange)}
+                    onChange={makeStringChangeHandler(onChange)}
                     value={value}
                     variant="outlined"
                 />

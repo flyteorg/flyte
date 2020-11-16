@@ -12,6 +12,7 @@ import {
     createInputCacheKey,
     getInputDefintionForLiteralType
 } from 'components/Launch/LaunchForm/utils';
+import { Admin } from 'flyteidl';
 import {
     Execution,
     ExecutionData,
@@ -191,8 +192,13 @@ describe('RelaunchExecutionForm', () => {
 
     describe('with single task execution', () => {
         let values: LiteralValueMap;
+        let authRole: Admin.IAuthRole;
         beforeEach(() => {
+            authRole = {
+                assumableIamRole: 'arn:aws:iam::12345678:role/defaultrole'
+            };
             execution.spec.launchPlan.resourceType = ResourceType.TASK;
+            execution.spec.authRole = { ...authRole };
             taskInputDefinitions = {
                 taskSimpleString: mockSimpleVariables.simpleString,
                 taskSimpleInteger: mockSimpleVariables.simpleInteger
@@ -221,6 +227,17 @@ describe('RelaunchExecutionForm', () => {
             await waitFor(() => getByText(mockContentString));
             checkLaunchFormProps({
                 taskId: execution.spec.launchPlan
+            });
+        });
+
+        it('passes authRole from original execution', async () => {
+            const { getByText } = renderForm();
+            await waitFor(() => getByText(mockContentString));
+
+            checkLaunchFormProps({
+                initialParameters: expect.objectContaining({
+                    authRole
+                })
             });
         });
 

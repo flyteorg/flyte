@@ -1,8 +1,10 @@
+import { Typography } from '@material-ui/core';
 import * as React from 'react';
 import { BlobInput } from './BlobInput';
 import { CollectionInput } from './CollectionInput';
-import { formStrings } from './constants';
+import { formStrings, inputsDescription } from './constants';
 import { LaunchState } from './launchMachine';
+import { NoInputsNeeded } from './NoInputsNeeded';
 import { SimpleInput } from './SimpleInput';
 import { StructInput } from './StructInput';
 import { useStyles } from './styles';
@@ -15,6 +17,7 @@ import {
 import { UnsupportedInput } from './UnsupportedInput';
 import { UnsupportedRequiredInputsError } from './UnsupportedRequiredInputsError';
 import { useFormInputsState } from './useFormInputsState';
+import { isEnterInputsState } from './utils';
 
 function getComponentForInput(input: InputProps, showErrors: boolean) {
     const props = { ...input, error: showErrors ? input.error : undefined };
@@ -39,6 +42,29 @@ export interface LaunchFormInputsProps {
     variant: 'workflow' | 'task';
 }
 
+const RenderFormInputs: React.FC<{
+    inputs: InputProps[];
+    showErrors: boolean;
+    variant: LaunchFormInputsProps['variant'];
+}> = ({ inputs, showErrors, variant }) => {
+    const styles = useStyles();
+    return inputs.length === 0 ? (
+        <NoInputsNeeded variant={variant} />
+    ) : (
+        <>
+            <header className={styles.sectionHeader}>
+                <Typography variant="h6">{formStrings.inputs}</Typography>
+                <Typography variant="body2">{inputsDescription}</Typography>
+            </header>
+            {inputs.map(input => (
+                <div key={input.label} className={styles.formControl}>
+                    {getComponentForInput(input, showErrors)}
+                </div>
+            ))}
+        </>
+    );
+};
+
 export const LaunchFormInputsImpl: React.RefForwardingComponent<
     LaunchFormInputsRef,
     LaunchFormInputsProps
@@ -49,24 +75,12 @@ export const LaunchFormInputsImpl: React.RefForwardingComponent<
         showErrors
     } = state.context;
     const { getValues, inputs, validate } = useFormInputsState(parsedInputs);
-    const styles = useStyles();
     React.useImperativeHandle(ref, () => ({
         getValues,
         validate
     }));
 
-    const showInputs = [
-        LaunchState.UNSUPPORTED_INPUTS,
-        LaunchState.ENTER_INPUTS,
-        LaunchState.VALIDATING_INPUTS,
-        LaunchState.INVALID_INPUTS,
-        LaunchState.SUBMIT_VALIDATING,
-        LaunchState.SUBMITTING,
-        LaunchState.SUBMIT_FAILED,
-        LaunchState.SUBMIT_SUCCEEDED
-    ].some(state.matches);
-
-    return showInputs ? (
+    return isEnterInputsState(state) ? (
         <section title={formStrings.inputs}>
             {state.matches(LaunchState.UNSUPPORTED_INPUTS) ? (
                 <UnsupportedRequiredInputsError
@@ -74,13 +88,11 @@ export const LaunchFormInputsImpl: React.RefForwardingComponent<
                     variant={variant}
                 />
             ) : (
-                <>
-                    {inputs.map(input => (
-                        <div key={input.label} className={styles.formControl}>
-                            {getComponentForInput(input, showErrors)}
-                        </div>
-                    ))}
-                </>
+                <RenderFormInputs
+                    inputs={inputs}
+                    showErrors={showErrors}
+                    variant={variant}
+                />
             )}
         </section>
     ) : null;

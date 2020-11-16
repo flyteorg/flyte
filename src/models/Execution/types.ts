@@ -47,6 +47,7 @@ export interface ExecutionMetadata extends Admin.IExecutionMetadata {
 }
 
 export interface ExecutionSpec extends Admin.IExecutionSpec {
+    authRole?: Admin.IAuthRole;
     inputs: LiteralMap;
     launchPlan: Identifier;
     metadata: ExecutionMetadata;

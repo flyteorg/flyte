@@ -13,8 +13,10 @@ import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
 import { inputToLiteral } from './inputHelpers/inputHelpers';
 import { typeIsSupported } from './inputHelpers/utils';
+import { LaunchState } from './launchMachine';
 import { SearchableSelectorOption } from './SearchableSelector';
 import {
+    BaseInterpretedLaunchState,
     BlobValue,
     InputProps,
     InputType,
@@ -194,4 +196,18 @@ export function getUnsupportedRequiredInputs(
 
 export function isBlobValue(value: unknown): value is BlobValue {
     return isObject(value);
+}
+
+/** Determines if a given launch machine state is one in which a user can provide input values. */
+export function isEnterInputsState(state: BaseInterpretedLaunchState): boolean {
+    return [
+        LaunchState.UNSUPPORTED_INPUTS,
+        LaunchState.ENTER_INPUTS,
+        LaunchState.VALIDATING_INPUTS,
+        LaunchState.INVALID_INPUTS,
+        LaunchState.SUBMIT_VALIDATING,
+        LaunchState.SUBMITTING,
+        LaunchState.SUBMIT_FAILED,
+        LaunchState.SUBMIT_SUCCEEDED
+    ].some(state.matches);
 }
