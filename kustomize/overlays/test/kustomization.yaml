@@ -67,7 +67,7 @@ images:
     newName: docker.io/lyft/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v0.12.1 # override the tag
+    newTag: v0.17.7 # override the tag
     newName: docker.io/lyft/flyteconsole # override the namep 
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
