@@ -1,7 +1,7 @@
 
 
 ### Flytekit
-* Fast register - code only changes no longer need a rebuild of the container to run
+* Fast register - code only changes no longer need a rebuild of the container to run ([read the docs!](https://flyte.readthedocs.io/en/latest/user/features/fast_registration.html))
 * Project archive/activate command in flyte-cli
 * Bug fixes and misc improvements
 
