@@ -92,5 +92,5 @@ images:
     newName: docker.io/lyft/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.5.0 # override the tag
+    newTag: v0.5.2 # override the tag
     newName: docker.io/lyft/flytepropeller # override the name
