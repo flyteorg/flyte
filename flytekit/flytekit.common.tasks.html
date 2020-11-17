@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.common.tasks package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -202,7 +202,9 @@
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.built_in_training_job_task">flytekit.common.tasks.sagemaker.built_in_training_job_task module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.custom_training_job_task">flytekit.common.tasks.sagemaker.custom_training_job_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.distributed_training">flytekit.common.tasks.sagemaker.distributed_training module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.types">flytekit.common.tasks.sagemaker.types module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker">Module contents</a></li>
 </ul>
 </li>
@@ -748,6 +750,43 @@ workflow.  Where as local engine will merely feed the outputs directly into the 
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.sdk_runnable.SdkRunnableTask.fast_register">
+<code class="sig-name descname">fast_register</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">name</em>, <em class="sig-param">digest</em>, <em class="sig-param">additional_distribution</em>, <em class="sig-param">dest_dir</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/common/tasks/sdk_runnable.html#SdkRunnableTask.fast_register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.fast_register" title="Permalink to this definition">¶</a></dt>
+<dd><p>The fast register call essentially hijacks the task container commandline.
+Say an existing task container definition had a commandline like so:</p>
+<blockquote>
+<div><p>flyte_venv pyflyte-execute –task-module app.workflows.my_workflow –task-name my_task</p>
+</div></blockquote>
+<dl class="simple">
+<dt>The fast register command introduces a wrapper call to fast-execute the original commandline like so:</dt><dd><dl class="simple">
+<dt>flyte_venv pyflyte-fast-execute –additional-distribution s3://my-s3-bucket/foo/bar/12345.tar.gz –</dt><dd><p>flyte_venv pyflyte-execute –task-module app.workflows.my_workflow –task-name my_task</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>At execution time pyflyte-fast-execute will ensure the additional distribution (i.e. the fast-registered code)
+exists before calling the original task commandline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>project</strong> (<em>Text</em>) – The project in which to register this task.</p></li>
+<li><p><strong>domain</strong> (<em>Text</em>) – The domain in which to register this task.</p></li>
+<li><p><strong>name</strong> (<em>Text</em>) – The name to give this task.</p></li>
+<li><p><strong>digest</strong> (<em>Text</em>) – The version in which to register this task.</p></li>
+<li><p><strong>additional_distribution</strong> (<em>Text</em>) – User-specified location for remote source code distribution.</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param Text The optional location for where to install the additional distribution at runtime
+:rtype: Text: Registered identifier.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.tasks.sdk_runnable.SdkRunnableTask.has_fast_registered">
+<em class="property">property </em><code class="sig-name descname">has_fast_registered</code><a class="headerlink" href="#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.has_fast_registered" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="flytekit.common.tasks.sdk_runnable.SdkRunnableTask.local_execute">

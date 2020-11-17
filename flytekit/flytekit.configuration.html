@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.configuration package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.configuration package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -532,6 +532,14 @@ storage request/limit format.</p>
 <code class="sig-prename descclassname">flytekit.configuration.sdk.</code><code class="sig-name descname">EXECUTION_ENGINE</code><em class="property"> = &lt;flytekit.configuration.common.FlyteStringConfigurationEntry object&gt;</em><a class="headerlink" href="#flytekit.configuration.sdk.EXECUTION_ENGINE" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a comma-delimited list of package strings, in order, for resolving execution behavior.</p>
 <p>TODO: Explain how this would be used to extend the SDK</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="flytekit.configuration.sdk.FAST_REGISTRATION_DIR">
+<code class="sig-prename descclassname">flytekit.configuration.sdk.</code><code class="sig-name descname">FAST_REGISTRATION_DIR</code><em class="property"> = &lt;flytekit.configuration.common.FlyteStringConfigurationEntry object&gt;</em><a class="headerlink" href="#flytekit.configuration.sdk.FAST_REGISTRATION_DIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the remote directory where fast-registered code will be uploaded to.
+Users calling fast-execute need write permission to this directory.
+Furthermore, it is important that whichever role executes your workflow has read access to this directory.</p>
 </dd></dl>
 
 <dl class="data">

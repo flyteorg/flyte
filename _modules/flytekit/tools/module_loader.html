@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools.module_loader &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.tools.module_loader &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -212,6 +212,8 @@
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">HasDependencies</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">upstream</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">upstream_entities</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">upstream</span><span class="o">.</span><span class="n">has_registered</span><span class="p">:</span>
+                <span class="k">continue</span>
             <span class="k">if</span> <span class="n">upstream</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">m1</span><span class="p">,</span> <span class="n">k1</span><span class="p">,</span> <span class="n">o1</span> <span class="ow">in</span> <span class="n">_topo_sort_helper</span><span class="p">(</span>
                     <span class="n">upstream</span><span class="p">,</span>
@@ -234,10 +236,8 @@
             <span class="k">yield</span> <span class="n">entity_to_module_key</span><span class="p">[</span><span class="n">obj</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">obj</span><span class="p">,)</span>
         <span class="k">elif</span> <span class="n">detect_unreferenced_entities</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span>
-                <span class="s2">&quot;An entity was not found in modules accessible from the workflow packages configuration.  Please &quot;</span>
-                <span class="s2">&quot;ensure that entities in &#39;</span><span class="si">{}</span><span class="s2">&#39; are moved to a configured packaged, or adjust the configuration.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">obj</span><span class="o">.</span><span class="n">instantiated_in</span>
-                <span class="p">)</span>
+                <span class="n">f</span><span class="s2">&quot;An entity (</span><span class="si">{obj.id}</span><span class="s2">) was not found in modules accessible from the workflow packages configuration.  Please &quot;</span>
+                <span class="n">f</span><span class="s2">&quot;ensure that entities in &#39;</span><span class="si">{obj.instantiated_in}</span><span class="s2">&#39; are moved to a configured packaged, or adjust the configuration.&quot;</span>
             <span class="p">)</span>
 
 
@@ -271,6 +271,8 @@
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">m</span><span class="p">):</span>
             <span class="n">o</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_registerable</span><span class="o">.</span><span class="n">RegisterableEntity</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">has_registered</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="k">if</span> <span class="n">o</span><span class="o">.</span><span class="n">instantiated_in</span> <span class="o">==</span> <span class="n">m</span><span class="o">.</span><span class="vm">__name__</span><span class="p">:</span>
                     <span class="n">entity_to_module_key</span><span class="p">[</span><span class="n">o</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="n">_SdkRunnableWorkflow</span><span class="p">)</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">should_create_default_launch_plan</span><span class="p">:</span>

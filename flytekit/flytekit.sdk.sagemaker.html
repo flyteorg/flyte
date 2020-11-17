@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.sagemaker package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.sdk.sagemaker package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -201,7 +201,7 @@
 <span id="flytekit-sdk-sagemaker-task-module"></span><h2>flytekit.sdk.sagemaker.task module<a class="headerlink" href="#module-flytekit.sdk.sagemaker.task" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="flytekit.sdk.sagemaker.task.custom_training_job_task">
-<code class="sig-prename descclassname">flytekit.sdk.sagemaker.task.</code><code class="sig-name descname">custom_training_job_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">algorithm_specification: flytekit.models.sagemaker.training_job.AlgorithmSpecification = None</em>, <em class="sig-param">training_job_resource_config: flytekit.models.sagemaker.training_job.TrainingJobResourceConfig = None</em>, <em class="sig-param">cache_version: str = ''</em>, <em class="sig-param">retries: int = 0</em>, <em class="sig-param">deprecated: str = ''</em>, <em class="sig-param">storage_request: str = None</em>, <em class="sig-param">cpu_request: str = None</em>, <em class="sig-param">gpu_request: str = None</em>, <em class="sig-param">memory_request: str = None</em>, <em class="sig-param">storage_limit: str = None</em>, <em class="sig-param">cpu_limit: str = None</em>, <em class="sig-param">gpu_limit: str = None</em>, <em class="sig-param">memory_limit: str = None</em>, <em class="sig-param">cache: bool = False</em>, <em class="sig-param">timeout: datetime.timedelta = None</em>, <em class="sig-param">environment: Dict[str</em>, <em class="sig-param">str] = None</em>, <em class="sig-param">cls: Type = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/sagemaker/task.html#custom_training_job_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.sagemaker.task.custom_training_job_task" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">flytekit.sdk.sagemaker.task.</code><code class="sig-name descname">custom_training_job_task</code><span class="sig-paren">(</span><em class="sig-param">_task_function=None</em>, <em class="sig-param">algorithm_specification: flytekit.models.sagemaker.training_job.AlgorithmSpecification = None</em>, <em class="sig-param">training_job_resource_config: flytekit.models.sagemaker.training_job.TrainingJobResourceConfig = None</em>, <em class="sig-param">cache_version: str = ''</em>, <em class="sig-param">retries: int = 0</em>, <em class="sig-param">deprecated: str = ''</em>, <em class="sig-param">storage_request: str = None</em>, <em class="sig-param">cpu_request: str = None</em>, <em class="sig-param">gpu_request: str = None</em>, <em class="sig-param">memory_request: str = None</em>, <em class="sig-param">storage_limit: str = None</em>, <em class="sig-param">cpu_limit: str = None</em>, <em class="sig-param">gpu_limit: str = None</em>, <em class="sig-param">memory_limit: str = None</em>, <em class="sig-param">cache: bool = False</em>, <em class="sig-param">timeout: datetime.timedelta = None</em>, <em class="sig-param">environment: Dict[str</em>, <em class="sig-param">str] = None</em>, <em class="sig-param">cls: Type = None</em>, <em class="sig-param">output_persist_predicate: Callable = &lt;flytekit.common.tasks.sagemaker.distributed_training.DefaultOutputPersistPredicate object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/sdk/sagemaker/task.html#custom_training_job_task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.sdk.sagemaker.task.custom_training_job_task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Decorator to create a Custom Training Job definition.  This task will run as a single unit of work on the platform.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@inputs</span><span class="p">(</span><span class="n">int_list</span><span class="o">=</span><span class="p">[</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span><span class="p">])</span>
 <span class="nd">@outputs</span><span class="p">(</span><span class="n">sum_of_list</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">Integer</span>
@@ -279,6 +279,9 @@ indefinitely.  If a null timedelta is passed (i.e. timedelta(seconds=0)), the ta
 <li><p><strong>cls</strong> – This can be used to override the task implementation with a user-defined extension. The class
 provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to
 inject bespoke logic into the base Flyte programming model.</p></li>
+<li><p><strong>output_persist_predicate</strong> (<em>Callable</em>) – [optional] This callable should return a boolean and is used to indicate whether
+the current copy (i.e., an instance of the task running on a particular node inside the worker pool) would
+write output.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type</dt>

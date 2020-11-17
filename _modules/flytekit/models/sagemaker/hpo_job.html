@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.sagemaker.hpo_job &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.models.sagemaker.hpo_job &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -164,7 +164,6 @@
 <span></span><span class="kn">from</span> <span class="nn">flyteidl.plugins.sagemaker</span> <span class="k">import</span> <span class="n">hyperparameter_tuning_job_pb2</span> <span class="k">as</span> <span class="n">_pb2_hpo_job</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
-<span class="kn">from</span> <span class="nn">flytekit.models.sagemaker</span> <span class="k">import</span> <span class="n">parameter_ranges</span> <span class="k">as</span> <span class="n">_parameter_ranges_models</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.sagemaker</span> <span class="k">import</span> <span class="n">training_job</span> <span class="k">as</span> <span class="n">_training_job</span>
 
 
@@ -235,24 +234,13 @@
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">hyperparameter_ranges</span><span class="p">:</span> <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="p">,</span>
         <span class="n">tuning_strategy</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">tuning_objective</span><span class="p">:</span> <span class="n">HyperparameterTuningObjective</span><span class="p">,</span>
         <span class="n">training_job_early_stopping_type</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_hyperparameter_ranges</span> <span class="o">=</span> <span class="n">hyperparameter_ranges</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tuning_strategy</span> <span class="o">=</span> <span class="n">tuning_strategy</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_tuning_objective</span> <span class="o">=</span> <span class="n">tuning_objective</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_training_job_early_stopping_type</span> <span class="o">=</span> <span class="n">training_job_early_stopping_type</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">hyperparameter_ranges</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        hyperparameter_ranges is a structure containing a map that maps hyperparameter name to the corresponding</span>
-<span class="sd">        hyperparameter range object</span>
-<span class="sd">        :rtype:  _parameter_ranges_models.ParameterRanges</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hyperparameter_ranges</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">tuning_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -285,7 +273,6 @@
 <div class="viewcode-block" id="HyperparameterTuningJobConfig.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_pb2_hpo_job</span><span class="o">.</span><span class="n">HyperparameterTuningJobConfig</span><span class="p">:</span>
 
         <span class="k">return</span> <span class="n">_pb2_hpo_job</span><span class="o">.</span><span class="n">HyperparameterTuningJobConfig</span><span class="p">(</span>
-            <span class="n">hyperparameter_ranges</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_hyperparameter_ranges</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">tuning_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tuning_strategy</span><span class="p">,</span>
             <span class="n">tuning_objective</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_tuning_objective</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),</span>
             <span class="n">training_job_early_stopping_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_training_job_early_stopping_type</span><span class="p">,</span>
@@ -295,9 +282,6 @@
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">:</span> <span class="n">_pb2_hpo_job</span><span class="o">.</span><span class="n">HyperparameterTuningJobConfig</span><span class="p">):</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">hyperparameter_ranges</span><span class="o">=</span><span class="p">(</span>
-                <span class="n">_parameter_ranges_models</span><span class="o">.</span><span class="n">ParameterRanges</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">hyperparameter_ranges</span><span class="p">)</span>
-            <span class="p">),</span>
             <span class="n">tuning_strategy</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">tuning_strategy</span><span class="p">,</span>
             <span class="n">tuning_objective</span><span class="o">=</span><span class="n">HyperparameterTuningObjective</span><span class="o">.</span><span class="n">from_flyte_idl</span><span class="p">(</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">tuning_objective</span><span class="p">),</span>
             <span class="n">training_job_early_stopping_type</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">training_job_early_stopping_type</span><span class="p">,</span>

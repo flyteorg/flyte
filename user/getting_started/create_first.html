@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Writing Your First Workflow &mdash; Flyte 0.8.0 documentation</title>
+  <title>Writing Your First Workflow &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -273,10 +273,11 @@
 <div class="section" id="interacting-with-flyte">
 <h2>Interacting with Flyte<a class="headerlink" href="#interacting-with-flyte" title="Permalink to this headline">¶</a></h2>
 <p>Flyte fulfills tasks using docker images. You’ll need to build a docker image from this code before it can run in Flyte. The repo has a make target to build the docker image for you</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">docker_build</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>eval $(minikube -p minikube docker-env)  # If using the flyte sandbox via minikube
+make docker_build
 </pre></div>
 </div>
-<p>If you have the flyte sandbox installed on your local machine, the image will be accessible to to your Flyte system. If you’re running a remote Flyte instance, you’ll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system.</p>
+<p>If you have the flyte sandbox installed on your local machine, the image will be accessible to your Flyte system. If you’re running a remote Flyte instance, you’ll need to upload this image to a remote registry such as Dockerhub, Amazon ECR, or Google Container Registry, so that it can be used by the Flyte system.</p>
 <p>To upload to a remote registry (or even local registry), use</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DOCKER_REGISTRY_USERNAME</span><span class="o">=</span><span class="p">{</span><span class="n">username</span><span class="p">}</span> <span class="n">DOCKER_REGISTRY_PASSWORD</span><span class="o">=</span><span class="p">{</span><span class="k">pass</span><span class="p">}</span> <span class="n">REGISTRY</span><span class="o">=</span><span class="n">docker</span><span class="o">.</span><span class="n">io</span> <span class="n">make</span> <span class="n">docker_build</span>
 </pre></div>

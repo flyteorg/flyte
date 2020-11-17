@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.component_nodes &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.common.component_nodes &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -205,8 +205,9 @@
 
         <span class="k">if</span> <span class="n">base_model</span><span class="o">.</span><span class="n">reference_id</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
             <span class="n">t</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">[</span><span class="n">base_model</span><span class="o">.</span><span class="n">reference_id</span><span class="p">]</span>
-            <span class="n">_logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Found existing task template for </span><span class="si">{}</span><span class="s2">, will not retrieve from Admin&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+            <span class="n">_logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Found existing task template for </span><span class="si">{t.id}</span><span class="s2">, will not retrieve from Admin&quot;</span><span class="p">)</span>
             <span class="n">sdk_task</span> <span class="o">=</span> <span class="n">_task</span><span class="o">.</span><span class="n">SdkTask</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">sdk_task</span><span class="o">.</span><span class="n">_has_registered</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">sdk_task</span><span class="p">)</span>
 
         <span class="c1"># If not found, fetch it from Admin</span>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients.friendly &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.clients.friendly &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -950,6 +950,14 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">register_project</span><span class="p">(</span>
             <span class="n">_project_pb2</span><span class="o">.</span><span class="n">ProjectRegisterRequest</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="n">project</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">(),)</span>
         <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SynchronousFlyteClient.update_project"><a class="viewcode-back" href="../../../flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.update_project">[docs]</a>    <span class="k">def</span> <span class="nf">update_project</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an existing project specified by id.</span>
+<span class="sd">        :param flytekit.models.project.Project project:</span>
+<span class="sd">        :rtype: flyteidl.admin.project_pb2.ProjectUpdateResponse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SynchronousFlyteClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">update_project</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">to_flyte_idl</span><span class="p">())</span></div>
 
     <span class="c1">####################################################################################################################</span>
     <span class="c1">#</span>

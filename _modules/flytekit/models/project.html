@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.project &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.models.project &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -167,7 +167,12 @@
 
 
 <div class="viewcode-block" id="Project"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project">[docs]</a><span class="k">class</span> <span class="nc">Project</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span>
+<div class="viewcode-block" id="Project.ProjectState"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project.ProjectState">[docs]</a>    <span class="k">class</span> <span class="nc">ProjectState</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="n">ACTIVE</span> <span class="o">=</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="o">.</span><span class="n">ACTIVE</span>
+        <span class="n">ARCHIVED</span> <span class="o">=</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="o">.</span><span class="n">ARCHIVED</span>
+        <span class="n">SYSTEM_GENERATED</span> <span class="o">=</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="o">.</span><span class="n">SYSTEM_GENERATED</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">ProjectState</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A project represents a logical grouping used to organize entities (tasks, workflows, executions) in the Flyte</span>
 <span class="sd">        platform.</span>
@@ -179,6 +184,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span>
+
+<div class="viewcode-block" id="Project.archived_project"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project.archived_project">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">archived_project</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ProjectState</span><span class="o">.</span><span class="n">ARCHIVED</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Project.active_project"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project.active_project">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">active_project</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">ProjectState</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -204,11 +218,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The state of this project.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
+
 <div class="viewcode-block" id="Project.to_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :rtype: flyteidl.admin.project_pb2.Project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,)</span></div>
+        <span class="k">return</span> <span class="n">_project_pb2</span><span class="o">.</span><span class="n">Project</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Project.from_flyte_idl"><a class="viewcode-back" href="../../../flytekit/flytekit.models.html#flytekit.models.project.Project.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_flyte_idl</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pb2_object</span><span class="p">):</span>
@@ -216,7 +238,7 @@
 <span class="sd">        :param flyteidl.admin.project_pb2.Project pb2_object:</span>
 <span class="sd">        :rtype: Project</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">description</span><span class="p">,)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">state</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

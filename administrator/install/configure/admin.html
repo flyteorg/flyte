@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>FlyteAdmin Configuration &mdash; Flyte 0.8.0 documentation</title>
+  <title>FlyteAdmin Configuration &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -315,6 +315,23 @@
 </div>
 <div class="section" id="example-config">
 <span id="admin-config-example"></span><h2>Example config<a class="headerlink" href="#example-config" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="flyteadmin-remote-cluster-access">
+<h2>FlyteAdmin Remote Cluster Access<a class="headerlink" href="#flyteadmin-remote-cluster-access" title="Permalink to this headline">¶</a></h2>
+<p>Some deployments of Flyte may choose to run the control plane separate from the data plane. Flyte Admin is designed to create kubernetes resources in one or more Flyte data plane clusters. For Admin to access remote clusters, it needs credentials to each cluster. In kubernetes, scoped service credentials are created by configuring a “Role” resource in a Kubernetes cluster. When you attach that role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access. We create a flyteadmin <a class="reference external" href="https://github.com/lyft/flyte/blob/c0339e7cc4550a9b7eb78d6fb4fc3884d65ea945/artifacts/base/adminserviceaccount/adminserviceaccount.yaml">ServiceAccount</a> in each data plane cluster to generate these tokens.</p>
+<p>When you first create the Flyte Admin ServiceAccount in a new cluster, a bearer token is generated, and will continue to allow access unless the ServiceAccount is deleted. Once we create the Flyte Admin ServiceAccount on a cluster, we should never delete it. In order to feed the credentials to Flyte Admin, you must retrieve them from your new data plane cluster, and upload them to Admin somehow (within Lyft, we use Confidant for example).</p>
+<p>The credentials have two parts (ca cert, bearer token). Find the generated secret via</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kubectl</span> <span class="n">get</span> <span class="n">secrets</span> <span class="o">-</span><span class="n">n</span> <span class="n">flyte</span> <span class="o">|</span> <span class="n">grep</span> <span class="n">flyteadmin</span><span class="o">-</span><span class="n">token</span>
+</pre></div>
+</div>
+<p>Once you have the name of the secret, you can copy the ca cert to your clipboard with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kubectl</span> <span class="n">get</span> <span class="n">secret</span> <span class="o">-</span><span class="n">n</span> <span class="n">flyte</span> <span class="p">{</span><span class="n">secret</span><span class="o">-</span><span class="n">name</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="n">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.ca\.crt}&#39;</span> <span class="o">|</span> <span class="n">base64</span> <span class="o">-</span><span class="n">D</span> <span class="o">|</span> <span class="n">pbcopy</span>
+</pre></div>
+</div>
+<p>You can copy the bearer token to your clipboard with</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">kubectl</span> <span class="n">get</span> <span class="n">secret</span> <span class="o">-</span><span class="n">n</span> <span class="n">flyte</span> <span class="p">{</span><span class="n">secret</span><span class="o">-</span><span class="n">name</span><span class="p">}</span> <span class="o">-</span><span class="n">o</span> <span class="n">jsonpath</span><span class="o">=</span><span class="s1">&#39;{.data.token}’ | base64 -D | pbcopy</span>
+</pre></div>
+</div>
 </div>
 </div>
 

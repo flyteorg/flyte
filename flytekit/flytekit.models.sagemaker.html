@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.sagemaker package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.models.sagemaker package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -240,7 +240,7 @@
 
 <dl class="class">
 <dt id="flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.hpo_job.</code><code class="sig-name descname">HyperparameterTuningJobConfig</code><span class="sig-paren">(</span><em class="sig-param">hyperparameter_ranges: flytekit.models.sagemaker.parameter_ranges.ParameterRanges</em>, <em class="sig-param">tuning_strategy: int</em>, <em class="sig-param">tuning_objective: flytekit.models.sagemaker.hpo_job.HyperparameterTuningObjective</em>, <em class="sig-param">training_job_early_stopping_type: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/hpo_job.html#HyperparameterTuningJobConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.hpo_job.</code><code class="sig-name descname">HyperparameterTuningJobConfig</code><span class="sig-paren">(</span><em class="sig-param">tuning_strategy: int</em>, <em class="sig-param">tuning_objective: flytekit.models.sagemaker.hpo_job.HyperparameterTuningObjective</em>, <em class="sig-param">training_job_early_stopping_type: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/hpo_job.html#HyperparameterTuningJobConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <p>The specification of the hyperparameter tuning process
 <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-ex-tuning-job.html#automatic-model-tuning-ex-low-tuning-config">https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-ex-tuning-job.html#automatic-model-tuning-ex-low-tuning-config</a></p>
@@ -248,14 +248,6 @@
 <dt id="flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.from_flyte_idl">
 <em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object: flyteidl.plugins.sagemaker.hyperparameter_tuning_job_pb2.HyperparameterTuningJobConfig</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/hpo_job.html#HyperparameterTuningJobConfig.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-
-<dl class="method">
-<dt id="flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.hyperparameter_ranges">
-<em class="property">property </em><code class="sig-name descname">hyperparameter_ranges</code><a class="headerlink" href="#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.hyperparameter_ranges" title="Permalink to this definition">¶</a></dt>
-<dd><p>hyperparameter_ranges is a structure containing a map that maps hyperparameter name to the corresponding
-hyperparameter range object
-:rtype:  _parameter_ranges_models.ParameterRanges</p>
-</dd></dl>
 
 <dl class="method">
 <dt id="flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.to_flyte_idl">
@@ -382,7 +374,15 @@ the Hyperparameter Tuning Job with respect to the specified metric.
 <dl class="method">
 <dt id="flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange.from_flyte_idl">
 <em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object: flyteidl.plugins.sagemaker.parameter_ranges_pb2.CategoricalParameterRange</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#CategoricalParameterRange.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange" title="flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange">CategoricalParameterRange</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange.to_flyte_idl">
@@ -545,18 +545,68 @@ the Hyperparameter Tuning Job with respect to the specified metric.
 </dd></dl>
 
 <dl class="class">
+<dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.parameter_ranges.</code><code class="sig-name descname">ParameterRangeOneOf</code><span class="sig-paren">(</span><em class="sig-param">param: Union[flytekit.models.sagemaker.parameter_ranges.IntegerParameterRange, flytekit.models.sagemaker.parameter_ranges.ContinuousParameterRange, flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#ParameterRangeOneOf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
+<dl class="method">
+<dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.categorical_parameter_range">
+<em class="property">property </em><code class="sig-name descname">categorical_parameter_range</code><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.categorical_parameter_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the categorical parameter range if one is set. None otherwise.
+:rtype: Optional[CategoricalParameterRange]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.continuous_parameter_range">
+<em class="property">property </em><code class="sig-name descname">continuous_parameter_range</code><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.continuous_parameter_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the continuous parameter range if one is set. None otherwise.
+:rtype: Optional[ContinuousParameterRange]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.from_flyte_idl">
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb_object: Union[flyteidl.plugins.sagemaker.parameter_ranges_pb2.ParameterRangeOneOf, flyteidl.plugins.sagemaker.parameter_ranges_pb2.IntegerParameterRange, flyteidl.plugins.sagemaker.parameter_ranges_pb2.ContinuousParameterRange, flyteidl.plugins.sagemaker.parameter_ranges_pb2.CategoricalParameterRange]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#ParameterRangeOneOf.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.integer_parameter_range">
+<em class="property">property </em><code class="sig-name descname">integer_parameter_range</code><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.integer_parameter_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the integer parameter range if one is set. None otherwise.
+:rtype: Optional[IntegerParameterRange]</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.to_flyte_idl">
+<code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; flyteidl.plugins.sagemaker.parameter_ranges_pb2.ParameterRangeOneOf<a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#ParameterRangeOneOf.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRanges">
 <em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.parameter_ranges.</code><code class="sig-name descname">ParameterRanges</code><span class="sig-paren">(</span><em class="sig-param">parameter_range_map: Dict[str, flytekit.models.common.FlyteIdlEntity]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#ParameterRanges"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRanges" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRanges.from_flyte_idl">
 <em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object: flyteidl.plugins.sagemaker.parameter_ranges_pb2.ParameterRanges</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#ParameterRanges.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRanges.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb2_object</strong> – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRanges" title="flytekit.models.sagemaker.parameter_ranges.ParameterRanges">ParameterRanges</a></p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="method">
 <dt id="flytekit.models.sagemaker.parameter_ranges.ParameterRanges.to_flyte_idl">
 <code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; flyteidl.plugins.sagemaker.parameter_ranges_pb2.ParameterRanges<a class="reference internal" href="../_modules/flytekit/models/sagemaker/parameter_ranges.html#ParameterRanges.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.parameter_ranges.ParameterRanges.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>_idl_parameter_ranges.ParameterRanges</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -646,6 +696,24 @@ See this: <a class="reference external" href="https://docs.aws.amazon.com/sagema
 <dl class="method">
 <dt id="flytekit.models.sagemaker.training_job.AlgorithmSpecification.to_flyte_idl">
 <code class="sig-name descname">to_flyte_idl</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; flyteidl.plugins.sagemaker.training_job_pb2.AlgorithmSpecification<a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#AlgorithmSpecification.to_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.AlgorithmSpecification.to_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="flytekit.models.sagemaker.training_job.DistributedProtocol">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.training_job.</code><code class="sig-name descname">DistributedProtocol</code><a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#DistributedProtocol"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.DistributedProtocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>The distribution framework is used for determining which underlying distributed training mechanism to use.
+This is only required for use cases where the user wants to train its custom training job in a distributed manner</p>
+<dl class="attribute">
+<dt id="flytekit.models.sagemaker.training_job.DistributedProtocol.MPI">
+<code class="sig-name descname">MPI</code><em class="property"> = 1</em><a class="headerlink" href="#flytekit.models.sagemaker.training_job.DistributedProtocol.MPI" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.models.sagemaker.training_job.DistributedProtocol.UNSPECIFIED">
+<code class="sig-name descname">UNSPECIFIED</code><em class="property"> = 0</em><a class="headerlink" href="#flytekit.models.sagemaker.training_job.DistributedProtocol.UNSPECIFIED" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -772,11 +840,19 @@ streams to find the algorithm metrics on which the users want to track
 
 <dl class="class">
 <dt id="flytekit.models.sagemaker.training_job.TrainingJobResourceConfig">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.training_job.</code><code class="sig-name descname">TrainingJobResourceConfig</code><span class="sig-paren">(</span><em class="sig-param">instance_count: int</em>, <em class="sig-param">instance_type: str</em>, <em class="sig-param">volume_size_in_gb: int</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#TrainingJobResourceConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.models.sagemaker.training_job.</code><code class="sig-name descname">TrainingJobResourceConfig</code><span class="sig-paren">(</span><em class="sig-param">instance_count: int</em>, <em class="sig-param">instance_type: str</em>, <em class="sig-param">volume_size_in_gb: int</em>, <em class="sig-param">distributed_protocol: int = 0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#TrainingJobResourceConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.common.FlyteIdlEntity" title="flytekit.models.common.FlyteIdlEntity"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.common.FlyteIdlEntity</span></code></a></p>
 <p>TrainingJobResourceConfig is a pass-through, specifying the instance type to use for the training job, the
 number of instances to launch, and the size of the ML storage volume the user wants to provision
 Refer to SageMaker official doc for more details: <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html">https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html</a></p>
+<dl class="method">
+<dt id="flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.distributed_protocol">
+<em class="property">property </em><code class="sig-name descname">distributed_protocol</code><a class="headerlink" href="#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.distributed_protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>The distribution framework is used to determine through which mechanism the distributed training is done.
+enum value from DistributionFramework.
+:rtype: int</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.from_flyte_idl">
 <em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object: flyteidl.plugins.sagemaker.training_job_pb2.TrainingJobResourceConfig</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/models/sagemaker/training_job.html#TrainingJobResourceConfig.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.from_flyte_idl" title="Permalink to this definition">¶</a></dt>

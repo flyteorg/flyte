@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>project.proto &mdash; Flyte 0.8.0 documentation</title>
+  <title>project.proto &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -107,6 +107,7 @@
 <li class="toctree-l3 current"><a class="current reference internal" href="#">project.proto</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-domain">flyteidl.admin.Domain</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-project">flyteidl.admin.Project</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#enum-flyteidl-admin-project-projectstate">Enum flyteidl.admin.Project.ProjectState</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-projects">flyteidl.admin.Projects</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-projectlistrequest">flyteidl.admin.ProjectListRequest</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#flyteidl-admin-projectregisterrequest">flyteidl.admin.ProjectRegisterRequest</a></li>
@@ -224,14 +225,15 @@ e.g. “production”, “development”, etc.</p>
 </div>
 <div class="section" id="flyteidl-admin-project">
 <span id="api-msg-flyteidl-admin-project"></span><h2>flyteidl.admin.Project<a class="headerlink" href="#flyteidl-admin-project" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L18">[flyteidl.admin.Project proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L19">[flyteidl.admin.Project proto]</a></p>
 <p>Top-level namespace used to classify different entities like workflows and executions.</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;domains&quot;</span><span class="p">:</span> <span class="p">[],</span>
   <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
+  <span class="nt">&quot;labels&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -256,10 +258,31 @@ e.g. “production”, “development”, etc.</p>
 tag projects with ownership information.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-admin-project-state">
+<dt>state</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-admin-project-projectstate"><span class="std std-ref">flyteidl.admin.Project.ProjectState</span></a>)</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="enum-flyteidl-admin-project-projectstate">
+<span id="api-enum-flyteidl-admin-project-projectstate"></span><h2>Enum flyteidl.admin.Project.ProjectState<a class="headerlink" href="#enum-flyteidl-admin-project-projectstate" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L21">[flyteidl.admin.Project.ProjectState proto]</a></p>
+<p>The state of the project is used to control its visibility in the UI and validity.</p>
+<dl class="simple" id="api-enum-value-flyteidl-admin-project-projectstate-active">
+<dt>ACTIVE</dt><dd><p><em>(DEFAULT)</em> ⁣By default, all projects are considered active.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-admin-project-projectstate-archived">
+<dt>ARCHIVED</dt><dd><p>⁣Archived projects are no longer visible in the UI and no longer valid.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-admin-project-projectstate-system-generated">
+<dt>SYSTEM_GENERATED</dt><dd><p>⁣System generated projects that aren’t explicitly created or managed by a user.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-admin-projects">
 <span id="api-msg-flyteidl-admin-projects"></span><h2>flyteidl.admin.Projects<a class="headerlink" href="#flyteidl-admin-projects" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L33">[flyteidl.admin.Projects proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L48">[flyteidl.admin.Projects proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;projects&quot;</span><span class="p">:</span> <span class="p">[]</span>
 <span class="p">}</span>
@@ -272,14 +295,14 @@ tag projects with ownership information.</p>
 </div>
 <div class="section" id="flyteidl-admin-projectlistrequest">
 <span id="api-msg-flyteidl-admin-projectlistrequest"></span><h2>flyteidl.admin.ProjectListRequest<a class="headerlink" href="#flyteidl-admin-projectlistrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L37">[flyteidl.admin.ProjectListRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L52">[flyteidl.admin.ProjectListRequest proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="flyteidl-admin-projectregisterrequest">
 <span id="api-msg-flyteidl-admin-projectregisterrequest"></span><h2>flyteidl.admin.ProjectRegisterRequest<a class="headerlink" href="#flyteidl-admin-projectregisterrequest" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L40">[flyteidl.admin.ProjectRegisterRequest proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L55">[flyteidl.admin.ProjectRegisterRequest proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;project&quot;</span><span class="p">:</span> <span class="s2">&quot;{...}&quot;</span>
 <span class="p">}</span>
@@ -292,14 +315,14 @@ tag projects with ownership information.</p>
 </div>
 <div class="section" id="flyteidl-admin-projectregisterresponse">
 <span id="api-msg-flyteidl-admin-projectregisterresponse"></span><h2>flyteidl.admin.ProjectRegisterResponse<a class="headerlink" href="#flyteidl-admin-projectregisterresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L44">[flyteidl.admin.ProjectRegisterResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L59">[flyteidl.admin.ProjectRegisterResponse proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="flyteidl-admin-projectupdateresponse">
 <span id="api-msg-flyteidl-admin-projectupdateresponse"></span><h2>flyteidl.admin.ProjectUpdateResponse<a class="headerlink" href="#flyteidl-admin-projectupdateresponse" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L47">[flyteidl.admin.ProjectUpdateResponse proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L62">[flyteidl.admin.ProjectUpdateResponse proto]</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
 </pre></div>
 </div>

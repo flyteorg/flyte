@@ -20,6 +20,14 @@ flytekit.clis.sdk\_in\_container.constants module
    :undoc-members:
    :show-inheritance:
 
+flytekit.clis.sdk\_in\_container.fast\_register module
+------------------------------------------------------
+
+.. automodule:: flytekit.clis.sdk_in_container.fast_register
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.clis.sdk\_in\_container.launch\_plan module
 ----------------------------------------------------
 

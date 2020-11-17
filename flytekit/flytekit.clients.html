@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clients package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.clients package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -926,6 +926,14 @@ task or launch plan specified by {project, domain, name} across all versions of 
 </dd></dl>
 
 <dl class="method">
+<dt id="flytekit.clients.friendly.SynchronousFlyteClient.update_project">
+<code class="sig-name descname">update_project</code><span class="sig-paren">(</span><em class="sig-param">project</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.update_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.update_project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update an existing project specified by id.
+:param flytekit.models.project.Project project:
+:rtype: flyteidl.admin.project_pb2.ProjectUpdateResponse</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="flytekit.clients.friendly.SynchronousFlyteClient.update_project_domain_attributes">
 <code class="sig-name descname">update_project_domain_attributes</code><span class="sig-paren">(</span><em class="sig-param">project</em>, <em class="sig-param">domain</em>, <em class="sig-param">matching_attributes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/friendly.html#SynchronousFlyteClient.update_project_domain_attributes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.friendly.SynchronousFlyteClient.update_project_domain_attributes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets custom attributes for a project and domain combination.
@@ -1294,6 +1302,15 @@ be explicit as opposed to inferred from the environment or a configuration file.
 <dl class="method">
 <dt id="flytekit.clients.raw.RawSynchronousFlyteClient.update_named_entity">
 <code class="sig-name descname">update_named_entity</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.update_named_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.update_named_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
+:param args:
+:param kwargs:
+:return:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.clients.raw.RawSynchronousFlyteClient.update_project">
+<code class="sig-name descname">update_project</code><span class="sig-paren">(</span><em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/clients/raw.html#RawSynchronousFlyteClient.update_project"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.clients.raw.RawSynchronousFlyteClient.update_project" title="Permalink to this definition">¶</a></dt>
 <dd><p>Wraps rpc errors as Flyte exceptions and handles authentication the client.
 :param args:
 :param kwargs:

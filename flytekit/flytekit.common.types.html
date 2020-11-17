@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.types package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.common.types package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -289,11 +289,11 @@
 
 <dl class="class">
 <dt id="flytekit.common.types.base_sdk_types.FlyteSdkValue">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.base_sdk_types.</code><code class="sig-name descname">FlyteSdkValue</code><span class="sig-paren">(</span><em class="sig-param">scalar=None</em>, <em class="sig-param">collection=None</em>, <em class="sig-param">map=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/base_sdk_types.html#FlyteSdkValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.base_sdk_types.</code><code class="sig-name descname">FlyteSdkValue</code><span class="sig-paren">(</span><em class="sig-param">scalar: flytekit.models.literals.Scalar = None</em>, <em class="sig-param">collection: flytekit.models.literals.LiteralCollection = None</em>, <em class="sig-param">map: flytekit.models.literals.LiteralMap = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/base_sdk_types.html#FlyteSdkValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="flytekit.models.html#flytekit.models.literals.Literal" title="flytekit.models.literals.Literal"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.models.literals.Literal</span></code></a></p>
 <dl class="method">
 <dt id="flytekit.common.types.base_sdk_types.FlyteSdkValue.from_flyte_idl">
-<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/base_sdk_types.html#FlyteSdkValue.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_flyte_idl</code><span class="sig-paren">(</span><em class="sig-param">pb2_object: flyteidl.core.literals_pb2.Literal</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/base_sdk_types.html#FlyteSdkValue.from_flyte_idl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue.from_flyte_idl" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>pb2_object</strong> (<em>flyteidl.core.literals_pb2.Literal</em>) – </p>
@@ -915,7 +915,7 @@ this location is NOT managed and the blob will not be cleaned up upon exit.</p><
 
 <dl class="class">
 <dt id="flytekit.common.types.containers.ListImpl">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.containers.</code><code class="sig-name descname">ListImpl</code><span class="sig-paren">(</span><em class="sig-param">scalar=None</em>, <em class="sig-param">collection=None</em>, <em class="sig-param">map=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/containers.html#ListImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.containers.ListImpl" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.containers.</code><code class="sig-name descname">ListImpl</code><span class="sig-paren">(</span><em class="sig-param">scalar: flytekit.models.literals.Scalar = None</em>, <em class="sig-param">collection: flytekit.models.literals.LiteralCollection = None</em>, <em class="sig-param">map: flytekit.models.literals.LiteralMap = None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/containers.html#ListImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.containers.ListImpl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue" title="flytekit.common.types.base_sdk_types.FlyteSdkValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.types.base_sdk_types.FlyteSdkValue</span></code></a></p>
 </dd></dl>
 
@@ -1837,8 +1837,104 @@ this location is NOT managed and the blob will not be cleaned up upon exit.</p><
 <div class="section" id="module-flytekit.common.types.proto">
 <span id="flytekit-common-types-proto-module"></span><h2>flytekit.common.types.proto module<a class="headerlink" href="#module-flytekit.common.types.proto" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
+<dt id="flytekit.common.types.proto.GenericProtobuf">
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.proto.</code><code class="sig-name descname">GenericProtobuf</code><span class="sig-paren">(</span><em class="sig-param">pb_object: Union[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType, flytekit.models.common.FlyteIdlEntity]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue" title="flytekit.common.types.base_sdk_types.FlyteSdkValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.types.base_sdk_types.FlyteSdkValue</span></code></a></p>
+<dl class="attribute">
+<dt id="flytekit.common.types.proto.GenericProtobuf.PB_FIELD_KEY">
+<code class="sig-name descname">PB_FIELD_KEY</code><em class="property"> = 'pb_type'</em><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.PB_FIELD_KEY" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="flytekit.common.types.proto.GenericProtobuf.TAG_PREFIX">
+<code class="sig-name descname">TAG_PREFIX</code><em class="property"> = 'pb_type='</em><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.TAG_PREFIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.from_python_std">
+<em class="property">classmethod </em><code class="sig-name descname">from_python_std</code><span class="sig-paren">(</span><em class="sig-param">t_value: Union[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType, flytekit.models.common.FlyteIdlEntity]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.from_python_std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.from_python_std" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>FlyteIdlEntity</strong><strong>] </strong><strong>t_value</strong> (<em>Union</em><em>[</em><em>T</em><em>,</em>) – It is up to each individual object as to whether or not this value can be cast.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>_base_sdk_types.FlyteSdkValue</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p>flytekit.common.exceptions.user.FlyteTypeException</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.is_castable_from">
+<em class="property">classmethod </em><code class="sig-name descname">is_castable_from</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.is_castable_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.is_castable_from" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>other</strong> (<em>flytekit.common.types.base_literal_types.FlyteSdkType</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.promote_from_model">
+<em class="property">classmethod </em><code class="sig-name descname">promote_from_model</code><span class="sig-paren">(</span><em class="sig-param">literal_model</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.promote_from_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.promote_from_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates an object of this type from the model primitive defining it.
+:param flytekit.models.literals.Literal literal_model:
+:rtype: Protobuf</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.short_class_string">
+<em class="property">classmethod </em><code class="sig-name descname">short_class_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.short_class_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.short_class_string" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.short_string">
+<code class="sig-name descname">short_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.short_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.short_string" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Text</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.to_flyte_literal_type">
+<em class="property">classmethod </em><code class="sig-name descname">to_flyte_literal_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; flytekit.models.types.LiteralType<a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.to_flyte_literal_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.to_flyte_literal_type" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="flytekit.models.html#flytekit.models.types.LiteralType" title="flytekit.models.types.LiteralType">flytekit.models.types.LiteralType</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="flytekit.common.types.proto.GenericProtobuf.to_python_std">
+<code class="sig-name descname">to_python_std</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#GenericProtobuf.to_python_std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.GenericProtobuf.to_python_std" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The protobuf object as defined by the user.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>T</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
 <dt id="flytekit.common.types.proto.Protobuf">
-<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.proto.</code><code class="sig-name descname">Protobuf</code><span class="sig-paren">(</span><em class="sig-param">pb_object</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#Protobuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.Protobuf" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">flytekit.common.types.proto.</code><code class="sig-name descname">Protobuf</code><span class="sig-paren">(</span><em class="sig-param">pb_object: Union[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType, flytekit.models.common.FlyteIdlEntity]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#Protobuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.Protobuf" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#flytekit.common.types.base_sdk_types.FlyteSdkValue" title="flytekit.common.types.base_sdk_types.FlyteSdkValue"><code class="xref py py-class docutils literal notranslate"><span class="pre">flytekit.common.types.base_sdk_types.FlyteSdkValue</span></code></a></p>
 <dl class="attribute">
 <dt id="flytekit.common.types.proto.Protobuf.PB_FIELD_KEY">
@@ -1982,14 +2078,28 @@ this location is NOT managed and the blob will not be cleaned up upon exit.</p><
 </dd></dl>
 
 <dl class="function">
-<dt id="flytekit.common.types.proto.create_protobuf">
-<code class="sig-prename descclassname">flytekit.common.types.proto.</code><code class="sig-name descname">create_protobuf</code><span class="sig-paren">(</span><em class="sig-param">pb_type</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/common/types/proto.html#create_protobuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.create_protobuf" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+<dt id="flytekit.common.types.proto.create_generic">
+<code class="sig-prename descclassname">flytekit.common.types.proto.</code><code class="sig-name descname">create_generic</code><span class="sig-paren">(</span><em class="sig-param">pb_type: Type[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType]</em><span class="sig-paren">)</span> &#x2192; Type[flytekit.common.types.proto.GenericProtobuf]<a class="reference internal" href="../_modules/flytekit/common/types/proto.html#create_generic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.create_generic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a generic protobuf type that represents protobuf type ProtobufT and that will get serialized into a struct.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>pb_type</strong> (<em>T</em>) – </p>
+<dd class="field-odd"><p><strong>pb_type</strong> (<em>Type</em><em>[</em><em>GeneratedProtocolMessageType</em><em>]</em>) – </p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="#flytekit.common.types.proto.ProtobufType" title="flytekit.common.types.proto.ProtobufType">ProtobufType</a></p>
+<dd class="field-even"><p>Type[<a class="reference internal" href="#flytekit.common.types.proto.GenericProtobuf" title="flytekit.common.types.proto.GenericProtobuf">GenericProtobuf</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.common.types.proto.create_protobuf">
+<code class="sig-prename descclassname">flytekit.common.types.proto.</code><code class="sig-name descname">create_protobuf</code><span class="sig-paren">(</span><em class="sig-param">pb_type: Type[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType]</em><span class="sig-paren">)</span> &#x2192; Type[flytekit.common.types.proto.Protobuf]<a class="reference internal" href="../_modules/flytekit/common/types/proto.html#create_protobuf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.common.types.proto.create_protobuf" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pb_type</strong> (<em>Type</em><em>[</em><em>GeneratedProtocolMessageType</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Type[<a class="reference internal" href="#flytekit.common.types.proto.Protobuf" title="flytekit.common.types.proto.Protobuf">Protobuf</a>]</p>
 </dd>
 </dl>
 </dd></dl>

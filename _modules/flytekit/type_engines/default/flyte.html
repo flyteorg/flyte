@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.type_engines.default.flyte &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.type_engines.default.flyte &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -162,6 +162,7 @@
             
   <h1>Source code for flytekit.type_engines.default.flyte</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">importlib</span> <span class="k">as</span> <span class="nn">_importer</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Type</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">system</span> <span class="k">as</span> <span class="n">_system_exceptions</span>
 <span class="kn">from</span> <span class="nn">flytekit.common.exceptions</span> <span class="k">import</span> <span class="n">user</span> <span class="k">as</span> <span class="n">_user_exceptions</span>
@@ -176,11 +177,11 @@
 <span class="kn">from</span> <span class="nn">flytekit.models.core</span> <span class="k">import</span> <span class="n">types</span> <span class="k">as</span> <span class="n">_core_types</span>
 
 
-<span class="k">def</span> <span class="nf">_proto_sdk_type_from_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_load_type_from_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    :param Text tag:</span>
-<span class="sd">    :rtype: _proto.Protobuf</span>
+<span class="sd">    Loads python type from tag</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tag</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteValueException</span><span class="p">(</span>
             <span class="n">tag</span><span class="p">,</span> <span class="s2">&quot;Protobuf tag must include at least one &#39;.&#39; to delineate package and object name.&quot;</span><span class="p">,</span>
@@ -197,11 +198,27 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pb_module</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">_user_exceptions</span><span class="o">.</span><span class="n">FlyteAssertion</span><span class="p">(</span><span class="s2">&quot;Could not find the protobuf named: </span><span class="si">{}</span><span class="s2"> @ </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">module</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">_proto</span><span class="o">.</span><span class="n">create_protobuf</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">pb_module</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">pb_module</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_proto_sdk_type_from_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param Text tag:</span>
+<span class="sd">    :rtype: _proto.Protobuf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_proto</span><span class="o">.</span><span class="n">create_protobuf</span><span class="p">(</span><span class="n">_load_type_from_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_generic_proto_sdk_type_from_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">[</span><span class="n">_proto</span><span class="o">.</span><span class="n">GenericProtobuf</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :param Text tag:</span>
+<span class="sd">    :rtype: _proto.GenericProtobuf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">_proto</span><span class="o">.</span><span class="n">create_generic</span><span class="p">(</span><span class="n">_load_type_from_tag</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="FlyteDefaultTypeEngine"><a class="viewcode-back" href="../../../../flytekit/flytekit.type_engines.default.html#flytekit.type_engines.default.flyte.FlyteDefaultTypeEngine">[docs]</a><span class="k">class</span> <span class="nc">FlyteDefaultTypeEngine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
     <span class="n">_SIMPLE_TYPE_LOOKUP_TABLE</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">_literal_type_models</span><span class="o">.</span><span class="n">SimpleType</span><span class="o">.</span><span class="n">INTEGER</span><span class="p">:</span> <span class="n">_primitive_types</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span>
         <span class="n">_literal_type_models</span><span class="o">.</span><span class="n">SimpleType</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">:</span> <span class="n">_primitive_types</span><span class="o">.</span><span class="n">Float</span><span class="p">,</span>
@@ -258,6 +275,12 @@
                 <span class="ow">and</span> <span class="n">_proto</span><span class="o">.</span><span class="n">Protobuf</span><span class="o">.</span><span class="n">PB_FIELD_KEY</span> <span class="ow">in</span> <span class="n">literal_type</span><span class="o">.</span><span class="n">metadata</span>
             <span class="p">):</span>
                 <span class="k">return</span> <span class="n">_proto_sdk_type_from_tag</span><span class="p">(</span><span class="n">literal_type</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_proto</span><span class="o">.</span><span class="n">Protobuf</span><span class="o">.</span><span class="n">PB_FIELD_KEY</span><span class="p">])</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">literal_type</span><span class="o">.</span><span class="n">simple</span> <span class="o">==</span> <span class="n">_literal_type_models</span><span class="o">.</span><span class="n">SimpleType</span><span class="o">.</span><span class="n">STRUCT</span>
+                <span class="ow">and</span> <span class="n">literal_type</span><span class="o">.</span><span class="n">metadata</span>
+                <span class="ow">and</span> <span class="n">_proto</span><span class="o">.</span><span class="n">Protobuf</span><span class="o">.</span><span class="n">PB_FIELD_KEY</span> <span class="ow">in</span> <span class="n">literal_type</span><span class="o">.</span><span class="n">metadata</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">_generic_proto_sdk_type_from_tag</span><span class="p">(</span><span class="n">literal_type</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="n">_proto</span><span class="o">.</span><span class="n">Protobuf</span><span class="o">.</span><span class="n">PB_FIELD_KEY</span><span class="p">])</span>
             <span class="n">sdk_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_SIMPLE_TYPE_LOOKUP_TABLE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">literal_type</span><span class="o">.</span><span class="n">simple</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sdk_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
