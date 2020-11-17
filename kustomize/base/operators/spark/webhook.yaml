@@ -5,20 +5,20 @@ metadata:
   namespace: sparkoperator
   labels:
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/version: v2.4.0-v1beta1
+    app.kubernetes.io/version: v2.4.5-v1beta2
 spec:
   backoffLimit: 3
   template:
     metadata:
       labels:
         app.kubernetes.io/name: sparkoperator
-        app.kubernetes.io/version: v2.4.0-v1beta1
+        app.kubernetes.io/version: v2.4.5-v1beta2
     spec:
       serviceAccountName: sparkoperator
       restartPolicy: Never
       containers:
         - name: main
-          image: gcr.io/spark-operator/spark-operator:v2.4.0-v1beta1-0.9.0
+          image: gcr.io/spark-operator/spark-operator:v1beta2-1.1.2-2.4.5
           imagePullPolicy: IfNotPresent
           command: ["/usr/bin/gencerts.sh","--namespace", "$(NAMESPACE)", "-p"]
 ---
@@ -34,4 +34,3 @@ spec:
       name: webhook
   selector:
     app.kubernetes.io/name: sparkoperator
-    app.kubernetes.io/version: v2.4.0-v1beta1
