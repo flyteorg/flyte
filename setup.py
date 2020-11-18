@@ -10,7 +10,7 @@
 set -ex
 
 # Set up a temp directory
-mkdir _repos || true
+mkdir -p _repos
 
 # Clone all repos
 echo "Cloning Flyteidl"
