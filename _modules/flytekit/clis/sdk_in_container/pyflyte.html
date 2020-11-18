@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.clis.sdk_in_container.pyflyte &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.clis.sdk_in_container.pyflyte &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -168,6 +168,7 @@
 <span class="kn">import</span> <span class="nn">click</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.constants</span> <span class="k">import</span> <span class="n">CTX_DOMAIN</span><span class="p">,</span> <span class="n">CTX_PACKAGES</span><span class="p">,</span> <span class="n">CTX_PROJECT</span><span class="p">,</span> <span class="n">CTX_VERSION</span>
+<span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.fast_register</span> <span class="k">import</span> <span class="n">fast_register</span>
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.launch_plan</span> <span class="k">import</span> <span class="n">launch_plans</span>
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.register</span> <span class="k">import</span> <span class="n">register</span>
 <span class="kn">from</span> <span class="nn">flytekit.clis.sdk_in_container.serialize</span> <span class="k">import</span> <span class="n">serialize</span>
@@ -271,6 +272,7 @@
 
 
 <span class="n">main</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">register</span><span class="p">)</span>
+<span class="n">main</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">fast_register</span><span class="p">)</span>
 <span class="n">main</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">serialize</span><span class="p">)</span>
 <span class="n">main</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">launch_plans</span><span class="p">)</span>
 

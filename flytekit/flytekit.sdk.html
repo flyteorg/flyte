@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.sdk package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -1927,6 +1927,56 @@ scratch context will be prepared and then cleaned up upon completion.</p>
 
 </dd></dl>
 
+<dl class="method">
+<dt id="flytekit.sdk.types.Types.GenericProto">
+<em class="property">static </em><code class="sig-name descname">GenericProto</code><span class="sig-paren">(</span><em class="sig-param">pb_type: Type[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType]</em><span class="sig-paren">)</span> &#x2192; Type[flytekit.common.types.proto.GenericProtobuf]<a class="headerlink" href="#flytekit.sdk.types.Types.GenericProto" title="Permalink to this definition">¶</a></dt>
+<dd><p>GenericProto type wraps a protobuf type to provide interoperability between protobuf and flyte typing system. Using
+this type, you can define custom input/output variable types of flyte entities and continue to provide strong typing
+syntax. Proto type serializes proto objects as binary (leveraging <a class="reference external" href="https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/core/literals.proto#L63">flyteidl’s Binary literal</a>).
+A generic proto is a specialization of the Generic type with added convenience functions to support marshalling/
+unmarshalling of the underlying protobuf object using the protobuf official json marshaller. While GenericProto type
+does not produce the most space-efficient representation of protobufs, it’s a suitable solution for making protobufs
+easily accessible (i.e. humanly readable) in other flyte components (e.g. console, cli… etc.).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The protobuf Python library should be installed on the PYTHONPATH to ensure the type engine can access the
+appropriate Python code to deserialize the protobuf.</p>
+</div>
+<p>When used with an SDK-decorated method, expect this behavior from the default type engine:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>As input:</dt><dd><ol class="arabic simple">
+<li><p>If set, a Python protobuf object of the type specified in the definition.</p></li>
+<li><p>If not set, a None value.</p></li>
+</ol>
+</dd>
+<dt>As output:</dt><dd><ol class="arabic simple">
+<li><p>A Python protobuf object matching the type specified by the users.</p></li>
+<li><p>Set None to null the output.</p></li>
+</ol>
+</dd>
+<dt>From command-line:</dt><dd><p>A base-64 encoded string of the serialized protobuf.</p>
+</dd>
+</dl>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">protos</span> <span class="kn">import</span> <span class="n">my_protos_pb2</span>
+
+<span class="nd">@inputs</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">GenericProto</span><span class="p">(</span><span class="n">my_protos_pb2</span><span class="o">.</span><span class="n">Custom</span><span class="p">))</span>
+<span class="nd">@outputs</span><span class="p">(</span><span class="n">b</span><span class="o">=</span><span class="n">Types</span><span class="o">.</span><span class="n">GenericProto</span><span class="p">(</span><span class="n">my_protos_pb2</span><span class="o">.</span><span class="n">Custom</span><span class="p">))</span>
+<span class="nd">@python_task</span>
+<span class="k">def</span> <span class="nf">assert_and_create</span><span class="p">(</span><span class="n">wf_params</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="n">a</span><span class="o">.</span><span class="n">field1</span> <span class="o">==</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">a</span><span class="o">.</span><span class="n">field2</span> <span class="o">==</span> <span class="s1">&#39;abc&#39;</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+        <span class="n">my_protos_pb2</span><span class="o">.</span><span class="n">Custom</span><span class="p">(</span>
+            <span class="n">field1</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">field2</span><span class="o">=</span><span class="s1">&#39;hello&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 <dl class="class">
 <dt id="flytekit.sdk.types.Types.Integer">
 <em class="property">class </em><code class="sig-name descname">Integer</code><span class="sig-paren">(</span><em class="sig-param">value</em><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Integer" title="Permalink to this definition">¶</a></dt>
@@ -2239,8 +2289,13 @@ nested list.  Syntax for nesting is <cite>[[[Types.Integer]]]</cite> to create a
 
 <dl class="method">
 <dt id="flytekit.sdk.types.Types.Proto">
-<em class="property">static </em><code class="sig-name descname">Proto</code><span class="sig-paren">(</span><em class="sig-param">pb_type</em><span class="sig-paren">)</span><a class="headerlink" href="#flytekit.sdk.types.Types.Proto" title="Permalink to this definition">¶</a></dt>
-<dd><p>Use this to specify a custom protobuf type.</p>
+<em class="property">static </em><code class="sig-name descname">Proto</code><span class="sig-paren">(</span><em class="sig-param">pb_type: Type[google.protobuf.pyext.cpp_message.GeneratedProtocolMessageType]</em><span class="sig-paren">)</span> &#x2192; Type[flytekit.common.types.proto.Protobuf]<a class="headerlink" href="#flytekit.sdk.types.Types.Proto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Proto type wraps a protobuf type to provide interoperability between protobuf and flyte typing system. Using this
+type, you can define custom input/output variable types of flyte entities and continue to provide strong typing
+syntax. Proto type serializes proto objects as binary (leveraging <a class="reference external" href="https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/core/literals.proto#L45">flyteidl’s Binary literal</a>).
+Binary serialization of protobufs is the most space-efficient serialization form. Because of the way protobufs are
+designed, unmarshalling the serialized proto requires access to the corresponding type. In order to use/visualize
+the serialized proto, you will generally need to write custom code in the corresponding component.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The protobuf Python library should be installed on the PYTHONPATH to ensure the type engine can access the

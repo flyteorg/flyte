@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.sdk_runnable &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.common.tasks.sdk_runnable &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -161,7 +161,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for flytekit.common.tasks.sdk_runnable</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getfullargspec</span> <span class="k">as</span> <span class="n">_getargspec</span>
+<span></span><span class="kn">import</span> <span class="nn">copy</span> <span class="k">as</span> <span class="nn">_copy</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="k">import</span> <span class="n">getfullargspec</span> <span class="k">as</span> <span class="n">_getargspec</span>
 
 <span class="kn">import</span> <span class="nn">six</span> <span class="k">as</span> <span class="nn">_six</span>
 
@@ -435,6 +436,7 @@
             <span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">task_function_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_fast_registered</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="n">_banned_inputs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">_banned_outputs</span> <span class="o">=</span> <span class="p">{}</span>
@@ -545,11 +547,10 @@
         <span class="k">return</span> <span class="n">_exception_scopes</span><span class="o">.</span><span class="n">user_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_function</span><span class="p">)(</span>
             <span class="n">ExecutionParameters</span><span class="p">(</span>
                 <span class="n">execution_date</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">execution_date</span><span class="p">,</span>
-                <span class="c1"># TODO: it might be better to consider passing the full struct</span>
-                <span class="n">execution_id</span><span class="o">=</span><span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">WorkflowExecutionIdentifier</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">execution_id</span><span class="p">)),</span>
-                <span class="n">stats</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
-                <span class="n">logging</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">logging</span><span class="p">,</span>
                 <span class="n">tmp_dir</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_directory</span><span class="p">,</span>
+                <span class="n">stats</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
+                <span class="n">execution_id</span><span class="o">=</span><span class="n">_six</span><span class="o">.</span><span class="n">text_type</span><span class="p">(</span><span class="n">WorkflowExecutionIdentifier</span><span class="o">.</span><span class="n">promote_from_model</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">execution_id</span><span class="p">)),</span>
+                <span class="n">logging</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">logging</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="o">**</span><span class="n">inputs</span>
         <span class="p">)</span>
@@ -583,6 +584,51 @@
                 <span class="n">literals</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">sdk_value</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">outputs_dict</span><span class="p">)}</span>
             <span class="p">)</span>
         <span class="p">}</span></div>
+
+<div class="viewcode-block" id="SdkRunnableTask.fast_register"><a class="viewcode-back" href="../../../../flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.fast_register">[docs]</a>    <span class="nd">@_exception_scopes</span><span class="o">.</span><span class="n">system_entry_point</span>
+    <span class="k">def</span> <span class="nf">fast_register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">additional_distribution</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The fast register call essentially hijacks the task container commandline.</span>
+<span class="sd">        Say an existing task container definition had a commandline like so:</span>
+<span class="sd">            flyte_venv pyflyte-execute --task-module app.workflows.my_workflow --task-name my_task</span>
+
+<span class="sd">        The fast register command introduces a wrapper call to fast-execute the original commandline like so:</span>
+<span class="sd">            flyte_venv pyflyte-fast-execute --additional-distribution s3://my-s3-bucket/foo/bar/12345.tar.gz --</span>
+<span class="sd">                flyte_venv pyflyte-execute --task-module app.workflows.my_workflow --task-name my_task</span>
+
+<span class="sd">        At execution time pyflyte-fast-execute will ensure the additional distribution (i.e. the fast-registered code)</span>
+<span class="sd">        exists before calling the original task commandline.</span>
+
+<span class="sd">        :param Text project: The project in which to register this task.</span>
+<span class="sd">        :param Text domain: The domain in which to register this task.</span>
+<span class="sd">        :param Text name: The name to give this task.</span>
+<span class="sd">        :param Text digest: The version in which to register this task.</span>
+<span class="sd">        :param Text additional_distribution: User-specified location for remote source code distribution.</span>
+<span class="sd">        :param Text The optional location for where to install the additional distribution at runtime</span>
+<span class="sd">        :rtype: Text: Registered identifier.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">original_container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">_copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">original_container</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pyflyte-fast-execute&quot;</span><span class="p">,</span> <span class="s2">&quot;--additional-distribution&quot;</span><span class="p">,</span> <span class="n">additional_distribution</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">dest_dir</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;--dest-dir&quot;</span><span class="p">,</span> <span class="n">dest_dir</span><span class="p">]</span>
+        <span class="n">args</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;--&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">container</span><span class="o">.</span><span class="n">args</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">_args</span> <span class="o">=</span> <span class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_container</span> <span class="o">=</span> <span class="n">container</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">registered_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">digest</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_container</span> <span class="o">=</span> <span class="n">original_container</span>
+            <span class="k">raise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_fast_registered</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_container</span> <span class="o">=</span> <span class="n">original_container</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">registered_id</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_fast_registered</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_fast_registered</span>
 
     <span class="k">def</span> <span class="nf">_get_container_definition</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

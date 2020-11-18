@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.sagemaker.task &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.sdk.sagemaker.task &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -165,6 +165,7 @@
 <span class="kn">import</span> <span class="nn">typing</span>
 
 <span class="kn">from</span> <span class="nn">flytekit.common.tasks.sagemaker.custom_training_job_task</span> <span class="k">import</span> <span class="n">CustomTrainingJobTask</span>
+<span class="kn">from</span> <span class="nn">flytekit.common.tasks.sagemaker.distributed_training</span> <span class="k">import</span> <span class="n">DefaultOutputPersistPredicate</span>
 <span class="kn">from</span> <span class="nn">flytekit.models.sagemaker</span> <span class="k">import</span> <span class="n">training_job</span> <span class="k">as</span> <span class="n">_training_job_models</span>
 
 
@@ -187,6 +188,7 @@
     <span class="n">timeout</span><span class="p">:</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">environment</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="bp">cls</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_persist_predicate</span><span class="p">:</span> <span class="n">typing</span><span class="o">.</span><span class="n">Callable</span> <span class="o">=</span> <span class="n">DefaultOutputPersistPredicate</span><span class="p">(),</span>
 <span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Decorator to create a Custom Training Job definition.  This task will run as a single unit of work on the platform.</span>
@@ -279,6 +281,10 @@
 <span class="sd">        provided must be a subclass of flytekit.common.tasks.sdk_runnable.SdkRunnableTask.  A user can use this to</span>
 <span class="sd">        inject bespoke logic into the base Flyte programming model.</span>
 
+<span class="sd">    :param Callable output_persist_predicate: [optional] This callable should return a boolean and is used to indicate whether</span>
+<span class="sd">        the current copy (i.e., an instance of the task running on a particular node inside the worker pool) would</span>
+<span class="sd">        write output.</span>
+
 <span class="sd">    :rtype: flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -301,6 +307,7 @@
             <span class="n">environment</span><span class="o">=</span><span class="n">environment</span><span class="p">,</span>
             <span class="n">algorithm_specification</span><span class="o">=</span><span class="n">algorithm_specification</span><span class="p">,</span>
             <span class="n">training_job_resource_config</span><span class="o">=</span><span class="n">training_job_resource_config</span><span class="p">,</span>
+            <span class="n">output_persist_predicate</span><span class="o">=</span><span class="n">output_persist_predicate</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">_task_function</span><span class="p">:</span>

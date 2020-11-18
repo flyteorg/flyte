@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; Flyte 0.8.0 documentation</title>
+  <title>Index &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -211,7 +211,11 @@
       <ul>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityState.ACTIVE">(flytekit.models.named_entity.NamedEntityState attribute)</a>
 </li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.ProjectState.ACTIVE">(flytekit.models.project.Project.ProjectState attribute)</a>
+</li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.active_project">active_project() (flytekit.models.project.Project class method)</a>
+</li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask.add_inputs">add_inputs() (flytekit.common.tasks.generic_spark_task.SdkGenericSparkTask method)</a>
 
       <ul>
@@ -261,7 +265,15 @@
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.SparkJob.application_file">application_file() (flytekit.models.task.SparkJob property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityState.ARCHIVED">ARCHIVED (flytekit.models.named_entity.NamedEntityState attribute)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.ProjectState.ARCHIVED">(flytekit.models.project.Project.ProjectState attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.archived_project">archived_project() (flytekit.models.project.Project class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer.args">args() (flytekit.common.tasks.pytorch_task.SdkRunnablePytorchContainer property)</a>
 
       <ul>
@@ -274,8 +286,6 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Container.args">(flytekit.models.task.Container property)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.array_job.ArrayJob">ArrayJob (class in flytekit.models.array_job)</a>
 </li>
       <li><a href="flytekit/flytekit.models.admin.html#flytekit.models.admin.common.Sort.Direction.ASCENDING">ASCENDING (flytekit.models.admin.common.Sort.Direction attribute)</a>
@@ -454,6 +464,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.presto.PrestoQuery.catalog">(flytekit.models.presto.PrestoQuery property)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.categorical_parameter_range">categorical_parameter_range() (flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf property)</a>
+</li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.CategoricalParameterRange">CategoricalParameterRange (class in flytekit.models.sagemaker.parameter_ranges)</a>
 </li>
       <li><a href="flytekit/flytekit.tools.html#flytekit.tools.subprocess.check_call">check_call() (in module flytekit.tools.subprocess)</a>
@@ -542,6 +554,8 @@
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.compiler.CompiledWorkflowClosure">CompiledWorkflowClosure (class in flytekit.models.core.compiler)</a>
 </li>
+      <li><a href="flytekit/flytekit.tools.html#flytekit.tools.fast_registration.compute_digest">compute_digest() (in module flytekit.tools.fast_registration)</a>
+</li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.workflow.IfBlock.condition">condition() (flytekit.models.core.workflow.IfBlock property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Container.config">config() (flytekit.models.task.Container property)</a>
@@ -560,10 +574,10 @@
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.local_workflow.SdkRunnableWorkflow.construct_from_class_definition">construct_from_class_definition() (flytekit.common.local_workflow.SdkRunnableWorkflow class method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.clis.html#flytekit.clis.helpers.construct_literal_map_from_parameter_map">construct_literal_map_from_parameter_map() (in module flytekit.clis.helpers)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.clis.html#flytekit.clis.helpers.construct_literal_map_from_variable_map">construct_literal_map_from_variable_map() (in module flytekit.clis.helpers)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.Container">Container (class in flytekit.models.task)</a>
@@ -581,6 +595,8 @@
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.errors.ContainerError.Kind">ContainerError.Kind (class in flytekit.models.core.errors)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.filters.Contains">Contains (class in flytekit.models.filters)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.continuous_parameter_range">continuous_parameter_range() (flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ContinuousParameterRange">ContinuousParameterRange (class in flytekit.models.sagemaker.parameter_ranges)</a>
 </li>
@@ -628,6 +644,8 @@
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.schema.SchemaInstantiator.create_from_hive_query">(flytekit.common.types.schema.SchemaInstantiator method)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.create_generic">create_generic() (in module flytekit.common.types.proto)</a>
+</li>
       <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.create_launch_plan">create_launch_plan() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
 
       <ul>
@@ -673,6 +691,8 @@
 </li>
       </ul></li>
       <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.blobs.CsvInstantiator">CsvInstantiator (class in flytekit.common.types.blobs)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey.CURRENT_HOST">CURRENT_HOST (flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.engines.unit.html#flytekit.engines.unit.mock_stats.MockStats.current_tags">current_tags() (flytekit.engines.unit.mock_stats.MockStats method)</a>
 </li>
@@ -736,6 +756,8 @@
 </li>
       <li><a href="flytekit/flytekit.configuration.html#flytekit.configuration.resources.DEFAULT_STORAGE_REQUEST">DEFAULT_STORAGE_REQUEST (in module flytekit.configuration.resources)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DefaultOutputPersistPredicate">DefaultOutputPersistPredicate (class in flytekit.common.tasks.sagemaker.distributed_training)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.TaskMetadata.deprecated_error_message">deprecated_error_message() (flytekit.models.task.TaskMetadata property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.admin.html#flytekit.models.admin.common.Sort.Direction.DESCENDING">DESCENDING (flytekit.models.admin.common.Sort.Direction attribute)</a>
@@ -762,9 +784,25 @@
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.TaskMetadata.discovery_version">discovery_version() (flytekit.models.task.TaskMetadata property)</a>
 </li>
+      <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.discovery.DiscoveryClient">DiscoveryClient (class in flytekit.clis.auth.discovery)</a>
+</li>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.distributed_protocol">distributed_protocol() (flytekit.models.sagemaker.training_job.TrainingJobResourceConfig property)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingEngineContext.distributed_training_context">distributed_training_context() (flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingEngineContext property)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingExecutionParam.distributed_training_context">(flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingExecutionParam property)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.discovery.DiscoveryClient">DiscoveryClient (class in flytekit.clis.auth.discovery)</a>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.DistributedProtocol">DistributedProtocol (class in flytekit.models.sagemaker.training_job)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey">DistributedTrainingContextKey (class in flytekit.common.tasks.sagemaker.distributed_training)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingEngineContext">DistributedTrainingEngineContext (class in flytekit.common.tasks.sagemaker.distributed_training)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingExecutionParam">DistributedTrainingExecutionParam (class in flytekit.common.tasks.sagemaker.distributed_training)</a>
 </li>
       <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.auth.OAuthCallbackHandler.do_GET">do_GET() (flytekit.clis.auth.auth.OAuthCallbackHandler method)</a>
 </li>
@@ -808,6 +846,8 @@
         <li><a href="flytekit/flytekit.interfaces.data.s3.html#flytekit.interfaces.data.s3.s3proxy.AwsS3Proxy.download_directory">(flytekit.interfaces.data.s3.s3proxy.AwsS3Proxy method)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.tools.html#flytekit.tools.fast_registration.download_distribution">download_distribution() (in module flytekit.tools.fast_registration)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.IOStrategy.DOWNLOAD_MODE_EAGER">DOWNLOAD_MODE_EAGER (flytekit.models.task.IOStrategy attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.IOStrategy.DOWNLOAD_MODE_NO_DOWNLOAD">DOWNLOAD_MODE_NO_DOWNLOAD (flytekit.models.task.IOStrategy attribute)</a>
@@ -934,6 +974,8 @@
 
       <ul>
         <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.hive_task.SdkHiveTask.execute">(flytekit.common.tasks.hive_task.SdkHiveTask method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask.execute">(flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin.execute">(flytekit.common.tasks.sdk_dynamic.SdkDynamicTaskMixin method)</a>
 </li>
@@ -1067,6 +1109,14 @@
 </li>
       </ul></li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.workflow.WorkflowTemplate.failure_node">failure_node() (flytekit.models.core.workflow.WorkflowTemplate property)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.fast_register">fast_register() (flytekit.common.tasks.sdk_runnable.SdkRunnableTask method)</a>
+</li>
+      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.fast_register.fast_register_all">fast_register_all() (in module flytekit.clis.sdk_in_container.fast_register)</a>
+</li>
+      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#flytekit.clis.sdk_in_container.fast_register.fast_register_tasks_only">fast_register_tasks_only() (in module flytekit.clis.sdk_in_container.fast_register)</a>
+</li>
+      <li><a href="flytekit/flytekit.configuration.html#flytekit.configuration.sdk.FAST_REGISTRATION_DIR">FAST_REGISTRATION_DIR (in module flytekit.configuration.sdk)</a>
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.fetch">fetch() (flytekit.common.launch_plan.SdkLaunchPlan class method)</a>
 
@@ -1226,6 +1276,8 @@
 </li>
       <li><a href="flytekit/flytekit.clis.sdk_in_container.html#module-flytekit.clis.sdk_in_container.constants">flytekit.clis.sdk_in_container.constants (module)</a>
 </li>
+      <li><a href="flytekit/flytekit.clis.sdk_in_container.html#module-flytekit.clis.sdk_in_container.fast_register">flytekit.clis.sdk_in_container.fast_register (module)</a>
+</li>
       <li><a href="flytekit/flytekit.clis.sdk_in_container.html#module-flytekit.clis.sdk_in_container.launch_plan">flytekit.clis.sdk_in_container.launch_plan (module)</a>
 </li>
       <li><a href="flytekit/flytekit.clis.sdk_in_container.html#module-flytekit.clis.sdk_in_container.pyflyte">flytekit.clis.sdk_in_container.pyflyte (module)</a>
@@ -1302,7 +1354,11 @@
 </li>
       <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.custom_training_job_task">flytekit.common.tasks.sagemaker.custom_training_job_task (module)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.distributed_training">flytekit.common.tasks.sagemaker.distributed_training (module)</a>
+</li>
       <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.hpo_job_task">flytekit.common.tasks.sagemaker.hpo_job_task (module)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#module-flytekit.common.tasks.sagemaker.types">flytekit.common.tasks.sagemaker.types (module)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#module-flytekit.common.tasks.sdk_dynamic">flytekit.common.tasks.sdk_dynamic (module)</a>
 </li>
@@ -1524,6 +1580,8 @@
 </li>
       <li><a href="flytekit/flytekit.tools.html#module-flytekit.tools">flytekit.tools (module)</a>
 </li>
+      <li><a href="flytekit/flytekit.tools.html#module-flytekit.tools.fast_registration">flytekit.tools.fast_registration (module)</a>
+</li>
       <li><a href="flytekit/flytekit.tools.html#module-flytekit.tools.lazy_loader">flytekit.tools.lazy_loader (module)</a>
 </li>
       <li><a href="flytekit/flytekit.tools.html#module-flytekit.tools.module_loader">flytekit.tools.module_loader (module)</a>
@@ -1534,14 +1592,14 @@
 </li>
       <li><a href="flytekit/flytekit.type_engines.html#module-flytekit.type_engines.common">flytekit.type_engines.common (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.type_engines.default.html#module-flytekit.type_engines.default">flytekit.type_engines.default (module)</a>
 </li>
       <li><a href="flytekit/flytekit.type_engines.default.html#module-flytekit.type_engines.default.flyte">flytekit.type_engines.default.flyte (module)</a>
 </li>
       <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteLaunchPlan">FlyteLaunchPlan (class in flytekit.engines.flyte.engine)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.engines.flyte.html#flytekit.engines.flyte.engine.FlyteNodeExecution">FlyteNodeExecution (class in flytekit.engines.flyte.engine)</a>
 </li>
       <li><a href="flytekit/flytekit.common.exceptions.html#flytekit.common.exceptions.system.FlyteNotImplementedException">FlyteNotImplementedException</a>
@@ -1831,6 +1889,8 @@
 </li>
         <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.IntegerParameterRange.from_flyte_idl">(flytekit.models.sagemaker.parameter_ranges.IntegerParameterRange class method)</a>
 </li>
+        <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.from_flyte_idl">(flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf class method)</a>
+</li>
         <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRanges.from_flyte_idl">(flytekit.models.sagemaker.parameter_ranges.ParameterRanges class method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.AlgorithmSpecification.from_flyte_idl">(flytekit.models.sagemaker.training_job.AlgorithmSpecification class method)</a>
@@ -1932,6 +1992,8 @@
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.String.from_python_std">(flytekit.common.types.primitives.String class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.from_python_std">(flytekit.common.types.primitives.Timedelta class method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.from_python_std">(flytekit.common.types.proto.GenericProtobuf class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.from_python_std">(flytekit.common.types.proto.Protobuf class method)</a>
 </li>
@@ -2046,6 +2108,10 @@
 </li>
       <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.tasks.generic_spark_task">generic_spark_task() (in module flytekit.sdk.tasks)</a>
 </li>
+      <li><a href="flytekit/flytekit.sdk.html#flytekit.sdk.types.Types.GenericProto">GenericProto() (flytekit.sdk.types.Types static method)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf">GenericProtobuf (class in flytekit.common.types.proto)</a>
+</li>
       <li><a href="flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.data_proxy.LocalWorkingDirectoryContext.get">get() (flytekit.interfaces.data.data_proxy.LocalWorkingDirectoryContext class method)</a>
 </li>
       <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.get_active_launch_plan">get_active_launch_plan() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
@@ -2054,6 +2120,8 @@
         <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_active_launch_plan">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.tools.html#flytekit.tools.fast_registration.get_additional_distribution_loc">get_additional_distribution_loc() (in module flytekit.tools.fast_registration)</a>
+</li>
       <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.discovery.DiscoveryClient.get_authorization_endpoints">get_authorization_endpoints() (flytekit.clis.auth.discovery.DiscoveryClient method)</a>
 
       <ul>
@@ -2178,6 +2246,8 @@
         <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.get_project_domain_attributes">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.common.DataProxy.get_random_directory">get_random_directory() (flytekit.interfaces.data.common.DataProxy method)</a>
 
       <ul>
@@ -2190,8 +2260,6 @@
         <li><a href="flytekit/flytekit.interfaces.data.s3.html#flytekit.interfaces.data.s3.s3proxy.AwsS3Proxy.get_random_directory">(flytekit.interfaces.data.s3.s3proxy.AwsS3Proxy method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.common.DataProxy.get_random_path">get_random_path() (flytekit.interfaces.data.common.DataProxy method)</a>
 
       <ul>
@@ -2209,6 +2277,10 @@
       <li><a href="flytekit/flytekit.interfaces.data.html#flytekit.interfaces.data.data_proxy.Data.get_remote_path">get_remote_path() (flytekit.interfaces.data.data_proxy.Data class method)</a>
 </li>
       <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableContainer.get_resources">get_resources() (flytekit.common.tasks.sdk_runnable.SdkRunnableContainer class method)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.get_sagemaker_distributed_training_context_from_env">get_sagemaker_distributed_training_context_from_env() (in module flytekit.common.tasks.sagemaker.distributed_training)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.get_sagemaker_distributed_training_context_from_file">get_sagemaker_distributed_training_context_from_file() (in module flytekit.common.tasks.sagemaker.distributed_training)</a>
 </li>
       <li><a href="flytekit/flytekit.type_engines.html#flytekit.type_engines.common.TypeEngine.get_sdk_type_from_literal_type">get_sdk_type_from_literal_type() (flytekit.type_engines.common.TypeEngine method)</a>
 
@@ -2344,6 +2416,8 @@
 </li>
       <li><a href="flytekit/flytekit.clis.auth.html#flytekit.clis.auth.auth.OAuthCallbackHandler.handle_login">handle_login() (flytekit.clis.auth.auth.OAuthCallbackHandler method)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.tasks.html#flytekit.common.tasks.sdk_runnable.SdkRunnableTask.has_fast_registered">has_fast_registered() (flytekit.common.tasks.sdk_runnable.SdkRunnableTask property)</a>
+</li>
       <li><a href="flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.RegisterableEntity.has_registered">has_registered() (flytekit.common.mixins.registerable.RegisterableEntity property)</a>
 </li>
       <li><a href="flytekit/flytekit.common.mixins.html#flytekit.common.mixins.registerable.TrackableEntity.has_valid_name">has_valid_name() (flytekit.common.mixins.registerable.TrackableEntity property)</a>
@@ -2362,10 +2436,10 @@
 </li>
       <li><a href="flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.impl.HiveFilteredPartitionSensor">HiveFilteredPartitionSensor (class in flytekit.contrib.sensors.impl)</a>
 </li>
-      <li><a href="flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.impl.HiveNamedPartitionSensor">HiveNamedPartitionSensor (class in flytekit.contrib.sensors.impl)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.contrib.sensors.html#flytekit.contrib.sensors.impl.HiveNamedPartitionSensor">HiveNamedPartitionSensor (class in flytekit.contrib.sensors.impl)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.HiveQuery">HiveQuery (class in flytekit.models.qubole)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.qubole.HiveQueryCollection">HiveQueryCollection (class in flytekit.models.qubole)</a>
@@ -2374,13 +2448,13 @@
 </li>
       <li><a href="flytekit/flytekit.engines.unit.html#flytekit.engines.unit.engine.HiveTask">HiveTask (class in flytekit.engines.unit.engine)</a>
 </li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey.HOSTS">HOSTS (flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.schedule.Schedule.FixedRateUnit.HOUR">HOUR (flytekit.models.schedule.Schedule.FixedRateUnit attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.configuration.html#flytekit.configuration.platform.HTTP_URL">HTTP_URL (in module flytekit.configuration.platform)</a>
 </li>
       <li><a href="flytekit/flytekit.interfaces.data.http.html#flytekit.interfaces.data.http.http_data_proxy.HttpFileProxy">HttpFileProxy (class in flytekit.interfaces.data.http.http_data_proxy)</a>
-</li>
-      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig.hyperparameter_ranges">hyperparameter_ranges() (flytekit.models.sagemaker.hpo_job.HyperparameterTuningJobConfig property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.HyperparameterScalingType">HyperparameterScalingType (class in flytekit.models.sagemaker.parameter_ranges)</a>
 </li>
@@ -2510,9 +2584,11 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.types.SimpleType.INTEGER">(flytekit.models.types.SimpleType attribute)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.literals.Primitive.integer">integer() (flytekit.models.literals.Primitive property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="flytekit/flytekit.models.html#flytekit.models.literals.Primitive.integer">integer() (flytekit.models.literals.Primitive property)</a>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.integer_parameter_range">integer_parameter_range() (flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf property)</a>
 </li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.IntegerParameterRange">IntegerParameterRange (class in flytekit.models.sagemaker.parameter_ranges)</a>
 </li>
@@ -2564,6 +2640,8 @@
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.String.is_castable_from">(flytekit.common.types.primitives.String class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.is_castable_from">(flytekit.common.types.primitives.Timedelta class method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.is_castable_from">(flytekit.common.types.proto.GenericProtobuf class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.is_castable_from">(flytekit.common.types.proto.Protobuf class method)</a>
 </li>
@@ -3000,6 +3078,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.execution.ExecutionMetadata.mode">(flytekit.models.execution.ExecutionMetadata property)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.DistributedProtocol.MPI">MPI (flytekit.models.sagemaker.training_job.DistributedProtocol attribute)</a>
+</li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.types.BlobType.BlobDimensionality.MULTIPART">MULTIPART (flytekit.models.core.types.BlobType.BlobDimensionality attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.common.types.impl.html#flytekit.common.types.impl.schema.Schema.multipart_blob">multipart_blob() (flytekit.common.types.impl.schema.Schema property)</a>
@@ -3065,6 +3145,8 @@
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.condition.ComparisonExpression.Operator.NEQ">NEQ (flytekit.models.core.condition.ComparisonExpression.Operator attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.execution.ExecutionMetadata.nesting">nesting() (flytekit.models.execution.ExecutionMetadata property)</a>
+</li>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey.NETWORK_INTERFACE_NAME">NETWORK_INTERFACE_NAME (flytekit.common.tasks.sagemaker.distributed_training.DistributedTrainingContextKey attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.workflow.Node">Node (class in flytekit.models.core.workflow)</a>
 </li>
@@ -3170,6 +3252,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="flytekit/flytekit.common.tasks.sagemaker.html#flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask.output_persist_predicate">output_persist_predicate() (flytekit.common.tasks.sagemaker.custom_training_job_task.CustomTrainingJobTask property)</a>
+</li>
       <li><a href="flytekit/flytekit.models.admin.html#flytekit.models.admin.task_execution.TaskExecutionClosure.output_uri">output_uri() (flytekit.models.admin.task_execution.TaskExecutionClosure property)</a>
 
       <ul>
@@ -3230,6 +3314,8 @@
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.nodes.ParameterMapper">ParameterMapper (class in flytekit.common.nodes)</a>
 </li>
+      <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf">ParameterRangeOneOf (class in flytekit.models.sagemaker.parameter_ranges)</a>
+</li>
       <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRanges">ParameterRanges (class in flytekit.models.sagemaker.parameter_ranges)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.interface.ParameterMap.parameters">parameters() (flytekit.models.interface.ParameterMap property)</a>
@@ -3238,8 +3324,12 @@
 </li>
       <li><a href="flytekit/flytekit.clis.html#flytekit.clis.helpers.parse_args_into_dict">parse_args_into_dict() (in module flytekit.clis.helpers)</a>
 </li>
-      <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.PB_FIELD_KEY">PB_FIELD_KEY (flytekit.common.types.proto.Protobuf attribute)</a>
+      <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.PB_FIELD_KEY">PB_FIELD_KEY (flytekit.common.types.proto.GenericProtobuf attribute)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.PB_FIELD_KEY">(flytekit.common.types.proto.Protobuf attribute)</a>
 </li>
+      </ul></li>
       <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.ProtobufType.pb_type">pb_type() (flytekit.common.types.proto.ProtobufType property)</a>
 </li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.utils.PerformanceTimer">PerformanceTimer (class in flytekit.common.utils)</a>
@@ -3308,6 +3398,8 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityIdentifier.project">(flytekit.models.named_entity.NamedEntityIdentifier property)</a>
 </li>
       </ul></li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.ProjectState">Project.ProjectState (class in flytekit.models.project)</a>
+</li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.promise.Input.promise">promise() (flytekit.common.promise.Input property)</a>
 
       <ul>
@@ -3396,6 +3488,8 @@
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.String.promote_from_model">(flytekit.common.types.primitives.String class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.promote_from_model">(flytekit.common.types.primitives.Timedelta class method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.promote_from_model">(flytekit.common.types.proto.GenericProtobuf class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.promote_from_model">(flytekit.common.types.proto.Protobuf class method)</a>
 </li>
@@ -3969,6 +4063,8 @@
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.short_class_string">(flytekit.common.types.primitives.Timedelta class method)</a>
 </li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.short_class_string">(flytekit.common.types.proto.GenericProtobuf class method)</a>
+</li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.short_class_string">(flytekit.common.types.proto.Protobuf class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.schema.Schema.short_class_string">(flytekit.common.types.schema.Schema class method)</a>
@@ -4022,6 +4118,8 @@
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.String.short_string">(flytekit.common.types.primitives.String method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.short_string">(flytekit.common.types.primitives.Timedelta method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.short_string">(flytekit.common.types.proto.GenericProtobuf method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.short_string">(flytekit.common.types.proto.Protobuf method)</a>
 </li>
@@ -4115,6 +4213,8 @@
 </li>
         <li><a href="flytekit/flytekit.models.html#flytekit.models.named_entity.NamedEntityMetadata.state">(flytekit.models.named_entity.NamedEntityMetadata property)</a>
 </li>
+        <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.state">(flytekit.models.project.Project property)</a>
+</li>
       </ul></li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.presto.PrestoQuery.statement">statement() (flytekit.models.presto.PrestoQuery property)</a>
 </li>
@@ -4202,6 +4302,8 @@
 </li>
       <li><a href="flytekit/flytekit.common.exceptions.html#flytekit.common.exceptions.scopes.system_entry_point">system_entry_point() (in module flytekit.common.exceptions.scopes)</a>
 </li>
+      <li><a href="flytekit/flytekit.models.html#flytekit.models.project.Project.ProjectState.SYSTEM_GENERATED">SYSTEM_GENERATED (flytekit.models.project.Project.ProjectState attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -4214,8 +4316,12 @@
         <li><a href="flytekit/flytekit.models.html#flytekit.models.literals.Binary.tag">(flytekit.models.literals.Binary property)</a>
 </li>
       </ul></li>
-      <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.TAG_PREFIX">TAG_PREFIX (flytekit.common.types.proto.Protobuf attribute)</a>
+      <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.TAG_PREFIX">TAG_PREFIX (flytekit.common.types.proto.GenericProtobuf attribute)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.TAG_PREFIX">(flytekit.common.types.proto.Protobuf attribute)</a>
 </li>
+      </ul></li>
       <li><a href="flytekit/flytekit.interfaces.stats.html#flytekit.interfaces.stats.taggable.TaggableStats">TaggableStats (class in flytekit.interfaces.stats.taggable)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.matchable_resource.ExecutionQueueAttributes.tags">tags() (flytekit.models.matchable_resource.ExecutionQueueAttributes property)</a>
@@ -4559,6 +4665,8 @@
 </li>
         <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.IntegerParameterRange.to_flyte_idl">(flytekit.models.sagemaker.parameter_ranges.IntegerParameterRange method)</a>
 </li>
+        <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf.to_flyte_idl">(flytekit.models.sagemaker.parameter_ranges.ParameterRangeOneOf method)</a>
+</li>
         <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.parameter_ranges.ParameterRanges.to_flyte_idl">(flytekit.models.sagemaker.parameter_ranges.ParameterRanges method)</a>
 </li>
         <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.AlgorithmSpecification.to_flyte_idl">(flytekit.models.sagemaker.training_job.AlgorithmSpecification method)</a>
@@ -4649,6 +4757,8 @@
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.to_flyte_literal_type">(flytekit.common.types.primitives.Timedelta class method)</a>
 </li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.to_flyte_literal_type">(flytekit.common.types.proto.GenericProtobuf class method)</a>
+</li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.to_flyte_literal_type">(flytekit.common.types.proto.Protobuf class method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.schema.Schema.to_flyte_literal_type">(flytekit.common.types.schema.Schema class method)</a>
@@ -4702,6 +4812,8 @@
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.String.to_python_std">(flytekit.common.types.primitives.String method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.primitives.Timedelta.to_python_std">(flytekit.common.types.primitives.Timedelta method)</a>
+</li>
+        <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.GenericProtobuf.to_python_std">(flytekit.common.types.proto.GenericProtobuf method)</a>
 </li>
         <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.proto.Protobuf.to_python_std">(flytekit.common.types.proto.Protobuf method)</a>
 </li>
@@ -4851,7 +4963,11 @@
       <li><a href="flytekit/flytekit.common.types.html#flytekit.common.types.helpers.unpack_literal_map_to_sdk_python_std">unpack_literal_map_to_sdk_python_std() (in module flytekit.common.types.helpers)</a>
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.identifier.ResourceType.UNSPECIFIED">UNSPECIFIED (flytekit.models.core.identifier.ResourceType attribute)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.DistributedProtocol.UNSPECIFIED">(flytekit.models.sagemaker.training_job.DistributedProtocol attribute)</a>
 </li>
+      </ul></li>
       <li><a href="flytekit/flytekit.common.html#flytekit.common.launch_plan.SdkLaunchPlan.update">update() (flytekit.common.launch_plan.SdkLaunchPlan method)</a>
 
       <ul>
@@ -4872,6 +4988,12 @@
 
       <ul>
         <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.update_named_entity">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
+</li>
+      </ul></li>
+      <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.update_project">update_project() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
+
+      <ul>
+        <li><a href="flytekit/flytekit.clients.html#flytekit.clients.raw.RawSynchronousFlyteClient.update_project">(flytekit.clients.raw.RawSynchronousFlyteClient method)</a>
 </li>
       </ul></li>
       <li><a href="flytekit/flytekit.clients.html#flytekit.clients.friendly.SynchronousFlyteClient.update_project_domain_attributes">update_project_domain_attributes() (flytekit.clients.friendly.SynchronousFlyteClient method)</a>
@@ -4925,6 +5047,8 @@
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.IOStrategy.UPLOAD_MODE_NO_UPLOAD">UPLOAD_MODE_NO_UPLOAD (flytekit.models.task.IOStrategy attribute)</a>
 </li>
       <li><a href="flytekit/flytekit.models.html#flytekit.models.task.IOStrategy.UPLOAD_MODE_ON_EXIT">UPLOAD_MODE_ON_EXIT (flytekit.models.task.IOStrategy attribute)</a>
+</li>
+      <li><a href="flytekit/flytekit.tools.html#flytekit.tools.fast_registration.upload_package">upload_package() (in module flytekit.tools.fast_registration)</a>
 </li>
       <li><a href="flytekit/flytekit.models.core.html#flytekit.models.core.compiler.ConnectionSet.upstream">upstream() (flytekit.models.core.compiler.ConnectionSet property)</a>
 </li>

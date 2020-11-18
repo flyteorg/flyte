@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>training_job.proto &mdash; Flyte 0.8.0 documentation</title>
+  <title>training_job.proto &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -328,16 +328,42 @@ See <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/la
 </dd>
 </dl>
 </div>
+<div class="section" id="flyteidl-plugins-sagemaker-distributedprotocol">
+<span id="api-msg-flyteidl-plugins-sagemaker-distributedprotocol"></span><h2>flyteidl.plugins.sagemaker.DistributedProtocol<a class="headerlink" href="#flyteidl-plugins-sagemaker-distributedprotocol" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/plugins/sagemaker/training_job.proto#L84">[flyteidl.plugins.sagemaker.DistributedProtocol proto]</a></p>
+<p>When enabling distributed training on a training job, the user should use this message to tell Flyte and SageMaker
+what kind of distributed protocol he/she wants to use to distribute the work.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="enum-flyteidl-plugins-sagemaker-distributedprotocol-value">
+<span id="api-enum-flyteidl-plugins-sagemaker-distributedprotocol-value"></span><h2>Enum flyteidl.plugins.sagemaker.DistributedProtocol.Value<a class="headerlink" href="#enum-flyteidl-plugins-sagemaker-distributedprotocol-value" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/plugins/sagemaker/training_job.proto#L85">[flyteidl.plugins.sagemaker.DistributedProtocol.Value proto]</a></p>
+<dl class="simple" id="api-enum-value-flyteidl-plugins-sagemaker-distributedprotocol-value-unspecified">
+<dt>UNSPECIFIED</dt><dd><p><em>(DEFAULT)</em> ⁣Use this value if the user wishes to use framework-native distributed training interfaces.
+If this value is used, Flyte won’t configure SageMaker to initialize unnecessary components such as
+OpenMPI or Parameter Server.</p>
+</dd>
+</dl>
+<dl class="simple" id="api-enum-value-flyteidl-plugins-sagemaker-distributedprotocol-value-mpi">
+<dt>MPI</dt><dd><p>⁣Use this value if the user wishes to use MPI as the underlying protocol for her distributed training job
+MPI is a framework-agnostic distributed protocol. It has multiple implementations. Currently, we have only
+tested the OpenMPI implementation, which is the recommended implementation for Horovod.</p>
+</dd>
+</dl>
+</div>
 <div class="section" id="flyteidl-plugins-sagemaker-trainingjobresourceconfig">
 <span id="api-msg-flyteidl-plugins-sagemaker-trainingjobresourceconfig"></span><h2>flyteidl.plugins.sagemaker.TrainingJobResourceConfig<a class="headerlink" href="#flyteidl-plugins-sagemaker-trainingjobresourceconfig" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/plugins/sagemaker/training_job.proto#L85">[flyteidl.plugins.sagemaker.TrainingJobResourceConfig proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/plugins/sagemaker/training_job.proto#L100">[flyteidl.plugins.sagemaker.TrainingJobResourceConfig proto]</a></p>
 <p>TrainingJobResourceConfig is a pass-through, specifying the instance type to use for the training job, the
 number of instances to launch, and the size of the ML storage volume the user wants to provision
 Refer to SageMaker official doc for more details: <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html">https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="nt">&quot;instance_count&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
   <span class="nt">&quot;instance_type&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
-  <span class="nt">&quot;volume_size_in_gb&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
+  <span class="nt">&quot;volume_size_in_gb&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;distributed_protocol&quot;</span><span class="p">:</span> <span class="s2">&quot;...&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -353,10 +379,16 @@ Refer to SageMaker official doc for more details: <a class="reference external" 
 <dt>volume_size_in_gb</dt><dd><p>(<a class="reference external" href="https://developers.google.com/protocol-buffers/docs/proto#scalar">int64</a>) The size of the ML storage volume that you want to provision.</p>
 </dd>
 </dl>
+<dl class="simple" id="api-field-flyteidl-plugins-sagemaker-trainingjobresourceconfig-distributed-protocol">
+<dt>distributed_protocol</dt><dd><p>(<a class="reference internal" href="#api-enum-flyteidl-plugins-sagemaker-distributedprotocol-value"><span class="std std-ref">flyteidl.plugins.sagemaker.DistributedProtocol.Value</span></a>) When users specify an instance_count &gt; 1, Flyte will try to configure SageMaker to enable distributed training.
+If the users wish to use framework-agnostic distributed protocol such as MPI or Parameter Server, this
+field should be set to the corresponding enum value</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="flyteidl-plugins-sagemaker-trainingjob">
 <span id="api-msg-flyteidl-plugins-sagemaker-trainingjob"></span><h2>flyteidl.plugins.sagemaker.TrainingJob<a class="headerlink" href="#flyteidl-plugins-sagemaker-trainingjob" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/plugins/sagemaker/training_job.proto#L96">[flyteidl.plugins.sagemaker.TrainingJob proto]</a></p>
+<p><a class="reference external" href="https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/plugins/sagemaker/training_job.proto#L115">[flyteidl.plugins.sagemaker.TrainingJob proto]</a></p>
 <p>The spec of a training job. This is mostly a pass-through object
 <a class="reference external" href="https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html">https://docs.aws.amazon.com/sagemaker/latest/APIReference/API_CreateTrainingJob.html</a></p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>

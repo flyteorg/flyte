@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.tools package &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.tools package &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -195,6 +195,52 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-flytekit.tools.fast_registration">
+<span id="flytekit-tools-fast-registration-module"></span><h2>flytekit.tools.fast_registration module<a class="headerlink" href="#module-flytekit.tools.fast_registration" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="flytekit.tools.fast_registration.compute_digest">
+<code class="sig-prename descclassname">flytekit.tools.fast_registration.</code><code class="sig-name descname">compute_digest</code><span class="sig-paren">(</span><em class="sig-param">source_dir: os.PathLike</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/tools/fast_registration.html#compute_digest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.fast_registration.compute_digest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Walks the entirety of the source dir to compute a deterministic hex digest of the dir contents.
+:param _os.PathLike source_dir:
+:return Text:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.tools.fast_registration.download_distribution">
+<code class="sig-prename descclassname">flytekit.tools.fast_registration.</code><code class="sig-name descname">download_distribution</code><span class="sig-paren">(</span><em class="sig-param">additional_distribution: str</em>, <em class="sig-param">destination: os.PathLike</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/flytekit/tools/fast_registration.html#download_distribution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.fast_registration.download_distribution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Downloads a remote code distribution and overwrites any local files.
+:param Text additional_distribution:
+:param _os.PathLike destination:</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.tools.fast_registration.get_additional_distribution_loc">
+<code class="sig-prename descclassname">flytekit.tools.fast_registration.</code><code class="sig-name descname">get_additional_distribution_loc</code><span class="sig-paren">(</span><em class="sig-param">remote_location: str</em>, <em class="sig-param">identifier: str</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/tools/fast_registration.html#get_additional_distribution_loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.fast_registration.get_additional_distribution_loc" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>remote_location</strong> (<em>Text</em>) – </p></li>
+<li><p><strong>identifier</strong> (<em>Text</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return Text</dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="flytekit.tools.fast_registration.upload_package">
+<code class="sig-prename descclassname">flytekit.tools.fast_registration.</code><code class="sig-name descname">upload_package</code><span class="sig-paren">(</span><em class="sig-param">source_dir: os.PathLike</em>, <em class="sig-param">identifier: str</em>, <em class="sig-param">remote_location: str</em>, <em class="sig-param">dry_run=False</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="../_modules/flytekit/tools/fast_registration.html#upload_package"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#flytekit.tools.fast_registration.upload_package" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uploads the contents of the source dir as a tar package to a destination specified by the unique identifier and
+remote_location.
+:param _os.PathLike source_dir:
+:param Text identifier:
+:param Text remote_location:
+:param bool dry_run:
+:return Text:</p>
+</dd></dl>
+
+</div>
 <div class="section" id="module-flytekit.tools.lazy_loader">
 <span id="flytekit-tools-lazy-loader-module"></span><h2>flytekit.tools.lazy_loader module<a class="headerlink" href="#module-flytekit.tools.lazy_loader" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -203,7 +249,7 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
 <dt id="flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS">
-<code class="sig-name descname">LAZY_LOADING_PLUGINS</code><em class="property"> = {'hive_sensor': ['hmsclient&gt;=0.0.1,&lt;1.0.0'], 'pytorch': ['torch&gt;=1.0.0,&lt;2.0.0'], 'schema': ['numpy&gt;=1.14.0,&lt;2.0.0', 'pandas&gt;=0.22.0,&lt;2.0.0', 'pyarrow&gt;=0.11.0,&lt;1.0.0'], 'sidecar': ['k8s-proto&gt;=0.0.3,&lt;1.0.0'], 'spark': ['pyspark&gt;=2.4.0,&lt;3.0.0'], 'spark3': ['pyspark&gt;=3.0.0'], 'tensorflow': ['tensorflow&gt;=2.0.0,&lt;3.0.0']}</em><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">LAZY_LOADING_PLUGINS</code><em class="property"> = {'hive_sensor': ['hmsclient&gt;=0.0.1,&lt;1.0.0'], 'sagemaker': ['sagemaker-training&gt;=3.6.2,&lt;4.0.0'], 'schema': ['numpy&gt;=1.14.0,&lt;2.0.0', 'pandas&gt;=0.22.0,&lt;2.0.0', 'pyarrow&gt;=0.11.0,&lt;1.0.0'], 'sidecar': ['k8s-proto&gt;=0.0.3,&lt;1.0.0'], 'spark': ['pyspark&gt;=2.4.0,&lt;3.0.0'], 'spark3': ['pyspark&gt;=3.0.0']}</em><a class="headerlink" href="#flytekit.tools.lazy_loader.LazyLoadPlugin.LAZY_LOADING_PLUGINS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">

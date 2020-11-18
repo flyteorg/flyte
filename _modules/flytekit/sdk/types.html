@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.sdk.types &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.sdk.types &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -326,7 +326,10 @@
 
     <span class="n">Generic</span> <span class="o">=</span> <span class="n">_helpers</span><span class="o">.</span><span class="n">get_sdk_type_from_literal_type</span><span class="p">(</span><span class="n">_primitives</span><span class="o">.</span><span class="n">Generic</span><span class="o">.</span><span class="n">to_flyte_literal_type</span><span class="p">())</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Use this to specify a simple JSON type.</span>
+<span class="sd">    Use this to specify a simple JSON type. The Generic type offer a flexible (but loose) extension to flyte&#39;s typing</span>
+<span class="sd">    system by allowing custom types/objects to be passed through. It&#39;s strongly recommended for producers &amp; consumers of</span>
+<span class="sd">    entities that produce or consume a Generic type to perform their own expectations checks on the integrity of the</span>
+<span class="sd">    object.</span>
 
 <span class="sd">    When used with an SDK-decorated method, expect this behavior from the default type engine:</span>
 
@@ -346,6 +349,22 @@
 
 <span class="sd">        @inputs(a=Types.Generic)</span>
 <span class="sd">        @outputs(b=Types.Generic)</span>
+<span class="sd">        @python_task</span>
+<span class="sd">        def operate(wf_params, a, b):</span>
+<span class="sd">            if a[&#39;operation&#39;] == &#39;add&#39;:</span>
+<span class="sd">                a[&#39;value&#39;] += a[&#39;operand&#39;]  # a[&#39;value&#39;] is a number</span>
+<span class="sd">            elif a[&#39;operation&#39;] == &#39;merge&#39;:</span>
+<span class="sd">                a[&#39;value&#39;].update(a[&#39;some&#39;][&#39;nested&#39;][0][&#39;field&#39;])</span>
+<span class="sd">            b.set(a)</span>
+
+<span class="sd">        # For better readability, it&#39;s strongly advised to leverage python&#39;s type aliasing.</span>
+<span class="sd">        MyTypeA = Types.Generic</span>
+<span class="sd">        MyTypeB = Types.Generic</span>
+
+<span class="sd">        # This makes it clearer that it received a certain type and produces a different one. Other tasks that consume</span>
+<span class="sd">        # MyTypeB should do so in their input declaration.</span>
+<span class="sd">        @inputs(a=MyTypeA)</span>
+<span class="sd">        @outputs(b=MyTypeB)</span>
 <span class="sd">        @python_task</span>
 <span class="sd">        def operate(wf_params, a, b):</span>
 <span class="sd">            if a[&#39;operation&#39;] == &#39;add&#39;:</span>
@@ -520,7 +539,12 @@
 
     <span class="n">Proto</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_proto</span><span class="o">.</span><span class="n">create_protobuf</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Use this to specify a custom protobuf type.</span>
+<span class="sd">    Proto type wraps a protobuf type to provide interoperability between protobuf and flyte typing system. Using this</span>
+<span class="sd">    type, you can define custom input/output variable types of flyte entities and continue to provide strong typing</span>
+<span class="sd">    syntax. Proto type serializes proto objects as binary (leveraging `flyteidl&#39;s Binary literal &lt;https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/core/literals.proto#L45&gt;`_).</span>
+<span class="sd">    Binary serialization of protobufs is the most space-efficient serialization form. Because of the way protobufs are</span>
+<span class="sd">    designed, unmarshalling the serialized proto requires access to the corresponding type. In order to use/visualize</span>
+<span class="sd">    the serialized proto, you will generally need to write custom code in the corresponding component.</span>
 
 <span class="sd">    .. note::</span>
 
@@ -546,6 +570,52 @@
 
 <span class="sd">        @inputs(a=Types.Proto(my_protos_pb2.Custom))</span>
 <span class="sd">        @outputs(b=Types.Proto(my_protos_pb2.Custom))</span>
+<span class="sd">        @python_task</span>
+<span class="sd">        def assert_and_create(wf_params, a, b):</span>
+<span class="sd">            assert a.field1 == 1</span>
+<span class="sd">            assert a.field2 == &#39;abc&#39;</span>
+<span class="sd">            b.set(</span>
+<span class="sd">                my_protos_pb2.Custom(</span>
+<span class="sd">                    field1=100,</span>
+<span class="sd">                    field2=&#39;hello&#39;</span>
+<span class="sd">                )</span>
+<span class="sd">            )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">GenericProto</span> <span class="o">=</span> <span class="nb">staticmethod</span><span class="p">(</span><span class="n">_proto</span><span class="o">.</span><span class="n">create_generic</span><span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    GenericProto type wraps a protobuf type to provide interoperability between protobuf and flyte typing system. Using</span>
+<span class="sd">    this type, you can define custom input/output variable types of flyte entities and continue to provide strong typing</span>
+<span class="sd">    syntax. Proto type serializes proto objects as binary (leveraging `flyteidl&#39;s Binary literal &lt;https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/core/literals.proto#L63&gt;`_).</span>
+<span class="sd">    A generic proto is a specialization of the Generic type with added convenience functions to support marshalling/</span>
+<span class="sd">    unmarshalling of the underlying protobuf object using the protobuf official json marshaller. While GenericProto type</span>
+<span class="sd">    does not produce the most space-efficient representation of protobufs, it&#39;s a suitable solution for making protobufs</span>
+<span class="sd">    easily accessible (i.e. humanly readable) in other flyte components (e.g. console, cli... etc.).</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        The protobuf Python library should be installed on the PYTHONPATH to ensure the type engine can access the</span>
+<span class="sd">        appropriate Python code to deserialize the protobuf.</span>
+
+<span class="sd">    When used with an SDK-decorated method, expect this behavior from the default type engine:</span>
+
+<span class="sd">        As input:</span>
+<span class="sd">            1) If set, a Python protobuf object of the type specified in the definition.</span>
+<span class="sd">            2) If not set, a None value.</span>
+
+<span class="sd">        As output:</span>
+<span class="sd">            1) A Python protobuf object matching the type specified by the users.</span>
+<span class="sd">            2) Set None to null the output.</span>
+
+<span class="sd">        From command-line:</span>
+<span class="sd">            A base-64 encoded string of the serialized protobuf.</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        from protos import my_protos_pb2</span>
+
+<span class="sd">        @inputs(a=Types.GenericProto(my_protos_pb2.Custom))</span>
+<span class="sd">        @outputs(b=Types.GenericProto(my_protos_pb2.Custom))</span>
 <span class="sd">        @python_task</span>
 <span class="sd">        def assert_and_create(wf_params, a, b):</span>
 <span class="sd">            assert a.field1 == 1</span>

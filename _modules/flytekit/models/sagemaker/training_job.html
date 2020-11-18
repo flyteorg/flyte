@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.models.sagemaker.training_job &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.models.sagemaker.training_job &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -168,6 +168,16 @@
 <span class="kn">from</span> <span class="nn">flytekit.models</span> <span class="k">import</span> <span class="n">common</span> <span class="k">as</span> <span class="n">_common</span>
 
 
+<div class="viewcode-block" id="DistributedProtocol"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.DistributedProtocol">[docs]</a><span class="k">class</span> <span class="nc">DistributedProtocol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The distribution framework is used for determining which underlying distributed training mechanism to use.</span>
+<span class="sd">    This is only required for use cases where the user wants to train its custom training job in a distributed manner</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">UNSPECIFIED</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">DistributedProtocol</span><span class="o">.</span><span class="n">UNSPECIFIED</span>
+    <span class="n">MPI</span> <span class="o">=</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">DistributedProtocol</span><span class="o">.</span><span class="n">MPI</span></div>
+
+
 <div class="viewcode-block" id="TrainingJobResourceConfig"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig">[docs]</a><span class="k">class</span> <span class="nc">TrainingJobResourceConfig</span><span class="p">(</span><span class="n">_common</span><span class="o">.</span><span class="n">FlyteIdlEntity</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    TrainingJobResourceConfig is a pass-through, specifying the instance type to use for the training job, the</span>
@@ -176,11 +186,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">instance_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">instance_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">volume_size_in_gb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">instance_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">instance_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">volume_size_in_gb</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">distributed_protocol</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">DistributedProtocol</span><span class="o">.</span><span class="n">UNSPECIFIED</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance_count</span> <span class="o">=</span> <span class="n">instance_count</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_instance_type</span> <span class="o">=</span> <span class="n">instance_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_volume_size_in_gb</span> <span class="o">=</span> <span class="n">volume_size_in_gb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_distributed_protocol</span> <span class="o">=</span> <span class="n">distributed_protocol</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">instance_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -206,6 +221,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_volume_size_in_gb</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">distributed_protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The distribution framework is used to determine through which mechanism the distributed training is done.</span>
+<span class="sd">        enum value from DistributionFramework.</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_distributed_protocol</span>
+
 <div class="viewcode-block" id="TrainingJobResourceConfig.to_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.to_flyte_idl">[docs]</a>    <span class="k">def</span> <span class="nf">to_flyte_idl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_training_job_pb2</span><span class="o">.</span><span class="n">TrainingJobResourceConfig</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
@@ -215,6 +239,7 @@
             <span class="n">instance_count</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance_count</span><span class="p">,</span>
             <span class="n">instance_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">instance_type</span><span class="p">,</span>
             <span class="n">volume_size_in_gb</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">volume_size_in_gb</span><span class="p">,</span>
+            <span class="n">distributed_protocol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">distributed_protocol</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="TrainingJobResourceConfig.from_flyte_idl"><a class="viewcode-back" href="../../../../flytekit/flytekit.models.sagemaker.html#flytekit.models.sagemaker.training_job.TrainingJobResourceConfig.from_flyte_idl">[docs]</a>    <span class="nd">@classmethod</span>
@@ -228,6 +253,7 @@
             <span class="n">instance_count</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">instance_count</span><span class="p">,</span>
             <span class="n">instance_type</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">instance_type</span><span class="p">,</span>
             <span class="n">volume_size_in_gb</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">volume_size_in_gb</span><span class="p">,</span>
+            <span class="n">distributed_protocol</span><span class="o">=</span><span class="n">pb2_object</span><span class="o">.</span><span class="n">distributed_protocol</span><span class="p">,</span>
         <span class="p">)</span></div></div>
 
 

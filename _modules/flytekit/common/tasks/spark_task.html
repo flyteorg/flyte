@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>flytekit.common.tasks.spark_task &mdash; Flyte 0.8.0 documentation</title>
+  <title>flytekit.common.tasks.spark_task &mdash; Flyte 0.9.0 documentation</title>
   
 
   
@@ -310,10 +310,10 @@
             <span class="n">_exception_scopes</span><span class="o">.</span><span class="n">user_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task_function</span><span class="p">)(</span>
                 <span class="n">_sdk_runnable</span><span class="o">.</span><span class="n">ExecutionParameters</span><span class="p">(</span>
                     <span class="n">execution_date</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">execution_date</span><span class="p">,</span>
-                    <span class="n">execution_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">execution_id</span><span class="p">,</span>
-                    <span class="n">stats</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
-                    <span class="n">logging</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">logging</span><span class="p">,</span>
                     <span class="n">tmp_dir</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">working_directory</span><span class="p">,</span>
+                    <span class="n">stats</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
+                    <span class="n">execution_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">execution_id</span><span class="p">,</span>
+                    <span class="n">logging</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">logging</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">GlobalSparkContext</span><span class="o">.</span><span class="n">get_spark_context</span><span class="p">(),</span>
                 <span class="o">**</span><span class="n">inputs_dict</span>

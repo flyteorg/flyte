@@ -4,6 +4,14 @@ flytekit.tools package
 Submodules
 ----------
 
+flytekit.tools.fast\_registration module
+----------------------------------------
+
+.. automodule:: flytekit.tools.fast_registration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 flytekit.tools.lazy\_loader module
 ----------------------------------
 
