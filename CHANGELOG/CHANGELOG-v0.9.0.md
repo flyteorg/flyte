@@ -16,4 +16,4 @@ For examples of the native typed SDK usage refer to: [Cookbook Examples](https:/
 ### Flyte Platform
  - SparkOperator v1beta2 support
  - Archive/Unarchive projects
- - BugFixes
+ - Bug Fixes
