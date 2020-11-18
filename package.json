@@ -182,7 +182,7 @@
     "react-test-renderer": "^16.9.0",
     "react-virtualized": "^9.21.1",
     "resolve-url-loader": "^2.3.0",
-    "semantic-release": "^17.0.7",
+    "semantic-release": "^17.2.3",
     "shallowequal": "^1.1.0",
     "snakecase-keys": "^3.1.0",
     "source-map-loader": "^0.2.1",
