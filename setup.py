@@ -9,15 +9,11 @@
 
 set -ex
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-BASEDIR="${DIR}/.."
-
 # Set up a temp directory
-mkdir ${BASEDIR}/_repos || true
-REPOS_DIR=`mktemp -d "${BASEDIR}/_repos/XXXXXXXXX"`
+mkdir _repos || true
 
 # Clone all repos
 echo "Cloning Flyteidl"
-git clone https://github.com/lyft/flyteidl.git ${REPOS_DIR}/flyteidl
+git clone https://github.com/lyft/flyteidl.git _repos/flyteidl
 echo "Cloning Flytekit"
-git clone https://github.com/lyft/flytekit.git ${REPOS_DIR}/flytekit
+git clone https://github.com/lyft/flytekit.git _repos/flytekit
