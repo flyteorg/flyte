@@ -13,7 +13,7 @@ For examples of the native typed SDK usage refer to: [Cookbook Examples](https:/
 - Launch form with more types supported
 - Bug and stability fixes
 
-### FlytePlatform
+### Flyte Platform
  - SparkOperator v1beta2 support
  - Archive/Unarchive projects
  - BugFixes
