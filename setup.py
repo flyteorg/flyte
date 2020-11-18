@@ -21,9 +21,3 @@ echo "Cloning Flyteidl"
 git clone https://github.com/lyft/flyteidl.git ${REPOS_DIR}/flyteidl
 echo "Cloning Flytekit"
 git clone https://github.com/lyft/flytekit.git ${REPOS_DIR}/flytekit
-
-# Generate documentation by running script inside the generation container
-docs_infra/in_container_rst_generation.sh
-
-# Cleanup
-rm -rf ${REPOS_DIR}/* || true
