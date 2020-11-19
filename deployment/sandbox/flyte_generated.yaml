@@ -8858,7 +8858,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.3.7
+        image: docker.io/lyft/flyteadmin:v0.3.15
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8904,7 +8904,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.3.7
+        image: docker.io/lyft/flyteadmin:v0.3.15
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8922,7 +8922,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: docker.io/lyft/flyteadmin:v0.3.7
+        image: docker.io/lyft/flyteadmin:v0.3.15
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8937,7 +8937,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.3.7
+        image: docker.io/lyft/flyteadmin:v0.3.15
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8990,7 +8990,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.12.1
+        image: docker.io/lyft/flyteconsole:v0.17.7
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -9279,7 +9279,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.3.7
+            image: docker.io/lyft/flyteadmin:v0.3.15
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
