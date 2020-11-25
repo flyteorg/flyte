@@ -136,7 +136,7 @@ Repo | Language | Purpose | Status
 [flytestdlib](https://github.com/lyft/flytestdlib) |  Go | standard library | Production-grade
 [flytesnacks](https://github.com/lyft/flytesnacks) | Python | examples, tips, and tricks | Incubating
 [flytekit-java](https://github.com/spotify/flytekit-java) | Java/Scala | Java & scala SDK for authoring Flyte workflows | Incubating
-[flytectl](https://github.com/lyft/flytectl) | Java/Scala | Java & scala SDK for authoring Flyte workflows | Incomplete
+[flytectl](https://github.com/lyft/flytectl) | Go | A standalone Flyte CLI | Incomplete
 
 
 # Production K8s Operators
