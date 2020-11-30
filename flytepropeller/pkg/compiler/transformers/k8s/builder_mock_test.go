@@ -73,6 +73,10 @@ type mockNode struct {
 	subWF    common.Workflow
 }
 
+func (n *mockNode) SetID(id common.NodeID) {
+	n.id = id
+}
+
 func (n mockNode) GetID() common.NodeID {
 	return n.id
 }

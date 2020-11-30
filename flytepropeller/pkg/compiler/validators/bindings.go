@@ -11,30 +11,46 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData, expectedType *flyte.LiteralType, errs errors.CompileErrors) (
-	[]c.NodeID, bool) {
+func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData,
+	expectedType *flyte.LiteralType, errs errors.CompileErrors) (
+	resolvedType *flyte.LiteralType, upstreamNodes []c.NodeID, ok bool) {
 
 	switch binding.GetValue().(type) {
 	case *flyte.BindingData_Collection:
 		if expectedType.GetCollectionType() != nil {
 			allNodeIds := make([]c.NodeID, 0, len(binding.GetMap().GetBindings()))
+			var subType *flyte.LiteralType
 			for _, v := range binding.GetCollection().GetBindings() {
-				if nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope()); ok {
+				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetCollectionType(), errs.NewScope()); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
+					subType = resolvedType
 				}
 			}
-			return allNodeIds, !errs.HasErrors()
+
+			return &flyte.LiteralType{
+				Type: &flyte.LiteralType_CollectionType{
+					CollectionType: subType,
+				},
+			}, allNodeIds, !errs.HasErrors()
 		}
+
 		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), binding.GetCollection().String()))
 	case *flyte.BindingData_Map:
 		if expectedType.GetMapValueType() != nil {
 			allNodeIds := make([]c.NodeID, 0, len(binding.GetMap().GetBindings()))
+			var subType *flyte.LiteralType
 			for _, v := range binding.GetMap().GetBindings() {
-				if nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope()); ok {
+				if resolvedType, nodeIds, ok := validateBinding(w, nodeID, nodeParam, v, expectedType.GetMapValueType(), errs.NewScope()); ok {
 					allNodeIds = append(allNodeIds, nodeIds...)
+					subType = resolvedType
 				}
 			}
-			return allNodeIds, !errs.HasErrors()
+
+			return &flyte.LiteralType{
+				Type: &flyte.LiteralType_MapValueType{
+					MapValueType: subType,
+				},
+			}, allNodeIds, !errs.HasErrors()
 		}
 
 		errs.Collect(errors.NewMismatchingBindingsErr(nodeID, nodeParam, expectedType.String(), binding.GetMap().String()))
@@ -43,7 +59,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			v, err := typing.ParseVarName(binding.GetPromise().GetVar())
 			if err != nil {
 				errs.Collect(errors.NewSyntaxError(nodeID, binding.GetPromise().GetVar(), err))
-				return nil, !errs.HasErrors()
+				return nil, nil, !errs.HasErrors()
 			}
 
 			if param, paramFound := validateOutputVar(upNode, v.Name, errs.NewScope()); paramFound {
@@ -59,12 +75,14 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 
 				if AreTypesCastable(sourceType, expectedType) {
 					binding.GetPromise().NodeId = upNode.GetId()
-					return []c.NodeID{binding.GetPromise().NodeId}, true
+					return param.GetType(), []c.NodeID{binding.GetPromise().NodeId}, true
 				}
 
 				errs.Collect(errors.NewMismatchingTypesErr(nodeID, binding.GetPromise().Var, sourceType.String(), expectedType.String()))
 			}
 		}
+
+		errs.Collect(errors.NewParameterNotBoundErr(nodeID, nodeParam))
 	case *flyte.BindingData_Scalar:
 		literalType := literalTypeForScalar(binding.GetScalar())
 		if literalType == nil {
@@ -73,42 +91,60 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
 		}
 
-		return []c.NodeID{}, !errs.HasErrors()
+		return literalType, []c.NodeID{}, !errs.HasErrors()
 	default:
 		errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(binding.GetValue()).String()))
 	}
 
-	return nil, !errs.HasErrors()
+	return nil, nil, !errs.HasErrors()
 }
 
 func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Binding, params *flyte.VariableMap,
-	errs errors.CompileErrors) (ok bool) {
+	validateParamTypes bool, errs errors.CompileErrors) (resolved *flyte.VariableMap, ok bool) {
+
+	resolved = &flyte.VariableMap{
+		Variables: make(map[string]*flyte.Variable, len(bindings)),
+	}
 
 	providedBindings := sets.NewString()
 	for _, binding := range bindings {
-		if param, ok := findVariableByName(params, binding.GetVar()); !ok {
+		if param, ok := findVariableByName(params, binding.GetVar()); !ok && validateParamTypes {
 			errs.Collect(errors.NewVariableNameNotFoundErr(node.GetId(), node.GetId(), binding.GetVar()))
 		} else if binding.GetBinding() == nil {
 			errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Binding"))
 		} else if providedBindings.Has(binding.GetVar()) {
 			errs.Collect(errors.NewParameterBoundMoreThanOnceErr(node.GetId(), binding.GetVar()))
 		} else {
+			if !validateParamTypes && param == nil {
+				param = &flyte.Variable{
+					Type: &flyte.LiteralType{
+						Type: &flyte.LiteralType_Simple{},
+					},
+				}
+			}
 			providedBindings.Insert(binding.GetVar())
-			if upstreamNodes, bindingOk := validateBinding(w, node.GetId(), binding.GetVar(), binding.GetBinding(), param.Type, errs.NewScope()); bindingOk {
+			if resolvedType, upstreamNodes, bindingOk := validateBinding(w, node.GetId(), binding.GetVar(), binding.GetBinding(),
+				param.Type, errs.NewScope()); bindingOk {
 				for _, upNode := range upstreamNodes {
 					// Add implicit Edges
 					w.AddExecutionEdge(upNode, node.GetId())
+				}
+
+				resolved.Variables[binding.GetVar()] = &flyte.Variable{
+					Type: resolvedType,
 				}
 			}
 		}
 	}
 
 	// If we missed binding some params, add errors
-	for paramName := range params.Variables {
-		if !providedBindings.Has(paramName) {
-			errs.Collect(errors.NewParameterNotBoundErr(node.GetId(), paramName))
+	if params != nil {
+		for paramName := range params.Variables {
+			if !providedBindings.Has(paramName) {
+				errs.Collect(errors.NewParameterNotBoundErr(node.GetId(), paramName))
+			}
 		}
 	}
 
-	return !errs.HasErrors()
+	return resolved, !errs.HasErrors()
 }

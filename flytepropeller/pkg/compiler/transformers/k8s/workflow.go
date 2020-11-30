@@ -66,7 +66,7 @@ func WorkflowNameFromID(id string) string {
 }
 
 func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTask, errs errors.CompileErrors) (
-	spec *v1alpha1.WorkflowSpec) {
+	spec *v1alpha1.WorkflowSpec, err error) {
 	var failureN *v1alpha1.NodeSpec
 	if n := wf.Template.GetFailureNode(); n != nil {
 		failureN, _ = buildNodeSpec(n, tasks, errs.NewScope())
@@ -75,7 +75,7 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 	nodes, _ := buildNodes(wf.Template.GetNodes(), tasks, errs.NewScope())
 
 	if errs.HasErrors() {
-		return nil
+		return nil, errs
 	}
 
 	outputBindings := make([]*v1alpha1.Binding, 0, len(wf.Template.Outputs))
@@ -105,7 +105,7 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 		Outputs:         outputs,
 		OutputBindings:  outputBindings,
 		OnFailurePolicy: failurePolicy,
-	}
+	}, nil
 }
 
 func withSeparatorIfNotEmpty(value string) string {
@@ -146,11 +146,23 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		return nil, errs
 	}
 
-	primarySpec := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
+	primarySpec, err := buildFlyteWorkflowSpec(wfClosure.Primary, wfClosure.Tasks, errs.NewScope())
+	if err != nil {
+		errs.Collect(errors.NewWorkflowBuildError(err))
+		return nil, errs
+	}
 	subwfs := make(map[v1alpha1.WorkflowID]*v1alpha1.WorkflowSpec, len(wfClosure.SubWorkflows))
 	for _, subWf := range wfClosure.SubWorkflows {
-		spec := buildFlyteWorkflowSpec(subWf, wfClosure.Tasks, errs.NewScope())
-		subwfs[subWf.Template.Id.String()] = spec
+		spec, err := buildFlyteWorkflowSpec(subWf, wfClosure.Tasks, errs.NewScope())
+		if err != nil {
+			errs.Collect(errors.NewWorkflowBuildError(err))
+		} else {
+			subwfs[subWf.Template.Id.String()] = spec
+		}
+	}
+
+	if errs.HasErrors() {
+		return nil, errs
 	}
 
 	wf := wfClosure.Primary.Template
@@ -186,7 +198,6 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 		NodeDefaults: v1alpha1.NodeDefaults{Interruptible: interruptible},
 	}
 
-	var err error
 	obj.ObjectMeta.Name, obj.ObjectMeta.GenerateName, obj.ObjectMeta.Labels[ExecutionIDLabel], err =
 		generateName(wf.GetId(), executionID)
 

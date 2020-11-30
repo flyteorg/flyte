@@ -420,6 +420,11 @@ func (_m *NodeBuilder) GetWorkflowNode() *core.WorkflowNode {
 	return r0
 }
 
+// SetID provides a mock function with given fields: id
+func (_m *NodeBuilder) SetID(id string) {
+	_m.Called(id)
+}
+
 // SetInputs provides a mock function with given fields: inputs
 func (_m *NodeBuilder) SetInputs(inputs []*core.Binding) {
 	_m.Called(inputs)

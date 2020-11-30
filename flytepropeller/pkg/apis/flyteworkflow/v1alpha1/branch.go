@@ -17,6 +17,10 @@ func (in Error) UnmarshalJSON(b []byte) error {
 }
 
 func (in Error) MarshalJSON() ([]byte, error) {
+	if in.Error == nil {
+		return nilJSON, nil
+	}
+
 	var buf bytes.Buffer
 	if err := marshaler.Marshal(&buf, in.Error); err != nil {
 		return nil, err
@@ -37,6 +41,10 @@ type BooleanExpression struct {
 }
 
 func (in BooleanExpression) MarshalJSON() ([]byte, error) {
+	if in.BooleanExpression == nil {
+		return nilJSON, nil
+	}
+
 	var buf bytes.Buffer
 	if err := marshaler.Marshal(&buf, in.BooleanExpression); err != nil {
 		return nil, err

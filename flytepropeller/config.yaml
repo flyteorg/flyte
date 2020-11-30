@@ -30,15 +30,17 @@ tasks:
   task-plugins:
     enabled-plugins:
       - container
+      - sidecar
       - K8S-ARRAY
       - qubole-hive-executor
-    default-for-task-type:
-      - container-array: k8s-array
-      - presto: my-presto
-# Uncomment to enable sagemaker plugin
-#      - sagemaker_training
-#      - sagemaker_hyperparameter_tuning
-#      - sagemaker_custom_training
+    # Uncomment to enable sagemaker plugin
+    #      - sagemaker_training
+    #      - sagemaker_hyperparameter_tuning
+    #      - sagemaker_custom_training
+    default-for-task-types:
+      - container: container
+      - container_array: K8S-ARRAY
+#      - presto: my-presto
 # Sample plugins config
 plugins:
   # All k8s plugins default configuration

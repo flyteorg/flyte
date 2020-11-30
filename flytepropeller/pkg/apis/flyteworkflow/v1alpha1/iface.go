@@ -21,6 +21,8 @@ import (
 
 //go:generate mockery -all
 
+var nilJSON, _ = json.Marshal(nil)
+
 type CustomState map[string]interface{}
 type WorkflowID = string
 type TaskID = string

@@ -123,6 +123,10 @@ func (n *nodeBuilder) SetInputs(inputs []*core.Binding) {
 	n.Inputs = inputs
 }
 
+func (n *nodeBuilder) SetID(id string) {
+	n.Id = id
+}
+
 type taskBuilder struct {
 	*flyteTask
 }

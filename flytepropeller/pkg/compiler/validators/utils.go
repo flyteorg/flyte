@@ -1,19 +1,21 @@
 package validators
 
 import (
+	"fmt"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-func findBindingByVariableName(bindings []*core.Binding, name string) (binding *core.Binding, found bool) {
+func containsBindingByVariableName(bindings []*core.Binding, name string) (found bool) {
 	for _, b := range bindings {
 		if b.Var == name {
-			return b, true
+			return true
 		}
 	}
 
-	return nil, false
+	return false
 }
 
 func findVariableByName(vars *core.VariableMap, name string) (variable *core.Variable, found bool) {
@@ -113,6 +115,26 @@ func withVariableName(param *core.Variable) (newParam *core.Variable, ok bool) {
 	}
 
 	return
+}
+
+func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*core.Variable, error) {
+	res := make(map[string]*core.Variable, len(m1)+len(m2))
+	for k, v := range m1 {
+		res[k] = v
+	}
+
+	for k, v := range m2 {
+		if existingV, exists := res[k]; exists {
+			if v.Type.String() != existingV.Type.String() {
+				return nil, fmt.Errorf("key already exists with a different type. %v has type [%v] on one side "+
+					"and type [%v] on the other", k, existingV.Type.String(), v.Type.String())
+			}
+		}
+
+		res[k] = v
+	}
+
+	return res, nil
 }
 
 // Gets LiteralType for literal, nil if the value of literal is unknown, or type None if the literal is a non-homogeneous

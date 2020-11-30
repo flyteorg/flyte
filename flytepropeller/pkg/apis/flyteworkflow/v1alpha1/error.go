@@ -19,7 +19,7 @@ func (in *ExecutionError) UnmarshalJSON(b []byte) error {
 
 func (in *ExecutionError) MarshalJSON() ([]byte, error) {
 	if in == nil {
-		return []byte{}, nil
+		return nilJSON, nil
 	}
 	var buf bytes.Buffer
 	if err := marshaler.Marshal(&buf, in.ExecutionError); err != nil {
