@@ -8113,6 +8113,7 @@ data:
           - "Content-Type"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
+      eventVersion: 1
       profilerPort: 10254
       metricsScope: "flyte:"
       metadataStoragePrefix:
@@ -8154,7 +8155,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-admin-config-678t259tk4
+  name: flyte-admin-config-2k7ct6tm5h
   namespace: flyte
 ---
 apiVersion: v1
@@ -8731,7 +8732,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-678t259tk4
+          name: flyte-admin-config-2k7ct6tm5h
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -9012,7 +9013,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-678t259tk4
+              name: flyte-admin-config-2k7ct6tm5h
             name: config-volume
           - name: db-pass
             secret:

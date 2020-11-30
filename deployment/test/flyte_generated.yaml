@@ -491,6 +491,7 @@ data:
           - "Content-Type"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
+      eventVersion: 1
       profilerPort: 10254
       metricsScope: "flyte:"
       metadataStoragePrefix:
@@ -524,7 +525,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-admin-config-c96tt5m6b7
+  name: flyte-admin-config-4kf68ktg52
   namespace: flyte
 ---
 apiVersion: v1
@@ -1025,7 +1026,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-c96tt5m6b7
+          name: flyte-admin-config-4kf68ktg52
         name: config-volume
       - configMap:
           name: clusterresource-template-dtg8ff28mt
