@@ -101,6 +101,55 @@ func marshalProto(t *testing.T, filename string, p proto.Message) {
 	assert.NoError(t, ioutil.WriteFile(strings.Replace(filename, filepath.Ext(filename), ".yaml", 1), b, os.ModePerm))
 }
 
+func TestBranches(t *testing.T) {
+	errors.SetConfig(errors.Config{IncludeSource: true})
+	assert.NoError(t, filepath.Walk("testdata/branch", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		t.Run(path, func(t *testing.T) {
+			//if !strings.HasSuffix(path, "success_5.json") {
+			//	t.SkipNow()
+			//}
+
+			raw, err := ioutil.ReadFile(path)
+			assert.NoError(t, err)
+			wf := &core.WorkflowClosure{}
+			err = jsonpb.UnmarshalString(string(raw), wf)
+			assert.NoError(t, err)
+
+			t.Log("Compiling Workflow")
+			compiledTasks := mustCompileTasks(t, wf.Tasks)
+			compiledWfc, err := compiler.CompileWorkflow(wf.Workflow, []*core.WorkflowTemplate{}, compiledTasks,
+				[]common.InterfaceProvider{})
+			assert.NoError(t, err)
+
+			inputs := map[string]interface{}{}
+			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
+				inputs[varName] = utils.MustMakeDefaultLiteralForType(v.Type)
+			}
+
+			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
+				utils.MustMakeLiteral(inputs).GetMap(),
+				&core.WorkflowExecutionIdentifier{
+					Project: "hello",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				"namespace")
+			if assert.NoError(t, err) {
+				raw, err := json.Marshal(flyteWf)
+				if assert.NoError(t, err) {
+					assert.NotEmpty(t, raw)
+				}
+			}
+		})
+
+		return nil
+	}))
+}
+
 func TestReverseEngineerFromYaml(t *testing.T) {
 	root := "testdata"
 	errors.SetConfig(errors.Config{IncludeSource: true})

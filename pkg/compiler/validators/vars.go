@@ -19,15 +19,22 @@ func validateOutputVar(n c.NodeBuilder, paramName string, errs errors.CompileErr
 	return param, !errs.HasErrors()
 }
 
-func validateInputVar(n c.NodeBuilder, paramName string, errs errors.CompileErrors) (param *flyte.Variable, ok bool) {
+func validateInputVar(n c.NodeBuilder, paramName string, requireParamType bool, errs errors.CompileErrors) (param *flyte.Variable, ok bool) {
 	if n.GetInterface() == nil {
 		return nil, false
 	}
 
-	if param, ok = findVariableByName(n.GetInterface().GetInputs(), paramName); !ok {
-		errs.Collect(errors.NewVariableNameNotFoundErr(n.GetId(), n.GetId(), paramName))
+	if param, ok = findVariableByName(n.GetInterface().GetInputs(), paramName); ok {
+		return
 	}
 
+	if !requireParamType {
+		if containsBindingByVariableName(n.GetInputs(), paramName) {
+			return
+		}
+	}
+
+	errs.Collect(errors.NewVariableNameNotFoundErr(n.GetId(), n.GetId(), paramName))
 	return
 }
 
@@ -51,12 +58,12 @@ func validateVarsSetMatch(nodeID string, params1, params2 map[string]*flyte.Vari
 	}
 
 	// All remaining params on either sides indicate errors
-	inLeftSide := params1Set.Intersection(params2Set)
+	inLeftSide := params1Set.Difference(params2Set)
 	for range inLeftSide {
 		errs.Collect(errors.NewMismatchingInterfacesErr(nodeID, nodeID))
 	}
 
-	inRightSide := params2Set.Intersection(params1Set)
+	inRightSide := params2Set.Difference(params1Set)
 	for range inRightSide {
 		errs.Collect(errors.NewMismatchingInterfacesErr(nodeID, nodeID))
 	}

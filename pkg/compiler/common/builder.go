@@ -26,6 +26,7 @@ type WorkflowBuilder interface {
 // A mutable node used during the build of the intermediate layer.
 type NodeBuilder interface {
 	Node
+	SetID(id string)
 	SetInterface(iface *core.TypedInterface)
 	SetInputs(inputs []*core.Binding)
 	SetSubWorkflow(wf Workflow)

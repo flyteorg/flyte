@@ -16,6 +16,9 @@ const (
 	// BranchNode is missing a condition.
 	BranchNodeHasNoCondition ErrorCode = "BranchNodeHasNoCondition"
 
+	// BranchNode is missing the else case & the else fail
+	BranchNodeHasNoDefault ErrorCode = "BranchNodeHasNoDefault"
+
 	// An expected field isn't populated.
 	ValueRequired ErrorCode = "ValueRequired"
 
@@ -89,6 +92,14 @@ func NewBranchNodeHasNoCondition(branchNodeID string) *CompileError {
 	return newError(
 		BranchNodeHasNoCondition,
 		"One of the branches on the node doesn't have a condition.",
+		branchNodeID,
+	)
+}
+
+func NewBranchNodeHasNoDefault(branchNodeID string) *CompileError {
+	return newError(
+		BranchNodeHasNoDefault,
+		"Branch Node must have either the else case set or a default error.",
 		branchNodeID,
 	)
 }

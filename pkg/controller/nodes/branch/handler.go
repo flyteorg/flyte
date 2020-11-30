@@ -125,6 +125,15 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 	// TODO we should replace the call to RecursiveNodeHandler with a call to SingleNode Handler. The inputs are also already known ahead of time
 	// There is no DAGStructure for the branch nodes, the branch taken node is the leaf node. The node itself may be arbitrarily complex, but in that case the node should reference a subworkflow etc
 	// The parent of the BranchTaken Node is the actual Branch Node and all the data is just forwarded from the Branch to the executed node.
+	nl := nCtx.ContextualNodeLookup()
+	if nl == nil {
+		return handler.DoTransition(handler.TransitionTypeBarrier, handler.PhaseInfo{}),
+			errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "nodeLookup must be supplied.")
+	}
+
+	childNodeStatus := nl.GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
+	childNodeStatus.SetDataDir(nodeStatus.GetDataDir())
+	childNodeStatus.SetOutputDir(nodeStatus.GetOutputDir())
 	dag := executors.NewLeafNodeDAGStructure(branchTakenNode.GetID(), nCtx.NodeID())
 	execContext, err := b.getExecutionContextForDownstream(nCtx)
 	if err != nil {
@@ -137,9 +146,6 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx handler.Node
 
 	if downstreamStatus.IsComplete() {
 		// For branch node we set the output node to be the same as the child nodes output
-		childNodeStatus := nCtx.ContextualNodeLookup().GetNodeExecutionStatus(ctx, branchTakenNode.GetID())
-		nodeStatus.SetDataDir(childNodeStatus.GetDataDir())
-		nodeStatus.SetOutputDir(childNodeStatus.GetOutputDir())
 		phase := handler.PhaseInfoSuccess(&handler.ExecutionInfo{
 			OutputInfo: &handler.OutputInfo{OutputURI: v1alpha1.GetOutputsFile(childNodeStatus.GetOutputDir())},
 		})
