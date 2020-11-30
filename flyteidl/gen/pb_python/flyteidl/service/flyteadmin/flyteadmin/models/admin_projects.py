@@ -33,21 +33,26 @@ class AdminProjects(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'projects': 'list[AdminProject]'
+        'projects': 'list[AdminProject]',
+        'token': 'str'
     }
 
     attribute_map = {
-        'projects': 'projects'
+        'projects': 'projects',
+        'token': 'token'
     }
 
-    def __init__(self, projects=None):  # noqa: E501
+    def __init__(self, projects=None, token=None):  # noqa: E501
         """AdminProjects - a model defined in Swagger"""  # noqa: E501
 
         self._projects = None
+        self._token = None
         self.discriminator = None
 
         if projects is not None:
             self.projects = projects
+        if token is not None:
+            self.token = token
 
     @property
     def projects(self):
@@ -69,6 +74,29 @@ class AdminProjects(object):
         """
 
         self._projects = projects
+
+    @property
+    def token(self):
+        """Gets the token of this AdminProjects.  # noqa: E501
+
+        In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty.  # noqa: E501
+
+        :return: The token of this AdminProjects.  # noqa: E501
+        :rtype: str
+        """
+        return self._token
+
+    @token.setter
+    def token(self, token):
+        """Sets the token of this AdminProjects.
+
+        In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. If there are no more results, this value will be empty.  # noqa: E501
+
+        :param token: The token of this AdminProjects.  # noqa: E501
+        :type: str
+        """
+
+        self._token = token
 
     def to_dict(self):
         """Returns the model properties as a dict"""

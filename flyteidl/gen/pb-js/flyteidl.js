@@ -26149,6 +26149,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.admin
              * @interface IProjects
              * @property {Array.<flyteidl.admin.IProject>|null} [projects] Projects projects
+             * @property {string|null} [token] Projects token
              */
 
             /**
@@ -26174,6 +26175,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             Projects.prototype.projects = $util.emptyArray;
+
+            /**
+             * Projects token.
+             * @member {string} token
+             * @memberof flyteidl.admin.Projects
+             * @instance
+             */
+            Projects.prototype.token = "";
 
             /**
              * Creates a new Projects instance using the specified properties.
@@ -26202,6 +26211,8 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.projects != null && message.projects.length)
                     for (let i = 0; i < message.projects.length; ++i)
                         $root.flyteidl.admin.Project.encode(message.projects[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.token != null && message.hasOwnProperty("token"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
                 return writer;
             };
 
@@ -26227,6 +26238,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (!(message.projects && message.projects.length))
                             message.projects = [];
                         message.projects.push($root.flyteidl.admin.Project.decode(reader, reader.uint32()));
+                        break;
+                    case 2:
+                        message.token = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -26256,6 +26270,9 @@ export const flyteidl = $root.flyteidl = (() => {
                             return "projects." + error;
                     }
                 }
+                if (message.token != null && message.hasOwnProperty("token"))
+                    if (!$util.isString(message.token))
+                        return "token: string expected";
                 return null;
             };
 
@@ -26268,6 +26285,10 @@ export const flyteidl = $root.flyteidl = (() => {
              * Properties of a ProjectListRequest.
              * @memberof flyteidl.admin
              * @interface IProjectListRequest
+             * @property {number|null} [limit] ProjectListRequest limit
+             * @property {string|null} [token] ProjectListRequest token
+             * @property {string|null} [filters] ProjectListRequest filters
+             * @property {flyteidl.admin.ISort|null} [sortBy] ProjectListRequest sortBy
              */
 
             /**
@@ -26284,6 +26305,38 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
+
+            /**
+             * ProjectListRequest limit.
+             * @member {number} limit
+             * @memberof flyteidl.admin.ProjectListRequest
+             * @instance
+             */
+            ProjectListRequest.prototype.limit = 0;
+
+            /**
+             * ProjectListRequest token.
+             * @member {string} token
+             * @memberof flyteidl.admin.ProjectListRequest
+             * @instance
+             */
+            ProjectListRequest.prototype.token = "";
+
+            /**
+             * ProjectListRequest filters.
+             * @member {string} filters
+             * @memberof flyteidl.admin.ProjectListRequest
+             * @instance
+             */
+            ProjectListRequest.prototype.filters = "";
+
+            /**
+             * ProjectListRequest sortBy.
+             * @member {flyteidl.admin.ISort|null|undefined} sortBy
+             * @memberof flyteidl.admin.ProjectListRequest
+             * @instance
+             */
+            ProjectListRequest.prototype.sortBy = null;
 
             /**
              * Creates a new ProjectListRequest instance using the specified properties.
@@ -26309,6 +26362,14 @@ export const flyteidl = $root.flyteidl = (() => {
             ProjectListRequest.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
+                if (message.limit != null && message.hasOwnProperty("limit"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.limit);
+                if (message.token != null && message.hasOwnProperty("token"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.filters);
+                if (message.sortBy != null && message.hasOwnProperty("sortBy"))
+                    $root.flyteidl.admin.Sort.encode(message.sortBy, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                 return writer;
             };
 
@@ -26330,6 +26391,18 @@ export const flyteidl = $root.flyteidl = (() => {
                 while (reader.pos < end) {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
+                    case 1:
+                        message.limit = reader.uint32();
+                        break;
+                    case 2:
+                        message.token = reader.string();
+                        break;
+                    case 3:
+                        message.filters = reader.string();
+                        break;
+                    case 4:
+                        message.sortBy = $root.flyteidl.admin.Sort.decode(reader, reader.uint32());
+                        break;
                     default:
                         reader.skipType(tag & 7);
                         break;
@@ -26349,6 +26422,20 @@ export const flyteidl = $root.flyteidl = (() => {
             ProjectListRequest.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (message.limit != null && message.hasOwnProperty("limit"))
+                    if (!$util.isInteger(message.limit))
+                        return "limit: integer expected";
+                if (message.token != null && message.hasOwnProperty("token"))
+                    if (!$util.isString(message.token))
+                        return "token: string expected";
+                if (message.filters != null && message.hasOwnProperty("filters"))
+                    if (!$util.isString(message.filters))
+                        return "filters: string expected";
+                if (message.sortBy != null && message.hasOwnProperty("sortBy")) {
+                    let error = $root.flyteidl.admin.Sort.verify(message.sortBy);
+                    if (error)
+                        return "sortBy." + error;
+                }
                 return null;
             };
 
