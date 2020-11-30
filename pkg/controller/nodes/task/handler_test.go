@@ -446,6 +446,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 
 		executionContext := &mocks.ExecutionContext{}
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetParentInfo().Return(nil)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		st := bytes.NewBuffer([]byte{})
@@ -768,6 +770,8 @@ func Test_task_Handle_Catalog(t *testing.T) {
 
 		executionContext := &mocks.ExecutionContext{}
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetParentInfo().Return(nil)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -992,6 +996,8 @@ func Test_task_Handle_Barrier(t *testing.T) {
 
 		executionContext := &mocks.ExecutionContext{}
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+		executionContext.OnGetParentInfo().Return(nil)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1264,6 +1270,7 @@ func Test_task_Abort(t *testing.T) {
 
 		executionContext := &mocks.ExecutionContext{}
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+		executionContext.OnGetParentInfo().Return(nil)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1404,6 +1411,7 @@ func Test_task_Finalize(t *testing.T) {
 
 	executionContext := &mocks.ExecutionContext{}
 	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	executionContext.OnGetParentInfo().Return(nil)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
