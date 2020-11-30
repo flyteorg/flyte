@@ -48,7 +48,7 @@ jobs:
           key: /tmp/docker-images-${{ github.event.after }}
       - name: Prime docker cache
         run: docker load -i /tmp/tmp/docker-images/snapshot.tar || true
-      - uses: engineerd/setup-kind@v0.4.0
+      - uses: engineerd/setup-kind@v0.5.0
       - name: End2End
         run: |
           kubectl cluster-info
@@ -107,12 +107,12 @@ jobs:
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
+          username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
+          password: "${{ secrets.PUBLIC_CONTAINER }}"
           image_name: ${{ github.repository }}/${{ github.event.repository.name }}
           image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
           push_git_tag: true
-          registry: docker.pkg.github.com
+          registry: ghcr.io
           build_extra_args: "--compress=true"
 
   push-dockerhub:
