@@ -3329,10 +3329,25 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, 
 AdminServiceApiService
 Fetch registered projects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param optional nil or *ListProjectsOpts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
 
 @return AdminProjects
 */
-func (a *AdminServiceApiService) ListProjects(ctx context.Context) (AdminProjects, *http.Response, error) {
+
+type ListProjectsOpts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListProjects(ctx context.Context, localVarOptionals *ListProjectsOpts) (AdminProjects, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3348,6 +3363,21 @@ func (a *AdminServiceApiService) ListProjects(ctx context.Context) (AdminProject
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
 

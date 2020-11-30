@@ -563,12 +563,27 @@ class Projects final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Project >&
       projects() const;
 
+  // string token = 2;
+  void clear_token();
+  static const int kTokenFieldNumber = 2;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Projects)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Project > projects_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
 };
@@ -669,11 +684,58 @@ class ProjectListRequest final :
 
   // accessors -------------------------------------------------------
 
+  // string token = 2;
+  void clear_token();
+  static const int kTokenFieldNumber = 2;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
+  // string filters = 3;
+  void clear_filters();
+  static const int kFiltersFieldNumber = 3;
+  const ::std::string& filters() const;
+  void set_filters(const ::std::string& value);
+  #if LANG_CXX11
+  void set_filters(::std::string&& value);
+  #endif
+  void set_filters(const char* value);
+  void set_filters(const char* value, size_t size);
+  ::std::string* mutable_filters();
+  ::std::string* release_filters();
+  void set_allocated_filters(::std::string* filters);
+
+  // .flyteidl.admin.Sort sort_by = 4;
+  bool has_sort_by() const;
+  void clear_sort_by();
+  static const int kSortByFieldNumber = 4;
+  const ::flyteidl::admin::Sort& sort_by() const;
+  ::flyteidl::admin::Sort* release_sort_by();
+  ::flyteidl::admin::Sort* mutable_sort_by();
+  void set_allocated_sort_by(::flyteidl::admin::Sort* sort_by);
+
+  // uint32 limit = 1;
+  void clear_limit();
+  static const int kLimitFieldNumber = 1;
+  ::google::protobuf::uint32 limit() const;
+  void set_limit(::google::protobuf::uint32 value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectListRequest)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
+  ::google::protobuf::internal::ArenaStringPtr filters_;
+  ::flyteidl::admin::Sort* sort_by_;
+  ::google::protobuf::uint32 limit_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
 };
@@ -1405,9 +1467,227 @@ Projects::projects() const {
   return projects_;
 }
 
+// string token = 2;
+inline void Projects::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Projects::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Projects.token)
+  return token_.GetNoArena();
+}
+inline void Projects::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Projects.token)
+}
+#if LANG_CXX11
+inline void Projects::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Projects.token)
+}
+#endif
+inline void Projects::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Projects.token)
+}
+inline void Projects::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Projects.token)
+}
+inline ::std::string* Projects::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Projects.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Projects::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Projects.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Projects::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Projects.token)
+}
+
 // -------------------------------------------------------------------
 
 // ProjectListRequest
+
+// uint32 limit = 1;
+inline void ProjectListRequest::clear_limit() {
+  limit_ = 0u;
+}
+inline ::google::protobuf::uint32 ProjectListRequest::limit() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectListRequest.limit)
+  return limit_;
+}
+inline void ProjectListRequest::set_limit(::google::protobuf::uint32 value) {
+  
+  limit_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectListRequest.limit)
+}
+
+// string token = 2;
+inline void ProjectListRequest::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectListRequest::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectListRequest.token)
+  return token_.GetNoArena();
+}
+inline void ProjectListRequest::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectListRequest.token)
+}
+#if LANG_CXX11
+inline void ProjectListRequest::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectListRequest.token)
+}
+#endif
+inline void ProjectListRequest::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectListRequest.token)
+}
+inline void ProjectListRequest::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectListRequest.token)
+}
+inline ::std::string* ProjectListRequest::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectListRequest.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectListRequest::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectListRequest.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectListRequest::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectListRequest.token)
+}
+
+// string filters = 3;
+inline void ProjectListRequest::clear_filters() {
+  filters_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectListRequest::filters() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectListRequest.filters)
+  return filters_.GetNoArena();
+}
+inline void ProjectListRequest::set_filters(const ::std::string& value) {
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectListRequest.filters)
+}
+#if LANG_CXX11
+inline void ProjectListRequest::set_filters(::std::string&& value) {
+  
+  filters_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectListRequest.filters)
+}
+#endif
+inline void ProjectListRequest::set_filters(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectListRequest.filters)
+}
+inline void ProjectListRequest::set_filters(const char* value, size_t size) {
+  
+  filters_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectListRequest.filters)
+}
+inline ::std::string* ProjectListRequest::mutable_filters() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectListRequest.filters)
+  return filters_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectListRequest::release_filters() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectListRequest.filters)
+  
+  return filters_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectListRequest::set_allocated_filters(::std::string* filters) {
+  if (filters != nullptr) {
+    
+  } else {
+    
+  }
+  filters_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filters);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectListRequest.filters)
+}
+
+// .flyteidl.admin.Sort sort_by = 4;
+inline bool ProjectListRequest::has_sort_by() const {
+  return this != internal_default_instance() && sort_by_ != nullptr;
+}
+inline const ::flyteidl::admin::Sort& ProjectListRequest::sort_by() const {
+  const ::flyteidl::admin::Sort* p = sort_by_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectListRequest.sort_by)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Sort*>(
+      &::flyteidl::admin::_Sort_default_instance_);
+}
+inline ::flyteidl::admin::Sort* ProjectListRequest::release_sort_by() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectListRequest.sort_by)
+  
+  ::flyteidl::admin::Sort* temp = sort_by_;
+  sort_by_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Sort* ProjectListRequest::mutable_sort_by() {
+  
+  if (sort_by_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Sort>(GetArenaNoVirtual());
+    sort_by_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectListRequest.sort_by)
+  return sort_by_;
+}
+inline void ProjectListRequest::set_allocated_sort_by(::flyteidl::admin::Sort* sort_by) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(sort_by_);
+  }
+  if (sort_by) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      sort_by = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, sort_by, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  sort_by_ = sort_by;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectListRequest.sort_by)
+}
 
 // -------------------------------------------------------------------
 

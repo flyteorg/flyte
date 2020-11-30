@@ -126,13 +126,21 @@ flyteidl.admin.Projects
 .. code-block:: json
 
   {
-    "projects": []
+    "projects": [],
+    "token": "..."
   }
 
 .. _api_field_flyteidl.admin.Projects.projects:
 
 projects
   (:ref:`flyteidl.admin.Project <api_msg_flyteidl.admin.Project>`) 
+  
+.. _api_field_flyteidl.admin.Projects.token:
+
+token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  in a query. If there are no more results, this value will be empty.
+  
   
 
 
@@ -141,14 +149,47 @@ projects
 flyteidl.admin.ProjectListRequest
 ---------------------------------
 
-`[flyteidl.admin.ProjectListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L52>`_
+`[flyteidl.admin.ProjectListRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L56>`_
 
 
 .. code-block:: json
 
-  {}
+  {
+    "limit": "...",
+    "token": "...",
+    "filters": "...",
+    "sort_by": "{...}"
+  }
 
+.. _api_field_flyteidl.admin.ProjectListRequest.limit:
 
+limit
+  (`uint32 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Indicates the number of projects to be returned.
+  
+  
+.. _api_field_flyteidl.admin.ProjectListRequest.token:
+
+token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+  in a query.
+  +optional
+  
+  
+.. _api_field_flyteidl.admin.ProjectListRequest.filters:
+
+filters
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Indicates a list of filters passed as string.
+  More info on constructing filters : <Link>
+  +optional
+  
+  
+.. _api_field_flyteidl.admin.ProjectListRequest.sort_by:
+
+sort_by
+  (:ref:`flyteidl.admin.Sort <api_msg_flyteidl.admin.Sort>`) Sort ordering.
+  +optional
+  
+  
 
 
 .. _api_msg_flyteidl.admin.ProjectRegisterRequest:
@@ -156,7 +197,7 @@ flyteidl.admin.ProjectListRequest
 flyteidl.admin.ProjectRegisterRequest
 -------------------------------------
 
-`[flyteidl.admin.ProjectRegisterRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L55>`_
+`[flyteidl.admin.ProjectRegisterRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L73>`_
 
 
 .. code-block:: json
@@ -177,7 +218,7 @@ project
 flyteidl.admin.ProjectRegisterResponse
 --------------------------------------
 
-`[flyteidl.admin.ProjectRegisterResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L59>`_
+`[flyteidl.admin.ProjectRegisterResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L77>`_
 
 
 .. code-block:: json
@@ -192,7 +233,7 @@ flyteidl.admin.ProjectRegisterResponse
 flyteidl.admin.ProjectUpdateResponse
 ------------------------------------
 
-`[flyteidl.admin.ProjectUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L62>`_
+`[flyteidl.admin.ProjectUpdateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/project.proto#L80>`_
 
 
 .. code-block:: json

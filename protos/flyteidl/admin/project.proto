@@ -48,9 +48,27 @@ message Project {
 
 message Projects {
     repeated Project projects = 1;
+
+    // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    // in a query. If there are no more results, this value will be empty.
+    string token        = 2;
 }
 
 message ProjectListRequest {
+    // Indicates the number of projects to be returned.
+    uint32 limit    = 1;
+    // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+    // in a query.
+    // +optional
+    string token    = 2;
+    // Indicates a list of filters passed as string.
+    // More info on constructing filters : <Link>
+    // +optional
+    string filters  = 3;
+
+    // Sort ordering.
+    // +optional
+    Sort sort_by    = 4;
 }
 
 message ProjectRegisterRequest {

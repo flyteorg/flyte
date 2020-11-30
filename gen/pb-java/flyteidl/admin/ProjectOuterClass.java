@@ -2510,6 +2510,26 @@ public final class ProjectOuterClass {
      */
     flyteidl.admin.ProjectOuterClass.ProjectOrBuilder getProjectsOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
   }
   /**
    * Protobuf type {@code flyteidl.admin.Projects}
@@ -2525,6 +2545,7 @@ public final class ProjectOuterClass {
     }
     private Projects() {
       projects_ = java.util.Collections.emptyList();
+      token_ = "";
     }
 
     @java.lang.Override
@@ -2558,6 +2579,12 @@ public final class ProjectOuterClass {
               }
               projects_.add(
                   input.readMessage(flyteidl.admin.ProjectOuterClass.Project.parser(), extensionRegistry));
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
               break;
             }
             default: {
@@ -2595,6 +2622,7 @@ public final class ProjectOuterClass {
               flyteidl.admin.ProjectOuterClass.Projects.class, flyteidl.admin.ProjectOuterClass.Projects.Builder.class);
     }
 
+    private int bitField0_;
     public static final int PROJECTS_FIELD_NUMBER = 1;
     private java.util.List<flyteidl.admin.ProjectOuterClass.Project> projects_;
     /**
@@ -2630,6 +2658,50 @@ public final class ProjectOuterClass {
       return projects_.get(index);
     }
 
+    public static final int TOKEN_FIELD_NUMBER = 2;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2647,6 +2719,9 @@ public final class ProjectOuterClass {
       for (int i = 0; i < projects_.size(); i++) {
         output.writeMessage(1, projects_.get(i));
       }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, token_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2659,6 +2734,9 @@ public final class ProjectOuterClass {
       for (int i = 0; i < projects_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, projects_.get(i));
+      }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, token_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2677,6 +2755,8 @@ public final class ProjectOuterClass {
 
       if (!getProjectsList()
           .equals(other.getProjectsList())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2692,6 +2772,8 @@ public final class ProjectOuterClass {
         hash = (37 * hash) + PROJECTS_FIELD_NUMBER;
         hash = (53 * hash) + getProjectsList().hashCode();
       }
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2832,6 +2914,8 @@ public final class ProjectOuterClass {
         } else {
           projectsBuilder_.clear();
         }
+        token_ = "";
+
         return this;
       }
 
@@ -2859,6 +2943,7 @@ public final class ProjectOuterClass {
       public flyteidl.admin.ProjectOuterClass.Projects buildPartial() {
         flyteidl.admin.ProjectOuterClass.Projects result = new flyteidl.admin.ProjectOuterClass.Projects(this);
         int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (projectsBuilder_ == null) {
           if (((bitField0_ & 0x00000001) != 0)) {
             projects_ = java.util.Collections.unmodifiableList(projects_);
@@ -2868,6 +2953,8 @@ public final class ProjectOuterClass {
         } else {
           result.projects_ = projectsBuilder_.build();
         }
+        result.token_ = token_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -2941,6 +3028,10 @@ public final class ProjectOuterClass {
               projectsBuilder_.addAllMessages(other.projects_);
             }
           }
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3211,6 +3302,100 @@ public final class ProjectOuterClass {
         }
         return projectsBuilder_;
       }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3267,6 +3452,87 @@ public final class ProjectOuterClass {
   public interface ProjectListRequestOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.ProjectListRequest)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Indicates the number of projects to be returned.
+     * </pre>
+     *
+     * <code>uint32 limit = 1;</code>
+     */
+    int getLimit();
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
+
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * More info on constructing filters : &lt;Link&gt;
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 3;</code>
+     */
+    java.lang.String getFilters();
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * More info on constructing filters : &lt;Link&gt;
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getFiltersBytes();
+
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+     */
+    boolean hasSortBy();
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+     */
+    flyteidl.admin.Common.Sort getSortBy();
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+     */
+    flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.admin.ProjectListRequest}
@@ -3281,6 +3547,8 @@ public final class ProjectOuterClass {
       super(builder);
     }
     private ProjectListRequest() {
+      token_ = "";
+      filters_ = "";
     }
 
     @java.lang.Override
@@ -3296,6 +3564,7 @@ public final class ProjectOuterClass {
       if (extensionRegistry == null) {
         throw new java.lang.NullPointerException();
       }
+      int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -3306,6 +3575,36 @@ public final class ProjectOuterClass {
             case 0:
               done = true;
               break;
+            case 8: {
+
+              limit_ = input.readUInt32();
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              filters_ = s;
+              break;
+            }
+            case 34: {
+              flyteidl.admin.Common.Sort.Builder subBuilder = null;
+              if (sortBy_ != null) {
+                subBuilder = sortBy_.toBuilder();
+              }
+              sortBy_ = input.readMessage(flyteidl.admin.Common.Sort.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(sortBy_);
+                sortBy_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3338,6 +3637,147 @@ public final class ProjectOuterClass {
               flyteidl.admin.ProjectOuterClass.ProjectListRequest.class, flyteidl.admin.ProjectOuterClass.ProjectListRequest.Builder.class);
     }
 
+    public static final int LIMIT_FIELD_NUMBER = 1;
+    private int limit_;
+    /**
+     * <pre>
+     * Indicates the number of projects to be returned.
+     * </pre>
+     *
+     * <code>uint32 limit = 1;</code>
+     */
+    public int getLimit() {
+      return limit_;
+    }
+
+    public static final int TOKEN_FIELD_NUMBER = 2;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+     * in a query.
+     * +optional
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int FILTERS_FIELD_NUMBER = 3;
+    private volatile java.lang.Object filters_;
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * More info on constructing filters : &lt;Link&gt;
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 3;</code>
+     */
+    public java.lang.String getFilters() {
+      java.lang.Object ref = filters_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        filters_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Indicates a list of filters passed as string.
+     * More info on constructing filters : &lt;Link&gt;
+     * +optional
+     * </pre>
+     *
+     * <code>string filters = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFiltersBytes() {
+      java.lang.Object ref = filters_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        filters_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int SORT_BY_FIELD_NUMBER = 4;
+    private flyteidl.admin.Common.Sort sortBy_;
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+     */
+    public boolean hasSortBy() {
+      return sortBy_ != null;
+    }
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+     */
+    public flyteidl.admin.Common.Sort getSortBy() {
+      return sortBy_ == null ? flyteidl.admin.Common.Sort.getDefaultInstance() : sortBy_;
+    }
+    /**
+     * <pre>
+     * Sort ordering.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+     */
+    public flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder() {
+      return getSortBy();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3352,6 +3792,18 @@ public final class ProjectOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (limit_ != 0) {
+        output.writeUInt32(1, limit_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, token_);
+      }
+      if (!getFiltersBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, filters_);
+      }
+      if (sortBy_ != null) {
+        output.writeMessage(4, getSortBy());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3361,6 +3813,20 @@ public final class ProjectOuterClass {
       if (size != -1) return size;
 
       size = 0;
+      if (limit_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(1, limit_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, token_);
+      }
+      if (!getFiltersBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, filters_);
+      }
+      if (sortBy_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getSortBy());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3376,6 +3842,17 @@ public final class ProjectOuterClass {
       }
       flyteidl.admin.ProjectOuterClass.ProjectListRequest other = (flyteidl.admin.ProjectOuterClass.ProjectListRequest) obj;
 
+      if (getLimit()
+          != other.getLimit()) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!getFilters()
+          .equals(other.getFilters())) return false;
+      if (hasSortBy() != other.hasSortBy()) return false;
+      if (hasSortBy()) {
+        if (!getSortBy()
+            .equals(other.getSortBy())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3387,6 +3864,16 @@ public final class ProjectOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + LIMIT_FIELD_NUMBER;
+      hash = (53 * hash) + getLimit();
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      hash = (37 * hash) + FILTERS_FIELD_NUMBER;
+      hash = (53 * hash) + getFilters().hashCode();
+      if (hasSortBy()) {
+        hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
+        hash = (53 * hash) + getSortBy().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3520,6 +4007,18 @@ public final class ProjectOuterClass {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        limit_ = 0;
+
+        token_ = "";
+
+        filters_ = "";
+
+        if (sortByBuilder_ == null) {
+          sortBy_ = null;
+        } else {
+          sortBy_ = null;
+          sortByBuilder_ = null;
+        }
         return this;
       }
 
@@ -3546,6 +4045,14 @@ public final class ProjectOuterClass {
       @java.lang.Override
       public flyteidl.admin.ProjectOuterClass.ProjectListRequest buildPartial() {
         flyteidl.admin.ProjectOuterClass.ProjectListRequest result = new flyteidl.admin.ProjectOuterClass.ProjectListRequest(this);
+        result.limit_ = limit_;
+        result.token_ = token_;
+        result.filters_ = filters_;
+        if (sortByBuilder_ == null) {
+          result.sortBy_ = sortBy_;
+        } else {
+          result.sortBy_ = sortByBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -3594,6 +4101,20 @@ public final class ProjectOuterClass {
 
       public Builder mergeFrom(flyteidl.admin.ProjectOuterClass.ProjectListRequest other) {
         if (other == flyteidl.admin.ProjectOuterClass.ProjectListRequest.getDefaultInstance()) return this;
+        if (other.getLimit() != 0) {
+          setLimit(other.getLimit());
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
+        }
+        if (!other.getFilters().isEmpty()) {
+          filters_ = other.filters_;
+          onChanged();
+        }
+        if (other.hasSortBy()) {
+          mergeSortBy(other.getSortBy());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -3621,6 +4142,404 @@ public final class ProjectOuterClass {
           }
         }
         return this;
+      }
+
+      private int limit_ ;
+      /**
+       * <pre>
+       * Indicates the number of projects to be returned.
+       * </pre>
+       *
+       * <code>uint32 limit = 1;</code>
+       */
+      public int getLimit() {
+        return limit_;
+      }
+      /**
+       * <pre>
+       * Indicates the number of projects to be returned.
+       * </pre>
+       *
+       * <code>uint32 limit = 1;</code>
+       */
+      public Builder setLimit(int value) {
+        
+        limit_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates the number of projects to be returned.
+       * </pre>
+       *
+       * <code>uint32 limit = 1;</code>
+       */
+      public Builder clearLimit() {
+        
+        limit_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, this server-provided token can be used to fetch the next page
+       * in a query.
+       * +optional
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object filters_ = "";
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * More info on constructing filters : &lt;Link&gt;
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 3;</code>
+       */
+      public java.lang.String getFilters() {
+        java.lang.Object ref = filters_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          filters_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * More info on constructing filters : &lt;Link&gt;
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFiltersBytes() {
+        java.lang.Object ref = filters_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          filters_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * More info on constructing filters : &lt;Link&gt;
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 3;</code>
+       */
+      public Builder setFilters(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        filters_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * More info on constructing filters : &lt;Link&gt;
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 3;</code>
+       */
+      public Builder clearFilters() {
+        
+        filters_ = getDefaultInstance().getFilters();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates a list of filters passed as string.
+       * More info on constructing filters : &lt;Link&gt;
+       * +optional
+       * </pre>
+       *
+       * <code>string filters = 3;</code>
+       */
+      public Builder setFiltersBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        filters_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.admin.Common.Sort sortBy_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> sortByBuilder_;
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public boolean hasSortBy() {
+        return sortByBuilder_ != null || sortBy_ != null;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public flyteidl.admin.Common.Sort getSortBy() {
+        if (sortByBuilder_ == null) {
+          return sortBy_ == null ? flyteidl.admin.Common.Sort.getDefaultInstance() : sortBy_;
+        } else {
+          return sortByBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public Builder setSortBy(flyteidl.admin.Common.Sort value) {
+        if (sortByBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          sortBy_ = value;
+          onChanged();
+        } else {
+          sortByBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public Builder setSortBy(
+          flyteidl.admin.Common.Sort.Builder builderForValue) {
+        if (sortByBuilder_ == null) {
+          sortBy_ = builderForValue.build();
+          onChanged();
+        } else {
+          sortByBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public Builder mergeSortBy(flyteidl.admin.Common.Sort value) {
+        if (sortByBuilder_ == null) {
+          if (sortBy_ != null) {
+            sortBy_ =
+              flyteidl.admin.Common.Sort.newBuilder(sortBy_).mergeFrom(value).buildPartial();
+          } else {
+            sortBy_ = value;
+          }
+          onChanged();
+        } else {
+          sortByBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public Builder clearSortBy() {
+        if (sortByBuilder_ == null) {
+          sortBy_ = null;
+          onChanged();
+        } else {
+          sortBy_ = null;
+          sortByBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public flyteidl.admin.Common.Sort.Builder getSortByBuilder() {
+        
+        onChanged();
+        return getSortByFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      public flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder() {
+        if (sortByBuilder_ != null) {
+          return sortByBuilder_.getMessageOrBuilder();
+        } else {
+          return sortBy_ == null ?
+              flyteidl.admin.Common.Sort.getDefaultInstance() : sortBy_;
+        }
+      }
+      /**
+       * <pre>
+       * Sort ordering.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Sort sort_by = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> 
+          getSortByFieldBuilder() {
+        if (sortByBuilder_ == null) {
+          sortByBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder>(
+                  getSortBy(),
+                  getParentForChildren(),
+                  isClean());
+          sortBy_ = null;
+        }
+        return sortByBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -5156,13 +6075,16 @@ public final class ProjectOuterClass {
       "dmin.Labels\0223\n\005state\030\006 \001(\0162$.flyteidl.ad" +
       "min.Project.ProjectState\">\n\014ProjectState" +
       "\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022\024\n\020SYSTEM_GEN" +
-      "ERATED\020\002\"5\n\010Projects\022)\n\010projects\030\001 \003(\0132\027" +
-      ".flyteidl.admin.Project\"\024\n\022ProjectListRe" +
-      "quest\"B\n\026ProjectRegisterRequest\022(\n\007proje" +
-      "ct\030\001 \001(\0132\027.flyteidl.admin.Project\"\031\n\027Pro" +
-      "jectRegisterResponse\"\027\n\025ProjectUpdateRes" +
-      "ponseB3Z1github.com/lyft/flyteidl/gen/pb" +
-      "-go/flyteidl/adminb\006proto3"
+      "ERATED\020\002\"D\n\010Projects\022)\n\010projects\030\001 \003(\0132\027" +
+      ".flyteidl.admin.Project\022\r\n\005token\030\002 \001(\t\"j" +
+      "\n\022ProjectListRequest\022\r\n\005limit\030\001 \001(\r\022\r\n\005t" +
+      "oken\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t\022%\n\007sort_by\030\004" +
+      " \001(\0132\024.flyteidl.admin.Sort\"B\n\026ProjectReg" +
+      "isterRequest\022(\n\007project\030\001 \001(\0132\027.flyteidl" +
+      ".admin.Project\"\031\n\027ProjectRegisterRespons" +
+      "e\"\027\n\025ProjectUpdateResponseB3Z1github.com" +
+      "/lyft/flyteidl/gen/pb-go/flyteidl/adminb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5194,13 +6116,13 @@ public final class ProjectOuterClass {
     internal_static_flyteidl_admin_Projects_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Projects_descriptor,
-        new java.lang.String[] { "Projects", });
+        new java.lang.String[] { "Projects", "Token", });
     internal_static_flyteidl_admin_ProjectListRequest_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_admin_ProjectListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectListRequest_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "Limit", "Token", "Filters", "SortBy", });
     internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_admin_ProjectRegisterRequest_fieldAccessorTable = new
