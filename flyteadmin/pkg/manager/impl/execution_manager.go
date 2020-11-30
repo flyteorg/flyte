@@ -174,7 +174,7 @@ func (m *ExecutionManager) addLabelsAndAnnotations(requestSpec *admin.ExecutionS
 }
 
 func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
-	workflowName, launchPlanName string, partiallyPopulatedInputs *workflowengineInterfaces.ExecuteWorkflowInput) error {
+	workflowName, launchPlanName string) ([]*admin.PluginOverride, error) {
 	override, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
 		Project:      executionID.Project,
 		Domain:       executionID.Domain,
@@ -185,13 +185,13 @@ func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *
 	if err != nil {
 		ec, ok := err.(errors.FlyteAdminError)
 		if !ok || ec.Code() != codes.NotFound {
-			return err
+			return nil, err
 		}
 	}
 	if override != nil && override.Attributes != nil && override.Attributes.GetPluginOverrides() != nil {
-		partiallyPopulatedInputs.TaskPluginOverrides = override.Attributes.GetPluginOverrides().Overrides
+		return override.Attributes.GetPluginOverrides().Overrides, nil
 	}
-	return nil
+	return nil, nil
 }
 
 func (m *ExecutionManager) offloadInputs(ctx context.Context, literalMap *core.LiteralMap, identifier *core.WorkflowExecutionIdentifier, key string) (storage.DataReference, error) {
@@ -476,6 +476,14 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		executeTaskInputs.Annotations = request.Spec.Annotations.Values
 	}
 
+	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, workflowExecutionID.Name, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	if overrides != nil {
+		executeTaskInputs.TaskPluginOverrides = overrides
+	}
+
 	execInfo, err := m.workflowExecutor.ExecuteTask(ctx, executeTaskInputs)
 	if err != nil {
 		m.systemMetrics.PropellerFailures.Inc()
@@ -642,10 +650,12 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
-	err = m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name,
-		&executeWorkflowInputs)
+	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)
 	if err != nil {
 		return nil, nil, err
+	}
+	if overrides != nil {
+		executeWorkflowInputs.TaskPluginOverrides = overrides
 	}
 
 	execInfo, err := m.workflowExecutor.ExecuteWorkflow(ctx, executeWorkflowInputs)

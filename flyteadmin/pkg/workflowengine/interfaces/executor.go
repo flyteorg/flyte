@@ -22,15 +22,16 @@ type ExecuteWorkflowInput struct {
 }
 
 type ExecuteTaskInput struct {
-	ExecutionID    *core.WorkflowExecutionIdentifier
-	WfClosure      core.CompiledWorkflowClosure
-	Inputs         *core.LiteralMap
-	ReferenceName  string
-	Auth           *admin.AuthRole
-	AcceptedAt     time.Time
-	Labels         map[string]string
-	Annotations    map[string]string
-	QueueingBudget time.Duration
+	ExecutionID         *core.WorkflowExecutionIdentifier
+	WfClosure           core.CompiledWorkflowClosure
+	Inputs              *core.LiteralMap
+	ReferenceName       string
+	Auth                *admin.AuthRole
+	AcceptedAt          time.Time
+	Labels              map[string]string
+	Annotations         map[string]string
+	QueueingBudget      time.Duration
+	TaskPluginOverrides []*admin.PluginOverride
 }
 
 type TerminateWorkflowInput struct {

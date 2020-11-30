@@ -2157,10 +2157,10 @@ func TestAddPluginOverrides(t *testing.T) {
 		db, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
 
-	err := execManager.(*ExecutionManager).addPluginOverrides(
-		context.Background(), executionID, workflowName, launchPlanName, &partiallyPopulatedInputs)
+	taskPluginOverrides, err := execManager.(*ExecutionManager).addPluginOverrides(
+		context.Background(), executionID, workflowName, launchPlanName)
 	assert.NoError(t, err)
-	assert.Len(t, partiallyPopulatedInputs.TaskPluginOverrides, 2)
+	assert.Len(t, taskPluginOverrides, 2)
 	for _, override := range partiallyPopulatedInputs.TaskPluginOverrides {
 		if override.TaskType == "python" {
 			assert.EqualValues(t, []string{"plugin a"}, override.PluginId)
@@ -2190,8 +2190,8 @@ func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
 		db, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), workflowengineMocks.NewMockExecutor(),
 		mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil)
 
-	err := execManager.(*ExecutionManager).addPluginOverrides(
-		context.Background(), executionID, workflowName, launchPlanName, &workflowengineInterfaces.ExecuteWorkflowInput{})
+	_, err := execManager.(*ExecutionManager).addPluginOverrides(
+		context.Background(), executionID, workflowName, launchPlanName)
 	assert.Error(t, err, "uh oh")
 }
 

@@ -225,6 +225,7 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
+	addExecutionOverrides(input.TaskPluginOverrides, flyteWf)
 
 	/*
 		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.
