@@ -108,7 +108,7 @@ jobs:
         uses: whoan/docker-build-with-cache-action@v5
         with:
           username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
-          password: "${{ secrets.PUBLIC_CONTAINER }}"
+          password: "${{ secrets.PUBLISH_CONTAINER }}"
           image_name: ${{ github.repository }}/${{ github.event.repository.name }}
           image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
           push_git_tag: true
