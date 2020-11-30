@@ -44,7 +44,7 @@ jobs:
           key: /tmp/docker-images-${{ github.event.after }}
       - name: Prime docker cache
         run: docker load -i /tmp/tmp/docker-images/snapshot.tar || true
-      - uses: engineerd/setup-kind@v0.4.0
+      - uses: engineerd/setup-kind@v0.5.0
       - name: End2End
         run: |
           kubectl cluster-info
@@ -68,7 +68,7 @@ jobs:
           key: /tmp/docker-images-${{ github.event.after }}
       - name: Prime docker cache
         run: docker load -i /tmp/tmp/docker-images/snapshot-builder.tar || true
-      - uses: engineerd/setup-kind@v0.4.0
+      - uses: engineerd/setup-kind@v0.5.0
       - name: Integration
         run: |
           kubectl cluster-info
