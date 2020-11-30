@@ -109,7 +109,7 @@ jobs:
         with:
           username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
           password: "${{ secrets.PUBLISH_CONTAINER }}"
-          image_name: ${{ github.repository }}/${{ github.event.repository.name }}
+          image_name: ${{ github.repository }}
           image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
           push_git_tag: true
           registry: ghcr.io
