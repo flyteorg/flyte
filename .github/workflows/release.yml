@@ -59,12 +59,12 @@ jobs:
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
-          image_name: ${{ secrets.package_name }}
+          username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
+          password: "${{ secrets.PUBLISH_CONTAINER }}"
+          image_name: ${{ github.repository }}
           image_tag: latest,${{github.sha}},${{ needs.check_for_tag.outputs.currentTag }}
           push_git_tag: true
-          registry: docker.pkg.github.com
+          registry: ghcr.io
   push_dockerhub:
     name: Build and push image to Dockerhub
     needs: check_for_tag

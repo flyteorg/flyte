@@ -1,4 +1,5 @@
 FROM node:10 as builder
+LABEL org.opencontainers.image.source https://github.com/lyft/flyteconsole
 
 WORKDIR /code/flyteconsole
 COPY package*.json yarn.lock ./
@@ -19,6 +20,8 @@ RUN : \
   && mv dist corsProxy.js index.js env.js plugins.js /app
 
 FROM gcr.io/distroless/nodejs
+LABEL org.opencontainers.image.source https://github.com/lyft/flyteconsole
+
 COPY --from=builder /app app
 WORKDIR /app
 ENV NODE_ENV=production PORT=8080
