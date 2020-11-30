@@ -10926,6 +10926,9 @@ export namespace flyteidl {
 
             /** Projects projects */
             projects?: (flyteidl.admin.IProject[]|null);
+
+            /** Projects token */
+            token?: (string|null);
         }
 
         /** Represents a Projects. */
@@ -10939,6 +10942,9 @@ export namespace flyteidl {
 
             /** Projects projects. */
             public projects: flyteidl.admin.IProject[];
+
+            /** Projects token. */
+            public token: string;
 
             /**
              * Creates a new Projects instance using the specified properties.
@@ -10975,6 +10981,18 @@ export namespace flyteidl {
 
         /** Properties of a ProjectListRequest. */
         interface IProjectListRequest {
+
+            /** ProjectListRequest limit */
+            limit?: (number|null);
+
+            /** ProjectListRequest token */
+            token?: (string|null);
+
+            /** ProjectListRequest filters */
+            filters?: (string|null);
+
+            /** ProjectListRequest sortBy */
+            sortBy?: (flyteidl.admin.ISort|null);
         }
 
         /** Represents a ProjectListRequest. */
@@ -10985,6 +11003,18 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.admin.IProjectListRequest);
+
+            /** ProjectListRequest limit. */
+            public limit: number;
+
+            /** ProjectListRequest token. */
+            public token: string;
+
+            /** ProjectListRequest filters. */
+            public filters: string;
+
+            /** ProjectListRequest sortBy. */
+            public sortBy?: (flyteidl.admin.ISort|null);
 
             /**
              * Creates a new ProjectListRequest instance using the specified properties.

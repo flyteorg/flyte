@@ -1420,7 +1420,51 @@ paths:
       - "AdminService"
       description: "Fetch registered projects."
       operationId: "ListProjects"
-      parameters: []
+      parameters:
+      - name: "limit"
+        in: "query"
+        description: "Indicates the number of projects to be returned."
+        required: false
+        type: "integer"
+        format: "int64"
+        x-exportParamName: "Limit"
+        x-optionalDataType: "Int64"
+      - name: "token"
+        in: "query"
+        description: "In the case of multiple pages of results, this server-provided\
+          \ token can be used to fetch the next page\nin a query.\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Token"
+        x-optionalDataType: "String"
+      - name: "filters"
+        in: "query"
+        description: "Indicates a list of filters passed as string.\nMore info on\
+          \ constructing filters : <Link>\n+optional."
+        required: false
+        type: "string"
+        x-exportParamName: "Filters"
+        x-optionalDataType: "String"
+      - name: "sort_by.key"
+        in: "query"
+        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
+          \ Add string validation here. This should never be empty."
+        required: false
+        type: "string"
+        x-exportParamName: "SortByKey"
+        x-optionalDataType: "String"
+      - name: "sort_by.direction"
+        in: "query"
+        description: "Indicates the direction to apply sort key for response values.\n\
+          +optional."
+        required: false
+        type: "string"
+        default: "DESCENDING"
+        enum:
+        - "DESCENDING"
+        - "ASCENDING"
+        x-exportParamName: "SortByDirection"
+        x-optionalDataType: "String"
       responses:
         200:
           description: "A successful response."
@@ -5667,6 +5711,11 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/adminProject"
+      token:
+        type: "string"
+        description: "In the case of multiple pages of results, the server-provided\
+          \ token can be used to fetch the next page\nin a query. If there are no\
+          \ more results, this value will be empty."
     example:
       projects:
       - name: "name"
@@ -5693,6 +5742,7 @@ definitions:
         labels:
           values:
             key: "values"
+      token: "token"
   adminRawOutputDataConfig:
     type: "object"
     properties:

@@ -16,6 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Sort_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Labels_flyteidl_2fadmin_2fcommon_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Domain_flyteidl_2fadmin_2fproject_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fproject_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Project_flyteidl_2fadmin_2fproject_2eproto;
@@ -107,8 +108,9 @@ static void InitDefaultsProjectListRequest_flyteidl_2fadmin_2fproject_2eproto() 
   ::flyteidl::admin::ProjectListRequest::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_ProjectListRequest_flyteidl_2fadmin_2fproject_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsProjectListRequest_flyteidl_2fadmin_2fproject_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<1> scc_info_ProjectListRequest_flyteidl_2fadmin_2fproject_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsProjectListRequest_flyteidl_2fadmin_2fproject_2eproto}, {
+      &scc_info_Sort_flyteidl_2fadmin_2fcommon_2eproto.base,}};
 
 static void InitDefaultsProjectRegisterRequest_flyteidl_2fadmin_2fproject_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -192,11 +194,16 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fproject_2eproto:
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Projects, projects_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Projects, token_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ProjectListRequest, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ProjectListRequest, limit_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ProjectListRequest, token_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ProjectListRequest, filters_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ProjectListRequest, sort_by_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ProjectRegisterRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -218,10 +225,10 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 0, -1, sizeof(::flyteidl::admin::Domain)},
   { 7, -1, sizeof(::flyteidl::admin::Project)},
   { 18, -1, sizeof(::flyteidl::admin::Projects)},
-  { 24, -1, sizeof(::flyteidl::admin::ProjectListRequest)},
-  { 29, -1, sizeof(::flyteidl::admin::ProjectRegisterRequest)},
-  { 35, -1, sizeof(::flyteidl::admin::ProjectRegisterResponse)},
-  { 40, -1, sizeof(::flyteidl::admin::ProjectUpdateResponse)},
+  { 25, -1, sizeof(::flyteidl::admin::ProjectListRequest)},
+  { 34, -1, sizeof(::flyteidl::admin::ProjectRegisterRequest)},
+  { 40, -1, sizeof(::flyteidl::admin::ProjectRegisterResponse)},
+  { 45, -1, sizeof(::flyteidl::admin::ProjectUpdateResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -250,18 +257,21 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto[] =
   "dmin.Labels\0223\n\005state\030\006 \001(\0162$.flyteidl.ad"
   "min.Project.ProjectState\">\n\014ProjectState"
   "\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022\024\n\020SYSTEM_GEN"
-  "ERATED\020\002\"5\n\010Projects\022)\n\010projects\030\001 \003(\0132\027"
-  ".flyteidl.admin.Project\"\024\n\022ProjectListRe"
-  "quest\"B\n\026ProjectRegisterRequest\022(\n\007proje"
-  "ct\030\001 \001(\0132\027.flyteidl.admin.Project\"\031\n\027Pro"
-  "jectRegisterResponse\"\027\n\025ProjectUpdateRes"
-  "ponseB3Z1github.com/lyft/flyteidl/gen/pb"
-  "-go/flyteidl/adminb\006proto3"
+  "ERATED\020\002\"D\n\010Projects\022)\n\010projects\030\001 \003(\0132\027"
+  ".flyteidl.admin.Project\022\r\n\005token\030\002 \001(\t\"j"
+  "\n\022ProjectListRequest\022\r\n\005limit\030\001 \001(\r\022\r\n\005t"
+  "oken\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t\022%\n\007sort_by\030\004"
+  " \001(\0132\024.flyteidl.admin.Sort\"B\n\026ProjectReg"
+  "isterRequest\022(\n\007project\030\001 \001(\0132\027.flyteidl"
+  ".admin.Project\"\031\n\027ProjectRegisterRespons"
+  "e\"\027\n\025ProjectUpdateResponseB3Z1github.com"
+  "/lyft/flyteidl/gen/pb-go/flyteidl/adminb"
+  "\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fproject_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fproject_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto,
-  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 626,
+  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 727,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fproject_2eproto() {
@@ -1305,6 +1315,7 @@ class Projects::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Projects::kProjectsFieldNumber;
+const int Projects::kTokenFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Projects::Projects()
@@ -1317,12 +1328,17 @@ Projects::Projects(const Projects& from)
       _internal_metadata_(nullptr),
       projects_(from.projects_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.token().size() > 0) {
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Projects)
 }
 
 void Projects::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Projects_flyteidl_2fadmin_2fproject_2eproto.base);
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 Projects::~Projects() {
@@ -1331,6 +1347,7 @@ Projects::~Projects() {
 }
 
 void Projects::SharedDtor() {
+  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void Projects::SetCachedSize(int size) const {
@@ -1349,6 +1366,7 @@ void Projects::Clear() {
   (void) cached_has_bits;
 
   projects_.Clear();
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -1381,6 +1399,22 @@ const char* Projects::_InternalParse(const char* begin, const char* end, void* o
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 10 && (ptr += 1));
         break;
       }
+      // string token = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Projects.token");
+        object = msg->mutable_token();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -1396,6 +1430,10 @@ const char* Projects::_InternalParse(const char* begin, const char* end, void* o
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -1416,6 +1454,21 @@ bool Projects::MergePartialFromCodedStream(
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                 input, add_projects()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string token = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_token()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->token().data(), static_cast<int>(this->token().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.Projects.token"));
         } else {
           goto handle_unusual;
         }
@@ -1458,6 +1511,16 @@ void Projects::SerializeWithCachedSizes(
       output);
   }
 
+  // string token = 2;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Projects.token");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->token(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1477,6 +1540,17 @@ void Projects::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         1, this->projects(static_cast<int>(i)), target);
+  }
+
+  // string token = 2;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Projects.token");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->token(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1511,6 +1585,13 @@ size_t Projects::ByteSizeLong() const {
     }
   }
 
+  // string token = 2;
+  if (this->token().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->token());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1539,6 +1620,10 @@ void Projects::MergeFrom(const Projects& from) {
   (void) cached_has_bits;
 
   projects_.MergeFrom(from.projects_);
+  if (from.token().size() > 0) {
+
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
 }
 
 void Projects::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1567,6 +1652,8 @@ void Projects::InternalSwap(Projects* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&projects_)->InternalSwap(CastToBase(&other->projects_));
+  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
 }
 
 ::google::protobuf::Metadata Projects::GetMetadata() const {
@@ -1578,12 +1665,29 @@ void Projects::InternalSwap(Projects* other) {
 // ===================================================================
 
 void ProjectListRequest::InitAsDefaultInstance() {
+  ::flyteidl::admin::_ProjectListRequest_default_instance_._instance.get_mutable()->sort_by_ = const_cast< ::flyteidl::admin::Sort*>(
+      ::flyteidl::admin::Sort::internal_default_instance());
 }
 class ProjectListRequest::HasBitSetters {
  public:
+  static const ::flyteidl::admin::Sort& sort_by(const ProjectListRequest* msg);
 };
 
+const ::flyteidl::admin::Sort&
+ProjectListRequest::HasBitSetters::sort_by(const ProjectListRequest* msg) {
+  return *msg->sort_by_;
+}
+void ProjectListRequest::clear_sort_by() {
+  if (GetArenaNoVirtual() == nullptr && sort_by_ != nullptr) {
+    delete sort_by_;
+  }
+  sort_by_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ProjectListRequest::kLimitFieldNumber;
+const int ProjectListRequest::kTokenFieldNumber;
+const int ProjectListRequest::kFiltersFieldNumber;
+const int ProjectListRequest::kSortByFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ProjectListRequest::ProjectListRequest()
@@ -1595,10 +1699,31 @@ ProjectListRequest::ProjectListRequest(const ProjectListRequest& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.token().size() > 0) {
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  filters_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.filters().size() > 0) {
+    filters_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.filters_);
+  }
+  if (from.has_sort_by()) {
+    sort_by_ = new ::flyteidl::admin::Sort(*from.sort_by_);
+  } else {
+    sort_by_ = nullptr;
+  }
+  limit_ = from.limit_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.ProjectListRequest)
 }
 
 void ProjectListRequest::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_ProjectListRequest_flyteidl_2fadmin_2fproject_2eproto.base);
+  token_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  filters_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(&sort_by_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&limit_) -
+      reinterpret_cast<char*>(&sort_by_)) + sizeof(limit_));
 }
 
 ProjectListRequest::~ProjectListRequest() {
@@ -1607,6 +1732,9 @@ ProjectListRequest::~ProjectListRequest() {
 }
 
 void ProjectListRequest::SharedDtor() {
+  token_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  filters_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete sort_by_;
 }
 
 void ProjectListRequest::SetCachedSize(int size) const {
@@ -1624,6 +1752,13 @@ void ProjectListRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  filters_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == nullptr && sort_by_ != nullptr) {
+    delete sort_by_;
+  }
+  sort_by_ = nullptr;
+  limit_ = 0u;
   _internal_metadata_.Clear();
 }
 
@@ -1640,7 +1775,60 @@ const char* ProjectListRequest::_InternalParse(const char* begin, const char* en
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
+      // uint32 limit = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
+        msg->set_limit(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string token = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.ProjectListRequest.token");
+        object = msg->mutable_token();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // string filters = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.ProjectListRequest.filters");
+        object = msg->mutable_filters();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .flyteidl.admin.Sort sort_by = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::admin::Sort::_InternalParse;
+        object = msg->mutable_sort_by();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
+      handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
           ctx->EndGroup(tag);
           return ptr;
@@ -1654,6 +1842,13 @@ const char* ProjectListRequest::_InternalParse(const char* begin, const char* en
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 bool ProjectListRequest::MergePartialFromCodedStream(
@@ -1665,12 +1860,71 @@ bool ProjectListRequest::MergePartialFromCodedStream(
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // uint32 limit = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &limit_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string token = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_token()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->token().data(), static_cast<int>(this->token().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ProjectListRequest.token"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string filters = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_filters()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->filters().data(), static_cast<int>(this->filters().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.ProjectListRequest.filters"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.admin.Sort sort_by = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_sort_by()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
     }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
   // @@protoc_insertion_point(parse_success:flyteidl.admin.ProjectListRequest)
@@ -1688,6 +1942,37 @@ void ProjectListRequest::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  // uint32 limit = 1;
+  if (this->limit() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->limit(), output);
+  }
+
+  // string token = 2;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ProjectListRequest.token");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->token(), output);
+  }
+
+  // string filters = 3;
+  if (this->filters().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->filters().data(), static_cast<int>(this->filters().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ProjectListRequest.filters");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->filters(), output);
+  }
+
+  // .flyteidl.admin.Sort sort_by = 4;
+  if (this->has_sort_by()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4, HasBitSetters::sort_by(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1700,6 +1985,40 @@ void ProjectListRequest::SerializeWithCachedSizes(
   // @@protoc_insertion_point(serialize_to_array_start:flyteidl.admin.ProjectListRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
+
+  // uint32 limit = 1;
+  if (this->limit() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->limit(), target);
+  }
+
+  // string token = 2;
+  if (this->token().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->token().data(), static_cast<int>(this->token().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ProjectListRequest.token");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->token(), target);
+  }
+
+  // string filters = 3;
+  if (this->filters().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->filters().data(), static_cast<int>(this->filters().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.ProjectListRequest.filters");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->filters(), target);
+  }
+
+  // .flyteidl.admin.Sort sort_by = 4;
+  if (this->has_sort_by()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, HasBitSetters::sort_by(this), target);
+  }
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
@@ -1721,6 +2040,34 @@ size_t ProjectListRequest::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string token = 2;
+  if (this->token().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->token());
+  }
+
+  // string filters = 3;
+  if (this->filters().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->filters());
+  }
+
+  // .flyteidl.admin.Sort sort_by = 4;
+  if (this->has_sort_by()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *sort_by_);
+  }
+
+  // uint32 limit = 1;
+  if (this->limit() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->limit());
+  }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
@@ -1749,6 +2096,20 @@ void ProjectListRequest::MergeFrom(const ProjectListRequest& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.token().size() > 0) {
+
+    token_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.token_);
+  }
+  if (from.filters().size() > 0) {
+
+    filters_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.filters_);
+  }
+  if (from.has_sort_by()) {
+    mutable_sort_by()->::flyteidl::admin::Sort::MergeFrom(from.sort_by());
+  }
+  if (from.limit() != 0) {
+    set_limit(from.limit());
+  }
 }
 
 void ProjectListRequest::CopyFrom(const ::google::protobuf::Message& from) {
@@ -1776,6 +2137,12 @@ void ProjectListRequest::Swap(ProjectListRequest* other) {
 void ProjectListRequest::InternalSwap(ProjectListRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  token_.Swap(&other->token_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  filters_.Swap(&other->filters_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(sort_by_, other->sort_by_);
+  swap(limit_, other->limit_);
 }
 
 ::google::protobuf::Metadata ProjectListRequest::GetMetadata() const {

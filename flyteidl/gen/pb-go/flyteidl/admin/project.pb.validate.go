@@ -223,6 +223,8 @@ func (m *Projects) Validate() error {
 
 	}
 
+	// no validation rules for Token
+
 	return nil
 }
 
@@ -286,6 +288,22 @@ var _ interface {
 func (m *ProjectListRequest) Validate() error {
 	if m == nil {
 		return nil
+	}
+
+	// no validation rules for Limit
+
+	// no validation rules for Token
+
+	// no validation rules for Filters
+
+	if v, ok := interface{}(m.GetSortBy()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ProjectListRequestValidationError{
+				field:  "SortBy",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil
