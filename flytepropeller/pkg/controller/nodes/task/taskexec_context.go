@@ -5,6 +5,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 
 	"github.com/lyft/flytestdlib/logger"
@@ -124,7 +126,11 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 
 	id := GetTaskExecutionIdentifier(nCtx)
 
-	uniqueID, err := utils.FixedLengthUniqueIDForParts(IDMaxLength, nCtx.NodeExecutionMetadata().GetOwnerID().Name, nCtx.NodeID(), strconv.Itoa(int(id.RetryAttempt)))
+	currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
+	if err != nil {
+		return nil, err
+	}
+	uniqueID, err := utils.FixedLengthUniqueIDForParts(IDMaxLength, nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(id.RetryAttempt)))
 	if err != nil {
 		// SHOULD never really happen
 		return nil, err

@@ -5,6 +5,8 @@ import (
 	"context"
 	"testing"
 
+	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -74,6 +76,11 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	nCtx.OnNodeID().Return(nodeID)
 	nCtx.OnEventsRecorder().Return(nil)
 	nCtx.OnEnqueueOwnerFunc().Return(nil)
+
+	executionContext := &mocks2.ExecutionContext{}
+	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
+	executionContext.OnGetParentInfo().Return(nil)
+	nCtx.OnExecutionContext().Return(executionContext)
 
 	ds, err := storage.NewDataStore(
 		&storage.Config{

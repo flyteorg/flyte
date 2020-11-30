@@ -6,6 +6,9 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/lyft/flytepropeller/pkg/controller/executors"
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
 
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
 )
@@ -51,7 +54,7 @@ func trimErrorMessage(original string, maxLength int) string {
 }
 
 func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputFilePaths, out io.OutputFilePaths, info pluginCore.PhaseInfo,
-	nodeExecutionMetadata handler.NodeExecutionMetadata) (*event.TaskExecutionEvent, error) {
+	nodeExecutionMetadata handler.NodeExecutionMetadata, execContext executors.ExecutionContext) (*event.TaskExecutionEvent, error) {
 	// Transitions to a new phase
 
 	tm := ptypes.TimestampNow()
@@ -63,9 +66,21 @@ func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputF
 		}
 	}
 
+	nodeExecutionID := &core.NodeExecutionIdentifier{
+		ExecutionId: taskExecID.NodeExecutionId.ExecutionId,
+	}
+	if execContext.GetEventVersion() != v1alpha1.EventVersion0 {
+		currentNodeUniqueID, err := common.GenerateUniqueID(execContext.GetParentInfo(), taskExecID.NodeExecutionId.NodeId)
+		if err != nil {
+			return nil, err
+		}
+		nodeExecutionID.NodeId = currentNodeUniqueID
+	} else {
+		nodeExecutionID.NodeId = taskExecID.NodeExecutionId.NodeId
+	}
 	tev := &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
-		ParentNodeExecutionId: taskExecID.NodeExecutionId,
+		ParentNodeExecutionId: nodeExecutionID,
 		RetryAttempt:          taskExecID.RetryAttempt,
 		Phase:                 ToTaskEventPhase(info.Phase()),
 		PhaseVersion:          info.Version(),
