@@ -1,0 +1,66 @@
+project_name: datacatalog
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: datacatalog
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/main.go
+    binary: datacatalog
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - id: datacatalog-archive
+    name_template: |-
+      datacatalog_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
+      {{- with .Arm -}}
+      {{- if (eq . "6") -}}hf
+      {{- else -}}v{{- . -}}
+      {{- end -}}
+      {{- end -}}
+    builds:
+      - datacatalog
+    replacements:
+      386: i386
+      amd64: x86_64
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+scoop:
+  # Default is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+  # url_template: "http://github.mycompany.com/foo/bar/releases/{{ .Tag }}/{{ .ArtifactName }}"
+
+  # Repository to push the app manifest to.
+  bucket:
+    owner: lyft
+    name: datacatalog
+
+  # Git author used to commit to the repository.
+  # Defaults are shown.
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+
+  # Your app's homepage.
+  # Default is empty.
+  homepage: "https://godoc.org/github.com/lyft/datacatalog"
+
+  # Your app's description.
+  # Default is empty.
+  description: "datacatalog is the a memoization & lineage tracking service."
+
+  # Your app's license
+  # Default is empty.
+  license: Apache-2.0
