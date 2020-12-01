@@ -60,6 +60,7 @@ var filterFieldEntityPrefix = map[string]common.Entity{
 	"task_execution":        common.TaskExecution,
 	"entities":              common.NamedEntity,
 	"named_entity_metadata": common.NamedEntityMetadata,
+	"project":               common.Project,
 }
 
 func parseField(field string, primaryEntity common.Entity) (common.Entity, string) {
@@ -188,6 +189,7 @@ func getIdentifierFilters(entity common.Entity, spec FilterSpec) ([]common.Inlin
 
 func AddRequestFilters(requestFilters string, primaryEntity common.Entity, existingFilters []common.InlineFilter) (
 	[]common.InlineFilter, error) {
+
 	if requestFilters == "" {
 		return existingFilters, nil
 	}

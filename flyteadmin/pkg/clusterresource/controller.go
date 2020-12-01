@@ -32,6 +32,7 @@ import (
 
 	"github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories"
+	repositoriesInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
 	"github.com/lyft/flytestdlib/promutils"
@@ -357,7 +358,14 @@ func (c *controller) Sync(ctx context.Context) error {
 	logger.Debugf(ctx, "Running an invocation of ClusterResource Sync")
 
 	// Prefer to sync projects most newly created to ensure their resources get created first when other resources exist.
-	projects, err := c.db.ProjectRepo().ListAll(ctx, descCreatedAtSortParam)
+	filter, err := common.NewSingleValueFilter(common.Project, common.NotEqual, "state", int32(admin.Project_ARCHIVED))
+	if err != nil {
+		return err
+	}
+	projects, err := c.db.ProjectRepo().List(ctx, repositoriesInterfaces.ListResourceInput{
+		SortParameter: descCreatedAtSortParam,
+		InlineFilters: []common.InlineFilter{filter},
+	})
 	if err != nil {
 		return err
 	}

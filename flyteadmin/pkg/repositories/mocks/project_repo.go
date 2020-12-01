@@ -3,7 +3,6 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/common"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
@@ -11,7 +10,7 @@ import (
 
 type CreateProjectFunction func(ctx context.Context, project models.Project) error
 type GetProjectFunction func(ctx context.Context, projectID string) (models.Project, error)
-type ListProjectsFunction func(ctx context.Context, sortParameter common.SortParameter) ([]models.Project, error)
+type ListProjectsFunction func(ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error)
 type UpdateProjectFunction func(ctx context.Context, projectUpdate models.Project) error
 
 type MockProjectRepo struct {
@@ -39,9 +38,9 @@ func (r *MockProjectRepo) Get(ctx context.Context, projectID string) (models.Pro
 	}, nil
 }
 
-func (r *MockProjectRepo) ListAll(ctx context.Context, sortParameter common.SortParameter) ([]models.Project, error) {
+func (r *MockProjectRepo) List(ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error) {
 	if r.ListProjectsFunction != nil {
-		return r.ListProjectsFunction(ctx, sortParameter)
+		return r.ListProjectsFunction(ctx, input)
 	}
 	return make([]models.Project, 0), nil
 }

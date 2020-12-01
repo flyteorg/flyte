@@ -16,6 +16,7 @@ const (
 	Workflow            = "w"
 	NamedEntity         = "nen"
 	NamedEntityMetadata = "nem"
+	Project             = "p"
 )
 
 // ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters
