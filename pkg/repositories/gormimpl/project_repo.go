@@ -10,7 +10,6 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"github.com/lyft/flyteadmin/pkg/common"
 	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/errors"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
@@ -49,13 +48,35 @@ func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project
 	return project, nil
 }
 
-func (r *ProjectRepo) ListAll(ctx context.Context, sortParameter common.SortParameter) ([]models.Project, error) {
+func (r *ProjectRepo) List(ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error) {
 	var projects []models.Project
-	var tx = r.db.Where("state != ?", int32(admin.Project_ARCHIVED))
-	if sortParameter != nil {
-		tx = tx.Order(sortParameter.GetGormOrderExpr())
+
+	tx := r.db.Offset(input.Offset)
+	if input.Limit != 0 {
+		tx = tx.Limit(input.Limit)
 	}
-	tx = tx.Find(&projects)
+
+	// Apply filters
+	// If no filter provided, default to filtering out archived projects
+	if len(input.InlineFilters) == 0 && len(input.MapFilters) == 0 {
+		tx = tx.Where("state != ?", int32(admin.Project_ARCHIVED))
+	} else {
+		var err error
+		tx, err = applyFilters(tx, input.InlineFilters, input.MapFilters)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Apply sort ordering
+	if input.SortParameter != nil {
+		tx = tx.Order(input.SortParameter.GetGormOrderExpr())
+	}
+
+	timer := r.metrics.ListDuration.Start()
+	tx.Find(&projects)
+	timer.Stop()
+
 	if tx.Error != nil {
 		return nil, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

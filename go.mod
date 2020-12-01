@@ -25,7 +25,7 @@ require (
 	github.com/jinzhu/gorm v1.9.12
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/lib/pq v1.3.0
-	github.com/lyft/flyteidl v0.18.10
+	github.com/lyft/flyteidl v0.18.11
 	github.com/lyft/flytepropeller v0.3.17
 	github.com/lyft/flytestdlib v0.3.9
 	github.com/magiconair/properties v1.8.1
@@ -58,5 +58,4 @@ replace (
 	k8s.io/api => github.com/lyft/api v0.0.0-20191031200350-b49a72c274e0
 	k8s.io/apimachinery => github.com/lyft/apimachinery v0.0.0-20191031200210-047e3ea32d7f
 	k8s.io/client-go => k8s.io/client-go v0.0.0-20191016111102-bec269661e48
-
 )
