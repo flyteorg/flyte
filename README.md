@@ -16,7 +16,7 @@ defines a stateless REST/gRPC service for interacting with registered Flyte enti
 Flyteadmin uses a relational style Metadata Store abstracted by [GORM](http://gorm.io/) ORM library.
 
 Before Check-In
-~~~~~~~~~~~~~~~
+---------------
 
 Flyte Admin has a few useful make targets for linting and testing. Please use these before checking in to help suss out
 minor bugs and linting errors.
