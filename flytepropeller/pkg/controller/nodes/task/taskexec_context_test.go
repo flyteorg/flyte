@@ -80,6 +80,7 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	executionContext := &mocks2.ExecutionContext{}
 	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	ds, err := storage.NewDataStore(

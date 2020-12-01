@@ -5,6 +5,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
 
 	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager"
@@ -123,13 +125,17 @@ func (t taskExecutionContext) SecretManager() pluginCore.SecretManager {
 }
 
 func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.NodeExecutionContext, pluginID string) (*taskExecutionContext, error) {
-
 	id := GetTaskExecutionIdentifier(nCtx)
 
-	currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
-	if err != nil {
-		return nil, err
+	currentNodeUniqueID := nCtx.NodeID()
+	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+		var err error
+		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
+		if err != nil {
+			return nil, err
+		}
 	}
+
 	uniqueID, err := utils.FixedLengthUniqueIDForParts(IDMaxLength, nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(id.RetryAttempt)))
 	if err != nil {
 		// SHOULD never really happen
