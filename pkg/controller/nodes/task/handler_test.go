@@ -1271,6 +1271,7 @@ func Test_task_Abort(t *testing.T) {
 		executionContext := &mocks.ExecutionContext{}
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
@@ -1412,6 +1413,7 @@ func Test_task_Finalize(t *testing.T) {
 	executionContext := &mocks.ExecutionContext{}
 	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 	executionContext.OnGetParentInfo().Return(nil)
+	executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
