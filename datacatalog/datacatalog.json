@@ -1,19 +1,19 @@
 {
-    "version": "0.2.103",
+    "version": "0.2.104",
     "architecture": {
         "32bit": {
-            "url": "https://github.com/lyft/datacatalog/releases/download/v0.2.103/datacatalog_v0.2.103_windows_i386.zip",
+            "url": "https://github.com/lyft/datacatalog/releases/download/v0.2.104/datacatalog_v0.2.104_windows_i386.zip",
             "bin": [
                 "datacatalog.exe"
             ],
-            "hash": "bb432f14ce804db28db549b38cdd10852358f6c906836b023e6e8a147823bc64"
+            "hash": "b66a0bd286847bc2c75fbbcc7881028e27fb00346c5dc393be0e4e73b9b6c533"
         },
         "64bit": {
-            "url": "https://github.com/lyft/datacatalog/releases/download/v0.2.103/datacatalog_v0.2.103_windows_x86_64.zip",
+            "url": "https://github.com/lyft/datacatalog/releases/download/v0.2.104/datacatalog_v0.2.104_windows_x86_64.zip",
             "bin": [
                 "datacatalog.exe"
             ],
-            "hash": "39d46ad10b72319a582aeefbf0a1208bdd48419a9c68cd10352f627a8d045cb3"
+            "hash": "8bf804baeeca3183b0286e205a8baacb929b4820e67d2e4a1714774eb715ae3c"
         }
     },
     "homepage": "https://godoc.org/github.com/lyft/datacatalog",
