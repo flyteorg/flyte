@@ -1,25 +1,37 @@
-package utils
+package template
 
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"regexp"
 	"strings"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
-	"github.com/pkg/errors"
 
+	"reflect"
+
+	"github.com/golang/protobuf/ptypes"
+	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/pkg/errors"
 )
 
-var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
-var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
-var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
-var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
-var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
+var alphaNumericOnly = regexp.MustCompile("[^a-zA-Z0-9_]+")
+var startsWithAlpha = regexp.MustCompile("^[^a-zA-Z_]+")
+
+type ErrorCollection struct {
+	Errors []error
+}
+
+func (e ErrorCollection) Error() string {
+	sb := strings.Builder{}
+	for idx, err := range e.Errors {
+		sb.WriteString(fmt.Sprintf("%v: %v\r\n", idx, err))
+	}
+
+	return sb.String()
+}
 
 // Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
 // Supported templates are:
@@ -32,7 +44,16 @@ var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPr
 // NOTE: I wanted to do in-place replacement, until I realized that in-place replacement will alter the definition of the
 // graph. This is not desirable, as we may have to retry and in that case the replacement will not work and we want
 // to create a new location for outputs
-func ReplaceTemplateCommandArgs(ctx context.Context, command []string, in io.InputReader, out io.OutputFilePaths) ([]string, error) {
+func ReplaceTemplateCommandArgs(ctx context.Context, tExecMeta core.TaskExecutionMetadata, command []string, in io.InputReader,
+	out io.OutputFilePaths) ([]string, error) {
+
+	// TODO: Change GetGeneratedName to follow these conventions
+	var perRetryUniqueKey = tExecMeta.GetTaskExecutionID().GetGeneratedName()
+	perRetryUniqueKey = startsWithAlpha.ReplaceAllString(perRetryUniqueKey, "a")
+	perRetryUniqueKey = alphaNumericOnly.ReplaceAllString(perRetryUniqueKey, "_")
+
+	logger.Debugf(ctx, "Using [%s] from [%s]", perRetryUniqueKey, tExecMeta.GetTaskExecutionID().GetGeneratedName())
+
 	if len(command) == 0 {
 		return []string{}, nil
 	}
@@ -41,7 +62,7 @@ func ReplaceTemplateCommandArgs(ctx context.Context, command []string, in io.Inp
 	}
 	res := make([]string, 0, len(command))
 	for _, commandTemplate := range command {
-		updated, err := replaceTemplateCommandArgs(ctx, commandTemplate, in, out)
+		updated, err := replaceTemplateCommandArgs(ctx, perRetryUniqueKey, commandTemplate, in, out)
 		if err != nil {
 			return res, err
 		}
@@ -52,7 +73,14 @@ func ReplaceTemplateCommandArgs(ctx context.Context, command []string, in io.Inp
 	return res, nil
 }
 
-func transformVarNameToStringVal(ctx context.Context, varName string, inputs *core.LiteralMap) (string, error) {
+var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
+var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
+var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
+var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
+var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
+var perRetryUniqueKey = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}`)
+
+func transformVarNameToStringVal(ctx context.Context, varName string, inputs *idlCore.LiteralMap) (string, error) {
 	inputVal, exists := inputs.Literals[varName]
 	if !exists {
 		return "", fmt.Errorf("requested input is not found [%s]", varName)
@@ -65,11 +93,14 @@ func transformVarNameToStringVal(ctx context.Context, varName string, inputs *co
 	return v, nil
 }
 
-func replaceTemplateCommandArgs(ctx context.Context, commandTemplate string, in io.InputReader, out io.OutputFilePaths) (string, error) {
+func replaceTemplateCommandArgs(ctx context.Context, perRetryKey string, commandTemplate string,
+	in io.InputReader, out io.OutputFilePaths) (string, error) {
+
 	val := inputFileRegex.ReplaceAllString(commandTemplate, in.GetInputPath().String())
 	val = outputRegex.ReplaceAllString(val, out.GetOutputPrefixPath().String())
 	val = inputPrefixRegex.ReplaceAllString(val, in.GetInputPrefixPath().String())
 	val = rawOutputDataPrefixRegex.ReplaceAllString(val, out.GetRawOutputPrefix().String())
+	val = perRetryUniqueKey.ReplaceAllString(val, perRetryKey)
 
 	inputs, err := in.Get(ctx)
 	if err != nil {
@@ -98,39 +129,41 @@ func replaceTemplateCommandArgs(ctx context.Context, commandTemplate string, in 
 	return val, nil
 }
 
-func serializePrimitive(p *core.Primitive) (string, error) {
+func serializePrimitive(p *idlCore.Primitive) (string, error) {
 	switch o := p.Value.(type) {
-	case *core.Primitive_Integer:
+	case *idlCore.Primitive_Integer:
 		return fmt.Sprintf("%v", o.Integer), nil
-	case *core.Primitive_Boolean:
+	case *idlCore.Primitive_Boolean:
 		return fmt.Sprintf("%v", o.Boolean), nil
-	case *core.Primitive_Datetime:
+	case *idlCore.Primitive_Datetime:
 		return ptypes.TimestampString(o.Datetime), nil
-	case *core.Primitive_Duration:
+	case *idlCore.Primitive_Duration:
 		return o.Duration.String(), nil
-	case *core.Primitive_FloatValue:
+	case *idlCore.Primitive_FloatValue:
 		return fmt.Sprintf("%v", o.FloatValue), nil
-	case *core.Primitive_StringValue:
+	case *idlCore.Primitive_StringValue:
 		return o.StringValue, nil
 	default:
 		return "", fmt.Errorf("received an unexpected primitive type [%v]", reflect.TypeOf(p.Value))
 	}
 }
 
-func serializeLiteralScalar(l *core.Scalar) (string, error) {
+func serializeLiteralScalar(l *idlCore.Scalar) (string, error) {
 	switch o := l.Value.(type) {
-	case *core.Scalar_Primitive:
+	case *idlCore.Scalar_Primitive:
 		return serializePrimitive(o.Primitive)
-	case *core.Scalar_Blob:
+	case *idlCore.Scalar_Blob:
 		return o.Blob.Uri, nil
+	case *idlCore.Scalar_Schema:
+		return o.Schema.Uri, nil
 	default:
 		return "", fmt.Errorf("received an unexpected scalar type [%v]", reflect.TypeOf(l.Value))
 	}
 }
 
-func serializeLiteral(ctx context.Context, l *core.Literal) (string, error) {
+func serializeLiteral(ctx context.Context, l *idlCore.Literal) (string, error) {
 	switch o := l.Value.(type) {
-	case *core.Literal_Collection:
+	case *idlCore.Literal_Collection:
 		res := make([]string, 0, len(o.Collection.Literals))
 		for _, sub := range o.Collection.Literals {
 			s, err := serializeLiteral(ctx, sub)
@@ -142,7 +175,7 @@ func serializeLiteral(ctx context.Context, l *core.Literal) (string, error) {
 		}
 
 		return fmt.Sprintf("[%v]", strings.Join(res, ",")), nil
-	case *core.Literal_Scalar:
+	case *idlCore.Literal_Scalar:
 		return serializeLiteralScalar(o.Scalar)
 	default:
 		logger.Debugf(ctx, "received unexpected primitive type")

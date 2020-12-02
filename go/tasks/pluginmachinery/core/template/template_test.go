@@ -1,10 +1,13 @@
-package utils
+package template
 
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"testing"
 	"time"
+
+	pluginsCoreMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 
 	"github.com/lyft/flyteidl/clients/go/coreutils"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -12,12 +15,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 )
-
-func BenchmarkRegexCommandArgs(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		inputFileRegex.MatchString("{{ .InputFile }}")
-	}
-}
 
 type dummyInputReader struct {
 	inputPrefix storage.DataReference
@@ -62,35 +59,14 @@ func (d dummyOutputPaths) GetErrorPath() storage.DataReference {
 	panic("should not be called")
 }
 
-func TestInputRegexMatch(t *testing.T) {
-	assert.True(t, inputFileRegex.MatchString("{{$input}}"))
-	assert.True(t, inputFileRegex.MatchString("{{ $Input }}"))
-	assert.True(t, inputFileRegex.MatchString("{{.input}}"))
-	assert.True(t, inputFileRegex.MatchString("{{ .Input }}"))
-	assert.True(t, inputFileRegex.MatchString("{{  .Input }}"))
-	assert.True(t, inputFileRegex.MatchString("{{       .Input }}"))
-	assert.True(t, inputFileRegex.MatchString("{{ .Input}}"))
-	assert.True(t, inputFileRegex.MatchString("{{.Input }}"))
-	assert.True(t, inputFileRegex.MatchString("--something={{.Input}}"))
-	assert.False(t, inputFileRegex.MatchString("{{input}}"), "Missing $")
-	assert.False(t, inputFileRegex.MatchString("{$input}}"), "Missing Brace")
-}
-
-func TestOutputRegexMatch(t *testing.T) {
-	assert.True(t, outputRegex.MatchString("{{.OutputPrefix}}"))
-	assert.True(t, outputRegex.MatchString("{{ .OutputPrefix }}"))
-	assert.True(t, outputRegex.MatchString("{{  .OutputPrefix }}"))
-	assert.True(t, outputRegex.MatchString("{{      .OutputPrefix }}"))
-	assert.True(t, outputRegex.MatchString("{{ .OutputPrefix}}"))
-	assert.True(t, outputRegex.MatchString("{{.OutputPrefix }}"))
-	assert.True(t, outputRegex.MatchString("--something={{.OutputPrefix}}"))
-	assert.False(t, outputRegex.MatchString("{{output}}"), "Missing $")
-	assert.False(t, outputRegex.MatchString("{.OutputPrefix}}"), "Missing Brace")
-}
-
 func TestReplaceTemplateCommandArgs(t *testing.T) {
+	taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
+	taskExecutionID.On("GetGeneratedName").Return("per_retry_unique_key")
+	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
+	taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+
 	t.Run("empty cmd", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(),
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata,
 			[]string{}, nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{}, actual)
@@ -103,7 +79,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	}
 
 	t.Run("nothing to substitute", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 		}, in, out)
@@ -116,7 +92,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Sub InputFile", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			"{{ .Input }}",
@@ -132,7 +108,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 
 	t.Run("Sub Input Prefix", func(t *testing.T) {
 		in := dummyInputReader{inputPath: "input/prefix"}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			"{{ .Input }}",
@@ -147,7 +123,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Sub Output Prefix", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			"{{ .OutputPrefix }}",
@@ -161,7 +137,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Sub Input Output prefix", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			"{{ .Input }}",
@@ -177,7 +153,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Bad input template", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			"${{input}}",
@@ -206,7 +182,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				},
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.arr }}`,
@@ -229,7 +205,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"date": coreutils.MustMakeLiteral(time.Date(1900, 01, 01, 01, 01, 01, 000000001, time.UTC)),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.date }}`,
@@ -252,7 +228,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.arr }}`,
@@ -272,7 +248,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	t.Run("nil input", func(t *testing.T) {
 		in := dummyInputReader{inputs: &core.LiteralMap{}}
 
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.arr }}`,
@@ -298,7 +274,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"min":   coreutils.MustMakeLiteral(15),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			`SELECT
         	COUNT(*) as total_count
     	FROM
@@ -323,7 +299,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 			},
 		}}
-		_, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		_, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.blah }}`,
@@ -338,32 +314,169 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
 			"world",
-			`--someArg {{ .Inputs.blah blah }}`,
+			`--someArg {{ .Inputs.blah blah }} {{ .PerretryuNIqueKey }}`,
 			"{{ .OutputPrefix }}",
 		}, in, out)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
 			"world",
-			`--someArg {{ .Inputs.blah blah }}`,
+			`--someArg {{ .Inputs.blah blah }} per_retry_unique_key`,
 			"output/blah",
 		}, actual)
 	})
 
 	t.Run("sub raw output data prefix", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), []string{
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
 			"hello",
+			"{{ .perRetryUniqueKey }}",
 			"world",
 			"{{ .rawOutputDataPrefix }}",
 		}, in, out)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
+			"per_retry_unique_key",
 			"world",
 			"s3://custom-bucket",
 		}, actual)
+	})
+}
+
+func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
+	in := dummyInputReader{inputPath: "input/blah"}
+	out := dummyOutputPaths{
+		outputPath:          "output/blah",
+		rawOutputDataPrefix: "s3://custom-bucket",
+	}
+
+	t.Run("dashes are replaced", func(t *testing.T) {
+		taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
+		taskExecutionID.On("GetGeneratedName").Return("per-retry-unique-key")
+		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
+		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+			"hello",
+			"{{ .perRetryUniqueKey }}",
+			"world",
+			"{{ .rawOutputDataPrefix }}",
+		}, in, out)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"per_retry_unique_key",
+			"world",
+			"s3://custom-bucket",
+		}, actual)
+	})
+
+	t.Run("non-alphabet leading characters are stripped", func(t *testing.T) {
+		var startsWithAlpha = regexp.MustCompile("^[^a-zA-Z_]+")
+		taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
+		taskExecutionID.On("GetGeneratedName").Return("33 per retry-unique-key")
+		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
+		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+
+		testString := "doesn't start with a number"
+		testString2 := "1 does start with a number"
+		testString3 := "  1 3 nd spaces "
+		assert.Equal(t, testString, startsWithAlpha.ReplaceAllString(testString, "a"))
+		assert.Equal(t, "adoes start with a number", startsWithAlpha.ReplaceAllString(testString2, "a"))
+		assert.Equal(t, "and spaces ", startsWithAlpha.ReplaceAllString(testString3, "a"))
+
+		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+			"hello",
+			"{{ .perRetryUniqueKey }}",
+			"world",
+			"{{ .rawOutputDataPrefix }}",
+		}, in, out)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"aper_retry_unique_key",
+			"world",
+			"s3://custom-bucket",
+		}, actual)
+	})
+}
+
+func BenchmarkRegexCommandArgs(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		inputFileRegex.MatchString("{{ .InputFile }}")
+	}
+}
+
+func TestInputRegexMatch(t *testing.T) {
+	assert.True(t, inputFileRegex.MatchString("{{$input}}"))
+	assert.True(t, inputFileRegex.MatchString("{{ $Input }}"))
+	assert.True(t, inputFileRegex.MatchString("{{.input}}"))
+	assert.True(t, inputFileRegex.MatchString("{{ .Input }}"))
+	assert.True(t, inputFileRegex.MatchString("{{  .Input }}"))
+	assert.True(t, inputFileRegex.MatchString("{{       .Input }}"))
+	assert.True(t, inputFileRegex.MatchString("{{ .Input}}"))
+	assert.True(t, inputFileRegex.MatchString("{{.Input }}"))
+	assert.True(t, inputFileRegex.MatchString("--something={{.Input}}"))
+	assert.False(t, inputFileRegex.MatchString("{{input}}"), "Missing $")
+	assert.False(t, inputFileRegex.MatchString("{$input}}"), "Missing Brace")
+}
+
+func TestOutputRegexMatch(t *testing.T) {
+	assert.True(t, outputRegex.MatchString("{{.OutputPrefix}}"))
+	assert.True(t, outputRegex.MatchString("{{ .OutputPrefix }}"))
+	assert.True(t, outputRegex.MatchString("{{  .OutputPrefix }}"))
+	assert.True(t, outputRegex.MatchString("{{      .OutputPrefix }}"))
+	assert.True(t, outputRegex.MatchString("{{ .OutputPrefix}}"))
+	assert.True(t, outputRegex.MatchString("{{.OutputPrefix }}"))
+	assert.True(t, outputRegex.MatchString("--something={{.OutputPrefix}}"))
+	assert.False(t, outputRegex.MatchString("{{output}}"), "Missing $")
+	assert.False(t, outputRegex.MatchString("{.OutputPrefix}}"), "Missing Brace")
+}
+
+func getBlobLiteral(uri string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Blob{
+					Blob: &core.Blob{
+						Metadata: nil,
+						Uri:      uri,
+					},
+				},
+			},
+		},
+	}
+}
+
+func getSchemaLiteral(uri string) *core.Literal {
+	return &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Schema{
+					Schema: &core.Schema{Type: nil, Uri: uri},
+				},
+			},
+		},
+	}
+}
+
+func TestSerializeLiteral(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("serialize blob", func(t *testing.T) {
+		b := getBlobLiteral("asdf fdsa")
+		interpolated, err := serializeLiteral(ctx, b)
+		assert.NoError(t, err)
+		assert.Equal(t, "asdf fdsa", interpolated)
+	})
+
+	t.Run("serialize blob", func(t *testing.T) {
+		s := getSchemaLiteral("s3://some-bucket/fdsa/x.parquet")
+		interpolated, err := serializeLiteral(ctx, s)
+		assert.NoError(t, err)
+		assert.Equal(t, "s3://some-bucket/fdsa/x.parquet", interpolated)
 	})
 }

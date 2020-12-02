@@ -2,9 +2,13 @@ package hive
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"testing"
 	"time"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/promutils/labeled"
@@ -75,24 +79,13 @@ func TestIsNotYetSubmitted(t *testing.T) {
 
 func TestGetQueryInfo(t *testing.T) {
 	ctx := context.Background()
+	tCtx := GetMockTaskExecutionContext()
 
-	taskTemplate := GetSingleHiveQueryTaskTemplate()
-	mockTaskReader := &mocks.TaskReader{}
-	mockTaskReader.On("Read", mock.Anything).Return(&taskTemplate, nil)
-
-	mockTaskExecutionContext := mocks.TaskExecutionContext{}
-	mockTaskExecutionContext.On("TaskReader").Return(mockTaskReader)
-
-	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
-	taskMetadata.On("GetNamespace").Return("myproject-staging")
-	taskMetadata.On("GetLabels").Return(map[string]string{"sample": "label"})
-	mockTaskExecutionContext.On("TaskExecutionMetadata").Return(taskMetadata)
-
-	query, cluster, tags, timeout, taskName, err := GetQueryInfo(ctx, &mockTaskExecutionContext)
+	query, cluster, tags, timeout, taskName, err := GetQueryInfo(ctx, tCtx)
 	assert.NoError(t, err)
 	assert.Equal(t, "select 'one'", query)
 	assert.Equal(t, "default", cluster)
-	assert.Equal(t, []string{"flyte_plugin_test", "ns:myproject-staging", "sample:label"}, tags)
+	assert.Equal(t, []string{"flyte_plugin_test", "ns:test-namespace", "label-1:val1"}, tags)
 	assert.Equal(t, 500, int(timeout))
 	assert.Equal(t, "sample_hive_task_test_name", taskName)
 }
@@ -167,6 +160,15 @@ func TestMapExecutionStateToPhaseInfo(t *testing.T) {
 		}
 		phaseInfo := MapExecutionStateToPhaseInfo(e, c)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
+	})
+
+	t.Run("Write outputs file", func(t *testing.T) {
+		e := ExecutionState{
+			Phase: PhaseWriteOutputFile,
+		}
+		phaseInfo := MapExecutionStateToPhaseInfo(e, c)
+		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
+		assert.Equal(t, uint32(1), phaseInfo.Version())
 	})
 }
 
@@ -345,6 +347,22 @@ func TestKickOffQuery(t *testing.T) {
 	assert.Equal(t, "453298043", newState.CommandID)
 	assert.True(t, getOrCreateCalled)
 	assert.True(t, quboleCalled)
+}
+
+func TestWriteOutputs(t *testing.T) {
+	ctx := context.Background()
+	tCtx := GetMockTaskExecutionContext()
+	tCtx.OutputWriter().(*ioMock.OutputWriter).On("Put", mock.Anything, mock.Anything).Return(nil).Run(func(arguments mock.Arguments) {
+		reader := arguments.Get(1).(io.OutputReader)
+		literals, err1, err2 := reader.Read(context.Background())
+		assert.Nil(t, err1)
+		assert.NoError(t, err2)
+		assert.NotNil(t, literals.Literals["results"].GetScalar().GetSchema())
+	})
+
+	state := ExecutionState{}
+	newState, _ := WriteOutputs(ctx, tCtx, state)
+	fmt.Println(newState)
 }
 
 func createMockQuboleCfg() *config.Config {

@@ -86,6 +86,6 @@ func TestQuboleHiveExecutionsCache_SyncQuboleQuery(t *testing.T) {
 		newExecutionState := newCacheItem[0].Item.(ExecutionStateCacheItem)
 		assert.NoError(t, err)
 		assert.Equal(t, cache.Update, newCacheItem[0].Action)
-		assert.Equal(t, PhaseQuerySucceeded, newExecutionState.Phase)
+		assert.Equal(t, PhaseWriteOutputFile, newExecutionState.Phase)
 	})
 }
