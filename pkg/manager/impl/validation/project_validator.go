@@ -25,7 +25,11 @@ func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error 
 	if request.Project == nil {
 		return shared.GetMissingArgumentError(shared.Project)
 	}
-	return ValidateProject(*request.Project)
+	project := *request.Project
+	if err := ValidateEmptyStringField(project.Name, projectName); err != nil {
+		return err
+	}
+	return ValidateProject(project)
 }
 
 func ValidateProject(project admin.Project) error {
@@ -37,9 +41,6 @@ func ValidateProject(project admin.Project) error {
 	}
 	if errs := validation.IsDNS1123Label(project.Id); len(errs) > 0 {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid project id [%s]: %v", project.Id, errs)
-	}
-	if err := ValidateEmptyStringField(project.Name, projectName); err != nil {
-		return err
 	}
 	if err := ValidateMaxLengthStringField(project.Name, projectName, maxNameLength); err != nil {
 		return err

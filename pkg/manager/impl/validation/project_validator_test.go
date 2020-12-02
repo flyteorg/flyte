@@ -145,8 +145,8 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 func TestValidateProject_ValidProject(t *testing.T) {
 	assert.Nil(t, ValidateProject(admin.Project{
 		Id:          "proj",
-		Name:        "proj",
 		Description: "An amazing description for this project",
+		State:       admin.Project_ARCHIVED,
 		Labels: &admin.Labels{
 			Values: map[string]string{
 				"foo": "bar",
@@ -181,12 +181,6 @@ func TestValidateProject(t *testing.T) {
 			expectedError: "invalid project id [%)(*&]: [a DNS-1123 label must consist of lower case alphanumeric " +
 				"characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or " +
 				"'123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
-		},
-		{
-			project: admin.Project{
-				Id: "proj",
-			},
-			expectedError: "missing project_name",
 		},
 		{
 			project: admin.Project{
