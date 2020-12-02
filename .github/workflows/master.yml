@@ -40,6 +40,10 @@ jobs:
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
