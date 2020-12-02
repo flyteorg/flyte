@@ -34,7 +34,7 @@ jobs:
 
   bump-version:
     name: Bump Version
-    if: github.actor != 'goreleaserbot'
+    if: github.event.commits[0].author.name != 'goreleaserbot'
     runs-on: ubuntu-latest
     needs: build-docker # Only to ensure it can successfully build
     outputs:
