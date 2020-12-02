@@ -667,9 +667,13 @@ func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, r
 	}
 	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	evRecorder := nCtx.EventsRecorder()
+	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, nCtx.ExecutionContext())
+	if err != nil {
+		return err
+	}
 	if err := evRecorder.RecordTaskEvent(ctx, &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
-		ParentNodeExecutionId: taskExecID.NodeExecutionId,
+		ParentNodeExecutionId: nodeExecutionID,
 		RetryAttempt:          nCtx.CurrentAttempt(),
 		Phase:                 core.TaskExecution_ABORTED,
 		OccurredAt:            ptypes.TimestampNow(),
