@@ -5,9 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
 	"github.com/lyft/flyteplugins/go/tasks/plugins/array/arraystatus"
 	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
@@ -74,7 +75,8 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	})
 
 	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, arrayJobEnvVars...)
-	pod.Spec.Containers[0].Args, err = utils.ReplaceTemplateCommandArgs(ctx, args, arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
+	pod.Spec.Containers[0].Args, err = template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), args,
+		arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
 	if err != nil {
 		return LaunchError, errors2.Wrapf(ErrReplaceCmdTemplate, err, "Failed to replace cmd args")
 	}

@@ -155,7 +155,7 @@ func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch c
 func QuboleStatusToExecutionPhase(s client.QuboleStatus) (ExecutionPhase, error) {
 	switch s {
 	case client.QuboleStatusDone:
-		return PhaseQuerySucceeded, nil
+		return PhaseWriteOutputFile, nil
 	case client.QuboleStatusCancelled:
 		return PhaseQueryFailed, nil
 	case client.QuboleStatusError:

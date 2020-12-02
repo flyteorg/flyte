@@ -5,6 +5,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+
 	"github.com/golang/protobuf/ptypes/duration"
 
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -19,8 +21,6 @@ import (
 	"github.com/aws/aws-sdk-go/service/batch"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
-
 	"github.com/lyft/flyteplugins/go/tasks/errors"
 	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	v1 "k8s.io/api/core/v1"
@@ -66,12 +66,12 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 		return nil, errors.Errorf(errors.BadTaskSpecification, "config[%v] is missing", DynamicTaskQueueKey)
 	}
 
-	cmd, err := utils.ReplaceTemplateCommandArgs(ctx, taskTemplate.GetContainer().GetCommand(), tCtx.InputReader(), tCtx.OutputWriter())
+	cmd, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), taskTemplate.GetContainer().GetCommand(), tCtx.InputReader(), tCtx.OutputWriter())
 	if err != nil {
 		return nil, err
 	}
 
-	args, err := utils.ReplaceTemplateCommandArgs(ctx, taskTemplate.GetContainer().GetArgs(),
+	args, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), taskTemplate.GetContainer().GetArgs(),
 		arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
 	taskTemplate.GetContainer().GetEnv()
 	if err != nil {
