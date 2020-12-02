@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/lyft/flyteadmin/pkg/common"
-	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
 
 	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
@@ -209,6 +208,7 @@ func TestProjectManager_UpdateProject(t *testing.T) {
 		assert.Equal(t, "project-id", projectUpdate.Identifier)
 		assert.Equal(t, "new-project-name", projectUpdate.Name)
 		assert.Equal(t, "new-project-description", projectUpdate.Description)
+		assert.Equal(t, int32(admin.Project_ACTIVE), *projectUpdate.State)
 		return nil
 	}
 	projectManager := NewProjectManager(mockRepository,
@@ -218,6 +218,7 @@ func TestProjectManager_UpdateProject(t *testing.T) {
 		Id:          "project-id",
 		Name:        "new-project-name",
 		Description: "new-project-description",
+		State:       admin.Project_ACTIVE,
 	})
 	assert.Nil(t, err)
 	assert.True(t, updateFuncCalled)
@@ -260,8 +261,8 @@ func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T)
 		runtimeMocks.NewMockConfigurationProvider(
 			getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 	_, err := projectManager.UpdateProject(context.Background(), admin.Project{
-		Id: "project-id",
-		// No project name
+		Id:   "project-id",
+		Name: "longnamelongnamelongnamelongnamelongnamelongnamelongnamelongnamel",
 	})
-	assert.Equal(t, shared.GetMissingArgumentError("project_name"), err)
+	assert.EqualError(t, err, "project_name cannot exceed 64 characters")
 }
