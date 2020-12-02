@@ -53,6 +53,22 @@ func trimErrorMessage(original string, maxLength int) string {
 	return original[0:maxLength/2] + original[len(original)-maxLength/2:]
 }
 
+func getParentNodeExecIDForTask(taskExecID *core.TaskExecutionIdentifier, execContext executors.ExecutionContext) (*core.NodeExecutionIdentifier, error) {
+	nodeExecutionID := &core.NodeExecutionIdentifier{
+		ExecutionId: taskExecID.NodeExecutionId.ExecutionId,
+	}
+	if execContext.GetEventVersion() != v1alpha1.EventVersion0 {
+		currentNodeUniqueID, err := common.GenerateUniqueID(execContext.GetParentInfo(), taskExecID.NodeExecutionId.NodeId)
+		if err != nil {
+			return nil, err
+		}
+		nodeExecutionID.NodeId = currentNodeUniqueID
+	} else {
+		nodeExecutionID.NodeId = taskExecID.NodeExecutionId.NodeId
+	}
+	return nodeExecutionID, nil
+}
+
 func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputFilePaths, out io.OutputFilePaths, info pluginCore.PhaseInfo,
 	nodeExecutionMetadata handler.NodeExecutionMetadata, execContext executors.ExecutionContext) (*event.TaskExecutionEvent, error) {
 	// Transitions to a new phase
@@ -66,17 +82,9 @@ func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputF
 		}
 	}
 
-	nodeExecutionID := &core.NodeExecutionIdentifier{
-		ExecutionId: taskExecID.NodeExecutionId.ExecutionId,
-	}
-	if execContext.GetEventVersion() != v1alpha1.EventVersion0 {
-		currentNodeUniqueID, err := common.GenerateUniqueID(execContext.GetParentInfo(), taskExecID.NodeExecutionId.NodeId)
-		if err != nil {
-			return nil, err
-		}
-		nodeExecutionID.NodeId = currentNodeUniqueID
-	} else {
-		nodeExecutionID.NodeId = taskExecID.NodeExecutionId.NodeId
+	nodeExecutionID, err := getParentNodeExecIDForTask(taskExecID, execContext)
+	if err != nil {
+		return nil, err
 	}
 	tev := &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
