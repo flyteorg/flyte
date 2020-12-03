@@ -3,6 +3,8 @@ package validators
 import (
 	"testing"
 
+	"github.com/lyft/flytepropeller/pkg/compiler/common"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/lyft/flytepropeller/pkg/compiler/common/mocks"
@@ -32,4 +34,16 @@ func TestValidateBranchNode(t *testing.T) {
 			assert.Equal(t, errors.BranchNodeHasNoDefault, errsList[1].Code())
 		}
 	})
+}
+
+func TestValidateNode(t *testing.T) {
+	n := &mocks.NodeBuilder{}
+	n.OnGetId().Return(common.StartNodeID)
+
+	wf := &mocks.WorkflowBuilder{}
+	errs := errors.NewCompileErrors()
+	ValidateNode(wf, n, true, errs)
+	if errs.HasErrors() {
+		assert.NoError(t, errs)
+	}
 }
