@@ -120,6 +120,10 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 		errs.Collect(errors.NewValueRequiredErr("<node>", "Id"))
 	}
 
+	if n.GetId() == c.StartNodeID || n.GetId() == c.EndNodeID {
+		return true
+	}
+
 	if _, ifaceOk := ValidateUnderlyingInterface(w, n, errs.NewScope()); ifaceOk {
 		// Validate node output aliases
 		validateEffectiveOutputParameters(n, errs.NewScope())
