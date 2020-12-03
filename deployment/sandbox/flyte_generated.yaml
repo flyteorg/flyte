@@ -8374,7 +8374,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "docker.io/lyft/flytecopilot:v0.3.35"
+          image: "ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -8486,7 +8486,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-57md596t6f
+  name: flyte-propeller-config-t88d5b727h
   namespace: flyte
 ---
 apiVersion: v1
@@ -8790,7 +8790,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: docker.io/lyft/datacatalog:v0.2.2
+        image: ghcr.io/lyft/datacatalog:v0.2.130
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -8809,7 +8809,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: docker.io/lyft/datacatalog:v0.2.2
+        image: ghcr.io/lyft/datacatalog:v0.2.130
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8858,7 +8858,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: docker.io/lyft/flyteadmin:v0.3.15
+        image: ghcr.io/lyft/flyteadmin:v0.3.26
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8904,7 +8904,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: docker.io/lyft/flyteadmin:v0.3.15
+        image: ghcr.io/lyft/flyteadmin:v0.3.26
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8922,7 +8922,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: docker.io/lyft/flyteadmin:v0.3.15
+        image: ghcr.io/lyft/flyteadmin:v0.3.26
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8937,7 +8937,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: docker.io/lyft/flyteadmin:v0.3.15
+        image: ghcr.io/lyft/flyteadmin:v0.3.26
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8990,7 +8990,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: docker.io/lyft/flyteconsole:v0.17.7
+        image: ghcr.io/lyft/flyteconsole:v0.17.8
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -9034,7 +9034,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: docker.io/lyft/flytepropeller:v0.5.2
+        image: ghcr.io/lyft/flytepropeller:v0.5.8
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -9045,7 +9045,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-57md596t6f
+          name: flyte-propeller-config-t88d5b727h
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -9279,7 +9279,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: docker.io/lyft/flyteadmin:v0.3.15
+            image: ghcr.io/lyft/flyteadmin:v0.3.26
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
