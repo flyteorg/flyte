@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
 	"github.com/lyft/flytestdlib/storage"
@@ -18,6 +20,23 @@ type launchPlanHandler struct {
 	launchPlan launchplan.Executor
 }
 
+func getParentNodeExecutionID(nCtx handler.NodeExecutionContext) (*core.NodeExecutionIdentifier, error) {
+	nodeExecID := &core.NodeExecutionIdentifier{
+		ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
+	}
+	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+		var err error
+		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId)
+		if err != nil {
+			return nil, err
+		}
+		nodeExecID.NodeId = currentNodeUniqueID
+	} else {
+		nodeExecID.NodeId = nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId
+	}
+	return nodeExecID, nil
+}
+
 func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
 	nodeInputs, err := nCtx.InputReader().Get(ctx)
 	if err != nil {
@@ -25,8 +44,12 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.RuntimeExecutionError, errMsg, nil)), nil
 	}
 
+	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
+	if err != nil {
+		return handler.UnknownTransition, err
+	}
 	childID, err := GetChildWorkflowExecutionID(
-		nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		parentNodeExecutionID,
 		nCtx.CurrentAttempt(),
 	)
 	if err != nil {
@@ -37,7 +60,7 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 		// TODO we need to add principal and nestinglevel as annotations or labels?
 		Principal:           "unknown",
 		NestingLevel:        0,
-		ParentNodeExecution: nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		ParentNodeExecution: parentNodeExecutionID,
 	}
 	err = l.launchPlan.Launch(ctx, launchCtx, childID, nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID().Identifier, nodeInputs)
 	if err != nil {
@@ -60,10 +83,13 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 }
 
 func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx handler.NodeExecutionContext) (handler.Transition, error) {
-
+	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
+	if err != nil {
+		return handler.UnknownTransition, err
+	}
 	// Handle launch plan
 	childID, err := GetChildWorkflowExecutionID(
-		nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		parentNodeExecutionID,
 		nCtx.CurrentAttempt(),
 	)
 
@@ -141,8 +167,12 @@ func (l *launchPlanHandler) CheckLaunchPlanStatus(ctx context.Context, nCtx hand
 }
 
 func (l *launchPlanHandler) HandleAbort(ctx context.Context, nCtx handler.NodeExecutionContext, reason string) error {
+	parentNodeExecutionID, err := getParentNodeExecutionID(nCtx)
+	if err != nil {
+		return err
+	}
 	childID, err := GetChildWorkflowExecutionID(
-		nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		parentNodeExecutionID,
 		nCtx.CurrentAttempt(),
 	)
 	if err != nil {
