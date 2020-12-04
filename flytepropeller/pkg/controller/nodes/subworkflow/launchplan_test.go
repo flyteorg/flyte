@@ -613,9 +613,6 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 			launchPlan: mockLPExec,
 		}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
-		eCtx := &execMocks.ExecutionContext{}
-		eCtx.OnGetName().Return("name")
-		nCtx.OnExecutionContext().Return(eCtx)
 		err := h.HandleAbort(ctx, nCtx, "reason")
 		assert.Error(t, err)
 		assert.Equal(t, err, expectedErr)

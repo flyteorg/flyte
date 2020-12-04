@@ -54,7 +54,7 @@ var wfExecID = &core.WorkflowExecutionIdentifier{
 	Name:    "name",
 }
 
-func createNodeContext(phase v1alpha1.WorkflowNodePhase, n v1alpha1.ExecutableNode, s v1alpha1.ExecutableNodeStatus) *mocks3.NodeExecutionContext {
+func createNodeContextWithVersion(phase v1alpha1.WorkflowNodePhase, n v1alpha1.ExecutableNode, s v1alpha1.ExecutableNodeStatus, version v1alpha1.EventVersion) *mocks3.NodeExecutionContext {
 
 	wfNodeState := handler.WorkflowNodeState{}
 	state := &workflowNodeStateHolder{s: wfNodeState}
@@ -94,7 +94,23 @@ func createNodeContext(phase v1alpha1.WorkflowNodePhase, n v1alpha1.ExecutableNo
 	})
 	nCtx.OnNodeStateReader().Return(nr)
 	nCtx.OnNodeStateWriter().Return(state)
+
+	ex := &execMocks.ExecutionContext{}
+	ex.OnGetEventVersion().Return(version)
+	ex.OnGetParentInfo().Return(nil)
+	ex.OnGetName().Return("name")
+
+	nCtx.OnExecutionContext().Return(ex)
+
 	return nCtx
+}
+
+func createNodeContextV1(phase v1alpha1.WorkflowNodePhase, n v1alpha1.ExecutableNode, s v1alpha1.ExecutableNodeStatus) *mocks3.NodeExecutionContext {
+	return createNodeContextWithVersion(phase, n, s, v1alpha1.EventVersion1)
+}
+
+func createNodeContext(phase v1alpha1.WorkflowNodePhase, n v1alpha1.ExecutableNode, s v1alpha1.ExecutableNodeStatus) *mocks3.NodeExecutionContext {
+	return createNodeContextWithVersion(phase, n, s, v1alpha1.EventVersion0)
 }
 
 func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
@@ -124,7 +140,7 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 	wfStatus := &mocks2.MutableWorkflowNodeStatus{}
 	mockNodeStatus.OnGetOrCreateWorkflowStatus().Return(wfStatus)
 
-	t.Run("happy", func(t *testing.T) {
+	t.Run("happy v0", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 		h := New(nil, mockLPExec, promutils.NewTestScope())
@@ -142,6 +158,29 @@ func TestWorkflowNodeHandler_StartNode_Launchplan(t *testing.T) {
 		).Return(nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
+		s, err := h.Handle(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+	})
+
+	t.Run("happy v1", func(t *testing.T) {
+
+		mockLPExec := &mocks.Executor{}
+		h := New(nil, mockLPExec, promutils.NewTestScope())
+		mockLPExec.OnLaunchMatch(
+			ctx,
+			mock.MatchedBy(func(o launchplan.LaunchContext) bool {
+				return o.ParentNodeExecution.NodeId == mockNode.GetID() &&
+					o.ParentNodeExecution.ExecutionId == wfExecID
+			}),
+			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+			}),
+			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+		).Return(nil)
+
+		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
 		s, err := h.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
@@ -175,7 +214,7 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	mockNodeStatus.OnGetDataDir().Return(dataDir)
 
-	t.Run("stillRunning", func(t *testing.T) {
+	t.Run("stillRunning V0", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 
@@ -190,6 +229,25 @@ func TestWorkflowNodeHandler_CheckNodeStatus(t *testing.T) {
 		}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+		s, err := h.Handle(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
+	})
+	t.Run("stillRunning V1", func(t *testing.T) {
+
+		mockLPExec := &mocks.Executor{}
+
+		h := New(nil, mockLPExec, promutils.NewTestScope())
+		mockLPExec.OnGetStatusMatch(
+			ctx,
+			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+			}),
+		).Return(&admin.ExecutionClosure{
+			Phase: core.WorkflowExecution_RUNNING,
+		}, nil)
+
+		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseRunning, s.Info().GetPhase())
@@ -223,7 +281,7 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 	mockNodeStatus.OnGetAttempts().Return(attempts)
 	mockNodeStatus.OnGetDataDir().Return(dataDir)
 
-	t.Run("abort", func(t *testing.T) {
+	t.Run("abort v0", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
@@ -244,6 +302,26 @@ func TestWorkflowNodeHandler_AbortNode(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
+	t.Run("abort v1", func(t *testing.T) {
+
+		mockLPExec := &mocks.Executor{}
+		nCtx := createNodeContextV1(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
+
+		h := New(nil, mockLPExec, promutils.NewTestScope())
+		mockLPExec.OnKillMatch(
+			ctx,
+			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
+				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
+			}),
+			mock.AnythingOfType(reflect.String.String()),
+		).Return(nil)
+
+		eCtx := &execMocks.ExecutionContext{}
+		nCtx.OnExecutionContext().Return(eCtx)
+		eCtx.OnGetName().Return("test")
+		err := h.Abort(ctx, nCtx, "test")
+		assert.NoError(t, err)
+	})
 	t.Run("abort-fail", func(t *testing.T) {
 
 		mockLPExec := &mocks.Executor{}
