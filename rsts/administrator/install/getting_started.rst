@@ -1,8 +1,10 @@
 .. _getting_started:
 
+####################
 Getting Started
----------------
+####################
 
+*************
 Prerequisites
 *************
 
@@ -10,22 +12,31 @@ Kubernetes and its ``kubectl`` client are the only strict prerequisites to insta
 
 Kubernetes can be installed on your local machine to run Flyte locally, or in the cloud for a scalable multi-user setup. Some installation options are listed below.
 
-Local:
+Local
+======
 
-- `Minikube <https://kubernetes.io/docs/tasks/tools/install-minikube/>`_
-- `Docker for Mac <https://blog.docker.com/2018/01/docker-mac-kubernetes/>`_
+Linux
+-------
+For Linux, you'll need to have Docker set up. For the local Kubernetes cluster itself, we've found that `KinD <https://kind.sigs.k8s.io/docs/user/quick-start>` works better than MicroK8s, but this may change in the future. Minikube should also work.
 
-Cloud Providers:
+Mac OS
+---------
+For Macs, we recommend `Docker Desktop <https://www.docker.com/products/docker-desktop>`_
+
+
+Cloud Providers
+================
 
 - `AWS EKS <https://aws.amazon.com/eks/>`_ (Amazon)
 - `GCP GKE <https://cloud.google.com/kubernetes-engine/>`_ (Google)
 - `Azure AKS <https://azure.microsoft.com/en-us/services/kubernetes-service/>`_ (Microsoft)
 
-Once you have kubernetes set up and can access it with ``kubectl cluster-info``, you're ready to deploy flyte.
+Once you have kubernetes set up and can access it with ``kubectl cluster-info``, you're ready to deploy Flyte.
 
 Flyte has a few different deployment configurations. We'll start with the easiest, and expand on it to increase scale and reliability.
 
 
+******************
 Sandbox Deployment
 ******************
 
@@ -37,6 +48,11 @@ This deployment uses a kubernetes `NodePort <https://kubernetes.io/docs/concepts
 Once deployed, you can access the Flyte console on any kubernetes node at ``http://{{ any kubernetes node }}:30081/console`` (note that it will take a moment to deploy).
 
 For local deployments, this endpoint is typically http://localhost:30081/console.
+
+For Linux, a couple commands will be different ::
+
+  sudo kubectl -n flyte port-forward service/contour 30081:80
+
 
 (for Minikube deployment, you need to run ``minikube tunnel`` and use the ip that Minikube tunnel outputs)
 
