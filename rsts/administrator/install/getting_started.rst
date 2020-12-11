@@ -19,9 +19,11 @@ Linux
 -------
 For Linux, you'll need to have Docker set up. For the local Kubernetes cluster itself, we've found that `KinD <https://kind.sigs.k8s.io/docs/user/quick-start>` works better than MicroK8s, but this may change in the future. Minikube should also work.
 
+.. note:: The Docker daemon typically runs as root in Linux (though there is a new option for running it rootless - we haven't tested that with KinD yet, so it may or may not work). Because of this, you may want to use ``sudo /full/path/to/kind`` and prepend sudo to your kubectl commands as well.
+
 Mac OS
 ---------
-For Macs, we recommend `Docker Desktop <https://www.docker.com/products/docker-desktop>`_
+For Macs, we recommend `Docker Desktop <https://www.docker.com/products/docker-desktop>`_. Docker Desktop ships with a Kubernetes cluster, which is the easiest option to use. One can also use KinD.
 
 
 Cloud Providers
@@ -34,7 +36,6 @@ Cloud Providers
 Once you have kubernetes set up and can access it with ``kubectl cluster-info``, you're ready to deploy Flyte.
 
 Flyte has a few different deployment configurations. We'll start with the easiest, and expand on it to increase scale and reliability.
-
 
 ******************
 Sandbox Deployment
@@ -49,9 +50,10 @@ Once deployed, you can access the Flyte console on any kubernetes node at ``http
 
 For local deployments, this endpoint is typically http://localhost:30081/console.
 
-For Linux, a couple commands will be different ::
+For Linux, you'll need to forward the port over before being able to hit that link with your browser ::
 
-  sudo kubectl -n flyte port-forward service/contour 30081:80
+    # See note above on sudo
+    sudo kubectl -n flyte port-forward service/contour 30081:80
 
 
 (for Minikube deployment, you need to run ``minikube tunnel`` and use the ip that Minikube tunnel outputs)
