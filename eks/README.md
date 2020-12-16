@@ -2,6 +2,12 @@
 Steps:
 - Make sure kubectl and aws-cli are installed and working
 - Make sure terraform is installed and working and references aws-cli permissions
+  - On MacOSX with brew, run `brew install terraform`
+  - In your terminal, navigate into the tf directory of this repo and run `terraform init` to initialize all referenced modules
+  - To retrieve short term creds. Follow the instructions [here](https://aws.amazon.com/blogs/security/aws-single-sign-on-now-enables-command-line-interface-access-for-aws-accounts-using-corporate-credentials). Summarized below:
+    - Go to https://nuclyde.awsapps.com/start#/
+    - Click on the AWS Account
+    - Click on Command line or prgrammatic access and choose Set AWS Env Vars
 - Run Terraform files. (There seems to be a race condition in one of the IAM role creation steps - you may need to run it twice.)
 - Copy or update the kubectl config file and switch to that context.
 - Create the webhook
@@ -23,3 +29,8 @@ https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts-
 The implementation of these steps is done for you in the `alb-ingress` submodule.
 
 
+
+
+## To Fix:
+* Make availability zones in `resource "aws_rds_cluster" "flyteadmin" {` a variable or drived from the region  somehow.
+* Install wget `brew wget`
