@@ -1,12 +1,10 @@
 storage:
   type: stow
   stow:
-    kind: google
+    kind: s3
     config:
-      json: ""
-      # TODO: replace <project-id> with the GCP project ID
-      project_id: <project-id>
-      scopes: https://www.googleapis.com/auth/devstorage.read_write
+      auth_type: iam
+      region: us-east-2
   # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
   container: "flyte"
   # NOTE this cache configuration is purely for propeller. But since we are having a common storage

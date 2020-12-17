@@ -3,8 +3,8 @@ terraform {
 }
 
 provider "aws" {
-  profile    = "default"
-  region     = var.region
+  profile = "default"
+  region  = var.region
 }
 
 # Use the internal module to create an RDS instance with a user-supplied VPC
@@ -16,8 +16,7 @@ module "flyte_rds" {
 
 # Use the internal module to create an EKS cluster, which has its own VPC
 module "flyte_eks" {
-  source = "./modules/flyte-eks"
-
+  source           = "./modules/flyte-eks"
   eks_cluster_name = var.eks_cluster_name
 }
 
@@ -27,18 +26,20 @@ data "aws_vpc" "rds_vpc" {
 }
 
 data "aws_vpc" "eks_vpc" {
-  id = module.flyte_eks.eks_vpc_id
+  id         = module.flyte_eks.eks_vpc_id
+  depends_on = ["module.flyte_eks"]
 }
 
 # Get information about the RDS instance
 data "aws_db_instance" "flyte_rds" {
   db_instance_identifier = module.flyte_rds.admin_rds_instance_id
+  depends_on             = ["module.flyte_rds.admin_rds_name"]
 }
 
 resource "aws_vpc_peering_connection" "eks_to_main_peering" {
-  peer_vpc_id   = var.rds_vpc
-  vpc_id        = module.flyte_eks.eks_vpc_id
-  auto_accept   = true
+  peer_vpc_id = var.rds_vpc
+  vpc_id      = module.flyte_eks.eks_vpc_id
+  auto_accept = true
 
   tags = {
     Name = "VPC peering connection between Flyte RDS and EKS"
@@ -69,6 +70,7 @@ resource "aws_route" "route_rds_cidr" {
 
 # Add a rule to the RDS security group to allow access from the EKS VPC
 resource "aws_security_group_rule" "allow_eks_to_rds" {
+  depends_on        = ["module.flyte_rds.admin_rds_name"]
   type              = "ingress"
   from_port         = 5432
   to_port           = 5432
@@ -103,7 +105,7 @@ data "aws_iam_policy_document" "let_pods_assume_roles" {
       type        = "Federated"
       identifiers = [aws_iam_openid_connect_provider.eks_oidc_connection.arn]
     }
-    
+
     condition {
       test     = "StringLike"
       variable = "${local.issuer_parsed.trailing}:sub"
@@ -117,7 +119,7 @@ data "aws_iam_policy_document" "let_pods_assume_roles" {
 
 # Make a role for Flyte components themselves to use
 resource "aws_iam_role" "flyte_operator" {
-  name = "flyte-operator"
+  name               = "flyte-operator"
   assume_role_policy = data.aws_iam_policy_document.let_pods_assume_roles.json
 }
 
@@ -152,10 +154,10 @@ resource "aws_iam_role_policy_attachment" "flyte_operator_s3_attach" {
 module "alb_ingress" {
   source = "./modules/alb-ingress"
 
-  region = var.region
-  eks_cluster_name = var.eks_cluster_name
-  cluster_id = module.flyte_eks.cluster_id
-  eks_vpc_id = module.flyte_eks.eks_vpc_id
+  region                    = var.region
+  eks_cluster_name          = var.eks_cluster_name
+  cluster_id                = module.flyte_eks.cluster_id
+  eks_vpc_id                = module.flyte_eks.eks_vpc_id
   assume_role_policy_string = data.aws_iam_policy_document.let_pods_assume_roles.json
 }
 

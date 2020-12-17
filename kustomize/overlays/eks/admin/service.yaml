@@ -12,7 +12,7 @@ metadata:
 spec:
   loadBalancerSourceRanges:
     # TODO change source ip range if desired
-    - 0.0.0.0
+    - 0.0.0.0/0
   ports:
     # TODO do multiple ports work for ELB
     - name: http

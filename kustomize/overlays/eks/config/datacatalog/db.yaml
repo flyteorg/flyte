@@ -1,7 +1,7 @@
 database:
   port: 5432
-  username: flyte
+  username: flyteadmin
   # TODO Change this to match aurora or rds postgres endpoint
-  host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
+  host: flyteadmin-instances-0.cgm8dnl8d3bh.us-east-2.rds.amazonaws.com
   dbname: flytedatacatalog
-  passwordPath: /etc/db/pass.txt
+  passwordPath: spongebob
