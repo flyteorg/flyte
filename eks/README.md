@@ -5,7 +5,7 @@ Steps:
   - On MacOSX with brew, run `brew install terraform`
   - In your terminal, navigate into the tf directory of this repo and run `terraform init` to initialize all referenced modules
   - To retrieve short term creds. Follow the instructions [here](https://aws.amazon.com/blogs/security/aws-single-sign-on-now-enables-command-line-interface-access-for-aws-accounts-using-corporate-credentials). Summarized below:
-    - Go to https://nuclyde.awsapps.com/start#/
+    - Go to https://yourcorp.awsapps.com/start#/
     - Click on the AWS Account
     - Click on Command line or prgrammatic access and choose Set AWS Env Vars
 - Run Terraform files. (There seems to be a race condition in one of the IAM role creation steps - you may need to run it twice.)
