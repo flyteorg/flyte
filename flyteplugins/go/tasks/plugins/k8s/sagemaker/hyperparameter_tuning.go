@@ -295,6 +295,22 @@ func (m awsSagemakerPlugin) getTaskPhaseForHyperparameterTuningJob(
 	case sagemaker.HyperParameterTuningJobStatusCompleted:
 		// Now that it is a success we will set the outputs as expected by the task
 
+		// 11/01/2020: how do I tell if it is a custom training job or not in this function? Do I need to know?
+
+		logger.Infof(ctx, "Looking for the output.pb under %s", pluginContext.OutputWriter().GetOutputPrefixPath())
+		outputReader := ioutils.NewRemoteFileOutputReader(ctx, pluginContext.DataStore(), pluginContext.OutputWriter(), pluginContext.MaxDatasetSizeBytes())
+
+		retrieveBestTrainingJobOutput
+		createModelOutputPath(hpoJob, pluginContext.OutputWriter().GetRawOutputPrefix().String(),
+			*hpoJob.Status.BestTrainingJob.TrainingJobName)
+
+		// Instantiate a output reader with the literal map, and write the output to the remote location referred to by the OutputWriter
+		if err := pluginContext.OutputWriter().Put(ctx, outputReader); err != nil {
+			return pluginsCore.PhaseInfoUndefined, pluginErrors.Wrapf(pluginErrors.BadTaskSpecification, err, "Failed to write output to the remote location")
+		}
+		logger.Debugf(ctx, "Successfully produced and returned outputs")
+		return pluginsCore.PhaseInfoSuccess(info), nil
+
 		// TODO:
 		// Check task template -> custom training job -> if custom: assume output.pb exist, and fail if it doesn't. If it exists, then
 		//						 				      -> if not custom: check model.tar.gz
