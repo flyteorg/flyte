@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
@@ -17,7 +19,7 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 	"k8s.io/client-go/kubernetes/scheme"
 
-	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta1"
+	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	logUtils "github.com/lyft/flyteidl/clients/go/coreutils/logs"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -133,7 +135,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 		},
 	}
 
-	modifiedArgs, err := utils.ReplaceTemplateCommandArgs(ctx, container.GetArgs(), taskCtx.InputReader(), taskCtx.OutputWriter())
+	modifiedArgs, err := template.ReplaceTemplateCommandArgs(ctx, taskCtx.TaskExecutionMetadata(), container.GetArgs(), taskCtx.InputReader(), taskCtx.OutputWriter())
 	if err != nil {
 		return nil, err
 	}
@@ -168,6 +170,25 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 		sparkConfig["spark.kubernetes.executor.limit.cores"] = sparkConfig["spark.executor.cores"]
 	}
 	sparkConfig["spark.kubernetes.executor.podNamePrefix"] = taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	sparkConfig["spark.kubernetes.driverEnv.FLYTE_START_TIME"] = strconv.FormatInt(time.Now().UnixNano()/1000000, 10)
+
+	// Add driver/executor defaults to CRD Driver/Executor Spec as well.
+	cores, err := strconv.Atoi(sparkConfig["spark.driver.cores"])
+	if err == nil {
+		driverSpec.Cores = intPtr(int32(cores))
+	}
+	driverSpec.Memory = strPtr(sparkConfig["spark.driver.memory"])
+
+	execCores, err := strconv.Atoi(sparkConfig["spark.executor.cores"])
+	if err == nil {
+		executorSpec.Cores = intPtr(int32(execCores))
+	}
+
+	execCount, err := strconv.Atoi(sparkConfig["spark.executor.instances"])
+	if err == nil {
+		executorSpec.Instances = intPtr(int32(execCount))
+	}
+	executorSpec.Memory = strPtr(sparkConfig["spark.executor.memory"])
 
 	j := &sparkOp.SparkApplication{
 		TypeMeta: metav1.TypeMeta{
@@ -391,4 +412,18 @@ func init() {
 			IsDefault:           false,
 			DefaultForTaskTypes: []pluginsCore.TaskType{sparkTaskType},
 		})
+}
+
+func strPtr(str string) *string {
+	if str == "" {
+		return nil
+	}
+	return &str
+}
+
+func intPtr(val int32) *int32 {
+	if val == 0 {
+		return nil
+	}
+	return &val
 }

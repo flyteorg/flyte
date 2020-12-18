@@ -6,6 +6,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+
 	"github.com/lyft/flytestdlib/cache"
 	"github.com/lyft/flytestdlib/contextutils"
 
@@ -27,7 +31,7 @@ const (
 	PhaseNotStarted ExecutionPhase = iota
 	PhaseQueued                    // resource manager token gotten
 	PhaseSubmitted                 // Sent off to Qubole
-
+	PhaseWriteOutputFile
 	PhaseQuerySucceeded
 	PhaseQueryFailed
 )
@@ -40,6 +44,8 @@ func (p ExecutionPhase) String() string {
 		return "PhaseQueued"
 	case PhaseSubmitted:
 		return "PhaseSubmitted"
+	case PhaseWriteOutputFile:
+		return "PhaseWriteOutputFile"
 	case PhaseQuerySucceeded:
 		return "PhaseQuerySucceeded"
 	case PhaseQueryFailed:
@@ -84,6 +90,9 @@ func HandleExecutionState(ctx context.Context, tCtx core.TaskExecutionContext, c
 	case PhaseSubmitted:
 		newState, transformError = MonitorQuery(ctx, tCtx, currentState, executionsCache)
 
+	case PhaseWriteOutputFile:
+		newState, transformError = WriteOutputs(ctx, tCtx, currentState)
+
 	case PhaseQuerySucceeded:
 		newState = currentState
 		transformError = nil
@@ -96,7 +105,7 @@ func HandleExecutionState(ctx context.Context, tCtx core.TaskExecutionContext, c
 	return newState, transformError
 }
 
-func MapExecutionStateToPhaseInfo(state ExecutionState, quboleClient client.QuboleClient) core.PhaseInfo {
+func MapExecutionStateToPhaseInfo(state ExecutionState, _ client.QuboleClient) core.PhaseInfo {
 	var phaseInfo core.PhaseInfo
 	t := time.Now()
 
@@ -112,6 +121,9 @@ func MapExecutionStateToPhaseInfo(state ExecutionState, quboleClient client.Qubo
 		}
 	case PhaseSubmitted:
 		phaseInfo = core.PhaseInfoRunning(core.DefaultPhaseVersion, ConstructTaskInfo(state))
+
+	case PhaseWriteOutputFile:
+		phaseInfo = core.PhaseInfoRunning(core.DefaultPhaseVersion+1, ConstructTaskInfo(state))
 
 	case PhaseQuerySucceeded:
 		phaseInfo = core.PhaseInfoSuccess(ConstructTaskInfo(state))
@@ -231,7 +243,7 @@ func validateQuboleHiveJob(hiveJob plugins.QuboleHiveJob) error {
 // This function is the link between the output written by the SDK, and the execution side. It extracts the query
 // out of the task template.
 func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
-	query string, cluster string, tags []string, timeoutSec uint32, taskName string, err error) {
+	formattedQuery string, cluster string, tags []string, timeoutSec uint32, taskName string, err error) {
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -248,7 +260,14 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 		return "", "", []string{}, 0, "", err
 	}
 
-	query = hiveJob.Query.GetQuery()
+	query := hiveJob.Query.GetQuery()
+
+	outputs, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), []string{query}, tCtx.InputReader(), tCtx.OutputWriter())
+	if err != nil {
+		return "", "", []string{}, 0, "", err
+	}
+	formattedQuery = outputs[0]
+
 	cluster = hiveJob.ClusterLabel
 	timeoutSec = hiveJob.Query.TimeoutSec
 	taskName = taskTemplate.Id.Name
@@ -257,8 +276,10 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 	for k, v := range tCtx.TaskExecutionMetadata().GetLabels() {
 		tags = append(tags, fmt.Sprintf("%s:%s", k, v))
 	}
-	logger.Debugf(ctx, "QueryInfo: query: [%v], cluster: [%v], timeoutSec: [%v], tags: [%v]", query, cluster, timeoutSec, tags)
-	return
+	logger.Debugf(ctx, "QueryInfo: original query [%s], query: [%s], cluster: [%s], timeoutSec: [%d], tags: [%v]",
+		query, formattedQuery, cluster, timeoutSec, tags)
+
+	return formattedQuery, cluster, tags, timeoutSec, taskName, err
 }
 
 func mapLabelToPrimaryLabel(ctx context.Context, quboleCfg *config.Config, label string) (primaryLabel string, found bool) {
@@ -458,4 +479,55 @@ func IsNotYetSubmitted(e ExecutionState) bool {
 		return true
 	}
 	return false
+}
+
+func WriteOutputs(ctx context.Context, tCtx core.TaskExecutionContext, currentState ExecutionState) (
+	ExecutionState, error) {
+
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Error reading task template: [%s]", err)
+		return currentState, err
+	}
+
+	externalLocation := tCtx.OutputWriter().GetRawOutputPrefix()
+	outputs := taskTemplate.Interface.Outputs.GetVariables()
+	if len(outputs) != 0 && len(outputs) != 1 {
+		return currentState, errors.Errorf(errors.BadTaskSpecification, "Hive tasks must have zero or one output: [%d] found", len(outputs))
+	}
+	if len(outputs) == 1 {
+		if results, ok := outputs["results"]; ok {
+			if results.GetType().GetSchema() == nil {
+				return currentState, errors.Errorf(errors.BadTaskSpecification, "A non-SchemaType was found [%v]", results.GetType())
+			}
+			logger.Debugf(ctx, "Writing outputs file for Hive task at [%s]", tCtx.OutputWriter().GetOutputPrefixPath())
+			err = tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
+				&idlCore.LiteralMap{
+					Literals: map[string]*idlCore.Literal{
+						"results": {
+							Value: &idlCore.Literal_Scalar{
+								Scalar: &idlCore.Scalar{Value: &idlCore.Scalar_Schema{
+									Schema: &idlCore.Schema{
+										Uri:  externalLocation.String(),
+										Type: results.GetType().GetSchema(),
+									},
+								},
+								},
+							},
+						},
+					},
+				}, nil))
+			if err != nil {
+				logger.Errorf(ctx, "Error writing outputs file: [%s]", err)
+				return currentState, err
+			}
+		} else {
+			logger.Errorf(ctx, "Wrong name for output [%s]", err)
+			return currentState, errors.Errorf(errors.BadTaskSpecification, "One output found but wrong name [%s]", outputs)
+		}
+	}
+
+	logger.Debugf(ctx, "Moving hive task to succeeded")
+	currentState.Phase = PhaseQuerySucceeded
+	return currentState, nil
 }
