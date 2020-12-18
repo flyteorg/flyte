@@ -5,3 +5,6 @@ __pycache__/
 .ipynb_checkpoints/
 *.csv
 *.dat
+.DS_Store
+auto_recipes
+gen_modules

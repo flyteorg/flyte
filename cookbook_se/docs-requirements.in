@@ -1,0 +1,6 @@
+-r requirements.in
+
+sphinx_rtd_theme
+sphinx-prompt
+sphinx-gallery
+pillow
