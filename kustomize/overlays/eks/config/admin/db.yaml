@@ -4,4 +4,4 @@ database:
   # TODO Change this to match aurora or rds postgres endpoint
   host: flyteadmin-instances-0.cgm8dnl8d3bh.us-east-2.rds.amazonaws.com
   dbname: flyte
-  passwordPath: spongebob
+  passwordPath: /etc/db/pass.txt
