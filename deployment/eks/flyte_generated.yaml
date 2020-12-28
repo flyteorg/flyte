@@ -7602,7 +7602,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::811135720119:role/flyte-operator
+    eks.amazonaws.com/role-arn: arn:aws:iam::590375264460:role/eksctl-flyte-addon-iamserviceaccount-flyte-f-Role1-F328POU8L7HT
   name: flyteadmin
   namespace: flyte
 ---
@@ -7610,7 +7610,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::811135720119:role/flyte-operator
+    eks.amazonaws.com/role-arn: arn:aws:iam::590375264460:role/eksctl-flyte-addon-iamserviceaccount-flyte-f-Role1-F328POU8L7HT
   name: flytepropeller
   namespace: flyte
 ---
@@ -8145,7 +8145,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-admin-config-6d6bh27895
+  name: flyte-admin-config-5ttf69m22t
   namespace: flyte
 ---
 apiVersion: v1
@@ -8643,7 +8643,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-6d6bh27895
+          name: flyte-admin-config-5ttf69m22t
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8924,7 +8924,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-6d6bh27895
+              name: flyte-admin-config-5ttf69m22t
             name: config-volume
           - name: db-pass
             secret:
