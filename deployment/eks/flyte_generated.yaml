@@ -8032,7 +8032,7 @@ data:
           auth_type: iam
           region: us-east-2
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8045,7 +8045,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: datacatalog-config-dbb2567679
+  name: datacatalog-config-2c74f77bbf
   namespace: flyte
 ---
 apiVersion: v1
@@ -8087,7 +8087,7 @@ data:
   remote_data.yaml: |
     remoteData:
       # TODO change this to match the region of the s3 bucket
-      region: "us-west-2"
+      region: "us-east-2"
       scheme: aws
       signedUrls:
         durationMinutes: 3
@@ -8122,7 +8122,7 @@ data:
           auth_type: iam
           region: us-east-2
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8145,7 +8145,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-admin-config-5ttf69m22t
+  name: flyte-admin-config-dmtmtkc5ct
   namespace: flyte
 ---
 apiVersion: v1
@@ -8289,7 +8289,7 @@ data:
           auth_type: iam
           region: us-east-2
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8313,7 +8313,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-4gf855592c
+  name: flyte-propeller-config-fb7t6264t2
   namespace: flyte
 ---
 apiVersion: v1
@@ -8513,7 +8513,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-dbb2567679
+          name: datacatalog-config-2c74f77bbf
         name: config-volume
       - name: db-pass
         secret:
@@ -8643,7 +8643,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-5ttf69m22t
+          name: flyte-admin-config-dmtmtkc5ct
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8735,7 +8735,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-4gf855592c
+          name: flyte-propeller-config-fb7t6264t2
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -8924,7 +8924,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-5ttf69m22t
+              name: flyte-admin-config-dmtmtkc5ct
             name: config-volume
           - name: db-pass
             secret:
