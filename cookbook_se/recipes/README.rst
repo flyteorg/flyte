@@ -1,5 +1,5 @@
 ############################################
-FlyteSnacks: A Flytekit tutorial
+Flyte Cookbook: A Flytekit tutorial
 ############################################
 
 The intention of this cookbook is to provide a hands on tutorial of various
@@ -12,6 +12,6 @@ Flyte is to run these examples locally. The tutorial is divided into 4 sections
 ``Working with Hosted Flyte Service`` is an independent section and can be used with any of the difficulty
 level sections.
 
-
+Please see additional information in the [GitHub Readme](https://github.com/lyft/flytesnacks/tree/master/cookbook_se) as well.
 
 

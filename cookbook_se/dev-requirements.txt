@@ -10,9 +10,9 @@ attrs==20.3.0             # via -c requirements.txt, black, pytest
 babel==2.9.0              # via sphinx
 black==19.10b0            # via -c requirements.txt, -r dev-requirements.in, flake8-black
 certifi==2020.12.5        # via -c requirements.txt, requests
-chardet==3.0.4            # via -c requirements.txt, requests
+chardet==4.0.0            # via -c requirements.txt, requests
 click==7.1.2              # via -c requirements.txt, black
-coverage==5.3             # via -r dev-requirements.in
+coverage==5.3.1           # via -r dev-requirements.in
 docutils==0.16            # via sphinx
 flake8-black==0.2.1       # via -r dev-requirements.in
 flake8-isort==4.0.0       # via -r dev-requirements.in
@@ -33,20 +33,20 @@ pycodestyle==2.6.0        # via flake8
 pyflakes==2.2.0           # via flake8
 pygments==2.7.3           # via -c requirements.txt, sphinx
 pyparsing==2.4.7          # via -c requirements.txt, packaging
-pytest==6.2.0             # via -c requirements.txt, -r dev-requirements.in
+pytest==6.2.1             # via -c requirements.txt, -r dev-requirements.in
 pytz==2018.4              # via -c requirements.txt, babel
 regex==2020.11.13         # via -c requirements.txt, black
-requests==2.25.0          # via -c requirements.txt, sphinx
+requests==2.25.1          # via -c requirements.txt, sphinx
 snowballstemmer==2.0.0    # via sphinx
-sphinx-gallery==0.8.1     # via -r dev-requirements.in
-sphinx==3.3.1             # via -r dev-requirements.in, sphinx-gallery
+sphinx-gallery==0.8.2     # via -r dev-requirements.in
+sphinx==3.4.1             # via -r dev-requirements.in, sphinx-gallery
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx
 sphinxcontrib-jsmath==1.0.1  # via sphinx
 sphinxcontrib-qthelp==1.0.3  # via sphinx
 sphinxcontrib-serializinghtml==1.1.4  # via sphinx
-testfixtures==6.16.0      # via flake8-isort
+testfixtures==6.17.0      # via flake8-isort
 toml==0.10.2              # via -c requirements.txt, black, pytest
 typed-ast==1.4.1          # via -c requirements.txt, black
 urllib3==1.25.11          # via -c requirements.txt, requests

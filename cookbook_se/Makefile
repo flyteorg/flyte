@@ -45,17 +45,15 @@ docker_push:
 	IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh ./Dockerfile
 	IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh ./Dockerfile.spark spark
 
-.PHONY: in_container_register_sandbox
-in_container_register_sandbox:
-	pyflyte -p ${PROJECT} -d development --config /root/sandbox.config register workflows
-
-.PHONY: register_sandbox
-register_sandbox: docker_build
-	docker run --rm --network=host ${FULL_IMAGE_NAME}:${VERSION} /usr/local/bin/flytekit_venv make in_container_register_sandbox
 
 .PHONY: in_container_serialize_sandbox
 in_container_serialize_sandbox:
-	pyflyte -p ${PROJECT} -d development --config /root/sandbox.config serialize workflows -f /tmp/output
+	pyflyte --config /root/sandbox.config serialize workflows -f /tmp/output
+
+.PHONY: register_sandbox
+register_sandbox: docker_build
+	make serialize_sandbox
+	flyte-cli register-files -i -p ${PROJECT} -d development -v ${VERSION} -h localhost:30081 ${CURDIR}/_pb_output/*
 
 .PHONY: serialize_sandbox
 serialize_sandbox: docker_build
