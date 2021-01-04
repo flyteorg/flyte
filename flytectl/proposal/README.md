@@ -74,6 +74,35 @@ Eventually we may want to simplify the json and yaml representations but that is
 The create for Task and Workflow is essential what is encompassed in the pyflyte as the registration process. We will decouple the registration process such that pyflyte, jflyte (other native cli's or
 code methods) can dump a serialized representations of the workflows and tasks that are directly consumed by **flytectl**. Thus flytectl is essential in every flow for the user.
 
+
+#### Create Templatization
+User-facing SDKs can serialize workflow code to protobuf representations but these will be incomplete. Specifically, the _project_, _domain_, and _version_ parameters must be supplied at create time since these are attributes of the registerable, rather than serialized object. Placeholder template variables including:
+
+* `{{ .project }}`
+* `{{ .domain }}`
+* `{{ .version }}`
+* [auth](https://github.com/lyft/flyteidl/blob/c3baba8983019680ef57b6244cea36ba951233ed/protos/flyteidl/admin/common.proto#L241): including the assumable_iam_role and/or kubernetes_service_account
+* the [output_location_prefix](https://github.com/lyft/flyteidl/blob/c3baba8983019680ef57b6244cea36ba951233ed/protos/flyteidl/admin/common.proto#L250)
+
+will be included in the serialized protobuf that must be substituted at **create** time.  Eventually the hope is that substitution will be done server-side.
+
+Furthermore, to reproduce the equivalent **fast-register** code path for the flyte-cli defined in flytekit an equivalent _fast-create_ command must fill in additional template variables in the [task container args](https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L142). These serialized, templatized args will appear like so:
+
+```
+"pyflyte-fast-execute",
+"--additional-distribution",
+"{{ .remote_package_path }}",
+"--dest-dir",
+"{{ .dest_dir }}",
+"--",
+"pyflyte-execute",
+...
+```
+
+The `remote package path` is determined by uploading the compressed user code (produced in the serialize step) to a user-specified remote directory (called `additional-distribution-dir` in flytekit). In the case of fast-create the code _version_ arg can be deterministcally assigned when serializing the code. Compressed code archives uploaded as individual files to the remote directory can assume the version name to guarantee uniqueness.
+
+The `dest dir` is an optional argument specified by the user to designate where code is downloaded at execution time.
+
 ![Registration process](flytectl_interaction.png)
 
 ### update
