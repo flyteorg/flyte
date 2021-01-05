@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig, Method } from 'axios';
 import { env } from 'common/env';
 import { toBoolean } from 'common/utils';
 
@@ -23,7 +23,7 @@ import {
  */
 async function request(
     /** HTTP verb to use */
-    method: string,
+    method: Method,
     /** API endpoint to use, should not include protocol/host/prefix */
     endpoint: string,
     /** Admin API options to use for the request */
@@ -110,7 +110,7 @@ export async function getAdminEntity<ResponseType, TransformedType>(
 export interface PostEntityParams<RequestType, ResponseType, TransformedType> {
     data: RequestType;
     path: string;
-    method?: string;
+    method?: Method;
     requestMessageType: EncodableType<RequestType>;
     responseMessageType: DecodableType<ResponseType>;
     transform?: AdminEntityTransformer<ResponseType, TransformedType>;
