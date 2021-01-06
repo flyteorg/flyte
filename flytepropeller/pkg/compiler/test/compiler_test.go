@@ -109,7 +109,7 @@ func TestBranches(t *testing.T) {
 		}
 
 		t.Run(path, func(t *testing.T) {
-			//if !strings.HasSuffix(path, "success_5.json") {
+			//if !strings.HasSuffix(path, "success_6.json") {
 			//	t.SkipNow()
 			//}
 
@@ -117,13 +117,17 @@ func TestBranches(t *testing.T) {
 			assert.NoError(t, err)
 			wf := &core.WorkflowClosure{}
 			err = jsonpb.UnmarshalString(string(raw), wf)
-			assert.NoError(t, err)
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
 			t.Log("Compiling Workflow")
 			compiledTasks := mustCompileTasks(t, wf.Tasks)
 			compiledWfc, err := compiler.CompileWorkflow(wf.Workflow, []*core.WorkflowTemplate{}, compiledTasks,
 				[]common.InterfaceProvider{})
-			assert.NoError(t, err)
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
 
 			inputs := map[string]interface{}{}
 			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {

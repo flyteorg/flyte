@@ -1,0 +1,274 @@
+{
+  "workflow": {
+    "id": {
+      "resourceType": "WORKFLOW",
+      "project": "test_proj",
+      "domain": "test_domain",
+      "name": "recipes.02_intermediate.run_conditions.multiplier",
+      "version": "abc"
+    },
+    "metadata": {},
+    "interface": {
+      "inputs": {
+        "variables": {
+          "my_input": {
+            "type": {
+              "simple": "FLOAT"
+            },
+            "description": "my_input"
+          }
+        }
+      },
+      "outputs": {
+        "variables": {
+          "o0": {
+            "type": {
+              "simple": "FLOAT"
+            },
+            "description": "o0"
+          }
+        }
+      }
+    },
+    "nodes": [
+      {
+        "id": "node-0",
+        "metadata": {
+          "name": "fractions",
+          "retries": {},
+          "interruptible": false
+        },
+        "inputs": [
+          {
+            "var": ".my_input",
+            "binding": {
+              "promise": {
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "branchNode": {
+          "ifElse": {
+            "case": {
+              "condition": {
+                "conjunction": {
+                  "leftExpression": {
+                    "comparison": {
+                      "operator": "GTE",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 0.1
+                        }
+                      }
+                    }
+                  },
+                  "rightExpression": {
+                    "comparison": {
+                      "operator": "LTE",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 1.0
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "thenNode": {
+                "id": "branchn0",
+                "metadata": {
+                  "name": "flytekit.annotated.python_function_task.recipes.02_intermediate.run_conditions.double",
+                  "retries": {},
+                  "interruptible": false
+                },
+                "inputs": [
+                  {
+                    "var": "n",
+                    "binding": {
+                      "promise": {
+                        "var": "my_input"
+                      }
+                    }
+                  }
+                ],
+                "taskNode": {
+                  "referenceId": {
+                    "resourceType": "TASK",
+                    "project": "test_proj",
+                    "domain": "test_domain",
+                    "name": "recipes.02_intermediate.run_conditions.double",
+                    "version": "abc"
+                  }
+                }
+              }
+            },
+            "elseNode": {
+              "id": "branchn1",
+              "metadata": {
+                "name": "flytekit.annotated.python_function_task.recipes.02_intermediate.run_conditions.square",
+                "retries": {},
+                "interruptible": false
+              },
+              "inputs": [
+                {
+                  "var": "n",
+                  "binding": {
+                    "promise": {
+                      "var": "my_input"
+                    }
+                  }
+                }
+              ],
+              "taskNode": {
+                "referenceId": {
+                  "resourceType": "TASK",
+                  "project": "test_proj",
+                  "domain": "test_domain",
+                  "name": "recipes.02_intermediate.run_conditions.square",
+                  "version": "abc"
+                }
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outputs": [
+      {
+        "var": "o0",
+        "binding": {
+          "promise": {
+            "nodeId": "node-0",
+            "var": "o0"
+          }
+        }
+      }
+    ],
+    "metadataDefaults": {}
+  },
+  "tasks": [
+    {
+      "id": {
+        "resourceType": "TASK",
+        "project": "test_proj",
+        "domain": "test_domain",
+        "name": "recipes.02_intermediate.run_conditions.double",
+        "version": "abc"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "image:name",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "recipes.02_intermediate.run_conditions",
+          "--task-name",
+          "double",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {}
+      }
+    },
+    {
+      "id": {
+        "resourceType": "TASK",
+        "project": "test_proj",
+        "domain": "test_domain",
+        "name": "recipes.02_intermediate.run_conditions.square",
+        "version": "abc"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "n": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "n"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "simple": "FLOAT"
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "image:name",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "recipes.02_intermediate.run_conditions",
+          "--task-name",
+          "square",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {}
+      }
+    }
+  ]
+}
