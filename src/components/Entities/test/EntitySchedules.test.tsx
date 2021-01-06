@@ -1,4 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
+// launchPlanData is mock data, not a Jest mock
+// eslint-disable-next-line jest/no-mocks-import
 import {
     createMockLaunchPlan,
     mockLaunchPlanSchedules

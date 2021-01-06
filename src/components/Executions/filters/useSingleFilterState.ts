@@ -20,7 +20,7 @@ function valueOrDefault<FilterKey extends string>(
         return defaultValue;
     }
 
-    if (!options.hasOwnProperty(newValue)) {
+    if (!{}.hasOwnProperty.call(options,newValue)) {
         log.warn(`Filter has no option ${newValue}, using default`);
         return defaultValue;
     }

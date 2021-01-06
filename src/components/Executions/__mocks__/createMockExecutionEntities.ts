@@ -13,8 +13,7 @@ interface CreateExecutionEntitiesArgs {
 }
 
 /** Creates the basic entities necessary to render the majority of the
- * ExecutionDetails page. These can be inserted into an ExecutionDataCache
- * for mocking.
+ * ExecutionDetails page.
  */
 export function createMockExecutionEntities({
     workflowName,

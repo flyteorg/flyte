@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-export interface WorkflowsTableProps extends ListProps<Workflow> {}
+export type WorkflowsTableProps = ListProps<Workflow>
 export interface CellDataGetterParams extends TableCellDataGetterParams {
     rowData: Workflow;
 }

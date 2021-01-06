@@ -1,10 +1,14 @@
-import { Execution } from 'models/Execution';
-import { DetailedNodeExecution, DetailedTaskExecution } from '../types';
+import {
+    Execution,
+    NodeExecution,
+    NodeExecutionIdentifier
+} from 'models/Execution';
 
 export interface NodeExecutionsTableState {
-    executions: DetailedNodeExecution[];
-    selectedExecution?: DetailedNodeExecution | null;
-    setSelectedExecution: (execution: DetailedNodeExecution | null) => void;
+    selectedExecution?: NodeExecutionIdentifier | null;
+    setSelectedExecution: (
+        selectedExecutionId: NodeExecutionIdentifier | null
+    ) => void;
 }
 
 type LabelFn = () => JSX.Element;
@@ -16,20 +20,11 @@ export interface ColumnDefinition<CellRendererData> {
 }
 
 export interface NodeExecutionCellRendererData {
-    execution: DetailedNodeExecution;
+    execution: NodeExecution;
     state: NodeExecutionsTableState;
 }
 export type NodeExecutionColumnDefinition = ColumnDefinition<
     NodeExecutionCellRendererData
->;
-
-export interface TaskExecutionCellRendererData {
-    execution: DetailedTaskExecution;
-    nodeExecution: DetailedNodeExecution;
-    state: NodeExecutionsTableState;
-}
-export type TaskExecutionColumnDefinition = ColumnDefinition<
-    TaskExecutionCellRendererData
 >;
 
 export interface WorkflowExecutionCellRendererData {

@@ -14,7 +14,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';
 import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { TerminateExecutionButton } from '../TerminateExecution';
-import { executionIsTerminal } from '../utils';
+import { executionIsRunning, executionIsTerminal } from '../utils';
 import { backLinkTitle, executionActionStrings } from './constants';
 import { RelaunchExecutionForm } from './RelaunchExecutionForm';
 import { getExecutionBackLink, getExecutionSourceId } from './utils';
@@ -80,6 +80,7 @@ export const ExecutionDetailsAppBarContent: React.FC<{
     const { phase } = execution.closure;
     const sourceId = getExecutionSourceId(execution);
     const { backLink = getExecutionBackLink(execution) } = useLocationState();
+    const isRunning = executionIsRunning(execution);
     const isTerminal = executionIsTerminal(execution);
     const onClickShowInputsOutputs = () => setShowInputsOutputs(true);
     const onClickRelaunch = () => setShowRelaunchForm(true);
@@ -96,7 +97,9 @@ export const ExecutionDetailsAppBarContent: React.FC<{
         );
     }
 
-    const actionContent = isTerminal ? (
+    const actionContent = isRunning ? (
+        <TerminateExecutionButton className={styles.actionButton} />
+    ) : isTerminal ? (
         <Button
             variant="outlined"
             color="primary"
@@ -109,12 +112,9 @@ export const ExecutionDetailsAppBarContent: React.FC<{
         >
             Relaunch
         </Button>
-    ) : (
-        <TerminateExecutionButton className={styles.actionButton} />
-    );
+    ) : null;
 
-    // For running executions, add an overflow menu with the ability to clone
-    // while we are still running.
+    // For non-terminal executions, add an overflow menu with the ability to clone
     const moreActionsContent = !isTerminal ? (
         <MoreOptionsMenu
             className={styles.moreActions}

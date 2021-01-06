@@ -40,8 +40,7 @@ export const TerminateExecutionForm: React.FC<{
     const {
         cause,
         setCause,
-        terminating,
-        terminationError,
+        terminationState: { error, isLoading: terminating },
         terminateExecution
     } = useTerminateExecutionState(onClose);
 
@@ -74,9 +73,7 @@ export const TerminateExecutionForm: React.FC<{
                     value={cause}
                 />
             </FormControl>
-            {terminationError && (
-                <p className={commonStyles.errorText}>{terminationError}</p>
-            )}
+            {error && <p className={commonStyles.errorText}>{`${error}`}</p>}
             <div className={commonStyles.formButtonGroup}>
                 <Button
                     color="primary"

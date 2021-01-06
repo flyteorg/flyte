@@ -1,17 +1,18 @@
 import axios from 'axios';
-import { Admin, Core } from 'flyteidl';
-import {
-    defaultPaginationConfig,
-    getAdminEntity,
-    getProfileUrl,
-    getProtobufObject,
-    PaginatedEntityResponse,
-    RequestConfig
-} from 'models/AdminEntity';
-
 import { env } from 'common/env';
 import { log } from 'common/log';
 import { createCorsProxyURL } from 'common/utils';
+import { Admin, Core } from 'flyteidl';
+import {
+    defaultPaginationConfig,
+    getProfileUrl,
+    PaginatedEntityResponse,
+    RequestConfig
+} from 'models/AdminEntity';
+import {
+    getAdminEntity,
+    getProtobufObject
+} from 'models/AdminEntity/AdminEntity';
 import { transformRequestError } from 'models/AdminEntity/transformRequestError';
 import {
     defaultAxiosConfig,

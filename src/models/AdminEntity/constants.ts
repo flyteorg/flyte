@@ -1,5 +1,7 @@
 import { RequestConfig } from './types';
 
+export const apiPrefix = '/api/v1';
+
 export const limits = {
     DEFAULT: 25,
     /** The admin API requires a limit value for all list endpoints, but does not
@@ -19,4 +21,9 @@ export const sortQueryKeys = {
 /** Sane values to be used as a basis for any endpoints returning paginated results */
 export const defaultPaginationConfig: RequestConfig = {
     limit: limits.DEFAULT
+};
+
+/** For listing execution children, we generally do *not* want multiple pages */
+export const defaultListExecutionChildrenConfig: RequestConfig = {
+    limit: limits.NONE
 };

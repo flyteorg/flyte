@@ -6,7 +6,9 @@ import {
     encodeProtoPayload
 } from '../utils';
 
-jest.mock('common/env');
+jest.mock('common/env', () => ({
+    env: jest.requireActual('common/env').env
+}));
 
 const adminPrefix = 'http://admin';
 const corsPrefix = '/cors_proxy';

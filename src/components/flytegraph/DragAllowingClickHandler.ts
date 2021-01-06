@@ -9,11 +9,11 @@ export type DragFilteringClickHandlerListener = (
  * will be called with the final mouseup event if the click has not been filtered
  */
 export class DragFilteringClickHandler {
-    private deltaX: number = 0;
-    private deltaY: number = 0;
-    private xPos: number = 0;
-    private yPos: number = 0;
-    private dragging: boolean = false;
+    private deltaX = 0;
+    private deltaY = 0;
+    private xPos = 0;
+    private yPos = 0;
+    private dragging = false;
 
     constructor(
         private listener: DragFilteringClickHandlerListener,

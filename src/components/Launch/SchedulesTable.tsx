@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-export interface SchedulesTableProps extends ListProps<LaunchPlan> {}
+export type SchedulesTableProps = ListProps<LaunchPlan>
 interface CellDataGetterParams extends TableCellDataGetterParams {
     rowData: LaunchPlan;
 }

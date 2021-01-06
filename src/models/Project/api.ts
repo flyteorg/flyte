@@ -1,8 +1,8 @@
 import { Admin } from 'flyteidl';
 import { sortBy } from 'lodash';
-import { endpointPrefixes } from 'models/Common';
+import { endpointPrefixes } from 'models/Common/constants';
 
-import { getAdminEntity } from '../AdminEntity';
+import { getAdminEntity } from 'models/AdminEntity/AdminEntity';
 import { Project } from './types';
 
 /** Fetches the list of available `Project`s */

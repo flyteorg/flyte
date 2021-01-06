@@ -29,7 +29,7 @@ export interface BaseExecutionClosure {
 
 export interface ExecutionClosure extends Admin.IExecutionClosure {
     createdAt: Protobuf.ITimestamp;
-    computedInputs: LiteralMap;
+    computedInputs?: LiteralMap;
     duration?: Protobuf.Duration;
     error?: ExecutionError;
     outputs?: LiteralMapBlob;

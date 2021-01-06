@@ -1,9 +1,8 @@
-import { Card, CardContent } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography';
 import { WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { useNodeExecutionData } from 'components/hooks';
-import { LiteralMapViewer, RemoteLiteralMapViewer } from 'components/Literals';
+import { RemoteLiteralMapViewer } from 'components/Literals';
 import { NodeExecution } from 'models';
 import * as React from 'react';
 

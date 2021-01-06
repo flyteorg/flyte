@@ -6,12 +6,16 @@ import {
 } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
+import { WaitForQuery } from 'components/common/WaitForQuery';
 import { Core } from 'flyteidl';
+import { isEqual } from 'lodash';
 import { TaskNodeMetadata } from 'models';
 import { NodeExecutionPhase } from 'models/Execution/enums';
 import * as React from 'react';
 import { ExecutionStatusBadge, getNodeExecutionTimingMS } from '..';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
+import { NodeExecutionDetails } from '../types';
+import { useNodeExecutionDetails } from '../useNodeExecutionDetails';
 import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
 import {
@@ -23,27 +27,52 @@ const NodeExecutionName: React.FC<NodeExecutionCellRendererData> = ({
     execution,
     state
 }) => {
+    const detailsQuery = useNodeExecutionDetails(execution);
     const commonStyles = useCommonStyles();
     const styles = useColumnStyles();
     const name = execution.id.nodeId;
 
-    if (execution === state.selectedExecution) {
-        return (
-            <Typography
-                variant="body1"
-                className={styles.selectedExecutionName}
-            >
-                {name}
-            </Typography>
-        );
-    }
-    return (
+    const isSelected =
+        state.selectedExecution != null &&
+        isEqual(execution.id, state.selectedExecution);
+
+    const nameContent = isSelected ? (
+        <Typography variant="body1" className={styles.selectedExecutionName}>
+            {name}
+        </Typography>
+    ) : (
         <SelectNodeExecutionLink
             className={commonStyles.primaryLink}
             execution={execution}
             linkText={name}
             state={state}
         />
+    );
+
+    const renderNodeSpecName = ({ displayId }: NodeExecutionDetails) => (
+        <Typography variant="subtitle1" color="textSecondary">
+            {displayId}
+        </Typography>
+    );
+
+    return (
+        <>
+            {nameContent}
+            <WaitForQuery query={detailsQuery}>
+                {renderNodeSpecName}
+            </WaitForQuery>
+        </>
+    );
+};
+
+const NodeExecutionDisplayType: React.FC<NodeExecutionCellRendererData> = ({
+    execution
+}) => {
+    const detailsQuery = useNodeExecutionDetails(execution);
+    const extractDisplayType = ({ displayType }: NodeExecutionDetails) =>
+        displayType;
+    return (
+        <WaitForQuery query={detailsQuery}>{extractDisplayType}</WaitForQuery>
     );
 };
 
@@ -66,14 +95,7 @@ export function generateColumns(
 ): NodeExecutionColumnDefinition[] {
     return [
         {
-            cellRenderer: props => (
-                <>
-                    <NodeExecutionName {...props} />
-                    <Typography variant="subtitle1" color="textSecondary">
-                        {props.execution.displayId}
-                    </Typography>
-                </>
-            ),
+            cellRenderer: props => <NodeExecutionName {...props} />,
             className: styles.columnName,
             key: 'name',
             label: 'node'
@@ -102,7 +124,7 @@ export function generateColumns(
             label: 'status'
         },
         {
-            cellRenderer: ({ execution: { displayType } }) => displayType,
+            cellRenderer: props => <NodeExecutionDisplayType {...props} />,
             className: styles.columnType,
             key: 'type',
             label: 'type'

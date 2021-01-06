@@ -36,7 +36,7 @@ export function useDataRefresher<T, IDType extends object | string>(
             return;
         }
 
-        let timerId: number = 0;
+        let timerId = 0;
 
         const clear = () => {
             if (timerId === 0) {

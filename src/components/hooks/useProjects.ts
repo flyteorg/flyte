@@ -22,7 +22,7 @@ const doFetchProjects = async (cache: ValueCache) => {
 export function useProjects(): FetchableData<Project[]> {
     const cache = useContext(CacheContext);
 
-    return useFetchableData<Project[], Symbol>(
+    return useFetchableData<Project[], symbol>(
         {
             debugName: 'Projects',
             useCache: true,

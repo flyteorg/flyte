@@ -4,6 +4,7 @@ import * as React from 'react';
 import { CircularProgress } from '@material-ui/core';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { useDelayedValue } from 'components/hooks/useDelayedValue';
 
 const useStyles = makeStyles({
     container: {
@@ -27,14 +28,31 @@ const spinnerSizes: Record<SizeValue, number> = {
     large: 96
 };
 
-/** Renders a loading spinner. Size options are 'small', 'medium', and 'large' */
+/** Renders a loading spinner after 1000ms. Size options are 'small', 'medium', and 'large' */
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     size = 'large'
 }) => {
     const styles = useStyles();
-    return (
-        <div className={classnames(styles.container, size)}>
+    const shouldRender = useDelayedValue(false, 1000, true);
+    return shouldRender ? (
+        <div
+            className={classnames(styles.container, size)}
+            data-testid="loading-spinner"
+        >
             <CircularProgress size={spinnerSizes[size]} />
         </div>
-    );
+    ) : null;
 };
+
+/** `LoadingSpinner` with a pre-bound size of `small` */
+export const SmallLoadingSpinner: React.FC = () => (
+    <LoadingSpinner size="small" />
+);
+/** `LoadingSpinner` with a pre-bound size of `medium` */
+export const MediumLoadingSpinner: React.FC = () => (
+    <LoadingSpinner size="medium" />
+);
+/** `LoadingSpinner` with a pre-bound size of `large` */
+export const LargeLoadingSpinner: React.FC = () => (
+    <LoadingSpinner size="large" />
+);

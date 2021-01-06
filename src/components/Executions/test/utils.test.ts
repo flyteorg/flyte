@@ -55,11 +55,6 @@ describe('getWorkflowExecutionTimingMS', () => {
         expect(getWorkflowExecutionTimingMS(execution)).toBeNull();
     });
 
-    it('should return null when no createdAt field is present', () => {
-        delete execution.closure.createdAt;
-        expect(getWorkflowExecutionTimingMS(execution)).toBeNull();
-    });
-
     it('should return null when no startedAt field is present', () => {
         delete execution.closure.startedAt;
         expect(getWorkflowExecutionTimingMS(execution)).toBeNull();
@@ -103,11 +98,6 @@ describe('getNodeExecutionTimingMS', () => {
         expect(getNodeExecutionTimingMS(execution)).toBeNull();
     });
 
-    it('should return null when no createdAt field is present', () => {
-        delete execution.closure.createdAt;
-        expect(getNodeExecutionTimingMS(execution)).toBeNull();
-    });
-
     it('should return null when no startedAt field is present', () => {
         delete execution.closure.startedAt;
         expect(getNodeExecutionTimingMS(execution)).toBeNull();
@@ -148,11 +138,6 @@ describe('getTaskExecutionTimingMS', () => {
         expect(getTaskExecutionTimingMS(execution)).toBeNull();
 
         execution.closure.phase = TaskExecutionPhase.FAILED;
-        expect(getTaskExecutionTimingMS(execution)).toBeNull();
-    });
-
-    it('should return null when no createdAt field is present', () => {
-        delete execution.closure.createdAt;
         expect(getTaskExecutionTimingMS(execution)).toBeNull();
     });
 

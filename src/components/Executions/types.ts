@@ -1,20 +1,15 @@
 import {
+    BranchNode,
     CompiledNode,
-    GloballyUniqueNode,
-    Identifier,
-    NodeId,
-    RequestConfig,
-    Workflow,
-    WorkflowId
+    TaskNode,
+    WorkflowId,
+    WorkflowNode
 } from 'models';
 import {
-    Execution,
     NodeExecution,
-    NodeExecutionIdentifier,
+    NodeExecutionClosure,
     NodeExecutionMetadata,
-    TaskExecution,
-    TaskExecutionIdentifier,
-    WorkflowExecutionIdentifier
+    WorkflowNodeMetadata
 } from 'models/Execution/types';
 import { TaskTemplate } from 'models/Task/types';
 
@@ -48,79 +43,39 @@ export interface NodeInformation {
     node: CompiledNode;
 }
 
+export interface CompiledTaskNode extends CompiledNode {
+    taskNode: TaskNode;
+}
+
+export interface CompiledWorkflowNode extends CompiledNode {
+    workflowNode: WorkflowNode;
+}
+
+export interface CompiledBranchNode extends CompiledNode {
+    branchNode: BranchNode;
+}
+
 export interface ParentNodeExecution extends NodeExecution {
     metadata: NodeExecutionMetadata & {
         isParentNode: true;
     };
 }
 
-/** An interface combining a NodeExecution with data pulled from the
- * corresponding Workflow Node structure.
- */
-export interface DetailedNodeExecution extends NodeExecution {
-    displayType: NodeExecutionDisplayType;
-    displayId: string;
-    cacheKey: string;
-    taskTemplate?: TaskTemplate;
+export interface WorkflowNodeExecutionClosure extends NodeExecutionClosure {
+    workflowNodeMetadata: WorkflowNodeMetadata;
 }
 
-export interface DetailedTaskExecution extends TaskExecution {
-    cacheKey: string;
+export interface WorkflowNodeExecution extends NodeExecution {
+    closure: WorkflowNodeExecutionClosure;
+}
+
+export interface NodeExecutionDetails {
+    displayType: NodeExecutionDisplayType;
+    displayId: string;
+    taskTemplate?: TaskTemplate;
 }
 
 export interface NodeExecutionGroup {
     name: string;
     nodeExecutions: NodeExecution[];
-}
-
-export interface DetailedNodeExecutionGroup extends NodeExecutionGroup {
-    nodeExecutions: DetailedNodeExecution[];
-}
-
-export interface ExecutionDataCache {
-    getNode(id: NodeId): GloballyUniqueNode | undefined;
-    getNodeForNodeExecution(
-        nodeExecution: NodeExecution
-    ): GloballyUniqueNode | null | undefined;
-    getNodeExecutions(
-        workflowExecutionId: WorkflowExecutionIdentifier,
-        config: RequestConfig
-    ): Promise<DetailedNodeExecution[]>;
-    getNodeExecution(
-        id: string | NodeExecutionIdentifier
-    ): DetailedNodeExecution | undefined;
-    getNodeExecutionsForParentNode(
-        id: NodeExecutionIdentifier,
-        config: RequestConfig
-    ): Promise<DetailedNodeExecution[]>;
-    getTaskExecutions(
-        nodeExecutionId: NodeExecutionIdentifier
-    ): Promise<TaskExecution[]>;
-    getTaskExecutionChildren: (
-        taskExecutionId: TaskExecutionIdentifier,
-        config: RequestConfig
-    ) => Promise<DetailedNodeExecution[]>;
-    getTaskTemplate: (taskId: Identifier) => TaskTemplate | undefined;
-    getWorkflow: (workflowId: Identifier) => Promise<Workflow>;
-    getWorkflowExecution: (
-        executionId: WorkflowExecutionIdentifier
-    ) => Promise<Execution>;
-    getWorkflowIdForWorkflowExecution: (
-        executionId: WorkflowExecutionIdentifier
-    ) => Promise<WorkflowId>;
-    insertExecution(execution: Execution): void;
-    insertNodes(nodes: GloballyUniqueNode[]): void;
-    insertNodeExecutions(nodeExecutions: DetailedNodeExecution[]): void;
-    insertTaskTemplates(templates: TaskTemplate[]): void;
-    insertWorkflow(workflow: Workflow): void;
-    insertWorkflowExecutionReference(
-        executionId: WorkflowExecutionIdentifier,
-        workflowId: WorkflowId
-    ): void;
-    populateNodeExecutionDetails(
-        nodeExecution: NodeExecution
-    ): DetailedNodeExecution;
-    mapNodeExecutionDetails(
-        nodeExecutions: NodeExecution[]
-    ): DetailedNodeExecution[];
 }

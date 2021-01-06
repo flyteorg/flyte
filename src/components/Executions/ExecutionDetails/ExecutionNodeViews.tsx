@@ -1,17 +1,17 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { WaitForData } from 'components/common';
+import { WaitForQuery } from 'components/common/WaitForQuery';
 import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme';
-import { Execution } from 'models';
+import { Execution, NodeExecution } from 'models';
 import * as React from 'react';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
-import { useWorkflowExecutionState } from '../useWorkflowExecutionState';
 import { tabs } from './constants';
 import { ExecutionWorkflowGraph } from './ExecutionWorkflowGraph';
+import { useExecutionNodeViewsState } from './useExecutionNodeViewsState';
 
 const useStyles = makeStyles((theme: Theme) => ({
     filters: {
@@ -49,13 +49,27 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
         tabState.value === tabs.nodes.id ? filterState.appliedFilters : [];
 
     const {
-        workflow,
-        nodeExecutions,
+        nodeExecutionsQuery,
         nodeExecutionsRequestConfig
-    } = useWorkflowExecutionState(execution, appliedFilters);
+    } = useExecutionNodeViewsState(execution, appliedFilters);
+
+    const renderNodeExecutionsTable = (nodeExecutions: NodeExecution[]) => (
+        <NodeExecutionsRequestConfigContext.Provider
+            value={nodeExecutionsRequestConfig}
+        >
+            <NodeExecutionsTable nodeExecutions={nodeExecutions} />
+        </NodeExecutionsRequestConfigContext.Provider>
+    );
+
+    const renderExecutionWorkflowGraph = (nodeExecutions: NodeExecution[]) => (
+        <ExecutionWorkflowGraph
+            nodeExecutions={nodeExecutions}
+            workflowId={execution.closure.workflowId}
+        />
+    );
 
     return (
-        <WaitForData {...workflow}>
+        <>
             <Tabs className={styles.tabs} {...tabState}>
                 <Tab value={tabs.nodes.id} label={tabs.nodes.label} />
                 <Tab value={tabs.graph.id} label={tabs.graph.label} />
@@ -66,27 +80,17 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
                         <div className={styles.filters}>
                             <ExecutionFilters {...filterState} />
                         </div>
-                        <WaitForData {...nodeExecutions}>
-                            <NodeExecutionsRequestConfigContext.Provider
-                                value={nodeExecutionsRequestConfig}
-                            >
-                                <NodeExecutionsTable
-                                    {...nodeExecutions}
-                                    moreItemsAvailable={false}
-                                />
-                            </NodeExecutionsRequestConfigContext.Provider>
-                        </WaitForData>
+                        <WaitForQuery query={nodeExecutionsQuery}>
+                            {renderNodeExecutionsTable}
+                        </WaitForQuery>
                     </>
                 )}
                 {tabState.value === tabs.graph.id && (
-                    <WaitForData {...nodeExecutions}>
-                        <ExecutionWorkflowGraph
-                            nodeExecutions={nodeExecutions.value}
-                            workflow={workflow.value}
-                        />
-                    </WaitForData>
+                    <WaitForQuery query={nodeExecutionsQuery}>
+                        {renderExecutionWorkflowGraph}
+                    </WaitForQuery>
                 )}
             </div>
-        </WaitForData>
+        </>
     );
 };

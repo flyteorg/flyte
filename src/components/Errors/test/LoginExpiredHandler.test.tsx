@@ -47,7 +47,6 @@ describe('LoginExpiredHandler', () => {
             })
         );
 
-        await waitFor(() => {});
-        expect(getByText('Login')).toBeInTheDocument();
+        await waitFor(() => getByText('Login'));
     });
 });

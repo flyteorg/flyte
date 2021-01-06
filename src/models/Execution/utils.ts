@@ -1,5 +1,10 @@
 import { Admin } from 'flyteidl';
-import { endpointPrefixes } from 'models/Common';
+import {
+    endpointPrefixes,
+    IdentifierScope,
+    makeIdentifierPath,
+    NameIdentifierScope
+} from 'models/Common';
 
 import {
     Execution,
@@ -26,6 +31,9 @@ export const makeNodeExecutionPath = ({
     nodeId
 }: NodeExecutionIdentifier) =>
     [endpointPrefixes.nodeExecution, project, domain, name, nodeId].join('/');
+
+export const makeNodeExecutionListPath = (scope: NameIdentifierScope) =>
+    makeIdentifierPath(endpointPrefixes.nodeExecution, scope);
 
 /** Generates the API endpoint for a list of `TaskExecution` children */
 export const makeTaskExecutionChildrenPath = ({

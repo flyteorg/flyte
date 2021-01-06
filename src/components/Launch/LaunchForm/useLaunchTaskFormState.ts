@@ -97,8 +97,7 @@ async function loadInputs(
 
 async function validate(
     formInputsRef: RefObject<LaunchFormInputsRef>,
-    roleInputRef: RefObject<LaunchRoleInputRef>,
-    context: any
+    roleInputRef: RefObject<LaunchRoleInputRef>
 ) {
     if (roleInputRef.current === null) {
         throw new Error('Unexpected empty role input ref');
@@ -107,7 +106,7 @@ async function validate(
     if (!roleInputRef.current.validate()) {
         throw new Error(correctInputErrors);
     }
-    return baseValidate(formInputsRef, context);
+    return baseValidate(formInputsRef);
 }
 
 async function submit(

@@ -2,7 +2,7 @@
 export class MessageMissingRequiredFieldsError extends Error {
     constructor(
         public fields: string[],
-        msg: string = `Message is missing required fields: ${fields.join(',')}`
+        msg = `Message is missing required fields: ${fields.join(',')}`
     ) {
         super(msg);
     }

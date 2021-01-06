@@ -1,7 +1,7 @@
 import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
 import { createLocalURL, ensureSlashPrefixed } from 'common/utils';
-
+import { apiPrefix } from './constants';
 import {
     AdminEntityTransformer,
     DecodableType,
@@ -18,9 +18,9 @@ const redirectParam = 'redirect_url';
 export function adminApiUrl(url: string) {
     const finalUrl = ensureSlashPrefixed(url);
     if (env.ADMIN_API_URL) {
-        return `${env.ADMIN_API_URL}/api/v1${finalUrl}`;
+        return `${env.ADMIN_API_URL}${apiPrefix}${finalUrl}`;
     }
-    return createLocalURL(`/api/v1${finalUrl}`);
+    return createLocalURL(`${apiPrefix}${finalUrl}`);
 }
 
 /** Constructs a url for redirecting to the Admin login endpoint and returning

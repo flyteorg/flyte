@@ -71,7 +71,7 @@ export interface NodeRendererProps<T> extends BaseNodeProps<T> {
     textRenderer?: NodeTextRenderer<T>;
 }
 
-export interface NodeTextRendererProps<T> extends BaseNodeProps<T> {}
+export type NodeTextRendererProps<T> = BaseNodeProps<T>
 
 export interface NodeLinkRendererProps<T> {
     link: RenderableNodeLink<T>;

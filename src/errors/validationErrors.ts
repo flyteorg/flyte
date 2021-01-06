@@ -4,7 +4,7 @@ import { ParameterError } from './parameterErrors';
 export class ValidationError extends Error {
     constructor(
         public errors: ParameterError[],
-        msg: string = 'One or more parameters are invalid'
+        msg = 'One or more parameters are invalid'
     ) {
         super(msg);
     }

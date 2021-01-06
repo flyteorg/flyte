@@ -36,7 +36,7 @@ export interface ProjectListProps {
 const ProjectCard: React.FC<{ project: Project }> = ({ project }) => {
     const styles = useStyles();
     const commonStyles = useCommonStyles();
-    const description = !!project.description
+    const description = project.description
         ? project.description
         : defaultProjectDescription;
     return (

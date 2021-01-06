@@ -1,34 +1,15 @@
-import {
-    fireEvent,
-    render,
-    waitFor,
-    waitForElementToBeRemoved
-} from '@testing-library/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
-import { APIContext, APIContextValue } from 'components/data/apiContext';
-import { createMockExecutionEntities } from 'components/Executions/__mocks__/createMockExecutionEntities';
-import {
-    ExecutionContextData,
-    ExecutionDataCacheContext
-} from 'components/Executions/contexts';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { filterLabels } from 'components/Executions/filters/constants';
 import { nodeExecutionStatusFilters } from 'components/Executions/filters/statusFilters';
-import { ExecutionDataCache } from 'components/Executions/types';
-import { createExecutionDataCache } from 'components/Executions/useExecutionDataCache';
-import {
-    getExecution,
-    Identifier,
-    listNodeExecutions,
-    WorkflowExecutionIdentifier
-} from 'models';
-import { createMockExecution } from 'models/__mocks__/executionsData';
-import { mockTasks } from 'models/Task/__mocks__/mockTaskData';
+import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
+import { insertFixture } from 'mocks/data/insertFixture';
+import { mockServer } from 'mocks/server';
+import { Execution } from 'models/Execution/types';
 import * as React from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { createTestQueryClient } from 'test/utils';
 import { tabs } from '../constants';
-import {
-    ExecutionNodeViews,
-    ExecutionNodeViewsProps
-} from '../ExecutionNodeViews';
+import { ExecutionNodeViews } from '../ExecutionNodeViews';
 
 // We don't need to verify the content of the graph component here and it is
 // difficult to make it work correctly in a test environment.
@@ -36,121 +17,83 @@ jest.mock('../ExecutionWorkflowGraph.tsx', () => ({
     ExecutionWorkflowGraph: () => null
 }));
 
+// ExecutionNodeViews uses query params for NE list, so we must match them
+// for the list to be returned properly
+const baseQueryParams = {
+    filters: '',
+    'sort_by.direction': 'ASCENDING',
+    'sort_by.key': 'created_at'
+};
+
 describe('ExecutionNodeViews', () => {
-    let props: ExecutionNodeViewsProps;
-    let apiContext: APIContextValue;
-    let executionContext: ExecutionContextData;
-    let dataCache: ExecutionDataCache;
-    let mockListNodeExecutions: jest.Mock<ReturnType<
-        typeof listNodeExecutions
-    >>;
-    let mockGetExecution: jest.Mock<ReturnType<typeof getExecution>>;
+    let queryClient: QueryClient;
+    let execution: Execution;
+    let fixture: ReturnType<typeof oneFailedTaskWorkflow.generate>;
 
     beforeEach(() => {
-        const {
-            nodeExecutions,
-            workflow,
-            workflowExecution
-        } = createMockExecutionEntities({
-            workflowName: 'SampleWorkflow',
-            nodeExecutionCount: 2
-        });
+        fixture = oneFailedTaskWorkflow.generate();
+        execution = fixture.workflowExecutions.top.data;
+        insertFixture(mockServer, fixture);
+        const nodeExecutions = fixture.workflowExecutions.top.nodeExecutions;
 
-        mockGetExecution = jest
-            .fn()
-            .mockImplementation(async (id: WorkflowExecutionIdentifier) => {
-                return { ...createMockExecution(id.name), id };
-            });
-
-        mockListNodeExecutions = jest
-            .fn()
-            .mockResolvedValue({ entities: nodeExecutions });
-        apiContext = mockAPIContextValue({
-            getExecution: mockGetExecution,
-            getTask: jest.fn().mockImplementation(async (id: Identifier) => {
-                return { template: { ...mockTasks[0].template, id } };
-            }),
-            listNodeExecutions: mockListNodeExecutions,
-            listTaskExecutions: jest.fn().mockResolvedValue({ entities: [] }),
-            listTaskExecutionChildren: jest
-                .fn()
-                .mockResolvedValue({ entities: [] })
-        });
-
-        dataCache = createExecutionDataCache(apiContext);
-        dataCache.insertWorkflow(workflow);
-        dataCache.insertWorkflowExecutionReference(
-            workflowExecution.id,
-            workflow.id
+        mockServer.insertNodeExecutionList(
+            execution.id,
+            Object.values(nodeExecutions).map(({ data }) => data),
+            baseQueryParams
         );
-
-        executionContext = {
-            execution: workflowExecution,
-            terminateExecution: jest.fn().mockRejectedValue('Not Implemented')
-        };
-
-        props = { execution: workflowExecution };
+        mockServer.insertNodeExecutionList(
+            execution.id,
+            [nodeExecutions.failedNode.data],
+            { ...baseQueryParams, filters: 'value_in(phase,FAILED)' }
+        );
+        queryClient = createTestQueryClient();
     });
 
     const renderViews = () =>
         render(
-            <APIContext.Provider value={apiContext}>
-                <ExecutionDataCacheContext.Provider value={dataCache}>
-                    <ExecutionNodeViews {...props} />
-                </ExecutionDataCacheContext.Provider>
-            </APIContext.Provider>
+            <QueryClientProvider client={queryClient}>
+                <ExecutionNodeViews execution={execution} />
+            </QueryClientProvider>
         );
 
-    it('only applies filter when viewing the nodes tab', async () => {
-        const { getByText } = renderViews();
+    it('maintains filter when switching back to nodes tab', async () => {
+        const { nodeExecutions } = fixture.workflowExecutions.top;
+        const failedNodeName = nodeExecutions.failedNode.data.id.nodeId;
+        const succeededNodeName = nodeExecutions.pythonNode.data.id.nodeId;
+
+        const { getByText, queryByText } = renderViews();
         const nodesTab = await waitFor(() => getByText(tabs.nodes.label));
         const graphTab = await waitFor(() => getByText(tabs.graph.label));
 
+        // Ensure we are on Nodes tab
         fireEvent.click(nodesTab);
+        await waitFor(() => getByText(succeededNodeName));
+
         const statusButton = await waitFor(() =>
             getByText(filterLabels.status)
         );
+
+        // Apply 'Failed' filter and wait for list to include only the failed item
         fireEvent.click(statusButton);
-        const successFilter = await waitFor(() =>
-            getByText(nodeExecutionStatusFilters.succeeded.label)
+        const failedFilter = await waitFor(() =>
+            screen.getByLabelText(nodeExecutionStatusFilters.failed.label)
         );
 
-        mockListNodeExecutions.mockClear();
-        fireEvent.click(successFilter);
-        await waitFor(() => mockListNodeExecutions.mock.calls.length > 0);
-        // Verify at least one filter is passed
-        expect(mockListNodeExecutions).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({
-                filter: expect.arrayContaining([
-                    expect.objectContaining({ key: expect.any(String) })
-                ])
-            })
+        // Wait for succeeded task to disappear and ensure failed task remains
+        fireEvent.click(failedFilter);
+        await waitFor(() => queryByText(succeededNodeName) == null);
+        await waitFor(() =>
+            expect(getByText(failedNodeName)).toBeInTheDocument()
         );
 
+        // Switch to the Graph tab
         fireEvent.click(statusButton);
-        await waitForElementToBeRemoved(successFilter);
-        mockListNodeExecutions.mockClear();
         fireEvent.click(graphTab);
-        await waitFor(() => mockListNodeExecutions.mock.calls.length > 0);
-        // No filter expected on the graph tab
-        expect(mockListNodeExecutions).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({ filter: [] })
-        );
+        await waitFor(() => queryByText(failedNodeName) == null);
 
-        mockListNodeExecutions.mockClear();
+        // Switch back to Nodes Tab and verify filter still applied
         fireEvent.click(nodesTab);
-        await waitFor(() => mockListNodeExecutions.mock.calls.length > 0);
-        // Verify (again) at least one filter is passed, after changing back to
-        // nodes tab.
-        expect(mockListNodeExecutions).toHaveBeenCalledWith(
-            expect.anything(),
-            expect.objectContaining({
-                filter: expect.arrayContaining([
-                    expect.objectContaining({ key: expect.any(String) })
-                ])
-            })
-        );
+        await waitFor(() => getByText(failedNodeName));
+        expect(queryByText(succeededNodeName)).toBeNull();
     });
 });

@@ -1,24 +1,24 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { WaitForData } from 'components/common';
-import { useDataRefresher, useFetchableData } from 'components/hooks';
+import { WaitForQuery } from 'components/common/WaitForQuery';
+import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { useTabState } from 'components/hooks/useTabState';
 import { every } from 'lodash';
 import {
     executionSortFields,
     limits,
-    RequestConfig,
+    NodeExecution,
     SortDirection,
-    TaskExecution,
-    TaskExecutionIdentifier
+    TaskExecution
 } from 'models';
 import * as React from 'react';
-import { executionRefreshIntervalMs, nodeExecutionIsTerminal } from '..';
-import { ExecutionDataCacheContext } from '../contexts';
+import { useQueryClient } from 'react-query';
+import { nodeExecutionIsTerminal } from '..';
+import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
+import { makeTaskExecutionChildListQuery } from '../nodeExecutionQueries';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
-import { DetailedNodeExecution } from '../types';
 import { taskExecutionIsTerminal } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -44,28 +44,6 @@ const tabIds = {
     nodes: 'nodes'
 };
 
-interface UseCachedTaskExecutionChildrenArgs {
-    config: RequestConfig;
-    id: TaskExecutionIdentifier;
-}
-function useCachedTaskExecutionChildren(
-    args: UseCachedTaskExecutionChildrenArgs
-) {
-    const dataCache = React.useContext(ExecutionDataCacheContext);
-    return useFetchableData<
-        DetailedNodeExecution[],
-        UseCachedTaskExecutionChildrenArgs
-    >(
-        {
-            debugName: 'CachedTaskExecutionChildren',
-            defaultValue: [],
-            doFetch: ({ id, config }) =>
-                dataCache.getTaskExecutionChildren(id, config)
-        },
-        args
-    );
-}
-
 /** Contains the content for viewing child NodeExecutions for a TaskExecution */
 export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
     taskExecution
@@ -73,27 +51,34 @@ export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
     const styles = useStyles();
     const filterState = useNodeExecutionFiltersState();
     const tabState = useTabState(tabIds, tabIds.nodes);
-    const sort = {
-        key: executionSortFields.createdAt,
-        direction: SortDirection.ASCENDING
-    };
-    const nodeExecutions = useCachedTaskExecutionChildren({
-        id: taskExecution.id,
-        config: {
-            sort,
-            limit: limits.NONE,
-            filter: filterState.appliedFilters
-        }
-    });
 
-    // We will continue to refresh the node executions list as long
-    // as either the parent execution or any child is non-terminal
-    useDataRefresher(taskExecution.id, nodeExecutions, {
-        interval: executionRefreshIntervalMs,
-        valueIsFinal: nodeExecutions =>
-            every(nodeExecutions, nodeExecutionIsTerminal) &&
-            taskExecutionIsTerminal(taskExecution)
-    });
+    const requestConfig = React.useMemo(
+        () => ({
+            filter: filterState.appliedFilters,
+            limit: limits.NONE,
+            sort: {
+                key: executionSortFields.createdAt,
+                direction: SortDirection.ASCENDING
+            }
+        }),
+        [filterState.appliedFilters]
+    );
+
+    const shouldEnableQuery = (executions: NodeExecution[]) =>
+        every(executions, nodeExecutionIsTerminal) &&
+        taskExecutionIsTerminal(taskExecution);
+
+    const nodeExecutionsQuery = useConditionalQuery(
+        makeTaskExecutionChildListQuery(useQueryClient(), taskExecution.id, requestConfig),
+        shouldEnableQuery
+    );
+
+    const renderNodeExecutionsTable = (nodeExecutions: NodeExecution[]) => (
+        <NodeExecutionsRequestConfigContext.Provider value={requestConfig}>
+            <NodeExecutionsTable nodeExecutions={nodeExecutions} />
+        </NodeExecutionsRequestConfigContext.Provider>
+    );
+
     return (
         <>
             <Tabs className={styles.tabs} {...tabState}>
@@ -105,12 +90,9 @@ export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
                         <div className={styles.filters}>
                             <ExecutionFilters {...filterState} />
                         </div>
-                        <WaitForData {...nodeExecutions}>
-                            <NodeExecutionsTable
-                                {...nodeExecutions}
-                                moreItemsAvailable={false}
-                            />
-                        </WaitForData>
+                        <WaitForQuery query={nodeExecutionsQuery}>
+                            {renderNodeExecutionsTable}
+                        </WaitForQuery>
                     </>
                 )}
             </div>

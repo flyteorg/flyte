@@ -5,9 +5,9 @@ import { Collection } from 'react-virtualized';
 /** These are types shared across multiple sections of the data model. Most of
  * map to types found in `flyteidl.core`.
  */
-export interface Alias extends Core.IAlias {}
-export interface Binding extends Core.IBinding {}
-export interface Container extends Core.IContainer {}
+export type Alias = Core.IAlias
+export type Binding = Core.IBinding
+export type Container = Core.IContainer
 export type FixedRateUnit = Admin.FixedRateUnit;
 export const FixedRateUnit = Admin.FixedRateUnit;
 export interface Identifier extends Core.IIdentifier {
@@ -18,26 +18,24 @@ export interface Identifier extends Core.IIdentifier {
     version: string;
 }
 
-export interface NamedEntityIdentifier
-    extends RequiredNonNullable<Admin.INamedEntityIdentifier> {}
+export type NamedEntityIdentifier = RequiredNonNullable<Admin.INamedEntityIdentifier>
 export interface ResourceIdentifier extends NamedEntityIdentifier {
     resourceType: Core.ResourceType;
 }
 
-export interface NamedEntityMetadata
-    extends RequiredNonNullable<Admin.INamedEntityMetadata> {}
+export type NamedEntityMetadata = RequiredNonNullable<Admin.INamedEntityMetadata>
 
 export interface NamedEntity extends Admin.INamedEntity {
     resourceType: Core.ResourceType;
     id: NamedEntityIdentifier;
     metadata: NamedEntityMetadata;
 }
-export interface Notification extends Admin.INotification {}
+export type Notification = Admin.INotification
 export type ResourceType = Core.ResourceType;
 export const ResourceType = Core.ResourceType;
-export interface RetryStrategy extends Core.IRetryStrategy {}
-export interface RuntimeMetadata extends Core.IRuntimeMetadata {}
-export interface Schedule extends Admin.ISchedule {}
+export type RetryStrategy = Core.IRetryStrategy
+export type RuntimeMetadata = Core.IRuntimeMetadata
+export type Schedule = Admin.ISchedule
 export type MessageFormat = Core.TaskLog.MessageFormat;
 export interface TaskLog extends Core.ITaskLog {
     name: string;
@@ -45,7 +43,7 @@ export interface TaskLog extends Core.ITaskLog {
 }
 
 /*** Literals ****/
-export interface Binary extends RequiredNonNullable<Core.IBinary> {}
+export type Binary = RequiredNonNullable<Core.IBinary>
 
 export interface Blob extends Core.IBlob {
     metadata: BlobMetadata;
@@ -61,9 +59,9 @@ export interface BlobMetadata extends Core.IBlobMetadata {
 export interface BlobType extends Core.IBlobType {
     dimensionality: BlobDimensionality;
 }
-export interface UrlBlob extends Admin.IUrlBlob {}
+export type UrlBlob = Admin.IUrlBlob
 
-export interface Error extends RequiredNonNullable<Core.IError> {}
+export type Error = RequiredNonNullable<Core.IError>
 
 export interface Literal extends Core.Literal {
     value: keyof Core.ILiteral;
@@ -79,10 +77,9 @@ export interface BlobLiteral extends Core.ILiteral {
     scalar: BlobScalar;
 }
 
-export interface LiteralCollection
-    extends RequiredNonNullable<Core.ILiteralCollection> {}
+export type LiteralCollection = RequiredNonNullable<Core.ILiteralCollection>
 
-export interface LiteralMap extends RequiredNonNullable<Core.ILiteralMap> {}
+export type LiteralMap = RequiredNonNullable<Core.ILiteralMap>
 export const LiteralMap = Core.LiteralMap;
 export interface LiteralMapBlob extends Admin.ILiteralMapBlob {
     values: LiteralMap;

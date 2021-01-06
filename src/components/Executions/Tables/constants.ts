@@ -17,6 +17,7 @@ export const nodeExecutionsTableColumnWidths = {
 };
 
 export const titleStrings = {
+    childGroupFetchFailed: 'Failed to fetch children. Click to retry.',
     expandRow: 'Expand row',
     groupName: 'Group name'
 };

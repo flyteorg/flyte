@@ -1,17 +1,10 @@
-import { log } from 'common/log';
 import { durationToMilliseconds, timestampToDate } from 'common/utils';
-import { getCacheKey } from 'components/Cache';
-import {
-    endNodeId,
-    Identifier,
-    startNodeId,
-    TaskTemplate,
-    TaskType
-} from 'models';
+import { CompiledNode } from 'models';
 import {
     BaseExecutionClosure,
     Execution,
     NodeExecution,
+    runningExecutionStates,
     TaskExecution,
     terminalExecutionStates,
     terminalNodeExecutionStates,
@@ -25,15 +18,15 @@ import {
 import {
     nodeExecutionPhaseConstants,
     taskExecutionPhaseConstants,
-    taskTypeToNodeExecutionDisplayType,
     workflowExecutionPhaseConstants
 } from './constants';
 import {
-    DetailedNodeExecution,
-    ExecutionDataCache,
+    CompiledBranchNode,
+    CompiledTaskNode,
+    CompiledWorkflowNode,
     ExecutionPhaseConstants,
-    NodeExecutionDisplayType,
-    ParentNodeExecution
+    ParentNodeExecution,
+    WorkflowNodeExecution
 } from './types';
 
 /** Given an execution phase, returns a set of constants (i.e. color, display
@@ -96,6 +89,13 @@ export const executionIsTerminal = (execution: Execution) =>
     execution.closure &&
     terminalExecutionStates.includes(execution.closure.phase);
 
+/** Determines if a workflow is in a known running state. Note: "Unknown" does
+ * not evaluate to true here.
+ */
+export const executionIsRunning = (execution: Execution) =>
+    execution.closure &&
+    runningExecutionStates.includes(execution.closure.phase);
+
 /** Determines if a node execution can be considered finalized and will not
  * change state again.
  */
@@ -155,6 +155,30 @@ export function isParentNode(
     return (
         nodeExecution.metadata != null && !!nodeExecution.metadata.isParentNode
     );
+}
+
+export function isWorkflowNodeExecution(
+    nodeExecution: NodeExecution
+): nodeExecution is WorkflowNodeExecution {
+    return nodeExecution.closure.workflowNodeMetadata != null;
+}
+
+export function isCompiledTaskNode(
+    node: CompiledNode
+): node is CompiledTaskNode {
+    return node.taskNode != null;
+}
+
+export function isCompiledWorkflowNode(
+    node: CompiledNode
+): node is CompiledWorkflowNode {
+    return node.workflowNode != null;
+}
+
+export function isCompiledBranchNode(
+    node: CompiledNode
+): node is CompiledBranchNode {
+    return node.branchNode != null;
 }
 
 /** Returns timing information (duration, queue time, ...) for a WorkflowExecution */

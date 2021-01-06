@@ -26,20 +26,14 @@ jest.mock('components/Navigation/NavBarContent', () => ({
 describe('ExecutionDetailsAppBarContent', () => {
     let execution: Execution;
     let executionContext: ExecutionContextData;
-    let mockTerminateExecution: jest.Mock<Promise<void>>;
-    let terminatePromise: DelayedPromiseResult<void>;
     let sourceId: Identifier;
 
     beforeEach(() => {
         execution = createMockExecution();
         sourceId = execution.closure.workflowId;
-        mockTerminateExecution = jest.fn().mockImplementation(() => {
-            terminatePromise = delayedPromise();
-            return terminatePromise;
-        });
+
         executionContext = {
-            execution,
-            terminateExecution: mockTerminateExecution
+            execution
         };
     });
 

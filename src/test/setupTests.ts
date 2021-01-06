@@ -1,6 +1,22 @@
 import '@testing-library/jest-dom';
+import { insertDefaultData } from 'mocks/insertDefaultData';
+import { mockServer } from 'mocks/server';
+import { obj } from './utils';
 
-// Make sure the env object exists in a sane way
-window.env = {
-    BASE_URL: ''
-};
+beforeAll(() => {
+    insertDefaultData(mockServer);
+    mockServer.listen({
+        onUnhandledRequest: (req) => {
+            const message = `Unexpected request: ${obj(req)}`;
+            throw new Error(message);
+        }
+    });
+});
+
+afterEach(() => {
+    mockServer.resetHandlers();
+});
+
+afterAll(() => {
+    mockServer.close();
+});

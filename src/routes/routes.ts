@@ -9,7 +9,7 @@ import {
 import { makeRoute } from './utils';
 
 /** Creates a path relative to a particular project */
-export const makeProjectBoundPath = (projectId: string, path: string = '') =>
+export const makeProjectBoundPath = (projectId: string, path = '') =>
     makeRoute(
         `/projects/${projectId}${
             path.length ? ensureSlashPrefixed(path) : path
@@ -20,7 +20,7 @@ export const makeProjectBoundPath = (projectId: string, path: string = '') =>
 export const makeProjectDomainBoundPath = (
     projectId: string,
     domainId: string,
-    path: string = ''
+    path = ''
 ) => makeRoute(`/projects/${projectId}/domains/${domainId}${path}`);
 
 export class Routes {

@@ -21,7 +21,7 @@ const taskId: (name: string, version: string) => Identifier = (
 
 export const createMockTask: (name: string, version?: string) => Task = (
     name: string,
-    version: string = 'abcdefg'
+    version = 'abcdefg'
 ) => ({
     id: taskId(name, version),
     closure: createMockTaskClosure()

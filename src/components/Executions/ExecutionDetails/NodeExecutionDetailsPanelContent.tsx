@@ -1,4 +1,4 @@
-import { IconButton, SvgIconProps, Typography } from '@material-ui/core';
+import { IconButton, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
@@ -10,11 +10,17 @@ import { ExecutionStatusBadge } from 'components/Executions/ExecutionStatusBadge
 import { LocationState } from 'components/hooks/useLocationState';
 import { useTabState } from 'components/hooks/useTabState';
 import { LocationDescriptor } from 'history';
+import { NodeExecution, NodeExecutionIdentifier } from 'models/Execution/types';
+import { TaskTemplate } from 'models/Task/types';
 import * as React from 'react';
+import Skeleton from 'react-loading-skeleton';
+import { useQuery } from 'react-query';
 import { Link as RouterLink } from 'react-router-dom';
 import { Routes } from 'routes';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
-import { DetailedNodeExecution, NodeExecutionDisplayType } from '../types';
+import { makeNodeExecutionQuery } from '../nodeExecutionQueries';
+import { NodeExecutionDetails } from '../types';
+import { useNodeExecutionDetails } from '../useNodeExecutionDetails';
 import { NodeExecutionInputs } from './NodeExecutionInputs';
 import { NodeExecutionOutputs } from './NodeExecutionOutputs';
 import { NodeExecutionTaskDetails } from './NodeExecutionTaskDetails';
@@ -55,6 +61,9 @@ const useStyles = makeStyles((theme: Theme) => {
             marginTop: theme.spacing(2),
             paddingTop: theme.spacing(2)
         },
+        nodeTypeContent: {
+            minWidth: theme.spacing(9)
+        },
         nodeTypeLink: {
             fontWeight: 'normal'
         },
@@ -79,49 +88,44 @@ const tabIds = {
 const defaultTab = tabIds.executions;
 
 interface NodeExecutionDetailsProps {
-    execution: DetailedNodeExecution;
+    nodeExecutionId: NodeExecutionIdentifier;
     onClose?: () => void;
 }
 
 const NodeExecutionLinkContent: React.FC<{
-    execution: DetailedNodeExecution;
+    execution: NodeExecution;
 }> = ({ execution }) => {
     const commonStyles = useCommonStyles();
     const styles = useStyles();
-    useStyles();
-    if (execution.displayType === NodeExecutionDisplayType.Workflow) {
-        const { workflowNodeMetadata } = execution.closure;
-        if (!workflowNodeMetadata) {
-            return null;
-        }
-        const linkTarget: LocationDescriptor<LocationState> = {
-            pathname: Routes.ExecutionDetails.makeUrl(
-                workflowNodeMetadata.executionId
-            ),
-            state: {
-                backLink: Routes.ExecutionDetails.makeUrl(
-                    execution.id.executionId
-                )
-            }
-        };
-        return workflowNodeMetadata ? (
-            <RouterLink
-                className={classnames(
-                    commonStyles.primaryLink,
-                    styles.nodeTypeLink
-                )}
-                to={linkTarget}
-            >
-                View Sub-Workflow
-            </RouterLink>
-        ) : null;
+    const { workflowNodeMetadata } = execution.closure;
+    if (!workflowNodeMetadata) {
+        return null;
     }
-    return null;
+    const linkTarget: LocationDescriptor<LocationState> = {
+        pathname: Routes.ExecutionDetails.makeUrl(
+            workflowNodeMetadata.executionId
+        ),
+        state: {
+            backLink: Routes.ExecutionDetails.makeUrl(execution.id.executionId)
+        }
+    };
+    return (
+        <RouterLink
+            className={classnames(
+                commonStyles.primaryLink,
+                styles.nodeTypeLink
+            )}
+            to={linkTarget}
+        >
+            View Sub-Workflow
+        </RouterLink>
+    );
 };
 
 const ExecutionTypeDetails: React.FC<{
-    execution: DetailedNodeExecution;
-}> = ({ execution }) => {
+    details?: NodeExecutionDetails;
+    execution: NodeExecution;
+}> = ({ details, execution }) => {
     const styles = useStyles();
     const commonStyles = useCommonStyles();
     return (
@@ -131,7 +135,7 @@ const ExecutionTypeDetails: React.FC<{
                 styles.nodeTypeContainer
             )}
         >
-            <div>
+            <div className={styles.nodeTypeContent}>
                 <div
                     className={classnames(
                         commonStyles.microHeader,
@@ -140,37 +144,99 @@ const ExecutionTypeDetails: React.FC<{
                 >
                     Type
                 </div>
-                <div>{execution.displayType}</div>
+                <div>{details ? details.displayType : <Skeleton />}</div>
             </div>
             {<NodeExecutionLinkContent execution={execution} />}
         </div>
     );
 };
 
+const NodeExecutionTabs: React.FC<{
+    nodeExecution: NodeExecution;
+    taskTemplate?: TaskTemplate | null;
+}> = ({ nodeExecution, taskTemplate }) => {
+    const styles = useStyles();
+    const tabState = useTabState(tabIds, defaultTab);
+
+    let tabContent = null;
+    switch (tabState.value) {
+        case tabIds.executions: {
+            tabContent = <TaskExecutionsList nodeExecution={nodeExecution} />;
+            break;
+        }
+        case tabIds.inputs: {
+            tabContent = <NodeExecutionInputs execution={nodeExecution} />;
+            break;
+        }
+        case tabIds.outputs: {
+            tabContent = <NodeExecutionOutputs execution={nodeExecution} />;
+            break;
+        }
+        case tabIds.task: {
+            tabContent = taskTemplate ? (
+                <NodeExecutionTaskDetails taskTemplate={taskTemplate} />
+            ) : null;
+            break;
+        }
+    }
+    return (
+        <>
+            <Tabs {...tabState} className={styles.tabs}>
+                <Tab value={tabIds.executions} label="Executions" />
+                <Tab value={tabIds.inputs} label="Inputs" />
+                <Tab value={tabIds.outputs} label="Outputs" />
+                {!!taskTemplate && <Tab value={tabIds.task} label="Task" />}
+            </Tabs>
+            <div className={styles.content}>{tabContent}</div>
+        </>
+    );
+};
+
 /** DetailsPanel content which renders execution information about a given NodeExecution
  */
-export const NodeExecutionDetails: React.FC<NodeExecutionDetailsProps> = ({
-    execution,
+export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProps> = ({
+    nodeExecutionId,
     onClose
 }) => {
-    const tabState = useTabState(tabIds, defaultTab);
+    const nodeExecutionQuery = useQuery<NodeExecution, Error>({
+        ...makeNodeExecutionQuery(nodeExecutionId),
+        // The selected NodeExecution has been fetched at this point, we don't want to
+        // issue an additional fetch.
+        staleTime: Infinity
+    });
+
+    const nodeExecution = nodeExecutionQuery.data;
+
     const commonStyles = useCommonStyles();
     const styles = useStyles();
-    const showTaskDetails = !!execution.taskTemplate;
+    const detailsQuery = useNodeExecutionDetails(nodeExecution);
+    const displayId = detailsQuery.data ? detailsQuery.data.displayId : <Skeleton />;
+    const taskTemplate = detailsQuery.data
+        ? detailsQuery.data.taskTemplate
+        : null;
 
-    // Reset to default tab when we change executions
-    React.useEffect(() => {
-        tabState.onChange({}, defaultTab);
-    }, [execution.cacheKey]);
+    const statusContent = nodeExecution ? (
+        <ExecutionStatusBadge phase={nodeExecution.closure.phase} type="node" />
+    ) : null;
 
-    const statusContent = (
-        <ExecutionStatusBadge phase={execution.closure.phase} type="node" />
-    );
+    const detailsContent = nodeExecution ? (
+        <>
+            <NodeExecutionCacheStatus
+                taskNodeMetadata={nodeExecution.closure.taskNodeMetadata}
+            />
+            <ExecutionTypeDetails
+                details={detailsQuery.data}
+                execution={nodeExecution}
+            />
+        </>
+    ) : null;
 
-    // TODO: Switch based on node type
-    const executionDetailsContent = (
-        <TaskExecutionsList nodeExecution={execution} />
-    );
+    const tabsContent = nodeExecution ? (
+        <NodeExecutionTabs
+            nodeExecution={nodeExecution}
+            taskTemplate={taskTemplate}
+        />
+    ) : null;
 
     return (
         <section className={styles.container}>
@@ -183,7 +249,7 @@ export const NodeExecutionDetails: React.FC<NodeExecutionDetailsProps> = ({
                         )}
                         variant="h3"
                     >
-                        {execution.id.nodeId}
+                        {nodeExecutionId.nodeId}
                         <IconButton
                             className={styles.closeButton}
                             onClick={onClose}
@@ -200,34 +266,13 @@ export const NodeExecutionDetails: React.FC<NodeExecutionDetailsProps> = ({
                         variant="subtitle1"
                         color="textSecondary"
                     >
-                        {execution.displayId}
+                        {displayId}
                     </Typography>
                     {statusContent}
-                    <NodeExecutionCacheStatus
-                        taskNodeMetadata={execution.closure.taskNodeMetadata}
-                    />
-                    <ExecutionTypeDetails execution={execution} />
+                    {detailsContent}
                 </div>
             </header>
-            <Tabs {...tabState} className={styles.tabs}>
-                <Tab value={tabIds.executions} label="Executions" />
-                {execution && <Tab value={tabIds.inputs} label="Inputs" />}
-                {execution && <Tab value={tabIds.outputs} label="Outputs" />}
-                {showTaskDetails && <Tab value={tabIds.task} label="Task" />}
-            </Tabs>
-            <div className={styles.content}>
-                {tabState.value === tabIds.executions &&
-                    executionDetailsContent}
-                {tabState.value === tabIds.inputs && (
-                    <NodeExecutionInputs execution={execution} />
-                )}
-                {tabState.value === tabIds.outputs && (
-                    <NodeExecutionOutputs execution={execution} />
-                )}
-                {tabState.value === tabIds.task && (
-                    <NodeExecutionTaskDetails execution={execution} />
-                )}
-            </div>
+            {tabsContent}
         </section>
     );
 };

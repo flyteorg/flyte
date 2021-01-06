@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-export interface LaunchPlansTableProps extends ListProps<LaunchPlan> {}
+export type LaunchPlansTableProps = ListProps<LaunchPlan>
 export interface CellDataGetterParams extends TableCellDataGetterParams {
     rowData: LaunchPlan;
 }

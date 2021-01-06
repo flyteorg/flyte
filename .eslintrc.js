@@ -1,13 +1,27 @@
-// We are using eslint with the typescript parser plugin only to validate things
-// which are not supported in tslint, such as react hooks
 module.exports = {
-    parser: '@typescript-eslint/parser',
-    parserOptions: {
-        jsx: true,
-        sourceType: 'module'
+    root: true,
+    env: {
+        browser: true,
+        es6: true,
+        node: true
     },
-    plugins: ['react-hooks'],
+    parser: '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint', 'react-hooks', 'jest'],
+    extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:react-hooks/recommended',
+        'plugin:jest/recommended',
+        'prettier',
+        'prettier/@typescript-eslint'
+    ],
     rules: {
-        'react-hooks/rules-of-hooks': 'error'
+        'no-case-declarations': 'warn',
+        'jest/no-mocks-import': 'off',
+        'jest/valid-title': 'off',
+        '@typescript-eslint/no-var-requires': 'off',
+        '@typescript-eslint/ban-types': 'warn',
+        '@typescript-eslint/no-empty-function': 'warn',
+        '@typescript-eslint/explicit-module-boundary-types': 'off'
     }
 };

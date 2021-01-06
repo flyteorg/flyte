@@ -68,23 +68,23 @@ export const EntityDetails: React.FC<EntityDetailsProps> = ({ id }) => {
                 onClickLaunch={onLaunch}
             />
             <div className={styles.metadataContainer}>
-                {!!sections.description ? (
+                {sections.description ? (
                     <div className={styles.descriptionContainer}>
                         <EntityDescription id={id} />
                     </div>
                 ) : null}
-                {!!sections.schedules ? (
+                {sections.schedules ? (
                     <div className={styles.schedulesContainer}>
                         <EntitySchedules id={id} />
                     </div>
                 ) : null}
             </div>
-            {!!sections.executions ? (
+            {sections.executions ? (
                 <div className={styles.executionsContainer}>
                     <EntityExecutions id={id} />
                 </div>
             ) : null}
-            {!!sections.launch ? (
+            {sections.launch ? (
                 <Dialog
                     scroll="paper"
                     maxWidth="sm"

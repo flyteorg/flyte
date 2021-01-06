@@ -24,11 +24,11 @@ jest.mock('../timezone.ts', () => ({
 
 const invalidDates = ['abc', -200, 0];
 // Matches strings in the form 01/01/2000 01:01:00 PM  (5 minutes ago)
-const dateWithAgoRegex = /^[\w\/:\s]+ (AM|PM)\s+UTC\s+\([a\d] (minute|hour|day|second)s? ago\)$/;
+const dateWithAgoRegex = /^[\w/:\s]+ (AM|PM)\s+UTC\s+\([a\d] (minute|hour|day|second)s? ago\)$/;
 const dateFromNowRegex = /^[a\d] (minute|hour|day|second)s? ago$/;
-const dateRegex = /^[\w\/:\s]+ (AM|PM)/;
-const utcDateRegex = /^[\w\/:\s]+ (AM|PM) UTC/;
-const localDateRegex = /^[\w\/:\s]+ (AM|PM) (PDT|PST)/;
+const dateRegex = /^[\w/:\s]+ (AM|PM)/;
+const utcDateRegex = /^[\w/:\s]+ (AM|PM) UTC/;
+const localDateRegex = /^[\w/:\s]+ (AM|PM) (PDT|PST)/;
 
 describe('dateWithFromNow', () => {
     invalidDates.forEach(v =>

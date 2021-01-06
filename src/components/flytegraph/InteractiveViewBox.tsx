@@ -87,7 +87,7 @@ function scaleViewBox(viewBox: ViewBoxRect, scaleDelta: number): ViewBoxRect {
 
 class InteractiveViewBoxImpl extends React.Component<InteractiveViewBoxProps> {
     private viewBox: ViewBoxRect;
-    private updating: boolean = false;
+    private updating = false;
     private dragData: DragData = defaultDragData;
     private viewboxRef: React.RefObject<HTMLDivElement>;
 

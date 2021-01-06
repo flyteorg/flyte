@@ -1,16 +1,16 @@
 import { DumpJSON } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
 import { DataError } from 'components/Errors';
+import { TaskTemplate } from 'models';
 import * as React from 'react';
-import { DetailedNodeExecution } from '../types';
 
 /** Render the task template for a given NodeExecution */
 export const NodeExecutionTaskDetails: React.FC<{
-    execution: DetailedNodeExecution;
-}> = ({ execution }) => {
+    taskTemplate: TaskTemplate;
+}> = ({ taskTemplate }) => {
     const commonStyles = useCommonStyles();
-    const content = execution.taskTemplate ? (
-        <DumpJSON value={execution.taskTemplate} />
+    const content = taskTemplate ? (
+        <DumpJSON value={taskTemplate} />
     ) : (
         <DataError errorTitle="No task information found" />
     );

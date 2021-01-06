@@ -8,7 +8,7 @@ import { useFilterButtonState } from './useFilterButtonState';
 function serializeForQueryState(values: any[]) {
     return values.join(';');
 }
-function deserializeFromQueryState(stateValue: string = '') {
+function deserializeFromQueryState(stateValue = '') {
     return stateValue.split(';');
 }
 

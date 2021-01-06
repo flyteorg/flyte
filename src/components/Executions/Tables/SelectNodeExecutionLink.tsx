@@ -1,6 +1,6 @@
 import { Link } from '@material-ui/core';
+import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
-import { DetailedNodeExecution } from '../types';
 import { NodeExecutionsTableState } from './types';
 
 /** Renders a link that, when clicked, will trigger selection of the
@@ -8,11 +8,11 @@ import { NodeExecutionsTableState } from './types';
  */
 export const SelectNodeExecutionLink: React.FC<{
     className?: string;
-    execution: DetailedNodeExecution;
+    execution: NodeExecution;
     linkText: string;
     state: NodeExecutionsTableState;
 }> = ({ className, execution, linkText, state }) => {
-    const onClick = () => state.setSelectedExecution(execution);
+    const onClick = () => state.setSelectedExecution(execution.id);
     return (
         <Link
             className={className}

@@ -1,21 +1,16 @@
-import { Admin } from 'flyteidl';
-import { emptyProject } from 'models/__mocks__/projectData';
-import { getAdminEntity } from '../../AdminEntity/AdminEntity';
+import { emptyProject } from 'mocks/data/projects';
+import { mockServer } from 'mocks/server';
 import { listProjects } from '../api';
-jest.mock('../../AdminEntity/AdminEntity.ts');
-
-const mockGetAdminEntity = getAdminEntity as jest.Mock;
+import { Project } from '../types';
 
 describe('Project.api', () => {
-    let projects: Admin.Project[];
+    let projects: Project[];
     beforeEach(() => {
         projects = [
-            { ...emptyProject, id: 'projectb', name: 'B Project' },
-            { ...emptyProject, id: 'projecta', name: 'aproject' }
+            emptyProject('projectb', 'B Project'),
+            emptyProject('projecta', 'aproject')
         ];
-        mockGetAdminEntity.mockImplementation(({ transform }) =>
-            Promise.resolve(transform({ projects }))
-        );
+        mockServer.insertProjects(projects);
     });
     describe('listProjects', () => {
         it('sorts projects by case-insensitive name', async () => {

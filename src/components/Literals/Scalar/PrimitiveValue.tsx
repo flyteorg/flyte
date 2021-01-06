@@ -8,7 +8,7 @@ import { Primitive } from 'models';
 function primitiveToString(primitive: Primitive): string {
     switch (primitive.value) {
         case 'boolean':
-            return !!primitive.boolean ? 'true' : 'false';
+            return primitive.boolean ? 'true' : 'false';
         case 'datetime':
             return formatDateUTC(timestampToDate(primitive.datetime!));
         case 'duration':

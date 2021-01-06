@@ -18,6 +18,11 @@ export const terminalTaskExecutionStates: TaskExecutionPhase[] = [
     TaskExecutionPhase.SUCCEEDED
 ];
 
+export const runningExecutionStates: WorkflowExecutionPhase[] = [
+    WorkflowExecutionPhase.QUEUED,
+    WorkflowExecutionPhase.RUNNING
+];
+
 export const terminalExecutionStates: WorkflowExecutionPhase[] = [
     WorkflowExecutionPhase.ABORTED,
     WorkflowExecutionPhase.FAILED,

@@ -222,7 +222,7 @@ const WorkflowExecutionRow: React.FC<WorkflowExecutionRowProps> = ({
     );
 };
 
-export interface WorkflowExecutionsTableProps extends ListProps<Execution> {}
+export type WorkflowExecutionsTableProps = ListProps<Execution>
 
 /** Renders a table of WorkflowExecution records. Executions with errors will
  * have an expanadable container rendered as part of the table row.

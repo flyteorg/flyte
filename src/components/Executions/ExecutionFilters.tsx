@@ -27,6 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
+    const searchFilterState = filter as SearchFilterState;
     switch (filter.type) {
         case 'single':
             return <SingleSelectForm {...(filter as SingleFilterState<any>)} />;
@@ -35,8 +36,7 @@ const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
                 <MultiSelectForm {...(filter as MultiFilterState<any, any>)} />
             );
         case 'search':
-            const state = filter as SearchFilterState;
-            return <SearchInputForm {...state} defaultValue={state.value} />;
+            return <SearchInputForm {...searchFilterState} defaultValue={searchFilterState.value} />;
         default:
             return null;
     }

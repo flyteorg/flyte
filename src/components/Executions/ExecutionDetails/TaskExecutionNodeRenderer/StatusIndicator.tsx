@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-const statusSize: number = 11;
+const statusSize = 11;
 
 /** Renders an indicator for a node based on execution status */
 export const StatusIndicator: React.FC<{

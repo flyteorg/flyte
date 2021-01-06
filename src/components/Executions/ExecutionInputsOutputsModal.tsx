@@ -145,7 +145,7 @@ export const ExecutionInputsOutputsModal: React.FC<ExecutionInputsOutputsModalPr
             open={!!execution}
             onClose={onClose}
         >
-            {!!execution ? (
+            {execution ? (
                 <RenderDialog execution={execution} onClose={onClose} />
             ) : (
                 <div />

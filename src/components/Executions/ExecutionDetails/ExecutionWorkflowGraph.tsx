@@ -1,28 +1,34 @@
 import { DetailsPanel } from 'components/common';
+import { WaitForQuery } from 'components/common/WaitForQuery';
+import { makeWorkflowQuery } from 'components/Workflow/workflowQueries';
 import { WorkflowGraph } from 'components/WorkflowGraph';
 import { keyBy } from 'lodash';
-import { endNodeId, startNodeId } from 'models';
-import { Workflow } from 'models/Workflow';
+import { endNodeId, NodeExecution, startNodeId } from 'models';
+import { Workflow, WorkflowId } from 'models/Workflow';
 import * as React from 'react';
+import { useQuery, useQueryClient } from 'react-query';
 import { NodeExecutionsContext } from '../contexts';
-import { DetailedNodeExecution } from '../types';
-import { NodeExecutionDetails } from './NodeExecutionDetails';
+import { NodeExecutionDetailsPanelContent } from './NodeExecutionDetailsPanelContent';
 import { TaskExecutionNodeRenderer } from './TaskExecutionNodeRenderer/TaskExecutionNodeRenderer';
 
 export interface ExecutionWorkflowGraphProps {
-    nodeExecutions: DetailedNodeExecution[];
-    workflow: Workflow;
+    nodeExecutions: NodeExecution[];
+    workflowId: WorkflowId;
 }
 
 /** Wraps a WorkflowGraph, customizing it to also show execution statuses */
 export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
     nodeExecutions,
-    workflow
+    workflowId
 }) => {
+    const workflowQuery = useQuery<Workflow, Error>(
+        makeWorkflowQuery(useQueryClient(), workflowId)
+    );
     const nodeExecutionsById = React.useMemo(
         () => keyBy(nodeExecutions, 'id.nodeId'),
         [nodeExecutions]
     );
+
     const [selectedNodes, setSelectedNodes] = React.useState<string[]>([]);
     const onNodeSelectionChanged = (newSelection: string[]) => {
         const validSelection = newSelection.filter(nodeId => {
@@ -38,29 +44,35 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
         setSelectedNodes(validSelection);
     };
 
+    // Note: flytegraph allows multiple selection, but we only support showing
+    // a single item in the details panel
     const selectedExecution = selectedNodes.length
-        ? nodeExecutionsById[selectedNodes[0]]
+        ? nodeExecutionsById[selectedNodes[0]].id
         : null;
     const onCloseDetailsPanel = () => setSelectedNodes([]);
+
+    const renderGraph = (workflow: Workflow) => (
+        <WorkflowGraph
+            onNodeSelectionChanged={onNodeSelectionChanged}
+            nodeRenderer={TaskExecutionNodeRenderer}
+            selectedNodes={selectedNodes}
+            workflow={workflow}
+        />
+    );
 
     return (
         <>
             <NodeExecutionsContext.Provider value={nodeExecutionsById}>
-                <WorkflowGraph
-                    onNodeSelectionChanged={onNodeSelectionChanged}
-                    nodeRenderer={TaskExecutionNodeRenderer}
-                    selectedNodes={selectedNodes}
-                    workflow={workflow}
-                />
+                <WaitForQuery query={workflowQuery}>{renderGraph}</WaitForQuery>
             </NodeExecutionsContext.Provider>
             <DetailsPanel
                 open={selectedExecution !== null}
                 onClose={onCloseDetailsPanel}
             >
                 {selectedExecution && (
-                    <NodeExecutionDetails
+                    <NodeExecutionDetailsPanelContent
                         onClose={onCloseDetailsPanel}
-                        execution={selectedExecution}
+                        nodeExecutionId={selectedExecution}
                     />
                 )}
             </DetailsPanel>

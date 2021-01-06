@@ -45,7 +45,7 @@ const workflowId: (name: string, version: string) => Identifier = (
 export const createMockLaunchPlan: (
     name: string,
     version?: string
-) => LaunchPlan = (name: string, version: string = 'abcdefg') => ({
+) => LaunchPlan = (name: string, version = 'abcdefg') => ({
     id: workflowId(name, version),
     spec: createMockLaunchPlanSpec(),
     closure: cloneDeep(basicLaunchPlanClosure)

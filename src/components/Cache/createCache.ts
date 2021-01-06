@@ -1,12 +1,12 @@
 import { getCacheKey } from './utils';
 
-type EntityKey = object | string | Symbol;
+type EntityKey = object | string | symbol;
 interface HasIdObject {
     id: object;
 }
 
 function hasId(value: Object): value is HasIdObject {
-    return value.hasOwnProperty('id');
+    return {}.hasOwnProperty.call(value, ('id'));
 }
 
 /** A generic cache for any type of object or Array. Keys can be objects,

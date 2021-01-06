@@ -13,7 +13,9 @@ import {
     timestampToDate
 } from '../utils';
 
-jest.mock('common/env');
+jest.mock('common/env', () => ({
+    env: jest.requireActual('common/env').env
+}));
 
 import { Protobuf } from 'flyteidl';
 

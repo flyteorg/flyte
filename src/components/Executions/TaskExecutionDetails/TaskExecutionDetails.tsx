@@ -1,14 +1,10 @@
-import { WaitForData, withRouteParams } from 'components/common';
-import {
-    RefreshConfig,
-    useDataRefresher,
-    useTaskExecution
-} from 'components/hooks';
+import { LargeLoadingSpinner, withRouteParams } from 'components/common';
+import { WaitForQuery } from 'components/common/WaitForQuery';
+import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { TaskExecution, TaskExecutionIdentifier } from 'models';
 import * as React from 'react';
 import { executionRefreshIntervalMs } from '../constants';
-import { ExecutionDataCacheContext } from '../contexts';
-import { useExecutionDataCache } from '../useExecutionDataCache';
+import { makeTaskExecutionQuery } from '../taskExecutionQueries';
 import { taskExecutionIsTerminal } from '../utils';
 import { TaskExecutionDetailsAppBarContent } from './TaskExecutionDetailsAppBarContent';
 import { TaskExecutionNodes } from './TaskExecutionNodes';
@@ -25,11 +21,6 @@ export interface TaskExecutionDetailsRouteParams {
     taskVersion: string;
 }
 export type TaskExecutionDetailsProps = TaskExecutionDetailsRouteParams;
-
-const refreshConfig: RefreshConfig<TaskExecution> = {
-    interval: executionRefreshIntervalMs,
-    valueIsFinal: taskExecutionIsTerminal
-};
 
 function routeParamsToTaskExecutionId(
     params: TaskExecutionDetailsRouteParams
@@ -60,20 +51,28 @@ function routeParamsToTaskExecutionId(
 
 export const TaskExecutionDetailsContainer: React.FC<TaskExecutionDetailsProps> = props => {
     const taskExecutionId = routeParamsToTaskExecutionId(props);
-    const dataCache = useExecutionDataCache();
-    const taskExecution = useTaskExecution(taskExecutionId);
+    const taskExecutionQuery = useConditionalQuery(
+        {
+            ...makeTaskExecutionQuery(taskExecutionId),
+            refetchInterval: executionRefreshIntervalMs
+        },
+        execution => !taskExecutionIsTerminal(execution)
+    );
 
-    useDataRefresher(taskExecutionId, taskExecution, refreshConfig);
+    const renderContent = (taskExecution: TaskExecution) => (
+        <>
+            <TaskExecutionDetailsAppBarContent taskExecution={taskExecution} />
+            <TaskExecutionNodes taskExecution={taskExecution} />
+        </>
+    );
 
     return (
-        <WaitForData {...taskExecution}>
-            <TaskExecutionDetailsAppBarContent
-                taskExecution={taskExecution.value}
-            />
-            <ExecutionDataCacheContext.Provider value={dataCache}>
-                <TaskExecutionNodes taskExecution={taskExecution.value} />
-            </ExecutionDataCacheContext.Provider>
-        </WaitForData>
+        <WaitForQuery
+            loadingComponent={LargeLoadingSpinner}
+            query={taskExecutionQuery}
+        >
+            {renderContent}
+        </WaitForQuery>
     );
 };
 

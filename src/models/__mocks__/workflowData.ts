@@ -22,7 +22,7 @@ const workflowId: (name: string, version: string) => Identifier = (
 export const createMockWorkflow: (
     name: string,
     version?: string
-) => Workflow = (name: string, version: string = 'abcdefg') => ({
+) => Workflow = (name: string, version = 'abcdefg') => ({
     id: workflowId(name, version)
 });
 
