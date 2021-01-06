@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](http://github.com/lyft/flyteconsole/compare/v0.17.8...v0.18.0) (2021-01-06)
+
+
+### Features
+
+* improved data fetching for execution details page ([#131](http://github.com/lyft/flyteconsole/issues/131)) ([928f094](http://github.com/lyft/flyteconsole/commit/928f094bee6f84a34325eb1ab88c1ddf88d45541)), closes [#123](http://github.com/lyft/flyteconsole/issues/123) [#126](http://github.com/lyft/flyteconsole/issues/126) [#127](http://github.com/lyft/flyteconsole/issues/127) [#128](http://github.com/lyft/flyteconsole/issues/128) [#130](http://github.com/lyft/flyteconsole/issues/130)
+
 ## [0.17.8](http://github.com/lyft/flyteconsole/compare/v0.17.7...v0.17.8) (2020-12-02)
 
 
