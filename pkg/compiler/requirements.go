@@ -82,5 +82,9 @@ func updateNodeRequirements(node *flyteNode, subWfs common.WorkflowIndex, taskId
 		for _, otherCase := range branchN.IfElse.Other {
 			updateNodeRequirements(otherCase.ThenNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
 		}
+
+		if elseNode := branchN.IfElse.GetElseNode(); elseNode != nil {
+			updateNodeRequirements(elseNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+		}
 	}
 }
