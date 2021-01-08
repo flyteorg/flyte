@@ -18,6 +18,8 @@ Flytekit's typing engine.
 
 """
 import os
+import shutil
+import tempfile
 import typing
 
 # %%
@@ -41,9 +43,8 @@ class MyDataset(object):
 
     def __init__(self, base_dir: str = None):
         if base_dir is None:
-            self._base_dir = (
-                FlyteContext.current_context().user_space_params.working_directory
-            )
+            self._tmp_dir = tempfile.TemporaryDirectory()
+            self._base_dir = self._tmp_dir.name
             self._files = []
         else:
             self._base_dir = base_dir

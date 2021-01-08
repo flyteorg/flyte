@@ -23,7 +23,7 @@ import os
 import time
 
 from flytekit import task, workflow
-from flytekit.taskplugins.sidecar import Sidecar
+from flytekit.taskplugins.pod import Pod
 from k8s.io.api.core.v1 import generated_pb2
 from k8s.io.apimachinery.pkg.api.resource.generated_pb2 import Quantity
 
@@ -76,7 +76,7 @@ def generate_pod_spec_for_task():
 # you can still use flyte directives to specify resources and even the image. The default image built for
 # flyte tasks will get used unless you specify the `container_image` task attribute.
 @task(
-    task_config=Sidecar(
+    task_config=Pod(
         pod_spec=generate_pod_spec_for_task(), primary_container_name="primary"
     )
 )
@@ -93,3 +93,7 @@ def my_sidecar_task() -> str:
 def SidecarWorkflow() -> str:
     s = my_sidecar_task()
     return s
+
+
+if __name__ == "__main__":
+    pass

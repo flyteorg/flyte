@@ -39,10 +39,8 @@ from time import sleep
 
 from flytekit import task, workflow
 from flytekit.annotated import context_manager
-from flytekit.annotated.base_task import PythonTask
+from flytekit.annotated.base_task import PythonTask, TaskMetadata
 from flytekit.annotated.interface import Interface
-from flytekit.annotated.task import metadata
-from flytekit.models.task import TaskMetadata
 
 
 # %%
@@ -62,16 +60,17 @@ class WaitForObjectStoreFile(PythonTask):
     def __init__(
         self,
         name: str,
-        metadata: TaskMetadata,
         poll_interval: timedelta = timedelta(seconds=10),
+        **kwargs,
     ):
         super(WaitForObjectStoreFile, self).__init__(
             task_type="object-store-sensor",
             name=name,
+            task_config=None,
             interface=Interface(
                 inputs={self._VAR_NAME: str}, outputs={self._VAR_NAME: str}
             ),
-            metadata=metadata,
+            **kwargs,
         )
         self._poll_interval = poll_interval
 
@@ -114,7 +113,7 @@ class WaitForObjectStoreFile(PythonTask):
 
 sensor = WaitForObjectStoreFile(
     name="my-objectstore-sensor",
-    metadata=metadata(retries=10, timeout=timedelta(minutes=20)),
+    metadata=TaskMetadata(retries=10, timeout=timedelta(minutes=20)),
     poll_interval=timedelta(seconds=1),
 )
 

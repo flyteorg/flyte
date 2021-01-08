@@ -44,10 +44,17 @@ If you are just iterating locally, there is no need to push your Docker image. F
 If you would like to later push your image to a registry (Dockerhub, ECR, etc.), you can run,
 
 ```bash
-REGISTRY=docker.io/corp make docker_push
+REGISTRY=docker.io/corp make all_docker_push
 ```
 
 ## Additional Notes
 1. Follow instructions in the main Flyte documentation to set up a local Flyte cluster. All the commands in this book assume that you are using Docker Desktop. If you are using minikube or another K8s deployment, the commands will need to be modified.
 1. Please also ensure that you have a Python virtual environment installed and activated, and have pip installed the requirements.
 1. Use flyte-cli to create a project named `flytesnacks` (the name the Makefile is set up to use) if it's not already there.
+
+### Building the repo itself
+```bash
+make all_requirements
+```
+
+

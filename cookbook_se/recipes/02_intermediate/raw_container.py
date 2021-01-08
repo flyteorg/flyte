@@ -9,7 +9,7 @@ for the container to write all the data which will be stored away.
 The data is written as separate files, one per input variable. The format of the file is serialized strings.
 Refer to the raw protocol to understand how to leverage this
 """
-from flytekit import ContainerTask, kwtypes, metadata, workflow
+from flytekit import ContainerTask, kwtypes, workflow
 
 # %%
 # A :py:class:`flytekit.ContainerTask` denotes an arbitrary container. In the following example, the name of the task
@@ -22,7 +22,6 @@ from flytekit import ContainerTask, kwtypes, metadata, workflow
 # output variables
 square = ContainerTask(
     name="square",
-    metadata=metadata(),
     input_data_dir="/var/inputs",
     output_data_dir="/var/outputs",
     inputs=kwtypes(val=int),
@@ -38,7 +37,6 @@ square = ContainerTask(
 
 sum = ContainerTask(
     name="sum",
-    metadata=metadata(),
     input_data_dir="/var/flyte/inputs",
     output_data_dir="/var/flyte/outputs",
     inputs=kwtypes(x=int, y=int),

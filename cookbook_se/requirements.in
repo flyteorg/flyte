@@ -1,15 +1,6 @@
-flytekit[schema,sidecar,spark3]==0.16.0a1
-pytest
-statsd
-opencv-python
-k8s-proto>=0.0.2
-# TODO: Remove this - installing 1.28 (in Linux) for some reason is incredibly slow
-grpcio==1.27.2
-ipython
-jupyter
-xgboost
-joblib
-sklearn
-tabulate
-matplotlib
-dataclasses_json
+-r env/default/requirements.in
+-r env/opencv/requirements.in
+-r env/pytorch/requirements.in
+-r env/sagemaker/requirements.in
+-r env/spark/requirements.in
+-r env/xgboost-scikit/requirements.in

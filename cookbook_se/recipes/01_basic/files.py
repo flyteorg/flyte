@@ -15,15 +15,13 @@ import urllib.request
 import cv2
 import flytekit
 from flytekit import task, workflow
-from flytekit.types import FlyteFile
+from flytekit.types.file import FlyteFile
 
 # %%
 # Let's assume our mission here is pretty simple. We want to take each of these links, download the picture, rotate it
 # and return the file.
 default_images = [
     "https://upload.wikimedia.org/wikipedia/commons/a/a8/Fractal_pyramid.jpg",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Mandel_zoom_00_mandelbrot_set.jpg/"
-    "640px-Mandel_zoom_00_mandelbrot_set.jpg",
     "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Julian_fractal.jpg/256px-Julian_fractal.jpg",
 ]
 

@@ -13,10 +13,7 @@ RUN : \
 
 RUN : \
     && apt-get update \
-    && apt-get install -y python3.8 python3-pip python3-venv make build-essential libssl-dev curl vim
-
-# This is necessary for opencv to work
-RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev ffmpeg
+    && apt-get install -y python3.8 python3-pip python3-venv make build-essential libssl-dev curl vim wget
 
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip3 install awscli
@@ -26,7 +23,7 @@ RUN python3.8 -m venv ${VENV}
 RUN ${VENV}/bin/pip install wheel
 
 # Install Python dependencies
-COPY ./requirements.txt /root
+COPY ./env/spark/requirements.txt /root
 RUN ${VENV}/bin/pip install -r /root/requirements.txt
 RUN ${VENV}/bin/flytekit_install_spark3.sh
 # Adding Tini support for the spark pods
@@ -40,8 +37,6 @@ ENV SPARK_VERSION 2.4.0
 ENV PYSPARK_PYTHON ${VENV}/bin/python3
 ENV PYSPARK_DRIVER_PYTHON ${VENV}/bin/python3
 
-# TODO delete this once we are using the alpha
-RUN ${VENV}/bin/pip install -U https://github.com/lyft/flytekit/archive/2511acb9fb5252aaf7acf3a8b4f293d7b4c5b4aa.zip#egg=flytekit[sidecar,schema]
 # Copy the actual code
 COPY . /root
 

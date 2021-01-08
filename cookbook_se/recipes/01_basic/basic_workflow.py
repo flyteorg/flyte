@@ -18,7 +18,7 @@ behind workflows for additional information.
 """
 import typing
 
-from flytekit import LaunchPlan, task, workflow
+from flytekit import task, workflow
 
 
 @task

@@ -10,7 +10,7 @@ from flytekit import kwtypes, task, workflow
 
 # %%
 # Flytekit consists of some pre-built type extenstions, one of them is the FlyteSchema type
-from flytekit.types import FlyteSchema
+from flytekit.types.schema import FlyteSchema
 
 # %%
 # FlyteSchema is an abstract Schema type that can be used to represent any structured dataset which has typed

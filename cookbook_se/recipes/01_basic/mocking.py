@@ -13,10 +13,8 @@ of utilities to help navigate this.
 import datetime
 
 import pandas
-from flytekit import SQLTask, kwtypes
-from flytekit.annotated.task import metadata, task
+from flytekit import task, workflow, SQLTask, kwtypes, TaskMetadata
 from flytekit.annotated.testing import task_mock, patch
-from flytekit.annotated.workflow import workflow
 from flytekit.types.schema import FlyteSchema
 
 # %%
@@ -27,7 +25,7 @@ sql = SQLTask(
     query_template="SELECT * FROM hive.city.fact_airport_sessions WHERE ds = '{{ .Inputs.ds }}' LIMIT 10",
     inputs=kwtypes(ds=datetime.datetime),
     outputs=kwtypes(results=FlyteSchema),
-    metadata=metadata(retries=2),
+    metadata=TaskMetadata(retries=2),
 )
 
 

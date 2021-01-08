@@ -11,7 +11,7 @@ import flytekit
 import pandas
 from flytekit import task, workflow, kwtypes
 from flytekit.taskplugins.spark import Spark
-from flytekit.types import FlyteSchema
+from flytekit.types.schema import FlyteSchema
 
 # %%
 # .. _df_my_schema_definition:

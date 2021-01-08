@@ -33,7 +33,7 @@ from flytekit import task, workflow
 @dataclass
 class Datum(object):
     """
-
+    Example of a simple custom class that is modeled as a dataclass
     """
 
     x: int
