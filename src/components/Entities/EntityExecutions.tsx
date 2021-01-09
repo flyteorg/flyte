@@ -3,9 +3,10 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
 import { WaitForData } from 'components/common';
 import { ExecutionFilters } from 'components/Executions/ExecutionFilters';
-import { useWorkflowExecutionFiltersState as useExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
+import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
 import { WorkflowExecutionsTable as ExecutionsTable } from 'components/Executions/Tables/WorkflowExecutionsTable';
 import { useWorkflowExecutions as useExecutions } from 'components/hooks';
+import { isLoadingState } from 'components/hooks/fetchMachine';
 import { ResourceIdentifier } from 'models';
 import { SortDirection } from 'models/AdminEntity';
 import { executionSortFields } from 'models/Execution';
@@ -30,7 +31,7 @@ export interface EntityExecutionsProps {
 export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
     const { domain, project, resourceType } = id;
     const styles = useStyles();
-    const filtersState = useExecutionFiltersState();
+    const filtersState = useWorkflowExecutionFiltersState();
     const sort = {
         key: executionSortFields.createdAt,
         direction: SortDirection.DESCENDING
@@ -58,7 +59,7 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
                 <ExecutionFilters {...filtersState} />
             </div>
             <WaitForData {...executions}>
-                <ExecutionsTable {...executions} />
+                <ExecutionsTable {...executions} isFetching={isLoadingState(executions.state)} />
             </WaitForData>
         </>
     );

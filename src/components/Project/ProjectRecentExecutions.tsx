@@ -2,6 +2,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { SectionHeader, WaitForData } from 'components/common';
 import { WorkflowExecutionsTable } from 'components/Executions/Tables/WorkflowExecutionsTable';
 import { useWorkflowExecutions } from 'components/hooks';
+import { isLoadingState } from 'components/hooks/fetchMachine';
 import { SortDirection } from 'models/AdminEntity';
 import { executionSortFields } from 'models/Execution';
 import * as React from 'react';
@@ -44,6 +45,7 @@ export const ProjectRecentExecutions: React.FC<ProjectRecentExecutionsProps> = (
                 <WaitForData {...executions}>
                     <WorkflowExecutionsTable
                         {...executions}
+                        isFetching={isLoadingState(executions.state)}
                         // This is a simple quick-glance list, we don't want to
                         // do pagination here
                         moreItemsAvailable={false}

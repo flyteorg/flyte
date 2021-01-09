@@ -6,6 +6,7 @@ import { Project } from 'models';
 import * as React from 'react';
 import { Redirect, Route, Switch } from 'react-router';
 import { Routes } from 'routes';
+import { ProjectExecutions } from './ProjectExecutions';
 import { ProjectTasks } from './ProjectTasks';
 import { ProjectWorkflows } from './ProjectWorkflows';
 
@@ -24,13 +25,14 @@ export interface ProjectDetailsRouteParams {
 export type ProjectDetailsProps = ProjectDetailsRouteParams;
 
 const entityTypeToComponent = {
+    executions: ProjectExecutions,
     tasks: ProjectTasks,
     workflows: ProjectWorkflows
 };
 
 const ProjectEntitiesByDomain: React.FC<{
     project: Project;
-    entityType: 'tasks' | 'workflows';
+    entityType: 'executions' | 'tasks' | 'workflows';
 }> = ({ entityType, project }) => {
     const styles = useStyles();
     const { params, setQueryState } = useQueryState<{ domain: string }>();
@@ -38,7 +40,7 @@ const ProjectEntitiesByDomain: React.FC<{
         throw new Error('No domains exist for this project');
     }
     const domainId = params.domain || project.domains[0].id;
-    const handleTabChange = (event: React.ChangeEvent<{}>, tabId: string) =>
+    const handleTabChange = (_event: React.ChangeEvent<unknown>, tabId: string) =>
         setQueryState({
             domain: tabId
         });
@@ -63,6 +65,10 @@ const ProjectEntitiesByDomain: React.FC<{
         </>
     );
 };
+
+const ProjectExecutionsByDomain: React.FC<{ project: Project}> = ({
+    project
+}) => <ProjectEntitiesByDomain project={project} entityType="executions" />;
 
 const ProjectWorkflowsByDomain: React.FC<{ project: Project }> = ({
     project
@@ -89,6 +95,9 @@ export const ProjectDetailsContainer: React.FC<ProjectDetailsRouteParams> = ({
                         </Route>
                         <Route path={Routes.ProjectDetails.sections.tasks.path}>
                             <ProjectTasksByDomain project={project.value} />
+                        </Route>
+                        <Route path={Routes.ProjectDetails.sections.executions.path}>
+                            <ProjectExecutionsByDomain project={project.value} />
                         </Route>
                         <Redirect
                             to={Routes.ProjectDetails.sections.workflows.makeUrl(

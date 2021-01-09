@@ -1,11 +1,10 @@
-import * as React from 'react';
-
 import { SectionHeader, WaitForData, withRouteParams } from 'components/common';
 import { useLaunchPlans } from 'components/hooks';
+import { isLoadingState } from 'components/hooks/fetchMachine';
 import { SchedulesTable } from 'components/Launch/SchedulesTable';
-
 import { SortDirection } from 'models/AdminEntity';
 import { launchSortFields } from 'models/Launch';
+import * as React from 'react';
 
 export interface ProjectSchedulesRouteParams {
     projectId: string;
@@ -30,7 +29,10 @@ export const ProjectSchedulesContainer: React.FC<ProjectSchedulesRouteParams> = 
         <>
             <SectionHeader title="Schedules" />
             <WaitForData {...launchPlans}>
-                <SchedulesTable {...launchPlans} />
+                <SchedulesTable
+                    {...launchPlans}
+                    isFetching={isLoadingState(launchPlans.state)}
+                />
             </WaitForData>
         </>
     );

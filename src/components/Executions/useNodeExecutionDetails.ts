@@ -1,5 +1,5 @@
 import { log } from 'common/log';
-import { QueryType } from 'components/data/queries';
+import { QueryType } from 'components/data/types';
 import { fetchTaskTemplate } from 'components/Task/taskQueries';
 import { fetchWorkflow } from 'components/Workflow/workflowQueries';
 import {

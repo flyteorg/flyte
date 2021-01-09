@@ -1,4 +1,3 @@
-import { FetchableState } from 'components/hooks/types';
 import { ScrollbarPresenceParams } from 'react-virtualized';
 
 export interface ListProps<T> {
@@ -7,7 +6,7 @@ export interface ListProps<T> {
     height?: number;
     value: T[];
     lastError: string | Error | null;
-    state: FetchableState<T[]>;
+    isFetching: boolean;
     moreItemsAvailable: boolean;
     onScrollbarPresenceChange?: (params: ScrollbarPresenceParams) => any;
     width?: number;

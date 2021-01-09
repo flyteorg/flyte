@@ -1,5 +1,5 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { QueryType } from 'components/data/queries';
+import { QueryType } from 'components/data/types';
 import { waitForQueryState } from 'components/data/queryUtils';
 import { Execution } from 'models';
 import { useContext, useState } from 'react';

@@ -1,6 +1,7 @@
 import { Admin } from 'flyteidl';
 import {
     adminApiUrl,
+    DomainIdentifierScope,
     EncodableType,
     encodeProtoPayload,
     Execution,
@@ -34,6 +35,19 @@ function isValidIdentifier(id: Partial<Identifier>): id is Identifier {
 
 function nodeExecutionListQueryParams(params: QueryParamsMap): QueryParamsMap {
     return { limit: `${limits.NONE}`, ...params };
+}
+
+function workflowExecutionListQueryParams(
+    params: QueryParamsMap
+): QueryParamsMap {
+    const finalParams: QueryParamsMap = { limit: `${limits.DEFAULT}` };
+    if (params.token && params.token.length) {
+        finalParams.token = params.token;
+    }
+    if (params.filters && params.filters.length) {
+        finalParams.filters = params.filters;
+    }
+    return finalParams;
 }
 
 function makeFullIdentifier(
@@ -81,7 +95,6 @@ function protobufResponse<T>(
 function getItemKey(id: unknown) {
     return stableStringify(id);
 }
-
 
 function getItem<ItemType>(store: Map<string, unknown>, id: unknown): ItemType {
     const item = store.get(getItemKey(id));
@@ -199,6 +212,15 @@ export interface AdminServer {
     insertWorkflow(data: RequireIdField<Partial<Workflow>>): void;
     /** Inserts a single `Execution` record. */
     insertWorkflowExecution(data: RequireIdField<Partial<Execution>>): void;
+    /** Inserts a list of `Execution` records.
+     * Note: Does not insert single `Execution` records. Those must be inserted
+     * separately.
+     */
+    insertWorkflowExecutionList(
+        scope: DomainIdentifierScope,
+        data: RequireIdField<Partial<Execution>>[] | RequestError,
+        query?: Record<string, string>
+    ): void;
     /** Debug utility which dumps the contents of the backing store. */
     printEntities(): void;
 }
@@ -217,6 +239,7 @@ enum EntityType {
     Workflow = 'workflow',
     Task = 'task',
     WorkflowExecution = 'workflowExecution',
+    WorkflowExecutionList = 'workflowExecutionList',
     NodeExecution = 'nodeExecution',
     NodeExecutionList = 'nodeExecutionList',
     TaskExecution = 'taskExecution',
@@ -305,6 +328,30 @@ export function createAdminServer(): CreateAdminServerResult {
             return { projects: data.map(Admin.Project.create) };
         },
         responseEncoder: Admin.Projects
+    });
+
+    const getWorkflowExecutionListHandler = adminEntityHandler({
+        path: '/executions/:project/:domain',
+        getDataForRequest: req => {
+            const { domain, project } = req.params;
+            const scope: DomainIdentifierScope = { domain, project };
+            const data = getItem<WorkflowExecutionIdentifier[]>(entityMap, [
+                EntityType.WorkflowExecutionList,
+                scope,
+                workflowExecutionListQueryParams(getQueryParams(req))
+            ]);
+            return {
+                executions: data.map(executionId =>
+                    Admin.Execution.create(
+                        getItem(entityMap, [
+                            EntityType.WorkflowExecution,
+                            executionId
+                        ])
+                    )
+                )
+            };
+        },
+        responseEncoder: Admin.ExecutionList
     });
 
     const getWorkflowExecutionHandler = adminEntityHandler({
@@ -436,6 +483,7 @@ export function createAdminServer(): CreateAdminServerResult {
             getProjectListHandler,
             getWorkflowHandler,
             getTaskHandler,
+            getWorkflowExecutionListHandler,
             getWorkflowExecutionHandler,
             getNodeExecutionHandler,
             getNodeExecutionListHandler,
@@ -473,6 +521,22 @@ export function createAdminServer(): CreateAdminServerResult {
                     [EntityType.WorkflowExecution, execution.id],
                     execution
                 ),
+            insertWorkflowExecutionList: (
+                scope,
+                data,
+                query: QueryParamsMap = {}
+            ) =>
+                insertItem(
+                    entityMap,
+                    [
+                        EntityType.WorkflowExecutionList,
+                        scope,
+                        workflowExecutionListQueryParams(query)
+                    ],
+                    data instanceof RequestError
+                        ? data
+                        : data.map(({ id }) => id)
+                ),
             insertNodeExecution: execution =>
                 insertItem(
                     entityMap,
@@ -491,7 +555,9 @@ export function createAdminServer(): CreateAdminServerResult {
                         parentExecutionId,
                         nodeExecutionListQueryParams(query)
                     ],
-                    data instanceof RequestError ? data : data.map(({ id }) => id)
+                    data instanceof RequestError
+                        ? data
+                        : data.map(({ id }) => id)
                 ),
             insertTaskExecution: execution =>
                 insertItem(

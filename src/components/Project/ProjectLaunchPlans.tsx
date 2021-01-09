@@ -1,11 +1,10 @@
-import * as React from 'react';
-
 import { SectionHeader, WaitForData, withRouteParams } from 'components/common';
 import { useLaunchPlans } from 'components/hooks';
+import { isLoadingState } from 'components/hooks/fetchMachine';
 import { LaunchPlansTable } from 'components/Launch/LaunchPlansTable';
-
 import { SortDirection } from 'models/AdminEntity';
 import { launchSortFields } from 'models/Launch';
+import * as React from 'react';
 
 export interface ProjectLaunchPlansRouteParams {
     projectId: string;
@@ -31,7 +30,10 @@ export const ProjectLaunchPlansContainer: React.FC<ProjectLaunchPlansRouteParams
         <>
             <SectionHeader title="Launch Plans" />
             <WaitForData {...launchPlans}>
-                <LaunchPlansTable {...launchPlans} />
+                <LaunchPlansTable
+                    {...launchPlans}
+                    isFetching={isLoadingState(launchPlans.state)}
+                />
             </WaitForData>
         </>
     );

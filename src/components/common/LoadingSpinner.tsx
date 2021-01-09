@@ -1,10 +1,9 @@
-import * as classnames from 'classnames';
-import * as React from 'react';
-
 import { CircularProgress } from '@material-ui/core';
-
 import { makeStyles } from '@material-ui/core/styles';
+import * as classnames from 'classnames';
 import { useDelayedValue } from 'components/hooks/useDelayedValue';
+import * as React from 'react';
+import { loadingSpinnerDelayMs } from './constants';
 
 const useStyles = makeStyles({
     container: {
@@ -33,7 +32,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
     size = 'large'
 }) => {
     const styles = useStyles();
-    const shouldRender = useDelayedValue(false, 1000, true);
+    const shouldRender = useDelayedValue(false, loadingSpinnerDelayMs, true);
     return shouldRender ? (
         <div
             className={classnames(styles.container, size)}

@@ -4,6 +4,10 @@ import {
     NodeExecutionIdentifier
 } from 'models/Execution';
 
+export interface WorkflowExecutionsTableState {
+    selectedIOExecution: Execution | null;
+    setSelectedIOExecution(execution: Execution | null): void;
+}
 export interface NodeExecutionsTableState {
     selectedExecution?: NodeExecutionIdentifier | null;
     setSelectedExecution: (
@@ -11,7 +15,6 @@ export interface NodeExecutionsTableState {
     ) => void;
 }
 
-type LabelFn = () => JSX.Element;
 export interface ColumnDefinition<CellRendererData> {
     cellRenderer(data: CellRendererData): React.ReactNode;
     className?: string;
@@ -29,7 +32,7 @@ export type NodeExecutionColumnDefinition = ColumnDefinition<
 
 export interface WorkflowExecutionCellRendererData {
     execution: Execution;
-    state: NodeExecutionsTableState;
+    state: WorkflowExecutionsTableState;
 }
 export type WorkflowExecutionColumnDefinition = ColumnDefinition<
     WorkflowExecutionCellRendererData

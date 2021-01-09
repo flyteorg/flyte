@@ -73,7 +73,7 @@ const DataListImplComponent: React.RefForwardingComponent<
         height,
         value: items,
         lastError,
-        state,
+        isFetching,
         moreItemsAvailable,
         onScrollbarPresenceChange,
         noRowsContent: NoRowsContent = 'No items found.',
@@ -145,7 +145,7 @@ const DataListImplComponent: React.RefForwardingComponent<
             content = (
                 <LoadMoreRowContent
                     loadMoreRows={loadMoreRows}
-                    state={state}
+                    isFetching={isFetching}
                     lastError={lastError}
                     style={style}
                 />

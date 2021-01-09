@@ -31,6 +31,14 @@ export class Routes {
             makeProjectBoundPath(project, section ? `/${section}` : ''),
         path: projectBasePath,
         sections: {
+            executions: {
+                makeUrl: (project: string, domain?: string) =>
+                    makeProjectBoundPath(
+                        project,
+                        `/executions${domain ? `?domain=${domain}` : ''}`
+                    ),
+                path: `${projectBasePath}/executions`
+            },
             tasks: {
                 makeUrl: (project: string, domain?: string) =>
                     makeProjectBoundPath(

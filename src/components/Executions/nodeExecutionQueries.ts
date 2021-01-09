@@ -1,5 +1,4 @@
-import { QueryType } from 'components/data/queries';
-import { QueryInput } from 'components/data/types';
+import { QueryInput, QueryType } from 'components/data/types';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { isEqual } from 'lodash';
 import {

@@ -8,7 +8,7 @@ import {
     tableHeaderColor,
     tablePlaceholderColor
 } from 'components/Theme';
-import { nodeExecutionsTableColumnWidths } from './constants';
+import { nodeExecutionsTableColumnWidths, workflowExecutionsTableColumnWidths } from './constants';
 
 export const selectedClassName = 'selected';
 
@@ -152,5 +152,36 @@ export const useColumnStyles = makeStyles((theme: Theme) => ({
     },
     selectedExecutionName: {
         fontWeight: 'bold'
+    }
+}));
+
+/** Style overrides specific to columns in `WorkflowExecutionsTable`. */
+export const useWorkflowExecutionsColumnStyles = makeStyles((theme: Theme) => ({
+    cellName: {
+        paddingLeft: theme.spacing(1)
+    },
+    columnName: {
+        flexBasis: workflowExecutionsTableColumnWidths.name,
+        whiteSpace: 'normal'
+    },
+    columnLastRun: {
+        flexBasis: workflowExecutionsTableColumnWidths.lastRun
+    },
+    columnStatus: {
+        flexBasis: workflowExecutionsTableColumnWidths.phase
+    },
+    columnStartedAt: {
+        flexBasis: workflowExecutionsTableColumnWidths.startedAt
+    },
+    columnDuration: {
+        flexBasis: workflowExecutionsTableColumnWidths.duration,
+        textAlign: 'right'
+    },
+    columnInputsOutputs: {
+        flexGrow: 1,
+        flexBasis: workflowExecutionsTableColumnWidths.inputsOutputs,
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        textAlign: 'left'
     }
 }));

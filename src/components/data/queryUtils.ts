@@ -1,5 +1,6 @@
 import { log } from 'common/log';
 import { QueryClient, QueryFunction, QueryKey } from 'react-query';
+import { InfiniteQueryInput, InfiniteQueryPage } from './types';
 
 const defaultRefetchInterval = 1000;
 const defaultTimeout = 30000;
@@ -48,4 +49,17 @@ export async function waitForQueryState<TResult>({
         setTimeout(() => reject(new Error('Timed Out')), timeout);
     });
     return Promise.race([queryWaitPromise, timeoutPromise]);
+}
+
+function getNextPageParam<T>({ token }: InfiniteQueryPage<T>) {
+    // An empty token will cause pagination code to think there are more results.
+    // Only return a defined value if it is a non-zero-length string.
+    return token != null && token.length > 0 ? token : undefined;
+}
+
+/** Composes a `queryOptions` object with generic options which make our API responses
+ * compatible with `useInfiniteQuery`
+ */
+export function createPaginationQuery<T>(queryOptions: InfiniteQueryInput<T>) {
+    return { ...queryOptions, getNextPageParam };
 }

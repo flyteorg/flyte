@@ -3,6 +3,7 @@ import { SvgIconProps } from '@material-ui/core/SvgIcon';
 import ChevronRight from '@material-ui/icons/ChevronRight';
 import DeviceHub from '@material-ui/icons/DeviceHub';
 import LinearScale from '@material-ui/icons/LinearScale';
+import TrendingFlat from '@material-ui/icons/TrendingFlat';
 import * as classnames from 'classnames';
 import { withRouteParams } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
@@ -103,6 +104,23 @@ const ProjectNavigationImpl: React.FC<ProjectNavigationRouteParams> = ({
                 domainId
             ),
             text: 'Tasks'
+        },
+        {
+            icon: TrendingFlat,
+            isActive: (match, location) => {
+                const finalMatch = match
+                    ? match
+                    : matchPath(location.pathname, {
+                          path: Routes.ProjectExecutions.path,
+                          exact: false
+                      });
+                return !!finalMatch;
+            },
+            path: Routes.ProjectDetails.sections.executions.makeUrl(
+                project.value.id,
+                domainId
+            ),
+            text: 'Executions'
         }
     ];
 
