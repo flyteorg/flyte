@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0](http://github.com/lyft/flyteconsole/compare/v0.18.0...v0.19.0) (2021-01-09)
+
+
+### Features
+
+* adds project-level executions view ([#135](http://github.com/lyft/flyteconsole/issues/135)) ([d8daf6c](http://github.com/lyft/flyteconsole/commit/d8daf6c503810ffc06976c399ddf35e982c0f2e9))
+
 # [0.18.0](http://github.com/lyft/flyteconsole/compare/v0.17.8...v0.18.0) (2021-01-06)
 
 
