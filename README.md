@@ -28,7 +28,7 @@ python, making it perfect for modern Machine Learning and Data processing pipeli
 Resources that would help you get a better understanding of Flyte.
 
 # Communication channels
-- [Slack Org](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
+- [Slack Org](https://forms.gle/UVuek9WfBoweiqcJA)
 - [Email list](https://groups.google.com/a/flyte.org/g/users)
 
 # Biweekly Community Sync
