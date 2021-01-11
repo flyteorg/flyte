@@ -916,7 +916,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.4
+        app.kubernetes.io/version: 0.3.29
     spec:
       containers:
       - command:
@@ -925,7 +925,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/lyft/flyteadmin:v0.3.26
+        image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -971,7 +971,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/flyteadmin:v0.3.26
+        image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -989,7 +989,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: ghcr.io/lyft/flyteadmin:v0.3.26
+        image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -1004,7 +1004,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/lyft/flyteadmin:v0.3.26
+        image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1067,7 +1067,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/lyft/flytepropeller:v0.5.8
+        image: ghcr.io/lyft/flytepropeller:v0.5.13
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:

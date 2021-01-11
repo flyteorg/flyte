@@ -63,11 +63,11 @@ configMapGenerator:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.3.26 # override the tag
+    newTag: v0.3.29 # override the tag
     newName: ghcr.io/lyft/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v0.17.8 # override the tag
+    newTag: v0.19.0# override the tag
     newName: ghcr.io/lyft/flyteconsole # override the namep 
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
@@ -75,5 +75,5 @@ images:
     newName: ghcr.io/lyft/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.5.8 # override the tag
+    newTag: v0.5.13 # override the tag
     newName: ghcr.io/lyft/flytepropeller # override the name
