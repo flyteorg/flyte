@@ -8,9 +8,9 @@
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
 ![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/10?style=plastic)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
-[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://forms.gle/UVuek9WfBoweiqcJA)
 
-Flyte is a container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for Python and Java.
+Flyte is a container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for Python, Java and Scala.
 
 # Homepage
 - [flyte.org](https://flyte.org)
@@ -28,7 +28,7 @@ python, making it perfect for modern Machine Learning and Data processing pipeli
 Resources that would help you get a better understanding of Flyte.
 
 # Communication channels
-- [Slack Org](https://docs.google.com/forms/d/e/1FAIpQLSf8bNuyhy7rkm77cOXPHIzCm3ApfL7Tdo7NUs6Ej2NOGQ1PYw/viewform?pli=1)
+- [Slack Org](https://forms.gle/UVuek9WfBoweiqcJA)
 - [Email list](https://groups.google.com/a/flyte.org/g/users)
 
 # Biweekly Community Sync
