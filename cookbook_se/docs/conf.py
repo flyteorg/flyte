@@ -12,7 +12,9 @@
 #
 import os
 import sys
-from sphinx_gallery.sorting import ExampleTitleSortKey
+import logging
+from sphinx_gallery.sorting import FileNameSortKey
+from sphinx_gallery.sorting import ExplicitOrder
 
 sys.path.insert(0, os.path.abspath("../"))
 
@@ -24,6 +26,62 @@ author = "Flyte"
 
 # The full version, including alpha/beta/rc tags
 release = "0.16.0"
+
+
+class CustomSorter(FileNameSortKey):
+    """
+    Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
+    """
+
+    CUSTOM_FILE_SORT_ORDER = [
+        # Basic
+        "task.py",
+        "basic_workflow.py",
+        "lp.py",
+        "task_cache.py",
+        "files.py",
+        "folders.py",
+        "mocking.py",
+        "graphviz.py",
+        "diabetes.py",
+        # Intermediate
+        "schema.py",
+        "typed_schema.py",
+        "subworkflows.py",
+        "dataframe_passing.py",
+        "dynamics.py",
+        "hive.py",
+        "pyspark_pi.py",
+        "custom_objects.py",
+        "run_conditions.py",
+        "raw_container.py",
+        "sidecar.py",
+        # Advanced
+        "custom_task_plugin.py",
+        "run_custom_types.py",
+        # Remote Flyte
+        "multi_images.py",
+        "customizing_resources.py",
+        "lp_schedules.py",
+        "lp_notifications.py",
+        # Native Plugins
+        "pytorch_mnist.py",
+        # AWS Plugins
+        "sagemaker_builtin_algo_training.py",
+        "sagemaker_custom_training.py",
+    ]
+
+    def __call__(self, filename):
+        src_file = os.path.normpath(os.path.join(self.src_dir, filename))
+        if filename in self.CUSTOM_FILE_SORT_ORDER:
+            return f"{self.CUSTOM_FILE_SORT_ORDER.index(filename):03d}"
+        else:
+            logging.warning(
+                f"File {filename} not found in static ordering list, temporarily adding to the end"
+            )
+            self.CUSTOM_FILE_SORT_ORDER.append(src_file)
+            return f"{len(self.CUSTOM_FILE_SORT_ORDER)-1:03d}"
+
 
 # -- General configuration ---------------------------------------------------
 
@@ -93,8 +151,18 @@ min_reported_time = 0
 sphinx_gallery_conf = {
     "examples_dirs": examples_dirs,
     "gallery_dirs": gallery_dirs,
+    "subsection_order": ExplicitOrder(
+        [
+            "../recipes/basic",
+            "../recipes/intermediate",
+            "../recipes/advanced",
+            "../recipes/remote_flyte",
+            "../recipes/native_plugins",
+            "../recipes/aws_plugins",
+        ]
+    ),
     # specify the order of examples to be according to filename
-    "within_subsection_order": ExampleTitleSortKey,
+    "within_subsection_order": CustomSorter,
     "min_reported_time": min_reported_time,
     "filename_pattern": "/run_",
     "capture_repr": (),
