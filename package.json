@@ -11,7 +11,6 @@
     "build:prod": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' NODE_ENV=production webpack --config webpack.config.ts --mode=production",
     "build": "TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\"}' webpack --config webpack.config.ts --mode=development",
     "clean": "rm -rf dist",
-    "codecov": "codecov -f .coverage/coverage-final.json",
     "lint": "eslint . --ext .js,.ts,.tsx",
     "lint-fix": "eslint . --ext .js,.ts,.tsx --fix",
     "mockApi": "node ./mockApi",

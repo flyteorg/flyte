@@ -9,10 +9,6 @@ update_boilerplate:
 install: #installs dependencies
 	yarn
 
-.PHONY: install_ci
-install_ci: install
-	yarn add codecov
-
 .PHONY: lint
 lint: #lints the package for common code smells
 	yarn run lint
@@ -40,4 +36,4 @@ clean:
 # submits the coverage to codecov.io
 .PHONY: test_unit_codecov
 test_unit_codecov:
-	yarn run test-coverage && yarn run codecov
+	yarn run test-coverage
