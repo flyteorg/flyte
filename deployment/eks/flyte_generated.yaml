@@ -8689,7 +8689,7 @@ spec:
       labels:
         app: flyteconsole
         app.kubernetes.io/name: flyteconsole
-        app.kubernetes.io/version: 0.11.0
+        app.kubernetes.io/version: 0.19.0
     spec:
       containers:
       - envFrom:
@@ -8726,7 +8726,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.3.12
+        app.kubernetes.io/version: 0.5.13
     spec:
       containers:
       - args:

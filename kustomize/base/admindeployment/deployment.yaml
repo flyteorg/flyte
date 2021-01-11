@@ -37,7 +37,7 @@ spec:
           secretName: db-pass
       initContainers:
       - name: run-migrations
-        image: flyteadmin:v0.3.5
+        image: flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "migrate", "run"]
         volumeMounts:
@@ -47,7 +47,7 @@ spec:
           mountPath: /etc/db
       # Optional, These just seed the project - TODO move them to only
       - name: seed-projects
-        image: flyteadmin:v0.3.5
+        image: flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
                   "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
@@ -57,7 +57,7 @@ spec:
         - name: db-pass
           mountPath: /etc/db
       - name: sync-cluster-resources
-        image: flyteadmin:v0.3.5
+        image: flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
         volumeMounts:
@@ -69,7 +69,7 @@ spec:
           mountPath: /etc/db
       containers:
       - name: flyteadmin
-        image: flyteadmin:v0.3.5
+        image: flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "serve"]
         ports:
