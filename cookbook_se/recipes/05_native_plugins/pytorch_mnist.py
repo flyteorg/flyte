@@ -14,6 +14,7 @@ import torch
 from dataclasses_json import dataclass_json
 from flytekit import task, Resources, workflow
 from flytekit.taskplugins.pytorch import PyTorch
+from flytekit.types.directory import FlyteDirectory
 from flytekit.types.file import FlyteFile
 from tensorboardX import SummaryWriter
 from torch import distributed as dist, nn, optim
@@ -121,7 +122,6 @@ class Hyperparameters(object):
     sgd_momentum: float = 0.5
     seed: int = 1
     log_interval: int = 10
-    dir: str = "logs"
     batch_size: int = 64
     test_batch_size: int = 1000
     epochs: int = 10
@@ -134,9 +134,14 @@ class Hyperparameters(object):
 # The output model using `torch.save` saves the `state_dict` as described
 # `in pytorch docs <https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-and-loading-models>`_.
 # A common convention is to have the ``.pt`` extension for the file
+#
+# Notice we are also generating an output variable called logs, these logs can be used to visualize the training in
+# Tensorboard and are the output of the `SummaryWriter` interface
+# Refer to section :ref:`pytorch_tensorboard` to visualize the outputs of this example.
 PytorchPickledFile = FlyteFile[typing.TypeVar("pt")]
+TensorboardLogs = FlyteDirectory[typing.TypeVar("tensorboard")]
 TrainingOutputs = typing.NamedTuple("TrainingOutputs", epoch_accuracies=typing.List[float],
-                                    model_state=PytorchPickledFile)
+                                    model_state=PytorchPickledFile, logs=TensorboardLogs)
 
 
 @task(
@@ -154,7 +159,8 @@ def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
     # USE GLOO backend
     backend_type = dist.Backend.GLOO
 
-    writer = SummaryWriter(hp.dir)
+    log_dir = "logs"
+    writer = SummaryWriter(log_dir)
 
     torch.manual_seed(hp.seed)
 
@@ -201,7 +207,7 @@ def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
     model_file = "mnist_cnn.pt"
     torch.save(model.state_dict(), model_file)
 
-    return TrainingOutputs(epoch_accuracies=accuracies, model_state=PytorchPickledFile(model_file))
+    return TrainingOutputs(epoch_accuracies=accuracies, model_state=PytorchPickledFile(model_file), logs=log_dir)
 
 
 # %%
@@ -231,10 +237,10 @@ def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImage:
 # followed by the plotting of the accuracy. Data is passed between them and the workflow itself outputs the image and
 # the serialize model
 @workflow
-def pytorch_training_wf(hp: Hyperparameters) -> (PytorchPickledFile, PNGImage):
-    accuracies, model = mnist_pytorch_job(hp=hp)
+def pytorch_training_wf(hp: Hyperparameters) -> (PytorchPickledFile, PNGImage, TensorboardLogs):
+    accuracies, model, logs = mnist_pytorch_job(hp=hp)
     plot = plot_accuracy(epoch_accuracies=accuracies)
-    return model, plot
+    return model, plot, logs
 
 
 # %%
@@ -243,4 +249,30 @@ def pytorch_training_wf(hp: Hyperparameters) -> (PytorchPickledFile, PNGImage):
 # It is possible to run the model locally with almost no modifications (as long as the code takes care of the resolving
 # if distributed or not)
 if __name__ == "__main__":
-    print(pytorch_training_wf(hp=Hyperparameters(epochs=2, batch_size=128)))
+    model, plot, logs = pytorch_training_wf(hp=Hyperparameters(epochs=2, batch_size=128))
+    print(f"Model: {model}, plot PNG: {plot}, Tensorboard Log Dir: {logs}")
+
+# %%
+#
+# .. _pytorch_tensorboard:
+#
+# Rendering the output logs in tensorboard
+# -----------------------------------------
+# When running locally, the output of execution looks like
+#
+# .. code-block::
+#
+#   Model: /tmp/flyte/20210110_214129/mock_remote/8421ae4d041f76488e245edf3f4360d5/my_model.h5, plot PNG: /tmp/flyte/20210110_214129/mock_remote/cf6a2cd9d3ded89ed814278a8fb3678c/accuracy.png, Tensorboard Log Dir: /tmp/flyte/20210110_214129/mock_remote/a4b04e58e21f26f08f81df24094d6446/
+#
+# You can use the ``Tensorboard Log Dir: /tmp/flyte/20210110_214129/mock_remote/a4b04e58e21f26f08f81df24094d6446/`` as
+# an input to tensorboard to visualize the training as follows
+#
+# .. prompt:: bash
+#
+#   tensorboard --logdir /tmp/flyte/20210110_214129/mock_remote/a4b04e58e21f26f08f81df24094d6446/
+#
+#
+# If running remotely (executing on Flyte hosted environment), the workflow execution outputs can be retrieved.
+# Refer to .. TODO.
+# You can retrieve the outputs - which will be a path to a blob store like S3, GCS, minio, etc. Tensorboad can be
+# pointed to on your local laptop to visualize the results.
