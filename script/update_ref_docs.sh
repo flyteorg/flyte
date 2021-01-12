@@ -23,7 +23,7 @@ echo "Cloning Flytekit"
 git clone https://github.com/lyft/flytekit.git --single-branch --branch v${FLYTEKIT_VERSION} ${REPOS_DIR}/flytekit
 
 # Generate documentation by running script inside the generation container
-docker run --rm -t -e FLYTEKIT_VERSION=${FLYTEKIT_VERSION} -v ${BASEDIR}:/base -v ${REPOS_DIR}:/repos -v ${BASEDIR}/_rsts:/_rsts ghcr.io/nuclyde-io/docbuilder:e461362c9da2415ac5419e4b2b0f13f839bdd1fe /base/docs_infra/in_container_rst_generation.sh
+docker run --rm -t -e FLYTEKIT_VERSION=${FLYTEKIT_VERSION} -v ${BASEDIR}:/base -v ${REPOS_DIR}:/repos -v ${BASEDIR}/_rsts:/_rsts ghcr.io/nuclyde-io/docbuilder:e91a079b384be0c89c74d8fa5c8109fdd1980941 /base/docs_infra/in_container_rst_generation.sh
 
 # Cleanup
 rm -rf ${REPOS_DIR}/* || true
