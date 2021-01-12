@@ -19,7 +19,7 @@ end2end_execute:
 # Use this target to build the rsts directory only. In order to build the entire flyte docs, use update_ref_docs && all_docs
 .PHONY: generate-local-docs
 generate-local-docs:
-	@docker run -t -v `pwd`:/base ghcr.io/nuclyde-io/docbuilder:e91a079b384be0c89c74d8fa5c8109fdd1980941 sphinx-build -E -b html /base/rsts/. /base/_build
+	@docker run -t -v `pwd`:/base ghcr.io/nuclyde-io/docbuilder:e70cfafe3397c3b23d11183973c0f44e0024f025 sphinx-build -E -b html /base/rsts/. /base/_build
 
 # Builds the entire doc tree. Assumes update_ref_docs has run and that all externals rsts are in _rsts/ dir
 .PHONY: generate-docs
