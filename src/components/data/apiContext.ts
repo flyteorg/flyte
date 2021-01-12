@@ -1,3 +1,4 @@
+import { getLoginUrl } from 'models/AdminEntity/utils';
 import * as CommonAPI from 'models/Common/api';
 import * as ExecutionAPI from 'models/Execution/api';
 import * as LaunchAPI from 'models/Launch/api';
@@ -30,7 +31,9 @@ export const defaultAPIContextValue = {
     ...WorkflowAPI,
     loginStatus: {
         expired: false,
-        setExpired: () => {}
+        setExpired: () => {
+            // do nothing
+        }
     }
 };
 
@@ -44,6 +47,13 @@ export const APIContext = React.createContext<APIContextValue>(
 
 function useLoginStatus(): LoginStatus {
     const [expired, setExpired] = React.useState(false);
+
+    // Whenever we detect expired credentials, trigger a login redirect automatically
+    React.useEffect(() => {
+        if (expired) {
+            window.location.href = getLoginUrl();
+        }
+    }, [expired]);
     return {
         expired,
         setExpired

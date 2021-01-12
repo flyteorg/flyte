@@ -81,6 +81,7 @@ function createFetchFn<T extends object, DataType>({
             return mergedValue;
         } catch (error) {
             if (error instanceof NotAuthorizedError) {
+                // Trigger auth flow
                 apiContext.loginStatus.setExpired(true);
             }
             return Promise.reject(

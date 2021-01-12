@@ -19,8 +19,7 @@ export const QueryAuthorizationObserver: React.FC = () => {
                 if (query.state.error instanceof NotAuthorizedError) {
                     // Stop all in-progress and future requests
                     onlineManager.setOnline(false);
-                    // TODO: https://github.com/lyft/flyte/issues/525
-                    // Notify user of unauthorized status
+                    // Trigger auth flow
                     apiContext.loginStatus.setExpired(true);
                 }
             }

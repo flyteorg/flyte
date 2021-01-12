@@ -5,7 +5,6 @@ import { debug, debugPrefix } from 'common/log';
 import { APIContext, useAPIState } from 'components/data/apiContext';
 import { QueryAuthorizationObserver } from 'components/data/QueryAuthorizationObserver';
 import { createQueryClient } from 'components/data/queryCache';
-import { LoginExpiredHandler } from 'components/Errors/LoginExpiredHandler';
 import { SystemStatusBanner } from 'components/Notifications/SystemStatusBanner';
 import { skeletonColor, skeletonHighlightColor } from 'components/Theme';
 import { muiTheme } from 'components/Theme/muiTheme';
@@ -50,7 +49,6 @@ export const AppComponent: React.StatelessComponent<{}> = () => {
                             <ErrorBoundary fixed={true}>
                                 <NavBarRouter />
                                 <ApplicationRouter />
-                                <LoginExpiredHandler />
                             </ErrorBoundary>
                         </Router>
                         <SystemStatusBanner />
