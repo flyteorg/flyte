@@ -1,7 +1,9 @@
-import { ButtonBase, Typography } from '@material-ui/core';
+import * as classnames from 'classnames';
+import { Fade, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { SearchableList, SearchResult } from 'components/common/SearchableList';
 import { useCommonStyles } from 'components/common/styles';
+import { defaultProjectDescription } from 'components/SelectProject/constants';
 import { Project } from 'models';
 import * as React from 'react';
 
@@ -11,7 +13,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '100%'
     },
     itemName: {
-        flex: '1 0 auto',
+        flex: '1 0 0',
         fontWeight: 'bold'
     },
     noResults: {
@@ -66,14 +68,33 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <NoResults />
     ) : (
         <ul className={commonStyles.listUnstyled}>
-            {results.map(({ key, content, value }) => (
-                <div
-                    className={styles.searchResult}
-                    key={key}
-                    onClick={onProjectSelected.bind(null, value)}
+            {results.map(({ content, value }) => (
+                <Tooltip
+                    TransitionComponent={Fade}
+                    key={value.id}
+                    placement="bottom-end"
+                    enterDelay={500}
+                    title={
+                        <Typography variant="body1">
+                            <div className={commonStyles.textMonospace}>
+                                {value.id}
+                            </div>
+                            <div>
+                                <em>
+                                    {value.description ||
+                                        defaultProjectDescription}
+                                </em>
+                            </div>
+                        </Typography>
+                    }
                 >
-                    <div className={styles.itemName}>{content}</div>
-                </div>
+                    <div
+                        className={styles.searchResult}
+                        onClick={onProjectSelected.bind(null, value)}
+                    >
+                        <div className={classnames(styles.itemName, commonStyles.textWrapped)}>{content}</div>
+                    </div>
+                </Tooltip>
             ))}
         </ul>
     );

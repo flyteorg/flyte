@@ -7,7 +7,7 @@ import * as React from 'react';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { KeyCodes } from 'common/constants';
 import { useCommonStyles } from 'components/common/styles';
-import { listhoverColor, mutedPrimaryTextColor } from 'components/Theme';
+import { listhoverColor } from 'components/Theme';
 import { SearchableProjectList } from './SearchableProjectList';
 
 const expanderGridHeight = 12;
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         flex: '0 0 auto'
     },
     header: {
-        flex: '1 0 auto',
+        flex: '1 0 0',
         textAlign: 'left'
     },
     listContainer: {
@@ -83,7 +83,7 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             >
                 <header className={styles.header}>
                     <div className={commonStyles.microHeader}>PROJECT</div>
-                    <div className={commonStyles.mutedHeader}>
+                    <div className={classnames(commonStyles.mutedHeader, commonStyles.textWrapped)}>
                         {selectedProject.name}
                     </div>
                 </header>
