@@ -8763,7 +8763,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: ghcr.io/lyft/flyteconsole:v0.19.0
+        image: ghcr.io/lyft/flyteconsole:v0.19.1
         name: flyteconsole
         ports:
         - containerPort: 8080
