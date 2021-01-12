@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.1](http://github.com/lyft/flyteconsole/compare/v0.19.0...v0.19.1) (2021-01-12)
+
+
+### Bug Fixes
+
+* perform login redirect automatically ([#137](http://github.com/lyft/flyteconsole/issues/137)) ([9f09aa2](http://github.com/lyft/flyteconsole/commit/9f09aa2bdeb0929f18b0b5d853fddaae4bc808d3))
+
 # [0.19.0](http://github.com/lyft/flyteconsole/compare/v0.18.0...v0.19.0) (2021-01-09)
 
 
