@@ -14,3 +14,7 @@ docs/_sources/
 docs/flytekit/flytekit.interfaces.html
 docs/searchindex.js
 docs/
+eks/tf/.terraform*
+eks/tf/kubeconfig_flyte-demo
+eks/tf/terraform.tfstate
+eks/tf/terraform.tfstate.backup

@@ -7602,7 +7602,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::111222333456:role/flyte-operator
+    eks.amazonaws.com/role-arn: arn:aws:iam::590375264460:role/eksctl-flyte-addon-iamserviceaccount-flyte-f-Role1-F328POU8L7HT
   name: flyteadmin
   namespace: flyte
 ---
@@ -7610,7 +7610,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   annotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::111222333456:role/flyte-operator
+    eks.amazonaws.com/role-arn: arn:aws:iam::590375264460:role/eksctl-flyte-addon-iamserviceaccount-flyte-f-Role1-F328POU8L7HT
   name: flytepropeller
   namespace: flyte
 ---
@@ -8010,14 +8010,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  db.yaml: |
-    database:
-      port: 5432
-      username: flyte
-      # TODO Change this to match aurora or rds postgres endpoint
-      host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
-      dbname: flytedatacatalog
-      passwordPath: /etc/db/pass.txt
+  db.yaml: "database:\n  port: 5432\n  username: flyte\n  # TODO Change this to match aurora or rds postgres endpoint\n  host: flyteadmin.cluster-cguibupmpitq.us-east-2.rds.amazonaws.com\t\n  dbname: datacatalog\n  passwordPath: /etc/db/pass.txt\n"
   logger.yaml: |
     # TODO this is used to control the log level
     logger:
@@ -8034,14 +8027,12 @@ data:
     storage:
       type: stow
       stow:
-        kind: google
+        kind: s3
         config:
-          json: ""
-          # TODO: replace <project-id> with the GCP project ID
-          project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          auth_type: iam
+          region: us-east-2
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8054,7 +8045,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: datacatalog-config-2bb94tc5b5
+  name: datacatalog-config-2c74f77bbf
   namespace: flyte
 ---
 apiVersion: v1
@@ -8079,14 +8070,7 @@ data:
           - projectQuotaMemory:
               value: "3000Mi"
       refresh: 5m
-  db.yaml: |
-    database:
-      port: 5432
-      username: flyte
-      # TODO Change this to match aurora or rds postgres endpoint
-      host: flyteadmin-cluster.cluster-456123e6ivib.us-west-2.rds.amazonaws.com
-      dbname: flyte
-      passwordPath: /etc/db/pass.txt
+  db.yaml: "database:\n  port: 5432\n  username: flyte\n  # TODO Change this to match aurora or rds postgres endpoint\n  host: flyteadmin.cluster-cguibupmpitq.us-east-2.rds.amazonaws.com\t\n  dbname: flyteadmin\n  passwordPath: /etc/db/pass.txt\n"
   domain.yaml: |
     domains:
       - id: development
@@ -8103,7 +8087,7 @@ data:
   remote_data.yaml: |
     remoteData:
       # TODO change this to match the region of the s3 bucket
-      region: "us-west-2"
+      region: "us-east-2"
       scheme: aws
       signedUrls:
         durationMinutes: 3
@@ -8133,14 +8117,12 @@ data:
     storage:
       type: stow
       stow:
-        kind: google
+        kind: s3
         config:
-          json: ""
-          # TODO: replace <project-id> with the GCP project ID
-          project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          auth_type: iam
+          region: us-east-2
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8163,7 +8145,7 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-admin-config-g79597h75m
+  name: flyte-admin-config-dmtmtkc5ct
   namespace: flyte
 ---
 apiVersion: v1
@@ -8200,7 +8182,7 @@ data:
           start-timeout: "30s"
   core.yaml: |
     propeller:
-      rawoutput-prefix: s3://my-s3-bucket/
+      rawoutput-prefix: s3://nuclyde-demo/
       metadata-prefix: metadata/propeller
       workers: 40
       gc-interval: 12h
@@ -8302,14 +8284,12 @@ data:
     storage:
       type: stow
       stow:
-        kind: google
+        kind: s3
         config:
-          json: ""
-          # TODO: replace <project-id> with the GCP project ID
-          project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
+          auth_type: iam
+          region: us-east-2
       # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8333,17 +8313,17 @@ kind: ConfigMap
 metadata:
   annotations: {}
   labels: {}
-  name: flyte-propeller-config-88bdc8dc9f
+  name: flyte-propeller-config-fb7t6264t2
   namespace: flyte
 ---
 apiVersion: v1
 data:
-  pass.txt: eW91cnBhc3N3b3Jk
+  pass.txt: c3BvbmdlYm9i
 kind: Secret
 metadata:
   annotations: {}
   labels: {}
-  name: db-pass-bthd2588cc
+  name: db-pass-dd2566284h
   namespace: flyte
 type: Opaque
 ---
@@ -8379,7 +8359,7 @@ metadata:
   namespace: flyte
 spec:
   loadBalancerSourceRanges:
-  - 0.0.0.0
+  - 0.0.0.0/0
   ports:
   - name: http
     port: 80
@@ -8404,7 +8384,7 @@ metadata:
   namespace: flyte
 spec:
   loadBalancerSourceRanges:
-  - 0.0.0.0
+  - 0.0.0.0/0
   ports:
   - name: http
     port: 80
@@ -8533,11 +8513,11 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-2bb94tc5b5
+          name: datacatalog-config-2c74f77bbf
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-dd2566284h
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8577,7 +8557,7 @@ spec:
         - containerPort: 8089
         resources:
           limits:
-            cpu: "2"
+            cpu: "1"
             ephemeral-storage: 1Gi
             memory: 1Gi
         volumeMounts:
@@ -8663,14 +8643,14 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-g79597h75m
+          name: flyte-admin-config-dmtmtkc5ct
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-dd2566284h
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8746,16 +8726,16 @@ spec:
         - containerPort: 10254
         resources:
           limits:
-            cpu: "2"
+            cpu: "1"
             ephemeral-storage: 1Gi
-            memory: 4Gi
+            memory: 2Gi
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-88bdc8dc9f
+          name: flyte-propeller-config-fb7t6264t2
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -8944,11 +8924,11 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-g79597h75m
+              name: flyte-admin-config-dmtmtkc5ct
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-bthd2588cc
+              secretName: db-pass-dd2566284h
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1

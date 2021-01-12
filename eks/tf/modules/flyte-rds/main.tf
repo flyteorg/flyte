@@ -3,15 +3,15 @@ resource "aws_rds_cluster_instance" "flyte_instances" {
   identifier         = "flyteadmin-instances-${count.index}"
   cluster_identifier = aws_rds_cluster.flyteadmin.id
   instance_class     = "db.t3.medium"
-  engine               = "aurora-postgresql"
-  engine_version       = "11.6"
+  engine             = "aurora-postgresql"
+  engine_version     = "11.6"
 }
 
 resource "aws_rds_cluster" "flyteadmin" {
   cluster_identifier      = "flyteadmin-cluster"
   engine                  = "aurora-postgresql"
   engine_version          = "11.6"
-  availability_zones      = ["us-west-2a", "us-west-2b", "us-west-2c"]
+  availability_zones      = ["us-east-2a", "us-east-2b", "us-east-2c"]
   database_name           = "flyteadmin"
   master_username         = "flyteadmin"
   master_password         = "spongebob"

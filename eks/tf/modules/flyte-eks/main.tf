@@ -53,8 +53,8 @@ resource "aws_security_group" "all_worker_mgmt" {
 }
 
 module "vpc" {
-  source  = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=v2.6.0"
-  name                 = "${var.eks_cluster_name}-vpc"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git?ref=v2.6.0"
+  name   = "${var.eks_cluster_name}-vpc"
 
   cidr                 = "10.0.0.0/16"
   azs                  = data.aws_availability_zones.available.names
@@ -66,17 +66,17 @@ module "vpc" {
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                      = "1"
+    "kubernetes.io/role/elb"                        = "1"
   }
 
   private_subnet_tags = {
     "kubernetes.io/cluster/${var.eks_cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = "1"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 }
 
 module "eks" {
-  source  = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=v11.0.0"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=v11.0.0"
 
   cluster_name = var.eks_cluster_name
   subnets      = module.vpc.private_subnets
@@ -102,7 +102,7 @@ module "eks" {
       instance_type                 = "t2.medium"
       additional_userdata           = "flyte t2.medium"
       additional_security_group_ids = [aws_security_group.worker_group_mgmt_two.id]
-      asg_desired_capacity          = 1
+      asg_desired_capacity          = 2
     },
   ]
 

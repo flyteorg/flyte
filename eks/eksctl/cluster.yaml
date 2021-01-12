@@ -1,0 +1,106 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: flyte-demo
+  region: us-east-2
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: flyte-operator
+        # if no namespace is set, "default" will be used;
+        # the namespace will be created if it doesn't exist already
+        namespace: flyte
+        labels: { aws-usage: "application" }
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        - "arn:aws:iam::aws:policy/AWSBatchFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+      tags:
+        Owner: "Haytham Abuelfutuh"
+        Team: "Flyte Team"
+    - metadata:
+        name: cache-access
+        namespace: flyte
+        labels: { aws-usage: "application" }
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess"
+        - "arn:aws:iam::aws:policy/AmazonElastiCacheFullAccess"
+    - metadata:
+        name: cluster-autoscaler
+        namespace: kube-system
+        labels: { aws-usage: "cluster-ops" }
+      attachPolicy: # inline policy can be defined along with `attachPolicyARNs`
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "autoscaling:DescribeAutoScalingGroups"
+              - "autoscaling:DescribeAutoScalingInstances"
+              - "autoscaling:DescribeLaunchConfigurations"
+              - "autoscaling:DescribeTags"
+              - "autoscaling:SetDesiredCapacity"
+              - "autoscaling:TerminateInstanceInAutoScalingGroup"
+              - "ec2:DescribeLaunchTemplateVersions"
+            Resource: "*"
+
+vpc:
+  subnets:
+    private:
+      us-east-2b: { id: subnet-0d94ade065d7c8061 }
+      us-east-2a: { id: subnet-0ccc4bcd496a5ffd0 }
+      us-east-2c: { id: subnet-0fed3ef943940091c }
+
+nodeGroups:
+  - name: ng-1
+    instanceType: m5.large
+    desiredCapacity: 5
+    volumeSize: 80
+    ssh:
+      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
+    privateNetworking: true
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        appMesh: true
+        appMeshPreview: true
+        ebs: true
+        fsx: true
+        efs: true
+        albIngress: true
+        xRay: true
+        cloudWatch: true
+    tags:
+      # EC2 tags required for cluster-autoscaler auto-discovery
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/cluster-13: "owned"
+  - name: ng-2
+    instanceType: m5.xlarge
+    desiredCapacity: 2
+    volumeSize: 80
+    ssh:
+      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
+    privateNetworking: true
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        appMesh: true
+        appMeshPreview: true
+        ebs: true
+        fsx: true
+        efs: true
+        albIngress: true
+        xRay: true
+        cloudWatch: true
+    tags:
+      # EC2 tags required for cluster-autoscaler auto-discovery
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/cluster-13: "owned"

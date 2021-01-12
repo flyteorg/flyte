@@ -12,7 +12,7 @@ metadata:
 spec:
   loadBalancerSourceRanges:
     # TODO limit source ranges if you want
-    - 0.0.0.0
+    - 0.0.0.0/0
   ports:
     - name: http
       port: 80
