@@ -42,60 +42,35 @@ Release Train
 Upcoming Features
 =================
 
-1. flytekit python overhaul.
+.. note::
+
+   We are curently gathering requirements from our users to prioritize. Please
+   checkout :ref:`Link here <https://docs.google.com/spreadsheets/d/1LE6X4Pgf1XWriXkDOYPlL7W0SkHWbz5Fa9XKjnCDTMY/edit#gid=0>`_
+
+#. Flytekit Enhancement proposal: GA
+   Thw new version of flytekit is available in alpha - refer to :ref:`Release Notes <https://github.com/lyft/flytekit/releases/tag/v0.16.0a2>`_
+   For examples refer to :ref:`FlyteCookbook docs on RTD <https://flytecookbook.readthedocs.io/en/latest/auto_recipes/index.html>`_
    Goal: Make flyte almost invisible to the user.
    - Use python native typing system - 0 ramp to learn types
    - Ability to execute everything locally (in some cases mocking out things)
    - minimal imports - just one import for task and workflow
    - simplified extensibility for types and task-types in flytekit
 
+#. Getting started overhaul. Example driven learning.
 
-Sneak Peek
+#. flytekit java feature complete
+   Refer to :ref:`Flyte kit java <https://github.com/spotify/flytekit-java>`_
 
-.. code-block:: python
-  :linenos:
+#. Observability stack open source
+
+#. Flyte workflows and tasks inline documentation support and visualization
+
+#. Visualization of Blobs in UI/Console
+
+#. Performance visualization of Task execution
+
+#. Data Lineage and Provenance visualization
+
+#. Plugins
 
 
-  from flytekit import task, workflow
-
-  @task
-  def t1(a: int) -> pandas.DataFrame:
-      return pandas.DataFrame(data={"col1": [a, 2], "col2": [a, 4]})
-
-  @task
-  def t2(df: pandas.DataFrame) -> pandas.DataFrame:
-      return df.append(pandas.DataFrame(data={"col1": [5, 10], "col2": [5, 10]}))
-
-  @workflow
-  def my_wf(a: int) -> pandas.DataFrame:
-      return t2(df=t1(a=a))
-
-  print(my_wf(a=20))
-
-Output
-
-::
-
-        col1  col2
-    0    20    20
-    1     2     4
-    0     5     5
-    1    10    10
-
-2. flytekit java feature complete
-
-3. flyte workflows and tasks inline documentation support and visualization
-
-4. Visualization of Blobs in UI/Console
-
-5. Performance visualization of Task execution
-
-6. Faster iteration support (no container building)
-
-7. Data Lineage and Provenance visualization
-
-8. More plugins
-
-9. Observability stack open source
-
-10. Getting started overhaul
