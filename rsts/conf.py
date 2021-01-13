@@ -26,7 +26,7 @@ author = u'Flyte Authors'
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'0.9.0'
+release = u'0.10.0'
 
 
 # -- General configuration ---------------------------------------------------
