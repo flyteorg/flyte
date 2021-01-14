@@ -15,6 +15,10 @@ type mockWorkflow struct {
 	upstream    common.StringAdjacencyList
 }
 
+func (m mockWorkflow) GetCompiledSubWorkflow(id common.WorkflowID) (wf *core.CompiledWorkflow, found bool) {
+	panic("method invocation not expected")
+}
+
 func (m mockWorkflow) GetSubWorkflow(id common.WorkflowID) (wf *core.CompiledWorkflow, found bool) {
 	panic("method invocation not expected")
 }

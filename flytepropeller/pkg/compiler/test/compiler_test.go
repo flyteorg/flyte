@@ -101,6 +101,85 @@ func marshalProto(t *testing.T, filename string, p proto.Message) {
 	assert.NoError(t, ioutil.WriteFile(strings.Replace(filename, filepath.Ext(filename), ".yaml", 1), b, os.ModePerm))
 }
 
+func TestDynamic(t *testing.T) {
+	errors.SetConfig(errors.Config{IncludeSource: true})
+	assert.NoError(t, filepath.Walk("testdata/dynamic", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+
+		t.Run(path, func(t *testing.T) {
+			// If you want to debug a single use-case. Uncomment this line.
+			//if !strings.HasSuffix(path, "success_1.json") {
+			//	t.SkipNow()
+			//}
+
+			raw, err := ioutil.ReadFile(path)
+			assert.NoError(t, err)
+			wf := &core.DynamicJobSpec{}
+			err = jsonpb.UnmarshalString(string(raw), wf)
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
+
+			t.Log("Compiling Workflow")
+			compiledTasks := mustCompileTasks(t, wf.Tasks)
+			wfTemplate := &core.WorkflowTemplate{
+				Id: &core.Identifier{
+					Domain:  "domain",
+					Name:    "name",
+					Version: "version",
+				},
+				Interface: &core.TypedInterface{
+					Inputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+					Outputs: &core.VariableMap{Variables: map[string]*core.Variable{
+						"o0": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_CollectionType{
+									CollectionType: &core.LiteralType{
+										Type: &core.LiteralType_Simple{
+											Simple: core.SimpleType_INTEGER,
+										},
+									},
+								},
+							},
+						},
+					}},
+				},
+				Nodes:   wf.Nodes,
+				Outputs: wf.Outputs,
+			}
+			compiledWfc, err := compiler.CompileWorkflow(wfTemplate, wf.Subworkflows, compiledTasks,
+				[]common.InterfaceProvider{})
+			if !assert.NoError(t, err) {
+				t.FailNow()
+			}
+
+			inputs := map[string]interface{}{}
+			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
+				inputs[varName] = utils.MustMakeDefaultLiteralForType(v.Type)
+			}
+
+			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
+				utils.MustMakeLiteral(inputs).GetMap(),
+				&core.WorkflowExecutionIdentifier{
+					Project: "hello",
+					Domain:  "domain",
+					Name:    "name",
+				},
+				"namespace")
+			if assert.NoError(t, err) {
+				raw, err := json.Marshal(flyteWf)
+				if assert.NoError(t, err) {
+					assert.NotEmpty(t, raw)
+				}
+			}
+		})
+
+		return nil
+	}))
+}
+
 func TestBranches(t *testing.T) {
 	errors.SetConfig(errors.Config{IncludeSource: true})
 	assert.NoError(t, filepath.Walk("testdata/branch", func(path string, info os.FileInfo, err error) error {
@@ -109,7 +188,8 @@ func TestBranches(t *testing.T) {
 		}
 
 		t.Run(path, func(t *testing.T) {
-			//if !strings.HasSuffix(path, "success_6.json") {
+			// If you want to debug a single use-case. Uncomment this line.
+			//if !strings.HasSuffix(path, "success_1.json") {
 			//	t.SkipNow()
 			//}
 

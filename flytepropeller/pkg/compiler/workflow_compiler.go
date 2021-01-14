@@ -186,8 +186,14 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 	globalOutputNode.SetInterface(&core.TypedInterface{Inputs: wf.CoreWorkflow.Template.Interface.Outputs})
 	globalOutputNode.SetInputs(wf.CoreWorkflow.Template.Outputs)
 
+	// Track top level nodes (a branch in a branch node is NOT a top level node). The final graph should ensure that all
+	// top level nodes are executed before the end node. We do that by adding execution edges from leaf nodes that do not
+	// contribute to the final outputs to the end node.
+	topLevelNodes := sets.NewString()
+
 	// Add and validate all other nodes
 	for _, n := range checkpoint {
+		topLevelNodes.Insert(n.Id)
 		if node, addOk := wf.AddNode(wf.NewNodeBuilder(n), errs.NewScope()); addOk {
 			v.ValidateNode(&wf, node, false /* validateConditionTypes */, errs.NewScope())
 		}
@@ -230,12 +236,23 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 			continue
 		}
 
-		if _, foundUpStream := wf.upstreamNodes[nodeID]; !foundUpStream {
-			wf.AddExecutionEdge(c.StartNodeID, nodeID)
+		// Nodes that do not have a upstream dependencies means they do not rely on the workflow inputs to execute.
+		// This is a rare but possible occurrence, by explicitly adding an execution edge from the start node to these
+		// nodes, we ensure that propeller starts executing the workflow by running all such nodes and then their
+		// downstream dependencies.
+		if topLevelNodes.Has(nodeID) {
+			if _, foundUpStream := wf.upstreamNodes[nodeID]; !foundUpStream {
+				wf.AddExecutionEdge(c.StartNodeID, nodeID)
+			}
 		}
 
-		if _, foundDownStream := wf.downstreamNodes[nodeID]; !foundDownStream {
-			wf.AddExecutionEdge(nodeID, c.EndNodeID)
+		// When propeller executes nodes it'll ensure that any node does not start executing until all of its upstream
+		// dependencies have finished successfully. By explicitly adding execution edges from such nodes to end-node, we
+		// ensure that execution continues until all nodes successfully finish.
+		if topLevelNodes.Has(nodeID) {
+			if _, foundDownStream := wf.downstreamNodes[nodeID]; !foundDownStream {
+				wf.AddExecutionEdge(nodeID, c.EndNodeID)
+			}
 		}
 	}
 
@@ -348,14 +365,15 @@ func newWorkflowBuilder(fg *flyteWorkflow, wfIndex c.WorkflowIndex, tasks c.Task
 	workflows map[string]c.InterfaceProvider) workflowBuilder {
 
 	return workflowBuilder{
-		CoreWorkflow:    fg,
-		LaunchPlans:     map[string]c.InterfaceProvider{},
-		Nodes:           c.NewNodeIndex(),
-		Tasks:           c.NewTaskIndex(),
-		downstreamNodes: c.StringAdjacencyList{},
-		upstreamNodes:   c.StringAdjacencyList{},
-		allSubWorkflows: wfIndex,
-		allLaunchPlans:  workflows,
-		allTasks:        tasks,
+		CoreWorkflow:            fg,
+		LaunchPlans:             map[string]c.InterfaceProvider{},
+		Nodes:                   c.NewNodeIndex(),
+		Tasks:                   c.NewTaskIndex(),
+		downstreamNodes:         c.StringAdjacencyList{},
+		upstreamNodes:           c.StringAdjacencyList{},
+		allSubWorkflows:         wfIndex,
+		allCompiledSubWorkflows: c.WorkflowIndex{},
+		allLaunchPlans:          workflows,
+		allTasks:                tasks,
 	}
 }

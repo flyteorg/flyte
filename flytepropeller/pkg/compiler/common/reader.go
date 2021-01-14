@@ -17,6 +17,7 @@ type Workflow interface {
 	GetTask(id TaskID) (task Task, found bool)
 	GetLaunchPlan(id LaunchPlanID) (wf InterfaceProvider, found bool)
 	GetSubWorkflow(id WorkflowID) (wf *core.CompiledWorkflow, found bool)
+	GetCompiledSubWorkflow(id WorkflowID) (wf *core.CompiledWorkflow, found bool)
 	GetCoreWorkflow() *core.CompiledWorkflow
 	GetFailureNode() Node
 	GetNodes() NodeIndex

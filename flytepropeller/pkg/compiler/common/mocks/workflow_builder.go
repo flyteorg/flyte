@@ -62,6 +62,47 @@ func (_m *WorkflowBuilder) AddNode(n common.NodeBuilder, errs errors.CompileErro
 	return r0, r1
 }
 
+type WorkflowBuilder_GetCompiledSubWorkflow struct {
+	*mock.Call
+}
+
+func (_m WorkflowBuilder_GetCompiledSubWorkflow) Return(wf *core.CompiledWorkflow, found bool) *WorkflowBuilder_GetCompiledSubWorkflow {
+	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: _m.Call.Return(wf, found)}
+}
+
+func (_m *WorkflowBuilder) OnGetCompiledSubWorkflow(id core.Identifier) *WorkflowBuilder_GetCompiledSubWorkflow {
+	c := _m.On("GetCompiledSubWorkflow", id)
+	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c}
+}
+
+func (_m *WorkflowBuilder) OnGetCompiledSubWorkflowMatch(matchers ...interface{}) *WorkflowBuilder_GetCompiledSubWorkflow {
+	c := _m.On("GetCompiledSubWorkflow", matchers...)
+	return &WorkflowBuilder_GetCompiledSubWorkflow{Call: c}
+}
+
+// GetCompiledSubWorkflow provides a mock function with given fields: id
+func (_m *WorkflowBuilder) GetCompiledSubWorkflow(id core.Identifier) (*core.CompiledWorkflow, bool) {
+	ret := _m.Called(id)
+
+	var r0 *core.CompiledWorkflow
+	if rf, ok := ret.Get(0).(func(core.Identifier) *core.CompiledWorkflow); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.CompiledWorkflow)
+		}
+	}
+
+	var r1 bool
+	if rf, ok := ret.Get(1).(func(core.Identifier) bool); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	return r0, r1
+}
+
 type WorkflowBuilder_GetCoreWorkflow struct {
 	*mock.Call
 }
@@ -464,8 +505,8 @@ func (_m *WorkflowBuilder) NewNodeBuilder(n *core.Node) common.NodeBuilder {
 	return r0
 }
 
-// UpdateSubWorkflow provides a mock function with given fields: id, compiledWorkflow
-func (_m *WorkflowBuilder) UpdateSubWorkflow(id core.Identifier, compiledWorkflow *core.CompiledWorkflow) {
+// StoreCompiledSubWorkflow provides a mock function with given fields: id, compiledWorkflow
+func (_m *WorkflowBuilder) StoreCompiledSubWorkflow(id core.Identifier, compiledWorkflow *core.CompiledWorkflow) {
 	_m.Called(id, compiledWorkflow)
 }
 
