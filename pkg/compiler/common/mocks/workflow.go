@@ -14,6 +14,47 @@ type Workflow struct {
 	mock.Mock
 }
 
+type Workflow_GetCompiledSubWorkflow struct {
+	*mock.Call
+}
+
+func (_m Workflow_GetCompiledSubWorkflow) Return(wf *core.CompiledWorkflow, found bool) *Workflow_GetCompiledSubWorkflow {
+	return &Workflow_GetCompiledSubWorkflow{Call: _m.Call.Return(wf, found)}
+}
+
+func (_m *Workflow) OnGetCompiledSubWorkflow(id core.Identifier) *Workflow_GetCompiledSubWorkflow {
+	c := _m.On("GetCompiledSubWorkflow", id)
+	return &Workflow_GetCompiledSubWorkflow{Call: c}
+}
+
+func (_m *Workflow) OnGetCompiledSubWorkflowMatch(matchers ...interface{}) *Workflow_GetCompiledSubWorkflow {
+	c := _m.On("GetCompiledSubWorkflow", matchers...)
+	return &Workflow_GetCompiledSubWorkflow{Call: c}
+}
+
+// GetCompiledSubWorkflow provides a mock function with given fields: id
+func (_m *Workflow) GetCompiledSubWorkflow(id core.Identifier) (*core.CompiledWorkflow, bool) {
+	ret := _m.Called(id)
+
+	var r0 *core.CompiledWorkflow
+	if rf, ok := ret.Get(0).(func(core.Identifier) *core.CompiledWorkflow); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.CompiledWorkflow)
+		}
+	}
+
+	var r1 bool
+	if rf, ok := ret.Get(1).(func(core.Identifier) bool); ok {
+		r1 = rf(id)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	return r0, r1
+}
+
 type Workflow_GetCoreWorkflow struct {
 	*mock.Call
 }

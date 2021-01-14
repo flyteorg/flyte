@@ -16,7 +16,7 @@ const (
 // A mutable workflow used during the build of the intermediate layer.
 type WorkflowBuilder interface {
 	Workflow
-	UpdateSubWorkflow(id WorkflowID, compiledWorkflow *core.CompiledWorkflow)
+	StoreCompiledSubWorkflow(id WorkflowID, compiledWorkflow *core.CompiledWorkflow)
 	AddExecutionEdge(nodeFrom, nodeTo NodeID)
 	AddNode(n NodeBuilder, errs errors.CompileErrors) (node NodeBuilder, ok bool)
 	ValidateWorkflow(fg *core.CompiledWorkflow, errs errors.CompileErrors) (Workflow, bool)

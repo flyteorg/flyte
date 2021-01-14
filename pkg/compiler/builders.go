@@ -22,9 +22,10 @@ type workflowBuilder struct {
 	// These are references to all subgraphs and tasks passed to CompileWorkflow. They will be passed around but will
 	// not show in their entirety in the final Graph. The required subset of these will be added to each subgraph as
 	// the compile traverses them.
-	allLaunchPlans  map[string]c.InterfaceProvider
-	allTasks        c.TaskIndex
-	allSubWorkflows c.WorkflowIndex
+	allLaunchPlans          map[string]c.InterfaceProvider
+	allTasks                c.TaskIndex
+	allSubWorkflows         c.WorkflowIndex
+	allCompiledSubWorkflows c.WorkflowIndex
 }
 
 func (w workflowBuilder) GetFailureNode() c.Node {
@@ -70,8 +71,13 @@ func (w workflowBuilder) GetLaunchPlan(id c.LaunchPlanID) (wf c.InterfaceProvide
 	return
 }
 
-func (w workflowBuilder) UpdateSubWorkflow(id c.WorkflowID, compiledWorkflow *core.CompiledWorkflow) {
-	w.allSubWorkflows[id.String()] = compiledWorkflow
+func (w workflowBuilder) StoreCompiledSubWorkflow(id c.WorkflowID, compiledWorkflow *core.CompiledWorkflow) {
+	w.allCompiledSubWorkflows[id.String()] = compiledWorkflow
+}
+
+func (w workflowBuilder) GetCompiledSubWorkflow(id c.WorkflowID) (wf *core.CompiledWorkflow, found bool) {
+	wf, found = w.allCompiledSubWorkflows[id.String()]
+	return
 }
 
 func (w workflowBuilder) GetSubWorkflow(id c.WorkflowID) (wf *core.CompiledWorkflow, found bool) {
