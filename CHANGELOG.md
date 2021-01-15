@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.4](http://github.com/lyft/flyteconsole/compare/v0.19.3...v0.19.4) (2021-01-15)
+
+
+### Bug Fixes
+
+* default to not showing errors for WaitForQuery ([#146](http://github.com/lyft/flyteconsole/issues/146)) ([62e7ab3](http://github.com/lyft/flyteconsole/commit/62e7ab3a2fd612a2d6fa50bdf4f2693ea314c275))
+
 ## [0.19.3](http://github.com/lyft/flyteconsole/compare/v0.19.2...v0.19.3) (2021-01-15)
 
 
