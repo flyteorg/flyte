@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.3](http://github.com/lyft/flyteconsole/compare/v0.19.2...v0.19.3) (2021-01-15)
+
+
+### Bug Fixes
+
+* failed data loading/refreshing in TaskExecutionDetails ([#142](http://github.com/lyft/flyteconsole/issues/142)) ([2a3875b](http://github.com/lyft/flyteconsole/commit/2a3875bbd1bdf436cb9f5be5e1b64254f9a4536f))
+
 ## [0.19.2](http://github.com/lyft/flyteconsole/compare/v0.19.1...v0.19.2) (2021-01-12)
 
 
