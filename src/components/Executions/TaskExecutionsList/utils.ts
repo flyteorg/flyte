@@ -1,5 +1,5 @@
 import { leftPaddedNumber } from 'common/formatters';
-import { TaskExecution } from 'models';
+import { TaskExecution } from 'models/Execution/types';
 
 /** Generates a unique name for a task execution, suitable for display in a
  * header and use as a child component key. The name is a combination of task

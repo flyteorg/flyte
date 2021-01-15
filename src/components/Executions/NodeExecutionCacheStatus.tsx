@@ -8,10 +8,10 @@ import { assertNever } from 'common/utils';
 import { PublishedWithChangesOutlined } from 'components/common/PublishedWithChanges';
 import { useCommonStyles } from 'components/common/styles';
 import { Core } from 'flyteidl';
-import { TaskNodeMetadata } from 'models';
+import { TaskNodeMetadata } from 'models/Execution/types';
 import * as React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { Routes } from 'routes';
+import { Routes } from 'routes/routes';
 import {
     cacheStatusMessages,
     unknownCacheStatusString,

@@ -1,7 +1,7 @@
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Admin } from 'flyteidl';
 import { cloneDeep, random, sample } from 'lodash';
-import { CompiledNode } from 'models/Node';
+import { CompiledNode } from 'models/Node/types';
 import { mockNodes } from 'models/Node/__mocks__/mockNodeData';
 import { NodeExecutionPhase } from '../enums';
 import { NodeExecution } from '../types';

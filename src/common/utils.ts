@@ -1,6 +1,5 @@
 import { env } from 'common/env';
 import { Protobuf } from 'flyteidl';
-
 import * as Long from 'long';
 
 /** Determines if a given date string or object is a valid, usable date. This will detect
@@ -61,12 +60,6 @@ export function millisecondsToDuration(
     });
 }
 
-export interface DecodeProtobufTypedDictionaryResult {
-    error?: Error;
-    // tslint:disable-next-line:no-any
-    value?: { [k: string]: any };
-}
-
 /** Ensures that a string is slash-prefixed */
 export function ensureSlashPrefixed(path: string) {
     return path.startsWith('/') ? path : `/${path}`;
@@ -87,7 +80,7 @@ export function createCorsProxyURL(path: string) {
 }
 
 /** Returns entires for an object, sorted lexicographically */
-export function sortedObjectEntries<T = any>(object: {
+export function sortedObjectEntries<T = unknown>(object: {
     [s: string]: T;
 }): [string, T][] {
     return Object.entries(object).sort((a, b) => a[0].localeCompare(b[0]));
@@ -95,7 +88,7 @@ export function sortedObjectEntries<T = any>(object: {
 
 /** Returns keys for an objext, sorted lexicographically */
 export function sortedObjectKeys(
-    object: Object
+    object: Record<string, unknown>
 ): ReturnType<typeof Object.keys> {
     return Object.keys(object).sort((a, b) => a.localeCompare(b));
 }
@@ -130,6 +123,6 @@ export function toBoolean(value?: string): boolean {
 /** Simple shared stringify function to ensure consistency in formatting with
  * respect to spacing.
  */
-export function stringifyValue(value: any): string {
+export function stringifyValue(value: unknown): string {
     return JSON.stringify(value, null, 2);
 }

@@ -1,7 +1,8 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { noExecutionsFoundString } from 'common/constants';
-import { NonIdealState, WaitForData } from 'components/common';
-import { NodeExecution, TaskExecution } from 'models';
+import { NonIdealState } from 'components/common/NonIdealState';
+import { WaitForData } from 'components/common/WaitForData';
+import { NodeExecution, TaskExecution } from 'models/Execution/types';
 import * as React from 'react';
 import {
     useTaskExecutions,

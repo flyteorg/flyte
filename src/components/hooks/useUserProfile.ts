@@ -1,6 +1,6 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { useFetchableData } from 'components/hooks';
-import { UserProfile } from 'models';
+import { UserProfile } from 'models/Common/types';
+import { useFetchableData } from './useFetchableData';
 
 /** State hook that returns the user information if logged in, null otherwise */
 export function useUserProfile() {

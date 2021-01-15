@@ -1,12 +1,15 @@
 import { makeStyles } from '@material-ui/core/styles';
-import { getCacheKey } from 'components/Cache';
-import { ErrorBoundary, LargeLoadingSpinner } from 'components/common';
+import { getCacheKey } from 'components/Cache/utils';
+import { ErrorBoundary } from 'components/common/ErrorBoundary';
+import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { DataError } from 'components/Errors/DataError';
 import { ExecutionFilters } from 'components/Executions/ExecutionFilters';
 import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
 import { WorkflowExecutionsTable } from 'components/Executions/Tables/WorkflowExecutionsTable';
 import { makeWorkflowExecutionListQuery } from 'components/Executions/workflowExecutionQueries';
-import { Execution, executionSortFields, SortDirection } from 'models';
+import { SortDirection } from 'models/AdminEntity/types';
+import { executionSortFields } from 'models/Execution/constants';
+import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { useInfiniteQuery } from 'react-query';
 import { failedToLoadExecutionsString } from './constants';

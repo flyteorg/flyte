@@ -6,7 +6,7 @@ import {
     dangerousButtonHoverColor,
     mutedPrimaryTextColor,
     smallFontSize
-} from 'components/Theme';
+} from 'components/Theme/constants';
 
 const unstyledLinkProps = {
     textDecoration: 'none',
@@ -22,16 +22,6 @@ export const horizontalListSpacing = (spacing: number) => ({
 export const buttonGroup = (theme: Theme) => ({
     ...horizontalListSpacing(theme.spacing(1)),
     display: 'flex'
-});
-
-export const flexWrap = (spacing: number) => ({
-    flexFlow: 'wrap',
-    marginLeft: -spacing,
-    marginTop: -spacing,
-    '& > *': {
-        marginLeft: spacing,
-        marginTop: spacing
-    }
 });
 
 export const useCommonStyles = makeStyles((theme: Theme) => ({

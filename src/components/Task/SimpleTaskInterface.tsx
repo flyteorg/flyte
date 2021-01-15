@@ -1,13 +1,14 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { noneString } from 'common/constants';
 import { sortedObjectKeys } from 'common/utils';
-import { DetailsGroup } from 'components/common';
+import { DetailsGroup } from 'components/common/DetailsGroup';
 import { useCommonStyles } from 'components/common/styles';
 import {
     formatType,
     getInputDefintionForLiteralType
 } from 'components/Launch/LaunchForm/utils';
-import { Task, Variable } from 'models';
+import { Variable } from 'models/Common/types';
+import { Task } from 'models/Task/types';
 import * as React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({

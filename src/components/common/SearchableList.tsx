@@ -4,7 +4,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Close from '@material-ui/icons/Close';
 import Search from '@material-ui/icons/Search';
-import { bodyFontSize } from 'components/Theme';
+import { bodyFontSize } from 'components/Theme/constants';
 import * as React from 'react';
 import {
     PropertyGetter,

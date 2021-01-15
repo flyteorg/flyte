@@ -1,6 +1,5 @@
 import * as d3 from 'd3-dag';
 import { cloneDeep } from 'lodash';
-
 import { layoutSize, nodeSpacingMultiplier } from './constants';
 import { createTimer } from './timer';
 import {
@@ -65,7 +64,6 @@ export function measureText(fontSize: number, text: string) {
         throw new Error('Unable to create canvas context for text measurement');
     }
 
-    // TODO: Consider making the entire font definition configurable
     const fontString = `${fontSize}px sans-serif`;
 
     context.font = fontString;
@@ -91,8 +89,7 @@ export function assignNodeTextSizes<T>(
 ): AssignNodeTextWidthsResult<T> {
     const nodes = input as RenderableNode<T>[];
     const maxWidth = nodes.reduce((currentMax, node) => {
-        // TODO: Use a guaranteed field here instead of node.id, maybe adding a `label` property
-        const measured = measureText(fontSize, node.id!);
+        const measured = measureText(fontSize, node.id);
         (node as RenderableNode<T>).textWidth = measured.width;
         return Math.max(currentMax, Math.ceil(measured.width));
     }, 0);
@@ -100,9 +97,9 @@ export function assignNodeTextSizes<T>(
 }
 
 interface LayoutFunctions {
-    coordFunction(): any;
-    decrossFunction(): any;
-    layeringFunction(): any;
+    coordFunction(): unknown;
+    decrossFunction(): unknown;
+    layeringFunction(): unknown;
 }
 
 function determineLayoutFunctions<T extends GraphInputNode>(

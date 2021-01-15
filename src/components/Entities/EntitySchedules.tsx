@@ -4,10 +4,11 @@ import {
     getScheduleFrequencyString,
     getScheduleOffsetString
 } from 'common/formatters';
-import { WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
-import { useWorkflowSchedules } from 'components/hooks';
-import { LaunchPlan, ResourceIdentifier } from 'models';
+import { WaitForData } from 'components/common/WaitForData';
+import { useWorkflowSchedules } from 'components/hooks/useWorkflowSchedules';
+import { ResourceIdentifier } from 'models/Common/types';
+import { LaunchPlan } from 'models/Launch/types';
 import * as React from 'react';
 import { noSchedulesStrings, schedulesHeader } from './constants';
 

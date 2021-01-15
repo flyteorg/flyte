@@ -1,5 +1,9 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { ExecutionData, NodeExecution, NodeExecutionIdentifier } from 'models';
+import {
+    ExecutionData,
+    NodeExecution,
+    NodeExecutionIdentifier
+} from 'models/Execution/types';
 import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
 

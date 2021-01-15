@@ -1,5 +1,7 @@
 import { sortedObjectEntries } from 'common/utils';
-import { LaunchPlan, Task, Workflow } from 'models';
+import { LaunchPlan } from 'models/Launch/types';
+import { Task } from 'models/Task/types';
+import { Workflow } from 'models/Workflow/types';
 import { requiredInputSuffix } from './constants';
 import { LiteralValueMap, ParsedInput } from './types';
 import {

@@ -1,7 +1,7 @@
-import { DumpJSON } from 'components/common';
+import { DumpJSON } from 'components/common/DumpJSON';
 import { useCommonStyles } from 'components/common/styles';
-import { DataError } from 'components/Errors';
-import { TaskTemplate } from 'models';
+import { DataError } from 'components/Errors/DataError';
+import { TaskTemplate } from 'models/Task/types';
 import * as React from 'react';
 
 /** Render the task template for a given NodeExecution */

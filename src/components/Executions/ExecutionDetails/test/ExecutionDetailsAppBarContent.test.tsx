@@ -9,13 +9,13 @@ import {
     ExecutionContext,
     ExecutionContextData
 } from 'components/Executions/contexts';
-import { Execution, Identifier, ResourceType } from 'models';
-import { createMockExecution } from 'models/__mocks__/executionsData';
+import { Identifier, ResourceType } from 'models/Common/types';
 import { WorkflowExecutionPhase } from 'models/Execution/enums';
+import { Execution } from 'models/Execution/types';
+import { createMockExecution } from 'models/__mocks__/executionsData';
 import * as React from 'react';
 import { MemoryRouter } from 'react-router';
-import { Routes } from 'routes';
-import { delayedPromise, DelayedPromiseResult } from 'test/utils';
+import { Routes } from 'routes/routes';
 import { backLinkTitle, executionActionStrings } from '../constants';
 import { ExecutionDetailsAppBarContent } from '../ExecutionDetailsAppBarContent';
 

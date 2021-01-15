@@ -1,16 +1,14 @@
+import { Binding, ResourceType, TaskLog } from 'models/Common/types';
 import {
-    Task,
-    Binding,
-    Workflow,
-    ResourceType,
-    LaunchPlan,
-    NodeExecutionIdentifier,
-    WorkflowExecutionIdentifier,
     NodeExecution,
-    TaskLog,
+    NodeExecutionIdentifier,
     TaskExecutionIdentifier,
-    TaskNode
-} from 'models';
+    WorkflowExecutionIdentifier
+} from 'models/Execution/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { TaskNode } from 'models/Node/types';
+import { Task } from 'models/Task/types';
+import { Workflow } from 'models/Workflow/types';
 import { dataUriPrefix, testDomain, testProject } from './constants';
 
 interface TaskNodeIdsResult {

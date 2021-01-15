@@ -1,12 +1,10 @@
 import { Button } from '@material-ui/core';
-import ErrorOutline from '@material-ui/icons/ErrorOutline';
-import { NonIdealState } from 'components/common';
-import * as React from 'react';
-
 import { makeStyles, Theme } from '@material-ui/core/styles';
-
-import { NotFound } from 'components/NotFound';
-import { NotAuthorizedError, NotFoundError } from 'errors';
+import ErrorOutline from '@material-ui/icons/ErrorOutline';
+import { NonIdealState } from 'components/common/NonIdealState';
+import { NotFound } from 'components/NotFound/NotFound';
+import { NotAuthorizedError, NotFoundError } from 'errors/fetchErrors';
+import * as React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {

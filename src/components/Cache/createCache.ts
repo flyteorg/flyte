@@ -6,7 +6,7 @@ interface HasIdObject {
 }
 
 function hasId(value: Object): value is HasIdObject {
-    return {}.hasOwnProperty.call(value, ('id'));
+    return {}.hasOwnProperty.call(value, 'id');
 }
 
 /** A generic cache for any type of object or Array. Keys can be objects,

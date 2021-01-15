@@ -4,11 +4,11 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import * as classnames from 'classnames';
 import { log } from 'common/log';
-import { NonIdealState } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
-import { NotFound } from 'components/NotFound';
-import { NotFoundError } from 'errors';
+import { NotFound } from 'components/NotFound/NotFound';
+import { NotFoundError } from 'errors/fetchErrors';
 import * as React from 'react';
+import { NonIdealState } from './NonIdealState';
 
 const useStyles = makeStyles((theme: Theme) => ({
     container: {

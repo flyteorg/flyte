@@ -1,5 +1,5 @@
-import { CacheContext } from 'components/Cache';
-import { RequestConfig } from 'models';
+import { CacheContext } from 'components/Cache/CacheContext';
+import { RequestConfig } from 'models/AdminEntity/types';
 import { useContext, useMemo } from 'react';
 import {
     FetchFn,

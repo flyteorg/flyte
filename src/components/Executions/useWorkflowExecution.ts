@@ -2,13 +2,13 @@ import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { QueryInput, QueryType } from 'components/data/types';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { maxBlobDownloadSizeBytes } from 'components/Literals/constants';
+import { LiteralMap } from 'models/Common/types';
+import { getExecution } from 'models/Execution/api';
 import {
     Execution,
     ExecutionData,
-    getExecution,
-    LiteralMap,
     WorkflowExecutionIdentifier
-} from 'models';
+} from 'models/Execution/types';
 import { QueryClient } from 'react-query';
 import { FetchableData } from '../hooks/types';
 import { useFetchableData } from '../hooks/useFetchableData';

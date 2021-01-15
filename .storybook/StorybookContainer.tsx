@@ -3,7 +3,7 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import * as React from 'react';
 import { QueryClientProvider } from 'react-query';
-import { ErrorBoundary } from '../src/components/common';
+import { ErrorBoundary } from '../src/components/common/ErrorBoundary';
 import { createQueryClient } from '../src/components/data/queryCache';
 import { muiTheme } from '../src/components/Theme/muiTheme';
 
@@ -21,7 +21,7 @@ export const StorybookContainer: React.FC = ({ children }) => {
             <CssBaseline />
             <ErrorBoundary>
                 <QueryClientProvider client={queryClient}>
-                <div className={useStyles().container}>{children}</div>
+                    <div className={useStyles().container}>{children}</div>
                 </QueryClientProvider>
             </ErrorBoundary>
         </ThemeProvider>

@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react';
+import { ProtobufStruct } from 'models/Common/types';
 import * as React from 'react';
-
-import { ProtobufStruct } from 'models';
 import { ProtobufStructValue } from '../ProtobufStructValue';
 
 describe('ProtobufStructValue', () => {

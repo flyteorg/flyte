@@ -4,7 +4,7 @@ import ChevronRight from '@material-ui/icons/ChevronRight';
 import ErrorOutline from '@material-ui/icons/ErrorOutline';
 import * as classnames from 'classnames';
 import { noDescriptionString } from 'common/constants';
-import { SearchResult, WaitForData } from 'components/common';
+import { SearchResult } from 'components/common/SearchableList';
 import {
     SearchableNamedEntity,
     SearchableNamedEntityList,
@@ -12,7 +12,8 @@ import {
     useNamedEntityListStyles
 } from 'components/common/SearchableNamedEntityList';
 import { useCommonStyles } from 'components/common/styles';
-import { NamedEntity } from 'models';
+import { WaitForData } from 'components/common/WaitForData';
+import { NamedEntity } from 'models/Common/types';
 import * as React from 'react';
 import { IntersectionOptions, useInView } from 'react-intersection-observer';
 import reactLoadingSkeleton from 'react-loading-skeleton';

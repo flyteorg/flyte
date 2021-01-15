@@ -1,9 +1,8 @@
 import { DecoratorFn } from '@storybook/react';
-import * as React from 'react';
-
-import { ContentContainer } from 'components/common';
+import { ContentContainer } from 'components/common/ContentContainer';
 import { NavBar } from 'components/Navigation/NavBar';
 import { SideNavigation } from 'components/Navigation/SideNavigation';
+import * as React from 'react';
 
 export const withNavigation: DecoratorFn = story => (
     <>

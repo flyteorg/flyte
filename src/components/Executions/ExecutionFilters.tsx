@@ -36,7 +36,12 @@ const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
                 <MultiSelectForm {...(filter as MultiFilterState<any, any>)} />
             );
         case 'search':
-            return <SearchInputForm {...searchFilterState} defaultValue={searchFilterState.value} />;
+            return (
+                <SearchInputForm
+                    {...searchFilterState}
+                    defaultValue={searchFilterState.value}
+                />
+            );
         default:
             return null;
     }

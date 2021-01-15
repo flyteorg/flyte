@@ -1,9 +1,9 @@
 import { render, waitFor } from '@testing-library/react';
-import * as React from 'react';
-
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import { getUserProfile, UserProfile } from 'models';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { getUserProfile } from 'models/Common/api';
+import { UserProfile } from 'models/Common/types';
+import * as React from 'react';
 import { UserInformation } from '../UserInformation';
 
 describe('UserInformation', () => {

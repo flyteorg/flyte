@@ -2,11 +2,15 @@ import { CssBaseline } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
 import { env } from 'common/env';
 import { debug, debugPrefix } from 'common/log';
+import { ErrorBoundary } from 'components/common/ErrorBoundary';
 import { APIContext, useAPIState } from 'components/data/apiContext';
 import { QueryAuthorizationObserver } from 'components/data/QueryAuthorizationObserver';
 import { createQueryClient } from 'components/data/queryCache';
 import { SystemStatusBanner } from 'components/Notifications/SystemStatusBanner';
-import { skeletonColor, skeletonHighlightColor } from 'components/Theme';
+import {
+    skeletonColor,
+    skeletonHighlightColor
+} from 'components/Theme/constants';
 import { muiTheme } from 'components/Theme/muiTheme';
 import * as React from 'react';
 import { Helmet } from 'react-helmet';
@@ -18,11 +22,10 @@ import { Router } from 'react-router-dom';
 import { ApplicationRouter } from 'routes/ApplicationRouter';
 import { history } from 'routes/history';
 import { NavBarRouter } from 'routes/NavBarRouter';
-import { ErrorBoundary } from '../common';
 
 const queryClient = createQueryClient();
 
-export const AppComponent: React.StatelessComponent<{}> = () => {
+export const AppComponent: React.FC = () => {
     if (env.NODE_ENV === 'development') {
         debug.enable(`${debugPrefix}*:*`);
     }

@@ -1,16 +1,15 @@
 import {
-    BranchNode,
-    CompiledNode,
-    TaskNode,
-    WorkflowId,
-    WorkflowNode
-} from 'models';
-import {
     NodeExecution,
     NodeExecutionClosure,
     NodeExecutionMetadata,
     WorkflowNodeMetadata
 } from 'models/Execution/types';
+import {
+    BranchNode,
+    CompiledNode,
+    TaskNode,
+    WorkflowNode
+} from 'models/Node/types';
 import { TaskTemplate } from 'models/Task/types';
 
 export interface ExecutionPhaseConstants {
@@ -32,15 +31,6 @@ export enum NodeExecutionDisplayType {
     Unknown = 'Unknown',
     UnknownTask = 'Unknown Task',
     WaitableTask = 'Waitable Task'
-}
-
-export interface UniqueNodeId {
-    workflowId: WorkflowId;
-    nodeId: string;
-}
-export interface NodeInformation {
-    id: UniqueNodeId;
-    node: CompiledNode;
 }
 
 export interface CompiledTaskNode extends CompiledNode {

@@ -1,9 +1,5 @@
-import {
-    getTaskExecution,
-    TaskExecution,
-    TaskExecutionIdentifier
-} from 'models';
-
+import { getTaskExecution } from 'models/Execution/api';
+import { TaskExecution, TaskExecutionIdentifier } from 'models/Execution/types';
 import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
 

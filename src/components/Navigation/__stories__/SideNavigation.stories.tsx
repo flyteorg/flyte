@@ -1,8 +1,6 @@
-import * as React from 'react';
-
 import { storiesOf } from '@storybook/react';
-
-import { ContentContainer } from 'components/common';
+import { ContentContainer } from 'components/common/ContentContainer';
+import * as React from 'react';
 import { NavBar } from '../NavBar';
 import { SideNavigation } from '../SideNavigation';
 

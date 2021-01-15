@@ -1,7 +1,7 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { QueryType } from 'components/data/types';
 import { waitForQueryState } from 'components/data/queryUtils';
-import { Execution } from 'models';
+import { QueryType } from 'components/data/types';
+import { Execution } from 'models/Execution/types';
 import { useContext, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { ExecutionContext } from '../contexts';

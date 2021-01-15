@@ -1,9 +1,11 @@
 import { Dialog, DialogContent, Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { WaitForData } from 'components/common';
 import { ClosableDialogTitle } from 'components/common/ClosableDialogTitle';
-import { LiteralMapViewer, RemoteLiteralMapViewer } from 'components/Literals';
-import { emptyLiteralMapBlob, Execution } from 'models';
+import { WaitForData } from 'components/common/WaitForData';
+import { LiteralMapViewer } from 'components/Literals/LiteralMapViewer';
+import { RemoteLiteralMapViewer } from 'components/Literals/RemoteLiteralMapViewer';
+import { emptyLiteralMapBlob } from 'models/Common/constants';
+import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { useWorkflowExecutionData } from './useWorkflowExecution';
 

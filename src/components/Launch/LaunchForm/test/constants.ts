@@ -1,5 +1,3 @@
-import { roleTypes } from '../constants';
-
 export const booleanInputName = 'simpleBoolean';
 export const stringInputName = 'simpleString';
 export const stringNoLabelName = 'stringNoLabel';

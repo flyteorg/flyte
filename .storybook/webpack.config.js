@@ -2,9 +2,6 @@ const webpack = require('webpack');
 
 const env = require('../env').processEnv;
 
-// TODO: Consolidate our webpack loaders. These were copied from the project-level webpack config
-// (partially because that config is written in Typescript and this file is not).
-
 /** Adds sourcemap support */
 const sourceMapRule = {
     test: /\.js$/,

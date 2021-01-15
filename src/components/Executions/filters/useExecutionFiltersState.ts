@@ -1,5 +1,5 @@
 import { compact, flatMap } from 'lodash';
-import { FilterOperation } from 'models';
+import { FilterOperation } from 'models/AdminEntity/types';
 import { filterLabels } from './constants';
 import { durationFilters } from './durationFilters';
 import {

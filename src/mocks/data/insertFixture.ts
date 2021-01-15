@@ -1,5 +1,5 @@
 import { AdminServer } from 'mocks/createAdminServer';
-import { nodeExecutionQueryParams } from 'models';
+import { nodeExecutionQueryParams } from 'models/Execution/constants';
 import {
     MockDataFixture,
     MockNodeExecutionData,

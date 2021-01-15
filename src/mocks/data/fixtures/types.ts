@@ -1,11 +1,11 @@
 import {
-    TaskExecution,
-    NodeExecution,
     Execution,
-    Task,
-    Workflow,
-    LaunchPlan
-} from 'models';
+    NodeExecution,
+    TaskExecution
+} from 'models/Execution/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { Task } from 'models/Task/types';
+import { Workflow } from 'models/Workflow/types';
 
 /** Represents a TaskExecution and its associated children. */
 export interface MockTaskExecutionData {

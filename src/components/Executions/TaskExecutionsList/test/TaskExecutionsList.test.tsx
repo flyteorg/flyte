@@ -1,14 +1,12 @@
 import { render, waitFor } from '@testing-library/react';
 import { noExecutionsFoundString } from 'common/constants';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import {
-    listTaskExecutions,
-    NodeExecution,
-    SortDirection,
-    taskSortFields
-} from 'models';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { SortDirection } from 'models/AdminEntity/types';
+import { listTaskExecutions } from 'models/Execution/api';
+import { NodeExecution } from 'models/Execution/types';
 import { mockNodeExecutionResponse } from 'models/Execution/__mocks__/mockNodeExecutionsData';
+import { taskSortFields } from 'models/Task/constants';
 import * as React from 'react';
 import { TaskExecutionsList } from '../TaskExecutionsList';
 

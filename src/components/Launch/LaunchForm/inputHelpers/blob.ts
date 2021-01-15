@@ -1,6 +1,6 @@
 import { Core } from 'flyteidl';
 import { isObject } from 'lodash';
-import { BlobDimensionality } from 'models';
+import { BlobDimensionality } from 'models/Common/types';
 import { BlobValue, InputValue } from '../types';
 import { literalNone } from './constants';
 import { ConverterInput, InputHelper, InputValidatorParams } from './types';

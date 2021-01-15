@@ -1,8 +1,10 @@
 import { render, waitFor } from '@testing-library/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { Admin } from 'flyteidl';
-import { FilterOperationName, listNamedEntities, NamedEntity } from 'models';
+import { FilterOperationName } from 'models/AdminEntity/types';
+import { listNamedEntities } from 'models/Common/api';
+import { NamedEntity } from 'models/Common/types';
 import * as React from 'react';
 import { MemoryRouter } from 'react-router';
 import { createWorkflowName } from 'test/modelUtils';

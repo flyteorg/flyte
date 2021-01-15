@@ -1,8 +1,9 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { NewTargetLink } from 'components/common';
+import { NewTargetLink } from 'components/common/NewTargetLink';
 import { useCommonStyles } from 'components/common/styles';
-import { TaskExecution, TaskLog } from 'models';
+import { TaskLog } from 'models/Common/types';
+import { TaskExecution } from 'models/Execution/types';
 import * as React from 'react';
 import { noLogsFoundString } from '../constants';
 

@@ -1,6 +1,6 @@
 import * as classnames from 'classnames';
-import { getCacheKey } from 'components/Cache';
-import { DetailsPanel } from 'components/common';
+import { getCacheKey } from 'components/Cache/utils';
+import { DetailsPanel } from 'components/common/DetailsPanel';
 import { useCommonStyles } from 'components/common/styles';
 import * as scrollbarSize from 'dom-helpers/util/scrollbarSize';
 import { NodeExecution, NodeExecutionIdentifier } from 'models/Execution/types';

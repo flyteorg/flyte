@@ -2,14 +2,13 @@ import { Admin, Core } from 'flyteidl';
 import {
     BlobDimensionality,
     Identifier,
-    LaunchPlan,
     LiteralType,
-    NamedEntityIdentifier,
-    Task,
-    Workflow,
-    WorkflowExecutionIdentifier,
-    WorkflowId
-} from 'models';
+    NamedEntityIdentifier
+} from 'models/Common/types';
+import { WorkflowExecutionIdentifier } from 'models/Execution/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { Task } from 'models/Task/types';
+import { Workflow, WorkflowId } from 'models/Workflow/types';
 import { Interpreter, State } from 'xstate';
 import {
     BaseLaunchContext,
@@ -162,10 +161,6 @@ export interface InputTypeDefinition {
     literalType: LiteralType;
     type: InputType;
     subtype?: InputTypeDefinition;
-}
-
-export interface ObjectValue {
-    type: InputType;
 }
 
 export interface BlobValue {

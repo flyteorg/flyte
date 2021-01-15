@@ -1,10 +1,9 @@
-import { ExecutionDetails } from 'components/Executions/ExecutionDetails';
-import { TaskExecutionDetails } from 'components/Executions/TaskExecutionDetails';
-import { NotFound } from 'components/NotFound';
-import { ProjectDetails } from 'components/Project';
-import { SelectProject } from 'components/SelectProject';
+import { ExecutionDetails } from 'components/Executions/ExecutionDetails/ExecutionDetails';
+import { TaskExecutionDetails } from 'components/Executions/TaskExecutionDetails/TaskExecutionDetails';
+import { NotFound } from 'components/NotFound/NotFound';
+import { ProjectDetails } from 'components/Project/ProjectDetails';
+import { SelectProject } from 'components/SelectProject/SelectProject';
 import { TaskDetails } from 'components/Task/TaskDetails';
-import { WorkflowVersionDetails } from 'components/Workflow';
 import { WorkflowDetails } from 'components/Workflow/WorkflowDetails';
 
 /** Indexes the components for each defined route. These are done separately to avoid circular references
@@ -17,6 +16,5 @@ export const components = {
     selectProject: SelectProject,
     taskExecutionDetails: TaskExecutionDetails,
     taskDetails: TaskDetails,
-    workflowDetails: WorkflowDetails,
-    workflowVersionDetails: WorkflowVersionDetails
+    workflowDetails: WorkflowDetails
 };

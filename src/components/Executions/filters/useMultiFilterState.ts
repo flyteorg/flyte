@@ -1,6 +1,9 @@
-import { useQueryState } from 'components/hooks';
+import { useQueryState } from 'components/hooks/useQueryState';
 import { isEqual, mapValues, pickBy } from 'lodash';
-import { FilterOperationName, FilterOperationValue } from 'models';
+import {
+    FilterOperationName,
+    FilterOperationValue
+} from 'models/AdminEntity/types';
 import { useEffect, useState } from 'react';
 import { FilterValue, MultiFilterState } from './types';
 import { useFilterButtonState } from './useFilterButtonState';

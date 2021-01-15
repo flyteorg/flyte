@@ -1,6 +1,6 @@
-import { DAGNode, endNodeId, startNodeId } from 'models';
+import { DAGNode } from 'models/Graph/types';
+import { endNodeId, startNodeId } from 'models/Node/constants';
 
-// TODO: Checking start/end should also be based on presence of parents/children
 export function isStartNode(node: DAGNode) {
     return node.id === startNodeId;
 }

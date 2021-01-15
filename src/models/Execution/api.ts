@@ -1,20 +1,20 @@
 import { Admin, Core } from 'flyteidl';
 import {
-    defaultListExecutionChildrenConfig,
-    defaultPaginationConfig,
-    RequestConfig
-} from 'models/AdminEntity';
-import {
     getAdminEntity,
     postAdminEntity
 } from 'models/AdminEntity/AdminEntity';
 import {
-    endpointPrefixes,
+    defaultListExecutionChildrenConfig,
+    defaultPaginationConfig
+} from 'models/AdminEntity/constants';
+import { RequestConfig } from 'models/AdminEntity/types';
+import { endpointPrefixes } from 'models/Common/constants';
+import {
     Identifier,
     IdentifierScope,
-    makeIdentifierPath,
     NameIdentifierScope
-} from 'models/Common';
+} from 'models/Common/types';
+import { makeIdentifierPath } from 'models/Common/utils';
 import { defaultExecutionPrincipal } from './constants';
 import {
     Execution,

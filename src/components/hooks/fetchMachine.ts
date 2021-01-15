@@ -1,9 +1,10 @@
 import { assign, Machine, State, StateNodeConfig } from 'xstate';
-import { fetchEvents, fetchStates } from '.';
 import {
     FetchEventObject,
+    fetchEvents,
     FetchMachine,
     FetchStateContext,
+    fetchStates,
     FetchStateSchema
 } from './types';
 

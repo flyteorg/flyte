@@ -1,8 +1,13 @@
-import { Literal, LiteralCollection, LiteralMap, Scalar } from 'models';
+import {
+    Literal,
+    LiteralCollection,
+    LiteralMap,
+    Scalar
+} from 'models/Common/types';
 import * as React from 'react';
 import { LiteralCollectionViewer } from './LiteralCollectionViewer';
 import { LiteralMapViewer } from './LiteralMapViewer';
-import { ScalarValue } from './Scalar';
+import { ScalarValue } from './Scalar/ScalarValue';
 import { useLiteralStyles } from './styles';
 import { UnsupportedType } from './UnsupportedType';
 import { ValueLabel } from './ValueLabel';

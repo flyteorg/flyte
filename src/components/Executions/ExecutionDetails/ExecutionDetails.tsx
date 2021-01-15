@@ -2,15 +2,13 @@ import { Collapse, IconButton } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import * as classnames from 'classnames';
-import { LargeLoadingSpinner, withRouteParams } from 'components/common';
+import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { WaitForQuery } from 'components/common/WaitForQuery';
-import { RefreshConfig } from 'components/hooks';
-import { Execution } from 'models';
+import { withRouteParams } from 'components/common/withRouteParams';
+import { Execution } from 'models/Execution/types';
 import * as React from 'react';
-import { executionRefreshIntervalMs } from '../constants';
 import { ExecutionContext } from '../contexts';
 import { useWorkflowExecutionQuery } from '../useWorkflowExecution';
-import { executionIsTerminal } from '../utils';
 import { ExecutionDetailsAppBarContent } from './ExecutionDetailsAppBarContent';
 import { ExecutionMetadata } from './ExecutionMetadata';
 import { ExecutionNodeViews } from './ExecutionNodeViews';
@@ -98,7 +96,10 @@ export const ExecutionDetailsContainer: React.FC<ExecutionDetailsProps> = ({
     );
 
     return (
-        <WaitForQuery loadingComponent={LargeLoadingSpinner} query={useWorkflowExecutionQuery(id)}>
+        <WaitForQuery
+            loadingComponent={LargeLoadingSpinner}
+            query={useWorkflowExecutionQuery(id)}
+        >
             {renderExecutionDetails}
         </WaitForQuery>
     );

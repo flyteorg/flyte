@@ -1,9 +1,8 @@
-import { cloneDeep, keyBy, values } from 'lodash';
-
 import { createDebugLogger } from 'common/log';
 import { createTimer } from 'common/timer';
-import { identifierToString } from 'models/Common';
-import { CompiledWorkflowClosure } from 'models/Workflow';
+import { cloneDeep, keyBy, values } from 'lodash';
+import { identifierToString } from 'models/Common/utils';
+import { CompiledWorkflowClosure } from 'models/Workflow/types';
 import { nodeIds } from './constants';
 import { DAGNode } from './types';
 

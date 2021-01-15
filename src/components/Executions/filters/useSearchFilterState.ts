@@ -1,5 +1,5 @@
-import { useQueryState } from 'components/hooks';
-import { FilterOperationName } from 'models';
+import { useQueryState } from 'components/hooks/useQueryState';
+import { FilterOperationName } from 'models/AdminEntity/types';
 import { useEffect, useState } from 'react';
 import { SearchFilterState } from './types';
 import { useFilterButtonState } from './useFilterButtonState';

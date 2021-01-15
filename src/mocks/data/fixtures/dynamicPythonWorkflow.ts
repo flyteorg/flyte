@@ -1,12 +1,12 @@
-import { endNodeId, startNodeId } from 'models';
 import { TaskExecutionPhase } from 'models/Execution/enums';
+import { endNodeId, startNodeId } from 'models/Node/constants';
 import { nodeIds } from '../constants';
 import {
-    generateTask,
-    generateWorkflow,
     generateExecutionForWorkflow,
     generateNodeExecution,
-    generateTaskExecution
+    generateTask,
+    generateTaskExecution,
+    generateWorkflow
 } from '../generators';
 import { makeDefaultLaunchPlan, taskNodeIds } from '../utils';
 
@@ -80,7 +80,13 @@ function getSharedEntities() {
 }
 
 function generateWithDynamicTaskChild() {
-    const {dynamicTask, pythonTask, workflow, launchPlan, execution } = getSharedEntities();
+    const {
+        dynamicTask,
+        pythonTask,
+        workflow,
+        launchPlan,
+        execution
+    } = getSharedEntities();
     const pythonNodeExecution = generateNodeExecution(execution, pythonNodeId);
     const pythonTaskExecutions = [
         generateTaskExecution(pythonNodeExecution, pythonTask, {
@@ -138,7 +144,13 @@ function generateWithDynamicTaskChild() {
 }
 
 function generateWithNodeExecutionChild() {
-    const {dynamicTask, pythonTask, workflow, launchPlan, execution } = getSharedEntities();
+    const {
+        dynamicTask,
+        pythonTask,
+        workflow,
+        launchPlan,
+        execution
+    } = getSharedEntities();
     const dynamicNodeExecution = generateNodeExecution(
         execution,
         dynamicNodeId,
@@ -171,7 +183,7 @@ function generateWithNodeExecutionChild() {
             dynamic: dynamicTask,
             python: pythonTask
         },
-        workflows: { top: workflow},
+        workflows: { top: workflow },
         workflowExecutions: {
             top: {
                 data: execution,
@@ -182,13 +194,17 @@ function generateWithNodeExecutionChild() {
                             firstChild: {
                                 data: pythonNodeExecutions[0],
                                 taskExecutions: {
-                                    firstAttempt: { data: pythonTaskExecutions[0]}
+                                    firstAttempt: {
+                                        data: pythonTaskExecutions[0]
+                                    }
                                 }
                             },
                             secondChild: {
                                 data: pythonNodeExecutions[1],
                                 taskExecutions: {
-                                    firstAttempt: { data: pythonTaskExecutions[1]}
+                                    firstAttempt: {
+                                        data: pythonTaskExecutions[1]
+                                    }
                                 }
                             }
                         },

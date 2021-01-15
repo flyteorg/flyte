@@ -6,13 +6,11 @@ import {
     ProtobufStruct,
     Scalar,
     Schema
-} from 'models';
+} from 'models/Common/types';
 import * as React from 'react';
-
 import { PrintValue } from '../PrintValue';
 import { UnsupportedType } from '../UnsupportedType';
 import { ValueLabel } from '../ValueLabel';
-
 import { BinaryValue } from './BinaryValue';
 import { BlobValue } from './BlobValue';
 import { ErrorValue } from './ErrorValue';

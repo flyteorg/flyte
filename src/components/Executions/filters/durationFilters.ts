@@ -1,4 +1,4 @@
-import { FilterOperationName } from 'models';
+import { FilterOperationName } from 'models/AdminEntity/types';
 import { FilterMap } from './types';
 
 const key = 'duration';

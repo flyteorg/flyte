@@ -1,12 +1,10 @@
 import { Admin } from 'flyteidl';
-import { defaultPaginationConfig, RequestConfig } from 'models/AdminEntity';
 import { getAdminEntity } from 'models/AdminEntity/AdminEntity';
-import {
-    endpointPrefixes,
-    Identifier,
-    IdentifierScope,
-    makeIdentifierPath
-} from 'models/Common';
+import { defaultPaginationConfig } from 'models/AdminEntity/constants';
+import { RequestConfig } from 'models/AdminEntity/types';
+import { endpointPrefixes } from 'models/Common/constants';
+import { Identifier, IdentifierScope } from 'models/Common/types';
+import { makeIdentifierPath } from 'models/Common/utils';
 import { LaunchPlan } from './types';
 import { launchPlanListTransformer } from './utils';
 

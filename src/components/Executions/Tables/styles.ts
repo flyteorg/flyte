@@ -1,5 +1,5 @@
 import { makeStyles, Theme } from '@material-ui/core';
-import { headerGridHeight } from 'components';
+import { headerGridHeight } from 'components/Tables/constants';
 import {
     headerFontFamily,
     listhoverColor,
@@ -7,8 +7,11 @@ import {
     smallFontSize,
     tableHeaderColor,
     tablePlaceholderColor
-} from 'components/Theme';
-import { nodeExecutionsTableColumnWidths, workflowExecutionsTableColumnWidths } from './constants';
+} from 'components/Theme/constants';
+import {
+    nodeExecutionsTableColumnWidths,
+    workflowExecutionsTableColumnWidths
+} from './constants';
 
 export const selectedClassName = 'selected';
 

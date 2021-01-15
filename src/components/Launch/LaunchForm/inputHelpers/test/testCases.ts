@@ -5,9 +5,9 @@ import {
 } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import { BlobDimensionality, SchemaColumnType } from 'models';
-import { blobLiteral, primitiveLiteral } from '../../__mocks__/utils';
+import { BlobDimensionality, SchemaColumnType } from 'models/Common/types';
 import { InputType, InputTypeDefinition, InputValue } from '../../types';
+import { blobLiteral, primitiveLiteral } from '../../__mocks__/utils';
 import { literalNone } from '../constants';
 import { structTestCases } from './structTestCases';
 

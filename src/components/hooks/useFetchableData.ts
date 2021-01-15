@@ -1,10 +1,11 @@
 import { useMachine } from '@xstate/react';
-import { env } from 'common/env';
 import { createDebugLogger } from 'common/log';
-import { CacheContext, getCacheKey, ValueCache } from 'components/Cache';
+import { CacheContext } from 'components/Cache/CacheContext';
+import { ValueCache } from 'components/Cache/createCache';
+import { getCacheKey } from 'components/Cache/utils';
 import { defaultStateMachineConfig } from 'components/common/constants';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
-import { NotAuthorizedError } from 'errors';
+import { NotAuthorizedError } from 'errors/fetchErrors';
 import { useContext, useEffect, useMemo, useRef } from 'react';
 import { fetchMachine } from './fetchMachine';
 import {

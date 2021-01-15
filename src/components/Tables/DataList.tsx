@@ -1,9 +1,8 @@
-import { Typography } from '@material-ui/core';
+import { ListProps, Typography } from '@material-ui/core';
 import { makeStyles, Theme, useTheme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
-import { ListProps } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
-import { tablePlaceholderColor } from 'components/Theme';
+import { tablePlaceholderColor } from 'components/Theme/constants';
 import * as React from 'react';
 import {
     AutoSizer,

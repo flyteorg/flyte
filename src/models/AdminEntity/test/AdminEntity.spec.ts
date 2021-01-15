@@ -1,4 +1,4 @@
-import { NotAuthorizedError, NotFoundError } from 'errors';
+import { NotAuthorizedError, NotFoundError } from 'errors/fetchErrors';
 import { Admin } from 'flyteidl';
 import { mockServer } from 'mocks/server';
 import { rest } from 'msw';

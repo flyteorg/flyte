@@ -50,6 +50,7 @@ export const LaunchTaskForm: React.FC<LaunchTaskFormProps> = props => {
 
     // TODO: We removed all loading indicators here. Decide if we want skeletons
     // instead.
+    // https://github.com/lyft/flyte/issues/666
     return (
         <>
             <LaunchFormHeader title={state.context.sourceId?.name} />

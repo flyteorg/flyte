@@ -1,6 +1,6 @@
-import { ExpandableContentLink } from 'components/common';
+import { ExpandableContentLink } from 'components/common/ExpandableContentLink';
 import { useCommonStyles } from 'components/common/styles';
-import { ExecutionError } from 'models';
+import { ExecutionError } from 'models/Execution/types';
 import * as React from 'react';
 
 /** Renders an expandable error for a `TaskExecution` */

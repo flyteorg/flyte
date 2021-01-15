@@ -1,4 +1,4 @@
-import { obj } from "test/utils";
+import { obj } from 'test/utils';
 
 export enum RequestErrorType {
     NotFound = 404,

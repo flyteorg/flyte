@@ -1,10 +1,7 @@
 import { storiesOf } from '@storybook/react';
+import { ProtobufListValue, ProtobufStruct } from 'models/Common/types';
 import * as React from 'react';
-
-import { ProtobufListValue, ProtobufStruct } from 'models';
-
 import { LiteralValue } from '../LiteralValue';
-
 import { CardDecorator } from './CardDecorator';
 import { protobufValues } from './protobufValues';
 

@@ -1,4 +1,4 @@
-import { Error } from 'models/Common';
+import { Error } from 'models/Common/types';
 import * as React from 'react';
 import { PrintValue } from '../PrintValue';
 import { useLiteralStyles } from '../styles';

@@ -1,8 +1,8 @@
 import { render } from '@testing-library/react';
 import { set } from 'lodash';
+import { SimpleType, TypedInterface, Variable } from 'models/Common/types';
+import { Task } from 'models/Task/types';
 import * as React from 'react';
-
-import { SimpleType, Task, TypedInterface, Variable } from 'models';
 import { SimpleTaskInterface } from '../SimpleTaskInterface';
 
 function setTaskInterface(task: Task, values: TypedInterface): Task {

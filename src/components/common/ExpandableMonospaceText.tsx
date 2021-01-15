@@ -9,7 +9,7 @@ import {
     nestedListColor,
     separatorColor,
     smallFontSize
-} from 'components/Theme';
+} from 'components/Theme/constants';
 import * as copyToClipboard from 'copy-to-clipboard';
 import * as React from 'react';
 

@@ -1,4 +1,4 @@
-import { Blob, BlobDimensionality } from 'models';
+import { Blob, BlobDimensionality } from 'models/Common/types';
 import * as React from 'react';
 import { PrintValue } from '../PrintValue';
 import { useLiteralStyles } from '../styles';

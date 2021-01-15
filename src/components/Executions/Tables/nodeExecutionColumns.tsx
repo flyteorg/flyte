@@ -9,13 +9,14 @@ import { useCommonStyles } from 'components/common/styles';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { Core } from 'flyteidl';
 import { isEqual } from 'lodash';
-import { TaskNodeMetadata } from 'models';
 import { NodeExecutionPhase } from 'models/Execution/enums';
+import { TaskNodeMetadata } from 'models/Execution/types';
 import * as React from 'react';
-import { ExecutionStatusBadge, getNodeExecutionTimingMS } from '..';
+import { ExecutionStatusBadge } from '../ExecutionStatusBadge';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
 import { NodeExecutionDetails } from '../types';
 import { useNodeExecutionDetails } from '../useNodeExecutionDetails';
+import { getNodeExecutionTimingMS } from '../utils';
 import { SelectNodeExecutionLink } from './SelectNodeExecutionLink';
 import { useColumnStyles } from './styles';
 import {

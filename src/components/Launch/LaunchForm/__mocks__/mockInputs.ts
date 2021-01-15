@@ -7,7 +7,7 @@ import {
     SimpleType,
     TypedInterface,
     Variable
-} from 'models/Common';
+} from 'models/Common/types';
 import { literalNone } from '../inputHelpers/constants';
 import { primitiveLiteral } from './utils';
 

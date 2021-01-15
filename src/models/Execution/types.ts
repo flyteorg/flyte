@@ -3,11 +3,9 @@ import {
     Identifier,
     LiteralMap,
     LiteralMapBlob,
-    Notification,
     TaskLog,
     UrlBlob
-} from 'models/Common';
-
+} from 'models/Common/types';
 import {
     ExecutionMode,
     NodeExecutionPhase,
@@ -59,8 +57,6 @@ export interface Execution extends Admin.IExecution {
     id: WorkflowExecutionIdentifier;
     spec: ExecutionSpec;
 }
-
-export type ExecutionsMap = Map<string, Execution>;
 
 /** Node executions **/
 export interface WorkflowNodeMetadata {

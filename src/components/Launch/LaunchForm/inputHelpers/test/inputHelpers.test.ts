@@ -1,13 +1,13 @@
 import { stringifyValue } from 'common/utils';
 import { Core } from 'flyteidl';
 import * as Long from 'long';
-import { BlobDimensionality, SimpleType } from 'models';
+import { BlobDimensionality, SimpleType } from 'models/Common/types';
+import { InputProps, InputType, InputTypeDefinition } from '../../types';
 import {
     collectionInputTypeDefinition,
     nestedCollectionInputTypeDefinition,
     primitiveLiteral
 } from '../../__mocks__/utils';
-import { InputProps, InputType, InputTypeDefinition } from '../../types';
 import { literalNone } from '../constants';
 import { getHelperForInput } from '../getHelperForInput';
 import {

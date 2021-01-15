@@ -62,9 +62,3 @@ export const mockLaunchPlanSchedules = {
         cronExpression: '0 6 * * ? *'
     }
 };
-
-export const createMockLaunchPlans: Fn<LaunchPlan[]> = () => [
-    createMockLaunchPlan('workflow1'),
-    createMockLaunchPlan('workflow2'),
-    createMockLaunchPlan('workflow3')
-];

@@ -1,7 +1,6 @@
 import { Core } from 'flyteidl';
 import { mapValues } from 'lodash';
-import { Literal } from 'models';
-
+import { Literal } from 'models/Common/types';
 import {
     binaryScalars,
     blobScalars,

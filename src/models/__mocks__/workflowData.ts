@@ -1,8 +1,8 @@
-import { getCacheKey } from 'components/Cache';
+import { getCacheKey } from 'components/Cache/utils';
 import { Admin } from 'flyteidl';
 import { cloneDeep } from 'lodash';
-import { Identifier } from '../Common';
-import { Workflow, WorkflowClosure } from '../Workflow';
+import { Identifier } from 'models/Common/types';
+import { Workflow, WorkflowClosure } from 'models/Workflow/types';
 import * as simpleClosure from './simpleWorkflowClosure.json';
 
 const decodedClosure = Admin.WorkflowClosure.create(
@@ -28,12 +28,6 @@ export const createMockWorkflow: (
 
 export const createMockWorkflowClosure: () => WorkflowClosure = () =>
     cloneDeep(decodedClosure);
-
-export const createMockWorkflows: Fn<Workflow[]> = () => [
-    createMockWorkflow('workflow1'),
-    createMockWorkflow('workflow2'),
-    createMockWorkflow('workflow3')
-];
 
 export const createMockWorkflowVersions = (name: string, length: number) => {
     return Array.from({ length }, (_, idx) => {

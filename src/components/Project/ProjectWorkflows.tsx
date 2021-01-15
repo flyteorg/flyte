@@ -1,13 +1,10 @@
-import { WaitForData } from 'components/common';
+import { WaitForData } from 'components/common/WaitForData';
 import { useWorkflowNameList } from 'components/hooks/useNamedEntity';
 import { SearchableWorkflowNameList } from 'components/Workflow/SearchableWorkflowNameList';
 import { Admin } from 'flyteidl';
-import {
-    FilterOperationName,
-    limits,
-    SortDirection,
-    workflowSortFields
-} from 'models';
+import { limits } from 'models/AdminEntity/constants';
+import { FilterOperationName, SortDirection } from 'models/AdminEntity/types';
+import { workflowSortFields } from 'models/Workflow/constants';
 import * as React from 'react';
 
 export interface ProjectWorkflowsProps {

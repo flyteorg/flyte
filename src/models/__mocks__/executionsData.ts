@@ -1,12 +1,12 @@
 import { Core, Protobuf } from 'flyteidl';
 import * as Long from 'long';
-import { LiteralMap, LiteralMapBlob } from 'models/Common';
+import { LiteralMap, LiteralMapBlob } from 'models/Common/types';
 import {
     Execution,
     ExecutionClosure,
     ExecutionMetadata,
     ExecutionSpec
-} from '../Execution';
+} from 'models/Execution/types';
 import { ExecutionMode, WorkflowExecutionPhase } from '../Execution/enums';
 
 export const MOCK_LAUNCH_PLAN_ID = {
@@ -101,9 +101,3 @@ export const createMockExecution: (id?: string | number) => Execution = (
         spec: createMockExecutionSpec()
     };
 };
-
-export const createMockExecutions: () => Execution[] = () => [
-    createMockExecution(1),
-    createMockExecution(2),
-    createMockExecution(3)
-];

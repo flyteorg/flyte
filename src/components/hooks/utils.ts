@@ -1,4 +1,6 @@
-import { GloballyUniqueNode, TaskTemplate, Workflow } from 'models';
+import { GloballyUniqueNode } from 'models/Node/types';
+import { TaskTemplate } from 'models/Task/types';
+import { Workflow } from 'models/Workflow/types';
 
 export function extractTaskTemplates(workflow: Workflow): TaskTemplate[] {
     if (!workflow.closure || !workflow.closure.compiledWorkflow) {

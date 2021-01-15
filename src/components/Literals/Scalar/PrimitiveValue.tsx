@@ -1,8 +1,7 @@
-import * as React from 'react';
-
 import { formatDateUTC, protobufDurationToHMS } from 'common/formatters';
 import { timestampToDate } from 'common/utils';
-import { Primitive } from 'models';
+import { Primitive } from 'models/Common/types';
+import * as React from 'react';
 
 /** Stringifies a Primitive, handling any necessary formatting */
 function primitiveToString(primitive: Primitive): string {

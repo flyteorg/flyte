@@ -2,14 +2,11 @@ import { useMachine } from '@xstate/react';
 import { defaultStateMachineConfig } from 'components/common/constants';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { isEqual, partial, uniqBy } from 'lodash';
-import {
-    FilterOperationName,
-    Identifier,
-    SortDirection,
-    Task,
-    taskSortFields,
-    WorkflowExecutionIdentifier
-} from 'models';
+import { FilterOperationName, SortDirection } from 'models/AdminEntity/types';
+import { Identifier } from 'models/Common/types';
+import { WorkflowExecutionIdentifier } from 'models/Execution/types';
+import { taskSortFields } from 'models/Task/constants';
+import { Task } from 'models/Task/types';
 import { RefObject, useEffect, useMemo, useRef } from 'react';
 import { correctInputErrors } from './constants';
 import { getInputsForTask } from './getInputs';

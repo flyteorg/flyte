@@ -1,8 +1,9 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { SearchableList, SearchResult, WaitForData } from 'components/common';
-import { useProjects } from 'components/hooks';
-import { Project } from 'models/Project';
+import { SearchableList, SearchResult } from 'components/common/SearchableList';
+import { WaitForData } from 'components/common/WaitForData';
+import { useProjects } from 'components/hooks/useProjects';
+import { Project } from 'models/Project/types';
 import * as React from 'react';
 import { ProjectList } from './ProjectList';
 

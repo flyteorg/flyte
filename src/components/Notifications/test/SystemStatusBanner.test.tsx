@@ -1,7 +1,7 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext, APIContextValue } from 'components/data/apiContext';
-import { StatusString, SystemStatus } from 'models';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { StatusString, SystemStatus } from 'models/Common/types';
 import * as React from 'react';
 import { pendingPromise } from 'test/utils';
 import { SystemStatusBanner } from '../SystemStatusBanner';

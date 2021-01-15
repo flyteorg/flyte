@@ -5,7 +5,6 @@ import Tabs from '@material-ui/core/Tabs';
 import Close from '@material-ui/icons/Close';
 import * as classnames from 'classnames';
 import { useCommonStyles } from 'components/common/styles';
-import { TaskExecutionsList } from 'components/Executions';
 import { ExecutionStatusBadge } from 'components/Executions/ExecutionStatusBadge';
 import { LocationState } from 'components/hooks/useLocationState';
 import { useTabState } from 'components/hooks/useTabState';
@@ -16,9 +15,10 @@ import * as React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useQuery } from 'react-query';
 import { Link as RouterLink } from 'react-router-dom';
-import { Routes } from 'routes';
+import { Routes } from 'routes/routes';
 import { NodeExecutionCacheStatus } from '../NodeExecutionCacheStatus';
 import { makeNodeExecutionQuery } from '../nodeExecutionQueries';
+import { TaskExecutionsList } from '../TaskExecutionsList/TaskExecutionsList';
 import { NodeExecutionDetails } from '../types';
 import { useNodeExecutionDetails } from '../useNodeExecutionDetails';
 import { NodeExecutionInputs } from './NodeExecutionInputs';
@@ -210,7 +210,11 @@ export const NodeExecutionDetailsPanelContent: React.FC<NodeExecutionDetailsProp
     const commonStyles = useCommonStyles();
     const styles = useStyles();
     const detailsQuery = useNodeExecutionDetails(nodeExecution);
-    const displayId = detailsQuery.data ? detailsQuery.data.displayId : <Skeleton />;
+    const displayId = detailsQuery.data ? (
+        detailsQuery.data.displayId
+    ) : (
+        <Skeleton />
+    );
     const taskTemplate = detailsQuery.data
         ? detailsQuery.data.taskTemplate
         : null;

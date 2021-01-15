@@ -1,5 +1,5 @@
-import { endNodeId, startNodeId } from 'models';
 import { NodeExecutionPhase, TaskExecutionPhase } from 'models/Execution/enums';
+import { endNodeId, startNodeId } from 'models/Node/constants';
 import {
     generateExecutionForWorkflow,
     generateNodeExecution,

@@ -1,7 +1,8 @@
-import { LargeLoadingSpinner, withRouteParams } from 'components/common';
+import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { WaitForQuery } from 'components/common/WaitForQuery';
+import { withRouteParams } from 'components/common/withRouteParams';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
-import { TaskExecution, TaskExecutionIdentifier } from 'models';
+import { TaskExecution, TaskExecutionIdentifier } from 'models/Execution/types';
 import * as React from 'react';
 import { executionRefreshIntervalMs } from '../constants';
 import { makeTaskExecutionQuery } from '../taskExecutionQueries';

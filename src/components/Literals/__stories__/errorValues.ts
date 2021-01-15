@@ -1,4 +1,4 @@
-import { Error } from 'models';
+import { Error } from 'models/Common/types';
 
 export const errorValues: Dictionary<Error> = {
     basic: {

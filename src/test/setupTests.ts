@@ -6,7 +6,7 @@ import { obj } from './utils';
 beforeAll(() => {
     insertDefaultData(mockServer);
     mockServer.listen({
-        onUnhandledRequest: (req) => {
+        onUnhandledRequest: req => {
             const message = `Unexpected request: ${obj(req)}`;
             throw new Error(message);
         }

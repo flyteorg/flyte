@@ -1,10 +1,8 @@
 import { storiesOf } from '@storybook/react';
+import { LiteralCollection } from 'models/Common/types';
 import * as React from 'react';
-
-import { LiteralCollection } from 'models';
-import { CardDecorator } from './CardDecorator';
-
 import { LiteralValue } from '../LiteralValue';
+import { CardDecorator } from './CardDecorator';
 import {
     binaryLiterals,
     blobLiterals,

@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react';
+import { NotAuthorizedError, NotFoundError } from 'errors/fetchErrors';
 import * as React from 'react';
-
-import { NotAuthorizedError, NotFoundError } from 'errors';
 import { DataError, DataErrorProps } from '../DataError';
 
 describe('DataError', () => {

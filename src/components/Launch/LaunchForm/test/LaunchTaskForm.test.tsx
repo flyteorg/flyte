@@ -8,30 +8,26 @@ import {
     render,
     waitFor
 } from '@testing-library/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import { muiTheme } from 'components/Theme';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { muiTheme } from 'components/Theme/muiTheme';
 import { Core } from 'flyteidl';
 import { cloneDeep, get } from 'lodash';
+import { RequestConfig } from 'models/AdminEntity/types';
+import {
+    Identifier,
+    NamedEntityIdentifier,
+    Variable
+} from 'models/Common/types';
 import {
     createWorkflowExecution,
-    CreateWorkflowExecutionArguments,
-    getTask,
-    Identifier,
-    listTasks,
-    NamedEntityIdentifier,
-    RequestConfig,
-    Task,
-    Variable
-} from 'models';
+    CreateWorkflowExecutionArguments
+} from 'models/Execution/api';
+import { getTask, listTasks } from 'models/Task/api';
+import { Task } from 'models/Task/types';
 import { createMockTaskClosure } from 'models/__mocks__/taskData';
 import * as React from 'react';
 import { delayedPromise, pendingPromise } from 'test/utils';
-import {
-    createMockInputsInterface,
-    mockSimpleVariables,
-    simpleVariableDefaults
-} from '../__mocks__/mockInputs';
 import {
     cannotLaunchTaskString,
     formStrings,
@@ -43,6 +39,11 @@ import {
 import { LaunchForm } from '../LaunchForm';
 import { LaunchFormProps, TaskInitialLaunchParameters } from '../types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
+import {
+    createMockInputsInterface,
+    mockSimpleVariables,
+    simpleVariableDefaults
+} from '../__mocks__/mockInputs';
 import {
     binaryInputName,
     booleanInputName,

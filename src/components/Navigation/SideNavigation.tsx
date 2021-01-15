@@ -1,6 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { navbarGridHeight, sideNavGridWidth } from 'common/layout';
-import { separatorColor } from 'components/Theme';
+import { separatorColor } from 'components/Theme/constants';
 import * as React from 'react';
 import { Route } from 'react-router-dom';
 import { projectBasePath } from 'routes/constants';

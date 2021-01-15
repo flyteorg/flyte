@@ -1,9 +1,8 @@
-import * as React from 'react';
-
 import { storiesOf } from '@storybook/react';
-import { CompiledWorkflowClosure, convertFlyteGraphToDAG } from 'models';
+import { convertFlyteGraphToDAG } from 'models/Graph/convertFlyteGraphToDAG';
+import { CompiledWorkflowClosure } from 'models/Workflow/types';
+import * as React from 'react';
 import { Graph } from '../Graph';
-
 import * as batchTasks from './batchTasks.json';
 import * as largeGraph from './largeGraph.json';
 import * as rich from './rich.json';

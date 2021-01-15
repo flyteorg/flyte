@@ -1,11 +1,5 @@
-import { Domain, Project } from '../Project';
+import { Domain, Project } from 'models/Project/types';
 
-export const emptyProject = {
-    id: 'emptyproject',
-    name: 'emptyproject',
-    domains: [],
-    description: ''
-};
 export const mockDomainIds = ['development', 'production'];
 export const mockProjectIds = Array.from(Array(10).keys()).map(
     idx => `project number ${idx}`
@@ -24,10 +18,3 @@ export const createMockProjects: () => Project[] = () =>
         name: id,
         domains: makeDomainList(mockDomainIds)
     }));
-
-export const createMockProjectsMap: () => Map<string, Project> = () => {
-    const projects = createMockProjects();
-    return new Map(
-        projects.map<[string, Project]>(p => [p.id, p])
-    );
-};

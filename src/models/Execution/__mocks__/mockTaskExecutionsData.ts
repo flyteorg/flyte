@@ -2,13 +2,8 @@ import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Admin } from 'flyteidl';
 import { cloneDeep } from 'lodash';
 import { TaskLog } from 'models/Common/types';
-import { CompiledNode } from 'models/Node/types';
 import { TaskExecutionPhase } from '../enums';
-import {
-    NodeExecutionIdentifier,
-    TaskExecution,
-    TaskExecutionClosure
-} from '../types';
+import { TaskExecution, TaskExecutionClosure } from '../types';
 import { sampleError } from './sampleExecutionError';
 
 const sampleLogs: TaskLog[] = [
@@ -54,27 +49,6 @@ export const mockTaskExecutionResponse: Admin.ITaskExecution = {
 };
 
 export const mockExecution = mockTaskExecutionResponse as TaskExecution;
-
-export function createMockTaskExecutionForNodeExecution(
-    nodeExecutionId: NodeExecutionIdentifier,
-    node: CompiledNode,
-    retryAttempt: number,
-    overrides?: Partial<TaskExecution>
-): TaskExecution {
-    return {
-        ...{
-            inputUri,
-            id: {
-                nodeExecutionId,
-                retryAttempt,
-                taskId: node.taskNode!.referenceId
-            },
-            isParent: false,
-            closure: createClosure()
-        },
-        ...overrides
-    };
-}
 
 export const createMockTaskExecutionsListResponse = (length: number) => {
     return {

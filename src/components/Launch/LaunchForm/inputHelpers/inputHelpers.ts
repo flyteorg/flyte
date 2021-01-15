@@ -1,4 +1,4 @@
-import { ValueError } from 'errors';
+import { ValueError } from 'errors/parameterErrors';
 import { Core } from 'flyteidl';
 import { InputProps, InputTypeDefinition, InputValue } from '../types';
 import { literalNone } from './constants';

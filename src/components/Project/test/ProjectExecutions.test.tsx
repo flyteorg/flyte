@@ -2,19 +2,21 @@ import { render, waitFor } from '@testing-library/react';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
 import { insertFixture } from 'mocks/data/insertFixture';
-import { notFoundError, unexpectedError } from 'mocks/errors';
+import { unexpectedError } from 'mocks/errors';
 import { mockServer } from 'mocks/server';
-import {
-    DomainIdentifierScope,
-    Execution,
-    executionSortFields,
-    SortDirection,
-    sortQueryKeys
-} from 'models';
+import { sortQueryKeys } from 'models/AdminEntity/constants';
+import { SortDirection } from 'models/AdminEntity/types';
+import { DomainIdentifierScope } from 'models/Common/types';
+import { executionSortFields } from 'models/Execution/constants';
+import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { MemoryRouter } from 'react-router';
-import { createTestQueryClient, disableQueryLogger, enableQueryLogger } from 'test/utils';
+import {
+    createTestQueryClient,
+    disableQueryLogger,
+    enableQueryLogger
+} from 'test/utils';
 import { failedToLoadExecutionsString } from '../constants';
 import { ProjectExecutions } from '../ProjectExecutions';
 
@@ -92,7 +94,9 @@ describe('ProjectExecutions', () => {
 
         it('shows error message', async () => {
             const { getByText } = renderView();
-            await waitFor(() => expect(getByText(failedToLoadExecutionsString)));
+            await waitFor(() =>
+                expect(getByText(failedToLoadExecutionsString))
+            );
         });
     });
 });

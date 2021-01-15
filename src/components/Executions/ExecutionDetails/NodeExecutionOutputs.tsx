@@ -1,8 +1,8 @@
-import { WaitForData } from 'components/common';
 import { useCommonStyles } from 'components/common/styles';
-import { useNodeExecutionData } from 'components/hooks';
-import { LiteralMapViewer, RemoteLiteralMapViewer } from 'components/Literals';
-import { NodeExecution } from 'models';
+import { WaitForData } from 'components/common/WaitForData';
+import { useNodeExecutionData } from 'components/hooks/useNodeExecution';
+import { RemoteLiteralMapViewer } from 'components/Literals/RemoteLiteralMapViewer';
+import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
 
 /** Fetches and renders the output data for a given `NodeExecution` */

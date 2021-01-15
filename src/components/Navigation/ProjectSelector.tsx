@@ -1,13 +1,12 @@
 import ButtonBase from '@material-ui/core/ButtonBase';
+import { makeStyles, Theme } from '@material-ui/core/styles';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import * as classnames from 'classnames';
-import { Project } from 'models';
-import * as React from 'react';
-
-import { makeStyles, Theme } from '@material-ui/core/styles';
 import { KeyCodes } from 'common/constants';
 import { useCommonStyles } from 'components/common/styles';
-import { listhoverColor } from 'components/Theme';
+import { listhoverColor } from 'components/Theme/constants';
+import { Project } from 'models/Project/types';
+import * as React from 'react';
 import { SearchableProjectList } from './SearchableProjectList';
 
 const expanderGridHeight = 12;
@@ -83,7 +82,12 @@ export const ProjectSelector: React.FC<ProjectSelectorProps> = ({
             >
                 <header className={styles.header}>
                     <div className={commonStyles.microHeader}>PROJECT</div>
-                    <div className={classnames(commonStyles.mutedHeader, commonStyles.textWrapped)}>
+                    <div
+                        className={classnames(
+                            commonStyles.mutedHeader,
+                            commonStyles.textWrapped
+                        )}
+                    >
                         {selectedProject.name}
                     </div>
                 </header>

@@ -1,5 +1,5 @@
 import { createDebugLogger } from 'common/log';
-import { getCacheKey } from 'components/Cache';
+import { getCacheKey } from 'components/Cache/utils';
 import { useEffect } from 'react';
 import { isLoadingState } from './fetchMachine';
 import { FetchableData, fetchStates, RefreshConfig } from './types';

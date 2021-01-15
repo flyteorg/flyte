@@ -17,7 +17,6 @@ function isWorkflowPropsObject(
 export const LaunchForm: React.FC<LaunchFormProps> = props => {
     const [inputValueCache] = React.useState(createInputValueCache());
 
-    // TODO: Use LaunchTaskForm when it has been implemented.
     return (
         <InputValueCacheContext.Provider value={inputValueCache}>
             {isWorkflowPropsObject(props) ? (

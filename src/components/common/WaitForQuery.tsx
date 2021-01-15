@@ -1,5 +1,5 @@
 import { log } from 'common/log';
-import { DataError } from 'components/Errors';
+import { DataError } from 'components/Errors/DataError';
 import * as React from 'react';
 import { QueryObserverResult } from 'react-query';
 import { ErrorBoundary } from './ErrorBoundary';

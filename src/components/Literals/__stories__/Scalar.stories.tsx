@@ -1,10 +1,7 @@
 import { storiesOf } from '@storybook/react';
+import { Scalar } from 'models/Common/types';
 import * as React from 'react';
-
-import { Scalar } from 'models';
-
 import { ScalarValue } from '../Scalar/ScalarValue';
-
 import { CardDecorator } from './CardDecorator';
 import {
     binaryScalars,

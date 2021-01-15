@@ -1,19 +1,20 @@
 import { QueryInput, QueryType } from 'components/data/types';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { isEqual } from 'lodash';
+import { RequestConfig } from 'models/AdminEntity/types';
 import {
-    endNodeId,
     getNodeExecution,
     listNodeExecutions,
-    listTaskExecutionChildren,
+    listTaskExecutionChildren
+} from 'models/Execution/api';
+import { nodeExecutionQueryParams } from 'models/Execution/constants';
+import {
     NodeExecution,
     NodeExecutionIdentifier,
-    nodeExecutionQueryParams,
-    RequestConfig,
-    startNodeId,
     TaskExecutionIdentifier,
     WorkflowExecutionIdentifier
-} from 'models';
+} from 'models/Execution/types';
+import { endNodeId, startNodeId } from 'models/Node/constants';
 import { QueryClient, QueryObserverResult, useQueryClient } from 'react-query';
 import { fetchTaskExecutionList } from './taskExecutionQueries';
 import { formatRetryAttempt } from './TaskExecutionsList/utils';
@@ -245,7 +246,6 @@ async function fetchGroupsForParentNodeExecution(
     return Array.from(groupsByName.values());
 }
 
-
 function fetchChildNodeExecutionGroups(
     queryClient: QueryClient,
     nodeExecution: NodeExecution,
@@ -292,15 +292,13 @@ export function useChildNodeExecutionGroupsQuery(
         if (!nodeExecutionIsTerminal(nodeExecution)) {
             return true;
         }
-        return groups.some( group =>
+        return groups.some(group =>
             group.nodeExecutions.some(ne => !nodeExecutionIsTerminal(ne))
         );
     };
 
     return useConditionalQuery<NodeExecutionGroup[]>(
         {
-            // TODO: testing, remove.
-            retry: false,
             queryKey: [
                 QueryType.NodeExecutionChildList,
                 nodeExecution.id,

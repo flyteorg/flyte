@@ -1,14 +1,10 @@
 import { timestampToDate } from 'common/utils';
 import { Core } from 'flyteidl';
 import { isObject } from 'lodash';
-import {
-    Identifier,
-    LaunchPlan,
-    LiteralType,
-    Task,
-    Variable,
-    Workflow
-} from 'models';
+import { Identifier, LiteralType, Variable } from 'models/Common/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { Task } from 'models/Task/types';
+import { Workflow } from 'models/Workflow/types';
 import * as moment from 'moment';
 import { simpleTypeToInputType, typeLabels } from './constants';
 import { inputToLiteral } from './inputHelpers/inputHelpers';

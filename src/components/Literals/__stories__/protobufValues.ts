@@ -1,4 +1,4 @@
-import { ProtobufValue } from 'models';
+import { ProtobufValue } from 'models/Common/types';
 
 export const protobufValues: Dictionary<ProtobufValue> = {
     booleanFalse: {

@@ -1,11 +1,10 @@
-import { TaskType } from 'models/Task';
+import { TaskType } from 'models/Task/constants';
 import { COLOR_SPECTRUM } from './colorSpectrum';
 
 export const bodyFontFamily = 'Lato, helvetica, arial, sans-serif';
 export const headerFontFamily = '"Open Sans", helvetica, arial, sans-serif';
 
 export const whiteColor = COLOR_SPECTRUM.white.color;
-export const veryLightColor = '#ddd';
 export const primaryColor = COLOR_SPECTRUM.purple60.color;
 export const primaryLightColor = COLOR_SPECTRUM.purple30.color;
 export const primaryDarkColor = COLOR_SPECTRUM.purple70.color;
@@ -25,11 +24,6 @@ export const tableHeaderColor = COLOR_SPECTRUM.gray40.color;
 export const tablePlaceholderColor = COLOR_SPECTRUM.gray40.color;
 
 export const selectedActionColor = COLOR_SPECTRUM.gray10.color;
-
-export const warningHighlightColor = COLOR_SPECTRUM.sunset50.color;
-export const cautionHighlightColor = COLOR_SPECTRUM.amber50.color;
-export const successHighlightColor = COLOR_SPECTRUM.mint30.color;
-export const neutralHighlightColor = COLOR_SPECTRUM.gray10.color;
 
 export const separatorColor = COLOR_SPECTRUM.gray15.color;
 export const skeletonColor = COLOR_SPECTRUM.gray15.color;

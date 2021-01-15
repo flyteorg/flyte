@@ -1,10 +1,10 @@
 import { Core } from 'flyteidl';
-import { Alias, Binding, Identifier } from 'models/Common';
+import { Alias, Binding, Identifier } from 'models/Common/types';
 
 /** A graph node indicating a subworkflow execution */
-export type WorkflowNode = Core.IWorkflowNode
+export type WorkflowNode = Core.IWorkflowNode;
 /** A graph node indicating a branching decision. */
-export type BranchNode = Core.IBranchNode
+export type BranchNode = Core.IBranchNode;
 
 /** A graph node indicating a task to be executed. This is the most common
  * node type in a Flyte graph.

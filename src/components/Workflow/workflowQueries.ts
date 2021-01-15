@@ -1,9 +1,13 @@
 import { QueryInput, QueryType } from 'components/data/types';
 import { extractTaskTemplates } from 'components/hooks/utils';
-import { getWorkflow, Workflow, WorkflowId } from 'models';
+import { getWorkflow } from 'models/Workflow/api';
+import { Workflow, WorkflowId } from 'models/Workflow/types';
 import { QueryClient } from 'react-query';
 
-export function makeWorkflowQuery(queryClient: QueryClient, id: WorkflowId): QueryInput<Workflow> {
+export function makeWorkflowQuery(
+    queryClient: QueryClient,
+    id: WorkflowId
+): QueryInput<Workflow> {
     return {
         queryKey: [QueryType.Workflow, id],
         queryFn: async () => {
@@ -12,7 +16,10 @@ export function makeWorkflowQuery(queryClient: QueryClient, id: WorkflowId): Que
             // stored on the workflow so that we don't need to fetch them separately
             // if future queries reference them.
             extractTaskTemplates(workflow).forEach(task =>
-                queryClient.setQueryData([QueryType.TaskTemplate, task.id], task)
+                queryClient.setQueryData(
+                    [QueryType.TaskTemplate, task.id],
+                    task
+                )
             );
             return workflow;
         },

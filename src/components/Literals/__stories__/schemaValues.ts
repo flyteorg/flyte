@@ -1,4 +1,4 @@
-import { Schema, SchemaColumnType } from 'models';
+import { Schema, SchemaColumnType } from 'models/Common/types';
 
 const schemaWithNoColumns: Schema = {
     uri: 's3://path/to/my/schema_with_no_columns',

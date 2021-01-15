@@ -1,8 +1,8 @@
 import Link from '@material-ui/core/Link';
 import { makeStyles, Theme } from '@material-ui/core/styles';
-import { WaitForData } from 'components/common';
+import { WaitForData } from 'components/common/WaitForData';
 import { useUserProfile } from 'components/hooks/useUserProfile';
-import { getLoginUrl } from 'models';
+import { getLoginUrl } from 'models/AdminEntity/utils';
 import * as React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({

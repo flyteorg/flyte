@@ -1,6 +1,5 @@
-import { Literal, LiteralCollection } from 'models';
+import { Literal, LiteralCollection } from 'models/Common/types';
 import * as React from 'react';
-
 import { LiteralValue } from './LiteralValue';
 import { PrintList } from './PrintList';
 

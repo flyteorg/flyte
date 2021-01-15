@@ -1,6 +1,6 @@
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import * as classnames from 'classnames';
-import { bodyFontFamily, smallFontSize } from 'components/Theme';
+import { bodyFontFamily, smallFontSize } from 'components/Theme/constants';
 import {
     NodeExecutionPhase,
     TaskExecutionPhase,

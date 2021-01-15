@@ -1,5 +1,7 @@
 import { QueryInput, QueryType } from 'components/data/types';
-import { getTask, Identifier, TaskTemplate } from 'models';
+import { Identifier } from 'models/Common/types';
+import { getTask } from 'models/Task/api';
+import { TaskTemplate } from 'models/Task/types';
 import { QueryClient } from 'react-query';
 
 export function makeTaskTemplateQuery(

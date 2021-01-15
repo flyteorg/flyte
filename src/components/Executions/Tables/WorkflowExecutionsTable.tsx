@@ -1,10 +1,10 @@
 import * as classnames from 'classnames';
 import { noExecutionsFoundString } from 'common/constants';
-import { DataList, DataListRef } from 'components';
-import { getCacheKey } from 'components/Cache';
-import { ListProps } from 'components/common';
+import { getCacheKey } from 'components/Cache/utils';
 import { useCommonStyles } from 'components/common/styles';
-import { Execution } from 'models';
+import { ListProps } from 'components/common/types';
+import { DataList, DataListRef } from 'components/Tables/DataList';
+import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { ListRowRenderer } from 'react-virtualized';
 import { ExecutionInputsOutputsModal } from '../ExecutionInputsOutputsModal';

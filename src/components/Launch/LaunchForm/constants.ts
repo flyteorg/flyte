@@ -1,17 +1,5 @@
-import { BlobDimensionality, SimpleType } from 'models';
-import { BlobValue, InputType, ParsedInput, RoleType } from './types';
-
-export const launchPlansTableRowHeight = 40;
-export const launchPlansTableColumnWidths = {
-    name: 250,
-    version: 250
-};
-
-export const schedulesTableColumnsWidths = {
-    active: 80,
-    frequency: 300,
-    name: 250
-};
+import { BlobDimensionality, SimpleType } from 'models/Common/types';
+import { BlobValue, InputType, RoleType } from './types';
 
 export const formStrings = {
     cancel: 'Cancel',

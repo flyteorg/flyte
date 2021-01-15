@@ -1,5 +1,5 @@
 import { Admin, Core } from 'flyteidl';
-import { NamedEntity, NamedEntityIdentifier } from 'models/Common';
+import { NamedEntity, NamedEntityIdentifier } from 'models/Common/types';
 
 export const sampleWorkflowIds: NamedEntityIdentifier[] = [
     'batch_workflow.BatchTasksWorkflow',

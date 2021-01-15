@@ -1,6 +1,6 @@
 import { log } from 'common/log';
 import { isFunction } from 'common/typeCheckers';
-import { DataError } from 'components/Errors';
+import { DataError } from 'components/Errors/DataError';
 import { FetchableState, fetchStates } from 'components/hooks/types';
 import * as React from 'react';
 import { ErrorBoundary } from './ErrorBoundary';

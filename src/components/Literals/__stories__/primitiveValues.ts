@@ -1,7 +1,6 @@
-import * as Long from 'long';
-
 import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
-import { Primitive } from 'models';
+import * as Long from 'long';
+import { Primitive } from 'models/Common/types';
 
 export const primitiveValues: Dictionary<Partial<Primitive>> = {
     booleanTrue: {

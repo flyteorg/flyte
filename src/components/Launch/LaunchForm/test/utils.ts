@@ -1,5 +1,5 @@
 import { mapValues } from 'lodash';
-import { Variable } from 'models';
+import { Variable } from 'models/Common/types';
 import { createMockLaunchPlan } from 'models/__mocks__/launchPlanData';
 import {
     createMockTask,

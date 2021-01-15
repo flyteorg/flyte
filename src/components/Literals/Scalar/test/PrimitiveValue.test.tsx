@@ -1,10 +1,8 @@
 import { render } from '@testing-library/react';
+import { Primitive } from 'models/Common/types';
 import * as React from 'react';
-
-import { Primitive } from 'models';
-import { PrimitiveValue } from '../PrimitiveValue';
-
 import { long } from 'test/utils';
+import { PrimitiveValue } from '../PrimitiveValue';
 
 describe('PrimitiveValue', () => {
     it('renders datetime', () => {

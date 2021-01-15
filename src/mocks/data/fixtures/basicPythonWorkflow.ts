@@ -1,15 +1,15 @@
 import { cloneDeep } from 'lodash';
-import { startNodeId, endNodeId } from 'models';
 import { SimpleType } from 'models/Common/types';
+import { endNodeId, startNodeId } from 'models/Node/constants';
 import { variableNames } from '../constants';
 import {
-    generateTask,
-    generateWorkflow,
     generateExecutionForWorkflow,
     generateNodeExecution,
-    generateTaskExecution
+    generateTask,
+    generateTaskExecution,
+    generateWorkflow
 } from '../generators';
-import { taskNodeIds, bindingFromNode, makeDefaultLaunchPlan } from '../utils';
+import { bindingFromNode, makeDefaultLaunchPlan, taskNodeIds } from '../utils';
 
 const workflowName = 'BasicPythonWorkflow';
 const taskName = `${workflowName}.PythonTask`;

@@ -1,7 +1,7 @@
 import { storiesOf } from '@storybook/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import { SystemStatus } from 'models';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { SystemStatus } from 'models/Common/types';
 import * as React from 'react';
 import { SystemStatusBanner } from '../SystemStatusBanner';
 

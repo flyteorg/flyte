@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
 import ChevronRight from '@material-ui/icons/ChevronRight';
-import { SearchResult } from 'components/common';
+import { SearchResult } from 'components/common/SearchableList';
 import {
     SearchableNamedEntity,
     SearchableNamedEntityList,
@@ -10,7 +10,7 @@ import {
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { Routes } from 'routes';
+import { Routes } from 'routes/routes';
 
 /** Renders a searchable list of Workflow names, with associated descriptions */
 export const SearchableWorkflowNameList: React.FC<Omit<

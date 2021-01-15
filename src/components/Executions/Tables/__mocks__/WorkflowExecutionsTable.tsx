@@ -26,7 +26,14 @@ export const WorkflowExecutionsTable: React.FC<WorkflowExecutionsTableProps> = p
             )}
         >
             <ExecutionsTableHeader columns={columns} />
-            {executions.map(execution => <WorkflowExecutionRow key={execution.id.name} execution={execution} columns={columns} state={state} /> )}
+            {executions.map(execution => (
+                <WorkflowExecutionRow
+                    key={execution.id.name}
+                    execution={execution}
+                    columns={columns}
+                    state={state}
+                />
+            ))}
         </div>
     );
 };

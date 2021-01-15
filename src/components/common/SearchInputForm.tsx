@@ -18,12 +18,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }));
 
-export interface SelectValue {
-    label: string;
-    value: string;
-    data: any;
-}
-
 export interface SearchInputFormProps {
     label: string;
     placeholder?: string;

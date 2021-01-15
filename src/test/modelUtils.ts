@@ -5,8 +5,7 @@ import {
     NamedEntityIdentifier,
     NamedEntityMetadata,
     ResourceType
-} from 'models';
-
+} from 'models/Common/types';
 const defaultMetadata = {
     description: '',
     state: Admin.NamedEntityState.NAMED_ENTITY_ACTIVE

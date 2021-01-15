@@ -1,7 +1,7 @@
 import { Admin, Core } from 'flyteidl';
-import { Identifier, TypedInterface } from 'models/Common';
-import { CompiledNode, ConnectionSet } from 'models/Node';
-import { CompiledTask } from 'models/Task';
+import { Identifier, TypedInterface } from 'models/Common/types';
+import { CompiledNode, ConnectionSet } from 'models/Node/types';
+import { CompiledTask } from 'models/Task/types';
 
 /** Holds information about all nodes existing in a Workflow graph */
 export interface WorkflowTemplate extends Core.IWorkflowTemplate {
@@ -40,4 +40,3 @@ export interface Workflow extends Admin.IWorkflow {
 }
 
 export type WorkflowId = Identifier;
-export type WorkflowsMap = Map<string, Workflow>;

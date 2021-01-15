@@ -1,10 +1,11 @@
-import { DetailsPanel } from 'components/common';
+import { DetailsPanel } from 'components/common/DetailsPanel';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { makeWorkflowQuery } from 'components/Workflow/workflowQueries';
-import { WorkflowGraph } from 'components/WorkflowGraph';
+import { WorkflowGraph } from 'components/WorkflowGraph/WorkflowGraph';
 import { keyBy } from 'lodash';
-import { endNodeId, NodeExecution, startNodeId } from 'models';
-import { Workflow, WorkflowId } from 'models/Workflow';
+import { NodeExecution } from 'models/Execution/types';
+import { endNodeId, startNodeId } from 'models/Node/constants';
+import { Workflow, WorkflowId } from 'models/Workflow/types';
 import * as React from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import { NodeExecutionsContext } from '../contexts';

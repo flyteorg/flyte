@@ -7,7 +7,7 @@ import {
     buttonHoverColor,
     interactiveTextBackgroundColor,
     interactiveTextColor
-} from 'components/Theme';
+} from 'components/Theme/constants';
 import * as React from 'react';
 
 const useStyles = makeStyles((theme: Theme) => {

@@ -8,7 +8,7 @@ import {
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { ButtonLink } from 'components/common/ButtonLink';
 import { useCommonStyles } from 'components/common/styles';
-import { Project } from 'models/Project';
+import { Project } from 'models/Project/types';
 import * as React from 'react';
 import { Routes } from 'routes/routes';
 import { defaultProjectDescription } from './constants';

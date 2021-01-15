@@ -1,6 +1,6 @@
 import { Theme } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-import { smallFontSize } from 'components/Theme';
+import { smallFontSize } from 'components/Theme/constants';
 
 export const useStyles = makeStyles((theme: Theme) => ({
     footer: {

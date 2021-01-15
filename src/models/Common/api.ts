@@ -4,16 +4,16 @@ import { log } from 'common/log';
 import { createCorsProxyURL } from 'common/utils';
 import { Admin, Core } from 'flyteidl';
 import {
-    defaultPaginationConfig,
-    getProfileUrl,
-    PaginatedEntityResponse,
-    RequestConfig
-} from 'models/AdminEntity';
-import {
     getAdminEntity,
     getProtobufObject
 } from 'models/AdminEntity/AdminEntity';
+import { defaultPaginationConfig } from 'models/AdminEntity/constants';
 import { transformRequestError } from 'models/AdminEntity/transformRequestError';
+import {
+    PaginatedEntityResponse,
+    RequestConfig
+} from 'models/AdminEntity/types';
+import { getProfileUrl } from 'models/AdminEntity/utils';
 import {
     defaultAxiosConfig,
     defaultSystemStatus,

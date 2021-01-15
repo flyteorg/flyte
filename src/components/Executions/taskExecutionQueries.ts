@@ -1,12 +1,11 @@
 import { QueryInput, QueryType } from 'components/data/types';
+import { RequestConfig } from 'models/AdminEntity/types';
+import { getTaskExecution, listTaskExecutions } from 'models/Execution/api';
 import {
-    getTaskExecution,
-    listTaskExecutions,
     NodeExecutionIdentifier,
-    RequestConfig,
     TaskExecution,
     TaskExecutionIdentifier
-} from 'models';
+} from 'models/Execution/types';
 import { QueryClient } from 'react-query';
 
 /** A query for fetching a single `TaskExecution` by id. */

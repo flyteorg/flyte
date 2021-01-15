@@ -3,13 +3,10 @@
  * This file is NOT compiled and is run directly by Node.js. Make sure you are not using JavaScript features that
  * does not exist in Node.js runtime.
  */
-
-const fs = require('fs');
 const morgan = require('morgan');
 const express = require('express');
 const env = require('./env');
 const { applyMiddleware } = require('./plugins');
-
 const corsProxy = require('./corsProxy.js');
 
 const app = express();

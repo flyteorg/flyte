@@ -1,11 +1,7 @@
 import { useAPIContext } from 'components/data/apiContext';
-import {
-    Identifier,
-    IdentifierScope,
-    RequestConfig,
-    Task,
-    TaskTemplate
-} from 'models';
+import { RequestConfig } from 'models/AdminEntity/types';
+import { Identifier, IdentifierScope } from 'models/Common/types';
+import { Task, TaskTemplate } from 'models/Task/types';
 import { FetchableData } from './types';
 import { useFetchableData } from './useFetchableData';
 import { usePagination } from './usePagination';

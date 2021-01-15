@@ -1,8 +1,10 @@
+import {
+    ContentContainer,
+    ContentContainerProps
+} from 'components/common/ContentContainer';
+import { withSideNavigation } from 'components/Navigation/withSideNavigation';
 import * as React from 'react';
 import { Route, Switch } from 'react-router-dom';
-
-import { ContentContainer, ContentContainerProps } from 'components/common';
-import { withSideNavigation } from 'components/Navigation';
 import { components } from './components';
 import { Routes } from './routes';
 
@@ -17,7 +19,7 @@ function withContentContainer<P>(
     );
 }
 
-export const ApplicationRouter: React.FC<{}> = () => (
+export const ApplicationRouter: React.FC = () => (
     <>
         <Switch>
             <Route
@@ -35,13 +37,6 @@ export const ApplicationRouter: React.FC<{}> = () => (
                         center: false,
                         noMargin: true
                     }
-                )}
-            />
-            <Route
-                path={Routes.WorkflowVersionDetails.path}
-                component={withSideNavigation(
-                    components.workflowVersionDetails,
-                    { detailsPanel: true }
                 )}
             />
             <Route

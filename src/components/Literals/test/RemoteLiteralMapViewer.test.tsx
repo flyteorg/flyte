@@ -1,11 +1,10 @@
-import { getByText, render } from '@testing-library/react';
-import * as React from 'react';
-
-import { FetchableData } from 'components/hooks';
-import { loadedFetchable } from 'components/hooks/__mocks__/fetchableData';
+import { render } from '@testing-library/react';
+import { FetchableData } from 'components/hooks/types';
 import { useRemoteLiteralMap } from 'components/hooks/useRemoteLiteralMap';
+import { loadedFetchable } from 'components/hooks/__mocks__/fetchableData';
 import * as Long from 'long';
-import { LiteralMap } from 'models';
+import { LiteralMap } from 'models/Common/types';
+import * as React from 'react';
 import { RemoteLiteralMapViewer } from '../RemoteLiteralMapViewer';
 
 jest.mock('components/hooks/useRemoteLiteralMap');

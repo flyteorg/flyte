@@ -1,7 +1,9 @@
-import { WaitForData } from 'components/common';
+import { WaitForData } from 'components/common/WaitForData';
 import { useTaskNameList } from 'components/hooks/useNamedEntity';
 import { SearchableTaskNameList } from 'components/Task/SearchableTaskNameList';
-import { limits, SortDirection, taskSortFields } from 'models';
+import { limits } from 'models/AdminEntity/constants';
+import { SortDirection } from 'models/AdminEntity/types';
+import { taskSortFields } from 'models/Task/constants';
 import * as React from 'react';
 
 export interface ProjectTasksProps {

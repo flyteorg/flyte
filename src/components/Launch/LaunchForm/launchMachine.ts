@@ -1,13 +1,9 @@
 import { Admin } from 'flyteidl';
-import {
-    Identifier,
-    LaunchPlan,
-    NamedEntityIdentifier,
-    Task,
-    Workflow,
-    WorkflowExecutionIdentifier,
-    WorkflowId
-} from 'models';
+import { Identifier, NamedEntityIdentifier } from 'models/Common/types';
+import { WorkflowExecutionIdentifier } from 'models/Execution/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { Task } from 'models/Task/types';
+import { Workflow, WorkflowId } from 'models/Workflow/types';
 import {
     assign,
     DoneInvokeEvent,

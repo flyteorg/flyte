@@ -1,5 +1,5 @@
 import { ExpandableMonospaceText } from 'components/common/ExpandableMonospaceText';
-import { ExecutionError } from 'models';
+import { ExecutionError } from 'models/Execution/types';
 import * as React from 'react';
 import { useExecutionTableStyles } from './styles';
 

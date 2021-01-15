@@ -3,23 +3,21 @@ import { dateToTimestamp, millisecondsToDuration } from 'common/utils';
 import { Admin, Core } from 'flyteidl';
 import { merge } from 'lodash';
 import { timeStampOffset } from 'mocks/utils';
-import {
-    CompiledTask,
-    endNodeId,
-    Execution,
-    LaunchPlan,
-    NodeExecution,
-    startNodeId,
-    Task,
-    TaskExecution,
-    Workflow
-} from 'models';
 import { Identifier, ResourceType } from 'models/Common/types';
 import {
     NodeExecutionPhase,
     TaskExecutionPhase,
     WorkflowExecutionPhase
 } from 'models/Execution/enums';
+import {
+    Execution,
+    NodeExecution,
+    TaskExecution
+} from 'models/Execution/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { endNodeId, startNodeId } from 'models/Node/constants';
+import { CompiledTask, Task } from 'models/Task/types';
+import { Workflow } from 'models/Workflow/types';
 import {
     defaultExecutionDuration,
     emptyInputUri,

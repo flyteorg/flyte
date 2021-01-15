@@ -7,7 +7,11 @@ import { StorybookContainer } from './StorybookContainer';
 
 addDecorator(withKnobs);
 addDecorator(StoryRouter());
-addDecorator(Story => <StorybookContainer><Story /></StorybookContainer>);
+addDecorator(Story => (
+    <StorybookContainer>
+        <Story />
+    </StorybookContainer>
+));
 
 // Storybook executes this module in both bootstap phase (Node)
 // and a story's runtime (browser). However, cannot call `setupWorker`

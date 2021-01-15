@@ -12,9 +12,6 @@ const ADMIN_API_URL = process.env.ADMIN_API_URL;
 const BASE_URL = process.env.BASE_URL || '';
 const CORS_PROXY_PREFIX = process.env.CORS_PROXY_PREFIX || '/cors_proxy';
 
-const CONFIG_DIR = process.env.CONFIG_DIR || './config';
-const CONFIG_CACHE_TTL_SECONDS = process.env.CONFIG_CACHE_TTL_SECONDS || '60';
-
 // Defines a file to be required which will provide implementations for
 // any user-definable code.
 const PLUGINS_MODULE = process.env.PLUGINS_MODULE;
@@ -24,14 +21,13 @@ const PLUGINS_MODULE = process.env.PLUGINS_MODULE;
 // If it has no protocol, it will be treated as relative to window.location.origin
 const STATUS_URL = process.env.STATUS_URL;
 
+// Disable all code related to authorization for requests to Admin.
+// This should only be used when Admin is also in unsecured mode.
 const DISABLE_AUTH = process.env.DISABLE_AUTH;
 
 module.exports = {
     ADMIN_API_URL,
     BASE_URL,
-    // Config env isn't sent to the client, so excluded from processEnv
-    CONFIG_CACHE_TTL_SECONDS,
-    CONFIG_DIR,
     CORS_PROXY_PREFIX,
     DISABLE_AUTH,
     NODE_ENV,

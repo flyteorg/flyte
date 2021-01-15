@@ -1,9 +1,9 @@
-import { makeStyles, Theme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import classnames from 'classnames';
-import { NodeConfig, Point } from 'components/flytegraph';
+import { NodeConfig, Point } from 'components/flytegraph/types';
 import * as React from 'react';
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles(() => ({
     pulse: {
         animation: '1200ms infinite alternate',
         animationName: 'pulse'

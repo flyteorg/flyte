@@ -1,12 +1,8 @@
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
-import {
-    Execution,
-    executionSortFields,
-    FilterOperation,
-    limits,
-    NodeExecution,
-    SortDirection
-} from 'models';
+import { limits } from 'models/AdminEntity/constants';
+import { FilterOperation, SortDirection } from 'models/AdminEntity/types';
+import { executionSortFields } from 'models/Execution/constants';
+import { Execution, NodeExecution } from 'models/Execution/types';
 import { useQueryClient } from 'react-query';
 import { executionRefreshIntervalMs } from '../constants';
 import { makeNodeExecutionListQuery } from '../nodeExecutionQueries';

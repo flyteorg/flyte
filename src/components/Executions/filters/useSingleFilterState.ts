@@ -1,5 +1,5 @@
 import { log } from 'common/log';
-import { useQueryState } from 'components/hooks';
+import { useQueryState } from 'components/hooks/useQueryState';
 import { useEffect, useState } from 'react';
 import { FilterMap, FilterValue, SingleFilterState } from './types';
 import { useFilterButtonState } from './useFilterButtonState';
@@ -20,7 +20,7 @@ function valueOrDefault<FilterKey extends string>(
         return defaultValue;
     }
 
-    if (!{}.hasOwnProperty.call(options,newValue)) {
+    if (!{}.hasOwnProperty.call(options, newValue)) {
         log.warn(`Filter has no option ${newValue}, using default`);
         return defaultValue;
     }

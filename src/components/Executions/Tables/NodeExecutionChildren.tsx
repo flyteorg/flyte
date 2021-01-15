@@ -1,6 +1,6 @@
 import { Typography } from '@material-ui/core';
 import * as classnames from 'classnames';
-import { getCacheKey } from 'components/Cache';
+import { getCacheKey } from 'components/Cache/utils';
 import { useTheme } from 'components/Theme/useTheme';
 import * as React from 'react';
 import { NodeExecutionGroup } from '../types';

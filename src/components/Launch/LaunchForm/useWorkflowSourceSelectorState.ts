@@ -1,13 +1,9 @@
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
-import {
-    FilterOperationName,
-    LaunchPlan,
-    NamedEntityIdentifier,
-    SortDirection,
-    Workflow,
-    WorkflowId,
-    workflowSortFields
-} from 'models';
+import { FilterOperationName, SortDirection } from 'models/AdminEntity/types';
+import { NamedEntityIdentifier } from 'models/Common/types';
+import { LaunchPlan } from 'models/Launch/types';
+import { workflowSortFields } from 'models/Workflow/constants';
+import { Workflow, WorkflowId } from 'models/Workflow/types';
 import { useMemo, useState } from 'react';
 import { SearchableSelectorOption } from './SearchableSelector';
 import { WorkflowSourceSelectorState } from './types';

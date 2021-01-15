@@ -8,34 +8,30 @@ import {
     render,
     waitFor
 } from '@testing-library/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext } from 'components/data/apiContext';
-import { muiTheme } from 'components/Theme';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { muiTheme } from 'components/Theme/muiTheme';
 import { Core } from 'flyteidl';
 import { cloneDeep, get } from 'lodash';
 import * as Long from 'long';
+import { RequestConfig } from 'models/AdminEntity/types';
 import {
-    createWorkflowExecution,
-    CreateWorkflowExecutionArguments,
-    getWorkflow,
     Identifier,
-    LaunchPlan,
-    listLaunchPlans,
-    listWorkflows,
     Literal,
     NamedEntityIdentifier,
-    RequestConfig,
-    Variable,
-    Workflow
-} from 'models';
+    Variable
+} from 'models/Common/types';
+import {
+    createWorkflowExecution,
+    CreateWorkflowExecutionArguments
+} from 'models/Execution/api';
+import { listLaunchPlans } from 'models/Launch/api';
+import { LaunchPlan } from 'models/Launch/types';
+import { getWorkflow, listWorkflows } from 'models/Workflow/api';
+import { Workflow } from 'models/Workflow/types';
 import { createMockWorkflowClosure } from 'models/__mocks__/workflowData';
 import * as React from 'react';
 import { delayedPromise, pendingPromise } from 'test/utils';
-import {
-    createMockInputsInterface,
-    mockSimpleVariables,
-    simpleVariableDefaults
-} from '../__mocks__/mockInputs';
 import {
     cannotLaunchWorkflowString,
     formStrings,
@@ -46,6 +42,11 @@ import {
 import { LaunchForm } from '../LaunchForm';
 import { LaunchFormProps, WorkflowInitialLaunchParameters } from '../types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from '../utils';
+import {
+    createMockInputsInterface,
+    mockSimpleVariables,
+    simpleVariableDefaults
+} from '../__mocks__/mockInputs';
 import {
     binaryInputName,
     booleanInputName,

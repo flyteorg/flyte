@@ -1,8 +1,8 @@
 import { Button } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
+import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import { useCommonStyles } from 'components/common/styles';
 import * as React from 'react';
-import { ButtonCircularProgress } from '../common';
 import { loadMoreRowGridHeight } from './constants';
 
 export const useStyles = makeStyles((theme: Theme) => ({
@@ -37,7 +37,12 @@ export const LoadMoreRowContent: React.FC<LoadMoreRowContentProps> = props => {
     const { loadMoreRows, lastError, isFetching, style } = props;
 
     const button = (
-        <Button onClick={loadMoreRows} size="small" variant="outlined" disabled={isFetching}>
+        <Button
+            onClick={loadMoreRows}
+            size="small"
+            variant="outlined"
+            disabled={isFetching}
+        >
             Load More
             {isFetching ? <ButtonCircularProgress /> : null}
         </Button>

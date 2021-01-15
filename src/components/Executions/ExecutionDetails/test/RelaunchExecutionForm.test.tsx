@@ -1,8 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
-import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { APIContext, APIContextValue } from 'components/data/apiContext';
-import { mockSimpleVariables } from 'components/Launch/LaunchForm/__mocks__/mockInputs';
-import { primitiveLiteral } from 'components/Launch/LaunchForm/__mocks__/utils';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
 import { LaunchForm } from 'components/Launch/LaunchForm/LaunchForm';
 import {
     LaunchFormProps,
@@ -12,20 +10,17 @@ import {
     createInputCacheKey,
     getInputDefintionForLiteralType
 } from 'components/Launch/LaunchForm/utils';
+import { mockSimpleVariables } from 'components/Launch/LaunchForm/__mocks__/mockInputs';
+import { primitiveLiteral } from 'components/Launch/LaunchForm/__mocks__/utils';
 import { Admin } from 'flyteidl';
-import {
-    Execution,
-    ExecutionData,
-    getExecutionData,
-    getRemoteLiteralMap,
-    getTask,
-    getWorkflow,
-    LiteralMap,
-    ResourceType,
-    Task,
-    Variable,
-    Workflow
-} from 'models';
+import { getRemoteLiteralMap } from 'models/Common/api';
+import { LiteralMap, ResourceType, Variable } from 'models/Common/types';
+import { getExecutionData } from 'models/Execution/api';
+import { Execution, ExecutionData } from 'models/Execution/types';
+import { getTask } from 'models/Task/api';
+import { Task } from 'models/Task/types';
+import { getWorkflow } from 'models/Workflow/api';
+import { Workflow } from 'models/Workflow/types';
 import { createMockExecution } from 'models/__mocks__/executionsData';
 import { createMockTask } from 'models/__mocks__/taskData';
 import {

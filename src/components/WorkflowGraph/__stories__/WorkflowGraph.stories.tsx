@@ -1,13 +1,11 @@
 import { action } from '@storybook/addon-actions';
 import { storiesOf } from '@storybook/react';
-import * as React from 'react';
-
-import { CacheContext, createCache } from 'components/Cache';
-import { DetailsPanel } from 'components/common';
+import { CacheContext } from 'components/Cache/CacheContext';
+import { createCache } from 'components/Cache/createCache';
+import { DetailsPanel } from 'components/common/DetailsPanel';
 import { extractTaskTemplates } from 'components/hooks/utils';
-
-import { CompiledWorkflowClosure, Workflow } from 'models';
-
+import { CompiledWorkflowClosure, Workflow } from 'models/Workflow/types';
+import * as React from 'react';
 import { TaskNodeRenderer } from '../TaskNodeRenderer';
 import { WorkflowGraph } from '../WorkflowGraph';
 import * as graphData from './rich.json';

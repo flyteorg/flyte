@@ -1,8 +1,8 @@
-import { getCacheKey } from 'components/Cache';
+import { getCacheKey } from 'components/Cache/utils';
 import { Admin } from 'flyteidl';
 import { cloneDeep } from 'lodash';
-import { Identifier } from '../Common';
-import { Task, TaskClosure } from '../Task';
+import { Identifier } from 'models/Common/types';
+import { Task, TaskClosure } from 'models/Task/types';
 import * as simpleClosure from './simpleTaskClosure.json';
 
 const decodedClosure = Admin.TaskClosure.create(
@@ -29,12 +29,6 @@ export const createMockTask: (name: string, version?: string) => Task = (
 
 export const createMockTaskClosure: () => TaskClosure = () =>
     cloneDeep(decodedClosure);
-
-export const createMockTasks: Fn<Task[]> = () => [
-    createMockTask('task1'),
-    createMockTask('task2'),
-    createMockTask('task3')
-];
 
 export const createMockTaskVersions = (name: string, length: number) => {
     return Array.from({ length }, (_, idx) => {

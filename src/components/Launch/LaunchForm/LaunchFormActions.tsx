@@ -1,5 +1,5 @@
 import { Button, DialogActions, FormHelperText } from '@material-ui/core';
-import { ButtonCircularProgress } from 'components';
+import { ButtonCircularProgress } from 'components/common/ButtonCircularProgress';
 import * as React from 'react';
 import { history } from 'routes/history';
 import { Routes } from 'routes/routes';

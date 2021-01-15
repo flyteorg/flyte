@@ -1,9 +1,5 @@
-import {
-    FilterOperation,
-    FilterOperationName,
-    ResourceIdentifier,
-    ResourceType
-} from 'models';
+import { FilterOperation, FilterOperationName } from 'models/AdminEntity/types';
+import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import { Routes } from 'routes/routes';
 
 const noFilters = () => [];

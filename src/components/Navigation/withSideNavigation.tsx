@@ -1,4 +1,7 @@
-import { ContentContainer, ContentContainerProps } from 'components/common';
+import {
+    ContentContainer,
+    ContentContainerProps
+} from 'components/common/ContentContainer';
 import * as React from 'react';
 import { SideNavigation } from './SideNavigation';
 

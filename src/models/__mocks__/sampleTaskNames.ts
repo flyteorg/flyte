@@ -1,5 +1,5 @@
 import { Admin, Core } from 'flyteidl';
-import { NamedEntity, NamedEntityIdentifier } from 'models/Common';
+import { NamedEntity, NamedEntityIdentifier } from 'models/Common/types';
 
 export const sampleTaskIds: NamedEntityIdentifier[] = [
     'app.complex_workflows.custom_image.task_object',

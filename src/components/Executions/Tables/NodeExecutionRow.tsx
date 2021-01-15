@@ -5,9 +5,7 @@ import { useTheme } from 'components/Theme/useTheme';
 import { isEqual } from 'lodash';
 import { NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
-import {
-    NodeExecutionsRequestConfigContext
-} from '../contexts';
+import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { useChildNodeExecutionGroupsQuery } from '../nodeExecutionQueries';
 import { titleStrings } from './constants';
 import { NodeExecutionsTableContext } from './contexts';
@@ -27,7 +25,9 @@ interface NodeExecutionRowProps {
 const ChildFetchErrorIcon: React.FC<{
     query: ReturnType<typeof useChildNodeExecutionGroupsQuery>;
 }> = ({ query }) => {
-    return query.isFetching ? <CircularProgress size={24} /> : (
+    return query.isFetching ? (
+        <CircularProgress size={24} />
+    ) : (
         <IconButton
             disableRipple={true}
             disableTouchRipple={true}

@@ -1,6 +1,6 @@
-import { WaitForData } from 'components/common';
-import { useRemoteLiteralMap } from 'components/hooks';
-import { Literal, LiteralMap, UrlBlob } from 'models';
+import { WaitForData } from 'components/common/WaitForData';
+import { useRemoteLiteralMap } from 'components/hooks/useRemoteLiteralMap';
+import { LiteralMap, UrlBlob } from 'models/Common/types';
 import * as React from 'react';
 import { maxBlobDownloadSizeBytes } from './constants';
 import { LiteralMapViewer } from './LiteralMapViewer';

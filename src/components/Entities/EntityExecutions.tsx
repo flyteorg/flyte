@@ -1,15 +1,15 @@
 import { Typography } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
-import { WaitForData } from 'components/common';
+import { WaitForData } from 'components/common/WaitForData';
 import { ExecutionFilters } from 'components/Executions/ExecutionFilters';
 import { useWorkflowExecutionFiltersState } from 'components/Executions/filters/useExecutionFiltersState';
-import { WorkflowExecutionsTable as ExecutionsTable } from 'components/Executions/Tables/WorkflowExecutionsTable';
-import { useWorkflowExecutions as useExecutions } from 'components/hooks';
+import { WorkflowExecutionsTable } from 'components/Executions/Tables/WorkflowExecutionsTable';
 import { isLoadingState } from 'components/hooks/fetchMachine';
-import { ResourceIdentifier } from 'models';
-import { SortDirection } from 'models/AdminEntity';
-import { executionSortFields } from 'models/Execution';
+import { useWorkflowExecutions } from 'components/hooks/useWorkflowExecutions';
+import { SortDirection } from 'models/AdminEntity/types';
+import { ResourceIdentifier } from 'models/Common/types';
+import { executionSortFields } from 'models/Execution/constants';
 import * as React from 'react';
 import { executionFilterGenerator } from './generators';
 
@@ -42,7 +42,7 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
         [id]
     );
 
-    const executions = useExecutions(
+    const executions = useWorkflowExecutions(
         { domain, project },
         {
             sort,
@@ -59,7 +59,10 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
                 <ExecutionFilters {...filtersState} />
             </div>
             <WaitForData {...executions}>
-                <ExecutionsTable {...executions} isFetching={isLoadingState(executions.state)} />
+                <WorkflowExecutionsTable
+                    {...executions}
+                    isFetching={isLoadingState(executions.state)}
+                />
             </WaitForData>
         </>
     );

@@ -7,7 +7,7 @@ import {
     screen,
     waitFor
 } from '@testing-library/react';
-import { cacheStatusMessages } from 'components';
+import { cacheStatusMessages } from 'components/Executions/constants';
 import {
     ExecutionContext,
     ExecutionContextData,
@@ -29,16 +29,14 @@ import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow
 import { insertFixture } from 'mocks/data/insertFixture';
 import { notFoundError } from 'mocks/errors';
 import { mockServer } from 'mocks/server';
+import { FilterOperationName, RequestConfig } from 'models/AdminEntity/types';
+import { nodeExecutionQueryParams } from 'models/Execution/constants';
+import { NodeExecutionPhase } from 'models/Execution/enums';
 import {
     Execution,
-    FilterOperationName,
     NodeExecution,
-    nodeExecutionQueryParams,
-    RequestConfig,
     TaskNodeMetadata
-} from 'models';
-import { NodeExecutionPhase } from 'models/Execution/enums';
-
+} from 'models/Execution/types';
 import * as React from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from 'react-query';
 import { makeIdentifier } from 'test/modelUtils';

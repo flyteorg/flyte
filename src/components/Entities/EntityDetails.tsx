@@ -1,11 +1,11 @@
 import { Dialog } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { contentMarginGridUnits } from 'common/layout';
-import { WaitForData } from 'components/common';
+import { WaitForData } from 'components/common/WaitForData';
 import { EntityDescription } from 'components/Entities/EntityDescription';
-import { useProject } from 'components/hooks';
+import { useProject } from 'components/hooks/useProjects';
 import { LaunchForm } from 'components/Launch/LaunchForm/LaunchForm';
-import { ResourceIdentifier, ResourceType } from 'models';
+import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import * as React from 'react';
 import { entitySections } from './constants';
 import { EntityDetailsHeader } from './EntityDetailsHeader';

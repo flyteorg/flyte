@@ -1,7 +1,6 @@
 import { render } from '@testing-library/react';
+import { LiteralMap } from 'models/Common/types';
 import * as React from 'react';
-
-import { LiteralMap } from 'models';
 import { LiteralMapViewer } from '../LiteralMapViewer';
 
 describe('LiteralMapViewer', () => {

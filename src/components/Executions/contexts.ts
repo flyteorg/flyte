@@ -1,6 +1,6 @@
+import { RequestConfig } from 'models/AdminEntity/types';
+import { Execution, NodeExecution } from 'models/Execution/types';
 import * as React from 'react';
-
-import { Execution, NodeExecution, RequestConfig } from 'models';
 
 export interface ExecutionContextData {
     execution: Execution;

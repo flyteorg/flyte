@@ -1,4 +1,4 @@
-import { FilterOperationName } from 'models/AdminEntity';
+import { FilterOperationName } from 'models/AdminEntity/types';
 import { NamedEntityIdentifier } from 'models/Common/types';
 import { LaunchPlan, LaunchPlanState } from 'models/Launch/types';
 import { FetchableData } from './types';

@@ -1,6 +1,6 @@
-import { withRouteParams } from 'components/common';
+import { withRouteParams } from 'components/common/withRouteParams';
 import { EntityDetails } from 'components/Entities/EntityDetails';
-import { ResourceIdentifier, ResourceType } from 'models';
+import { ResourceIdentifier, ResourceType } from 'models/Common/types';
 import * as React from 'react';
 
 export interface WorkflowDetailsRouteParams {

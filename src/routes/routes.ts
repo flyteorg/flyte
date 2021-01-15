@@ -1,6 +1,8 @@
-import { workflowTabIds } from 'common/constants';
 import { ensureSlashPrefixed } from 'common/utils';
-import { TaskExecutionIdentifier, WorkflowExecutionIdentifier } from 'models';
+import {
+    TaskExecutionIdentifier,
+    WorkflowExecutionIdentifier
+} from 'models/Execution/types';
 import {
     projectBasePath,
     projectDomainBasePath,
@@ -62,16 +64,6 @@ export class Routes {
             makeProjectDomainBoundPath(project, domain, '/executions'),
         path: `${projectDomainBasePath}/executions`
     };
-    static ProjectLaunchPlans = {
-        makeUrl: (project: string, domain: string) =>
-            makeProjectDomainBoundPath(project, domain, '/launchplans'),
-        path: `${projectDomainBasePath}/launchplans`
-    };
-    static ProjectSchedules = {
-        makeUrl: (project: string, domain: string) =>
-            makeProjectDomainBoundPath(project, domain, '/schedules'),
-        path: `${projectDomainBasePath}/schedules`
-    };
     static ProjectTasks = {
         makeUrl: (project: string, domain: string) =>
             makeProjectDomainBoundPath(project, domain, '/tasks'),
@@ -91,58 +83,7 @@ export class Routes {
                 domain,
                 `/workflows/${workflowName}`
             ),
-        path: `${projectDomainBasePath}/workflows/:workflowName`,
-        Executions: {
-            makeUrl: (project: string, domain: string, workflowName: string) =>
-                makeProjectDomainBoundPath(
-                    project,
-                    domain,
-                    `/workflows/${workflowName}/${workflowTabIds.executions}`
-                ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.executions}`
-        },
-        Versions: {
-            makeUrl: (project: string, domain: string, workflowName: string) =>
-                makeProjectDomainBoundPath(
-                    project,
-                    domain,
-                    `/workflows/${workflowName}/${workflowTabIds.versions}`
-                ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.versions}`
-        },
-        LaunchPlans: {
-            makeUrl: (project: string, domain: string, workflowName: string) =>
-                makeProjectDomainBoundPath(
-                    project,
-                    domain,
-                    `/workflows/${workflowName}/${workflowTabIds.launchPlans}`
-                ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.launchPlans}`
-        },
-        Schedules: {
-            makeUrl: (project: string, domain: string, workflowName: string) =>
-                makeProjectDomainBoundPath(
-                    project,
-                    domain,
-                    `/workflows/${workflowName}/${workflowTabIds.schedules}`
-                ),
-            path: `${projectDomainBasePath}/workflows/:workflowName/${workflowTabIds.schedules}`
-        }
-    };
-
-    static WorkflowVersionDetails = {
-        makeUrl: (
-            project: string,
-            domain: string,
-            workflowName: string,
-            version: string
-        ) =>
-            makeProjectDomainBoundPath(
-                project,
-                domain,
-                `/workflows/${workflowName}/version/${version}`
-            ),
-        path: `${projectDomainBasePath}/workflows/:workflowName/version/:version`
+        path: `${projectDomainBasePath}/workflows/:workflowName`
     };
 
     // Tasks

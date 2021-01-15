@@ -4,22 +4,19 @@ import { WaitForQuery } from 'components/common/WaitForQuery';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { useTabState } from 'components/hooks/useTabState';
 import { every } from 'lodash';
-import {
-    executionSortFields,
-    limits,
-    NodeExecution,
-    SortDirection,
-    TaskExecution
-} from 'models';
+import { limits } from 'models/AdminEntity/constants';
+import { SortDirection } from 'models/AdminEntity/types';
+import { executionSortFields } from 'models/Execution/constants';
+import { NodeExecution, TaskExecution } from 'models/Execution/types';
 import * as React from 'react';
 import { useQueryClient } from 'react-query';
-import { executionRefreshIntervalMs, nodeExecutionIsTerminal } from '..';
+import { executionRefreshIntervalMs } from '../constants';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
 import { makeTaskExecutionChildListQuery } from '../nodeExecutionQueries';
 import { NodeExecutionsTable } from '../Tables/NodeExecutionsTable';
-import { taskExecutionIsTerminal } from '../utils';
+import { nodeExecutionIsTerminal, taskExecutionIsTerminal } from '../utils';
 
 const useStyles = makeStyles((theme: Theme) => ({
     filters: {

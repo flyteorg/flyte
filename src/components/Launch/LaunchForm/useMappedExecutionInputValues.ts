@@ -1,8 +1,10 @@
 import { log } from 'common/log';
 import { APIContextValue, useAPIContext } from 'components/data/apiContext';
 import { fetchWorkflowExecutionInputs } from 'components/Executions/useWorkflowExecution';
-import { FetchableData, useFetchableData } from 'components/hooks';
-import { Execution, Variable } from 'models';
+import { FetchableData } from 'components/hooks/types';
+import { useFetchableData } from 'components/hooks/useFetchableData';
+import { Variable } from 'models/Common/types';
+import { Execution } from 'models/Execution/types';
 import { LiteralValueMap } from './types';
 import { createInputCacheKey, getInputDefintionForLiteralType } from './utils';
 

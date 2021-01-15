@@ -1,7 +1,8 @@
 import { useAPIContext } from 'components/data/apiContext';
-import { FetchableData, useFetchableData } from 'components/hooks';
-import { SystemStatus } from 'models';
+import { FetchableData } from 'components/hooks/types';
+import { useFetchableData } from 'components/hooks/useFetchableData';
 import { defaultSystemStatus } from 'models/Common/constants';
+import { SystemStatus } from 'models/Common/types';
 
 /** Hook for fetching the current system status. Defaults to a safe value
  * indicating normal system status.

@@ -24,9 +24,13 @@ stories.addDecorator(story => {
     return <div className={useStyles().container}>{story()}</div>;
 });
 stories.add('Basic', () => {
-    const query = useQuery(makeNodeExecutionListQuery(useQueryClient(), workflowExecution.id));
-    return query.data ? <NodeExecutionsTable nodeExecutions={query.data} /> : <div />;
+    const query = useQuery(
+        makeNodeExecutionListQuery(useQueryClient(), workflowExecution.id)
+    );
+    return query.data ? (
+        <NodeExecutionsTable nodeExecutions={query.data} />
+    ) : (
+        <div />
+    );
 });
-stories.add('With no items', () => (
-    <NodeExecutionsTable  nodeExecutions={[]} />
-));
+stories.add('With no items', () => <NodeExecutionsTable nodeExecutions={[]} />);

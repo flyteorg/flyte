@@ -1,12 +1,11 @@
-import { NonIdealState } from 'components/common';
-import { Graph, NodeRenderer } from 'components/flytegraph';
+import { NonIdealState } from 'components/common/NonIdealState';
+import { Graph } from 'components/flytegraph/Graph';
+import { NodeRenderer } from 'components/flytegraph/types';
 import { keyBy } from 'lodash';
-import {
-    CompiledNode,
-    convertFlyteGraphToDAG,
-    DAGNode,
-    Workflow
-} from 'models';
+import { convertFlyteGraphToDAG } from 'models/Graph/convertFlyteGraphToDAG';
+import { DAGNode } from 'models/Graph/types';
+import { CompiledNode } from 'models/Node/types';
+import { Workflow } from 'models/Workflow/types';
 import * as React from 'react';
 
 export interface WorkflowGraphProps {

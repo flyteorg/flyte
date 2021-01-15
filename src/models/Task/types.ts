@@ -5,7 +5,7 @@ import {
     RetryStrategy,
     RuntimeMetadata,
     TypedInterface
-} from 'models/Common';
+} from 'models/Common/types';
 
 /** Additional, optional metadata pertaining to a task template */
 

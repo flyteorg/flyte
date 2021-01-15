@@ -1,7 +1,7 @@
 import { assertNever, stringifyValue } from 'common/utils';
 import { Core } from 'flyteidl';
 import { get } from 'lodash';
-import { BlobDimensionality } from 'models';
+import { BlobDimensionality } from 'models/Common/types';
 import { InputType, InputTypeDefinition } from '../types';
 
 /** Performs a deep get of `path` on the given `Core.ILiteral`. Will throw

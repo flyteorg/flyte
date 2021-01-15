@@ -1,11 +1,9 @@
-import * as React from 'react';
-
-import { getNodeExecutionPhaseConstants } from 'components/Executions';
-import { NodeRendererProps, Point } from 'components/flytegraph';
+import { getNodeExecutionPhaseConstants } from 'components/Executions/utils';
+import { NodeRendererProps, Point } from 'components/flytegraph/types';
 import { TaskNodeRenderer } from 'components/WorkflowGraph/TaskNodeRenderer';
 import { NodeExecutionPhase } from 'models/Execution/enums';
-import { DAGNode } from 'models/Graph';
-
+import { DAGNode } from 'models/Graph/types';
+import * as React from 'react';
 import { NodeExecutionsContext } from '../../contexts';
 import { StatusIndicator } from './StatusIndicator';
 

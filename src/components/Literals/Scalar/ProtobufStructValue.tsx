@@ -1,7 +1,11 @@
 import * as classnames from 'classnames';
 import { sortedObjectEntries } from 'common/utils';
 import { useCommonStyles } from 'components/common/styles';
-import { ProtobufListValue, ProtobufStruct, ProtobufValue } from 'models';
+import {
+    ProtobufListValue,
+    ProtobufStruct,
+    ProtobufValue
+} from 'models/Common/types';
 import * as React from 'react';
 import { htmlEntities } from '../constants';
 import { PrintList } from '../PrintList';

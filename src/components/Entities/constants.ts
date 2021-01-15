@@ -1,5 +1,5 @@
 import { mapValues, startCase } from 'lodash';
-import { ResourceType } from 'models';
+import { ResourceType } from 'models/Common/types';
 
 type EntityStringMap = { [k in ResourceType]: string };
 

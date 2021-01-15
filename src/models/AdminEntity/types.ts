@@ -51,11 +51,6 @@ export interface EncodableType<T> {
     ): $protobuf.Writer;
 }
 
-export interface ProtoMessageTypes<P, R> {
-    requestType: EncodableType<P>;
-    responseType?: DecodableType<R>;
-}
-
 /** Options for requests made to the Admin API.
  * @param data Specifies the data for a POST/PUT request, or query params to
  * append for GET requests.
