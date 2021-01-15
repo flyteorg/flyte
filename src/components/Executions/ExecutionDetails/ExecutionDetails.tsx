@@ -5,6 +5,7 @@ import * as classnames from 'classnames';
 import { LargeLoadingSpinner } from 'components/common/LoadingSpinner';
 import { WaitForQuery } from 'components/common/WaitForQuery';
 import { withRouteParams } from 'components/common/withRouteParams';
+import { DataError } from 'components/Errors/DataError';
 import { Execution } from 'models/Execution/types';
 import * as React from 'react';
 import { ExecutionContext } from '../contexts';
@@ -97,6 +98,7 @@ export const ExecutionDetailsContainer: React.FC<ExecutionDetailsProps> = ({
 
     return (
         <WaitForQuery
+            errorComponent={DataError}
             loadingComponent={LargeLoadingSpinner}
             query={useWorkflowExecutionQuery(id)}
         >

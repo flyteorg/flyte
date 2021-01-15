@@ -1,5 +1,6 @@
 import { DetailsPanel } from 'components/common/DetailsPanel';
 import { WaitForQuery } from 'components/common/WaitForQuery';
+import { DataError } from 'components/Errors/DataError';
 import { makeWorkflowQuery } from 'components/Workflow/workflowQueries';
 import { WorkflowGraph } from 'components/WorkflowGraph/WorkflowGraph';
 import { keyBy } from 'lodash';
@@ -64,7 +65,9 @@ export const ExecutionWorkflowGraph: React.FC<ExecutionWorkflowGraphProps> = ({
     return (
         <>
             <NodeExecutionsContext.Provider value={nodeExecutionsById}>
-                <WaitForQuery query={workflowQuery}>{renderGraph}</WaitForQuery>
+                <WaitForQuery errorComponent={DataError} query={workflowQuery}>
+                    {renderGraph}
+                </WaitForQuery>
             </NodeExecutionsContext.Provider>
             <DetailsPanel
                 open={selectedExecution !== null}

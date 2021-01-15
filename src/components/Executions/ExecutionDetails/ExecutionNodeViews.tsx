@@ -1,6 +1,7 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForQuery } from 'components/common/WaitForQuery';
+import { DataError } from 'components/Errors/DataError';
 import { useTabState } from 'components/hooks/useTabState';
 import { secondaryBackgroundColor } from 'components/Theme/constants';
 import { Execution, NodeExecution } from 'models/Execution/types';
@@ -80,13 +81,19 @@ export const ExecutionNodeViews: React.FC<ExecutionNodeViewsProps> = ({
                         <div className={styles.filters}>
                             <ExecutionFilters {...filterState} />
                         </div>
-                        <WaitForQuery query={nodeExecutionsQuery}>
+                        <WaitForQuery
+                            errorComponent={DataError}
+                            query={nodeExecutionsQuery}
+                        >
                             {renderNodeExecutionsTable}
                         </WaitForQuery>
                     </>
                 )}
                 {tabState.value === tabs.graph.id && (
-                    <WaitForQuery query={nodeExecutionsQuery}>
+                    <WaitForQuery
+                        errorComponent={DataError}
+                        query={nodeExecutionsQuery}
+                    >
                         {renderExecutionWorkflowGraph}
                     </WaitForQuery>
                 )}

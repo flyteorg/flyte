@@ -1,6 +1,7 @@
 import { Tab, Tabs } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { WaitForQuery } from 'components/common/WaitForQuery';
+import { DataError } from 'components/Errors/DataError';
 import { useConditionalQuery } from 'components/hooks/useConditionalQuery';
 import { useTabState } from 'components/hooks/useTabState';
 import { every } from 'lodash';
@@ -94,7 +95,10 @@ export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
                         <div className={styles.filters}>
                             <ExecutionFilters {...filterState} />
                         </div>
-                        <WaitForQuery query={nodeExecutionsQuery}>
+                        <WaitForQuery
+                            errorComponent={DataError}
+                            query={nodeExecutionsQuery}
+                        >
                             {renderNodeExecutionsTable}
                         </WaitForQuery>
                     </>

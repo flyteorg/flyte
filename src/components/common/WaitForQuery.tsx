@@ -1,15 +1,19 @@
 import { log } from 'common/log';
-import { DataError } from 'components/Errors/DataError';
 import * as React from 'react';
 import { QueryObserverResult } from 'react-query';
 import { ErrorBoundary } from './ErrorBoundary';
 
 const defaultErrorTitle = 'Failed to fetch data';
 
+interface ErrorComponentProps {
+    error?: Error;
+    retry?(): any;
+    errorTitle: string;
+}
 interface WaitForQueryProps<T> {
     children: (data: T) => React.ReactNode;
     /** Component to use for displaying errors. This will override `errorTitle` */
-    errorComponent?: React.ComponentType<{ error?: Error; retry?(): any }>;
+    errorComponent?: React.ComponentType<ErrorComponentProps>;
     /** The string to display as the header of the error content */
     errorTitle?: string;
     /** Component to show while loading. If not provided, nothing will be rendered
@@ -60,14 +64,12 @@ export const WaitForQuery = <T extends object>({
         case 'error': {
             const error = query.error || new Error('Unknown failure');
             return ErrorComponent ? (
-                <ErrorComponent error={error} retry={fetch} />
-            ) : (
-                <DataError
+                <ErrorComponent
                     error={error}
                     errorTitle={errorTitle}
                     retry={fetch}
                 />
-            );
+            ) : null;
         }
         default:
             log.error(`Unexpected query status value: ${status}`);
