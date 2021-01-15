@@ -13,7 +13,7 @@ import {
 } from 'models';
 import * as React from 'react';
 import { useQueryClient } from 'react-query';
-import { nodeExecutionIsTerminal } from '..';
+import { executionRefreshIntervalMs, nodeExecutionIsTerminal } from '..';
 import { NodeExecutionsRequestConfigContext } from '../contexts';
 import { ExecutionFilters } from '../ExecutionFilters';
 import { useNodeExecutionFiltersState } from '../filters/useExecutionFiltersState';
@@ -65,11 +65,18 @@ export const TaskExecutionNodes: React.FC<TaskExecutionNodesProps> = ({
     );
 
     const shouldEnableQuery = (executions: NodeExecution[]) =>
-        every(executions, nodeExecutionIsTerminal) &&
-        taskExecutionIsTerminal(taskExecution);
+        !every(executions, nodeExecutionIsTerminal) ||
+        !taskExecutionIsTerminal(taskExecution);
 
     const nodeExecutionsQuery = useConditionalQuery(
-        makeTaskExecutionChildListQuery(useQueryClient(), taskExecution.id, requestConfig),
+        {
+            ...makeTaskExecutionChildListQuery(
+                useQueryClient(),
+                taskExecution.id,
+                requestConfig
+            ),
+            refetchInterval: executionRefreshIntervalMs
+        },
         shouldEnableQuery
     );
 

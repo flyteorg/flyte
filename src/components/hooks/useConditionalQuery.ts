@@ -27,6 +27,8 @@ export function useConditionalQuery<
 ) {
     const queryClient = useQueryClient();
     const queryData = queryClient.getQueryData<TData>(options.queryKey);
-    const enabled = queryData === undefined ? true : shouldEnableFn(queryData);
-    return useQuery<TData, TError, TQueryFnData>({ ...options, enabled });
+    const enabled = queryData === undefined || shouldEnableFn(queryData);
+    const staleTime = enabled ? options.staleTime : Infinity;
+    const refetchInterval = enabled ? options.refetchInterval : false;
+    return useQuery<TData, TError, TQueryFnData>({ ...options, refetchInterval, staleTime });
 }
