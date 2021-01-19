@@ -57,6 +57,7 @@ class CustomSorter(FileNameSortKey):
         "raw_container.py",
         "sidecar.py",
         # Advanced
+        "run_merge_sort.py",
         "custom_task_plugin.py",
         "run_custom_types.py",
         # Remote Flyte
