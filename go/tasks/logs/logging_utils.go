@@ -2,30 +2,28 @@ package logs
 
 import (
 	"context"
+	"fmt"
 
-	logUtils "github.com/lyft/flyteidl/clients/go/coreutils/logs"
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog"
+
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
 	v1 "k8s.io/api/core/v1"
 )
 
+type logPlugin struct {
+	Name   string
+	Plugin tasklog.Plugin
+}
+
+// Internal
 func GetLogsForContainerInPod(ctx context.Context, pod *v1.Pod, index uint32, nameSuffix string) ([]*core.TaskLog, error) {
-	var logs []*core.TaskLog
-	logConfig := GetLogConfig()
-
-	logPlugins := map[string]logUtils.LogPlugin{}
-
-	if logConfig.IsKubernetesEnabled {
-		logPlugins["Kubernetes Logs"] = logUtils.NewKubernetesLogPlugin(logConfig.KubernetesURL)
-	}
-	if logConfig.IsCloudwatchEnabled {
-		logPlugins["Cloudwatch Logs"] = logUtils.NewCloudwatchLogPlugin(logConfig.CloudwatchRegion, logConfig.CloudwatchLogGroup)
-	}
-	if logConfig.IsStackDriverEnabled {
-		logPlugins["Stackdriver Logs"] = logUtils.NewStackdriverLogPlugin(logConfig.GCPProjectName, logConfig.StackdriverLogResourceName)
+	logPlugin, err := InitializeLogPlugins(GetLogConfig())
+	if err != nil {
+		return nil, err
 	}
 
-	if len(logPlugins) == 0 {
+	if logPlugin == nil {
 		return nil, nil
 	}
 
@@ -44,18 +42,87 @@ func GetLogsForContainerInPod(ctx context.Context, pod *v1.Pod, index uint32, na
 		return nil, nil
 	}
 
-	for name, plugin := range logPlugins {
-		log, err := plugin.GetTaskLog(
-			pod.Name,
-			pod.Namespace,
-			pod.Spec.Containers[index].Name,
-			pod.Status.ContainerStatuses[index].ContainerID,
-			name+nameSuffix,
-		)
-		if err != nil {
-			return nil, err
-		}
-		logs = append(logs, &log)
+	logs, err := logPlugin.GetTaskLogs(
+		tasklog.Input{
+			PodName:       pod.Name,
+			Namespace:     pod.Namespace,
+			ContainerName: pod.Spec.Containers[index].Name,
+			ContainerID:   pod.Status.ContainerStatuses[index].ContainerID,
+			LogName:       nameSuffix,
+		},
+	)
+
+	if err != nil {
+		return nil, err
 	}
-	return logs, nil
+
+	return logs.TaskLogs, nil
+}
+
+type taskLogPluginWrapper struct {
+	logPlugins []logPlugin
+}
+
+func (t taskLogPluginWrapper) GetTaskLogs(input tasklog.Input) (logOutput tasklog.Output, err error) {
+	logs := make([]*core.TaskLog, 0, len(t.logPlugins))
+	suffix := input.LogName
+	for _, plugin := range t.logPlugins {
+		input.LogName = plugin.Name + suffix
+		o, err := plugin.Plugin.GetTaskLogs(input)
+		if err != nil {
+			return tasklog.Output{}, err
+		}
+
+		logs = append(logs, o.TaskLogs...)
+	}
+
+	return tasklog.Output{
+		TaskLogs: logs,
+	}, nil
+}
+
+// Internal
+func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
+	// Use a list to maintain order.
+	logPlugins := make([]logPlugin, 0, 2)
+
+	if cfg.IsKubernetesEnabled {
+		if len(cfg.KubernetesTemplateURI) > 0 {
+			logPlugins = append(logPlugins, logPlugin{Name: "Kubernetes Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{cfg.KubernetesTemplateURI}, core.TaskLog_JSON)})
+		} else {
+			logPlugins = append(logPlugins, logPlugin{Name: "Kubernetes Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{fmt.Sprintf("%s/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}", cfg.KubernetesURL)}, core.TaskLog_JSON)})
+		}
+	}
+
+	if cfg.IsCloudwatchEnabled {
+		if len(cfg.CloudwatchTemplateURI) > 0 {
+			logPlugins = append(logPlugins, logPlugin{Name: "Cloudwatch Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{cfg.CloudwatchTemplateURI}, core.TaskLog_JSON)})
+		} else {
+			logPlugins = append(logPlugins, logPlugin{Name: "Cloudwatch Logs", Plugin: tasklog.NewTemplateLogPlugin(
+				[]string{fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=%s#logEventViewer:group=%s;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log", cfg.CloudwatchRegion, cfg.CloudwatchLogGroup)}, core.TaskLog_JSON)})
+		}
+	}
+
+	if cfg.IsStackDriverEnabled {
+		if len(cfg.StackDriverTemplateURI) > 0 {
+			logPlugins = append(logPlugins, logPlugin{Name: "Stackdriver Logs", Plugin: tasklog.NewTemplateLogPlugin([]string{cfg.StackDriverTemplateURI}, core.TaskLog_JSON)})
+		} else {
+			logPlugins = append(logPlugins, logPlugin{Name: "Stackdriver Logs", Plugin: tasklog.NewTemplateLogPlugin(
+				[]string{fmt.Sprintf("https://console.cloud.google.com/logs/viewer?project=%s&angularJsUrl=%%2Flogs%%2Fviewer%%3Fproject%%3D%s&resource=%s&advancedFilter=resource.labels.pod_name%%3D{{ .podName }}", cfg.GCPProjectName, cfg.GCPProjectName, cfg.StackdriverLogResourceName)}, core.TaskLog_JSON)})
+		}
+	}
+
+	if len(cfg.Templates) > 0 {
+		for _, cfg := range cfg.Templates {
+			logPlugins = append(logPlugins, logPlugin{Name: cfg.DisplayName, Plugin: tasklog.NewTemplateLogPlugin(cfg.TemplateURIs, cfg.MessageFormat)})
+		}
+	}
+
+	if len(logPlugins) == 0 {
+		return nil, nil
+	}
+
+	return taskLogPluginWrapper{
+		logPlugins: logPlugins,
+	}, nil
 }

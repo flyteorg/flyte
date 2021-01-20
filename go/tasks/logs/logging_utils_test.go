@@ -4,6 +4,10 @@ import (
 	"context"
 	"testing"
 
+	"github.com/go-test/deep"
+	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 )
@@ -201,4 +205,100 @@ func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
 	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " Suffix")
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
+}
+
+func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
+	t.Run("All Templates available", func(t *testing.T) {
+		assertTestSucceeded(t, &LogConfig{
+			IsKubernetesEnabled:   true,
+			KubernetesTemplateURI: "https://k8s-my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+
+			IsCloudwatchEnabled:   true,
+			CloudwatchTemplateURI: "https://cw-my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+
+			IsStackDriverEnabled:   true,
+			StackDriverTemplateURI: "https://sd-my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+		}, []*core.TaskLog{
+			{
+				Uri:           "https://k8s-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "Kubernetes Logs my-Suffix",
+			},
+			{
+				Uri:           "https://cw-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "Cloudwatch Logs my-Suffix",
+			},
+			{
+				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "Stackdriver Logs my-Suffix",
+			},
+		})
+	})
+
+	t.Run("StackDriver", func(t *testing.T) {
+		assertTestSucceeded(t, &LogConfig{
+			IsStackDriverEnabled:   true,
+			StackDriverTemplateURI: "https://sd-my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+		}, []*core.TaskLog{
+			{
+				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "Stackdriver Logs my-Suffix",
+			},
+		})
+	})
+}
+
+func assertTestSucceeded(tb testing.TB, config *LogConfig, expectedTaskLogs []*core.TaskLog) {
+	assert.NoError(tb, SetLogConfig(config))
+
+	pod := &v1.Pod{
+		ObjectMeta: v12.ObjectMeta{
+			Namespace: "my-namespace",
+			Name:      "my-pod",
+		},
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "ContainerName",
+				},
+			},
+		},
+		Status: v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					ContainerID: "ContainerID",
+				},
+			},
+		},
+	}
+
+	logs, err := GetLogsForContainerInPod(context.TODO(), pod, 0, " my-Suffix")
+	assert.Nil(tb, err)
+	assert.Len(tb, logs, len(expectedTaskLogs))
+	if diff := deep.Equal(logs, expectedTaskLogs); len(diff) > 0 {
+		assert.FailNowf(tb, "Not Equal.", "Diff: %v", diff)
+	}
+}
+
+func TestGetLogsForContainerInPod_Templates(t *testing.T) {
+	assertTestSucceeded(t, &LogConfig{
+		Templates: []TemplateLogPluginConfig{
+			{
+				DisplayName: "StackDriver",
+				TemplateURIs: []string{
+					"https://my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				},
+				MessageFormat: core.TaskLog_JSON,
+			},
+		},
+	}, []*core.TaskLog{
+		{
+			Uri:           "https://my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
+			MessageFormat: core.TaskLog_JSON,
+			Name:          "StackDriver my-Suffix",
+		},
+	})
 }

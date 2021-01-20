@@ -44,10 +44,13 @@ func (cfg LogConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "cloudwatch-enabled"), *new(bool), "Enable Cloudwatch Logging")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cloudwatch-region"), *new(string), "AWS region in which Cloudwatch logs are stored.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cloudwatch-log-group"), *new(string), "Log group to which streams are associated.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "cloudwatch-template-uri"), *new(string), "Template Uri to use when building cloudwatch log links")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "kubernetes-enabled"), *new(bool), "Enable Kubernetes Logging")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes-url"), *new(string), "Console URL for Kubernetes logs")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kubernetes-template-uri"), *new(string), "Template Uri to use when building kubernetes log links")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "stackdriver-enabled"), *new(bool), "Enable Log-links to stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gcp-project"), *new(string), "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stackdriver-logresourcename"), *new(string), "Name of the logresource in stackdriver")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stackdriver-template-uri"), *new(string), "Template Uri to use when building stackdriver log links")
 	return cmdFlags
 }

@@ -64,22 +64,42 @@ func TestGetApplicationType(t *testing.T) {
 }
 
 func TestGetEventInfo(t *testing.T) {
-	assert.NoError(t, logs.SetLogConfig(&logs.LogConfig{
-		IsCloudwatchEnabled: true,
-		CloudwatchRegion:    "us-east-1",
-		CloudwatchLogGroup:  "/kubernetes/flyte",
-		IsKubernetesEnabled: true,
-		KubernetesURL:       "k8s.com",
+	assert.NoError(t, setSparkConfig(&Config{
+		LogConfig: LogConfig{
+			User: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+				IsKubernetesEnabled:   true,
+				KubernetesURL:         "k8s.com",
+			},
+			System: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+			},
+			AllUser: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+			},
+		},
 	}))
 	info, err := getEventInfoForSpark(dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, fmt.Sprintf("https://%s", sparkUIAddress), info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
-	assert.Equal(t, "k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace", info.Logs[0].Uri)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix", info.Logs[1].Uri)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[2].Uri)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[3].Uri)
-	assert.Equal(t, "https://spark-ui.flyte", info.Logs[4].Uri)
+	generatedLinks := make([]string, 0, len(info.Logs))
+	for _, l := range info.Logs {
+		generatedLinks = append(generatedLinks, l.Uri)
+	}
+
+	expectedLinks := []string{
+		"k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace",
+		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix",
+		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix",
+		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix",
+		"https://spark-ui.flyte",
+	}
+
+	assert.Equal(t, expectedLinks, generatedLinks)
 
 	info, err = getEventInfoForSpark(dummySparkApplication(sj.SubmittedState))
 	assert.NoError(t, err)
@@ -88,17 +108,42 @@ func TestGetEventInfo(t *testing.T) {
 
 	assert.NoError(t, setSparkConfig(&Config{
 		SparkHistoryServerURL: "spark-history.flyte",
+		LogConfig: LogConfig{
+			User: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+				IsKubernetesEnabled:   true,
+				KubernetesURL:         "k8s.com",
+			},
+			System: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+			},
+			AllUser: logs.LogConfig{
+				IsCloudwatchEnabled:   true,
+				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+			},
+		},
 	}))
 
 	info, err = getEventInfoForSpark(dummySparkApplication(sj.FailedState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 5)
 	assert.Equal(t, "spark-history.flyte/history/app-id", info.CustomInfo.Fields[sparkHistoryUI].GetStringValue())
-	assert.Equal(t, "k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace", info.Logs[0].Uri)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix", info.Logs[1].Uri)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[2].Uri)
-	assert.Equal(t, "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix", info.Logs[3].Uri)
-	assert.Equal(t, "spark-history.flyte/history/app-id", info.Logs[4].Uri)
+	generatedLinks = make([]string, 0, len(info.Logs))
+	for _, l := range info.Logs {
+		generatedLinks = append(generatedLinks, l.Uri)
+	}
+
+	expectedLinks = []string{
+		"k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace",
+		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix",
+		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix",
+		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix",
+		"spark-history.flyte/history/app-id",
+	}
+
+	assert.Equal(t, expectedLinks, generatedLinks)
 }
 
 func TestGetTaskPhase(t *testing.T) {

@@ -165,6 +165,28 @@ func TestLogConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_cloudwatch-template-uri", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("cloudwatch-template-uri"); err == nil {
+				assert.Equal(t, string(*new(string)), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cloudwatch-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("cloudwatch-template-uri"); err == nil {
+				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vString), &actual.CloudwatchTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_kubernetes-enabled", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
@@ -203,6 +225,28 @@ func TestLogConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("kubernetes-url", testValue)
 			if vString, err := cmdFlags.GetString("kubernetes-url"); err == nil {
 				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vString), &actual.KubernetesURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_kubernetes-template-uri", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("kubernetes-template-uri"); err == nil {
+				assert.Equal(t, string(*new(string)), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("kubernetes-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("kubernetes-template-uri"); err == nil {
+				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vString), &actual.KubernetesTemplateURI)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -269,6 +313,28 @@ func TestLogConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("stackdriver-logresourcename", testValue)
 			if vString, err := cmdFlags.GetString("stackdriver-logresourcename"); err == nil {
 				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vString), &actual.StackdriverLogResourceName)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_stackdriver-template-uri", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("stackdriver-template-uri"); err == nil {
+				assert.Equal(t, string(*new(string)), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("stackdriver-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("stackdriver-template-uri"); err == nil {
+				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vString), &actual.StackDriverTemplateURI)
 
 			} else {
 				assert.FailNow(t, err.Error())
