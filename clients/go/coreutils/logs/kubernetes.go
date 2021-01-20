@@ -18,6 +18,7 @@ func (s kubernetesLogPlugin) GetTaskLog(podName, namespace, containerName, conta
 	}, nil
 }
 
+// Deprecated: Please use NewTemplateLogPlugin from github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog instead.
 func NewKubernetesLogPlugin(k8sURL string) LogPlugin {
 	return &kubernetesLogPlugin{
 		k8sURL: k8sURL,
