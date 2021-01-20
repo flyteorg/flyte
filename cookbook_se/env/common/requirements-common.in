@@ -1,2 +1,2 @@
-flytekit[schema,spark3,sidecar]==0.16.0a2
+flytekit[schema,spark3,sidecar]==0.16.0a3
 matplotlib

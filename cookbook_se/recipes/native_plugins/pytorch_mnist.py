@@ -1,8 +1,9 @@
 """
 Running Distributed Pytorch Training using KF PytorchOperator
 -------------------------------------------------------------------
-This example is the same as the default example available on Kubeflow's pytorch site
+This example is adapted from the default example available on Kubeflow's pytorch site.
 `here <https://github.com/kubeflow/pytorch-operator/blob/b7fef224fef1ef0117f6e74961b557270fcf4b04/examples/mnist/mnist.py>`_
+It has been modified to show how to integrate it with Flyte and can be probably simplified and cleaned up.
 
 """
 import os
@@ -11,14 +12,14 @@ from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
 import torch
+import torch.nn.functional as F
 from dataclasses_json import dataclass_json
 from flytekit import task, Resources, workflow
 from flytekit.taskplugins.pytorch import PyTorch
-from flytekit.types.directory import FlyteDirectory
-from flytekit.types.file import FlyteFile
+from flytekit.types.directory import TensorboardLogs
+from flytekit.types.file import PythonPickledFile, PNGImageFile
 from tensorboardX import SummaryWriter
 from torch import distributed as dist, nn, optim
-import torch.nn.functional as F
 from torchvision import datasets, transforms
 
 WORLD_SIZE = int(os.environ.get("WORLD_SIZE", 1))
@@ -132,6 +133,7 @@ class Hyperparameters(object):
         dir: directory where summary logs are stored
     """
 
+    backend: str = dist.Backend.GLOO
     sgd_momentum: float = 0.5
     seed: int = 1
     log_interval: int = 10
@@ -151,12 +153,10 @@ class Hyperparameters(object):
 # Notice we are also generating an output variable called logs, these logs can be used to visualize the training in
 # Tensorboard and are the output of the `SummaryWriter` interface
 # Refer to section :ref:`pytorch_tensorboard` to visualize the outputs of this example.
-PytorchPickledFile = FlyteFile[typing.TypeVar("pt")]
-TensorboardLogs = FlyteDirectory[typing.TypeVar("tensorboard")]
 TrainingOutputs = typing.NamedTuple(
     "TrainingOutputs",
     epoch_accuracies=typing.List[float],
-    model_state=PytorchPickledFile,
+    model_state=PythonPickledFile,
     logs=TensorboardLogs,
 )
 
@@ -173,9 +173,6 @@ TrainingOutputs = typing.NamedTuple(
     container_image="{{.image.default.fqn}}:pytorch-{{.image.default.version}}",
 )
 def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
-    # USE GLOO backend
-    backend_type = dist.Backend.GLOO
-
     log_dir = "logs"
     writer = SummaryWriter(log_dir)
 
@@ -188,8 +185,8 @@ def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
     print("Using device: {}, world size: {}".format(device, WORLD_SIZE))
 
     if should_distribute():
-        print("Using distributed PyTorch with {} backend".format(backend_type))
-        dist.init_process_group(backend=backend_type)
+        print("Using distributed PyTorch with {} backend".format(hp.backend))
+        dist.init_process_group(backend=hp.backend)
 
     # LOAD Data
     kwargs = {"num_workers": 1, "pin_memory": True} if use_cuda else {}
@@ -254,8 +251,8 @@ def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
 
     return TrainingOutputs(
         epoch_accuracies=accuracies,
-        model_state=PytorchPickledFile(model_file),
-        logs=log_dir,
+        model_state=PythonPickledFile(model_file),
+        logs=TensorboardLogs(log_dir),
     )
 
 
@@ -263,11 +260,8 @@ def mnist_pytorch_job(hp: Hyperparameters) -> TrainingOutputs:
 # Let us plot the accuracy
 # -------------------------
 # We will output the accuracy plot as a PNG image
-PNGImage = FlyteFile[typing.TypeVar("png")]
-
-
 @task
-def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImage:
+def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImageFile:
     # summarize history for accuracy
     plt.plot(epoch_accuracies)
     plt.title("Accuracy")
@@ -276,7 +270,7 @@ def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImage:
     accuracy_plot = "accuracy.png"
     plt.savefig(accuracy_plot)
 
-    return PNGImage(accuracy_plot)
+    return PNGImageFile(accuracy_plot)
 
 
 # %%
@@ -288,7 +282,7 @@ def plot_accuracy(epoch_accuracies: typing.List[float]) -> PNGImage:
 @workflow
 def pytorch_training_wf(
     hp: Hyperparameters,
-) -> (PytorchPickledFile, PNGImage, TensorboardLogs):
+) -> (PythonPickledFile, PNGImageFile, TensorboardLogs):
     accuracies, model, logs = mnist_pytorch_job(hp=hp)
     plot = plot_accuracy(epoch_accuracies=accuracies)
     return model, plot, logs

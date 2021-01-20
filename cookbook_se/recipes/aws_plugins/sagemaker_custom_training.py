@@ -18,18 +18,11 @@ from flytekit.taskplugins.sagemaker import (
     AlgorithmName,
     InputContentType,
 )
-from flytekit.types.directory import FlyteDirectory
-from flytekit.types.file import FlyteFile
 
 # %%
 # Training Algorithm
 # -------------------
 # In this custom algorithm we will train MNIST using tensorflow.
-#
-# The trained model will be serialized using HDF5 encoding. Lets create a special type alias to denote this model
-HDF5EncodedModelFile = FlyteFile[typing.TypeVar("hdf5")]
-
-# %%
 # The Training will produce 2 outputs
 #
 # #. The serialized model in HDF5 format
@@ -38,9 +31,29 @@ HDF5EncodedModelFile = FlyteFile[typing.TypeVar("hdf5")]
 #    these logs and make them available for visualization in tensorboard - locally or if running remote.
 #
 # Refer to section :ref:`sagemaker_tensorboard` to visualize the outputs of this example.
-TensorboardLogs = FlyteDirectory[typing.TypeVar("tensorboard")]
+#
+#
+# [Optional]: Create specialized type aliases for files in specific formats
+# --------------------------------------------------------------------------
+# The trained model will be serialized using HDF5 encoding. We can create a type for such a file. This type is simply
+# an informative way of understanding what type of file is generated and later on helps in matching up tasks that can
+# work on similar files. This completely optional.
+#
+# .. code-block:: python
+#
+#       HDF5EncodedModelFile = FlyteFile[typing.TypeVar("hdf5")]
+#
+# But this type alias is already available from Flytekit's type engine, so we can just import it.
+# We will also import ``PNGImageFile`` which we will use in the next task
+from flytekit.types.file import HDF5EncodedFile, PNGImageFile
+from flytekit.types.directory import TensorboardLogs
+
+# %%
+# We can create a named tuple to name the specific outputs from the training. This is optional as well, but
+# is useful to have human readable names for the outputs. In the absence of this, flytekit will name all outputs as
+# ``o0, o1, ...``
 TrainingOutputs = typing.NamedTuple(
-    "TrainingOutputs", model=HDF5EncodedModelFile, epoch_logs=dict, logs=TensorboardLogs
+    "TrainingOutputs", model=HDF5EncodedFile, epoch_logs=dict, logs=TensorboardLogs
 )
 
 
@@ -126,7 +139,7 @@ def custom_training_task(epochs: int, batch_size: int) -> TrainingOutputs:
     model.save(serialized_model, overwrite=True)
 
     return TrainingOutputs(
-        model=HDF5EncodedModelFile(serialized_model),
+        model=HDF5EncodedFile(serialized_model),
         epoch_logs=history.history,
         logs=TensorboardLogs(log_dir),
     )
@@ -137,8 +150,7 @@ def custom_training_task(epochs: int, batch_size: int) -> TrainingOutputs:
 # -----------------
 # In the following task we will use the history logs from the training in the previous step and plot the curves using
 # matplotlib. Images will be output as png.
-PNGImage = FlyteFile[typing.TypeVar("png")]
-PlotOutputs = typing.NamedTuple("PlotOutputs", accuracy=PNGImage, loss=PNGImage)
+PlotOutputs = typing.NamedTuple("PlotOutputs", accuracy=PNGImageFile, loss=PNGImageFile)
 
 
 @task
@@ -162,7 +174,7 @@ def plot_loss_and_accuracy(epoch_logs: dict) -> PlotOutputs:
     loss_plot = "loss.png"
     plt.savefig(loss_plot)
 
-    return PlotOutputs(accuracy=FlyteFile(accuracy_plot), loss=FlyteFile(loss_plot))
+    return PlotOutputs(accuracy=PNGImageFile(accuracy_plot), loss=PNGImageFile(loss_plot))
 
 
 # %%
@@ -171,7 +183,7 @@ def plot_loss_and_accuracy(epoch_logs: dict) -> PlotOutputs:
 @workflow
 def mnist_trainer(
     epochs: int = 5, batch_size: int = 128
-) -> (HDF5EncodedModelFile, PNGImage, PNGImage, TensorboardLogs):
+) -> (HDF5EncodedFile, PNGImageFile, PNGImageFile, TensorboardLogs):
     model, history, logs = custom_training_task(epochs=epochs, batch_size=batch_size)
     accuracy, loss = plot_loss_and_accuracy(epoch_logs=history)
     return model, accuracy, loss, logs
