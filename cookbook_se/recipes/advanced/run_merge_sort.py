@@ -122,7 +122,7 @@ def generate_inputs(numbers_count: int) -> typing.List[int]:
 # %%
 # The entire workflow can be executed locally as follows...
 if __name__ == "__main__":
-    print(f"Running {__file__} main...")
+    print(f"Running Merge Sort Locally...")
     count = 20
     x = generate_inputs(count)
     print(x)
