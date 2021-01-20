@@ -31,6 +31,7 @@ func (s *stackdriverLogPlugin) GetTaskLog(podName, namespace, containerName, con
 	}, nil
 }
 
+// Deprecated: Please use NewTemplateLogPlugin from github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog instead.
 func NewStackdriverLogPlugin(gcpProject, logResource string) LogPlugin {
 	return &stackdriverLogPlugin{
 		gcpProject:  gcpProject,
