@@ -36,6 +36,7 @@ func (s cloudwatchLogPlugin) GetTaskLog(podName, namespace, containerName, conta
 	}, nil
 }
 
+// Deprecated: Please use NewTemplateLogPlugin from github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog instead.
 func NewCloudwatchLogPlugin(region, groupName string) LogPlugin {
 	return &cloudwatchLogPlugin{
 		region:    region,
