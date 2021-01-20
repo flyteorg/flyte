@@ -68,12 +68,16 @@ plugins:
     features:
       - name: "feature1"
         spark-config:
-          - spark.hadoop.feature1 : "true"
-          - spark.sql.feature1 : "true"
+          - spark.hadoop.feature1: "true"
+          - spark.sql.feature1: "true"
       - name: "feature2"
         spark-config:
           - spark.hadoop.feature2: "true"
           - spark.sql.feature2: "true"
+    logs:
+      mixed:
+        kubernetes-enabled: true
+        kubernetes-url: "http://localhost:30082"
   # Logging configuration
   logs:
     kubernetes-enabled: true

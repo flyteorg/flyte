@@ -3,8 +3,11 @@ package pytorch
 import (
 	"context"
 	"fmt"
+
 	"sort"
 	"time"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	flyteerr "github.com/lyft/flyteplugins/go/tasks/errors"
@@ -17,7 +20,6 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	logUtils "github.com/lyft/flyteidl/clients/go/coreutils/logs"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteplugins/go/tasks/logs"
 
@@ -106,7 +108,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 // Analyses the k8s resource and reports the status as TaskPhase. This call is expected to be relatively fast,
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
-func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource k8s.Resource) (pluginsCore.PhaseInfo, error) {
+func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource k8s.Resource) (pluginsCore.PhaseInfo, error) {
 	app := resource.(*ptOp.PyTorchJob)
 
 	workersCount := app.Spec.PyTorchReplicaSpecs[ptOp.PyTorchReplicaTypeWorker].Replicas
@@ -148,35 +150,41 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(ctx context.Context, pluginCo
 }
 
 func getLogs(app *ptOp.PyTorchJob, workersCount int32) ([]*core.TaskLog, error) {
-	// If kubeClient was available, it would be better to use
-	// https://github.com/lyft/flyteplugins/blob/209c52d002b4e6a39be5d175bc1046b7e631c153/go/tasks/logs/logging_utils.go#L12
-	makeTaskLog := func(appName, appNamespace, suffix, url string) (core.TaskLog, error) {
-		return logUtils.NewKubernetesLogPlugin(url).GetTaskLog(
-			appName+"-"+suffix,
-			appNamespace,
-			"",
-			"",
-			suffix+" logs (via Kubernetes)")
+	p, err := logs.InitializeLogPlugins(logs.GetLogConfig())
+	if err != nil {
+		return nil, err
 	}
 
-	var taskLogs []*core.TaskLog
-
-	logConfig := logs.GetLogConfig()
-	if logConfig.IsKubernetesEnabled {
-		masterTaskLog, masterErr := makeTaskLog(app.Name, app.Namespace, "master-0", logConfig.KubernetesURL)
-		if masterErr != nil {
-			return nil, masterErr
-		}
-		taskLogs = append(taskLogs, &masterTaskLog)
-
-		for workerIndex := int32(0); workerIndex < workersCount; workerIndex++ {
-			workerLog, err := makeTaskLog(app.Name, app.Namespace, fmt.Sprintf("worker-%d", workerIndex), logConfig.KubernetesURL)
-			if err != nil {
-				return nil, err
-			}
-			taskLogs = append(taskLogs, &workerLog)
-		}
+	if p == nil {
+		return nil, nil
 	}
+
+	o, err := p.GetTaskLogs(tasklog.Input{
+		PodName:   app.Name + "-master-0",
+		Namespace: app.Namespace,
+		LogName:   "master",
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	taskLogs := make([]*core.TaskLog, 0, 10)
+	taskLogs = append(taskLogs, o.TaskLogs...)
+
+	for workerIndex := int32(0); workerIndex < workersCount; workerIndex++ {
+		workerLog, err := p.GetTaskLogs(tasklog.Input{
+			PodName:   app.Name + fmt.Sprintf("-worker-%d", workerIndex),
+			Namespace: app.Namespace,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+
+		taskLogs = append(taskLogs, workerLog.TaskLogs...)
+	}
+
 	return taskLogs, nil
 }
 

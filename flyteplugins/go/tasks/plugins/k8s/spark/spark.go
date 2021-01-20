@@ -3,7 +3,10 @@ package spark
 import (
 	"context"
 	"fmt"
+
 	"strconv"
+
+	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
 
@@ -20,7 +23,6 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	logUtils "github.com/lyft/flyteidl/clients/go/coreutils/logs"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,8 +30,6 @@ import (
 	"regexp"
 	"strings"
 	"time"
-
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
 )
 
 const KindSparkApplication = "SparkApplication"
@@ -39,32 +39,6 @@ const sparkHistoryUI = "sparkHistoryUI"
 var featureRegex = regexp.MustCompile(`^spark.((lyft)|(flyte)).(.+).enabled$`)
 
 var sparkTaskType = "spark"
-
-// Spark-specific configs
-type Config struct {
-	DefaultSparkConfig    map[string]string `json:"spark-config-default" pflag:",Key value pairs of default spark configuration that should be applied to every SparkJob"`
-	SparkHistoryServerURL string            `json:"spark-history-server-url" pflag:",URL for SparkHistory Server that each job will publish the execution history to."`
-	Features              []Feature         `json:"features" pflag:",List of optional features supported."`
-}
-
-// Optional feature with name and corresponding spark-config to use.
-type Feature struct {
-	Name        string            `json:"name"`
-	SparkConfig map[string]string `json:"spark-config"`
-}
-
-var (
-	sparkConfigSection = pluginsConfig.MustRegisterSubSection("spark", &Config{})
-)
-
-func GetSparkConfig() *Config {
-	return sparkConfigSection.GetConfig().(*Config)
-}
-
-// This method should be used for unit testing only
-func setSparkConfig(cfg *Config) error {
-	return sparkConfigSection.SetConfig(cfg)
-}
 
 type sparkResourceHandler struct {
 }
@@ -276,68 +250,95 @@ func (sparkResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx p
 }
 
 func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, error) {
-	var taskLogs []*core.TaskLog
-	customInfoMap := make(map[string]string)
-
-	logConfig := logs.GetLogConfig()
-
 	state := sj.Status.AppState.State
 	isQueued := state == sparkOp.NewState ||
 		state == sparkOp.PendingSubmissionState ||
 		state == sparkOp.SubmittedState
 
-	if logConfig.IsKubernetesEnabled && !isQueued && sj.Status.DriverInfo.PodName != "" {
-		k8sLog, err := logUtils.NewKubernetesLogPlugin(logConfig.KubernetesURL).GetTaskLog(
-			sj.Status.DriverInfo.PodName,
-			sj.Namespace,
-			"",
-			"",
-			"Driver Logs (via Kubernetes)")
+	sparkConfig := GetSparkConfig()
+	taskLogs := make([]*core.TaskLog, 0, 3)
+
+	if !isQueued {
+		if sj.Status.DriverInfo.PodName != "" {
+			p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.Mixed)
+			if err != nil {
+				return nil, err
+			}
+
+			if p != nil {
+				o, err := p.GetTaskLogs(tasklog.Input{
+					PodName:   sj.Status.DriverInfo.PodName,
+					Namespace: sj.Namespace,
+					LogName:   "Driver Logs",
+				})
+
+				if err != nil {
+					return nil, err
+				}
+
+				taskLogs = append(taskLogs, o.TaskLogs...)
+			}
+		}
+
+		p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.User)
+		if err != nil {
+			return nil, err
+		}
+
+		if p != nil {
+			o, err := p.GetTaskLogs(tasklog.Input{
+				PodName:   sj.Status.DriverInfo.PodName,
+				Namespace: sj.Namespace,
+				LogName:   "User Logs",
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			taskLogs = append(taskLogs, o.TaskLogs...)
+		}
+
+		p, err = logs.InitializeLogPlugins(&sparkConfig.LogConfig.System)
+		if err != nil {
+			return nil, err
+		}
+
+		if p != nil {
+			o, err := p.GetTaskLogs(tasklog.Input{
+				PodName:   sj.Name,
+				Namespace: sj.Namespace,
+				LogName:   "System Logs",
+			})
+
+			if err != nil {
+				return nil, err
+			}
+
+			taskLogs = append(taskLogs, o.TaskLogs...)
+		}
+	}
+
+	p, err := logs.InitializeLogPlugins(&sparkConfig.LogConfig.AllUser)
+	if err != nil {
+		return nil, err
+	}
+
+	if p != nil {
+		o, err := p.GetTaskLogs(tasklog.Input{
+			PodName:   sj.Name,
+			Namespace: sj.Namespace,
+			LogName:   "Spark-Submit/All User Logs",
+		})
 
 		if err != nil {
 			return nil, err
 		}
-		taskLogs = append(taskLogs, &k8sLog)
+
+		taskLogs = append(taskLogs, o.TaskLogs...)
 	}
 
-	if logConfig.IsCloudwatchEnabled && !isQueued {
-		cwUserLogs := core.TaskLog{
-			Uri: fmt.Sprintf(
-				"https://console.aws.amazon.com/cloudwatch/home?region=%s#logStream:group=%s;prefix=var.log.containers.%s;streamFilter=typeLogStreamPrefix",
-				logConfig.CloudwatchRegion,
-				logConfig.CloudwatchLogGroup,
-				sj.Status.DriverInfo.PodName),
-			Name:          "User Driver Logs (via Cloudwatch)",
-			MessageFormat: core.TaskLog_JSON,
-		}
-		cwSystemLogs := core.TaskLog{
-			Uri: fmt.Sprintf(
-				"https://console.aws.amazon.com/cloudwatch/home?region=%s#logStream:group=%s;prefix=system_log.var.log.containers.%s;streamFilter=typeLogStreamPrefix",
-				logConfig.CloudwatchRegion,
-				logConfig.CloudwatchLogGroup,
-				sj.Name),
-			Name:          "System Logs (via Cloudwatch)",
-			MessageFormat: core.TaskLog_JSON,
-		}
-
-		taskLogs = append(taskLogs, &cwUserLogs)
-		taskLogs = append(taskLogs, &cwSystemLogs)
-
-	}
-
-	if logConfig.IsCloudwatchEnabled {
-
-		allUserLogs := core.TaskLog{
-			Uri: fmt.Sprintf(
-				"https://console.aws.amazon.com/cloudwatch/home?region=%s#logStream:group=%s;prefix=var.log.containers.%s;streamFilter=typeLogStreamPrefix",
-				logConfig.CloudwatchRegion,
-				logConfig.CloudwatchLogGroup,
-				sj.Name),
-			Name:          "Spark-Submit/All User Logs (via Cloudwatch)",
-			MessageFormat: core.TaskLog_JSON,
-		}
-		taskLogs = append(taskLogs, &allUserLogs)
-	}
+	customInfoMap := make(map[string]string)
 
 	// Spark UI.
 	if sj.Status.AppState.State == sparkOp.FailedState || sj.Status.AppState.State == sparkOp.CompletedState {
