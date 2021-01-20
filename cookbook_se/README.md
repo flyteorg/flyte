@@ -38,6 +38,24 @@ Registration is the second step of the process and it is merely sending those pr
 
 While it's not required to use the git sha for the version, it is highly recommended. If you are registering to your local Docker Desktop Flyte cluster, both the serialization and the registration command have been combined into `make register_sandbox`.
 
+### Fast serialization and registration
+When you make changes that affect code and not dependencies or other container attributes you can use fast registration to avoid having to rebuild your docker container between iterations.
+Like above, the fast iteration process requires serialization and registration using two separate commands.
+
+Serialization is as simple as running `make fast_serialize_sandbox`.
+
+To register and serialize in one go simply run `make fast_register_sandbox`. The output of this command will show entities registered under `--local-source-root` scoped by `--pkgs` with a version of the form `fast...`. Simply execute
+this version of your entities once the register command terminates as your normally do.
+
+To run fast registration against a remote host, update the host argument in the `fast-register-files` command to use your
+hosted endpoint:
+
+```
+flyte-cli fast-register-files -p ${PROJECT} -d development -h YOUR_HOST_HERE -i \
+		--additional-distribution-dir s3://my-s3-bucket/fast/ --dest-dir /root/recipes \
+		--assumable-iam-role user-role --output-location-prefix s3://my-s3-bucket/output/ ${CURDIR}/_pb_output/*
+```
+
 ### Building Images
 If you are just iterating locally, there is no need to push your Docker image. For Docker for Desktop at least, locally built images will be available for use in its K8s cluster.
 
