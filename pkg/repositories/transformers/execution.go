@@ -90,6 +90,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 		Cluster:               input.Cluster,
 		InputsURI:             input.InputsURI,
 		UserInputsURI:         input.UserInputsURI,
+		User:                  requestSpec.Metadata.Principal,
 	}
 	// A reference launch entity can be one of either or a task OR launch plan. Traditionally, workflows are executed
 	// with a reference launch plan which is why this behavior is the default below.
