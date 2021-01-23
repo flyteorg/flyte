@@ -287,4 +287,13 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Exec("UPDATE projects set state = NULL").Error
 		},
 	},
+	{
+		ID: "2021-01-22-execution-user",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.Execution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Model(&models.Execution{}).DropColumn("user").Error
+		},
+	},
 }

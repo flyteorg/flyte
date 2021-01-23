@@ -56,4 +56,7 @@ type Execution struct {
 	ErrorKind *string `gorm:"index"`
 	// Execution Error Code nullable
 	ErrorCode *string
+	// The user responsible for launching this execution.
+	// This is also stored in the spec but promoted as a column for filtering.
+	User string `gorm:"index"`
 }

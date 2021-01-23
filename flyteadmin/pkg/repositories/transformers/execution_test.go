@@ -90,6 +90,7 @@ func TestCreateExecutionModel(t *testing.T) {
 	}
 	expectedSpecBytes, _ := proto.Marshal(expectedSpec)
 	assert.Equal(t, expectedSpecBytes, execution.Spec)
+	assert.Equal(t, execution.User, principal)
 
 	expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
 	expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
