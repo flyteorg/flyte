@@ -3,7 +3,7 @@
 #Usage
 #  make_all_subdirs.sh target
 #
-# This script is intended to be run from the base cookbook_se directory. It will go through all sub-folders in the
+# This script is intended to be run from the base cookbook directory. It will go through all sub-folders in the
 # recipes folder and run the 'target' supplied if a Makefile exists in that directory.
 
 

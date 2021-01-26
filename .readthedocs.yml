@@ -7,10 +7,10 @@ version: 2
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
-  configuration: cookbook_se/docs/conf.py
+  configuration: cookbook/docs/conf.py
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
   version: 3.8
   install:
-    - requirements: cookbook_se/dev-requirements.txt
+    - requirements: cookbook/dev-requirements.txt

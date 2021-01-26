@@ -1,11 +1,6 @@
-_build/
+_build
 _pb_output/
 .bash_history
 .cache/
 .ipython/
 .ipynb_checkpoints
-.vim/
-._rsts/
-*.zip
-auto_*/
-docs/_rsts/
