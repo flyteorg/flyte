@@ -1,3 +1,0 @@
--r ../common/requirements-common.in
-tensorflow
-tensorflow-datasets

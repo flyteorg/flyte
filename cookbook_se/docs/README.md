@@ -24,7 +24,8 @@ To make this work it is essential that the examples are written with comments fo
   ```
  - prompts should use 
    ```rst
-    .. prompt::
+    .. prompt::bash
+
        flyte-cli test
    ```
 

@@ -27,7 +27,11 @@ dirhash==0.2.1
 flyteidl==0.18.11
     # via flytekit
 flytekit==0.16.0b1
-    # via -r recipes/common/requirements-common.in
+    # via
+    #   -r ../../common/requirements-common.in
+    #   flytekitplugins-hive
+flytekitplugins-hive==0.1.0
+    # via -r requirements.in
 grpcio==1.35.0
     # via flytekit
 idna==2.10
@@ -43,7 +47,7 @@ marshmallow==3.10.0
     #   dataclasses-json
     #   marshmallow-enum
 matplotlib==3.3.3
-    # via -r recipes/common/requirements-common.in
+    # via -r ../../common/requirements-common.in
 mypy-extensions==0.4.3
     # via typing-inspect
 natsort==7.1.1
@@ -53,11 +57,8 @@ natsort==7.1.1
 numpy==1.19.5
     # via
     #   matplotlib
-    #   opencv-python
     #   pandas
     #   pyarrow
-opencv-python==4.5.1.48
-    # via -r requirements.in
 pandas==1.2.1
     # via flytekit
 pathspec==0.8.1
@@ -121,7 +122,7 @@ urllib3==1.25.11
     #   requests
     #   responses
 wheel==0.36.2
-    # via -r recipes/common/requirements-common.in
+    # via -r ../../common/requirements-common.in
 wrapt==1.12.1
     # via
     #   deprecated

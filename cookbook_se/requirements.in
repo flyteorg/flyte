@@ -1,6 +1,2 @@
--r env/default/requirements.in
--r env/opencv/requirements.in
--r env/pytorch/requirements.in
--r env/sagemaker/requirements.in
--r env/spark/requirements.in
--r env/xgboost-scikit/requirements.in
+-r recipes/common/requirements-common.in
+opencv-python

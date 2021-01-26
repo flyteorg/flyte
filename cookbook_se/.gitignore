@@ -6,3 +6,6 @@ _pb_output/
 .ipynb_checkpoints
 .vim/
 ._rsts/
+*.zip
+auto_*/
+docs/_rsts/

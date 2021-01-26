@@ -1,4 +1,0 @@
--r ../common/requirements-common.in
-torch
-torchvision
-tensorboardX
