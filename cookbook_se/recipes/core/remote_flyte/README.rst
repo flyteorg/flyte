@@ -1,16 +1,18 @@
 Getting setup for remote execution
 -------------------------------------
-Flytekit provides a python SDK for authoring and executing workflows and tasks in python.
-Flytekit comes with a simplistic local scheduler that executes code in a local environment.
-But, to leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run
-on a kubernetes cluster - locally, in a cloud environment or on-prem.
+Locally, Flytekit relies on the Python interpreter to execute both tasks and workflows.
+To leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run
+on any Kubernetes cluster - a local cluster like `kind <https://kind.sigs.k8s.io/>`__, in a cloud environment or on-prem.
 
-Please refer to the `Installing Flyte <https://lyft.github.io/flyte/administrator/install/index.html>`_ for details on getting started with a Flyte installation.
-This section walks through steps on deploying your local workflow to a distributed Flyte environment, with ``NO CODE CHANGES``.
+Please refer to the `Installing Flyte <https://lyft.github.io/flyte/administrator/install/index.html>`__ for details on getting started with a Flyte installation.
+
+
+1. First commit your changes. Some of the steps below default to referencing the git sha.
+1. Run `make serialize_sandbox`. This will build the image tagged with just `flytecookbook:<sha>`, no registry will be prefixed. See the image building section below for additional information.
 
 Build your Dockerfile
 ^^^^^^^^^^^^^^^^^^^^^^
-Now that you have workflows running locally, its time to take them for a spin onto a Hosted Flyte backend.
+The first step of this process is building a container image that holds your code.
 
 .. literalinclude:: ../../Dockerfile
     :language: dockerfile
@@ -20,6 +22,8 @@ Now that you have workflows running locally, its time to take them for a spin on
 
 Serialize your workflows and tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Getting your tasks, workflows, and launch plans to run on a Flyte platform is effectively a two-step process.  Serialization is the first step of that process. It is the translation of all your Flyte entities defined in Python, into Flyte IDL entities, defined in protobuf.
+
 Once you've built a Docker container image with your updated code changes, you can use the predefined make target to easily serialize your tasks:
 
 .. code-block::
@@ -39,15 +43,20 @@ The make target is a handy wrapper around the following:
 - `--in-container-config-path` maps to the location within your Docker container image where the above config file will be copied over too
 - `--image` is the non-optional fully qualified name of the container image housing your code
 
-To avoid mucking with with specifying out of container configs and code paths you can also use the handy in-container serialize recipe:
+In-container serialization
+""""""""""""""""""""""""""
+Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigourous, serialization should be done within the container for the following reasons.
 
+1. It ensures that the versions of all libraries used at execution time on the Flyte platform, are the same that are used during serialization.
+1. Since serialization runs part of flytekit, it helps ensure that your container is set up correctly.
+
+Take a look at this make target to see how it's done.
 .. code-block::
 
    make serialize_sandbox
 
 Register your Workflows and Tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 Once you've serialized your workflows and tasks to proto, you'll need to register them with your deployed Flyte installation.
 Again, you can make use of the included make target like so:
 
@@ -95,10 +104,21 @@ And then the fast register target:
 
 and just like that you can update your code without requiring a rebuild of your container!
 
+
+Building Images
+^^^^^^^^^^^^^^^
+If you are just iterating locally, there is no need to push your Docker image. For Docker for Desktop at least, locally built images will be available for use in its K8s cluster.
+
+If you would like to later push your image to a registry (Dockerhub, ECR, etc.), you can run,
+
+```bash
+REGISTRY=docker.io/corp make all_docker_push
+```
+
 .. _working_hosted_service:
 
-Features @Hosted Flyte: Schedules, Notifications etc
------------------------------------------------------
+Some concepts available remote only
+-----------------------------------
 
 Using remote Flyte gives you the ability to:
 

@@ -1,16 +1,14 @@
 Flyte Cookbook
 ==============================================
-Flytesnacks is intended to be a ``learn by example`` style cookbook. We try to
-cover all the various concepts in Flyte alongwith most of the maintained
-plugins. This cookbook is currently designed to get you running locally and on
-a Flyte cluster using the `flytekit - Flyte Python SDK
-<https://github.com/lyft/flytekit>`_
+This cookbook provides a hands on tutorial of various features in Flyte using flytekit, the platform's Python SDK. Flytekit is
+intended to be useful even without Flyte backend. All the examples in this book are executable locally and we recommend the best way to try out
+Flyte is to run these examples locally. If you have access to a whole Flyte platform deployment, this cookbook can also be used as a fully functional workflow repo.
 
-For more details on Flyte refer to the `Homepage <https://flyte.org>`_. 
-Documentation on how to install, configure, administer Flyte refer to
-`Documentation <https://lyft.github.io/flyte/>`_
+The tutorial is divided into 3 sections:
 
-Incase you find any bugs, have suggestions or comments please create a `Github Issue <https://github.com/lyft/flyte/issues/new/choose>`_. We love Pull requests and you will realize how welcoming and warm the community is. Please join our `slack channel <https://docs.google.com/forms/d/e/1FAIpQLScWPJZncyL-bBCWbuQ9HWuMzA8-r2RJc__CSWJoAYUQADN-BQ/viewform>`_.
+* :ref:`Getting Started <sphx_glr_auto_core>` - This covers the basics of Flytekit, as well as working with a deployed Flyte platform.
+* :ref:`Case Studies <sphx_glr_auto_case_studies>` - These are examples that showcase the power of Flyte.
+* :ref:`Plugins <sphx_glr_auto_plugins>` - This section details flytekit extensibility
 
 .. toctree::
    :maxdepth: 2
