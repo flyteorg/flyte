@@ -101,6 +101,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx_gallery.gen_gallery",
     "sphinx-prompt",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -135,8 +136,8 @@ html_theme_options = {
     # specified, then no sitemap will be built.
     "base_url": "https://github.com/lyft/flytekit",
     # Set the color and the accent color
-    "color_primary": "blue",
-    "color_accent": "light-blue",
+    "color_primary": "deep-purple",
+    "color_accent": "blue",
     # Set the repo location to get a badge with stats
     "repo_url": "https://github.com/lyft/flyte/",
     "repo_name": "flyte",
@@ -146,6 +147,11 @@ html_theme_options = {
     "globaltoc_collapse": False,
     # If True, show hidden TOC entries
     "globaltoc_includehidden": False,
+
+    "heroes": {
+        "": "Flyte",
+    },
+
 }
 
 html_sidebars = {
@@ -157,7 +163,7 @@ html_sidebars = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
-html_logo = "flyte_lockup_on_dark.png"
+html_logo = "flyte_circle_gradient_1_4x4.png"
 # html_additional_pages = {"index": "index.html"}
 
 examples_dirs = [
@@ -196,7 +202,7 @@ sphinx_gallery_conf = {
     "filename_pattern": "/run_",
     "capture_repr": (),
     "image_scrapers": image_scrapers,
-    "default_thumb_file": "flyte_lockup_on_dark.png",
+    "default_thumb_file": "flyte_mark_offset_pink.png",
     # Support for binder
     # 'binder': {'org': 'sphinx-gallery',
     # 'repo': 'sphinx-gallery.github.io',

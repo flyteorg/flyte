@@ -19,6 +19,7 @@ pytest
 sphinx
 sphinx-gallery
 sphinx-prompt
-sphinx_material
+sphinx-material
 sphinx-code-include
 sphinx-autoapi
+sphinx-copybutton
