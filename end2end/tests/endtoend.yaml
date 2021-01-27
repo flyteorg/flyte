@@ -11,7 +11,7 @@ spec:
     command:
     - bash
     - -c
-    image: ghcr.io/nuclyde-io/flytetools:27a27e42546fa9472601d1376a0b5448896fadd7
+    image: ghcr.io/nuclyde-io/flytetools:3abbd2cc8e4d3900d7886888fd49c9164e8435e2
     imagePullPolicy: IfNotPresent
     name: flytetester
     resources:
