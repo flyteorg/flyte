@@ -14,6 +14,8 @@ alabaster==0.7.12
     # via sphinx
 appdirs==1.4.4
     # via black
+astroid==2.4.2
+    # via sphinx-autoapi
 astunparse==1.6.3
     # via tensorflow
 attrs==20.3.0
@@ -26,13 +28,15 @@ babel==2.9.0
     # via sphinx
 bcrypt==3.2.0
     # via paramiko
+beautifulsoup4==4.9.3
+    # via sphinx-code-include
 black==19.10b0
     # via
     #   -r dev-requirements.in
     #   flake8-black
-boto3==1.16.59
+boto3==1.16.60
     # via sagemaker-training
-botocore==1.19.59
+botocore==1.19.60
     # via
     #   boto3
     #   s3transfer
@@ -51,7 +55,7 @@ click==7.1.2
     # via
     #   black
     #   flytekit
-coverage==5.3.1
+coverage==5.4
     # via -r dev-requirements.in
 croniter==1.0.2
     # via flytekit
@@ -151,7 +155,9 @@ isort==5.7.0
     #   -r dev-requirements.in
     #   flake8-isort
 jinja2==2.11.2
-    # via sphinx
+    # via
+    #   sphinx
+    #   sphinx-autoapi
 jmespath==0.10.0
     # via
     #   boto3
@@ -164,10 +170,12 @@ k8s-proto==0.0.3
     # via flytekitplugins-pod
 keras-preprocessing==1.1.2
     # via tensorflow
-keyring==22.0.0
+keyring==22.0.1
     # via flytekit
 kiwisolver==1.3.1
     # via matplotlib
+lazy-object-proxy==1.4.3
+    # via astroid
 markdown==3.3.3
     # via tensorboard
 markupsafe==1.1.1
@@ -279,7 +287,9 @@ pycparser==2.20
 pyflakes==2.2.0
     # via flake8
 pygments==2.7.4
-    # via sphinx
+    # via
+    #   sphinx
+    #   sphinx-prompt
 pynacl==1.4.0
     # via paramiko
 pyparsing==2.4.7
@@ -306,6 +316,8 @@ pytz==2018.4
     #   babel
     #   flytekit
     #   pandas
+pyyaml==5.4.1
+    # via sphinx-autoapi
 regex==2020.11.13
     # via black
 requests-oauthlib==1.3.0
@@ -342,6 +354,7 @@ scipy==1.6.0
 six==1.15.0
     # via
     #   absl-py
+    #   astroid
     #   astunparse
     #   bcrypt
     #   cryptography
@@ -360,6 +373,7 @@ six==1.15.0
     #   retrying
     #   sagemaker-training
     #   scantree
+    #   sphinx-code-include
     #   tensorboard
     #   tensorboardx
     #   tensorflow
@@ -370,12 +384,26 @@ snowballstemmer==2.1.0
     # via sphinx
 sortedcontainers==2.3.0
     # via flytekit
+soupsieve==2.1
+    # via beautifulsoup4
+sphinx-autoapi==1.6.0
+    # via -r dev-requirements.in
+sphinx-code-include==1.1.1
+    # via -r dev-requirements.in
 sphinx-gallery==0.8.2
+    # via -r dev-requirements.in
+sphinx-prompt==1.3.0
+    # via -r dev-requirements.in
+sphinx-rtd-theme==0.5.1
     # via -r dev-requirements.in
 sphinx==3.4.3
     # via
     #   -r dev-requirements.in
+    #   sphinx-autoapi
+    #   sphinx-code-include
     #   sphinx-gallery
+    #   sphinx-prompt
+    #   sphinx-rtd-theme
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -442,6 +470,8 @@ typing-extensions==3.7.4.3
     #   typing-inspect
 typing-inspect==0.6.0
     # via dataclasses-json
+unidecode==1.1.2
+    # via sphinx-autoapi
 urllib3==1.25.11
     # via
     #   botocore
@@ -467,6 +497,7 @@ wheel==0.36.2
     #   tensorflow
 wrapt==1.12.1
     # via
+    #   astroid
     #   deprecated
     #   flytekit
     #   tensorflow

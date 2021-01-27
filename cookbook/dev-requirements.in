@@ -18,3 +18,7 @@ mock
 pytest
 sphinx
 sphinx-gallery
+sphinx-prompt
+sphinx-rtd-theme
+sphinx-code-include
+sphinx-autoapi
