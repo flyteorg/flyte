@@ -11,8 +11,8 @@ This example shows how users can serialize custom JSON'able dataclasses between 
 """
 import typing
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
 
+from dataclasses_json import dataclass_json
 from flytekit import task, workflow
 
 

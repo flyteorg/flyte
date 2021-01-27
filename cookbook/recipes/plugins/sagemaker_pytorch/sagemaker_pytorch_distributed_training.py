@@ -24,11 +24,15 @@ import torch.nn.functional as functional
 import torch.optim as optim
 from dataclasses_json import dataclass_json
 from flytekit import task, workflow
-from flytekitplugins.awssagemaker import (
-    SagemakerTrainingJobConfig, AlgorithmSpecification, InputMode, AlgorithmName,
-    InputContentType, TrainingJobResourceConfig,
-)
 from flytekit.types.file import PythonPickledFile
+from flytekitplugins.awssagemaker import (
+    AlgorithmName,
+    AlgorithmSpecification,
+    InputContentType,
+    InputMode,
+    SagemakerTrainingJobConfig,
+    TrainingJobResourceConfig,
+)
 from torchvision import datasets, transforms
 
 
@@ -46,6 +50,7 @@ class Hyperparameters(object):
         log_interval: how many batches to wait before logging training status
         dir: directory where summary logs are stored
     """
+
     backend: str = dist.Backend.GLOO
     sgd_momentum: float = 0.5
     seed: int = 1
@@ -62,6 +67,7 @@ class TrainingArgs(Hyperparameters):
     These are training arguments that contain additional metadata beyond the hyper parameters useful especially in
     distributed training
     """
+
     hosts: typing.List[int] = None
     current_host: int = 0
     num_gpus: int = 0
@@ -94,25 +100,45 @@ class Net(nn.Module):
 
 def _get_train_data_loader(batch_size, training_dir, is_distributed, **kwargs):
     logging.info("Get train data loader")
-    dataset = datasets.MNIST(training_dir, train=True, download=False, transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ]))
+    dataset = datasets.MNIST(
+        training_dir,
+        train=True,
+        download=False,
+        transform=transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+        ),
+    )
     logging.info("Dataset is downloaded. Creating a train_sampler")
-    train_sampler = torch.utils.data.distributed.DistributedSampler(dataset) if is_distributed else None
+    train_sampler = (
+        torch.utils.data.distributed.DistributedSampler(dataset)
+        if is_distributed
+        else None
+    )
     logging.info("Train_sampler is successfully created. Creating a DataLoader")
-    return torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=train_sampler is None,
-                                       sampler=train_sampler, **kwargs)
+    return torch.utils.data.DataLoader(
+        dataset,
+        batch_size=batch_size,
+        shuffle=train_sampler is None,
+        sampler=train_sampler,
+        **kwargs,
+    )
 
 
 def _get_test_data_loader(test_batch_size, training_dir, **kwargs):
     logging.info("Get test data loader")
     return torch.utils.data.DataLoader(
-        datasets.MNIST(training_dir, train=False, download=False, transform=transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))
-        ])),
-        batch_size=test_batch_size, shuffle=True, **kwargs)
+        datasets.MNIST(
+            training_dir,
+            train=False,
+            download=False,
+            transform=transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+            ),
+        ),
+        batch_size=test_batch_size,
+        shuffle=True,
+        **kwargs,
+    )
 
 
 def _average_gradients(model):
@@ -126,7 +152,9 @@ def _average_gradients(model):
 def configure_model(model, is_distributed, gpu):
     if is_distributed:
         # multi-machine multi-gpu case
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[gpu], output_device=gpu)
+        model = torch.nn.parallel.DistributedDataParallel(
+            model, device_ids=[gpu], output_device=gpu
+        )
     else:
         # single-machine multi-gpu case or single-machine or multi-machine cpu case
         model = torch.nn.DataParallel(model)
@@ -136,26 +164,33 @@ def configure_model(model, is_distributed, gpu):
 # %%
 # The Actual Trainer
 def train(gpu: int, args: TrainingArgs):
-    logging.basicConfig(level='INFO')
+    logging.basicConfig(level="INFO")
     is_distributed = args.is_distributed()
     logging.warning("Distributed training - {}".format(is_distributed))
     use_cuda = args.num_gpus > 0
     logging.warning("Number of gpus available - {}".format(args.num_gpus))
-    kwargs = {'num_workers': 1, 'pin_memory': True} if use_cuda else {}
-    device = torch.device('cuda' if use_cuda else 'cpu')
+    kwargs = {"num_workers": 1, "pin_memory": True} if use_cuda else {}
+    device = torch.device("cuda" if use_cuda else "cpu")
 
     rank = 0
 
     if is_distributed:
         # Initialize the distributed environment
         world_size = len(args.hosts) * args.num_gpus
-        os.environ['WORLD_SIZE'] = str(world_size)
+        os.environ["WORLD_SIZE"] = str(world_size)
         rank = args.hosts.index(args.current_host) * args.num_gpus + gpu
-        os.environ['RANK'] = str(rank)
-        dist.init_process_group(backend=args.backend, init_method='env://', rank=rank, world_size=world_size)
-        logging.info('Initialized the distributed environment: \'{}\' backend on {} nodes. '.format(
-            args.backend, dist.get_world_size()) + 'Current host rank is {}. Number of gpus: {}'.format(
-            dist.get_rank(), args.num_gpus))
+        os.environ["RANK"] = str(rank)
+        dist.init_process_group(
+            backend=args.backend, init_method="env://", rank=rank, world_size=world_size
+        )
+        logging.info(
+            "Initialized the distributed environment: '{}' backend on {} nodes. ".format(
+                args.backend, dist.get_world_size()
+            )
+            + "Current host rank is {}. Number of gpus: {}".format(
+                dist.get_rank(), args.num_gpus
+            )
+        )
         torch.cuda.set_device(gpu)
 
     # set the seed for generating random numbers
@@ -163,31 +198,46 @@ def train(gpu: int, args: TrainingArgs):
     if use_cuda:
         torch.cuda.manual_seed(args.seed)
 
-    train_loader = _get_train_data_loader(args.batch_size, args.data_dir, is_distributed, **kwargs)
+    train_loader = _get_train_data_loader(
+        args.batch_size, args.data_dir, is_distributed, **kwargs
+    )
     test_loader = _get_test_data_loader(args.test_batch_size, args.data_dir, **kwargs)
 
-    logging.info("Processes {}/{} ({:.0f}%) of train data".format(
-        len(train_loader.sampler), len(train_loader.dataset),
-        100. * len(train_loader.sampler) / len(train_loader.dataset)
-    ))
+    logging.info(
+        "Processes {}/{} ({:.0f}%) of train data".format(
+            len(train_loader.sampler),
+            len(train_loader.dataset),
+            100.0 * len(train_loader.sampler) / len(train_loader.dataset),
+        )
+    )
 
-    logging.info("Processes {}/{} ({:.0f}%) of test data".format(
-        len(test_loader.sampler), len(test_loader.dataset),
-        100. * len(test_loader.sampler) / len(test_loader.dataset)
-    ))
+    logging.info(
+        "Processes {}/{} ({:.0f}%) of test data".format(
+            len(test_loader.sampler),
+            len(test_loader.dataset),
+            100.0 * len(test_loader.sampler) / len(test_loader.dataset),
+        )
+    )
 
     model = Net().to(device)
 
     model = configure_model(model, is_distributed, gpu)
 
-    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate, momentum=args.sgd_momentum)
+    optimizer = optim.SGD(
+        model.parameters(), lr=args.learning_rate, momentum=args.sgd_momentum
+    )
 
-    logging.info("[rank {}|local-rank {}] Totally {} epochs".format(rank, gpu, args.epochs + 1))
+    logging.info(
+        "[rank {}|local-rank {}] Totally {} epochs".format(rank, gpu, args.epochs + 1)
+    )
     for epoch in range(1, args.epochs + 1):
         model.train()
         for batch_idx, (data, target) in enumerate(train_loader, 1):
             if use_cuda:
-                data, target = data.cuda(non_blocking=True), target.cuda(non_blocking=True)
+                data, target = (
+                    data.cuda(non_blocking=True),
+                    target.cuda(non_blocking=True),
+                )
             optimizer.zero_grad()
             output = model(data)
             loss = functional.nll_loss(output, target)
@@ -198,10 +248,17 @@ def train(gpu: int, args: TrainingArgs):
             optimizer.step()
             if batch_idx % args.log_interval == 0:
                 if not is_distributed or (is_distributed and rank == 0):
-                    logging.info('[rank {}|local-rank {}] Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f}'.format(
-                        rank, gpu,
-                        epoch, batch_idx * len(data), len(train_loader.sampler),
-                               100. * batch_idx / len(train_loader), loss.item()))
+                    logging.info(
+                        "[rank {}|local-rank {}] Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f}".format(
+                            rank,
+                            gpu,
+                            epoch,
+                            batch_idx * len(data),
+                            len(train_loader.sampler),
+                            100.0 * batch_idx / len(train_loader),
+                            loss.item(),
+                        )
+                    )
         test(model, test_loader, device)
 
     if not is_distributed or (is_distributed and rank == 0):
@@ -216,23 +273,35 @@ def test(model, test_loader, device):
     correct = 0
     with torch.no_grad():
         for data, target in test_loader:
-            if device.type == 'cuda':
-                data, target = data.cuda(non_blocking=True), target.cuda(non_blocking=True)
+            if device.type == "cuda":
+                data, target = (
+                    data.cuda(non_blocking=True),
+                    target.cuda(non_blocking=True),
+                )
             output = model(data)
-            test_loss += functional.nll_loss(output, target, size_average=False).item()  # sum up batch loss
-            pred = output.max(1, keepdim=True)[1]  # get the index of the max log-probability
+            test_loss += functional.nll_loss(
+                output, target, size_average=False
+            ).item()  # sum up batch loss
+            pred = output.max(1, keepdim=True)[
+                1
+            ]  # get the index of the max log-probability
             correct += pred.eq(target.view_as(pred)).sum().item()
 
     test_loss /= len(test_loader.dataset)
-    logging.info('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    logging.info(
+        "Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n".format(
+            test_loss,
+            correct,
+            len(test_loader.dataset),
+            100.0 * correct / len(test_loader.dataset),
+        )
+    )
 
 
 def model_fn(model_dir):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = torch.nn.DataParallel(Net())
-    with open(os.path.join(model_dir, 'model.pth'), 'rb') as f:
+    with open(os.path.join(model_dir, "model.pth"), "rb") as f:
         model.load_state_dict(torch.load(f))
     return model.to(device)
 
@@ -241,7 +310,7 @@ def model_fn(model_dir):
 # Save the model to a local path
 def save_model(model, model_dir) -> PythonPickledFile:
     logging.info("Saving the model.")
-    path = os.path.join(model_dir, 'model.pth')
+    path = os.path.join(model_dir, "model.pth")
     # recommended way from http://pytorch.org/docs/master/notes/serialization.html
     torch.save(model.cpu().state_dict(), path)
     print(f"Model saved to {path}")
@@ -250,18 +319,26 @@ def save_model(model, model_dir) -> PythonPickledFile:
 
 def download_training_data(training_dir):
     logging.info("Downloading train data")
-    datasets.MNIST(training_dir, train=True, download=True, transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ]))
+    datasets.MNIST(
+        training_dir,
+        train=True,
+        download=True,
+        transform=transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+        ),
+    )
 
 
 def download_test_data(training_dir):
     logging.info("Downloading test data")
-    datasets.MNIST(training_dir, train=False, download=True, transform=transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ]))
+    datasets.MNIST(
+        training_dir,
+        train=False,
+        download=True,
+        transform=transforms.Compose(
+            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+        ),
+    )
 
 
 # https://github.com/aws/amazon-sagemaker-examples/blob/89831fcf99ea3110f52794db0f6433a4013a5bca/sagemaker-python-sdk/pytorch_mnist/mnist.py
@@ -314,10 +391,12 @@ def mnist_pytorch_job(hp: Hyperparameters) -> PythonPickledFile:
 
     if len(args.hosts) > 1:
         # Config MASTER_ADDR and MASTER_PORT for PyTorch Distributed Training
-        os.environ['MASTER_ADDR'] = args.hosts[0]
-        os.environ['MASTER_PORT'] = '29500'
-        os.environ['NCCL_SOCKET_IFNAME'] = (ctx.distributed_training_context.network_interface_name)
-        os.environ['NCCL_DEBUG'] = 'INFO'
+        os.environ["MASTER_ADDR"] = args.hosts[0]
+        os.environ["MASTER_PORT"] = "29500"
+        os.environ[
+            "NCCL_SOCKET_IFNAME"
+        ] = ctx.distributed_training_context.network_interface_name
+        os.environ["NCCL_DEBUG"] = "INFO"
         # The function is called as fn(i, *args), where i is the process index and args is the passed
         # through tuple of arguments.
         # https://pytorch.org/docs/stable/multiprocessing.html#torch.multiprocessing.spawn
@@ -325,11 +404,11 @@ def mnist_pytorch_job(hp: Hyperparameters) -> PythonPickledFile:
     else:
         # Config for Multi GPU with a single instance training
         if args.num_gpus > 1:
-            gpu_devices = ','.join([str(gpu_id) for gpu_id in range(args.num_gpus)])
-            os.environ['CUDA_VISIBLE_DEVICES'] = gpu_devices
+            gpu_devices = ",".join([str(gpu_id) for gpu_id in range(args.num_gpus)])
+            os.environ["CUDA_VISIBLE_DEVICES"] = gpu_devices
         train(-1, args)
 
-    pth = os.path.join(model_dir, 'model.pth')
+    pth = os.path.join(model_dir, "model.pth")
     print(f"Returning model @ {pth}")
     return pth
 

@@ -16,7 +16,7 @@ import typing
 from datetime import datetime
 from random import random, seed
 
-from flytekit import task, workflow, dynamic
+from flytekit import dynamic, task, workflow
 from flytekit.annotated.condition import conditional
 
 # seed random number generator
@@ -27,24 +27,30 @@ seed(datetime.now().microsecond)
 # A simple split function that divides a list into two halves.
 @task
 def split(numbers: typing.List[int]) -> (typing.List[int], typing.List[int], int):
-    return numbers[0:int(len(numbers) / 2)], numbers[int(len(numbers) / 2) + 1:], int(len(numbers) / 2)
+    return (
+        numbers[0 : int(len(numbers) / 2)],
+        numbers[int(len(numbers) / 2) + 1 :],
+        int(len(numbers) / 2),
+    )
 
 
 # %%
 # One sample implementation for merging. In a more real world example, this might merge file streams and only load
 # chunks into the memory.
 @task
-def merge(sorted_list1: typing.List[int], sorted_list2: typing.List[int]) -> typing.List[int]:
+def merge(
+    sorted_list1: typing.List[int], sorted_list2: typing.List[int]
+) -> typing.List[int]:
     n1 = len(sorted_list1)
     n2 = len(sorted_list2)
     result = []
     i = 0
     j = 0
 
-    # Traverse both array 
+    # Traverse both array
     while i < n1 and j < n2:
-        # Check if current element of first array is smaller than current element of second array. If yes,  
-        # store first array element and increment first array index. Otherwise do same with second array 
+        # Check if current element of first array is smaller than current element of second array. If yes,
+        # store first array element and increment first array index. Otherwise do same with second array
         if sorted_list1[i] < sorted_list2[j]:
             result.append(sorted_list1[i])
             i = i + 1
@@ -52,12 +58,12 @@ def merge(sorted_list1: typing.List[int], sorted_list2: typing.List[int]) -> typ
             result.append(sorted_list2[j])
             j = j + 1
 
-    # Store remaining elements of first array 
+    # Store remaining elements of first array
     while i < n1:
         result.append(sorted_list1[i])
         i = i + 1
 
-    # Store remaining elements of second array 
+    # Store remaining elements of second array
     while j < n2:
         result.append(sorted_list2[j])
         j = j + 1
@@ -82,10 +88,16 @@ def sort_locally(numbers: typing.List[int]) -> typing.List[int]:
 # 4 different nodes that will all run remotely on potentially different hosts. Flyte takes care of ensuring references
 # of data are properly passed around and order of execution is maintained with maximum possible parallelism.
 @dynamic
-def merge_sort_remotely(numbers: typing.List[int], run_local_at_count: int) -> typing.List[int]:
+def merge_sort_remotely(
+    numbers: typing.List[int], run_local_at_count: int
+) -> typing.List[int]:
     split1, split2, new_count = split(numbers=numbers)
-    sorted1 = merge_sort(numbers=split1, numbers_count=new_count, run_local_at_count=run_local_at_count)
-    sorted2 = merge_sort(numbers=split2, numbers_count=new_count, run_local_at_count=run_local_at_count)
+    sorted1 = merge_sort(
+        numbers=split1, numbers_count=new_count, run_local_at_count=run_local_at_count
+    )
+    sorted2 = merge_sort(
+        numbers=split2, numbers_count=new_count, run_local_at_count=run_local_at_count
+    )
     return merge(sorted_list1=sorted1, sorted_list2=sorted2)
 
 
@@ -97,13 +109,17 @@ def merge_sort_remotely(numbers: typing.List[int], run_local_at_count: int) -> t
 # the cut-off size to run locally, if so, it runs the sort_locally task. Otherwise it runs the above dynamic workflow
 # that recurse down the list.
 @workflow
-def merge_sort(numbers: typing.List[int], numbers_count: int, run_local_at_count: int = 10) -> typing.List[int]:
+def merge_sort(
+    numbers: typing.List[int], numbers_count: int, run_local_at_count: int = 10
+) -> typing.List[int]:
     return (
         conditional("terminal_case")
-            .if_(numbers_count <= run_local_at_count)
-            .then(sort_locally(numbers=numbers))
-            .else_()
-            .then(merge_sort_remotely(numbers=numbers, run_local_at_count=run_local_at_count))
+        .if_(numbers_count <= run_local_at_count)
+        .then(sort_locally(numbers=numbers))
+        .else_()
+        .then(
+            merge_sort_remotely(numbers=numbers, run_local_at_count=run_local_at_count)
+        )
     )
 
 

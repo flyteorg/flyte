@@ -20,10 +20,10 @@ You get a couple templating args to help make that happen, along with the usual 
   should write the outputs to this location.
 
 """
-from flytekit import workflow, kwtypes, task
-from flytekitplugins.hive import HiveTask, HiveSelectTask
-from flytekitplugins.hive.task import HiveConfig
+from flytekit import kwtypes, task, workflow
 from flytekit.types.schema import FlyteSchema
+from flytekitplugins.hive import HiveSelectTask, HiveTask
+from flytekitplugins.hive.task import HiveConfig
 
 # %%
 # This is the world's simplest query. Note that in order for registration to work properly, you'll need to give your

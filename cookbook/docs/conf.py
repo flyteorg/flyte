@@ -6,26 +6,27 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import logging
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
 import sys
-import logging
-from sphinx_gallery.sorting import FileNameSortKey
-from sphinx_gallery.sorting import ExplicitOrder
+
+from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 
 sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "Flyte Cookbook 2nd Ed."
-copyright = "2020, Flyte"
+project = "Flyte Cookbook [Python]"
+copyright = "2021, Flyte"
 author = "Flyte"
 
 # The full version, including alpha/beta/rc tags
-release = "0.16.0"
+release = "0.16.0b1"
 
 
 class CustomSorter(FileNameSortKey):
@@ -124,7 +125,32 @@ master_doc = "index"
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "sphinx_material"
+html_theme_options = {
+    # Set the name of the project to appear in the navigation.
+    "nav_title": "Flyte",
+    # Set you GA account ID to enable tracking
+    "google_analytics_account": "G-YQL24L5CKY",
+    # Specify a base_url used to generate sitemap.xml. If not
+    # specified, then no sitemap will be built.
+    "base_url": "https://github.com/lyft/flytekit",
+    # Set the color and the accent color
+    "color_primary": "blue",
+    "color_accent": "light-blue",
+    # Set the repo location to get a badge with stats
+    "repo_url": "https://github.com/lyft/flyte/",
+    "repo_name": "flyte",
+    # Visible levels of the global TOC; -1 means unlimited
+    "globaltoc_depth": 1,
+    # If False, expand all TOC entries
+    "globaltoc_collapse": False,
+    # If True, show hidden TOC entries
+    "globaltoc_includehidden": False,
+}
+
+html_sidebars = {
+    "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -132,11 +158,7 @@ html_theme = "sphinx_rtd_theme"
 html_static_path = []
 
 html_logo = "flyte_lockup_on_dark.png"
-html_theme_options = {
-    "logo_only": True,
-    "display_version": True,
-}
-
+# html_additional_pages = {"index": "index.html"}
 
 examples_dirs = [
     "../recipes/core",
@@ -164,7 +186,7 @@ sphinx_gallery_conf = {
             "../recipes/plugins/sagemaker_training",
             "../recipes/plugins/k8s_spark",
             "../recipes/plugins/kfpytorch",
-            "../recipes/plugins/pod/", 
+            "../recipes/plugins/pod/",
             "../recipes/plugins/sagemaker_pytorch/",
         ]
     ),
@@ -192,6 +214,6 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "torch": ("https://pytorch.org/docs/master/", None),
-    "scipy": ('https://docs.scipy.org/doc/scipy/reference', None),
-    "matplotlib": ('https://matplotlib.org', None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "matplotlib": ("https://matplotlib.org", None),
 }

@@ -29,7 +29,9 @@ babel==2.9.0
 bcrypt==3.2.0
     # via paramiko
 beautifulsoup4==4.9.3
-    # via sphinx-code-include
+    # via
+    #   sphinx-code-include
+    #   sphinx-material
 black==19.10b0
     # via
     #   -r dev-requirements.in
@@ -61,6 +63,8 @@ croniter==1.0.2
     # via flytekit
 cryptography==3.3.1
     # via paramiko
+css-html-js-minify==2.5.5
+    # via sphinx-material
 cycler==0.10.0
     # via matplotlib
 dataclasses-json==0.5.2
@@ -176,6 +180,8 @@ kiwisolver==1.3.1
     # via matplotlib
 lazy-object-proxy==1.4.3
     # via astroid
+lxml==4.6.2
+    # via sphinx-material
 markdown==3.3.3
     # via tensorboard
 markupsafe==1.1.1
@@ -309,6 +315,8 @@ python-dateutil==2.8.1
     #   flytekit
     #   matplotlib
     #   pandas
+python-slugify[unidecode]==4.0.1
+    # via sphinx-material
 pytimeparse==1.1.8
     # via flytekit
 pytz==2018.4
@@ -392,9 +400,9 @@ sphinx-code-include==1.1.1
     # via -r dev-requirements.in
 sphinx-gallery==0.8.2
     # via -r dev-requirements.in
-sphinx-prompt==1.3.0
+sphinx-material==0.0.32
     # via -r dev-requirements.in
-sphinx-rtd-theme==0.5.1
+sphinx-prompt==1.3.0
     # via -r dev-requirements.in
 sphinx==3.4.3
     # via
@@ -402,8 +410,8 @@ sphinx==3.4.3
     #   sphinx-autoapi
     #   sphinx-code-include
     #   sphinx-gallery
+    #   sphinx-material
     #   sphinx-prompt
-    #   sphinx-rtd-theme
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -444,6 +452,8 @@ termcolor==1.1.0
     #   tensorflow-datasets
 testfixtures==6.17.1
     # via flake8-isort
+text-unidecode==1.3
+    # via python-slugify
 threadpoolctl==2.1.0
     # via scikit-learn
 toml==0.10.2
@@ -471,7 +481,9 @@ typing-extensions==3.7.4.3
 typing-inspect==0.6.0
     # via dataclasses-json
 unidecode==1.1.2
-    # via sphinx-autoapi
+    # via
+    #   python-slugify
+    #   sphinx-autoapi
 urllib3==1.25.11
     # via
     #   botocore

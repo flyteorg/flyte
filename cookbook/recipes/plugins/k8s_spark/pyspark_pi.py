@@ -11,16 +11,18 @@ but when run remote spins up a arbitrarily sized cluster depending on the specif
 This Example also shows how a user can simply create 2 tasks, that use different Docker images. For more information refer to :any:`hosted_multi_images`
 
 """
-import flytekit
-import random
 import datetime
+import random
 from operator import add
+
+import flytekit
 from flytekit import task, workflow
-from recipes.plugins.k8s_spark.dataframe_passing import CONTAINER_TEMPLATE
 
 # %%
 # The follow import is required to configure a Spark Server in Flyte.
 from flytekitplugins.spark import Spark
+
+from recipes.plugins.k8s_spark.dataframe_passing import CONTAINER_TEMPLATE
 
 
 # %%

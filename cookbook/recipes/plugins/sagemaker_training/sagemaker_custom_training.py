@@ -10,14 +10,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from flytekit import task, workflow
-from flytekitplugins.awssagemaker import (
-    SagemakerTrainingJobConfig,
-    TrainingJobResourceConfig,
-    AlgorithmSpecification,
-    InputMode,
-    AlgorithmName,
-    InputContentType,
-)
+from flytekit.types.directory import TensorboardLogs
 
 # %%
 # Training Algorithm
@@ -46,7 +39,14 @@ from flytekitplugins.awssagemaker import (
 # But this type alias is already available from Flytekit's type engine, so we can just import it.
 # We will also import ``PNGImageFile`` which we will use in the next task
 from flytekit.types.file import HDF5EncodedFile, PNGImageFile
-from flytekit.types.directory import TensorboardLogs
+from flytekitplugins.awssagemaker import (
+    AlgorithmName,
+    AlgorithmSpecification,
+    InputContentType,
+    InputMode,
+    SagemakerTrainingJobConfig,
+    TrainingJobResourceConfig,
+)
 
 # %%
 # We can create a named tuple to name the specific outputs from the training. This is optional as well, but
@@ -174,7 +174,9 @@ def plot_loss_and_accuracy(epoch_logs: dict) -> PlotOutputs:
     loss_plot = "loss.png"
     plt.savefig(loss_plot)
 
-    return PlotOutputs(accuracy=PNGImageFile(accuracy_plot), loss=PNGImageFile(loss_plot))
+    return PlotOutputs(
+        accuracy=PNGImageFile(accuracy_plot), loss=PNGImageFile(loss_plot)
+    )
 
 
 # %%

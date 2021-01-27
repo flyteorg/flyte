@@ -19,6 +19,6 @@ pytest
 sphinx
 sphinx-gallery
 sphinx-prompt
-sphinx-rtd-theme
+sphinx_material
 sphinx-code-include
 sphinx-autoapi

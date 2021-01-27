@@ -5,18 +5,17 @@ Train an XGBoost model and validate it
 """
 import typing
 from collections import OrderedDict
-
 from dataclasses import dataclass
-from dataclasses_json import dataclass_json
+
 import joblib
 import pandas as pd
+from dataclasses_json import dataclass_json
 from flytekit import task, workflow
 from flytekit.types.file import FlyteFile
 from flytekit.types.schema import FlyteSchema
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
-
 
 # %%
 # Since we are working with a specific dataset, we will create a strictly typed schema for the dataset.

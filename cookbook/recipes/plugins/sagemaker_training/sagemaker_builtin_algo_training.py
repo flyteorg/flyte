@@ -17,24 +17,24 @@ import typing
 
 from flytekit import TaskMetadata
 from flytekitplugins.awssagemaker import (
-    SagemakerBuiltinAlgorithmsTask,
-    SagemakerTrainingJobConfig,
-    SagemakerHPOTask,
+    AlgorithmName,
+    AlgorithmSpecification,
+    ContinuousParameterRange,
     HPOJob,
+    HyperparameterScalingType,
     HyperparameterTuningJobConfig,
+    HyperparameterTuningObjective,
     HyperparameterTuningObjectiveType,
     HyperparameterTuningStrategy,
-    TrainingJobEarlyStoppingType,
-    HyperparameterTuningObjective,
-    HyperparameterScalingType,
-    ContinuousParameterRange,
-    IntegerParameterRange,
-    ParameterRangeOneOf,
-    AlgorithmSpecification,
     InputContentType,
     InputMode,
+    IntegerParameterRange,
+    ParameterRangeOneOf,
+    SagemakerBuiltinAlgorithmsTask,
+    SagemakerHPOTask,
+    SagemakerTrainingJobConfig,
+    TrainingJobEarlyStoppingType,
     TrainingJobResourceConfig,
-    AlgorithmName,
 )
 
 # %%

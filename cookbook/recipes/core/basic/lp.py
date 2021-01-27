@@ -9,6 +9,8 @@ with optional run-time overrides such as notifications, schedules and more.
 Launch plan inputs must only assign inputs already defined in the reference workflow definition.
 """
 
+import calendar
+
 # %%
 # Launch plans are the only means for invoking workflow executions.
 # By default, a 'default' launch plan will be created during the serialization (and registration process),
@@ -16,9 +18,8 @@ Launch plan inputs must only assign inputs already defined in the reference work
 # flytekit config (such as user role, etc).
 # The following example creates a default launch plan with no inputs during serialization.
 import datetime
-import calendar
 
-from flytekit import task, LaunchPlan, workflow, current_context
+from flytekit import LaunchPlan, current_context, task, workflow
 
 
 @task

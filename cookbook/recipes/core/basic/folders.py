@@ -4,15 +4,14 @@ Work with folders
 
 Please also see the entry on files. After files, folders are the other fundamental operating system primitive users might find themselves working with. The Flyte IDL's support of folders take the form of `multi-part blobs <https://github.com/lyft/flyteidl/blob/cee566b2e6e109120f1bb34c980b1cfaf006a473/protos/flyteidl/core/types.proto#L50>`__.
 """
-import pathlib
 import os
+import pathlib
 import urllib.request
 
 import cv2
 import flytekit
 from flytekit import task, workflow
 from flytekit.types.directory import FlyteDirectory
-
 
 # %%
 # Playing on the same example used in the File chapter, this first task downloads a bunch of files into a directory,

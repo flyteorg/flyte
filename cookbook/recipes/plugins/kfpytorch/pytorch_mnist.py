@@ -14,12 +14,13 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn.functional as F
 from dataclasses_json import dataclass_json
-from flytekit import task, Resources, workflow
-from flytekitplugins.kfpytorch import PyTorch
+from flytekit import Resources, task, workflow
 from flytekit.types.directory import TensorboardLogs
-from flytekit.types.file import PythonPickledFile, PNGImageFile
+from flytekit.types.file import PNGImageFile, PythonPickledFile
+from flytekitplugins.kfpytorch import PyTorch
 from tensorboardX import SummaryWriter
-from torch import distributed as dist, nn, optim
+from torch import distributed as dist
+from torch import nn, optim
 from torchvision import datasets, transforms
 
 WORLD_SIZE = int(os.environ.get("WORLD_SIZE", 1))
