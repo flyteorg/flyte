@@ -14,4 +14,4 @@ Getting Started
 
    examples
    create_first
-   more_examples 
+   Learn Flytekit by example <https://flytecookbook.readthedocs.io/en/latest/>

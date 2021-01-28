@@ -22,11 +22,3 @@ jobs:
         echo "current-context:" $(kubectl config current-context)
         echo "environment-kubeconfig:" ${KUBECONFIG}
         make end2end_execute
-  docs:
-    runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-    steps:
-    - uses: actions/checkout@v1
-    - name: Build docs
-      run: make generate-docs
