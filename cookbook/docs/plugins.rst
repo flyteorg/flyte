@@ -1,6 +1,9 @@
+.. currentmodule:: plugins
+
 ############################################
 Flyte Plugins
 ############################################
+
 Flyte is designed to be highly extensible. Flyte can be extended in multiple ways
 
 #. Flytekit only plugins: Plugins that are like executing a python function in a container

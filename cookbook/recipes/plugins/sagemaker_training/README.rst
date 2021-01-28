@@ -3,6 +3,17 @@ AWS Sagemaker Training
 This section provides examples of Flyte Plugins that are designed to work with
 AWS Hosted services like Sagemaker, EMR, Athena, Redshift etc
 
+
+Installation
+------------
+
+To use the flytekit aws sagemaker plugin simply run the following:
+
+.. prompt:: bash
+
+   pip install flytekitplugins-awssagemaker==0.1.0
+
+
 Builtin Algorithms
 ------------------
 Amazon SageMaker provides several built-in machine learning algorithms that you can use for a variety of problem types. Built-in algorithms are the fastest to get started with, as they are already pre-built and optimized on Sagemaker. To understand how they work and the various options available please refer to Amazon Sagemaker Official Documentation

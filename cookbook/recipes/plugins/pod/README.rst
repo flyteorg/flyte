@@ -12,4 +12,13 @@ This can be done by using ``Pod`` task_config can be leveraged to fully customiz
 
 .. note::
 
-    Flyte will automatically take care of sidecars. Typically a K8s pod will not exit, if the pod contains any sidecars (containers that do not exit automatically). No additional code is required.
+    Flyte will automatically take care of pod tasks. Typically a K8s pod will not exit, if the pod contains any sidecars (containers that do not exit automatically). No additional code is required.
+
+Installation
+------------
+
+To use the flytekit pod plugin simply run the following:
+
+.. prompt:: bash
+
+   pip install flytekitplugins-pod==0.1.0

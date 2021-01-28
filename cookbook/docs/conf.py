@@ -135,6 +135,7 @@ html_theme_options = {
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
     "base_url": "https://github.com/lyft/flytekit",
+    "collapse_navigation" : False,
     # Set the color and the accent color
     "color_primary": "deep-purple",
     "color_accent": "blue",
@@ -167,11 +168,28 @@ html_logo = "flyte_circle_gradient_1_4x4.png"
 # html_additional_pages = {"index": "index.html"}
 
 examples_dirs = [
-    "../recipes/core",
-    "../recipes/case_studies",
-    "../recipes/plugins",
+    "../recipes/core/basic",
+    "../recipes/core/intermediate",
+    "../recipes/core/advanced",
+    "../recipes/case_studies/pima_diabetes",
+    "../recipes/plugins/hive",
+    "../recipes/plugins/sagemaker_training",
+    "../recipes/plugins/k8s_spark",
+    "../recipes/plugins/kfpytorch",
+    "../recipes/plugins/pod/",
+    "../recipes/plugins/sagemaker_pytorch/",
+
 ]
-gallery_dirs = ["auto_core", "auto_case_studies", "auto_plugins"]
+gallery_dirs = ["auto_core_basic",
+        "auto_core_intermediate",
+        "auto_core_advanced",
+        "auto_case_studies",
+        "auto_plugins_hive",
+        "auto_plugins_sagemaker_training",
+        "auto_plugins_k8s_spark",
+        "auto_plugins_kfpytorch",
+        "auto_plugins_pod",
+        "auto_plugins_sagemaker_pytorch",]
 
 # image_scrapers = ('matplotlib',)
 image_scrapers = ()

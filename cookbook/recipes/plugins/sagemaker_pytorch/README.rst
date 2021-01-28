@@ -2,6 +2,17 @@ AWS Sagemaker distributed training using PyTorch
 ================================================
 This plugin shows an example of using Sagemaker custom training, with Pytorch distributed training.
 
+
+Installation
+------------
+
+To use the flytekit aws sagemaker plugin simply run the following:
+
+.. prompt:: bash
+
+   pip install flytekitplugins-awssagemaker==0.1.0
+
+
 Creating a dockerfile for Sagemaker custom training [Required]
 --------------------------------------------------------------
 The dockerfile for Sagemaker custom training is similar to any regular dockerfile, except for the difference in using the Nvidia cuda base.

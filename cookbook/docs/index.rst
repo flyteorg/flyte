@@ -21,12 +21,38 @@ It is our hope new contributors find the community welcoming!
 Please join our Slack channel as well through this `form <https://docs.google.com/forms/d/e/1FAIpQLScWPJZncyL-bBCWbuQ9HWuMzA8-r2RJc__CSWJoAYUQADN-BQ/viewform>`__.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents
+   :maxdepth: 4
+   :caption: Getting Started
 
-   auto_core/index
-   auto_case_studies/index
-   auto_plugins/index
+   core
+   auto_core_basic/index
+   auto_core_intermediate/index
+   auto_core_advanced/index
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Case Studies
+
+   case_studies
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Flytekit Plugins
+
+   plugins
+   auto_plugins_hive/index
+   auto_plugins_sagemaker_training/index
+   auto_plugins_k8s_spark/index
+   auto_plugins_kfpytorch/index
+   auto_plugins_pod/index
+   auto_plugins_sagemaker_pytorch/index
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Additional Flyte Documentation
+
+   Flyte Project <https://flyte.readthedocs.io/en/latest//>
+   Flytekit Python <https://flytekit.readthedocs.io/en/latest/">
 
 
 Indices and tables

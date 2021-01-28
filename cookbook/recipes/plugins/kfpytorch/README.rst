@@ -2,6 +2,15 @@ Executing Distributed Pytorch training jobs on K8s
 ==========================================================
 This plugin uses the Kubeflow Pytorch Operator and provides an extremely simplified interface for executing distributed training using various pytorch backends.
 
+Installation
+------------
+
+To use the flytekit distributed pytorch plugin simply run the following:
+
+.. prompt:: bash
+
+   pip install flytekitplugins-kfpytorch==0.1.0
+
 
 How to build your Dockerfile for Pytorch on K8s
 -----------------------------------------------
