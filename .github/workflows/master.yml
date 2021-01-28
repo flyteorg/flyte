@@ -29,3 +29,49 @@ jobs:
           push_git_tag: true
           registry: docker.pkg.github.com
           build_extra_args: "--compress=true"
+
+  bump-version:
+    name: Bump Version
+    if: github.event.commits[0].author.name != 'goreleaserbot'
+    runs-on: ubuntu-latest
+    # Only to ensure it can successfully build
+    needs: build-docker
+    outputs:
+      version: ${{ steps.bump-version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch
+
+  tests-lint:
+    name: Run tests and lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Unit Tests
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make test_unit_codecov
+      - name: Push CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
+      - name: Lint
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make lint

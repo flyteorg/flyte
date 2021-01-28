@@ -4,7 +4,8 @@ on:
   pull_request
 
 jobs:
-  build:
+  build-copilot:
+    name: Build Co-Pilot Docker Image
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -17,3 +18,27 @@ jobs:
           image_tag: ${{ github.sha }}
           push_git_tag: true
           registry: ghcr.io
+  tests-lint:
+    name: Run tests and lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Unit Tests
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make test_unit_codecov
+      - name: Push CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage.txt
+          flags: unittests
+          fail_ci_if_error: true
+      - name: Lint
+        uses: cedrickring/golang-action@1.5.2
+        env:
+          GO111MODULE: "on"
+        with:
+          args: make install && make lint
