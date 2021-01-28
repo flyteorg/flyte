@@ -15,7 +15,6 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import sphinx_rtd_theme
 
 # -- Project information -----------------------------------------------------
 
@@ -48,6 +47,12 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.extlinks',
+    "sphinx.ext.napoleon",
+    "sphinx.ext.doctest",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.coverage",
+    "sphinx-prompt",
+    "sphinx_copybutton",
 ]
 
 extlinks = {
@@ -92,13 +97,31 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
 html_logo = "flyte_lockup_on_dark.png"
+html_static_path = ['_static']
+html_theme = "sphinx_material"
 html_theme_options = {
-    'logo_only': True,
-    'display_version': False,
+    # Set the name of the project to appear in the navigation.
+    "nav_title": "Flyte",
+    # Set you GA account ID to enable tracking
+    "google_analytics_account": "G-YQL24L5CKY",
+    # Specify a base_url used to generate sitemap.xml. If not
+    # specified, then no sitemap will be built.
+    "base_url": "https://github.com/lyft/flyte",
+    # Set the color and the accent color
+    "color_primary": "deep-purple",
+    "color_accent": "blue",
+    # Set the repo location to get a badge with stats
+    "repo_url": "https://github.com/lyft/flyte/",
+    "repo_name": "flyte",
+    # Visible levels of the global TOC; -1 means unlimited
+    "globaltoc_depth": 1,
+    # If False, expand all TOC entries
+    "globaltoc_collapse": False,
+    # If True, show hidden TOC entries
+    "globaltoc_includehidden": False,
 }
+
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -119,7 +142,7 @@ html_theme_options = {
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-# html_sidebars = {}
+html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -174,7 +197,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'Flyte', u'Flyte Documentation',
-     author, 'Flyte', 'One line description of project.',
+     author, 'Flyte', 'Accelerate your ML and data workflows to production.',
      'Miscellaneous'),
 ]
 
