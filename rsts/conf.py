@@ -98,7 +98,7 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_logo = "flyte_lockup_on_dark.png"
-html_static_path = ['_static']
+html_static_path = []
 html_theme = "sphinx_material"
 html_theme_options = {
     # Set the name of the project to appear in the navigation.
