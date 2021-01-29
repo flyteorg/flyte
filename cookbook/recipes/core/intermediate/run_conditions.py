@@ -125,7 +125,7 @@ if __name__ == "__main__":
 #
 # .. note::
 #
-#    Wondering how output values get these methods. In a workflow no output value is available to access directly. The inputs and outputs are auto-wrapped in a special object called :ref:pyclass:`flytekit.annotated.promise.Promise`.
+#    Wondering how output values get these methods. In a workflow no output value is available to access directly. The inputs and outputs are auto-wrapped in a special object called :py:class:`flytekit.annotated.promise.Promise`.
 #
 @task
 def coin_toss() -> bool:

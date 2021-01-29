@@ -19,8 +19,8 @@ out_schema = FlyteSchema[kwtypes(x=int, y=str)]
 
 
 # %%
-# To write to a schema object refer to :py:func:`flytekit.FlyteSchema.open` method. Writing can be done using
-# Any of the supported dataframe formats.
+# To write to a schema object refer to :py:meth:`flytekit.types.schema.FlyteSchema.open` method. Writing can be done
+# using any of the supported dataframe formats.
 #
 # .. todo::
 #
@@ -34,8 +34,8 @@ def t1() -> out_schema:
 
 
 # %%
-# To read a Schema, one has to invoke the :py:func:`flytekit.FlyteSchema.open`. The default mode is automatically
-# configured to be `open` and the default returned dataframe type is :py:class:`pandas.DataFrame`
+# To read a Schema, one has to invoke the :py:meth:`flytekit.types.schema.FlyteSchema.open`. The default mode
+# is automatically configured to be `open` and the default returned dataframe type is :py:class:`pandas.DataFrame`
 # Different types of dataframes can be returned based on the type passed into the open method
 @task
 def t2(schema: FlyteSchema[kwtypes(x=int, y=str)]) -> FlyteSchema[kwtypes(x=int)]:

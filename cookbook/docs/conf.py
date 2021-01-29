@@ -171,6 +171,7 @@ examples_dirs = [
     "../recipes/core/basic",
     "../recipes/core/intermediate",
     "../recipes/core/advanced",
+    "../recipes/core/remote_flyte",
     "../recipes/case_studies/pima_diabetes",
     "../recipes/plugins/hive",
     "../recipes/plugins/sagemaker_training",
@@ -180,9 +181,11 @@ examples_dirs = [
     "../recipes/plugins/sagemaker_pytorch/",
 
 ]
-gallery_dirs = ["auto_core_basic",
+gallery_dirs = [
+        "auto_core_basic",
         "auto_core_intermediate",
         "auto_core_advanced",
+        "auto_core_remote_flyte",
         "auto_case_studies",
         "auto_plugins_hive",
         "auto_plugins_sagemaker_training",
@@ -240,4 +243,7 @@ intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
+    "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
+    # Uncomment for local development and change to your username
+    # "flytekit": ("/Users/ytong/go/src/github.com/lyft/flytekit/docs/build/html", None),
 }
