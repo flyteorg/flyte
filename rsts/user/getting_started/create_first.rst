@@ -72,8 +72,12 @@ From there, we can begin to write our first task.  It should look something like
 
 Some of the new concepts demonstrated here are:
 
-* Use the ``@task`` decorator to convert your typed python function to a Flyte task.
-* A ``FlyteFile`` is a Flyte Kit type that represents binary data.  It is used to offload data to a storage location like S3.  Here we use it to store an image.
+* Use the :py:func:`flytekit.task` decorator to convert your typed python function to a Flyte task.
+* A :py:class:`flytekit.types.file.FlyteFile` is a Flyte Kit type that represents binary data.  It is used to offload data to a storage location like S3.  Here we use it to store an image.
+
+
+You can call this task ``edge_detection_canny(image_location=...)`` and iterate locally before adding it to part of a larger overall workflow.
+
 
 Writing a Workflow
 *********************
@@ -90,7 +94,11 @@ This code block creates a workflow, with one task. The workflow itself has an in
 
 You can call this workflow ``EdgeDetectorWf(image_input=...)`` and iterate locally before moving on to register it with Flyte.
 
+.. note::
+
+   Every invocation of a Flyte workflow requires specifying keyword args.
+
 Interacting with Flyte
 ************************
 
-For detailed and interactive example workflow 'recipes' check out the `Flytesnacks Cookbook <https://flytecookbook.readthedocs.io/en/latest/>`__
+If you're interested in learning more and want to try more complex examples, `Flytesnacks Cookbook <https://flytecookbook.readthedocs.io/en/latest/>`__
