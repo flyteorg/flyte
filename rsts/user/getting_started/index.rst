@@ -12,6 +12,6 @@ Getting Started
    :maxdepth: 1
    :caption: Getting Started
 
-   examples
    create_first
+   examples
    Learn Flytekit by example <https://flytecookbook.readthedocs.io/en/latest/>
