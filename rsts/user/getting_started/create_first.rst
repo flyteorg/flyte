@@ -91,4 +91,4 @@ You can call this workflow ``EdgeDetectorWf(image_input=...)`` and iterate local
 Interacting with Flyte
 ************************
 
-For detailed and interactive example workflow 'recipes' check out the `Flytesnacks Cookbook <https://flytecookbook.readthedocs.io/en/latest//>`_
+For detailed and interactive example workflow 'recipes' check out the `Flytesnacks Cookbook <https://flytecookbook.readthedocs.io/en/latest/>`__
