@@ -7,6 +7,10 @@ require (
 	github.com/Masterminds/semver v1.5.0
 	github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20200410212604-780c48ecb21a
 	github.com/aws/aws-sdk-go v1.29.23
+	github.com/aws/aws-sdk-go-v2 v1.0.0
+	github.com/aws/aws-sdk-go-v2/config v1.0.0
+	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
+	github.com/aws/aws-sdk-go-v2/service/sagemaker v1.0.0 // indirect
 	github.com/coocood/freecache v1.1.0
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-test/deep v1.0.5
@@ -32,7 +36,7 @@ require (
 	k8s.io/api v0.17.3
 	k8s.io/apimachinery v0.17.3
 	k8s.io/client-go v11.0.1-0.20190918222721-c0e3722d5cf0+incompatible
-	k8s.io/utils v0.0.0-20200124190032-861946025e34 // indirect
+	k8s.io/utils v0.0.0-20200124190032-861946025e34
 	sigs.k8s.io/controller-runtime v0.5.1
 )
 

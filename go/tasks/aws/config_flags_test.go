@@ -165,48 +165,4 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_maxErrorLength", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("maxErrorLength"); err == nil {
-				assert.Equal(t, int(defaultConfig.MaxErrorStringLength), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("maxErrorLength", testValue)
-			if vInt, err := cmdFlags.GetInt("maxErrorLength"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.MaxErrorStringLength)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_catalog-timeout", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("catalog-timeout"); err == nil {
-				assert.Equal(t, string(defaultConfig.CatalogCacheTimeout.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := defaultConfig.CatalogCacheTimeout.String()
-
-			cmdFlags.Set("catalog-timeout", testValue)
-			if vString, err := cmdFlags.GetString("catalog-timeout"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CatalogCacheTimeout)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 }

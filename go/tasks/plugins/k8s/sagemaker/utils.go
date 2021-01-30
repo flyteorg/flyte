@@ -17,7 +17,7 @@ import (
 
 	"github.com/Masterminds/semver"
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
-	awssagemaker "github.com/aws/amazon-sagemaker-operator-for-k8s/controllers/controllertest"
+	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
@@ -157,7 +157,7 @@ func buildParameterRanges(ctx context.Context, literals map[string]*core.Literal
 		switch p.GetParameterRangeType().(type) {
 		case *flyteSagemakerIdl.ParameterRangeOneOf_CategoricalParameterRange:
 			var newElem = commonv1.CategoricalParameterRange{
-				Name:   awssagemaker.ToStringPtr(name),
+				Name:   awsSdk.String(name),
 				Values: p.GetCategoricalParameterRange().GetValues(),
 			}
 
@@ -166,9 +166,9 @@ func buildParameterRanges(ctx context.Context, literals map[string]*core.Literal
 		case *flyteSagemakerIdl.ParameterRangeOneOf_ContinuousParameterRange:
 			scalingTypeString := strings.Title(strings.ToLower(p.GetContinuousParameterRange().GetScalingType().String()))
 			var newElem = commonv1.ContinuousParameterRange{
-				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", p.GetContinuousParameterRange().GetMaxValue())),
-				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%f", p.GetContinuousParameterRange().GetMinValue())),
-				Name:        awssagemaker.ToStringPtr(name),
+				MaxValue:    awsSdk.String(fmt.Sprintf("%f", p.GetContinuousParameterRange().GetMaxValue())),
+				MinValue:    awsSdk.String(fmt.Sprintf("%f", p.GetContinuousParameterRange().GetMinValue())),
+				Name:        awsSdk.String(name),
 				ScalingType: commonv1.HyperParameterScalingType(scalingTypeString),
 			}
 
@@ -177,9 +177,9 @@ func buildParameterRanges(ctx context.Context, literals map[string]*core.Literal
 		case *flyteSagemakerIdl.ParameterRangeOneOf_IntegerParameterRange:
 			scalingTypeString := strings.Title(strings.ToLower(p.GetIntegerParameterRange().GetScalingType().String()))
 			var newElem = commonv1.IntegerParameterRange{
-				MaxValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", p.GetIntegerParameterRange().GetMaxValue())),
-				MinValue:    awssagemaker.ToStringPtr(fmt.Sprintf("%d", p.GetIntegerParameterRange().GetMinValue())),
-				Name:        awssagemaker.ToStringPtr(name),
+				MaxValue:    awsSdk.String(fmt.Sprintf("%d", p.GetIntegerParameterRange().GetMaxValue())),
+				MinValue:    awsSdk.String(fmt.Sprintf("%d", p.GetIntegerParameterRange().GetMinValue())),
+				Name:        awsSdk.String(name),
 				ScalingType: commonv1.HyperParameterScalingType(scalingTypeString),
 			}
 

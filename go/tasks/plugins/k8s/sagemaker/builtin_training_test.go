@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	trainingjobController "github.com/aws/amazon-sagemaker-operator-for-k8s/controllers/trainingjob"
 	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	taskError "github.com/lyft/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
@@ -161,12 +160,12 @@ func Test_awsSagemakerPlugin_GetTaskPhaseForTrainingJob(t *testing.T) {
 
 		trainingJob, ok := trainingJobResource.(*trainingjobv1.TrainingJob)
 		assert.True(t, ok)
-		trainingJob.Status.TrainingJobStatus = trainingjobController.ReconcilingTrainingJobStatus
+		trainingJob.Status.TrainingJobStatus = ReconcilingTrainingJobStatus
 		phaseInfo, err := awsSageMakerTrainingJobHandler.getTaskPhaseForTrainingJob(ctx, taskCtx, trainingJob)
 		assert.Nil(t, err)
 		assert.Equal(t, phaseInfo.Phase(), pluginsCore.PhaseRetryableFailure)
 		assert.Equal(t, phaseInfo.Err().GetKind(), flyteIdlCore.ExecutionError_USER)
-		assert.Equal(t, phaseInfo.Err().GetCode(), trainingjobController.ReconcilingTrainingJobStatus)
+		assert.Equal(t, phaseInfo.Err().GetCode(), ReconcilingTrainingJobStatus)
 		assert.Equal(t, phaseInfo.Err().GetMessage(), "")
 	})
 	t.Run("TrainingJobStatusFailed should be a permanent failure", func(t *testing.T) {
