@@ -4,7 +4,7 @@ endef
 
 .PHONY: kustomize
 kustomize:
-	KUSTOMIZE_VERSION=3.8.4 bash script/generate_kustomize.sh
+	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox:

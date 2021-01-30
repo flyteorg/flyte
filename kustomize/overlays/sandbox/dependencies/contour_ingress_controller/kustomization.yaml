@@ -1,5 +1,5 @@
 resources:
-- rbac.yaml
-- custom-config.yaml
-- service.yaml
-- deployment.yaml
+  # We cannot just import from remote as namespace transformer causes conflicts
+  #- https://projectcontour.io/quickstart/v1.11.0/contour.yaml
+- contour.yaml
+

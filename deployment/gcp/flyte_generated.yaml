@@ -7999,8 +7999,6 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: clusterresource-template-tkdkkt4cb5
   namespace: flyte
 ---
@@ -8048,8 +8046,6 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: datacatalog-config-d56hkd9229
   namespace: flyte
 ---
@@ -8152,8 +8148,6 @@ data:
         storage: 2000Mi
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: flyte-admin-config-678t259tk4
   namespace: flyte
 ---
@@ -8322,8 +8316,6 @@ data:
         stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: flyte-propeller-config-7288ccf2f8
   namespace: flyte
 ---
@@ -8332,8 +8324,6 @@ data:
   pass.txt: eW91cnBhc3N3b3Jk
 kind: Secret
 metadata:
-  annotations: {}
-  labels: {}
   name: db-pass-bthd2588cc
   namespace: flyte
 type: Opaque
@@ -8397,6 +8387,13 @@ metadata:
   namespace: flyte
 spec:
   ports:
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
   - name: http
     port: 80
     protocol: TCP
@@ -8405,13 +8402,6 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
-  - name: http-metrics
-    port: 10254
-    protocol: TCP
   selector:
     app: flyteadmin
   type: LoadBalancer
@@ -8425,9 +8415,6 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
   - name: redoc
     port: 87
     protocol: TCP
@@ -8435,6 +8422,9 @@ spec:
   - name: http-metrics
     port: 10254
     protocol: TCP
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
   selector:
     app: flyteconsole
   type: LoadBalancer
