@@ -5,8 +5,11 @@
 package aws
 
 import (
-	"time"
+	"context"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/lyft/flytestdlib/config"
 
 	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
@@ -18,10 +21,8 @@ const ConfigSectionKey = "aws"
 
 var (
 	defaultConfig = &Config{
-		Region:               "us-east-1",
-		MaxErrorStringLength: 150,
-		Retries:              3,
-		CatalogCacheTimeout:  config.Duration{Duration: time.Second * 5},
+		Region:  "us-east-2",
+		Retries: 3,
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection(ConfigSectionKey, defaultConfig)
@@ -29,11 +30,10 @@ var (
 
 // Config section for AWS Package
 type Config struct {
-	Region               string          `json:"region" pflag:",AWS Region to connect to."`
-	AccountID            string          `json:"accountId" pflag:",AWS Account Identifier."`
-	Retries              int             `json:"retries" pflag:",Number of retries."`
-	MaxErrorStringLength int             `json:"maxErrorLength" pflag:",Maximum size of error messages."`
-	CatalogCacheTimeout  config.Duration `json:"catalog-timeout" pflag:"\"5s\",Timeout duration for checking catalog for all batch tasks"`
+	Region    string            `json:"region" pflag:",AWS Region to connect to."`
+	AccountID string            `json:"accountId" pflag:",AWS Account Identifier."`
+	Retries   int               `json:"retries" pflag:",Number of retries."`
+	LogLevel  aws.ClientLogMode `json:"logLevel" pflag:"-,Defines the Sdk Log Level."`
 }
 
 type RateLimiterConfig struct {
@@ -44,6 +44,22 @@ type RateLimiterConfig struct {
 // Gets loaded config for AWS
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
+}
+
+func (cfg Config) GetSdkConfig() (aws.Config, error) {
+	sdkConfig, err := awsConfig.LoadDefaultConfig(context.TODO(),
+		awsConfig.WithRegion(cfg.Region),
+		awsConfig.WithRetryer(func() aws.Retryer {
+			return retry.NewStandard(func(options *retry.StandardOptions) {
+				options.MaxAttempts = cfg.Retries
+			})
+		}),
+		awsConfig.WithClientLogMode(cfg.LogLevel))
+	if err != nil {
+		return aws.Config{}, err
+	}
+
+	return sdkConfig, nil
 }
 
 func MustRegisterSubSection(key config.SectionKey, cfg config.Config) config.Section {

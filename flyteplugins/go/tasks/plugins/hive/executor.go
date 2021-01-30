@@ -102,19 +102,19 @@ func (q QuboleHiveExecutor) GetProperties() core.PluginProperties {
 
 func QuboleHiveExecutorLoader(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 	cfg := config.GetQuboleConfig()
-	return InitializeHiveExecutor(ctx, iCtx, cfg, BuildResourceConfig(cfg), client.NewQuboleClient(cfg))
+	return InitializeHiveExecutor(ctx, iCtx, cfg, BuildResourceConfig(cfg.ClusterConfigs), client.NewQuboleClient(cfg))
 }
 
-func BuildResourceConfig(cfg *config.Config) map[string]int {
-	resourceConfig := make(map[string]int, len(cfg.ClusterConfigs))
+func BuildResourceConfig(cfg []config.ClusterConfig) map[core.ResourceNamespace]int {
+	resourceConfig := make(map[core.ResourceNamespace]int, len(cfg))
 
-	for _, clusterCfg := range cfg.ClusterConfigs {
-		resourceConfig[clusterCfg.PrimaryLabel] = clusterCfg.Limit
+	for _, clusterCfg := range cfg {
+		resourceConfig[core.ResourceNamespace(clusterCfg.PrimaryLabel)] = clusterCfg.Limit
 	}
 	return resourceConfig
 }
 
-func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *config.Config, resourceConfig map[string]int,
+func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *config.Config, resourceConfig map[core.ResourceNamespace]int,
 	quboleClient client.QuboleClient) (core.Plugin, error) {
 	logger.Infof(ctx, "Initializing a Hive executor with a resource config [%v]", resourceConfig)
 	q, err := NewQuboleHiveExecutor(ctx, cfg, quboleClient, iCtx.SecretManager(), iCtx.MetricsScope())
@@ -125,7 +125,7 @@ func InitializeHiveExecutor(ctx context.Context, iCtx core.SetupContext, cfg *co
 
 	for clusterPrimaryLabel, clusterLimit := range resourceConfig {
 		logger.Infof(ctx, "Registering resource quota ([%v]) and namespace quota cap ([%v]) for cluster [%v]", clusterPrimaryLabel)
-		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, core.ResourceNamespace(clusterPrimaryLabel), clusterLimit); err != nil {
+		if err := iCtx.ResourceRegistrar().RegisterResourceQuota(ctx, clusterPrimaryLabel, clusterLimit); err != nil {
 			logger.Errorf(ctx, "Resource quota registration for [%v] failed due to error [%v]", clusterPrimaryLabel, err)
 			return nil, err
 		}

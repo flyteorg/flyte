@@ -8,7 +8,6 @@ import (
 
 	awsUtils "github.com/lyft/flyteplugins/go/tasks/plugins/awsutils"
 
-	hpojobController "github.com/aws/amazon-sagemaker-operator-for-k8s/controllers/hyperparametertuningjob"
 	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
 	"github.com/lyft/flytestdlib/logger"
 
@@ -30,6 +29,8 @@ import (
 
 	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )
+
+const ReconcilingTuningJobStatus = "ReconcilingTuningJob"
 
 func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
 	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
@@ -223,13 +224,13 @@ func (m awsSagemakerPlugin) getTaskPhaseForHyperparameterTuningJob(
 	occurredAt := time.Now()
 
 	switch hpoJob.Status.HyperParameterTuningJobStatus {
-	case hpojobController.ReconcilingTuningJobStatus:
+	case ReconcilingTuningJobStatus:
 		logger.Errorf(ctx, "Job stuck in reconciling status, assuming retryable failure [%s]", hpoJob.Status.Additional)
 		// TODO talk to AWS about why there cannot be an explicit condition that signals AWS API call pluginErrors
 		execError := &flyteIdlCore.ExecutionError{
 			Message: hpoJob.Status.Additional,
 			Kind:    flyteIdlCore.ExecutionError_USER,
-			Code:    hpojobController.ReconcilingTuningJobStatus,
+			Code:    ReconcilingTuningJobStatus,
 		}
 		return pluginsCore.PhaseInfoFailed(pluginsCore.PhaseRetryableFailure, execError, info), nil
 	case sagemaker.HyperParameterTuningJobStatusFailed:

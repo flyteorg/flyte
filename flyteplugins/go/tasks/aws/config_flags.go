@@ -44,7 +44,5 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "region"), defaultConfig.Region, "AWS Region to connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accountId"), defaultConfig.AccountID, "AWS Account Identifier.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "retries"), defaultConfig.Retries, "Number of retries.")
-	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "maxErrorLength"), defaultConfig.MaxErrorStringLength, "Maximum size of error messages.")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "catalog-timeout"), defaultConfig.CatalogCacheTimeout.String(), "Timeout duration for checking catalog for all batch tasks")
 	return cmdFlags
 }

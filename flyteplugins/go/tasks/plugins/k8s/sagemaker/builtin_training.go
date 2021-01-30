@@ -7,7 +7,6 @@ import (
 	"time"
 
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
-	trainingjobController "github.com/aws/amazon-sagemaker-operator-for-k8s/controllers/trainingjob"
 
 	awsUtils "github.com/lyft/flyteplugins/go/tasks/plugins/awsutils"
 
@@ -31,6 +30,8 @@ import (
 
 	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )
+
+const ReconcilingTrainingJobStatus = "ReconcilingTrainingJob"
 
 func (m awsSagemakerPlugin) buildResourceForTrainingJob(
 	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
@@ -194,13 +195,13 @@ func (m awsSagemakerPlugin) getTaskPhaseForTrainingJob(
 	occurredAt := time.Now()
 
 	switch trainingJob.Status.TrainingJobStatus {
-	case trainingjobController.ReconcilingTrainingJobStatus:
+	case ReconcilingTrainingJobStatus:
 		logger.Errorf(ctx, "Job stuck in reconciling status, assuming retryable failure [%s]", trainingJob.Status.Additional)
 		// TODO talk to AWS about why there cannot be an explicit condition that signals AWS API call pluginErrors
 		execError := &flyteIdlCore.ExecutionError{
 			Message: trainingJob.Status.Additional,
 			Kind:    flyteIdlCore.ExecutionError_USER,
-			Code:    trainingjobController.ReconcilingTrainingJobStatus,
+			Code:    ReconcilingTrainingJobStatus,
 		}
 		return pluginsCore.PhaseInfoFailed(pluginsCore.PhaseRetryableFailure, execError, info), nil
 	case sagemaker.TrainingJobStatusFailed:

@@ -4,21 +4,23 @@ import (
 	"context"
 )
 
-type AllocationStatus string
+//go:generate enumer -type=AllocationStatus -trimprefix=AllocationStatus
+
+type AllocationStatus int
 
 const (
 	// This is the enum returned when there's an error
-	AllocationUndefined AllocationStatus = "ResourceGranted"
+	AllocationUndefined AllocationStatus = iota
 
 	// Go for it
-	AllocationStatusGranted AllocationStatus = "ResourceGranted"
+	AllocationStatusGranted
 
 	// This means that no resources are available globally.  This is the only rejection message we use right now.
-	AllocationStatusExhausted AllocationStatus = "ResourceExhausted"
+	AllocationStatusExhausted
 
 	// We're not currently using this - but this would indicate that things globally are okay, but that your
 	// own namespace is too busy
-	AllocationStatusNamespaceQuotaExceeded AllocationStatus = "NamespaceQuotaExceeded"
+	AllocationStatusNamespaceQuotaExceeded
 )
 
 const namespaceSeparator = ":"
