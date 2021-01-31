@@ -291,13 +291,16 @@ func discoverFieldsRecursive(ctx context.Context, typ *types.Named, defaultValue
 func NewGenerator(pkg, targetTypeName, defaultVariableName string) (*PFlagProviderGenerator, error) {
 	ctx := context.Background()
 	var err error
+
 	// Resolve package path
 	if pkg == "" || pkg[0] == '.' {
 		pkg, err = filepath.Abs(filepath.Clean(pkg))
 		if err != nil {
 			return nil, err
 		}
+
 		pkg = gogenutil.StripGopath(pkg)
+		logger.InfofNoCtx("Loading package from path [%v]", pkg)
 	}
 
 	targetPackage, err := loadPackage(pkg)
@@ -340,11 +343,18 @@ func NewGenerator(pkg, targetTypeName, defaultVariableName string) (*PFlagProvid
 func loadPackage(pkg string) (*types.Package, error) {
 	config := &packages.Config{
 		Mode: packages.NeedTypes | packages.NeedTypesInfo,
+		Logf: logger.InfofNoCtx,
 	}
+
 	loadedPkgs, err := packages.Load(config, pkg)
 	if err != nil {
 		return nil, err
 	}
+
+	if len(loadedPkgs) == 0 {
+		return nil, fmt.Errorf("No packages loaded")
+	}
+
 	targetPackage := loadedPkgs[0].Types
 	return targetPackage, nil
 }

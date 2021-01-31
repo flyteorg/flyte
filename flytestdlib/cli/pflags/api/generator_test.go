@@ -45,19 +45,29 @@ func TestElemValueOrNil(t *testing.T) {
 }
 
 func TestNewGenerator(t *testing.T) {
-	g, err := NewGenerator(".", "TestType", "DefaultTestType")
-	assert.NoError(t, err)
+	g, err := NewGenerator("github.com/lyft/flytestdlib/cli/pflags/api", "TestType", "DefaultTestType")
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
 
 	ctx := context.Background()
 	p, err := g.Generate(ctx)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
 
 	codeOutput, err := ioutil.TempFile("", "output-*.go")
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
 	defer func() { assert.NoError(t, os.Remove(codeOutput.Name())) }()
 
 	testOutput, err := ioutil.TempFile("", "output-*_test.go")
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
 	defer func() { assert.NoError(t, os.Remove(testOutput.Name())) }()
 
 	assert.NoError(t, p.WriteCodeFile(codeOutput.Name()))

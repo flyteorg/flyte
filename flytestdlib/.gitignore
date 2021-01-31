@@ -115,3 +115,5 @@ codecov_bash.sh
 coverage.txt
 
 # End of https://www.gitignore.io/api/go,vim,emacs,visualstudiocode
+
+.vscode/*
