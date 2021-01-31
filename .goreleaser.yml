@@ -11,7 +11,7 @@ builds:
       - windows
       - darwin
     ldflags:
-     - -s -w -X github.com/lyft/flytestdlib/version.Version={{.Version}} -X github.com/lyft/flytestdlib/version.Build={{.ShortCommit}} -X github.com/lyft/flytestdlib/version.BuildTime={{.Date}}
+     - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
 archives:
   - replacements:
       darwin: macOS
@@ -49,7 +49,7 @@ scoop:
 
   # Your app's homepage.
   # Default is empty.
-  homepage: "https://godoc.org/github.com/lyft/flytestdlib"
+  homepage: "https://godoc.org/github.com/flyteorg/flytestdlib"
 
   # Your app's description.
   # Default is empty.
