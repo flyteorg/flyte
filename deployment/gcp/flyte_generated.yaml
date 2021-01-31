@@ -8382,7 +8382,7 @@ kind: Service
 metadata:
   annotations:
     cloud.google.com/load-balancer-type: Internal
-    contour.heptio.com/upstream-protocol.h2c: grpc
+    projectcontour.io/upstream-protocol.h2c: grpc
   name: flyteadmin
   namespace: flyte
 spec:
