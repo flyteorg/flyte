@@ -1631,6 +1631,7 @@ spec:
   - port: 80
     name: http
     protocol: TCP
+    nodePort: 30081
   - port: 443
     name: https
     protocol: TCP
