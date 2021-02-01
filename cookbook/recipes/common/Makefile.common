@@ -9,7 +9,7 @@ endef
 
 # If the REGISTRY environment variable has been set, that means the image name will not just be tagged as
 #   flytecookbook:<sha> but rather,
-#   docker.io/lyft/flytecookbook:<sha> or whatever your REGISTRY is.
+#   ghcr.io/flyteorg/flytecookbook:<sha> or whatever your REGISTRY is.
 ifneq ($(origin REGISTRY), undefined)
 	FULL_IMAGE_NAME = ${REGISTRY}/${IMAGE_NAME}
 else
@@ -38,7 +38,7 @@ docker_build:
 	NOPUSH=1 IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh ./Dockerfile ${PREFIX}
 
 # This should only be used by Admins to push images to the public Dockerhub repo. Make sure you
-# specify REGISTRY=docker.io/lyft before the make command otherwise this won't actually push
+# specify REGISTRY=ghcr.io/flyteorg or your registry before the make command otherwise this won't actually push
 # Also if you want to push the docker image for sagemaker consumption then
 # specify ECR_REGISTRY
 .PHONY: docker_push

@@ -1,0 +1,26 @@
+name: Master
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  push-github:
+    name: Push to GHCR
+    runs-on: ubuntu-latest
+    needs: bump-version
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ github.actor }}"
+          password: "${{ secrets.GITHUB_TOKEN }}"
+          image_name: ${{ github.repository }}/${{ github.event.repository.name }}
+          image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
+          push_git_tag: true
+          registry: ghcr.io
+          build_extra_args: "--compress=true"
