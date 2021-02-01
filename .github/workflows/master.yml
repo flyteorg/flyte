@@ -12,7 +12,6 @@ jobs:
     defaults:
       run:
         working-directory: cookbook
-    needs: bump-version
     steps:
       - uses: actions/checkout@v2
         with:
