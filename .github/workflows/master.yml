@@ -9,6 +9,9 @@ jobs:
   push-github:
     name: Push to GHCR
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cookbook
     needs: bump-version
     steps:
       - uses: actions/checkout@v2
