@@ -26,3 +26,4 @@ jobs:
           push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--compress=true"
+          dockerfile: cookbook/Dockerfile
