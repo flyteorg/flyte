@@ -12,7 +12,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.2
+croniter==1.0.5
     # via flytekit
 cycler==0.10.0
     # via matplotlib
@@ -26,8 +26,10 @@ dirhash==0.2.1
     # via flytekit
 flyteidl==0.18.11
     # via flytekit
-flytekit==0.16.0b1
+flytekit==0.16.0b3
     # via -r recipes/common/requirements-common.in
+future==0.18.2
+    # via croniter
 grpcio==1.35.0
     # via flytekit
 idna==2.10
@@ -42,7 +44,7 @@ marshmallow==3.10.0
     # via
     #   dataclasses-json
     #   marshmallow-enum
-matplotlib==3.3.3
+matplotlib==3.3.4
     # via -r recipes/common/requirements-common.in
 mypy-extensions==0.4.3
     # via typing-inspect

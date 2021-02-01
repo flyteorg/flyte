@@ -37,10 +37,8 @@ import typing
 from datetime import timedelta
 from time import sleep
 
-from flytekit import task, workflow
+from flytekit import Interface, PythonTask, TaskMetadata, task, workflow
 from flytekit.annotated import context_manager
-from flytekit.annotated.base_task import PythonTask, TaskMetadata
-from flytekit.annotated.interface import Interface
 
 
 # %%

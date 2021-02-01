@@ -135,7 +135,7 @@ html_theme_options = {
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
     "base_url": "https://github.com/lyft/flytekit",
-    "collapse_navigation" : False,
+    "collapse_navigation": False,
     # Set the color and the accent color
     "color_primary": "deep-purple",
     "color_accent": "blue",
@@ -148,11 +148,7 @@ html_theme_options = {
     "globaltoc_collapse": False,
     # If True, show hidden TOC entries
     "globaltoc_includehidden": False,
-
-    "heroes": {
-        "": "Flyte",
-    },
-
+    "heroes": {"": "Flyte",},
 }
 
 html_sidebars = {
@@ -179,20 +175,20 @@ examples_dirs = [
     "../recipes/plugins/kfpytorch",
     "../recipes/plugins/pod/",
     "../recipes/plugins/sagemaker_pytorch/",
-
 ]
 gallery_dirs = [
-        "auto_core_basic",
-        "auto_core_intermediate",
-        "auto_core_advanced",
-        "auto_core_remote_flyte",
-        "auto_case_studies",
-        "auto_plugins_hive",
-        "auto_plugins_sagemaker_training",
-        "auto_plugins_k8s_spark",
-        "auto_plugins_kfpytorch",
-        "auto_plugins_pod",
-        "auto_plugins_sagemaker_pytorch",]
+    "auto_core_basic",
+    "auto_core_intermediate",
+    "auto_core_advanced",
+    "auto_core_remote_flyte",
+    "auto_case_studies",
+    "auto_plugins_hive",
+    "auto_plugins_sagemaker_training",
+    "auto_plugins_k8s_spark",
+    "auto_plugins_kfpytorch",
+    "auto_plugins_pod",
+    "auto_plugins_sagemaker_pytorch",
+]
 
 # image_scrapers = ('matplotlib',)
 image_scrapers = ()

@@ -13,8 +13,7 @@ of utilities to help navigate this.
 import datetime
 
 import pandas
-from flytekit import SQLTask, TaskMetadata, kwtypes, task, workflow
-from flytekit.annotated.testing import patch, task_mock
+from flytekit import SQLTask, TaskMetadata, kwtypes, patch, task, task_mock, workflow
 from flytekit.types.schema import FlyteSchema
 
 # %%

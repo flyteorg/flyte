@@ -31,8 +31,7 @@ def date_formatter_wf(kickoff_time: datetime):
 # ---------------
 # Cron expression strings use the `AWS syntax <http://docs.aws.amazon.com/AmazonCloudWatch/latest/events/ScheduledEvents.html#CronExpressions>`_.
 # These are validated at launch plan registration time.
-from flytekit import LaunchPlan
-from flytekit.annotated.schedule import CronSchedule
+from flytekit import CronSchedule, LaunchPlan
 
 # creates a launch plan that runs at 10am UTC every day.
 cron_lp = LaunchPlan.create(
@@ -54,8 +53,7 @@ cron_lp = LaunchPlan.create(
 
 from datetime import timedelta
 
-from flytekit import LaunchPlan
-from flytekit.annotated.schedule import FixedRate
+from flytekit import FixedRate, LaunchPlan
 
 
 @task

@@ -36,9 +36,9 @@ black==19.10b0
     # via
     #   -r dev-requirements.in
     #   flake8-black
-boto3==1.16.60
+boto3==1.16.63
     # via sagemaker-training
-botocore==1.19.60
+botocore==1.19.63
     # via
     #   boto3
     #   s3transfer
@@ -59,7 +59,7 @@ click==7.1.2
     #   flytekit
 coverage==5.4
     # via -r dev-requirements.in
-croniter==1.0.2
+croniter==1.0.5
     # via flytekit
 cryptography==3.3.1
     # via paramiko
@@ -92,7 +92,7 @@ flatbuffers==1.12
     # via tensorflow
 flyteidl==0.18.11
     # via flytekit
-flytekit==0.16.0b1
+flytekit==0.16.0b3
     # via
     #   -r ./recipes/case_studies/pima_diabetes/../../common/requirements-common.in
     #   -r ./recipes/plugins/hive/../../common/requirements-common.in
@@ -120,7 +120,9 @@ flytekitplugins-pod==0.1.0
 flytekitplugins-spark==0.1.0
     # via -r ./recipes/plugins/k8s_spark/requirements.in
 future==0.18.2
-    # via tensorflow-datasets
+    # via
+    #   croniter
+    #   tensorflow-datasets
 gast==0.3.3
     # via tensorflow
 gevent==21.1.2
@@ -192,7 +194,7 @@ marshmallow==3.10.0
     # via
     #   dataclasses-json
     #   marshmallow-enum
-matplotlib==3.3.3
+matplotlib==3.3.4
     # via
     #   -r ./recipes/case_studies/pima_diabetes/../../common/requirements-common.in
     #   -r ./recipes/case_studies/pima_diabetes/requirements.in
@@ -238,7 +240,7 @@ opencv-python==4.5.1.48
     # via -r requirements.in
 opt-einsum==3.3.0
     # via tensorflow
-packaging==20.8
+packaging==20.9
     # via
     #   pytest
     #   sphinx

@@ -18,7 +18,6 @@ Flytekit's typing engine.
 
 """
 import os
-import shutil
 import tempfile
 import typing
 
@@ -26,11 +25,9 @@ import typing
 # FlyteContext is used only to access a random local directory
 from typing import Type
 
-from flytekit import FlyteContext, task, workflow
-
 # %%
 # Defined type here represents a list of Files on the disk. We will refer to it as ``MyDataset``
-from flytekit.annotated.type_engine import TypeEngine, TypeTransformer
+from flytekit import FlyteContext, TypeEngine, TypeTransformer, task, workflow
 from flytekit.models.core.types import BlobType
 from flytekit.models.literals import Blob, BlobMetadata, Literal, Scalar
 from flytekit.models.types import LiteralType

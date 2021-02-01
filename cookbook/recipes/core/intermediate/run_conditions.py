@@ -12,8 +12,7 @@ only be performed on primitive values.
 # To start off, import `conditional` module
 import random
 
-from flytekit import task, workflow
-from flytekit.annotated.condition import conditional
+from flytekit import conditional, task, workflow
 
 
 # %%

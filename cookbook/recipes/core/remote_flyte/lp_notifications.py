@@ -11,8 +11,7 @@ For up-to-date documentation on notifications see the `official docs <https://ly
 
 # %%
 # Let's consider the following example workflow:
-from flytekit import LaunchPlan, task, workflow
-from flytekit.annotated.notification import Email
+from flytekit import Email, LaunchPlan, task, workflow
 from flytekit.models.core.execution import WorkflowExecutionPhase
 
 
@@ -44,8 +43,7 @@ int_doubler_wf_lp = LaunchPlan.create(
 # Notifications shine when used for scheduled workflows to alert on failures:
 from datetime import timedelta
 
-from flytekit.annotated.notification import PagerDuty
-from flytekit.annotated.schedule import FixedRate
+from flytekit import FixedRate, PagerDuty
 
 int_doubler_wf_scheduled_lp = LaunchPlan.create(
     "int_doubler_wf_scheduled",
@@ -63,7 +61,7 @@ int_doubler_wf_scheduled_lp = LaunchPlan.create(
 
 # %%
 # If you desire you can combine notifications with different permutations of terminal phases and recipient targets:
-from flytekit.annotated.notification import Slack
+from flytekit import Slack
 
 wacky_int_doubler_lp = LaunchPlan.create(
     "wacky_int_doubler",

@@ -16,8 +16,7 @@ import typing
 from datetime import datetime
 from random import random, seed
 
-from flytekit import dynamic, task, workflow
-from flytekit.annotated.condition import conditional
+from flytekit import conditional, dynamic, task, workflow
 
 # seed random number generator
 seed(datetime.now().microsecond)
