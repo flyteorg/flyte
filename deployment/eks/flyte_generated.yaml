@@ -8123,6 +8123,7 @@ data:
       metadataStoragePrefix:
         - "metadata"
         - "admin"
+      eventVersion: 1
       testing:
         host: http://flyteadmin
   storage.yaml: |
@@ -8157,7 +8158,7 @@ data:
         storage: 2000Mi
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-g79597h75m
+  name: flyte-admin-config-m8c8m77fgd
   namespace: flyte
 ---
 apiVersion: v1
@@ -8657,7 +8658,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-g79597h75m
+          name: flyte-admin-config-m8c8m77fgd
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8938,7 +8939,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-g79597h75m
+              name: flyte-admin-config-m8c8m77fgd
             name: config-volume
           - name: db-pass
             secret:

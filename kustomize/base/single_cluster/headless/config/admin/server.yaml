@@ -17,5 +17,6 @@ flyteadmin:
   metadataStoragePrefix:
     - "metadata"
     - "admin"
+  eventVersion: 1
   testing:
     host: http://flyteadmin
