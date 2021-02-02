@@ -1,4 +1,7 @@
 {{- if .Values.common.ingress.enabled }}
+
+{{- if .Values.contour.enabled }}
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
@@ -39,4 +42,73 @@ spec:
           serviceName: flyteadmin
           servicePort: 87
         path: /openapi
+
+{{- else }}
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "flyte.name" . }}-http1
+  namespace: {{ template "flyte.namespace" . }}
+  annotations:
+    alb.ingress.kubernetes.io/backend-protocol-version: HTTP1
+    {{- with .Values.common.ingress.annotations }}
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+spec:
+  rules:
+  - {{- with .Values.common.ingress.host }}
+    host: {{ . }}
+    {{- end }}
+    http:
+      paths:
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /console*
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /__webpack_hmr*
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /api*
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /healthcheck*
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /v1*
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 87
+        path: /openapi*
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "flyte.name" . }}-grpc
+  namespace: {{ template "flyte.namespace" . }}
+  annotations:
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    {{- with .Values.common.ingress.annotations }}
+    {{- toYaml . | nindent 4}}
+    {{- end }}
+spec:
+  rules:
+  - {{- with .Values.common.ingress.host }}
+    host: {{ . }}
+    {{- end }}
+    http:
+      paths:
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 81
+        path: /flyteidl.service.AdminService*
+
+{{- end }}
+
 {{- end }}
