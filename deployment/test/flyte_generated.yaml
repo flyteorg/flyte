@@ -492,6 +492,7 @@ data:
       metadataStoragePrefix:
         - "metadata"
         - "admin"
+      eventVersion: 1
       testing:
         host: http://flyteadmin
   storage.yaml: |+
@@ -518,7 +519,7 @@ data:
         storage: 20Mi
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-c96tt5m6b7
+  name: flyte-admin-config-c4gcfmb2k7
   namespace: flyte
 ---
 apiVersion: v1
@@ -1020,7 +1021,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-c96tt5m6b7
+          name: flyte-admin-config-c4gcfmb2k7
         name: config-volume
       - name: db-pass
         secret:
