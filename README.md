@@ -14,7 +14,7 @@ Flyte is a container-native, type-safe workflow and pipelines platform optimized
 
 # Homepage
 - [flyte.org](https://flyte.org)
-- [Docs](https://lyft.github.io/flyte)
+- [Docs](https://flyte.readthedocs.io)
 
 # Introduction
 Flyte is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
