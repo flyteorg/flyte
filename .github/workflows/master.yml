@@ -19,9 +19,10 @@ jobs:
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: "${{ github.actor }}"
-          password: "${{ secrets.GITHUB_TOKEN }}"
-          image_name: ${{ github.repository }}/${{ github.event.repository.name }}
+          # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: flyteorg/flytecookbook
           image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
           push_git_tag: true
           registry: ghcr.io
