@@ -4,7 +4,7 @@ metadata:
   name: flyte
 spec:
   version: "{{ .TagName }}"
-  homepage: https://github.com/lyft/flyte
+  homepage: https://github.com/flyteorg/flyte
   shortDescription: Monitor, launch and manage flyte executions
   description: |+2
        Kubectl-flyte can be used to manage workflows in a kubernetes cluster executed by FlytePropeller. Users can monitor, visualize executing workflows, delete/terminate executions in bulk, dive into quota utilization for tenants. The tool allows users to launch yaml based Flyte workflows without needing FlyteAdmin etc. For more information about Flyte refer to https://flyte.org
@@ -13,7 +13,7 @@ spec:
         matchLabels:
           os: darwin
           arch: amd64
-      {{addURIAndSha "https://github.com/lyft/flytepropeller/releases/download/{{ .TagName }}/kubectl-flyte_{{ .TagName }}_darwin_x86_64.tar.gz" .TagName | indent 6}}
+      {{addURIAndSha "https://github.com/flyteorg/flytepropeller/releases/download/{{ .TagName }}/kubectl-flyte_{{ .TagName }}_darwin_x86_64.tar.gz" .TagName | indent 6}}
       files:
         - from: kubectl-flyte
           to: flyte
@@ -24,7 +24,7 @@ spec:
         matchLabels:
           os: linux
           arch: amd64
-      {{addURIAndSha "https://github.com/lyft/flytepropeller/releases/download/{{ .TagName }}/kubectl-flyte_{{ .TagName }}_linux_x86_64.tar.gz" .TagName | indent 6}}
+      {{addURIAndSha "https://github.com/flyteorg/flytepropeller/releases/download/{{ .TagName }}/kubectl-flyte_{{ .TagName }}_linux_x86_64.tar.gz" .TagName | indent 6}}
       files:
         - from: kubectl-flyte
           to: flyte
