@@ -3,3 +3,4 @@
 vendor/
 *.swp
 artifacts/
+dist/
