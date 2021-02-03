@@ -1,7 +1,6 @@
 name: Pull Request
 
-on:
-  pull_request
+on: pull_request
 
 jobs:
   build-copilot:
@@ -12,9 +11,9 @@ jobs:
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
-          password: "${{ secrets.PUBLISH_CONTAINER }}"
-          image_name: ${{ github.repository }}/flytecopilot
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: ${{ github.repository_owner }}/flytecopilot
           image_tag: ${{ github.sha }}
           push_git_tag: true
           registry: ghcr.io
