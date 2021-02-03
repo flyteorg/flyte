@@ -6,7 +6,7 @@
     "type": "git",
     "url": "git@github.com:flyteorg/flyteidl"
   },
-  "author": "Flyte Bot <haytham@afutuh.com>",
+  "author": "Flyte Bot <admin@flyte.org>",
   "license": "Apache-2.0",
   "keywords": [
     "flyte",
