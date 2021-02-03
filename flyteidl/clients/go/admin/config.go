@@ -22,7 +22,7 @@ type Config struct {
 	// Auth can only be used if also running with a secure connection. If UseInsecureConnection is set to true, none
 	// of the following options will even be referenced.
 	UseAuth              bool     `json:"useAuth" pflag:",Whether or not to try to authenticate with options below"`
-	ClientId             string   `json:"clientId" pflag:",Client ID"`
+	ClientID             string   `json:"clientId" pflag:",Client ID"`
 	ClientSecretLocation string   `json:"clientSecretLocation" pflag:",File containing the client secret"`
 	Scopes               []string `json:"scopes" pflag:",List of scopes to request"`
 

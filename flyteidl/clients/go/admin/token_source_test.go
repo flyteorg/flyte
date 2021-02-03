@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/oauth2"
 )
-import "golang.org/x/oauth2"
 
 type DummyTestTokenSource struct {
 	oauth2.TokenSource

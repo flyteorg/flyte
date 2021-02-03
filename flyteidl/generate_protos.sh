@@ -13,7 +13,7 @@ docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d pr
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/datacatalog -l go --go_source_relative --validate_out
 
 languages=("python" "cpp" "java")
-idlfolders=("service" "admin" "core" "event" "plugins")
+idlfolders=("service" "admin" "core" "event" "plugins" "datacatalog")
 
 for lang in "${languages[@]}"
 do
@@ -29,6 +29,7 @@ docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATI
 docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/core -l protodoc
 docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/event -l protodoc
 docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/plugins -l protodoc
+docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/datacatalog -l protodoc
 
 # Generate binary data from OpenAPI 2 file
 docker run --rm -u $(id -u):$(id -g) -v $DIR/gen/pb-go/flyteidl/service:/service --entrypoint go-bindata $LYFT_IMAGE -pkg service -o /service/openapi.go -prefix /service/ -modtime 1562572800 /service/admin.swagger.json

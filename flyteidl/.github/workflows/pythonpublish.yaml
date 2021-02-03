@@ -1,4 +1,4 @@
-name: Upload Python Package
+name: Upload PyPi Package
 
 on:
   release:
@@ -12,7 +12,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
-          python-version: '3.x'
+          python-version: "3.x"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

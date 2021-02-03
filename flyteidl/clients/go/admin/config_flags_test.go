@@ -235,7 +235,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("clientId"); err == nil {
-				assert.Equal(t, string(defaultConfig.ClientId), vString)
+				assert.Equal(t, string(defaultConfig.ClientID), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -246,7 +246,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("clientId", testValue)
 			if vString, err := cmdFlags.GetString("clientId"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ClientId)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.ClientID)
 
 			} else {
 				assert.FailNow(t, err.Error())
