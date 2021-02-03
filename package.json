@@ -1,12 +1,12 @@
 {
-  "name": "@lyft/flyteidl",
-  "version": "0.18.11",
+  "name": "@flyteorg/flyteidl",
+  "version": "0.18.12",
   "description": "Compiled protocol buffers and gRPC service clients/servers for Flyte IDLs",
   "repository": {
     "type": "git",
-    "url": "git@github.com:lyft/flyteidl"
+    "url": "git@github.com:flyteorg/flyteidl"
   },
-  "author": "Randy Schott <rschott@lyft.com>",
+  "author": "Flyte Bot <haytham@afutuh.com>",
   "license": "Apache-2.0",
   "keywords": [
     "flyte",

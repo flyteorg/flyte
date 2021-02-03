@@ -4,6 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"sync"
+
 	"github.com/coreos/go-oidc"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_retry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
@@ -14,10 +19,6 @@ import (
 	"golang.org/x/oauth2/clientcredentials"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"io/ioutil"
-	"net/http"
-	"strings"
-	"sync"
 )
 
 var (
@@ -97,7 +98,7 @@ func getAuthenticationDialOption(ctx context.Context, cfg Config) (grpc.DialOpti
 	secret := strings.TrimSpace(string(secretBytes))
 
 	ccConfig := clientcredentials.Config{
-		ClientID:     cfg.ClientId,
+		ClientID:     cfg.ClientID,
 		ClientSecret: secret,
 		TokenURL:     tokenURL,
 		Scopes:       cfg.Scopes,
@@ -117,7 +118,7 @@ func NewAdminConnection(ctx context.Context, cfg Config) (*grpc.ClientConn, erro
 		creds := credentials.NewClientTLSFromCert(nil, "")
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 		if cfg.UseAuth {
-			logger.Infof(ctx, "Instantiating a token source to authenticate against Admin, ID: %s", cfg.ClientId)
+			logger.Infof(ctx, "Instantiating a token source to authenticate against Admin, ID: %s", cfg.ClientID)
 			jwtDialOption, err := getAuthenticationDialOption(ctx, cfg)
 			if err != nil {
 				return nil, err

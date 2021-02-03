@@ -1,14 +1,14 @@
 from setuptools import setup, find_packages
 
-__version__ = '0.18.11'
+__version__ = '0.18.12'
 
 setup(
     name='flyteidl',
     version=__version__,
     description='IDL for Flyte Platform',
-    url='https://www.github.com/lyft/flyteidl',
-    maintainer='Lyft',
-    maintainer_email='flyte-eng@lyft.com',
+    url='https://www.github.com/flyteorg/flyteidl',
+    maintainer='FlyteOrg',
+    maintainer_email='admin@flyte.org',
     packages=find_packages('gen/pb_python'),
     package_dir={'': 'gen/pb_python'},
     dependency_links=[],
