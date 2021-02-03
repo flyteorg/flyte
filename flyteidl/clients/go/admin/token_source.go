@@ -1,7 +1,10 @@
 package admin
 
-import "golang.org/x/oauth2"
-import "context"
+import (
+	"context"
+
+	"golang.org/x/oauth2"
+)
 
 // This class is here because we cannot use the normal "github.com/grpc/grpc-go/credentials/oauth" package to satisfy
 // the credentials.PerRPCCredentials interface. This is because we want to be able to support a different 'header'

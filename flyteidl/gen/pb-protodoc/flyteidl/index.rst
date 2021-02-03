@@ -13,6 +13,7 @@ and documentation of all these entities.
 
 	admin/index
 	core/index
+	datacatalog/index
 	event/index
 	plugins/index
 	service/index
