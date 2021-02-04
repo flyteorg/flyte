@@ -32,7 +32,6 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
-      - qubole-hive-executor
     # Uncomment to enable sagemaker plugin
     #      - sagemaker_training
     #      - sagemaker_hyperparameter_tuning
@@ -95,7 +94,7 @@ event:
   rate: 500
   capacity: 1000
 admin:
-  endpoint: localhost:30081
+  endpoint: localhost:80
   insecure: true
 catalog-cache:
   type: noop

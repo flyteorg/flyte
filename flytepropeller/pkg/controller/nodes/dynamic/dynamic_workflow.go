@@ -286,7 +286,8 @@ func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context,
 
 	var launchPlanInterfaces = make([]common.InterfaceProvider, len(launchPlanIDs))
 	for idx, id := range launchPlanIDs {
-		lp, err := d.lpReader.GetLaunchPlan(ctx, &id)
+		idVal := id
+		lp, err := d.lpReader.GetLaunchPlan(ctx, &idVal)
 		if err != nil {
 			logger.Debugf(ctx, "Error fetching launch plan definition from admin")
 			if launchplan.IsNotFound(err) || launchplan.IsUserError(err) {

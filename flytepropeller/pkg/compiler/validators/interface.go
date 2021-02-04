@@ -70,13 +70,15 @@ func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs e
 
 				// Compute exposed inputs as the union of all required inputs and any input overwritten by the node.
 				exposedInputs := map[string]*core.Variable{}
-				for name, p := range inputs.Parameters {
-					if p.GetRequired() {
-						exposedInputs[name] = p.Var
-					} else if containsBindingByVariableName(node.GetInputs(), name) {
-						exposedInputs[name] = p.Var
+				if inputs != nil && inputs.Parameters != nil {
+					for name, p := range inputs.Parameters {
+						if p.GetRequired() {
+							exposedInputs[name] = p.Var
+						} else if containsBindingByVariableName(node.GetInputs(), name) {
+							exposedInputs[name] = p.Var
+						}
+						// else, the param has a default value and is not being overwritten by the node
 					}
-					// else, the param has a default value and is not being overwritten by the node
 				}
 
 				iface = &core.TypedInterface{
