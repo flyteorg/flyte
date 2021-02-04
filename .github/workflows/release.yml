@@ -19,11 +19,11 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Release
         env:
-          GITHUB_TOKEN: ${{ secrets.RELEASEBOT_TOKEN }}
-          GIT_AUTHOR_NAME: "service-github-lyft-semantic-release"
-          GIT_AUTHOR_EMAIL: "service-github-lyft-semantic-release@users.noreply.github.com"
-          GIT_COMMITTER_NAME: "service-github-lyft-semantic-release"
-          GIT_COMMITTER_EMAIL: "service-github-lyft-semantic-release@users.noreply.github.com"
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          GIT_AUTHOR_NAME: "flyte bot"
+          GIT_AUTHOR_EMAIL: "admin@flyte.org"
+          GIT_COMMITTER_NAME: "flyte bot"
+          GIT_COMMITTER_EMAIL: "admin@flyte.org"
         run: npx semantic-release
   check_for_tag:
     name: Get Release Tag
@@ -59,27 +59,9 @@ jobs:
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
-          password: "${{ secrets.PUBLISH_CONTAINER }}"
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository }}
           image_tag: latest,${{github.sha}},${{ needs.check_for_tag.outputs.currentTag }}
           push_git_tag: true
           registry: ghcr.io
-  push_dockerhub:
-    name: Build and push image to Dockerhub
-    needs: check_for_tag
-    runs-on: ubuntu-latest
-    if: needs.check_for_tag.outputs.currentTag
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          ref: ${{ needs.check_for_tag.outputs.currentTag }}
-      - name: Push Docker Image to Dockerhub
-        uses: whoan/docker-build-with-cache-action@v5
-        with:
-          username: "${{ secrets.DOCKERHUB_USERNAME }}"
-          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
-          image_name: ${{ secrets.DOCKERHUB_IMAGE_NAME }}
-          image_tag: latest,${{ github.sha }},${{ needs.check_for_tag.outputs.currentTag }}
-          push_git_tag: true
-          build_extra_args: "--compress=true"
