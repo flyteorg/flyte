@@ -515,11 +515,12 @@ data:
         storage: 5Mi
       limits:
         cpu: 2
-        memory: 2G
+        memory: 8Gi
         storage: 20Mi
+        gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-c4gcfmb2k7
+  name: flyte-admin-config-k7f4k7g76c
   namespace: flyte
 ---
 apiVersion: v1
@@ -1021,7 +1022,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-c4gcfmb2k7
+          name: flyte-admin-config-k7f4k7g76c
         name: config-volume
       - name: db-pass
         secret:

@@ -8154,11 +8154,12 @@ data:
         storage: 1000Mi
       limits:
         cpu: 2
-        memory: 2G
+        memory: 8Gi
         storage: 2000Mi
+        gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-m8c8m77fgd
+  name: flyte-admin-config-t2f9g68k65
   namespace: flyte
 ---
 apiVersion: v1
@@ -8658,7 +8659,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-m8c8m77fgd
+          name: flyte-admin-config-t2f9g68k65
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8939,7 +8940,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-m8c8m77fgd
+              name: flyte-admin-config-t2f9g68k65
             name: config-volume
           - name: db-pass
             secret:
