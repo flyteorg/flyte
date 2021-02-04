@@ -3,6 +3,10 @@
 IMAGE_NAME=flytecookbook
 VERSION=$(shell ./version.sh)
 
+# If you're port-forwarding your service or running the sandbox Flyte deployment you can leave this is as is.
+# If you want to use a secure channel with ssl enabled, be sure **not** to use the insecure flag.
+INSECURE=-i
+
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
