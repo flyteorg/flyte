@@ -385,8 +385,6 @@ data:
           enable-multicontainer: true
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: clusterresource-template-dtg8ff28mt
   namespace: flyte
 ---
@@ -424,8 +422,6 @@ data:
 
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: datacatalog-config-64k8dg9gck
   namespace: flyte
 ---
@@ -496,6 +492,7 @@ data:
       metadataStoragePrefix:
         - "metadata"
         - "admin"
+      eventVersion: 1
       testing:
         host: http://flyteadmin
   storage.yaml: |+
@@ -522,9 +519,7 @@ data:
         storage: 20Mi
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-admin-config-c96tt5m6b7
+  name: flyte-admin-config-c4gcfmb2k7
   namespace: flyte
 ---
 apiVersion: v1
@@ -631,8 +626,6 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: flyte-propeller-config-c55k94mm2h
   namespace: flyte
 ---
@@ -685,11 +678,15 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    contour.heptio.com/upstream-protocol.h2c: grpc
+    projectcontour.io/upstream-protocol.h2c: grpc
   name: flyteadmin
   namespace: flyte
 spec:
   ports:
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
   - name: http
     port: 80
     protocol: TCP
@@ -698,10 +695,6 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
   selector:
     app: flyteadmin
 ---
@@ -965,6 +958,12 @@ spec:
             memory: 200Mi
       initContainers:
       - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+        image: postgres:10.1
+        name: check-db-ready
+      - command:
         - flyteadmin
         - --logtostderr
         - --config
@@ -1014,22 +1013,16 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
-      - command:
-        - sh
-        - -c
-        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.1
-        name: check-db-ready
       serviceAccountName: flyteadmin
       volumes:
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: flyte-admin-config-c96tt5m6b7
-        name: config-volume
       - configMap:
           name: clusterresource-template-dtg8ff28mt
         name: resource-templates
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: flyte-admin-config-c4gcfmb2k7
+        name: config-volume
       - name: db-pass
         secret:
           secretName: db-pass-9dgchhk2bm

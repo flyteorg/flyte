@@ -9,7 +9,8 @@ metadata:
     # with the name 'grpc' under spec/ports.
     # For more information, refer to
     # https://github.com/heptio/contour/blob/master/docs/annotations.md#contour-specific-service-annotations
-    contour.heptio.com/upstream-protocol.h2c: "grpc"
+    # # Following this issue - the annotation was updated https://github.com/projectcontour/contour/issues/2092
+    projectcontour.io/upstream-protocol.h2c: "grpc"
 spec:
   selector:
     app: flyteadmin

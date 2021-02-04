@@ -8003,8 +8003,6 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: clusterresource-template-tkdkkt4cb5
   namespace: flyte
 ---
@@ -8052,8 +8050,6 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: datacatalog-config-2bb94tc5b5
   namespace: flyte
 ---
@@ -8127,6 +8123,7 @@ data:
       metadataStoragePrefix:
         - "metadata"
         - "admin"
+      eventVersion: 1
       testing:
         host: http://flyteadmin
   storage.yaml: |
@@ -8161,9 +8158,7 @@ data:
         storage: 2000Mi
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-admin-config-g79597h75m
+  name: flyte-admin-config-m8c8m77fgd
   namespace: flyte
 ---
 apiVersion: v1
@@ -8335,8 +8330,6 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
   name: flyte-propeller-config-ct29cf4cch
   namespace: flyte
 ---
@@ -8345,8 +8338,6 @@ data:
   pass.txt: eW91cnBhc3N3b3Jk
 kind: Secret
 metadata:
-  annotations: {}
-  labels: {}
   name: db-pass-bthd2588cc
   namespace: flyte
 type: Opaque
@@ -8375,8 +8366,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    contour.heptio.com/upstream-protocol.h2c: grpc
     external-dns.alpha.kubernetes.io/hostname: flyteadmin.subdomain.mydomain.com
+    projectcontour.io/upstream-protocol.h2c: grpc
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
     service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: sg-...,sg-...,sg-...
   name: flyteadmin
@@ -8667,7 +8658,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-g79597h75m
+          name: flyte-admin-config-m8c8m77fgd
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8948,7 +8939,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-g79597h75m
+              name: flyte-admin-config-m8c8m77fgd
             name: config-volume
           - name: db-pass
             secret:
