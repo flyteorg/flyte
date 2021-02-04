@@ -83,7 +83,7 @@ const (
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
 	return newError(
 		BranchNodeIDNotFound,
-		fmt.Sprintf("BranchNode not assigned"),
+		"BranchNode not assigned",
 		branchNodeID,
 	)
 }

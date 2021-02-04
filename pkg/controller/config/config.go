@@ -47,6 +47,7 @@ var (
 			MaxNodeRetriesOnSystemFailures: 3,
 			InterruptibleFailureThreshold:  1,
 		},
+		MaxStreakLength: 5, // Turbo mode is enabled by default
 	}
 )
 
@@ -74,6 +75,7 @@ type Config struct {
 	MaxDatasetSizeBytes    int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
 	KubeConfig             KubeClientConfig     `json:"kube-client-config" pflag:",Configuration to control the Kubernetes client"`
 	NodeConfig             NodeConfig           `json:"node-config,omitempty" pflag:",config for a workflow node"`
+	MaxStreakLength        int                  `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
 }
 
 type KubeClientConfig struct {

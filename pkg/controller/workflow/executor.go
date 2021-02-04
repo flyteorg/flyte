@@ -275,7 +275,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 			return nil
 		case v1alpha1.WorkflowPhaseRunning:
 			wfEvent.Phase = core.WorkflowExecution_RUNNING
-			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseRunning, fmt.Sprintf("Workflow Started"), nil)
+			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseRunning, "Workflow Started", nil)
 			wfEvent.OccurredAt = utils.GetProtoTime(wStatus.GetStartedAt())
 		case v1alpha1.WorkflowPhaseHandlingFailureNode:
 			fallthrough

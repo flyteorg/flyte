@@ -92,7 +92,8 @@ func (g *GetOpts) iterateOverWorkflows(f func(*v1alpha1.FlyteWorkflow) error, ba
 			return err
 		}
 		for _, w := range wList.Items {
-			if err := f(&w); err != nil {
+			_w := w
+			if err := f(&_w); err != nil {
 				return err
 			}
 			counter++
@@ -127,7 +128,8 @@ func (g *GetOpts) iterateOverQuotas(f func(quota *v12.ResourceQuota) error, batc
 			return err
 		}
 		for _, r := range rq.Items {
-			if err := f(&r); err != nil {
+			_r := r
+			if err := f(&_r); err != nil {
 				return err
 			}
 			counter++

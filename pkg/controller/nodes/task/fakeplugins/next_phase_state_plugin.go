@@ -84,7 +84,7 @@ func (n NextPhaseStatePlugin) Finalize(ctx context.Context, tCtx pluginCore.Task
 
 func NewPhaseBasedPlugin() NextPhaseStatePlugin {
 	return NextPhaseStatePlugin{
-		id:    fmt.Sprintf("next_phase_plugin"),
+		id:    "next_phase_plugin",
 		props: pluginCore.PluginProperties{},
 	}
 }
