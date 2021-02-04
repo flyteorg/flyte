@@ -12,7 +12,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.5
+croniter==1.0.6
     # via flytekit
 cycler==0.10.0
     # via matplotlib
@@ -24,9 +24,9 @@ deprecated==1.2.11
     # via flytekit
 dirhash==0.2.1
     # via flytekit
-flyteidl==0.18.11
+flyteidl==0.18.12
     # via flytekit
-flytekit==0.16.0b3
+flytekit==0.16.0b6
     # via -r recipes/common/requirements-common.in
 future==0.18.2
     # via croniter
@@ -52,7 +52,7 @@ natsort==7.1.1
     # via
     #   croniter
     #   flytekit
-numpy==1.19.5
+numpy==1.20.0
     # via
     #   matplotlib
     #   opencv-python
@@ -123,7 +123,9 @@ urllib3==1.25.11
     #   requests
     #   responses
 wheel==0.36.2
-    # via -r recipes/common/requirements-common.in
+    # via
+    #   -r recipes/common/requirements-common.in
+    #   flytekit
 wrapt==1.12.1
     # via
     #   deprecated

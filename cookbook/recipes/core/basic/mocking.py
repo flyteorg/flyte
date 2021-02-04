@@ -13,7 +13,8 @@ of utilities to help navigate this.
 import datetime
 
 import pandas
-from flytekit import SQLTask, TaskMetadata, kwtypes, patch, task, task_mock, workflow
+from flytekit import SQLTask, TaskMetadata, kwtypes, task, workflow
+from flytekit.testing import patch, task_mock
 from flytekit.types.schema import FlyteSchema
 
 # %%
@@ -74,6 +75,8 @@ def main_2():
             .all()
             .all()
         )
+
+    test_user_demo_test()
 
 
 if __name__ == "__main__":

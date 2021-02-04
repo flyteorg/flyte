@@ -1,3 +1,2 @@
 -r ../../common/requirements-common.in
-
-flytekitplugins-pod==0.1.0
+flytekitplugins-pod==0.1.1

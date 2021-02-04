@@ -25,7 +25,7 @@ Reasons why it is complicated and not recommended,
    Flyte (Service) by default has no requirement that a Workflow is bound to a single Container Image. Flytekit offers a simple interface to easily alter the images that should be associated per task, yet keeping the local execution simple for the user.
 
 
-For every :py:class:`flytekit.annotated.task.PythonFunctionTask` type task or simply a task that is decorated with the ``@task`` decorator, users can supply rules of how the container image should be bound. By default, flytekit will associate one container image with all tasks. This image is called the ``default`` image.
+For every :py:class:`flytekit.core.task.PythonFunctionTask` type task or simply a task that is decorated with the ``@task`` decorator, users can supply rules of how the container image should be bound. By default, flytekit will associate one container image with all tasks. This image is called the ``default`` image.
 To alter the image, users should use the ``container_image`` parameter available in the :py:func:`flytekit.task` decorator. Any one of the following is an acceptable
 
 #. Image reference is specified, but the version is derived from the default images version ``container_image="docker.io/redis:{{.image.default.version}},``

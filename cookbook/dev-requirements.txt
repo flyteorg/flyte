@@ -36,9 +36,9 @@ black==19.10b0
     # via
     #   -r dev-requirements.in
     #   flake8-black
-boto3==1.16.63
+boto3==1.17.1
     # via sagemaker-training
-botocore==1.19.63
+botocore==1.20.1
     # via
     #   boto3
     #   s3transfer
@@ -59,7 +59,7 @@ click==7.1.2
     #   flytekit
 coverage==5.4
     # via -r dev-requirements.in
-croniter==1.0.5
+croniter==1.0.6
     # via flytekit
 cryptography==3.3.1
     # via paramiko
@@ -90,9 +90,9 @@ flake8==3.8.4
     #   flake8-isort
 flatbuffers==1.12
     # via tensorflow
-flyteidl==0.18.11
+flyteidl==0.18.12
     # via flytekit
-flytekit==0.16.0b3
+flytekit==0.16.0b6
     # via
     #   -r ./recipes/case_studies/pima_diabetes/../../common/requirements-common.in
     #   -r ./recipes/plugins/hive/../../common/requirements-common.in
@@ -107,17 +107,17 @@ flytekit==0.16.0b3
     #   flytekitplugins-kfpytorch
     #   flytekitplugins-pod
     #   flytekitplugins-spark
-flytekitplugins-awssagemaker==0.1.0
+flytekitplugins-awssagemaker==0.1.1
     # via
     #   -r ./recipes/plugins/sagemaker_pytorch/requirements.in
     #   -r ./recipes/plugins/sagemaker_training/requirements.in
-flytekitplugins-hive==0.1.0
+flytekitplugins-hive==0.1.1
     # via -r ./recipes/plugins/hive/requirements.in
-flytekitplugins-kfpytorch==0.1.0
+flytekitplugins-kfpytorch==0.1.1
     # via -r ./recipes/plugins/kfpytorch/requirements.in
-flytekitplugins-pod==0.1.0
+flytekitplugins-pod==0.1.1
     # via -r ./recipes/plugins/pod/requirements.in
-flytekitplugins-spark==0.1.0
+flytekitplugins-spark==0.1.1
     # via -r ./recipes/plugins/k8s_spark/requirements.in
 future==0.18.2
     # via
@@ -129,7 +129,7 @@ gevent==21.1.2
     # via sagemaker-training
 google-auth-oauthlib==0.4.2
     # via tensorboard
-google-auth==1.24.0
+google-auth==1.25.0
     # via
     #   google-auth-oauthlib
     #   tensorboard
@@ -160,7 +160,7 @@ isort==5.7.0
     # via
     #   -r dev-requirements.in
     #   flake8-isort
-jinja2==2.11.2
+jinja2==2.11.3
     # via
     #   sphinx
     #   sphinx-autoapi
@@ -350,7 +350,7 @@ rsa==4.7
     # via google-auth
 s3transfer==0.3.4
     # via boto3
-sagemaker-training==3.7.2
+sagemaker-training==3.7.3
     # via flytekitplugins-awssagemaker
 scantree==0.0.1
     # via dirhash
@@ -396,7 +396,7 @@ sortedcontainers==2.3.0
     # via flytekit
 soupsieve==2.1
     # via beautifulsoup4
-sphinx-autoapi==1.6.0
+sphinx-autoapi==1.7.0
     # via -r dev-requirements.in
 sphinx-code-include==1.1.1
     # via -r dev-requirements.in
@@ -510,6 +510,7 @@ wheel==0.36.2
     #   -r ./recipes/plugins/sagemaker_training/../../common/requirements-common.in
     #   -r recipes/common/requirements-common.in
     #   astunparse
+    #   flytekit
     #   tensorboard
     #   tensorflow
 wrapt==1.12.1

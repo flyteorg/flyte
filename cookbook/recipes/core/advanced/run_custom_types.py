@@ -27,7 +27,8 @@ from typing import Type
 
 # %%
 # Defined type here represents a list of Files on the disk. We will refer to it as ``MyDataset``
-from flytekit import FlyteContext, TypeEngine, TypeTransformer, task, workflow
+from flytekit import FlyteContext, task, workflow
+from flytekit.extend import TypeEngine, TypeTransformer
 from flytekit.models.core.types import BlobType
 from flytekit.models.literals import Blob, BlobMetadata, Literal, Scalar
 from flytekit.models.types import LiteralType
@@ -66,7 +67,7 @@ class MyDataset(object):
 # ``MyDataset`` represents a set of files locally, but, when a workflow consists of multiple steps, we want the data to
 # flow between the different steps. To achieve this, it is necessary to explain how the data will be transformed to
 # Flyte's remote references. To do this, we create a new instance of
-# :py:class:`flytekit.annotated.type_engine.TypeTransformer`, for the type ``MyDataset`` as follows
+# :py:class:`flytekit.core.type_engine.TypeTransformer`, for the type ``MyDataset`` as follows
 #
 # .. note::
 #
@@ -124,7 +125,7 @@ class MyDatasetTransformer(TypeTransformer[MyDataset]):
 
 # %%
 # Before we can use MyDataset in our tasks, we need to let flytekit know that ``MyDataset`` should be considered as a
-# valid type. This is done using the :py:func:`flytekit.annotated.type_engine.TypeEngine.register` function.
+# valid type. This is done using the :py:func:`flytekit.core.type_engine.TypeEngine.register` function.
 TypeEngine.register(MyDatasetTransformer())
 
 

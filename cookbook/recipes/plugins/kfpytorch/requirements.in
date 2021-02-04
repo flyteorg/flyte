@@ -1,5 +1,5 @@
 -r ../../common/requirements-common.in
-flytekitplugins-kfpytorch==0.1.0
+flytekitplugins-kfpytorch==0.1.1
 tensorboardX
 torch
 torchvision

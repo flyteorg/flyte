@@ -20,7 +20,7 @@ Available SDKs:
 What are Flytekit [python] only plugins?
 ===========================================
 Flytekit plugins are simple plugins that can be implemented purely in python, unit tested locally and allow extending Flytekit functionality. These plugins can be anything and for comparison can be thought of like Airflow Operators.
-Data is automatically marshalled and unmarshalled into and out of the plugin and mostly users should implement :py:class:`flytekit.annotated.base_task.PythonTask` API, defined in flytekit.
+Data is automatically marshalled and unmarshalled into and out of the plugin and mostly users should implement :py:class:`flytekit.core.base_task.PythonTask` API, defined in flytekit.
 This tutorial will illustrate how a plugin can be implemented with the help of an example.
 
 Flytekit Plugins are lazily loaded and can be released independently like libraries. We follow a convention to name the plugin like
