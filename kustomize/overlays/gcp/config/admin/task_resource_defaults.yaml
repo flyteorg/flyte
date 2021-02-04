@@ -5,5 +5,6 @@ task_resources:
     storage: 1000Mi
   limits:
     cpu: 2
-    memory: 2G
+    memory: 8Gi
     storage: 2000Mi
+    gpu: 1
