@@ -1,10 +1,10 @@
 Flyte Propeller
 ===============
-[![Current Release](https://img.shields.io/github/release/lyft/flytepropeller.svg)](https://github.com/lyft/flytepropeller/releases/latest)
-![Master](https://github.com/lyft/flytepropeller/workflows/Master/badge.svg)
+[![Current Release](https://img.shields.io/github/release/flyteorg/flytepropeller.svg)](https://github.com/flyteorg/flytepropeller/releases/latest)
+![Master](https://github.com/flyteorg/flytepropeller/workflows/Master/badge.svg)
 [![GoDoc](https://godoc.org/github.com/lyft/flytepropeller?status.svg)](https://pkg.go.dev/mod/github.com/lyft/flytepropeller)
 [![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![CodeCoverage](https://img.shields.io/codecov/c/github/lyft/flytepropeller.svg)](https://codecov.io/gh/lyft/flytepropeller)
+[![CodeCoverage](https://img.shields.io/codecov/c/github/flyteorg/flytepropeller.svg)](https://codecov.io/gh/flyteorg/flytepropeller)
 [![Go Report Card](https://goreportcard.com/badge/github.com/lyft/flytepropeller)](https://goreportcard.com/report/github.com/lyft/flytepropeller)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytepropeller.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytepropeller/latest.svg?style=plastic)
