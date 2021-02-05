@@ -40,7 +40,7 @@ black==19.10b0
     # via
     #   flytekit
     #   papermill
-bleach==3.2.1
+bleach==3.3.0
     # via nbconvert
 boto3==1.16.49
     # via flytekit
