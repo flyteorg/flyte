@@ -9724,9 +9724,11 @@ data:
         batching-interval: 2s
         batch-size: -1
         queue:
-          type: bucket
-          rate: 10
-          capacity: 100
+          type: maxof
+          rate: 100
+          capacity: 1000
+          base-delay: 5s
+          max-delay: 120s
         sub-queue:
           type: bucket
           rate: 10
@@ -9807,7 +9809,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-t88d5b727h
+  name: flyte-propeller-config-4478hcfh2c
   namespace: flyte
 ---
 apiVersion: v1
@@ -10409,7 +10411,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-t88d5b727h
+          name: flyte-propeller-config-4478hcfh2c
         name: config-volume
 ---
 apiVersion: apps/v1
