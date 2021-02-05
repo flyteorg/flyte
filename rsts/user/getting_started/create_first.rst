@@ -4,30 +4,17 @@
 Writing Your First Workflow
 ########################################
 
+By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow, run and then deploy it locally.
+
 The easiest way to author a Flyte Workflow is using the provided python SDK called "FlyteKit".
 
-You can save some effort by cloning the ``flytesnacks`` repo, and re-initializing it as a new git repository ::
+You can save some effort by cloning the ``flytekit-python-template`` repo, and re-initializing it as a new git repository ::
 
-  git clone git@github.com:lyft/flytesnacks.git myflyteproject
+  git clone git@github.com:lyft/flytekit-python-template.git myflyteproject
   cd myflyteproject
   rm -rf .git
   git init
   cd python
-
-
-Let's take a look at how easy it is to use Flyte by writing a task from scratch.
-
-Creating a Project
-******************
-
-In Flyte, workflows are organized into namespaces called "Projects". When you register a workflow, it must be registered under a project.
-
-For example, to create a new project called ``myflyteproject``: in a virtual environment with flytekit installed use the
-``flyte-cli`` to create the new project ::
-
-  flyte-cli register-project -h localhost:30081 -i - myflyteproject --name "My Flyte Project" \
-      --description "My very first project getting started on Flyte"
-
 
 Writing a Task
 *****************
@@ -37,7 +24,9 @@ The most basic Flyte primitive is a "task". Flyte Tasks are units of work that c
 Start by creating a new file ::
 
 
-   touch cookbook/recipes/core/first.py
+   touch myapp/workflows/first.py
+
+And add the required imports we'll need for this example:
 
 
 .. code-block:: python
@@ -73,10 +62,11 @@ From there, we can begin to write our first task.  It should look something like
 Some of the new concepts demonstrated here are:
 
 * Use the :py:func:`flytekit.task` decorator to convert your typed python function to a Flyte task.
-* A :py:class:`flytekit.types.file.FlyteFile` is a Flyte Kit type that represents binary data.  It is used to offload data to a storage location like S3.  Here we use it to store an image.
+* A :py:class:`flytekit.types.file.FlyteFile` is a Flytekit type that represents binary data.  It is used to offload data to a storage location like S3.  Here we use it to store an image.
 
 
-You can call this task ``edge_detection_canny(image_location=...)`` and iterate locally before adding it to part of a larger overall workflow.
+You can call this task ``edge_detection_canny(image_location="https://images.unsplash.com/photo-1512289984044-071903207f5e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2250&q=80")`` and iterate locally before adding it to part of a larger overall workflow.
+
 
 
 Writing a Workflow
@@ -100,5 +90,15 @@ You can call this workflow ``EdgeDetectorWf(image_input=...)`` and iterate local
 
 Interacting with Flyte
 ************************
+
+TODO: fill this section out.
+1. Setup a sandbox deployment
+2. Create a project
+3. Register your workflows
+4. Run your workflows
+
+
+Expanded examples
+*****************
 
 If you're interested in learning more and want to try more complex examples, `Flytesnacks Cookbook <https://flytecookbook.readthedocs.io/en/latest/>`__
