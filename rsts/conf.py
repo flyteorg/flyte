@@ -97,7 +97,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_logo = "flyte_lockup_on_dark.png"
+html_logo = "images/flyte_circle_gradient_1_4x4.png"
 html_static_path = []
 html_theme = "sphinx_material"
 html_theme_options = {
@@ -107,12 +107,12 @@ html_theme_options = {
     "google_analytics_account": "G-YQL24L5CKY",
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
-    "base_url": "https://github.com/lyft/flyte",
+    "base_url": "https://github.com/flyteorg/flyte",
     # Set the color and the accent color
     "color_primary": "deep-purple",
     "color_accent": "blue",
     # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/lyft/flyte/",
+    "repo_url": "https://github.com/flyteorg/flyte/",
     "repo_name": "flyte",
     # Visible levels of the global TOC; -1 means unlimited
     "globaltoc_depth": 1,

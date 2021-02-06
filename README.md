@@ -1,4 +1,4 @@
-![Flyte Logo](images/flyte_lockup_gradient_on_light.png "Flyte Logo")
+![Flyte Logo](rsts/images/flyte_lockup_gradient_on_light.png "Flyte Logo")
 
 [![Current Release](https://img.shields.io/github/release/lyft/flyte.svg)](https://github.com/lyft/flyte/releases/latest)
 [![Build Status](https://travis-ci.org/lyft/flyte.svg?branch=master)](https://travis-ci.org/lyft/flyte)

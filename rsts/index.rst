@@ -1,6 +1,8 @@
 Flyte
 =====
 
+.. image:: images/flyte_lockup_gradient_on_light.png
+
 Flyte is a structured programming and distributed processing platform created at Lyft that enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 Welcome to the documentation hub for Flyte.
 
