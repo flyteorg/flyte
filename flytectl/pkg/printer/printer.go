@@ -73,7 +73,7 @@ func projectColumns(rows []interface{}, column []Column) ([][]string, error) {
 	return responses, nil
 }
 
-func JSONToTable(jsonRows []byte, columns []Column) error {
+func (p Printer) JSONToTable(jsonRows []byte, columns []Column) error {
 	var rawRows []interface{}
 	if err := json.Unmarshal(jsonRows, &rawRows); err != nil {
 		return errors.Wrapf("JSONUnmarshalFailure", err, "failed to unmarshal into []interface{} from json")
@@ -90,6 +90,9 @@ func JSONToTable(jsonRows []byte, columns []Column) error {
 	printer.AutoWrapText = false
 	printer.BorderLeft = true
 	printer.BorderRight = true
+	printer.BorderBottom = true
+	printer.BorderTop = true
+	printer.RowLine = true
 	printer.ColumnSeparator = "|"
 	printer.HeaderBgColor = tablewriter.BgHiWhiteColor
 	headers := make([]string, 0, len(columns))
@@ -141,7 +144,7 @@ func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.
 		if err != nil {
 			return errors.Wrapf("ProtoToJSONFailure", err, "failed to marshal proto messages")
 		}
-		return JSONToTable(rows, columns)
+		return p.JSONToTable(rows, columns)
 	}
 	return nil
 }

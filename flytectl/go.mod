@@ -8,7 +8,7 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27
-	github.com/lyft/flyteidl v0.18.1
+	github.com/lyft/flyteidl v0.18.11
 	github.com/lyft/flytestdlib v0.3.10-0.20200619054107-45f341b716fa
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/mapstructure v1.1.2
