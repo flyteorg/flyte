@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/lyft/flytectl/cmd/update"
 	"github.com/lyft/flytectl/cmd/register"
 
 	"github.com/lyft/flytectl/cmd/get"
@@ -38,6 +39,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd.AddCommand(viper.GetConfigCommand())
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(get.CreateGetCommand())
+	rootCmd.AddCommand(update.CreateUpdateCommand())
 	rootCmd.AddCommand(register.RegisterCommand())
 	config.GetConfig()
 
