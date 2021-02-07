@@ -1,22 +1,33 @@
 ================
 Flyte IDL
 ================
-This repository contains all of Flyte's IDLs.
+This is one of the core repositories of Flyte and contains the Specification of
+the Flyte Lanugage. The Specification is maintained using Googles fantastic
+Protcol buffers library. The code and docs are auto-generated.
 
-The contents of this Readme will be deprecated shortly.  Please refer to the Flyte `contributor's guide <https://github.com/lyft/flyte>`__ in the future.
+ - [flyte.org](https://flyte.org)
+ - [Flyte Docs](http://flyte.readthedocs.org/)
+ - [FlyteIDL Docs](http://flyteidl.readthedocs.org)
 
-Generating Protobufs -> Code
-#############################
+Generate Code from protobuf
+----------------------------
+#. Make sure docker is installed locally.
+#. Once installed run, ``make generate`` to generate all the code and mock
+   client for FlyteAdmin Service
 
-Mac OS
-*******
+   .. prompt:: bash
 
-1. Install Docker for Mac (https://www.docker.com/docker-mac)
-2. Start 'docker' and sign in.  You should see a whale icon in your toolbar.
-3. cd to the root of your flyteidl repository.
-4. Run ``./generate_protos.sh`` to generate just the protobuf files.  Side note: running ``make generate`` will generate protos along with some other things like mock classes.
+    make generate
 
-Admin Client Generation
-*************************
+#. You might have to run, ``make download_tooling`` to install generator
+   dependencies
 
-Please see the Flyte Tools documentation on the `generator <https://github.com/lyft/flytetools#swagger-client-code-generator>`__ for more information.
+   .. prompt:: bash
+
+   make download_tooling
+
+#. To add new dependencies for a doc, modify ``doc_requirements.in`` and then
+
+   .. prompt:: bash
+
+   make doc-requirements.txt
