@@ -1,6 +1,8 @@
 Flyte
 =====
 
+.. image:: images/flyte_lockup_gradient_on_light.png
+
 Flyte is a structured programming and distributed processing platform created at Lyft that enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 Welcome to the documentation hub for Flyte.
 
@@ -26,6 +28,7 @@ Welcome to the documentation hub for Flyte.
    :maxdepth: 1
    :name: sourcecodedocstoc
 
+   Flyte Core Language Specification (FlyteIDL) <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>
    Flytekit Python <https://flyte.readthedocs.io/projects/flytekit/en/master/>
    Flytekit JAVA  <https://github.com/spotify/flytekit-java>
    FlytePropeller <https://pkg.go.dev/mod/github.com/lyft/flytepropeller>
