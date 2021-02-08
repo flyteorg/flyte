@@ -1,0 +1,5 @@
+.. _contribute:
+
+#######################
+Contributors handbook
+######################
