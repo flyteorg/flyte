@@ -83,7 +83,7 @@ images:
   # FlyteConsole
   - name: flyteconsole # match images with this name
     newTag: v0.19.1 # override the tag
-    newName: ghcr.io/lyft/flyteconsole # override the namep 
+    newName: ghcr.io/lyft/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
     newTag: v0.2.130 # override the tag
@@ -91,4 +91,4 @@ images:
   # FlytePropeller
   - name: flytepropeller # match images with this name
     newTag: v0.5.13 # override the tag
-    newName: ghcr.io/lyft/flytepropeller # override the name
+    newName: ghcr.io/flyteorg/flytepropeller # override the name

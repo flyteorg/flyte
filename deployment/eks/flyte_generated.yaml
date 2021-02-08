@@ -8735,7 +8735,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/lyft/flytepropeller:v0.5.13
+        image: ghcr.io/flyteorg/flytepropeller:v0.5.13
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
