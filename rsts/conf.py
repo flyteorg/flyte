@@ -27,7 +27,6 @@ version = u''
 # The full version, including alpha/beta/rc tags
 release = u'0.10.0'
 
-
 # -- General configuration ---------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -56,12 +55,12 @@ extensions = [
 ]
 
 extlinks = {
-   'propeller': ('https://github.com/lyft/flytepropeller/tree/master/%s', ''),
-   'stdlib':    ('https://github.com/lyft/flytestdlib/tree/master/%s', ''),
-   'kit':       ('https://github.com/lyft/flytekit/tree/master/%s', ''),
-   'plugins':   ('https://github.com/lyft/flyteplugins/tree/v0.1.4/%s', ''),
-   'idl':       ('https://github.com/lyft/flyteidl/tree/v0.14.1/%s', ''),
-   'admin':     ('https://github.com/lyft/flyteadmin/tree/master/%s', ''),
+    'propeller': ('https://github.com/lyft/flytepropeller/tree/master/%s', ''),
+    'stdlib': ('https://github.com/lyft/flytestdlib/tree/master/%s', ''),
+    'kit': ('https://github.com/lyft/flytekit/tree/master/%s', ''),
+    'plugins': ('https://github.com/lyft/flyteplugins/tree/v0.1.4/%s', ''),
+    'idl': ('https://github.com/lyft/flyteidl/tree/v0.14.1/%s', ''),
+    'admin': ('https://github.com/lyft/flyteadmin/tree/master/%s', ''),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -90,7 +89,6 @@ exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -122,7 +120,6 @@ html_theme_options = {
     "globaltoc_includehidden": False,
 }
 
-
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -144,12 +141,10 @@ html_theme_options = {
 #
 html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
 
-
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Flytedoc'
-
 
 # -- Options for LaTeX output ------------------------------------------------
 
@@ -179,7 +174,6 @@ latex_documents = [
      u'Flyte Authors', 'manual'),
 ]
 
-
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
@@ -188,7 +182,6 @@ man_pages = [
     (master_doc, 'flyte', u'Flyte Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -201,13 +194,24 @@ texinfo_documents = [
      'Miscellaneous'),
 ]
 
-
 # -- Extension configuration -------------------------------------------------
 
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+# intersphinx configuration
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable", None),
+    "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "torch": ("https://pytorch.org/docs/master/", None),
+    "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
+    "matplotlib": ("https://matplotlib.org", None),
+    "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
+    # "flytekit": ("/Users/ytong/go/src/github.com/flyteorg/flytekit/docs/build/html", None),
+    "flytectl": ("https://flytectl.readthedocs.io/en/latest/", None),
+    # "flytectl": ("/Users/ytong/go/src/github.com/flyteorg/flytectl/docs/build/html", None),
+}
 
 # -- Options for todo extension ----------------------------------------------
 
