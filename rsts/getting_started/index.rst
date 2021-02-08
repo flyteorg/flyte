@@ -8,7 +8,7 @@ and run it on your local machine, and then finally deploy Flyte to a cloud provi
 
 TODO: Fill out the remainder of this list!
 
-* Getting started with the flytekit sdk:
+* Getting started with the flytekit sdk (<5 seconds):
 
 .. code-block:: text
 
