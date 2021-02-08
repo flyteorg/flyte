@@ -4,7 +4,7 @@
 Writing Your First Workflow
 ########################################
 
-By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow, run and then deploy it locally.
+By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow, run and then deploy it to a sandbox cluster (which can be run locally or on any kubernetes cluster).
 
 The easiest way to author a Flyte Workflow is using the provided python SDK called "FlyteKit".
 
