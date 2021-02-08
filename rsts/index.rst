@@ -15,6 +15,13 @@ Welcome to the documentation hub for Flyte.
    contributor/index
 
 .. toctree::
+   :maxdepth: 2
+   :caption: Getting Started
+   :name: gettingstarteddoctoc
+
+   getting_started/index
+
+.. toctree::
    :caption: Flyte User cookbook and examples (Github)
    :maxdepth: 1
    :name: examplesdoctoc
