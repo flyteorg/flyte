@@ -24,9 +24,10 @@ For Linux, you'll need to have Docker set up. For the local Kubernetes cluster i
 `KinD <https://kind.sigs.k8s.io/docs/user/quick-start>`__ works better than MicroK8s, but this may change in the future.
 Minikube should also work.
 
-.. note:: The Docker daemon typically runs as root in Linux (though there is a new option for running it rootless -
-we haven't tested that with KinD yet, so it may or may not work). Because of this, you may want to use
-``sudo /full/path/to/kind`` and prepend sudo to your kubectl commands as well.
+.. note::
+   The Docker daemon typically runs as root in Linux (though there is a new option for running it rootless -
+   we haven't tested that with KinD yet, so it may or may not work). Because of this, you may want to use
+   ``sudo /full/path/to/kind`` and prepend sudo to your kubectl commands as well.
 
 Mac OS
 ---------
@@ -79,11 +80,13 @@ From within root directory of ``myflyteproject`` you created :ref:`previously <t
 commit any changes and then register them ::
 
 Uploading your workflows to your Flyte deployment requires running the single make target below.
+The command will first build a Docker image containing your code changes (later on we'll cover how to avoid building a
+new Docker image every time you make code changes)
 This invokes a two step process to serialize your Flyte workflow objects into a
 `protobuf <https://developers.google.com/protocol-buffers>`__ representation and then makes the network call to upload
 these serialized protobufs onto the Flyte platform ::
 
-  git add -u && git commit -m "Added an example flyte workflow"
+  git add . && git commit -m "Added an example flyte workflow"
   PROJECT=myflyteproject make register
 
 
