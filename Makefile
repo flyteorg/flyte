@@ -20,11 +20,6 @@ end2end:
 end2end_execute:
 	@end2end/execute.sh
 
-# Builds the entire doc tree. Assumes update_ref_docs has run and that all externals rsts are in _rsts/ dir
-.PHONY: generate-docs
-generate-docs: generate-dependent-repo-docs
-	@FLYTEKIT_VERSION=0.15.4 ./script/generate_docs.sh
-
 # updates referenced docs from other repositories (e.g. flyteidl, flytekit)
 .PHONY: generate-dependent-repo-docs
 generate-dependent-repo-docs:
