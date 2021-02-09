@@ -9,4 +9,5 @@ Getting started and Tutorials
    :caption: Flyte Tutorials
    :name: tutorialsecstoc
 
-   tutorials/getting_started
+   getting_started/index
+   Learn to use Flytekit by example <https://flytecookbook.readthedocs.io/en/latest/>
