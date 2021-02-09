@@ -35,14 +35,7 @@ Welcome to the documentation hub for Flyte.
    dive_deep/index
 
 .. toctree::
-   :caption: Contributors Guide
-   :maxdepth: 1
-   :name: contributetoc
-
-   contribute/index
-
-.. toctree::
-   :caption: Community
+   :caption: Project Plan & Contributors guide
    :maxdepth: 1
    :name: roadmaptoc
 
