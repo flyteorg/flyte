@@ -4,16 +4,6 @@ Flyte
 Flyte is a structured programming and distributed processing platform created at Lyft that enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 Welcome to the documentation hub for Flyte.
 
------
-
-Link to flytekit page :std:doc:`flytekit:tasks`
-
-Link to flytekit page :std:doc:`random words<flytekit:tasks>`
-
-Link to flytekit code :py:function:`flytekit:flytekit.task`
-
------
-
 .. toctree::
    :maxdepth: 2
    :caption: Flyte Documentation
