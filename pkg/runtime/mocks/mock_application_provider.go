@@ -5,12 +5,13 @@ import (
 )
 
 type MockApplicationProvider struct {
-	dbConfig            interfaces.DbConfig
-	topLevelConfig      interfaces.ApplicationConfig
-	schedulerConfig     interfaces.SchedulerConfig
-	remoteDataConfig    interfaces.RemoteDataConfig
-	notificationsConfig interfaces.NotificationsConfig
-	domainsConfig       interfaces.DomainsConfig
+	dbConfig             interfaces.DbConfig
+	topLevelConfig       interfaces.ApplicationConfig
+	schedulerConfig      interfaces.SchedulerConfig
+	remoteDataConfig     interfaces.RemoteDataConfig
+	notificationsConfig  interfaces.NotificationsConfig
+	domainsConfig        interfaces.DomainsConfig
+	externalEventsConfig interfaces.ExternalEventsConfig
 }
 
 func (p *MockApplicationProvider) GetDbConfig() interfaces.DbConfig {
@@ -59,4 +60,12 @@ func (p *MockApplicationProvider) GetDomainsConfig() *interfaces.DomainsConfig {
 
 func (p *MockApplicationProvider) SetDomainsConfig(domainsConfig interfaces.DomainsConfig) {
 	p.domainsConfig = domainsConfig
+}
+
+func (p *MockApplicationProvider) SetExternalEventsConfig(externalEventsConfig interfaces.ExternalEventsConfig) {
+	p.externalEventsConfig = externalEventsConfig
+}
+
+func (p *MockApplicationProvider) GetExternalEventsConfig() *interfaces.ExternalEventsConfig {
+	return &p.externalEventsConfig
 }
