@@ -6,7 +6,6 @@ labels: enhancement, untriaged
 assignees: ''
 
 ---
-**[ ] Is this a blocker for you to adopt Flyte**
 
 **Motivation: Why do you think this is important?**
 A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] OR why this would be a cool addition OR which usecases could this unblock.
