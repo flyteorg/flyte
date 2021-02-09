@@ -16,6 +16,7 @@ const scheduler = "scheduler"
 const remoteData = "remoteData"
 const notifications = "notifications"
 const domains = "domains"
+const externalEvents = "externalEvents"
 
 var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfigSection{})
 var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.ApplicationConfig{})
@@ -23,6 +24,7 @@ var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.Schedule
 var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.RemoteDataConfig{})
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{})
 var domainsConfig = config.MustRegisterSection(domains, &interfaces.DomainsConfig{})
+var externalEventsConfig = config.MustRegisterSection(externalEvents, &interfaces.ExternalEventsConfig{})
 
 // Implementation of an interfaces.ApplicationConfiguration
 type ApplicationConfigurationProvider struct{}
@@ -72,6 +74,11 @@ func (p *ApplicationConfigurationProvider) GetNotificationsConfig() *interfaces.
 func (p *ApplicationConfigurationProvider) GetDomainsConfig() *interfaces.DomainsConfig {
 	return domainsConfig.GetConfig().(*interfaces.DomainsConfig)
 }
+
+func (p *ApplicationConfigurationProvider) GetExternalEventsConfig() *interfaces.ExternalEventsConfig {
+	return externalEventsConfig.GetConfig().(*interfaces.ExternalEventsConfig)
+}
+
 func NewApplicationConfigurationProvider() interfaces.ApplicationConfiguration {
 	return &ApplicationConfigurationProvider{}
 }

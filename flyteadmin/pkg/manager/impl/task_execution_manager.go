@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/golang/protobuf/proto"
+	notificationInterfaces "github.com/lyft/flyteadmin/pkg/async/notifications/interfaces"
+
 	"github.com/lyft/flytestdlib/storage"
 
 	"github.com/lyft/flytestdlib/contextutils"
@@ -40,14 +43,16 @@ type taskExecutionMetrics struct {
 	ClosureSizeBytes           prometheus.Summary
 	TaskExecutionInputBytes    prometheus.Summary
 	TaskExecutionOutputBytes   prometheus.Summary
+	PublishEventError          prometheus.Counter
 }
 
 type TaskExecutionManager struct {
-	db            repositories.RepositoryInterface
-	config        runtimeInterfaces.Configuration
-	storageClient *storage.DataStore
-	metrics       taskExecutionMetrics
-	urlData       dataInterfaces.RemoteURLInterface
+	db                 repositories.RepositoryInterface
+	config             runtimeInterfaces.Configuration
+	storageClient      *storage.DataStore
+	metrics            taskExecutionMetrics
+	urlData            dataInterfaces.RemoteURLInterface
+	notificationClient notificationInterfaces.Publisher
 }
 
 func getTaskExecutionContext(ctx context.Context, identifier *core.TaskExecutionIdentifier) context.Context {
@@ -171,6 +176,11 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 	} else if common.IsTaskExecutionTerminal(request.Event.Phase) && request.Event.PhaseVersion == 0 {
 		m.metrics.ActiveTaskExecutions.Dec()
 		m.metrics.TaskExecutionsTerminated.Inc()
+	}
+
+	if err = m.notificationClient.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		m.metrics.PublishEventError.Inc()
+		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
 
 	m.metrics.TaskExecutionEventsCreated.Inc()
@@ -310,9 +320,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	return response, nil
 }
 
-func NewTaskExecutionManager(
-	db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore,
-	scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface) interfaces.TaskExecutionInterface {
+func NewTaskExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface, publisher notificationInterfaces.Publisher) interfaces.TaskExecutionInterface {
 	metrics := taskExecutionMetrics{
 		Scope: scope,
 		ActiveTaskExecutions: scope.MustNewGauge("active_executions",
@@ -333,12 +341,15 @@ func NewTaskExecutionManager(
 			"size in bytes of serialized node execution inputs"),
 		TaskExecutionOutputBytes: scope.MustNewSummary("output_size_bytes",
 			"size in bytes of serialized node execution outputs"),
+		PublishEventError: scope.MustNewCounter("publish_event_error",
+			"overall count of publish event errors when invoking publish()"),
 	}
 	return &TaskExecutionManager{
-		db:            db,
-		config:        config,
-		storageClient: storageClient,
-		metrics:       metrics,
-		urlData:       urlData,
+		db:                 db,
+		config:             config,
+		storageClient:      storageClient,
+		metrics:            metrics,
+		urlData:            urlData,
+		notificationClient: publisher,
 	}
 }

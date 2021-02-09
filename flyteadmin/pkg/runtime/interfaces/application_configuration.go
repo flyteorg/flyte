@@ -146,6 +146,29 @@ type NotificationsEmailerConfig struct {
 	Body string `json:"body"`
 }
 
+// This section handles configuration for the workflow notifications pipeline.
+type EventsPublisherConfig struct {
+	// The topic which events should be published, e.g. node, task, workflow
+	TopicName string `json:"topicName"`
+	// Event types: task, node, workflow executions
+	EventTypes []string `json:"eventTypes"`
+}
+
+type ExternalEventsConfig struct {
+	Enable bool `json:"enable"`
+	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
+	// scheme is used.
+	Type      string    `json:"type"`
+	AWSConfig AWSConfig `json:"aws"`
+	GCPConfig GCPConfig `json:"gcp"`
+	// Publish events to a pubsub tops
+	EventsPublisherConfig EventsPublisherConfig `json:"eventsPublisher"`
+	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
+	ReconnectAttempts int `json:"reconnectAttempts"`
+	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
+	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
+}
+
 // Configuration specific to notifications handling
 type NotificationsConfig struct {
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
@@ -182,4 +205,5 @@ type ApplicationConfiguration interface {
 	GetRemoteDataConfig() *RemoteDataConfig
 	GetNotificationsConfig() *NotificationsConfig
 	GetDomainsConfig() *DomainsConfig
+	GetExternalEventsConfig() *ExternalEventsConfig
 }

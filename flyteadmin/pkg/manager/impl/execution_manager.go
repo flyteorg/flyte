@@ -64,6 +64,7 @@ type executionSystemMetrics struct {
 	SpecSizeBytes            prometheus.Summary
 	ClosureSizeBytes         prometheus.Summary
 	AcceptanceDelay          prometheus.Summary
+	PublishEventError        prometheus.Counter
 }
 
 type executionUserMetrics struct {
@@ -89,6 +90,7 @@ type ExecutionManager struct {
 	namedEntityManager        interfaces.NamedEntityInterface
 	resourceManager           interfaces.ResourceInterface
 	qualityOfServiceAllocator executions.QualityOfServiceAllocator
+	eventPublisher            notificationInterfaces.Publisher
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -1004,6 +1006,10 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 			return nil, err
 		}
 	}
+	if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		m.systemMetrics.PublishEventError.Inc()
+		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
+	}
 
 	m.systemMetrics.ExecutionEventsCreated.Inc()
 	return &admin.WorkflowExecutionEventResponse{}, nil
@@ -1326,20 +1332,12 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized execution closure"),
 		AcceptanceDelay: scope.MustNewSummary("acceptance_delay",
 			"delay in seconds from when an execution was requested to be created and when it actually was"),
+		PublishEventError: scope.MustNewCounter("publish_event_error",
+			"overall count of publish event errors when invoking publish()"),
 	}
 }
 
-func NewExecutionManager(
-	db repositories.RepositoryInterface,
-	config runtimeInterfaces.Configuration,
-	storageClient *storage.DataStore,
-	workflowExecutor workflowengineInterfaces.Executor,
-	systemScope promutils.Scope,
-	userScope promutils.Scope,
-	publisher notificationInterfaces.Publisher,
-	urlData dataInterfaces.RemoteURLInterface,
-	workflowManager interfaces.WorkflowInterface,
-	namedEntityManager interfaces.NamedEntityInterface) interfaces.ExecutionInterface {
+func NewExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, workflowExecutor workflowengineInterfaces.Executor, systemScope promutils.Scope, userScope promutils.Scope, publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface, workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, eventPublisher notificationInterfaces.Publisher) interfaces.ExecutionInterface {
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
@@ -1369,6 +1367,7 @@ func NewExecutionManager(
 		namedEntityManager:        namedEntityManager,
 		resourceManager:           resourceManager,
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),
+		eventPublisher:            eventPublisher,
 	}
 }
 

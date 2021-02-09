@@ -99,6 +99,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
+	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	go func() {
 		logger.Info(context.Background(), "Started processing notifications.")
 		processor.StartProcessing()
@@ -131,10 +132,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
 		adminScope.NewSubScope("workflow_manager"))
 	namedEntityManager := manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager"))
-	executionManager := manager.NewExecutionManager(
-		db, configuration, dataStorageClient, workflowExecutor, adminScope.NewSubScope("execution_manager"),
-		adminScope.NewSubScope("user_execution_metrics"), publisher, urlData, workflowManager,
-		namedEntityManager)
+	executionManager := manager.NewExecutionManager(db, configuration, dataStorageClient, workflowExecutor, adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"), publisher, urlData, workflowManager, namedEntityManager, eventPublisher)
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
 	logger.Info(context.Background(), "Successfully initialized a new scheduled workflow executor")
@@ -160,10 +158,10 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		LaunchPlanManager:  launchPlanManager,
 		ExecutionManager:   executionManager,
 		NamedEntityManager: namedEntityManager,
-		NodeExecutionManager: manager.NewNodeExecutionManager(
-			db, configuration, dataStorageClient, adminScope.NewSubScope("node_execution_manager"), urlData),
-		TaskExecutionManager: manager.NewTaskExecutionManager(
-			db, configuration, dataStorageClient, adminScope.NewSubScope("task_execution_manager"), urlData),
+		NodeExecutionManager: manager.NewNodeExecutionManager(db, configuration, dataStorageClient,
+			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher),
+		TaskExecutionManager: manager.NewTaskExecutionManager(db, configuration, dataStorageClient,
+			adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher),
 		ProjectManager:  manager.NewProjectManager(db, configuration),
 		ResourceManager: resources.NewResourceManager(db, configuration.ApplicationConfiguration()),
 		Metrics:         InitMetrics(adminScope),

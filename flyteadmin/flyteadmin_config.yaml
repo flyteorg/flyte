@@ -78,6 +78,14 @@ notifications:
       Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
       <a href=\http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
       http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+externalEvents:
+  Enable: false
+  type: gcp
+  gcp:
+    projectId: "foo"
+  eventsPublisher:
+    topicName: "bar"
+    eventTypes: all
 Logger:
   show-source: true
   level: 6
