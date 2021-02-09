@@ -199,7 +199,8 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-# intersphinx configuration
+# intersphinx configuration. Uncomment the repeats with the local paths and update your username
+# to help with local development.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "numpy": ("https://numpy.org/doc/stable", None),
@@ -208,9 +209,9 @@ intersphinx_mapping = {
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
     "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
-    # "flytekit": ("/Users/ytong/go/src/github.com/flyteorg/flytekit/docs/build/html", None),
+    # "flytekit": ("/Users/yourusername/go/src/github.com/flyteorg/flytekit/docs/build/html", None),
     "flytectl": ("https://flytectl.readthedocs.io/en/latest/", None),
-    # "flytectl": ("/Users/ytong/go/src/github.com/flyteorg/flytectl/docs/build/html", None),
+    # "flytectl": ("/Users/yourusername/go/src/github.com/flyteorg/flytectl/docs/build/html", None),
 }
 
 # -- Options for todo extension ----------------------------------------------
