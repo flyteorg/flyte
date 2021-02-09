@@ -1,0 +1,92 @@
+.. _tutorials-getting-started:
+
+########################################
+Writing Your First Workflow
+########################################
+
+By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow and run it locally.
+
+The easiest way to author a Flyte Workflow is using the provided python SDK called "FlyteKit".
+
+You can save some effort by cloning the ``flytekit-python-template`` repo, and re-initializing it as a new git repository ::
+
+  pip install flytekit==0.16.6b
+  git clone git@github.com:lyft/flytekit-python-template.git myflyteproject
+  cd myflyteproject
+  rm -rf .git
+  git init
+
+Writing a Task
+*****************
+
+The most basic Flyte primitive is a "task". Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the Flyte Python SDK - flytekit.
+
+Start by creating a new file ::
+
+
+   touch myapp/workflows/first.py
+
+
+And add the required imports we'll need for this example:
+
+
+.. code-block:: python
+
+  import flytekit
+  from flytekit import task, workflow
+  from flytekit.types.file import FlyteFile
+
+From there, we can begin to write our first task.  It should look something like this:
+
+.. code-block:: python
+
+    def greet(name: str="world") -> FlyteFile:
+        working_dir = flytekit.current_context().working_directory
+        output_file = '{}/greeting.txt'.format(working_dir)
+
+        greeting = f"Hello {name}"
+        with open(output_file,"a") as output:
+            output.write(greeting)
+
+        print(greeting)
+        return FlyteFile["txt"](path=output_file)
+
+
+Some of the new concepts demonstrated here are:
+
+* Use the :py:func:`flytekit.task` decorator to convert your typed python function to a Flyte task.
+* A :py:class:`flytekit.types.file.FlyteFile` is a Flytekit type that represents binary data.  It is used to offload data to a storage location like S3.  Here we use it to store an image.
+
+
+You can call this task
+
+.. code-block:: python
+
+   greet(name="world")
+
+and iterate locally before adding it to part of a larger overall workflow.
+
+Writing a Workflow
+*********************
+Next you need to call that task from a workflow.  In the same file, add these lines.
+
+.. code-block:: python
+
+   @workflow
+   class GreeterWorkflow(name: str="world") -> FlyteFile:
+       greeting_file = greet(name=name)
+       return greeting_file
+
+This code block creates a workflow, with one task. The workflow itself has an input (the link to an image) that gets passed into the task, and an output, which is the processed image.
+
+You can call this workflow
+
+.. code-block:: python
+
+   GreeterWorkflow(name=...)
+
+iterate locally before moving on to register it with Flyte.
+
+.. note::
+
+   Every invocation of a Flyte workflow requires specifying keyword args.
