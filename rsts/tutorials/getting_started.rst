@@ -6,6 +6,8 @@ Writing Your First Workflow
 
 By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow and run it locally.
 
+Estimated time to complete: <5 minutes.
+
 The easiest way to author a Flyte Workflow is using the provided python SDK called "FlyteKit".
 
 You can save some effort by cloning the ``flytekit-python-template`` repo, and re-initializing it as a new git repository ::
