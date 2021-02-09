@@ -1,4 +1,8 @@
-.. _multi_cluster:
+.. _howto_multi_cluster:
+
+#########################################
+How Do I use Multiple Kubernetes Clusters
+#########################################
 
 Scaling Beyond Kubernetes
 -------------------------

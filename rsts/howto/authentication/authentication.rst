@@ -1,8 +1,8 @@
-.. _install-authentication:
+.. _howto_authentication:
 
-#################
-Authentication
-#################
+#######################################
+How to setup Authentication
+#######################################
 
 Flyte Admin ships with a canonical implementation of OAuth2, integrating seamlessly into an organization's existing identity provider.  At Lyft, we use Okta as the IDP, but if you have issues integrating with another implementation of the OAuth server, please open an issue.
 
