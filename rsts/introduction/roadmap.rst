@@ -4,24 +4,22 @@
 Roadmap
 ###############
 
-How the core team works
-========================
-Flyte is used actively in production at Lyft and its various subsidiaries. The core team is very customer focused and cares deeply about a high quality customer experience. Thus we always
+How the community works?
+=========================
+Flyte is used actively in production at multiple companies. We pride ourselves at being extremely customer focused and cares deeply about a high quality customer experience. Thus we always
 prioritize stability, reliability, observability and maintainability over raw feature development. Features are developed usually in response to specific use cases and user scenarios. That being said,
 we are proactively thinking about the evolution of the system and how we want to keep adapting to changing requirements. Thus most of our changes reflect future development scenarios and in
 cases where we feel rapid prototyping would enable us to discover potential pitfalls or uncover hidden use cases we would proactively develop features, behind feature flags.
 
-We want to extend the same sense of customer obsession to our Open Source community. We would love to hear use cases that various teams are solving and see how we could adapt parts of Flyte to meet
-those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines. 
+Thus, it is extremely important to let the community know about your use cases and how we could adapt parts of Flyte to meet those requirements. We welcome collaboration and contributions, but please follow our Contribution Guidelines. 
 
 
 Milestones and Releases
 ========================
 Flyte consists of many components and services. In true Agile fashion each service is independently iterated and co-ordiated by maintaing backwards compatible contracts using protobuf defined in :ref:`flyteidltoc`. Thus components like flytekit, flytepropeller, datacatalog are independently versioned.
 
-We have decided to release a new version of the overall platform in the github.com/lyft/flyte repo every month. Thus we create one milestone for end of every month which points to a new release of
-Flyte. This may change in the future, but to match our velocity of development this is our preferred option. Every release will be associated with a CHANGELOG and we will communicate over our
-communication medium.
+We have decided to release a new version of the overall platform in the `flyte repo <https://github.com/flyteorg/flyte>`_ every month. Thus we create one milestone for end of every month which points to a new release of
+Flyte. This may change in the future, but to match our velocity of development this is our preferred option. Every release will be associated with a CHANGELOG (in the repo).
 
 Change management
 ------------------
@@ -33,69 +31,47 @@ To ensure that changes are trackable and the history is explainable, we use a sl
 
 Release Train
 --------------
-- We will start tagging issues with milestones, every new issue will be associated with the next milestone. If the issue is not completed by the milestone, or the contributor feels it may slip the deadline, they should manually move it to the next milestone. Every issue not removed, will be moved to the next milestone.
+- We tag issues with milestones, every new issue will be associated with the next milestone. If the issue is not completed by the milestone, or the contributor feels it may slip the deadline, they should manually move it to the next milestone. Every issue not removed, will be moved to the next milestone.
 - Every new issue has a “untriaged” label associated with, if we remove this label we should add an assignee. If a contributor is working on the issue, please remove this label.
 - Release indicates a release for overall flyte - marked mostly by a milestone.
 - Flyte release are monthly
 - We may have patch releases eg. 0.1.x in between the monthly releases.
 
-Upcoming Features
-=================
+Upcoming Features & Issues
+==========================
 
-1. flytekit python overhaul.
-   Goal: Make flyte almost invisible to the user.
-   - Use python native typing system - 0 ramp to learn types
-   - Ability to execute everything locally (in some cases mocking out things)
-   - minimal imports - just one import for task and workflow
-   - simplified extensibility for types and task-types in flytekit
+Issues by Theme
+----------------
+
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Theme       | Description                                                    | Open Issues                                                                | Comment                                                                                                     |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Bugs        | Currently known and open bugs                                  | `#Issues <https://github.com/flyteorg/flyte/labels/bug>`_                  | We are always working on bugs. Open a new one `here <https://github.com/flyteorg/flyte/issues/new/choose>`_ |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Security    | Issues related to security enhancements                        | `#Issues <https://github.com/flyteorg/flyte/labels/security>`_             |                                                                                                             |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Docs        | All the issues open with our documentation.                    | `#Issues <https://github.com/flyteorg/flyte/labels/documentation>`_        | Feb 2021, we are completely overhauling our docs. feedback appreciated!                                     |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Features    | All the new features in development                            | `#Issues <https://github.com/flyteorg/flyte/labels/enhancement>`_          |                                                                                                             |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| plugins     | New capabilities, plugins that are being built into Flyte.     | `#Issues <https://github.com/flyteorg/flyte/labels/plugins>`_              | This is one of the best place to get started contributing to Flyte. Issues with both                        |
+|             | These could be hosted services, K8s native execution etc       |                                                                            | labels `plugins` and `flytekit` refer to purely client side plugins and are the fastest to contribute       |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| scale       | These issues deal with performance,  reliability and           | `#Issues <https://github.com/flyteorg/flyte/labels/scale>`_                | We are always working on these issues and we would love to head feedback about what you                     |
+|             | scalability of Flyte                                           |                                                                            | would want to change or what should we prioritize                                                           |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
+| Contribute  | If you are looking to contribute and want a great first issue, | `#Issues <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`_ | These are the best issues to get started with                                                               |
+|             | look at these issues                                           |                                                                            |                                                                                                             |
++-------------+----------------------------------------------------------------+----------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------+
 
 
-Sneak Peek
+Issues by Components
+---------------------
 
-.. code-block:: python
-  :linenos:
-
-
-  from flytekit import task, workflow
-
-  @task
-  def t1(a: int) -> pandas.DataFrame:
-      return pandas.DataFrame(data={"col1": [a, 2], "col2": [a, 4]})
-
-  @task
-  def t2(df: pandas.DataFrame) -> pandas.DataFrame:
-      return df.append(pandas.DataFrame(data={"col1": [5, 10], "col2": [5, 10]}))
-
-  @workflow
-  def my_wf(a: int) -> pandas.DataFrame:
-      return t2(df=t1(a=a))
-
-  print(my_wf(a=20))
-
-Output
-
-::
-
-        col1  col2
-    0    20    20
-    1     2     4
-    0     5     5
-    1    10    10
-
-2. flytekit java feature complete
-
-3. flyte workflows and tasks inline documentation support and visualization
-
-4. Visualization of Blobs in UI/Console
-
-5. Performance visualization of Task execution
-
-6. Faster iteration support (no container building)
-
-7. Data Lineage and Provenance visualization
-
-8. More plugins
-
-9. Observability stack open source
-
-10. Getting started overhaul
++--------------+-----------------------------------------------+----------------------------------------------------------------+--------------------------------------------+
+| Theme        | Description                                   | Open Issues                                                    | Comment                                    |
++--------------+-----------------------------------------------+----------------------------------------------------------------+--------------------------------------------+
+| flyteconsole | Issues on FlyteConsole (Flytes UI)            | `#Issues <https://github.com/flyteorg/flyte/labels/ui>`_       | These are great issues to get started with |
++--------------+-----------------------------------------------+----------------------------------------------------------------+--------------------------------------------+
+| flytectl     | Issues on flytectl (standalone CLI for flyte) | `#Issues <https://github.com/flyteorg/flyte/labels/flytectl>`_ | Great issues to start with                 |
++--------------+-----------------------------------------------+----------------------------------------------------------------+--------------------------------------------+
