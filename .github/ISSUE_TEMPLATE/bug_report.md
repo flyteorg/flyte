@@ -14,7 +14,7 @@ A clear and concise description of what the bug is.
 A clear and concise description of what you expected to happen.
 
 
-**[Optional]Additional context**
+**[Optional] Additional context**
 ***To Reproduce***
 Steps to reproduce the behavior:
 1. 
