@@ -217,24 +217,27 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 func addConfig(sparkConfig map[string]string, key string, value string) {
 
 	if strings.ToLower(strings.TrimSpace(value)) != "true" {
+		sparkConfig[key] = value
 		return
 	}
 
 	matches := featureRegex.FindAllStringSubmatch(key, -1)
 	if len(matches) == 0 || len(matches[0]) == 0 {
+		sparkConfig[key] = value
 		return
 	}
 	featureName := matches[0][len(matches[0])-1]
+
 	// Use the first matching feature in-case of duplicates.
 	for _, feature := range GetSparkConfig().Features {
 		if feature.Name == featureName {
 			for k, v := range feature.SparkConfig {
 				sparkConfig[k] = v
 			}
-			break
+			return
 		}
-
 	}
+	sparkConfig[key] = value
 }
 
 // Convert SparkJob ApplicationType to Operator CRD ApplicationType

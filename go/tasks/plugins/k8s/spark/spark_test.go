@@ -45,6 +45,7 @@ var (
 		"spark.executor.memory":        "500M",
 		"spark.flyte.feature1.enabled": "true",
 		"spark.lyft.feature2.enabled":  "true",
+		"spark.lyft.feature3.enabled":  "true",
 	}
 
 	dummyEnvVars = []*core.KeyValuePair{
@@ -391,7 +392,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	for confKey, confVal := range dummySparkConf {
 		exists := false
 
-		if featureRegex.MatchString(confKey) {
+		if featureRegex.MatchString(confKey) && confKey != "spark.lyft.feature3.enabled" {
 			match := featureRegex.FindAllStringSubmatch(confKey, -1)
 			feature := match[0][len(match[0])-1]
 			assert.True(t, feature == "feature1" || feature == "feature2")
@@ -417,6 +418,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.driver.limit.cores"])
 	assert.Equal(t, dummySparkConf["spark.executor.cores"], sparkApp.Spec.SparkConf["spark.kubernetes.executor.limit.cores"])
 	assert.Greater(t, len(sparkApp.Spec.SparkConf["spark.kubernetes.driverEnv.FLYTE_START_TIME"]), 1)
+	assert.Equal(t, dummySparkConf["spark.lyft.feature3.enabled"], sparkApp.Spec.SparkConf["spark.lyft.feature3.enabled"])
 
 	assert.Equal(t, len(sparkApp.Spec.Driver.EnvVars["FLYTE_MAX_ATTEMPTS"]), 1)
 
