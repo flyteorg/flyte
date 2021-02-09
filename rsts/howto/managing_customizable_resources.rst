@@ -1,8 +1,8 @@
-.. _managing_customizable_resources:
+.. _howto_managing_customizable_resources:
 
-##################################
-Configuring customizable resources
-##################################
+########################################################################################
+How do I configure my Flyte deployment to have specialized behavior per project/domain?
+########################################################################################
 
 As the complexity of your user base grows, you may find yourself tweaking resource assignments based on specific projects, domains and workflows. This document walks through how and in what ways you can configure your Flyte deployment.
 
