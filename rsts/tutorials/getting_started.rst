@@ -75,7 +75,7 @@ Next you need to call that task from a workflow.  In the same file, add these li
 .. code-block:: python
 
    @workflow
-   class GreeterWorkflow(name: str="world") -> FlyteFile:
+   def GreeterWorkflow(name: str="world") -> FlyteFile:
        greeting_file = greet(name=name)
        return greeting_file
 
