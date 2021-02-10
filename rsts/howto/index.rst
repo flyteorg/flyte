@@ -17,6 +17,7 @@ How Do I ...
    execute_workflow
    enable_and_use_memoization
    productionize/index
+   launchplans
    managing_customizable_resources
    create_plugin
    enable_and_use_schedules

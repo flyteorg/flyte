@@ -1,4 +1,4 @@
-.. _features-observability:
+.. _dive_deep-observability:
 
 Metrics for your executions
 ===========================

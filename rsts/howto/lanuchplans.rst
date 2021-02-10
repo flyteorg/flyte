@@ -1,7 +1,8 @@
-.. _fetaures-lanuchplans:
+.. _howto-lanuchplans:
 
-Flyte Launchplans
-#################
+################################
+How do I add more launch plans?
+################################
 
 When to use launchplans?
 ========================
