@@ -16,7 +16,58 @@ Installing Flyte Locally
 Prerequisites
 =============
 
-Kubernetes and its ``kubectl`` client are the only strict prerequisites to installing Flyte.
+#. Ensure ``kubectl`` is installed. Follow ..
+#. If running locally ensure you have docker installed
+    - Docker for Mac
+    - docker daemon on Linux
+
+Steps
+======
+
+.. tabs::
+
+    .. tab:: Using k3d
+
+        #. Install k3d Using ``curl``::
+
+            curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
+           Or Using ``wget`` ::
+
+            wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
+
+        #. Start a new K3s cluster called flyte::
+
+            k3d cluster create -p "30081:30081" --no-lb --k3s-server-arg '--no-deploy=traefik' --k3s-server-arg '--no-deploy=servicelb' flyte
+
+        #. Ensure the context is set to the new cluster::
+
+            kubectl config set-context flyte
+
+        #. Install Flyte::
+
+            kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
+
+
+        #. Connect to `FlyteConsole <localhost:30081/console>`_
+        #. [Optional] You can delete the cluster once you are done with the tutorial using - ::
+
+            k3d cluster delete flyte
+
+
+        .. note::
+
+            #. Sometimes Flyteconsole will not open up. This is probably because your docker networking is impacted. One solution is to restart docker and re-do the previous steps.
+            #. To debug you can try a simple excercise - run nginx as follows::
+
+                docker run -it --rm -p 8083:80 nginx
+
+               Now connect to `locahost:8083 <localhost:8083>`_. If this does not work, then for sure the networking is impacted, please restart docker daemon.
+
+    .. tab:: Using Docker for Mac
+
+
+
 
 Linux
 -------
