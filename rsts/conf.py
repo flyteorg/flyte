@@ -83,6 +83,7 @@ hoverxref_roles = [
     'confval',
     'setting',
     'doc',
+    'ref',
 ]
 
 
