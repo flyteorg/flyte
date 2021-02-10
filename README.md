@@ -7,6 +7,7 @@
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
 ![GitHub milestones Completed](https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic)
 ![GitHub next milestone percentage](https://img.shields.io/github/milestones/progress-percent/lyft/flyte/11?style=plastic)
+[![Docs](https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic)](https://flyte.rtfd.io)
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://forms.gle/UVuek9WfBoweiqcJA)
 
