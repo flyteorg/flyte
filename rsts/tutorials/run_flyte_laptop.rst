@@ -40,7 +40,7 @@ Flyte Sandbox Deployment
 The simplest Flyte deployment is the "sandbox" deployment, which includes everything you need in order to use Flyte.
 The Flyte sandbox can be deployed with a single command ::
 
-  kubectl create -f https://raw.githubusercontent.com/lyft/flyte/master/deployment/sandbox/flyte_generated.yaml
+  kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
 
 Once the deployment comes up (this will take a moment or two) you should be able to verify that Flyte is running locally
 by visiting `http://localhost:80/console <http://localhost:80/console>`__
