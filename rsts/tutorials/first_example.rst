@@ -44,7 +44,7 @@ Similarly, you can call this workflow
 
 .. code-block:: python
 
-   GreeterWorkflow(name=...)
+   hello_world(name=...)
 
 and iterate locally before moving on to register it with Flyte.
 
