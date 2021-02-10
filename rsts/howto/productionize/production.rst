@@ -163,8 +163,11 @@ Dynamically Configured Projects
 
 As your Flyte user-base evolves, adding new projects is as simple as registering them through the cli ::
 
-    flyte-cli -h {{ your-flyte-admin-host.com }} register-project --identifier myuniqueworkflow --name FriendlyWorkflowName 
+  flyte-cli register-project -h {{ your-flyte-admin-host.com }}  -p myflyteproject --name "My Flyte Project" \
+    --description "My very first project onboarding onto Flyte"
 
 A cron which runs at the cadence specified in flyteadmin config will ensure that all the kubernetes resources necessary for the new project are created and new workflows can successfully
 be registered and executed under the new project.
+
+This project should immediately show up in the Flyte console after refreshing.
 

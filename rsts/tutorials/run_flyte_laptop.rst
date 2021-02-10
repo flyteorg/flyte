@@ -76,20 +76,12 @@ Running your Flyte Workflows
 Registration
 ============
 
-
-
 Register your workflows
 -----------------------
 
-From within root directory of ``myflyteproject`` you created :ref:`previously <tutorials-getting-started-first-example>`
+From within root directory of ``flyteexamples`` you created :ref:`previously <tutorials-getting-started-first-example>`
 commit any changes and then register them ::
 
-Uploading your workflows to your Flyte deployment requires running the single make target below.
-The command will first build a Docker image containing your code changes (later on we'll cover how to avoid building a
-new Docker image every time you make code changes)
-This invokes a two step process to serialize your Flyte workflow objects into a
-`protobuf <https://developers.google.com/protocol-buffers>`__ representation and then makes the network call to upload
-these serialized protobufs onto the Flyte platform.
 First lets commit your changes ::
 
   git add . && git commit -m "Added an example flyte workflow"
@@ -98,13 +90,10 @@ Now, lets build a docker image, serialize the protos and register with Flyte Pla
 
   PROJECT=myflyteproject make register
 
-
-Boom! It's that simple.
+.. rubric:: Boom! It's that simple.
 
 Run your workflows
 ------------------
-
-Triggering a workflow is super simple. For now, let's do so through the UI (flyte console).
 
 Visit the page housing workflows registered for your project (method if you used k3d):
 `http://localhost:30081/console/projects/myflyteproject/workflows <http://localhost:30081/console/projects/myflyteproject/workflows>`__
