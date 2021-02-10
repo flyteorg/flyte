@@ -101,10 +101,10 @@ Run your workflows
 ------------------
 
 Visit the page housing workflows registered for your project (method if you used k3d):
-`http://localhost:30081/console/projects/myflyteproject/workflows <http://localhost:30081/console/projects/myflyteproject/workflows>`__
+`http://localhost:30081/console/projects/flyteexamples/workflows <http://localhost:30081/console/projects/flyteexamples/workflows>`__
 else if you used docker-desktop or something else, then copy paste this URL into the browser and fill in the ``<host:port>``::
 
-    http://<host:port>/console/projects/myflyteproject/workflows
+    http://<host:port>/console/projects/flyteexamples/workflows
 
 
 Select your workflow, click the bright purple "Launch Workflow" button in the upper right, update the "name" input
