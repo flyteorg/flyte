@@ -76,19 +76,24 @@ Running your Flyte Workflows
 Registration
 ============
 
+Prerequisites
+-------------
+
+In a separate process, port-forward the flyte minio service. If you're using a locally deployed Flyte sandbox, simply: ::
+
+  kubectl -n flyte port-forward service/minio 9000
+
+
 Register your workflows
 -----------------------
 
 From within root directory of ``flyteexamples`` you created :ref:`previously <tutorials-getting-started-first-example>`
-commit any changes and then register them ::
+feel free to make any changes and then register ::
 
-First lets commit your changes ::
+  FLYTE_AWS_ENDPOINT=http://localhost:9000 FLYTE_AWS_ACCESS_KEY_ID=minio  \
+    FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage make fast_register
 
-  git add . && git commit -m "Added an example flyte workflow"
-
-Now, lets build a docker image, serialize the protos and register with Flyte Platform::
-
-  PROJECT=myflyteproject make register
+If you're port-forwarding minio somewhere else, substitute the ``FLYTE_AWS_ENDPOINT`` accordingly.
 
 .. rubric:: Boom! It's that simple.
 
