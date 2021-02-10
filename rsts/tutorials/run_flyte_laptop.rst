@@ -4,22 +4,24 @@
 Run Your Workflow on a Local Flyte
 ##################################
 
+************************
+Installing Flyte Locally
+************************
+
 This guide will walk you through a quick installation of Flyte on your laptop and then how to register and execute your
 workflows against this deployment.
 
 Estimated time to complete: 5 minutes.
 
-************************
-Installing Flyte Locally
-************************
-
 Prerequisites
 =============
 
-#. Ensure ``kubectl`` is installed. Follow ..
-#. If running locally ensure you have docker installed
-    - Docker for Mac
-    - docker daemon on Linux
+#. Ensure ``kubectl`` is installed. Follow docs `here <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
+
+    brew install kubectl
+
+#. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
+#. If you prefer to run the Sandbox cluster on a hosted environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`_, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`_.
 
 Steps
 ======
@@ -66,43 +68,6 @@ Steps
 
     .. tab:: Using Docker for Mac
 
-
-
-
-Linux
--------
-For Linux, you'll need to have Docker set up. For the local Kubernetes cluster itself, we've found that
-`KinD <https://kind.sigs.k8s.io/docs/user/quick-start>`__ works better than MicroK8s, but this may change in the future.
-Minikube should also work.
-
-.. note::
-   The Docker daemon typically runs as root in Linux (though there is a new option for running it rootless -
-   we haven't tested that with KinD yet, so it may or may not work). Because of this, you may want to use
-   ``sudo /full/path/to/kind`` and prepend sudo to your kubectl commands as well.
-
-Mac OS
----------
-For Macs, we recommend `Docker Desktop <https://www.docker.com/products/docker-desktop>`__. Docker Desktop ships with a
-Kubernetes cluster, which is the easiest option to use. One can also use KinD.
-
-Flyte Sandbox Deployment
-========================
-
-The simplest Flyte deployment is the "sandbox" deployment, which includes everything you need in order to use Flyte.
-The Flyte sandbox can be deployed with a single command ::
-
-  kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
-
-Once the deployment comes up (this will take a moment or two) you should be able to verify that Flyte is running locally
-by visiting `http://localhost:80/console <http://localhost:80/console>`__
-
-For Linux, you'll need to forward the port over before being able to hit that link with your browser
-
-See note above on sudo ::
-
-  sudo kubectl -n flyte port-forward service/contour 80:80
-
-(for Minikube deployment, you need to run minikube tunnel and use the ip that Minikube tunnel outputs)
 
 ****************************
 Running your Flyte Workflows
