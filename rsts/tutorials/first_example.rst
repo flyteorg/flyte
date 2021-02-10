@@ -12,7 +12,7 @@ The easiest way to author a Flyte Workflow is using the provided python SDK call
 
 You can save some effort by cloning the ``flytekit-python-template`` repo, and re-initializing it as a new git repository ::
 
-  pip install flytekit==0.16.6b
+  pip install flytekit==0.16.0b6
   git clone git@github.com:lyft/flytekit-python-template.git myflyteproject
   cd myflyteproject
   rm -rf .git

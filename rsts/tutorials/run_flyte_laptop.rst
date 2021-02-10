@@ -117,7 +117,7 @@ Register a new project (optional)
 Once your Flyte deployment is up running you'll see a few example projects registered in the console. For the sake of this
 exercise, let's create a new project you'll use to register your new workflows, but before that, if you have not already, install flytekit ::
 
-  pip install flytekit==0.16.6b  # if you haven't already
+  pip install flytekit==0.16.0b6  # if you haven't already
 
 After installing flytekit, you can using ``flyte-cli`` to register a project ::
 

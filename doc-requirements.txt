@@ -42,6 +42,7 @@ pygments==2.7.4
     # via
     #   sphinx
     #   sphinx-prompt
+    #   sphinx-tabs
 pyparsing==2.4.7
     # via packaging
 python-slugify[unidecode]==4.0.1
@@ -70,6 +71,8 @@ sphinx-material==0.0.32
     # via -r doc-requirements.in
 sphinx-prompt==1.3.0
     # via -r doc-requirements.in
+sphinx-tabs==2.0.1
+    # via -r doc-requirements.in
 sphinx==3.4.3
     # via
     #   -r doc-requirements.in
@@ -78,6 +81,7 @@ sphinx==3.4.3
     #   sphinx-copybutton
     #   sphinx-material
     #   sphinx-prompt
+    #   sphinx-tabs
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
