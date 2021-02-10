@@ -1,8 +1,8 @@
 .. _tutorials-getting-started-flyte-hosted:
 
-###################################
-Run Your Workflow on a Hosted Flyte
-###################################
+##############################################
+[Optional] Run Your Workflow on a Hosted Flyte
+##############################################
 
 *************
 Prerequisites
