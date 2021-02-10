@@ -19,20 +19,15 @@ Welcome to the documentation hub for Flyte.
    :name: howtoguidestoc
 
    howto/index
+   faq/index
 
 .. toctree::
-   :caption: Reference: SDK, API & CLI
-   :maxdepth: 1
-   :name: referencetoc
-
-   reference/index
-
-.. toctree::
-   :caption: Diving Deep: Concepts & Architecture
+   :caption: Diving Deep: Architecture, Concepts & API reference
    :maxdepth: 1
    :name: divedeeptoc
 
    dive_deep/index
+   reference/index
 
 .. toctree::
    :caption: Project Plan & Contributors guide
@@ -41,16 +36,3 @@ Welcome to the documentation hub for Flyte.
 
    community/index
 
-.. toctree::
-   :caption: Generated Documentation from Source
-   :maxdepth: 1
-   :name: sourcecodedocstoc
-
-   Flytekit Python - Learn by Example <https://flytecookbook.readthedocs.io/en/latest/>
-   Flyte Core Language Specification (FlyteIDL) <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>
-   Flytekit Python <https://flyte.readthedocs.io/projects/flytekit/en/master/>
-   Flytekit JAVA  <https://github.com/spotify/flytekit-java>
-   FlytePropeller <https://pkg.go.dev/mod/github.com/lyft/flytepropeller>
-   FlyteAdmin <https://pkg.go.dev/mod/github.com/lyft/flyteadmin>
-   FlytePlugins <https://pkg.go.dev/mod/github.com/lyft/flyteplugins>
-   DataCatalog <https://pkg.go.dev/mod/github.com/lyft/datacatalog>
