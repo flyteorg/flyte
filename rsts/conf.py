@@ -57,12 +57,12 @@ extensions = [
 ]
 
 extlinks = {
-    'propeller': ('https://github.com/lyft/flytepropeller/tree/master/%s', ''),
-    'stdlib': ('https://github.com/lyft/flytestdlib/tree/master/%s', ''),
-    'kit': ('https://github.com/lyft/flytekit/tree/master/%s', ''),
-    'plugins': ('https://github.com/lyft/flyteplugins/tree/v0.1.4/%s', ''),
-    'idl': ('https://github.com/lyft/flyteidl/tree/v0.14.1/%s', ''),
-    'admin': ('https://github.com/lyft/flyteadmin/tree/master/%s', ''),
+    'propeller': ('https://github.com/flyteorg/flytepropeller/tree/master/%s', ''),
+    'stdlib': ('https://github.com/flyteorg/flytestdlib/tree/master/%s', ''),
+    'kit': ('https://github.com/flyteorg/flytekit/tree/master/%s', ''),
+    'plugins': ('https://github.com/flyteorg/flyteplugins/tree/v0.1.4/%s', ''),
+    'idl': ('https://github.com/flyteorg/flyteidl/tree/v0.14.1/%s', ''),
+    'admin': ('https://github.com/flyteorg/flyteadmin/tree/master/%s', ''),
 }
 
 # Add any paths that contain templates here, relative to this directory.
