@@ -76,37 +76,14 @@ Running your Flyte Workflows
 Registration
 ============
 
-Register a new project (optional)
----------------------------------
-
-Once your Flyte deployment is up running you'll see a few example projects registered in the console. For the sake of this
-exercise, let's create a new project you'll use to register your new workflows, but before that, if you have not already, install flytekit ::
-
-  pip install flytekit==0.16.0b6  # if you haven't already
-
-After installing flytekit, you can using ``flyte-cli`` to register a project ::
-
-  flyte-cli register-project -i -h localhost:80 -p myflyteproject --name "My Flyte Project" \
-    --description "My very first project onboarding onto Flyte"
-
-
-If you refresh your `console <http://localhost:80/console>`__ you'll see your new project appear!
-
 Register your workflows
 -----------------------
 
-From within root directory of ``myflyteproject`` you created :ref:`previously <tutorials-getting-started-first-example>`
+From within root directory of ``flyteexamples`` you created :ref:`previously <tutorials-getting-started-first-example>`
 commit any changes and then register them ::
 
-Uploading your workflows to your Flyte deployment requires running the single make target below.
-The command will first build a Docker image containing your code changes (later on we'll cover how to avoid building a
-new Docker image every time you make code changes)
-This invokes a two step process to serialize your Flyte workflow objects into a
-`protobuf <https://developers.google.com/protocol-buffers>`__ representation and then makes the network call to upload
-these serialized protobufs onto the Flyte platform ::
-
   git add . && git commit -m "Added an example flyte workflow"
-  PROJECT=myflyteproject make register
+  PROJECT=flyteexamples make register
 
 
 Boom! It's that simple.
@@ -114,10 +91,8 @@ Boom! It's that simple.
 Run your workflows
 ------------------
 
-Triggering a workflow is super simple. For now, let's do so through the UI (flyte console).
-
 Visit the page housing workflows registered for your project:
-`http://localhost/console/projects/myflyteproject/workflows <http://localhost/console/projects/myflyteproject/workflows>`__
+`http://localhost:30081/console/projects/flyteexamples/workflows <http://localhost:30081/console/projects/flyteexamples/workflows>`__
 
 Select your workflow, click the bright purple "Launch Workflow" button in the upper right, update the "name" input
 argument as you please, proceed to launch and you'll have triggered an execution!
