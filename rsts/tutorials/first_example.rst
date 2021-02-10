@@ -8,58 +8,29 @@ By the end of this getting started guide you'll be familiar with how easy it is 
 
 Estimated time to complete: <3 minutes.
 
-The easiest way to author a Flyte Workflow is using the provided python SDK called "FlyteKit".
 
-You can save some effort by cloning the ``flytekit-python-template`` repo, and re-initializing it as a new git repository ::
+Prerequisites
+*************
+
+First install the python Flytekit SDK and clone the ``flytekit-python-template`` repo ::
 
   pip install flytekit==0.16.0b6
-  git clone git@github.com:lyft/flytekit-python-template.git myflyteproject
+  git clone git@github.com:flyteorg/flytekit-python-template.git flyteexamples
   cd myflyteproject
   rm -rf .git
   git init
 
-Writing a Task
-*****************
 
-The most basic Flyte primitive is a "task". Flyte Tasks are units of work that can be composed in a workflow. The simplest way to write a Flyte task is using the Flyte Python SDK - flytekit.
+Flyte Tasks and Workflows
+*************************
 
-Start by creating a new file ::
+Let's take a look at the example workflow found in `myapp/workflows/example.py <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py>`__
 
+.. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/myapp/workflows/example.py
+   :language: python
 
-   touch myapp/workflows/first.py
-
-
-And add the required imports we'll need for this example:
-
-
-.. code-block:: python
-
-  import flytekit
-  from flytekit import task, workflow
-  from flytekit.types.file import FlyteFile
-
-From there, we can begin to write our first task.  It should look something like this:
-
-.. code-block:: python
-
-    @task
-    def persist_and_greet(name: str) -> str:
-        working_dir = flytekit.current_context().working_directory
-        output_file = '{}/greeting.txt'.format(working_dir)
-
-        greeting = f"Hello {name}"
-        with open(output_file,"a") as output:
-            output.write(greeting)
-
-        print(greeting)
-        return greeting
-
-
-Some of the new concepts demonstrated here are:
-
-* Use the :py:func:`flytekit.task` decorator to convert your typed python function to a Flyte task.
-* A :py:meth:`flytekit.current_context` is a Flytekit entity that represents the execution context.  It is useful for getting run-time parameters such as the current working dir.
-
+The most basic Flyte primitive is a :std:doc:`task <flytekit:tasks>`.
+Flyte tasks are units of work that can be composed in a :std:doc:`workflow <flytekit:workflow>`.
 
 You can call this task
 
@@ -69,26 +40,13 @@ You can call this task
 
 and iterate locally before adding it to part of a larger overall workflow.
 
-Writing a Workflow
-*********************
-Next you need to call that task from a workflow.  In the same file, add these lines.
+Similarly, you can call this workflow
 
 .. code-block:: python
 
-   @workflow
-   def GreeterWorkflow(name: str="world") -> str:
-        greeting = persist_greet(name=name)
-        return greeting
+   hello_world(name=...)
 
-This code block creates a workflow, with one task. The workflow itself has an input (the link to an image) that gets passed into the task, and an output, which is the processed image.
-
-You can call this workflow
-
-.. code-block:: python
-
-   GreeterWorkflow(name=...)
-
-iterate locally before moving on to register it with Flyte.
+and iterate locally before moving on to register it with Flyte.
 
 .. note::
 

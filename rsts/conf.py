@@ -53,6 +53,7 @@ extensions = [
     "sphinx-prompt",
     "sphinx_copybutton",
     "sphinx_tabs.tabs",
+    "sphinxext.remoteliteralinclude",
 ]
 
 extlinks = {

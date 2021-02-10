@@ -5,3 +5,4 @@ sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
 sphinx-tabs
+sphinxext-remoteliteralinclude
