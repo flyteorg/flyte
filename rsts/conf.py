@@ -97,6 +97,7 @@ pygments_style = 'sphinx'
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
+html_favicon = "images/flyte_circle_gradient_1_4x4.png"
 html_logo = "images/flyte_circle_gradient_1_4x4.png"
 html_static_path = []
 html_theme = "sphinx_material"

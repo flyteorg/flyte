@@ -11,7 +11,7 @@ Installing Flyte Locally
 This guide will walk you through a quick installation of Flyte on your laptop and then how to register and execute your
 workflows against this deployment.
 
-Estimated time to complete: 5 minutes.
+.. rubric:: Estimated time to complete: 5 minutes.
 
 Prerequisites
 =============
@@ -21,7 +21,7 @@ Prerequisites
     brew install kubectl
 
 #. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
-#. If you prefer to run the Sandbox cluster on a hosted environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`_, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`_.
+#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`_, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`.
 
 Steps
 ======
@@ -76,21 +76,7 @@ Running your Flyte Workflows
 Registration
 ============
 
-Register a new project (optional)
----------------------------------
 
-Once your Flyte deployment is up running you'll see a few example projects registered in the console. For the sake of this
-exercise, let's create a new project you'll use to register your new workflows, but before that, if you have not already, install flytekit ::
-
-  pip install flytekit==0.16.0b6  # if you haven't already
-
-After installing flytekit, you can using ``flyte-cli`` to register a project ::
-
-  flyte-cli register-project -i -h localhost:80 -p myflyteproject --name "My Flyte Project" \
-    --description "My very first project onboarding onto Flyte"
-
-
-If you refresh your `console <http://localhost:80/console>`__ you'll see your new project appear!
 
 Register your workflows
 -----------------------
@@ -103,9 +89,13 @@ The command will first build a Docker image containing your code changes (later 
 new Docker image every time you make code changes)
 This invokes a two step process to serialize your Flyte workflow objects into a
 `protobuf <https://developers.google.com/protocol-buffers>`__ representation and then makes the network call to upload
-these serialized protobufs onto the Flyte platform ::
+these serialized protobufs onto the Flyte platform.
+First lets commit your changes ::
 
   git add . && git commit -m "Added an example flyte workflow"
+
+Now, lets build a docker image, serialize the protos and register with Flyte Platform::
+
   PROJECT=myflyteproject make register
 
 
@@ -116,11 +106,25 @@ Run your workflows
 
 Triggering a workflow is super simple. For now, let's do so through the UI (flyte console).
 
-Visit the page housing workflows registered for your project:
-`http://localhost/console/projects/myflyteproject/workflows <http://localhost/console/projects/myflyteproject/workflows>`__
+Visit the page housing workflows registered for your project (method if you used k3d):
+`http://localhost:30081/console/projects/myflyteproject/workflows <http://localhost:30081/console/projects/myflyteproject/workflows>`__
+else if you used docker-desktop or something else, then copy paste this URL into the browser and fill in the ``<host:port>``::
+
+    http://<host:port>/console/projects/myflyteproject/workflows
+
 
 Select your workflow, click the bright purple "Launch Workflow" button in the upper right, update the "name" input
 argument as you please, proceed to launch and you'll have triggered an execution!
 
-There are ways to trigger executions using the ``flyte-cli`` command line or even the underlying REST API, but for the
-purposes of this tutorial we won't get into them quite yet.
+.. note::
+
+    After registration Flyte Workflows exist in the FlyteAdmin service and can be triggered using the
+      - console
+      - Command line
+      - directly invoking the REST API
+      - on a schedule
+    More on this later
+
+Optionally you can create a new project
+----------------------------------------
+Refer to :ref:`howto_new_project`.
