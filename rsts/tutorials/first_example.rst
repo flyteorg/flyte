@@ -6,11 +6,13 @@ Writing Your First Workflow
 
 By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow and run it locally.
 
-Estimated time to complete: <3 minutes.
+.. rubric:: Estimated time to complete: <3 minutes.
 
 
 Prerequisites
 *************
+
+Ensure that you have `git <https://git-scm.com/>`__ installed.
 
 First install the python Flytekit SDK and clone the ``flytekit-python-template`` repo ::
 
