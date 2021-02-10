@@ -1,7 +1,8 @@
-.. _features-interruptible
+.. _howto-interruptible
 
-Interruptible
-####################
+###########################################################
+How do I use Spot, Pre-emptible Instances? Interruptible?
+###########################################################
 
 What is interruptible?
 ======================
@@ -27,14 +28,9 @@ In order to run your workload on spot, you can set interruptible to True. Exampl
 
 .. code-block:: python
 
-    @inputs(value_to_print=Types.Integer)
-    @outputs(out=Types.Integer)
-    @python_task(cache_version='1', interruptible=True)
-    def add_one_and_print(workflow_parameters, value_to_print, out):
-        workflow_parameters.stats.incr("task_run")
-        added = value_to_print + 1
-        print("My printed value: {}".format(added))
-        out.set(added)
+    @task(cache_version='1', interruptible=True)
+    def add_one_and_print(value_to_print: int) -> int:
+        return value_to_print + 1
 
 
 By setting this value, Flyte will schedule your task on an ASG with only spot instances. In the case your task gets preempted, Flyte will retry your task on a non-spot instance. This retry will not count towards a retry that a user sets.
@@ -48,3 +44,9 @@ Most Flyte workloads should be good candidates for spot instances. If your task 
 * Time sensitive. I need this to run now and can not have any unexpected delays.
 * Side Effects. My task is not idempotent and retrying will cause issues.
 * Long Running Task. My task takes  > 2 hours. Having an interruption during this time frame could potentially waste a lot of computation already done.
+
+
+How to recover from interruptions?
+===================================
+
+.. todo: Intra-task checkpointing coming soon

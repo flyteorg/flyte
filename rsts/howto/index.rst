@@ -5,7 +5,7 @@ How Do I ...
 ########################
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: How To Guides
    :name: howtoguidestoc
 
@@ -26,3 +26,5 @@ How Do I ...
    authentication/index
    resource_manager/index
    fast_registration
+   multi_cluster/index
+   interruptible
