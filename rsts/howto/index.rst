@@ -28,3 +28,4 @@ How Do I ...
    fast_registration
    multi_cluster/index
    interruptible
+   labels_annotations
