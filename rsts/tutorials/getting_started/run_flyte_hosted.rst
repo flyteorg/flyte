@@ -1,8 +1,8 @@
 .. _tutorials-getting-started-flyte-hosted:
 
-###################################
-Run Your Workflow on a Hosted Flyte
-###################################
+##############################################
+[Optional] Run Your Workflow on a Hosted Flyte
+##############################################
 
 *************
 Prerequisites
@@ -61,7 +61,7 @@ For the sake of this exercise, let's create a new project you'll use to register
 
 Once again, commit your changes and register them like so ::
 
-  git add -u && git commit -m "Added an example flyte workflow"
+  git add . && git commit -m "Added an example flyte workflow"
   PROJECT=myflyteproject FLYTE_HOST=localhost:80 make register
 
 Replace ``localhost`` with your external IP if you are **not** port-forwarding the service.

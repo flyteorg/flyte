@@ -42,7 +42,8 @@ From there, we can begin to write our first task.  It should look something like
 
 .. code-block:: python
 
-    def greet(name: str="world") -> FlyteFile:
+    @task
+    def persist_and_greet(name: str) -> str:
         working_dir = flytekit.current_context().working_directory
         output_file = '{}/greeting.txt'.format(working_dir)
 
@@ -51,13 +52,13 @@ From there, we can begin to write our first task.  It should look something like
             output.write(greeting)
 
         print(greeting)
-        return FlyteFile["txt"](path=output_file)
+        return greeting
 
 
 Some of the new concepts demonstrated here are:
 
 * Use the :py:func:`flytekit.task` decorator to convert your typed python function to a Flyte task.
-* A :py:class:`flytekit.types.file.FlyteFile` is a Flytekit type that represents binary data.  It is used to offload data to a storage location like S3.  Here we use it to store an image.
+* A :py:meth:`flytekit.current_context` is a Flytekit entity that represents the execution context.  It is useful for getting run-time parameters such as the current working dir.
 
 
 You can call this task
@@ -75,9 +76,9 @@ Next you need to call that task from a workflow.  In the same file, add these li
 .. code-block:: python
 
    @workflow
-   def GreeterWorkflow(name: str="world") -> FlyteFile:
-       greeting_file = greet(name=name)
-       return greeting_file
+   def GreeterWorkflow(name: str="world") -> str:
+        greeting = persist_greet(name=name)
+        return greeting
 
 This code block creates a workflow, with one task. The workflow itself has an input (the link to an image) that gets passed into the task, and an output, which is the processed image.
 

@@ -10,4 +10,5 @@ Getting started and Tutorials
    :name: tutorialsecstoc
 
    getting_started/index
-   Learn to use Flytekit by example <https://flytecookbook.readthedocs.io/en/latest/>
+   Learn to use Flytekit python by example <https://flytecookbook.readthedocs.io/en/latest/>
+   [Coming soon] Learn to use Flytekit-java by example
