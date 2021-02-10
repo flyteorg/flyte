@@ -4,3 +4,9 @@
 Conributors handbook
 #######################################
 
+.. toctree::
+   :caption: contribute
+   :maxdepth: 1
+   :name: communitycontributetoc
+
+   docs

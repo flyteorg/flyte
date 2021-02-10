@@ -19,6 +19,6 @@ so please join us on the
    :maxdepth: 1
    :name: communityinnertoc
 
-   contributing
+   contribute/index
    roadmap
    compare

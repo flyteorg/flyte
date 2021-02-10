@@ -5,13 +5,14 @@ How Do I ...
 ########################
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: How To Guides
    :name: howtoguidestoc
 
-   install_flytekit_py
-   install_flytekit_java
+   install_sdk
    sandbox/index
+   flytecli
+   new_project
    execute_single_task
    execute_workflow
    enable_and_use_memoization
@@ -24,3 +25,4 @@ How Do I ...
    performance/index
    authentication/index
    resource_manager/index
+   fast_registration

@@ -1,10 +1,10 @@
 .. _fast_registration:
 
+********************************
+How do I use Fast Registration?
+********************************
 
-*****************
-Fast Registration
-*****************
-
+.. caution:: Experimental feature (beta)
 
 Are you frustrated by having to wait for an image build in order to test out simple code changes to your Flyte workflows? If you're interested in reducing to your iteration cycle to mere seconds, read on below.
 
@@ -64,6 +64,8 @@ Or, from within your container:
 
 * Open the Flyte UI and launch the latest version of your workflow (under the domain you fast-registered above). It should run with your new code!
 
+
+.. deprecated:: The following section is deprecated
 
 Older flytekit instructions (flytekit <0.16.0)
 ==============================================

@@ -1,8 +1,12 @@
 .. _features-flytecli:
 
-#########
-Flyte CLI
-#########
+########################
+How do I use Flyte CLI?
+########################
+
+.. note::
+
+    We are working hard on replacing flyte-cli, with a more robust, better designed and cross platform CLI. Refer to :std:doc:`flytectl`.
 
 ***************************************************
 A command-line interface for interacting with Flyte
