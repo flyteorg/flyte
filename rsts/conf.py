@@ -214,7 +214,8 @@ intersphinx_mapping = {
     "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
     # "flytekit": ("/Users/yourusername/go/src/github.com/flyteorg/flytekit/docs.rst/build/html", None),
     "flytectl": ("https://flytectl.readthedocs.io/en/latest/", None),
-    # "flytectl": ("/Users/yourusername/go/src/github.com/flyteorg/flytectl/docs.rst/build/html", None),
+    # "flytectl": ("/Users/yourusername/go/src/github.com/flyteorg/flytectl/docs/build/html", None),
+    "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
 }
 
 # -- Options for todo extension ----------------------------------------------
