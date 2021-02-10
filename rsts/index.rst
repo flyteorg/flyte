@@ -12,6 +12,7 @@ Welcome to the documentation hub for Flyte.
    :name: tutorialstoc
 
    tutorials/index
+   plugins/index
 
 .. toctree::
    :caption: How to Guides
