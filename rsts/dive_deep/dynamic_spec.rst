@@ -1,4 +1,4 @@
-.. _concepts-dynamic-spec:
+.. _divedeep-dynamic-spec:
 
 Dynamic Job Spec
 ================

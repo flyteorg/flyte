@@ -1,4 +1,4 @@
-.. _dive_deep_overview:
+.. _divedeep_overview:
 
 ####################
 Logical Overview
@@ -41,4 +41,4 @@ an inventory of available tasks, workflows and launchplans declared per project
 and domain. A scheduled or on-demand execution can then be launched against one of
 the registered entities.
 
-Refer to the `dive_deep_architecture`_ to get an overview of the system architecture.
+Refer to the `divedeep-architecture`_ to get an overview of the system architecture.

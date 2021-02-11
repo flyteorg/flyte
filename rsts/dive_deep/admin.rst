@@ -1,4 +1,4 @@
-.. _components-admin:
+.. _divedeep-admin:
 
 ##########
 FlyteAdmin
@@ -24,7 +24,7 @@ methods to process requests.
 
 A detailed explanation of the service can be found in the :ref:`admin service <components-admin-service>` page.
 
-.. _components-admin-manager:
+.. _divedeep-admin-manager:
 
 Managers
 --------
@@ -41,7 +41,7 @@ The Admin API is broken up into entities:
 
 Each API entity has an entity manager in FlyteAdmin reposible for implementing business logic for the entity.
 Entity managers handle full validation for create, update and get requests, and
-data persistence in the backing store (see the :ref:`repository <components-admin-repository>` section).
+data persistence in the backing store (see the :ref:`divedeep-admin-repository`_ section).
 
 
 Additional Components
@@ -54,7 +54,7 @@ The managers utilize additional components to process requests. These additional
 - **:ref:`runtime <components-admin-config>`**: loads values from a config file to assign task resources, initialization values, execution queues and more.
 - **:ref:`async processes <components-admin-async>`**: provides functions for scheduling and executing workflows as well as enqueuing and triggering notifications
 
-.. _components-admin-repository:
+.. _divedeep-admin-repository:
 
 Repository
 ----------
@@ -86,7 +86,7 @@ These convert entities from the database format to a response format for the ext
 If you change either of these structures, you will find you must change the corresponding transformers.
 
 
-.. _components-admin-async:
+.. _divedeep-admin-async:
 
 Component Details
 =================
@@ -109,7 +109,7 @@ Common
 
 As the name implies, ``common`` houses shared components used across different flyteadmin components in a single, top-level directory to avoid cyclic dependencies. These components include execution naming and phase utils, query filter definitions, query sorting definitions, and named constants.
 
-.. _components-admin-data:
+.. _divedeep-admin-data:
 
 Data
 ----
@@ -121,13 +121,13 @@ Errors
 
 The errors directory contains centrally defined errors that are designed for compatibility with gRPC statuses.
 
-.. _components-admin-config:
+.. _divedeep-admin-config:
 
 Runtime
 -------
 Values specific to the flyteadmin application as well as task and workflow registration and execution are configured in the `runtime <https://github.com/lyft/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
-.. _components-admin-workflowengine:
+.. _divedeep-admin-workflowengine:
 
 Workflowengine
 --------------

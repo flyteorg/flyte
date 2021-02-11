@@ -1,4 +1,4 @@
-.. _dive_deep-observability:
+.. _divedeep-observability:
 
 Metrics for your executions
 ===========================

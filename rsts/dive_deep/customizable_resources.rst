@@ -1,4 +1,4 @@
-.. _components-customizable-resources:
+.. _divedeep-customizable-resources:
 
 #############################
 Adding customizable resources

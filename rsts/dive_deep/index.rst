@@ -1,4 +1,4 @@
-.. _dive_deep:
+.. _divedeep:
 
 ##########################################
 Architecture, Concepts and API Reference

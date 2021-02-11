@@ -1,4 +1,4 @@
-.. _concepts-projects:
+.. _divedeep-projects:
 
 Projects
 ========
