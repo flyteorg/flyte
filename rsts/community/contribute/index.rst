@@ -1,7 +1,7 @@
 .. _community_contribute:
 
 #######################################
-Conributors handbook
+Conributor Handbook
 #######################################
 
 .. toctree::

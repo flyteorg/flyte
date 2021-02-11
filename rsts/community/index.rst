@@ -1,7 +1,7 @@
 .. _community:
 
 #####################################
-Community, Roadmap and Contributions
+Community, Roadmap, and Contributions
 #####################################
 
 Flyte is an ambitious open source project and would not be possible without an
