@@ -46,7 +46,7 @@ How-to:
 
 Or, from within your container:
 
- .. code-block:: python 
+ .. code-block:: text
 
     pyflyte --config /root/sandbox.config serialize fast workflows -f _pb_output/ 
 
@@ -55,7 +55,7 @@ Or, from within your container:
    but with an new flag pointing to an additional distribution dir. This must be writable from the role you assume and readable from
    the role your flytepropeller assumes:
 
- .. code-block:: python 
+ .. code-block:: text
 
     flyte-cli fast-register-files -p flytetester -d development --kubernetes-service-account ${FLYTE_AUTH_KUBERNETES_SERVICE_ACCOUNT} \
         --output-location-prefix ${FLYTE_AUTH_RAW_OUTPUT_DATA_PREFIX} -h ${FLYTE_PLATFORM_URL} \

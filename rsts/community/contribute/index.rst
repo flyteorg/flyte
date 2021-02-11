@@ -10,3 +10,4 @@ Conributors handbook
    :name: communitycontributetoc
 
    docs
+   admin

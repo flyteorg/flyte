@@ -6,7 +6,8 @@ How do I use Flyte CLI?
 
 .. note::
 
-    We are working hard on replacing flyte-cli, with a more robust, better designed and cross platform CLI. Refer to :std:doc:`flytectl`.
+    We are working hard on replacing flyte-cli, with a more robust, better designed and cross platform CLI.
+    TODO: Refer to ``:std:doc:`flytectl`.`` (link to this when available)
 
 ***************************************************
 A command-line interface for interacting with Flyte
