@@ -70,6 +70,7 @@ For a more complete example refer to :std:ref:`Cookbook Spark Plugin <sphx_glr_a
                 }
             ),
             cache_version="1",
+            cache=True,
         )
         def hello_spark(partitions: int) -> float:
             ...
