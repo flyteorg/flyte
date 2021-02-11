@@ -31,7 +31,7 @@ Pros:
 Cons:
 -----
 #. Short running, bursty jobs are not a great fit - because of the container overhead
-#. No interactive spark capabilities available with Flyte K8s spark. It is useful for running, adhoc and/or scheduled jobs
+#. No interactive spark capabilities available with Flyte K8s spark which is more suited for running, adhoc and/or scheduled jobs
 
 
 How to enable Spark in flyte backend?
