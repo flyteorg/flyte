@@ -7,31 +7,33 @@ Flyte is a structured programming and distributed processing platform created at
 Welcome to the documentation hub for Flyte.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Flyte Documentation
-   :name: mastertoc
+   :maxdepth: 1
+   :caption: Jumpstart with Flyte
+   :name: tutorialstoc
 
-   introduction/index
-   user/index
-   administrator/index
-   contributor/index
+   tutorials/index
+   plugins/index
 
 .. toctree::
-   :caption: Flyte User cookbook and examples (Github)
+   :caption: How to Guides
    :maxdepth: 1
-   :name: examplesdoctoc
+   :name: howtoguidestoc
 
-   Flytekit Python - Learn by Example <https://flytecookbook.readthedocs.io/en/latest/>
+   howto/index
+   faq/index
 
 .. toctree::
-   :caption: Generated Documentation from Source
+   :caption: Diving Deep: Architecture, Concepts & API reference
    :maxdepth: 1
-   :name: sourcecodedocstoc
+   :name: divedeeptoc
 
-   Flyte Core Language Specification (FlyteIDL) <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>
-   Flytekit Python <https://flyte.readthedocs.io/projects/flytekit/en/master/>
-   Flytekit JAVA  <https://github.com/spotify/flytekit-java>
-   FlytePropeller <https://pkg.go.dev/mod/github.com/lyft/flytepropeller>
-   FlyteAdmin <https://pkg.go.dev/mod/github.com/lyft/flyteadmin>
-   FlytePlugins <https://pkg.go.dev/mod/github.com/lyft/flyteplugins>
-   DataCatalog <https://pkg.go.dev/mod/github.com/lyft/datacatalog>
+   dive_deep/index
+   reference/index
+
+.. toctree::
+   :caption: Project Plan & Contributors guide
+   :maxdepth: 1
+   :name: roadmaptoc
+
+   community/index
+
