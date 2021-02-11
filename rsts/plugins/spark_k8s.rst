@@ -1,4 +1,4 @@
-.. _plugins_spark_k8s:
+.. _plugins-spark-k8s:
 
 ########################################
 Run Spark on your Kubernetes Cluster
