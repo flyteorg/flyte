@@ -1,4 +1,4 @@
-.. _howto_enable_backend_plugins:
+.. _howto-enable-backend-plugins:
 
 #################################
 How do I enable backend plugins?
