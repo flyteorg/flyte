@@ -4,7 +4,7 @@
 How do I enable backend plugins?
 #################################
 
-.. tip:: Flyte Backend plugins are awesome, but are not required! You can always write a `flytekit-only plugin`. Refer to :std:ref:`sphx_glr_auto_core_advanced_custom_task_plugin.py`. Also refer to :ref:`howto-create-plugins`.
+.. tip:: Flyte Backend plugins are awesome, but are not required to extend Flyte! You can always write a `flytekit-only plugin`. Refer to :std:ref:`sphx_glr_auto_core_advanced_custom_task_plugin.py`. Also refer to :ref:`howto-create-plugins`.
 
 Flyte has a unique capability of adding backend plugins. Backend plugins enable Flyte platform to learn new capabilities. This has several advantages,
 
@@ -32,4 +32,3 @@ Enable a specific Backend Plugin in your own Kustomize generator
 Flyte uses Kustomize to generate the the deployment configuration and it can be leveraged to `kustomize your own deployment <https://github.com/flyteorg/flyte/tree/master/kustomize>`_.
 
 We will soon be supporting helm or a better deployment model - See issue :issue:`299`.
-
