@@ -15,8 +15,8 @@ In particular you'll need to configure the two components responsible for schedu
 
 Note this functionality is currently only supported for AWS installs.
 
-Event Scheduler
----------------
+Set-up the Event Scheduler
+--------------------------
 
 In order to schedule workflow executions, you'll need to set up an `AWS SQS <https://aws.amazon.com/sqs/>`_ queue. A standard type queue should suffice. The flyteadmin event scheduler creates `AWS CloudWatch <https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html>`_ event rules that invokes your SQS queue as a target.
 
@@ -40,8 +40,8 @@ With that in mind, let's take a look at an example ``eventScheduler`` config sec
 * **targetName** this is the ARN for the SQS Queue you've allocated to scheduling workflows
 * **scheduleNamePrefix** this is an entirely optional prefix used when creating schedule rules. Because of AWS naming length restrictions, scheduled rules are a random hash and having a shared prefix makes these names more readable and indicates who generated the rules
 
-Workflow Executor
------------------
+Set-up the Workflow Executor
+----------------------------
 Scheduled events which trigger need to be handled by the workflow executor, which subscribes to triggered events from the SQS queue you've configured above.
 
 Again, let's break down a sample config: ::
@@ -120,7 +120,7 @@ The full set of parameters which can be used for email templating are checked in
 Example config
 ==============
 
-.. literalinclude:: ../../../../kustomize/overlays/sandbox/admindeployment/flyteadmin_config.yaml
+.. rli:: https://raw.githubusercontent.com/flyteorg/flyteadmin/master/flyteadmin_config.yaml
 
 
 FlyteAdmin Remote Cluster Access

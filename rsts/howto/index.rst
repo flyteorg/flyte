@@ -19,7 +19,7 @@ How Do I ...
    productionize/index
    launchplans
    managing_customizable_resources
-   create_plugin
+   plugins/index
    enable_and_use_schedules
    enable_backend_plugin
    monitoring/index
@@ -31,4 +31,5 @@ How Do I ...
    interruptible
    labels_annotations
    notifications
+   serviceaccount
    

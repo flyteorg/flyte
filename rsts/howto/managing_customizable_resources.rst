@@ -17,7 +17,7 @@ Flyte allows these custom settings along the following combination of dimensions
 - project and domain
 - project, domain, and name (must be either a workflow name or a launch plan name)
 
-Please see the :ref:`concepts` document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.
+Please see the :ref:`concepts-projects` document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.
 
 - Defaults for task resource requests and limits (when not specified by the author of the task).
 - Settings for the cluster resource configuration that feeds into Admin's cluster resource manager.
