@@ -16,7 +16,7 @@ workflows against this deployment.
 Prerequisites
 =============
 
-#. Ensure ``kubectl`` is installed. Follow docs `here <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
+#. Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
 
     brew install kubectl
 
@@ -68,6 +68,7 @@ Steps
 
     .. tab:: Using Docker for Mac
 
+.. _tutorials-run-flyte-laptop:
 
 ****************************
 Running your Flyte Workflows
@@ -76,8 +77,8 @@ Running your Flyte Workflows
 Registration
 ============
 
-Prerequisites
--------------
+Set-up
+------
 
 In a separate process, port-forward the flyte minio service. If you're using a locally deployed Flyte sandbox, simply: ::
 
@@ -117,6 +118,7 @@ argument as you please, proceed to launch and you'll have triggered an execution
       - Command line
       - directly invoking the REST API
       - on a schedule
+
     More on this later
 
 Optionally you can create a new project

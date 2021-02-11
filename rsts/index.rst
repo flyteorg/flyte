@@ -17,7 +17,7 @@ Welcome to the documentation hub for Flyte.
 .. toctree::
    :caption: How to Guides
    :maxdepth: 1
-   :name: howtoguidestoc
+   :name: howtotoc
 
    howto/index
    faq/index

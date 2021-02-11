@@ -13,6 +13,8 @@ Deploy Flyte Sandbox environment locally - on your laptop
 *********************************************************
 
 
+.. _howto-sandbox-dedicated-k8s-cluster:
+
 ******************************************************************
 Deploy Flyte Sandbox environment to a dedicated kubernetes cluster
 ******************************************************************
