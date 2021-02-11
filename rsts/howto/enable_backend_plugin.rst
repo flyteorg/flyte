@@ -6,7 +6,7 @@ How do I enable backend plugins?
 
 .. tip:: Flyte Backend plugins are awesome, but are not required to extend Flyte! You can always write a `flytekit-only plugin`. Refer to :std:ref:`sphx_glr_auto_core_advanced_custom_task_plugin.py`. Also refer to :ref:`howto-create-plugins`.
 
-Flyte has a unique capability of adding backend plugins. Backend plugins enable Flyte platform to learn new capabilities. This has several advantages,
+Flyte has a unique capability of adding backend plugins. Backend plugins enable Flyte platform to add new capabilities. This has several advantages,
 
 #. Advanced introspection capabilities - ways to improve logging etc
 #. Service oriented architecture - ability to bugfix, deploy plugins without releasing new libraries and forcing all users to update their libraries
