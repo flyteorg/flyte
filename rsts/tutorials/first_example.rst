@@ -50,6 +50,4 @@ Similarly, you can call this workflow
 
 and iterate locally before moving on to register it with Flyte.
 
-.. note::
-
-   Every invocation of a Flyte workflow requires specifying keyword args.
+.. tip:: Every invocation of a Flyte workflow requires specifying keyword args.
