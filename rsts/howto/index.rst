@@ -33,5 +33,3 @@ How Do I...?
    labels_annotations
    notifications
    serviceaccount
-
-   
