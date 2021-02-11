@@ -35,7 +35,7 @@ with separate resource isolation and feature configuration.
 :ref:`Launchplans <divedeep-launchplans>` provide a mechanism to specialize input parameters
 for workflows associated different schedules.
 
-:ref:`Registration <divedeep-registrations>` is the process of uploading a workflow and its
+:ref:`Registration <divedeep-registration>` is the process of uploading a workflow and its
 task definitions to the :ref:`FlyteAdmin <divedeep-admin>` service. Registration creates
 an inventory of available tasks, workflows and launchplans declared per project
 and domain. A scheduled or on-demand execution can then be launched against one of

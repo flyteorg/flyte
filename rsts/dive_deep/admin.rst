@@ -19,10 +19,10 @@ FlyteAdmin uses the `grpc-gateway <https://github.com/grpc-ecosystem/grpc-gatewa
 incoming gRPC and HTTP requests with identical handlers. For a more detailed overview of the API,
 including request and response entities, see the admin
 service `definition <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/service/admin.proto>`__. The
-RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate :ref:`manager <components-admin-manager>`.
+RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate :ref:`manager <divedeep-admin-manager>`.
 methods to process requests.
 
-A detailed explanation of the service can be found in the :ref:`admin service <components-admin-service>` page.
+A detailed explanation of the service can be found in the :ref:`admin service <divedeep-admin-service>` page.
 
 .. _divedeep-admin-manager:
 

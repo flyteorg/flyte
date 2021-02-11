@@ -9,10 +9,10 @@ Understanding Registration process
 Typical Flow Using Flytekit
 ---------------------------
 
- * A user defines tasks using the :ref:`Flytekit <user-sdk-python>` Task Definition language 
- * A User defines a workflow using either :ref:`Flytekit <user-sdk-python>` Workflow definition lanugage. 
- * The user then uses flytekit's register cli to compile the tasks into their serialized representation as described in :ref:`Flyte Specification language <user-language>`. During this time the task representation is also bound to a container that contains the code for the task. This associated entity is registered with FlyteAdmin using the registerTask api.
- * The user then uses flytekit's register cli to compile the workflow into their serialized representation as described in :ref:`Flyte Specification language <user-language>`. The referenced tasks are replaced by their Flyte Admin registered Identifier, obtained in the previous step. This associated entity is registered with FlyteAdmin using the registerWorkflow api.
+ * A user defines tasks using the :py:module:`Flytekit <flytekit:flytekit>` Task Definition language
+ * A User defines a workflow using either :py:module:`Flytekit <flytekit:flytekit>` Workflow definition lanugage.
+ * The user then uses flytekit's register cli to compile the tasks into their serialized representation as described in :std:label:`Flyte Specification language <flyteidl:flyteidltoc>`. During this time the task representation is also bound to a container that contains the code for the task. This associated entity is registered with FlyteAdmin using the registerTask api.
+ * The user then uses flytekit's register cli to compile the workflow into their serialized representation as described in :std:label:`Flyte Specification language <flyteidl:flyteidltoc>`. The referenced tasks are replaced by their Flyte Admin registered Identifier, obtained in the previous step. This associated entity is registered with FlyteAdmin using the registerWorkflow api.
  * She can then launch an execution using the FlyteAdmin launch execution API, which requires the necessary inputs provided. This is automatically done if she uses the Flyte-CLI to launch the
    execution.
  * She can later use the FlyteAdmin read API's to get details of the execution,

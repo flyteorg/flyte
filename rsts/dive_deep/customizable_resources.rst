@@ -4,7 +4,7 @@
 Adding customizable resources
 #############################
 
-For background on customizable resources, see :ref:`managing_customizable_resources`. As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values. Examples of such resources include execution clusters, task resource defaults, and `more <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`__.
+For background on customizable resources, see :ref:`howto-managing-customizable-resources`. As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values. Examples of such resources include execution clusters, task resource defaults, and `more <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`__.
 
 
 Example

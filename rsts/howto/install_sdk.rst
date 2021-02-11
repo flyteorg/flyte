@@ -12,7 +12,7 @@ Install is using the following command::
 
 Installing flytekit plugins
 ----------------------------
-All Flytekiplugins are also published to pypi as independent libraries and can be installed using pip. Refer to :ref:`plugins`_.
+All Flytekiplugins are also published to pypi as independent libraries and can be installed using pip. Refer to :ref:`plugins`.
 
 
 .. _install-flytekit-java:

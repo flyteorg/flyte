@@ -14,7 +14,8 @@ I tried to run examples, but task fails with 401 error?
 
   gcloud auth list
 
- NOTE:
- FlytePropeller uses Google Application credentials, but gsutil does not use these credentials
+.. note::
+
+    FlytePropeller uses Google Application credentials, but gsutil does not use these credentials
 
 

@@ -1,4 +1,4 @@
-.. _config-admin:
+.. _howto-notifications:
 
 ####################################################
 How do I configure Flyte for scheduling Workflows?

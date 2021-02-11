@@ -1,4 +1,4 @@
-.. _howto_managing_customizable_resources:
+.. _howto-managing-customizable-resources:
 
 ########################################################################################
 How do I configure my Flyte deployment to have specialized behavior per project/domain?
@@ -17,7 +17,7 @@ Flyte allows these custom settings along the following combination of dimensions
 - project and domain
 - project, domain, and name (must be either a workflow name or a launch plan name)
 
-Please see the :ref:`concepts-projects` document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.
+Please see the :ref:`divedeep-projects` document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.
 
 - Defaults for task resource requests and limits (when not specified by the author of the task).
 - Settings for the cluster resource configuration that feeds into Admin's cluster resource manager.
@@ -80,10 +80,7 @@ Execution queues themselves are currently defined in the
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
 stored in the Admin database.
 
-Command
--------
-
-.. code-block:: console
+.. prompt:: bash
 
     curl --request PUT 'https://flyte.company.net/api/v1/workflow_attributes/project/domain/YourWorkflowName' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"executionQueueAttributes":{"tags":["my_queue"]}}}}'
 

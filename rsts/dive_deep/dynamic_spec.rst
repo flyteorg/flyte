@@ -6,7 +6,7 @@ Dynamic Job Spec
 A dynamic job spec is a subset of the full workflow spec that defines a set of tasks, workflows as well as 
 nodes and output bindindgs that control how the job should assemble its outputs.
 
-This spec is currently only supported as an intermediate step in running :ref:`Dynamic Tasks <dynamic-task-type>`.
+This spec is currently only supported as an intermediate step in running Dynamic Tasks.
 
 .. code-block:: protobuf
    :caption: Dynamic job spec in Protobuf
@@ -23,17 +23,17 @@ This spec is currently only supported as an intermediate step in running :ref:`D
 Tasks
 -----
 
-Defines one or more :ref:`Tasks <concepts-tasks>` that can then be referenced in the spec.
+Defines one or more :ref:`Tasks <divedeep-tasks>` that can then be referenced in the spec.
 
 Subworkflows
 ------------
 
-Defines zero or more :ref:`Workflows <concepts-workflows>` that can then be referenced in the spec.
+Defines zero or more :ref:`Workflows <divedeep-workflows>` that can then be referenced in the spec.
 
 Nodes
 -----
 
-Defines one or more :ref:`Nodes <concepts-nodes>` that can run in parallel to produce the final outputs of the spec.
+Defines one or more :ref:`Nodes <divedeep-nodes>` that can run in parallel to produce the final outputs of the spec.
 
 Outputs
 -------

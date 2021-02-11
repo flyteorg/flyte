@@ -1,4 +1,4 @@
-.. _howto-interruptible
+.. _howto-interruptible:
 
 ###########################################################
 How do I use Spot, Pre-emptible Instances? Interruptible?

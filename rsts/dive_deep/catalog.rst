@@ -9,11 +9,11 @@ Data Catalog (https://github.com/lyft/datacatalog) is a service for indexing par
 How Flyte Memoizes Task Executions on Data Catalog
 --------------------------------------------------
 
-Flyte :ref:`memoizes task executions<_concepts_catalog>` by creating artifacts in Data Catalog and associating meta information regarding the execution with the artifact. Let's walk through what happens when a task execution is cached on Data Catalog.
+Flyte ``memoizes task executions`` by creating artifacts in Data Catalog and associating meta information regarding the execution with the artifact. Let's walk through what happens when a task execution is cached on Data Catalog.
 
 Every task instance is represented as a DataSet:
 
-.. code-block:: JSON
+.. code-block:: javascript
 
     Dataset {
        project: Flyte project the task was registered in
@@ -24,7 +24,7 @@ Every task instance is represented as a DataSet:
 
 Every task execution is represented as an Artifact in the Dataset above:
 
-.. code-block:: JSON
+.. code-block:: javascript
 
     Artifact {
        id: uuid
@@ -40,7 +40,7 @@ Every task execution is represented as an Artifact in the Dataset above:
 
 To retrieve the Artifact, we tag the Artifact with a hash of the input values for the memoized task execution.
 
-.. code-block:: JSON
+.. code-block:: javascript
 
     ArtifactTag {
        Name: flyte_cached-<unique hash of the input values>

@@ -9,7 +9,7 @@ Entities
 The `admin service definition <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/service/admin.proto>`__ defines REST operations for the entities
 flyteadmin administers.
 
-As a refresher, the primary :ref:`entities <concepts>` across Flyte map similarly to FlyteAdmin entities.
+As a refresher, the primary :ref:`entities <divedeep>` across Flyte map similarly to FlyteAdmin entities.
 
 Static entities
 +++++++++++++++
@@ -98,7 +98,7 @@ Permitted project operations:
 - List
 
 Matchable resources
-A thorough background on :ref:`matchable resources <managing_customizable_resources>` explains their purpose and application logic. As a summary, these are used to override system level defaults
+A thorough background on :ref:`matchable resources <howto-managing-customizable-resources>` explains their purpose and application logic. As a summary, these are used to override system level defaults
 for kubernetes cluster resource management, default execution values, and more all across different levels of specificity.
 
 These entities consist of:

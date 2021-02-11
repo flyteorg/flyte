@@ -68,8 +68,9 @@ To be built.
 User Stats With Flyte
 ~~~~~~~~~~~~~~~~~~~~~~
 The workflow parameters object that the SDK injects into the various tasks has a statsd handle that users should call
-to emit stats related to their workflows not captured by the default metrics. Please see the 
-:ref:`tutorial <flytekit-task-stats>` for more information. The usual caveats around cardinality apply of course. 
+to emit stats related to their workflows not captured by the default metrics. The usual caveats around cardinality apply of course.
+
+.. todo: Reference to flytekit task stats
 
 Users are encouraged to avoid creating their own stats handlers.  These can pollute the general namespace if not done 
 correctly, and also can accidentally interfere with production stats of live services, causing pages and wreaking 

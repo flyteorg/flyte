@@ -89,14 +89,14 @@ of instances of Flyte entities by users. Within Lyft's context, this term
 usually refers to the name of the Github repository in which your workflow
 code resides.
 
-For more information see :ref:`Projects <concepts-projects>`
+For more information see :ref:`Projects <divedeep-projects>`
 
 Domain
 ------
 The term ``domain`` refers to development environment (or the service instance)
 of your workflow/execution/launch plan/etc. You can specify it with the
 ``domain`` argument. Values can be either ``development``, ``staging``, or
-``production``. See :ref:`Domains <concepts-domains>`
+``production``. See :ref:`Domains <divedeep-domains>`
 
 
 Name

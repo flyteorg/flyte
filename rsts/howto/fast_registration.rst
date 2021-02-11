@@ -77,18 +77,15 @@ Prerequisites
 
 * Upgrade your flytekit dependency to ``>=0.15.0``.
 
-* Update your development flyte config and add a new required parameter to the sdk block specifying an intermittent directory for code distributions. Whichever role you use in the [auth] block must have read access to
-this directory. For example:
-
-.. code-block:: text
+* Update your development flyte config and add a new required parameter to the sdk block specifying an intermittent directory for code distributions. Whichever role you use in the [auth] block must have read access to this directory. For example::
 
    [sdk]
    fast_registration_dir=s3://my-s3-bucket/distributions/<myproject>
 
 You'll need to build a base image with these changes incorporated before you can use fast registration.
 
-Fast-registering
-################
+how?
+####
 
 How-to:
 
