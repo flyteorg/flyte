@@ -1,4 +1,4 @@
-.. _howto_create_plugins:
+.. _howto-create-plugins:
 
 ###################################################
 How Do I contribute or develop private plugins

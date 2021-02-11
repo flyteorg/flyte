@@ -31,19 +31,19 @@ Characteristics
 
 In abstract, a task in the system is characterized by:
 
-1. A :ref:`project and domain <concepts-projects>` combination,
+1. A :ref:`divedeep-projects` and :ref:`divedeep-domains` combination,
 2. A unique unicode name (we recommend it not to exceed 32 characters), and
 3. A version string.
 4. *Optional* Task interface definition
 
    In order for tasks to exchange data with each other, a task can define a signature (much like a function/method
-   signature in programming languages). A task interface defines the :ref:`input and output variables <language-variables>` 
-   as well as their :ref:`types <language-types>`.
+   signature in programming languages). A task interface defines the input and output variables - :std:label:`flyteidl:api_field_flyteidl.core.variablemap.variables`
+   as well as their types :std:label:`flyteidl:api_msg_flyteidl.core.literaltype`.
 
 Requirements
 ------------
 
-When deciding whether a unit of execution conistitutes a Flyte Task or not. Consider the following:
+When deciding whether a unit of execution constitutes a Flyte Task or not. Consider the following:
 
 - Is there a well-defined graceful/successful exit criteria for the task? A task is expected to exit after finishing processing
   its inputs.
@@ -59,7 +59,7 @@ Types
 -----
 Since it's impossible to define the unit of execution of a task the same way for all kinds of tasks, Flyte allows different task
 types in the system. Flyte comes with a set of defined, battle tested task types but also allows for a very flexible model to
-introducing new :ref:`user-defined task types <contributor-extending>`. Read more about various supported task types :ref:`here <tasktypes>`.
+introducing new :ref:`howto-create-plugins`.
 
 Fault tolerance
 ---------------
@@ -76,4 +76,4 @@ Timeouts
 Memoization
 -----------
 Flyte supports memoization for task outputs to ensure identical invocations of a task are not repeatedly executed wasting compute resources.
-For more information on memoization please refer to :ref:`Task Cache <features-task_cache>`.
+For more information on memoization please refer to :ref:`howto-enable-use-memoization`.

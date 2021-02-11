@@ -40,5 +40,3 @@ task definitions to the :ref:`FlyteAdmin <divedeep-admin>` service. Registration
 an inventory of available tasks, workflows and launchplans declared per project
 and domain. A scheduled or on-demand execution can then be launched against one of
 the registered entities.
-
-Refer to the `divedeep-architecture-overview`_ to get an overview of the system architecture.
