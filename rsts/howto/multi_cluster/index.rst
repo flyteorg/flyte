@@ -1,4 +1,4 @@
-.. _howto_multi_cluster:
+.. _howto-multi-cluster:
 
 #########################################
 How Do I use Multiple Kubernetes Clusters

@@ -1,7 +1,7 @@
 .. _tutorials:
 
 ##############################
-Getting started and Tutorials
+Getting Started and Tutorials
 ##############################
 
 .. toctree::
@@ -12,4 +12,3 @@ Getting started and Tutorials
    first_example
    run_flyte_laptop
    Learn by example - Flytekit Python <https://flytecookbook.readthedocs.io/en/latest/>
-   [Coming soon] Learn to use Flytekit-java by example <https://github.com/spotify/flytekit-java>

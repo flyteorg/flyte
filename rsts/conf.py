@@ -54,6 +54,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
+    "sphinx_issues",
 ]
 
 extlinks = {
@@ -224,3 +225,19 @@ intersphinx_mapping = {
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# -- Options for Sphix issues extension --------------------------------------
+
+# GitHub repo
+issues_github_path = "flyteorg/flyte"
+
+# equivalent to
+issues_uri = "https://github.com/flyteorg/flyte/issues/{issue}"
+issues_pr_uri = "https://github.com/flyteorg/flyte/pull/{pr}"
+issues_commit_uri = "https://github.com/flyteorg/flyte/commit/{commit}"
+
+# Usage:
+# See issue :issue:`42`
+# See issues :issue:`12,13`
+# See :issue:`sloria/konch#45`.
+# See PR :pr:`58`

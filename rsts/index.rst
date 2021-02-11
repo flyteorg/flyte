@@ -8,7 +8,7 @@ Welcome to the documentation hub for Flyte.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Jumpstart with Flyte
+   :caption: Take off with Flyte
    :name: tutorialstoc
 
    tutorials/index
@@ -23,7 +23,7 @@ Welcome to the documentation hub for Flyte.
    faq/index
 
 .. toctree::
-   :caption: Diving Deep: Architecture, Concepts & API reference
+   :caption: Diving Deep: Architecture, Concepts & References
    :maxdepth: 1
    :name: divedeeptoc
 
@@ -31,7 +31,7 @@ Welcome to the documentation hub for Flyte.
    reference/index
 
 .. toctree::
-   :caption: Project Plan & Contributors guide
+   :caption: Project Plan & Contributor Guide
    :maxdepth: 1
    :name: roadmaptoc
 

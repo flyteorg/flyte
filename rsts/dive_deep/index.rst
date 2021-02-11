@@ -1,8 +1,12 @@
 .. _divedeep:
 
 ##########################################
-Architecture, Concepts and API Reference
+Architecture and Concepts
 ##########################################
+
+********************************
+Core Concepts & Architecture
+********************************
 
 .. toctree::
     :maxdepth: 1
@@ -11,19 +15,33 @@ Architecture, Concepts and API Reference
     overview
     tasks
     workflows_nodes
-    executions
     launchplans_schedules
+    architecture
+
+********************************
+Control Plane Details
+********************************
+
+.. toctree::
+    :maxdepth: 1
+
     projects
     domains
+    admin
+    admin_service
     registration
+    console
+
+********************************
+Execution Time Details
+********************************
+
+.. toctree::
+    :maxdepth: 1
+
+    executions
     execution_timeline
     observability
     dynamic_spec
-    architecture
-    admin
-    admin_service
     catalog
-    console
     customizable_resources
-
-
