@@ -54,7 +54,7 @@ Single task executions aren't limited to just tasks you've defined in your code.
 Launch a single task from the commandline
 =========================================
 
-Previously registered tasks can also be launched from the command-line using :ref:`flyte-cli <features-flytecli>`
+Previously registered tasks can also be launched from the command-line using :ref:`flyte-cli <howto-flytecli>`
 
 .. code-block:: console
 

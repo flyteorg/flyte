@@ -26,10 +26,12 @@ How Do I...?
    performance/index
    authentication/index
    resource_manager/index
+   resource_quota
    fast_registration
    multi_cluster/index
    interruptible
    labels_annotations
    notifications
    serviceaccount
+
    
