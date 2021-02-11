@@ -15,6 +15,8 @@ Flytectl is designed to be a portable, lightweight, CLI for working with Flyte. 
 ## Docs
 
 Docs are generated using Sphinx and are available at [flytectl.rtfd.io](https://flytectl.rtfd.io)
+Generating docs locally can be accomplished by running make gendocs from within the docs folder
+
 
 ## Installation
 
@@ -25,4 +27,5 @@ curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 ## Contributing
 
 [Contribution guidelines for this project](docs/CONTRIBUTING.md)
+
 

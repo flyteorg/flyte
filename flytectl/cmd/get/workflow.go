@@ -13,6 +13,41 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+const(
+	workflowShort = "Gets workflow resources"
+	workflowLong  = `
+Retrieves all the workflows within project and domain.(workflow,workflows can be used interchangeably in these commands)
+::
+
+ bin/flytectl get workflow -p flytesnacks -d development
+
+Retrieves workflow by name within project and domain.
+
+::
+
+ bin/flytectl workflow -p flytesnacks -d development  recipes.plugins.k8s_spark.pyspark_pi.my_spark
+
+Retrieves workflow by filters. 
+::
+
+ Not yet implemented
+
+Retrieves all the workflow within project and domain in yaml format.
+
+::
+
+ bin/flytectl get workflow -p flytesnacks -d development -o yaml
+
+Retrieves all the workflow within project and domain in json format.
+
+::
+
+ bin/flytectl get workflow -p flytesnacks -d development -o json
+
+Usage
+`
+)
+
 var workflowColumns = []printer.Column{
 	{"Version", "$.id.version"},
 	{"Name", "$.id.name"},

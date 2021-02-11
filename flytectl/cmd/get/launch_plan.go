@@ -11,6 +11,42 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 )
 
+const(
+
+	launchPlanShort = "Gets launch plan resources"
+	launchPlanLong  = `
+Retrieves all the launch plans within project and domain.(launchplan,launchplans can be used interchangeably in these commands)
+::
+
+ bin/flytectl get launchplan -p flytesnacks -d development
+
+Retrieves launch plan by name within project and domain.
+
+::
+
+ bin/flytectl launchplan -p flytesnacks -d development recipes.core.basic.lp.my_wf
+
+Retrieves launchplan by filters.
+::
+
+ Not yet implemented
+
+Retrieves all the launchplan within project and domain in yaml format.
+
+::
+
+ bin/flytectl get launchplan -p flytesnacks -d development -o yaml
+
+Retrieves all the launchplan within project and domain in json format
+
+::
+
+ bin/flytectl get launchplan -p flytesnacks -d development -o json
+
+Usage
+`
+)
+
 var launchplanColumns = []printer.Column{
 	{"Version", "$.id.version"},
 	{"Name", "$.id.name"},

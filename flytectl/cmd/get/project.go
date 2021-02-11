@@ -12,6 +12,41 @@ import (
 	"github.com/lyft/flytectl/pkg/printer"
 )
 
+const(
+projectShort = "Gets project resources"
+projectLong  = `
+Retrieves all the projects.(project,projects can be used interchangeably in these commands)
+::
+
+ bin/flytectl get project
+
+Retrieves project by name
+
+::
+
+ bin/flytectl get project flytesnacks
+
+Retrieves project by filters
+::
+
+ Not yet implemented
+
+Retrieves all the projects in yaml format
+
+::
+
+ bin/flytectl get project -o yaml
+
+Retrieves all the projects in json format
+
+::
+
+ bin/flytectl get project -o json
+
+Usage
+`
+)
+
 var projectColumns = []printer.Column{
 	{"ID", "$.id"},
 	{"Name", "$.name"},
