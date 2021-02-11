@@ -3,6 +3,10 @@
 ########################################
 Run Spark on your Kubernetes Cluster
 ########################################
+
+.. tip:: If you just looking for examples of spark on flyte - refer to :std:ref:`Cookbook Spark Plugin <sphx_glr_auto_plugins_k8s_spark>`
+
+
 Flyte has an optional plugin that makes it possible to run `Apache Spark <https://spark.apache.org/>`_ jobs native on your kubernetes cluster. This plugin has been used extensively at Lyft and is battle tested.
 This makes it extremely easy to run your pyspark (coming soon scala/java) code as a task. The plugin creates a new Virtual cluster for the spark execution dynamically and Flyte will manage the execution, auto-scaling
 for the spark job.
@@ -35,7 +39,7 @@ How to enable Spark in flyte backend?
 Flyte Spark uses `Spark On  K8s Operator <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator>`_ and a custom built `Flyte Spark Plugin <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark>`_.
 The plugin is a backend plugin and you have to enable it in your deployment. To enable a plugin follow the steps in :ref:`howto-enable-backend-plugins`.
 
-You can optionally configure the Plugin, to have some defaults that suite your environment. The config structure is defined `here <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark#Config>`_ and an example Config is defined
+You can optionally configure the Plugin as per the - `backend Config Structure <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark#Config>`_ and an example Config is defined
 `here <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/config/propeller/plugins/spark.yaml>`_, which looks like,
 
 .. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/overlays/sandbox/config/propeller/plugins/spark.yaml
@@ -50,7 +54,7 @@ For a more complete example refer to :std:ref:`Cookbook Spark Plugin <sphx_glr_a
 #. Enable Spark in backend, following the previous section.
 #. Install the `flytekit spark plugin <https://pypi.org/project/flytekitplugins-spark/>`_ ::
 
-   pip install flytekitplugins-spark
+    pip install flytekitplugins-spark
 
 #. Write regular pyspark code - with one change in ``@task`` decorator. Refer to the example
 
