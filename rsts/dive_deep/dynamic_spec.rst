@@ -20,20 +20,28 @@ This spec is currently only supported as an intermediate step in running Dynamic
         repeated WorkflowTemplate subworkflows = 5;
     }
 
+.. _divedeep-dynamic-tasks:
+
 Tasks
 -----
 
 Defines one or more :ref:`Tasks <divedeep-tasks>` that can then be referenced in the spec.
+
+.. _divedeep-dynamic-subworkflows:
 
 Subworkflows
 ------------
 
 Defines zero or more :ref:`Workflows <divedeep-workflows>` that can then be referenced in the spec.
 
+.. _divedeep-dynamic-nodes:
+
 Nodes
 -----
 
 Defines one or more :ref:`Nodes <divedeep-nodes>` that can run in parallel to produce the final outputs of the spec.
+
+.. _divedeep-dynamic-outputs:
 
 Outputs
 -------

@@ -72,7 +72,7 @@ Older flytekit instructions (flytekit <0.16.0)
 
 Flytekit releases prior to the introduction of native typing have a slightly modified workflow for fast-registering.
 
-Prerequisites
+Pre-Reqs
 #############
 
 * Upgrade your flytekit dependency to ``>=0.15.0``.

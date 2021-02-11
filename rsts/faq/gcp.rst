@@ -12,7 +12,8 @@ I tried to run examples, but task fails with 401 error?
 
  - If not, then start a dummy pod in the intended namespace and check for ::
 
-  gcloud auth list
+    gcloud auth list
+
 
 .. note::
 
