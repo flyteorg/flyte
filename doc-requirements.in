@@ -6,3 +6,4 @@ sphinx-autoapi
 sphinx-copybutton
 sphinx-tabs
 sphinxext-remoteliteralinclude
+sphinx-issues
