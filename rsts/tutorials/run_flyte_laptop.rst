@@ -74,7 +74,7 @@ Steps
 
         Refer to the :ref:`howto-sandbox-dedicated-k8s-cluster` guide.
 
-        Once you've deployed flyte sandbox to a cloud provider, refer to :ref:`tutorials-run-flyte-laptop` to run your first workflow remotely.
+        Once you've deployed flyte sandbox to a cloud provider, read on below to run your first workflow remotely.
 
 
 .. _tutorials-run-flyte-laptop:
