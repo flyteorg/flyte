@@ -45,7 +45,7 @@ Basic Configuration
 
    gen/flytectl
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Flytectl verbs
    
    gen/flytectl_get
@@ -55,7 +55,7 @@ Basic Configuration
    gen/flytectl_config
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Flytectl nouns
 
    gen/flytectl_get_execution
