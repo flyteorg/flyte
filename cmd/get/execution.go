@@ -13,6 +13,41 @@ import (
 	"github.com/lyft/flytectl/pkg/printer"
 )
 
+const(
+	executionShort = "Gets execution resources"
+	executionLong  = `
+Retrieves all the executions within project and domain.(execution,executions can be used interchangeably in these commands)
+::
+
+ bin/flytectl get execution -p flytesnacks -d development
+
+Retrieves execution by name within project and domain.
+
+::
+
+ bin/flytectl execution -p flytesnacks -d development oeh94k9r2r
+
+Retrieves execution by filters
+::
+
+ Not yet implemented
+
+Retrieves all the execution within project and domain in yaml format
+
+::
+
+ bin/flytectl get execution -p flytesnacks -d development -o yaml
+
+Retrieves all the execution within project and domain in json format.
+
+::
+
+ bin/flytectl get execution -p flytesnacks -d development -o json
+
+Usage
+`
+)
+
 var executionColumns = []printer.Column{
 	{"Name", "$.id.name"},
 	{"Workflow Name", "$.closure.workflowId.name"},

@@ -19,6 +19,8 @@ type CommandEntry struct {
 	ProjectDomainNotRequired bool
 	CmdFunc                  CommandFunc
 	Aliases                  []string
+	Short                    string
+	Long                     string
 	PFlagProvider            PFlagProvider
 }
 
@@ -26,7 +28,8 @@ func AddCommands(rootCmd *cobra.Command, cmdFuncs map[string]CommandEntry) {
 	for resource, cmdEntry := range cmdFuncs {
 		cmd := &cobra.Command{
 			Use:     resource,
-			Short:   fmt.Sprintf("Retrieves %v resources.", resource),
+			Short:   cmdEntry.Short,
+			Long:    cmdEntry.Long,
 			Aliases: cmdEntry.Aliases,
 			RunE:    generateCommandFunc(cmdEntry),
 		}

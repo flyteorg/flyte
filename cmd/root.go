@@ -3,15 +3,15 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"github.com/lyft/flytectl/cmd/update"
-	"github.com/lyft/flytectl/cmd/register"
-
 	"github.com/lyft/flytectl/cmd/get"
+	"github.com/lyft/flytectl/cmd/register"
+	"github.com/lyft/flytectl/cmd/update"
 	"github.com/lyft/flytectl/pkg/printer"
-
 	stdConfig "github.com/lyft/flytestdlib/config"
 	"github.com/lyft/flytestdlib/config/viper"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 
 	"github.com/lyft/flytectl/cmd/config"
 )
@@ -24,6 +24,9 @@ var (
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		PersistentPreRunE: initConfig,
+		Long : "flytectl is CLI tool written in go to interact with flyteadmin service",
+		Short: "flyetcl CLI tool",
+		Use : "flytectl",
 	}
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
@@ -58,6 +61,25 @@ func initConfig(_ *cobra.Command, _ []string) error {
 	}
 
 	return nil
+}
+
+func GenerateDocs() error {
+	rootCmd := newRootCmd()
+	err := GenReSTTree(rootCmd, "gen")
+	if err != nil {
+		logrus.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func GenReSTTree(cmd *cobra.Command, dir string) error {
+	emptyStr := func(s string) string { return "" }
+	// Sphinx cross-referencing format
+	linkHandler := func(name, ref string) string {
+		return fmt.Sprintf(":doc:`%s`", ref)
+	}
+	return doc.GenReSTTreeCustom(cmd, dir, emptyStr, linkHandler)
 }
 
 func ExecuteCmd() error {

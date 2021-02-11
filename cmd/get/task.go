@@ -14,6 +14,41 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+const(
+	taskShort = "Gets task resources"
+	taskLong  = `
+Retrieves all the task within project and domain.(task,tasks can be used interchangeably in these commands)
+::
+
+ bin/flytectl get task -p flytesnacks -d development
+
+Retrieves task by name within project and domain.
+
+::
+
+ bin/flytectl task -p flytesnacks -d development square
+
+Retrieves project by filters.
+::
+
+ Not yet implemented
+
+Retrieves all the tasks within project and domain in yaml format.
+
+::
+
+ bin/flytectl get task -p flytesnacks -d development -o yaml
+
+Retrieves all the tasks within project and domain in json format.
+
+::
+
+ bin/flytectl get task -p flytesnacks -d development -o json
+
+Usage
+`
+)
+
 var taskColumns = []printer.Column{
 	{"Version", "$.id.version"},
 	{"Name", "$.id.name"},

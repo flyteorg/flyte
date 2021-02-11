@@ -41,25 +41,32 @@ Basic Configuration
    :maxdepth: 1
    :caption: Flyte Core docs
 
-   Flyte Documentation <https://lyft.github.io/flyte/>
+   Flyte Documentation <https://flyte.readthedocs.io/en/latest/>
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Flytectl docs - Entities
-   
-   tasks
-   workflow
-   launchplan
-
-
+   gen/flytectl
 .. toctree::
    :maxdepth: 2
    :caption: Flytectl verbs
    
-   get
-   update
-   delete
-   register
+   gen/flytectl_get
+   gen/flytectl_update
+   gen/flytectl_delete
+   gen/flytectl_register
+   gen/flytectl_config
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Flytectl nouns
+
+   gen/flytectl_get_execution
+   gen/flytectl_get_project
+   gen/flytectl_get_workflow
+   gen/flytectl_get_task
+   gen/flytectl_get_launchplan
+   gen/flytectl_update_project
+   gen/flytectl_register_files
+   gen/flytectl_version
+   gen/flytectl_config_validate
 
 .. toctree::
    :maxdepth: 2
