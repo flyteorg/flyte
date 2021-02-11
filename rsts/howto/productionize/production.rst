@@ -43,7 +43,7 @@ The sandbox overlays live in the `kustomize/overlays/sandbox <https://github.com
 
 **Flyte Overlay**
   The ``flyte`` overlay is meant to aggregate the components into a single deployment file.
-  The `kustomization.yaml <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/flyte/kustomization.yaml>`__ in that directory lists the components to be included in the deploy.
+  The `kustomization.yaml overlay <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/flyte/kustomization.yaml>`__ in that directory lists the components to be included in the deploy.
 
   We run ``kustomize build`` against the ``flyte`` directory to generate the complete `sandbox deployment yaml <https://github.com/lyft/flyte/blob/master/deployment/sandbox/flyte_generated.yaml>`__ we used earlier to deploy Flyte sandbox.
 

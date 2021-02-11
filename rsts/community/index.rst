@@ -9,9 +9,9 @@ amazing community. We are a completely open community and we vouch to treat
 every member with respect. You will find the community very welcoming and warm,
 so please join us on the
 
-- `Slack <>`_
-- `Email <>`_
-- `Twitter <>`_
+- `Slack <http://flyte-org.slack.com>`_
+- `Email <https://groups.google.com/a/flyte.org/d/forum/users>`_
+- `Twitter <https://twitter.com/flyteorg>`_
 
 
 .. toctree::

@@ -16,12 +16,12 @@ workflows against this deployment.
 Prerequisites
 =============
 
-#. Ensure ``kubectl`` is installed. Follow docs `here <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
+#. Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
 
     brew install kubectl
 
-#. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`__
-#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`__, `Google GKE <https://cloud.google.com/kubernetes-engine>`__, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`.
+#. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
+#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`__, then follow the instructions for hosted Flyte below.
 
 Steps
 ======
@@ -68,6 +68,16 @@ Steps
 
     .. tab:: Using Docker for Mac
 
+        Coming soon
+
+    .. tab:: Hosted Flyte
+
+        Refer to the :ref:`howto-sandbox-dedicated-k8s-cluster` guide.
+
+        Once you've deployed flyte sandbox to a cloud provider, read on below to run your first workflow remotely.
+
+
+.. _tutorials-run-flyte-laptop:
 
 ****************************
 Running your Flyte Workflows
@@ -76,8 +86,8 @@ Running your Flyte Workflows
 Registration
 ============
 
-Prerequisites
--------------
+Set-up
+------
 
 In a separate process, port-forward the flyte minio service. If you're using a locally deployed Flyte sandbox, simply: ::
 
@@ -117,6 +127,7 @@ argument as you please, proceed to launch and you'll have triggered an execution
       - Command line
       - directly invoking the REST API
       - on a schedule
+
     More on this later
 
 Optionally you can create a new project
