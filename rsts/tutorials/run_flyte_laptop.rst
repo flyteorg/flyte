@@ -21,7 +21,7 @@ Prerequisites
     brew install kubectl
 
 #. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
-#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`_, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`.
+#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`_, then follow the instructions for hosted Flyte below.
 
 Steps
 ======
@@ -67,6 +67,15 @@ Steps
                Now connect to `locahost:8083 <localhost:8083>`_. If this does not work, then for sure the networking is impacted, please restart docker daemon.
 
     .. tab:: Using Docker for Mac
+
+        Coming soon
+
+    .. tab:: Hosted Flyte
+
+        Refer to the :ref:`howto-sandbox-dedicated-k8s-cluster` guide.
+
+        Once you've deployed flyte sandbox to a cloud provider, refer to :ref:`tutorials-run-flyte-laptop` to run your first workflow remotely.
+
 
 .. _tutorials-run-flyte-laptop:
 
