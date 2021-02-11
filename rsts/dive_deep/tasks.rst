@@ -10,24 +10,21 @@ Tasks encapsulate fully independent units of execution. Flyte language exposes a
 to express that in an execution-independent language. Flyte contains first class task plugins that take
 care of executing these tasks.
 
-Real world examples
--------------------
+Plugin Examples
+----------------
+Almost any action can be implemented and introduced into Flyte as a Plugin.
+ - So tasks that run queries on distributed data warehouses like Redshift, Hive, Snowflake etc can be a task (using plugins)
+ - Tasks that run executions on compute engines like Spark, Flink, AWS Sagemaker, AWS Batch, Kubernetes pods, jobs etc
+ - Tasks that call web services
 
-Query a data store
-  Using :ref:`Hive tasks <hive-task-type>` to retrieve data into dataframes so that subsequent tasks can process them.
+Flyte ships with some defaults, for example running a simple python function does not need any hosted service, so Flyte knows how to
+execute these tasks on Kubernetes. Turns out these are the vastt majority of tasks in ML and Flyte is deftly adept at handling a very large
+scale on kubernetes. this is achieved by implementing a unique scheduler on top of K8s.
 
-Transform data
-  Using :ref:`Container tasks <container-task-type>` to transform data collected/computed earlier, users can develop a task as
-  a simple Lambda function with specified inputs and outputs represented as a container with entrypoints, with specific compute, memory and
-  gpu requirements.
-
-Map-reduce massive jobs
-  Using :ref:`Spark programs <container-task-type>` with their cluster configuration and compute requirements
-
-Hyperparameter tuning task
-  Using a system like Katib, users can execute a task that needs multiple iterations and leads to multiple other containers to execute.
-
-A distributed or single container Tensorflow Job
+Dynamic Tasks
+---------------
+Dynamic tasks is a misnomer. Flyte is one of a kind Workflow engine that ships with a concept of truly dynamic workflows. Users can generate workflows
+in reaction to user inputs or computed values at runtime. And these executions are evaluated to generate a static graph, before execution.
 
 Characteristics
 ---------------
