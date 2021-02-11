@@ -49,10 +49,10 @@ Additional Components
 
 The managers utilize additional components to process requests. These additional components include:
 
-- **:ref:`workflow engine <components-admin-workflowengine>`**: compiles workflows and launches workflow executions from launch plans.
-- **:ref:`data <components-admin-data>` (remote cloud storage)**: offloads data blobs to the configured cloud provider.
-- **:ref:`runtime <components-admin-config>`**: loads values from a config file to assign task resources, initialization values, execution queues and more.
-- **:ref:`async processes <components-admin-async>`**: provides functions for scheduling and executing workflows as well as enqueuing and triggering notifications
+- **:ref:`workflow engine <divedeep-admin-workflowengine>`**: compiles workflows and launches workflow executions from launch plans.
+- **:ref:`data <divedeep-admin-data>` (remote cloud storage)**: offloads data blobs to the configured cloud provider.
+- **:ref:`runtime <divedeep-admin-config>`**: loads values from a config file to assign task resources, initialization values, execution queues and more.
+- **:ref:`async processes <divedeep-admin-async>`**: provides functions for scheduling and executing workflows as well as enqueuing and triggering notifications
 
 .. _divedeep-admin-repository:
 
