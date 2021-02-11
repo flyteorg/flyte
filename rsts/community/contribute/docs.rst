@@ -67,7 +67,24 @@ Installing ``sphobjinv`` and simple usage ::
 
 .. note::
 
-    Even though the ``sphobjinv`` CLI returns ``:py:function:...``, when actually creating a link you should just use ``:py:func:...``. See `this <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__.
+    Even though the ``sphobjinv`` CLI returns ``:py:function:...``, when actually creating a link you should just use ``:py:func:...``. See `this <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__. Here is a quick list of mappings
+
+    .. list-table:: Conversion table for - ``sphobjinv``
+        :widths: 50 50
+        :header-rows: 1
+
+        * - What the tool returns?
+          - What you should use instead?
+        * - :py:module:
+          - :py:mod:
+        * - :py:function:
+          - :py:func:
+        * - :std:label:
+          - :std:ref:
+        * - :py:method:
+          - :py:meth:
+
+
 
 Linking Examples
 ------------------
