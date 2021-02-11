@@ -30,4 +30,5 @@ How Do I ...
    multi_cluster/index
    interruptible
    labels_annotations
+   notifications
    
