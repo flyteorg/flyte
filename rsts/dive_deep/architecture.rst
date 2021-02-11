@@ -1,8 +1,8 @@
-.. _architecture-overview:
+.. _divedeep-architecture-overview:
 
-############
-Architecture
-############
+#############################
+Architecture Overview
+#############################
 
 This document aims to demystify how Flyte's major components ``FlyteIDL``, ``FlyteKit``, ``FlyteCLI``, ``FlyteConsole``, ``FlyteAdmin``, ``FlytePropeller``, and ``FlytePlugins`` fit together at a high level.
 

@@ -1,4 +1,4 @@
-.. _components-admin-service:
+.. _divedeep-admin-service:
 
 #############################
 FlyteAdmin Service Background

@@ -1,4 +1,4 @@
-.. _components-catalog:
+.. _divedeep-catalog:
 
 What is Data Catalog?
 =====================

@@ -1,4 +1,4 @@
-.. _concepts-registrations:
+.. _divedeep-registration:
 
 ##################################
 Understanding Registration process

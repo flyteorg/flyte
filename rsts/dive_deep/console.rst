@@ -1,4 +1,4 @@
-.. _components-console:
+.. _divedeep-console:
 
 #############
 Flyte Console

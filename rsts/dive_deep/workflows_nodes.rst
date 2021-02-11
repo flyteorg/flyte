@@ -1,4 +1,4 @@
-.. _concepts-workflows:
+.. _divedeep-workflows:
 
 Workflows
 =========

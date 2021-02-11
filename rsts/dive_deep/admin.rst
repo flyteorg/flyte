@@ -1,4 +1,4 @@
-.. _components-admin:
+.. _divedeep-admin:
 
 ##########
 FlyteAdmin
