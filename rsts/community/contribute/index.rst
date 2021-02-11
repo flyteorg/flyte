@@ -1,8 +1,8 @@
 .. _community_contribute:
 
-#######################################
-Conributors handbook
-#######################################
+######################
+Contributor Handbook
+######################
 
 .. toctree::
    :caption: contribute

@@ -16,12 +16,12 @@ workflows against this deployment.
 Prerequisites
 =============
 
-#. Ensure ``kubectl`` is installed. Follow docs `here <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
+#. Ensure ``kubectl`` is installed. Follow docs `here <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
 
     brew install kubectl
 
-#. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
-#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`_, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`.
+#. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`__
+#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`__, `Google GKE <https://cloud.google.com/kubernetes-engine>`__, then jump to :ref:`next section <tutorials-getting-started-flyte-hosted>`.
 
 Steps
 ======
@@ -51,7 +51,7 @@ Steps
             kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
 
 
-        #. Connect to `FlyteConsole <localhost:30081/console>`_
+        #. Connect to `FlyteConsole <localhost:30081/console>`__
         #. [Optional] You can delete the cluster once you are done with the tutorial using - ::
 
             k3d cluster delete flyte
@@ -64,7 +64,7 @@ Steps
 
                 docker run -it --rm -p 8083:80 nginx
 
-               Now connect to `locahost:8083 <localhost:8083>`_. If this does not work, then for sure the networking is impacted, please restart docker daemon.
+               Now connect to `locahost:8083 <localhost:8083>`__. If this does not work, then for sure the networking is impacted, please restart docker daemon.
 
     .. tab:: Using Docker for Mac
 
