@@ -8,7 +8,10 @@ How do I use Flyte scheduling?
 Usage
 *******
 
-Launch plans can be set to run automatically on a schedule if the Flyte platform is properly configured. There are two types of schedules, cron schedules, and fixed rate intervals.
+Launch plans can be set to run automatically on a schedule if the Flyte platform is properly configured.
+You can even use the scheduled kick-off time in your workflow as an input.
+
+There are two types of schedules, cron schedules, and fixed rate intervals.
 
 Cron Schedules
 ==============
@@ -27,6 +30,32 @@ These are validated at launch plan registration time.
 
 This ``schedule`` object can then be used in the construction of a :py:class:`flytekit:flytekit.LaunchPlan`.
 
+Complete cron example
+---------------------
+
+For example, take the following workflow:
+
+.. code:: python
+
+    from flytekit workflow
+
+    @workflow
+    def MyWorkflow(an_input: int, another_input: int=10):
+        ....
+
+The above can be run on a cron schedule every 5 minutes like so:
+
+.. code:: python
+
+    from flytekit import CronSchedule, LaunchPlan
+
+    cron_lp = LaunchPlan.create(
+        "my_cron_lp",
+        MyWorkflow,
+        schedule=CronSchedule(cron_expression="0 5 * * ? *"),
+        fixed_inputs={"an_input": 5},
+    )
+
 
 Fixed Rate Intervals
 ====================
@@ -40,8 +69,57 @@ Fixed rate schedules will run at the specified interval.
 
     schedule = FixedRate(duration=timedelta(minutes=10))
 
-Please see a more complete example in the :std:ref:`cookbook <cookbook:launch_plans>`.
 
+Complete fixed rate example
+---------------------------
+
+.. code:: python
+
+    from flytekit workflow
+
+    @workflow
+    def MyOtherWorkflow(triggered_time: datetime, an_input: int, another_input: int=10):
+        ....
+
+
+To run ``MyOtherWorkflow`` every 5 minutes with a value set for ``an_input`` and the scheduled execution time
+assigned to the ``triggered_time`` input you could define the following launch plan:
+
+.. code:: python
+
+    from datetime import timedelta
+    from flytekit import FixedRate, LaunchPlan
+
+    fixed_rate_lp = LaunchPlan.create(
+        "my_fixed_rate_lp",
+        MyOtherWorkflow,
+        # Note that kickoff_time_input_arg matches the workflow input we defined above: triggered_time
+        schedule=FixedRate(duration=timedelta(minutes=5), kickoff_time_input_arg="triggered_time"),
+        fixed_inputs={"an_input": 3},
+    )
+
+Please see a more complete example in the :std:ref:`cookbook <cookbook:Scheduling workflow executions with launch plans>`.
+
+Activating a schedule
+=====================
+
+Once you've initialized your launch plan, don't forget to set it to active so that the schedule is run.
+
+You can use pyflyte in container ::
+
+  pyflyte lp -p {{ your project }} -d {{ your domain }} activate-all
+
+Or with flyte-cli view and activate launch plans ::
+
+  flyte-cli -i -h localhost:30081 -p flyteexamples -d development list-launch-plan-versions
+
+Extract the URN returned for the launch plan you're interested in and make the call to activate it ::
+
+  flyte-cli update-launch-plan -i -h localhost:30081 --state active -u {{ urn }}
+
+Verify your active launch plans::
+
+  flyte-cli -i -h localhost:30081 -p flyteexamples -d development list-active-launch-plans
 
 ******************************
 Platform Configuration Changes
