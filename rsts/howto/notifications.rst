@@ -1,67 +1,61 @@
 .. _howto-notifications:
 
 ####################################################
-How do I configure Flyte for scheduling Workflows?
+How do I use and enable notifications on Flyte?
 ####################################################
 
-.. todo:: combine docs
+When a workflow completes, users can be notified by
 
-Setting up scheduled workflows
-==============================
+* email
+* `pagerduty <https://www.pagerduty.com/>`__
+* `slack <https://slack.com/>`__.
 
-In order to run workflow executions based on user-specified schedules you'll need to fill out the top-level ``scheduler`` portion of the flyteadmin application configuration.
+The content of these notifications is configurable at the platform level.
 
-In particular you'll need to configure the two components responsible for scheduling workflows and processing schedule event triggers.
+*****
+Usage
+*****
 
-Note this functionality is currently only supported for AWS installs.
+When a workflow reaches a specified `terminal workflow execution phase <https://github.com/flyteorg/flytekit/blob/v0.16.0b7/flytekit/core/notification.py#L10,L15>`__
+the :py:class:`flytekit:flytekit.Email`, :py:class:`flytekit:flytekit.PagerDuty`, or :py:class:`flytekit:flytekit.Slack`
+objects can be used in the construction of a :py:class:`flytekit:flytekit.LaunchPlan`.
 
-Set-up the Event Scheduler
---------------------------
+For example
 
-In order to schedule workflow executions, you'll need to set up an `AWS SQS <https://aws.amazon.com/sqs/>`_ queue. A standard type queue should suffice. The flyteadmin event scheduler creates `AWS CloudWatch <https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html>`_ event rules that invokes your SQS queue as a target.
+.. code:: python
 
-With that in mind, let's take a look at an example ``eventScheduler`` config section and dive into what each value represents: ::
+    from flytekit import Email, LaunchPlan
+    from flytekit.models.core.execution import WorkflowExecutionPhase
 
-    scheduler:
-      eventScheduler:
-        scheme: "aws"
-        region: "us-east-1"
-        scheduleRole: "arn:aws:iam::{{ YOUR ACCOUNT ID }}:role/{{ ROLE }}"
-        targetName: "arn:aws:sqs:us-east-1:{{ YOUR ACCOUNT ID }}:{{ YOUR QUEUE NAME }}"
-        scheduleNamePrefix: "flyte"
+    # This launch plan triggers email notifications when the workflow execution it triggered reaches the phase `SUCCEEDED`.
+    my_notifiying_lp = LaunchPlan.create(
+        "my_notifiying_lp",
+        my_workflow_defintiion,
+        default_inputs={"a": 4},
+        notifications=[
+            Email(
+                phases=[WorkflowExecutionPhase.SUCCEEDED],
+                recipients_email=["admin@example.com"],
+            )
+        ],
+    )
 
-* **scheme**: in this case because AWS is the only cloud back-end supported for scheduling workflows, only ``"aws"`` is a valid value. By default, the no-op scheduler is used.
-* **region**: this specifies which region initialized AWS clients should will use when creating CloudWatch rules
-* **scheduleRole** This is the IAM role ARN with permissions set to ``Allow``
-    * 'events:PutRule'
-    * 'events:PutTargets'
-    * 'events:DeleteRule'
-    * 'events:RemoveTargets'
-* **targetName** this is the ARN for the SQS Queue you've allocated to scheduling workflows
-* **scheduleNamePrefix** this is an entirely optional prefix used when creating schedule rules. Because of AWS naming length restrictions, scheduled rules are a random hash and having a shared prefix makes these names more readable and indicates who generated the rules
 
-Set-up the Workflow Executor
-----------------------------
-Scheduled events which trigger need to be handled by the workflow executor, which subscribes to triggered events from the SQS queue you've configured above.
+See detailed usage examples in the :std:ref:`cookbook <cookbook:Getting notifications on workflow termination>`
 
-Again, let's break down a sample config: ::
+Notifications can be combined with schedules to automatically alert you when a scheduled job succeeds or fails.
 
-    scheduler:
-      eventScheduler:
-        ...
-      workflowExecutor:
-        scheme: "aws"
-        region: "us-east-1"
-        scheduleQueueName: "{{ YOUR QUEUE NAME }}"
-        accountId: "{{ YOUR ACCOUNT ID }}"
+Future work
+===========
 
-* **scheme**: in this case because AWS is the only cloud back-end supported for executing scheduled workflows, only ``"aws"`` is a valid value. By default, the no-op executor is used.
-* **region**: this specifies which region AWS clients should will use when creating an SQS subscriber client
-* **scheduleQueueName**: this is the name of the SQS Queue you've allocated to scheduling workflows
-* **accountId**: Your AWS `account id <https://docs.aws.amazon.com/IAM/latest/UserGuide/console_account-alias.html#FindingYourAWSId>`_
+Work is ongoing to support a generic event egress system that can be used to publish events for tasks, workflows and
+workflow nodes. When this is complete, generic event subscribers can asynchronously process these vents for a rich
+and fully customizable experience.
 
-.. CAUTION::
-   Failure to configure a workflow executor will result in all your scheduled events piling up silently without ever kicking off workflow executions.
+
+******************************
+Platform Configuration Changes
+******************************
 
 Setting up workflow notifications
 =================================
@@ -121,24 +115,4 @@ Example config
 ==============
 
 .. rli:: https://raw.githubusercontent.com/flyteorg/flyteadmin/master/flyteadmin_config.yaml
-
-
-FlyteAdmin Remote Cluster Access
-================================
-
-Some deployments of Flyte may choose to run the control plane separate from the data plane. Flyte Admin is designed to create kubernetes resources in one or more Flyte data plane clusters. For Admin to access remote clusters, it needs credentials to each cluster. In kubernetes, scoped service credentials are created by configuring a “Role” resource in a Kubernetes cluster. When you attach that role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access. We create a flyteadmin `ServiceAccount <https://github.com/lyft/flyte/blob/c0339e7cc4550a9b7eb78d6fb4fc3884d65ea945/artifacts/base/adminserviceaccount/adminserviceaccount.yaml>`_ in each data plane cluster to generate these tokens.
-
-When you first create the Flyte Admin ServiceAccount in a new cluster, a bearer token is generated, and will continue to allow access unless the ServiceAccount is deleted. Once we create the Flyte Admin ServiceAccount on a cluster, we should never delete it. In order to feed the credentials to Flyte Admin, you must retrieve them from your new data plane cluster, and upload them to Admin somehow (within Lyft, we use Confidant for example). 
-
-The credentials have two parts (ca cert, bearer token). Find the generated secret via ::
-
-  kubectl get secrets -n flyte | grep flyteadmin-token
-
-Once you have the name of the secret, you can copy the ca cert to your clipboard with ::
-
-  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.ca\.crt}' | base64 -D | pbcopy
-
-You can copy the bearer token to your clipboard with ::
-
-  kubectl get secret -n flyte {secret-name} -o jsonpath='{.data.token}’ | base64 -D | pbcopy
-
+   :lines: 66-80
