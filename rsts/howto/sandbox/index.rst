@@ -22,7 +22,7 @@ Deploy Flyte Sandbox environment locally - on your laptop
 *********************************************************
 
 Flyte Sandbox deployment can be run locally on your laptop. This will allow only some of the functionality, but is great to get started with.
-Refer to :ref:`tutorials-getting-started-flyte-laptop`.
+Refer to :ref:`tutorials-getting-started-run-on-flyte`.
 
 
 .. _howto-sandbox-dedicated-k8s-cluster:
@@ -46,7 +46,7 @@ If you can access your cluster with ``kubectl cluster-info``, you're ready to de
 Deployment
 ==========
 
-We'll proceed like with :ref:`locally hosted flyte <tutorials-getting-started-flyte-laptop>` with deploying the sandbox
+We'll proceed like with :ref:`locally hosted flyte <tutorials-getting-started-run-on-flyte>` with deploying the sandbox
 Flyte configuration on your remote cluster.
 
 .. warning::

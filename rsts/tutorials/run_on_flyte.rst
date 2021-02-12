@@ -1,4 +1,4 @@
-.. _tutorials-getting-started-flyte-laptop:
+.. _tutorials-getting-started-run-on-flyte:
 
 ######################################
 Run Your Workflow on a Flyte Backend

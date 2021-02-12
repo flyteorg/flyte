@@ -1,12 +1,13 @@
 .. _plugins:
 
-########
-Plugins
-########
+####################
+Available Plugins
+####################
+
+Following is a list of maintained plugins for Flyte and guides on how to install / use them.
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Available Plugins
+   :maxdepth: 1
    :name: pluginstoc
 
    spark_k8s

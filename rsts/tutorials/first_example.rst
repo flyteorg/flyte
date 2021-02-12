@@ -1,8 +1,8 @@
 .. _tutorials-getting-started-first-example:
 
-###########################
-Writing Your First Workflow
-###########################
+######################################
+Write your first Flyte workflow
+######################################
 
 By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow and run it locally.
 
