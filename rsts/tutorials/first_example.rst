@@ -1,8 +1,8 @@
 .. _tutorials-getting-started-first-example:
 
-###########################
-Writing Your First Workflow
-###########################
+######################################
+Write your first Flyte workflow
+######################################
 
 By the end of this getting started guide you'll be familiar with how easy it is to author a Flyte workflow and run it locally.
 
@@ -50,6 +50,4 @@ Similarly, you can call this workflow
 
 and iterate locally before moving on to register it with Flyte.
 
-.. note::
-
-   Every invocation of a Flyte workflow requires specifying keyword args.
+.. tip:: Every invocation of a Flyte workflow requires specifying keyword args.

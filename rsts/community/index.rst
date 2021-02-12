@@ -1,8 +1,8 @@
 .. _community:
 
-#####################################
-Community, Roadmap, and Contributions
-#####################################
+##########
+Community
+##########
 
 Flyte is an ambitious open source project and would not be possible without an
 amazing community. We are a completely open community and we vouch to treat
@@ -13,12 +13,9 @@ so please join us on the
 - `Email <https://groups.google.com/a/flyte.org/d/forum/users>`_
 - `Twitter <https://twitter.com/flyteorg>`_
 
+We love contributions, so please contribute to
+ - docs
+ - examples
+ - new plugins or plugin ideas
+ - just feedback in general
 
-.. toctree::
-   :caption: Be nice!
-   :maxdepth: 1
-   :name: communityinnertoc
-
-   contribute/index
-   roadmap
-   compare

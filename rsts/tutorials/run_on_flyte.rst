@@ -1,15 +1,15 @@
-.. _tutorials-getting-started-flyte-laptop:
+.. _tutorials-getting-started-run-on-flyte:
 
-##################################
-Run Your Workflow on a Local Flyte
-##################################
+######################################
+Run Your Workflow on a Flyte Backend
+######################################
 
 ************************
 Installing Flyte Locally
 ************************
 
 This guide will walk you through a quick installation of Flyte on your laptop and then how to register and execute your
-workflows against this deployment.
+workflows against this deployment. (The tabs below have an option to install Flyte on a cloud provider as well)
 
 .. rubric:: Estimated time to complete: 5 minutes.
 
@@ -21,7 +21,7 @@ Prerequisites
     brew install kubectl
 
 #. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
-#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`__, then follow the instructions for hosted Flyte below.
+#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`__, then follow the instructions in a tab below. The rest of it is mostly the same.
 
 Steps
 ======
@@ -70,7 +70,7 @@ Steps
 
         Coming soon
 
-    .. tab:: Hosted Flyte
+    .. tab:: Install Flyte in EKS/GKE etc
 
         Refer to the :ref:`howto-sandbox-dedicated-k8s-cluster` guide.
 

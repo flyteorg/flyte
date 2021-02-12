@@ -8,17 +8,19 @@ Welcome to the documentation hub for Flyte.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Take off with Flyte
+   :caption: Get started with Flyte
    :name: tutorialstoc
 
-   tutorials/index
-   plugins/index
+   tutorials/first_example
+   tutorials/run_on_flyte
+   tutorials/learn
 
 .. toctree::
    :caption: How to Guides
    :maxdepth: 1
    :name: howtotoc
 
+   plugins/index
    howto/index
    faq/index
 
@@ -36,4 +38,7 @@ Welcome to the documentation hub for Flyte.
    :name: roadmaptoc
 
    community/index
+   community/docs
+   community/roadmap
+   community/compare
 

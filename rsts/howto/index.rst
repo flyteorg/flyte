@@ -6,11 +6,10 @@ How Do I...?
 
 .. toctree::
    :maxdepth: 1
-   :caption: How To Guides
    :name: howtoguidestoc
 
    install_sdk
-   sandbox/index
+   sandbox
    flytecli
    new_project
    execute_single_task
