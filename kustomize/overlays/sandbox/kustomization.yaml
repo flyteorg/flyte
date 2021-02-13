@@ -36,16 +36,12 @@ configMapGenerator:
   - behavior: merge
     files:
       - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
-      - ./config/clusterresource-templates/ad_spark-role.yaml
-      - ./config/clusterresource-templates/ae_spark-service-account.yaml
-      - ./config/clusterresource-templates/af_spark-role-binding.yaml
     name: clusterresource-template
   - behavior: merge
     files:
       - ./config/propeller/enabled_plugins.yaml
       - ./config/propeller/plugins/k8s.yaml
       - ./config/propeller/plugins/qubole.yaml
-      - ./config/propeller/plugins/spark.yaml
       - ./config/propeller/plugins/task_logs.yaml
       - ./config/common/storage.yaml
       - ./config/common/logger.yaml

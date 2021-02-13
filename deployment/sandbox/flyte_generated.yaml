@@ -1619,41 +1619,9 @@ data:
           type: minio
           container: my-s3-bucket
           enable-multicontainer: true
-  ad_spark-role.yaml: |
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: Role
-    metadata:
-      name: spark-role
-      namespace: {{ namespace }}
-    rules:
-    - apiGroups:
-      - ""
-      resources:
-      - pods
-      verbs:
-      - '*'
-    - apiGroups:
-      - ""
-      resources:
-      - services
-      verbs:
-      - '*'
-    - apiGroups:
-      - ""
-      resources:
-      - configmaps
-      verbs:
-      - '*'
-  ae_spark-service-account.yaml: |
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: spark
-      namespace: {{ namespace }}
-  af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-tkdkkt4cb5
+  name: clusterresource-template-dtg8ff28mt
   namespace: flyte
 ---
 apiVersion: v1
@@ -1948,15 +1916,11 @@ data:
         enabled-plugins:
           - container
           - sidecar
-          - spark
           - k8s-array
-          - pytorch
         default-for-task-types:
           container: container
           sidecar: sidecar
-          spark: spark
           container_array: k8s-array
-          pytorch: pytorch
   k8s.yaml: |
     plugins:
       k8s:
@@ -1982,23 +1946,6 @@ data:
         redis:
           hostPath: redis-resource-manager:6379
           hostKey: mypassword
-  spark.yaml: |
-    plugins:
-      spark:
-        spark-config-default:
-          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-          - spark.kubernetes.allocation.batch.size: "50"
-          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-          - spark.blacklist.enabled: "true"
-          - spark.blacklist.timeout: "5m"
-          - spark.task.maxfailures: "8"
   storage.yaml: |+
     storage:
       type: minio
@@ -2018,7 +1965,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-4478hcfh2c
+  name: flyte-propeller-config-75c2k45mgg
   namespace: flyte
 ---
 apiVersion: v1
@@ -2496,7 +2443,7 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
-          name: clusterresource-template-tkdkkt4cb5
+          name: clusterresource-template-dtg8ff28mt
         name: resource-templates
       - emptyDir: {}
         name: shared-data
@@ -2585,7 +2532,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-4478hcfh2c
+          name: flyte-propeller-config-75c2k45mgg
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -2742,7 +2689,7 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-tkdkkt4cb5
+              name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
               name: flyte-admin-config-k7f4k7g76c

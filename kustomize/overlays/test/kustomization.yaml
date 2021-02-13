@@ -31,7 +31,7 @@ configMapGenerator:
     - ./config/admin/db.yaml
     - ./config/common/storage.yaml
     - ./config/common/logger.yaml
-      
+      0
 # cluster resource templates
 - name: clusterresource-template
   behavior: merge
