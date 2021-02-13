@@ -2573,7 +2573,10 @@ spec:
         app: postgres
     spec:
       containers:
-      - image: postgres:10.16-alpine
+      - env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
+        image: postgres:10.16-alpine
         name: postgres
         ports:
         - containerPort: 5432
