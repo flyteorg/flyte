@@ -1,4 +1,4 @@
-package pytorch
+package tensorflow
 
 import (
 	"context"
@@ -32,11 +32,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	ptOp "github.com/kubeflow/pytorch-operator/pkg/apis/pytorch/v1"
+	tfOp "github.com/kubeflow/tf-operator/pkg/apis/tensorflow/v1"
 )
 
 const testImage = "image://"
-const serviceAccount = "pytorch_sa"
+const serviceAccount = "tensorflow_sa"
 
 var (
 	dummyEnvVars = []*core.KeyValuePair{
@@ -61,25 +61,27 @@ var (
 	}
 
 	jobName      = "the-job"
-	jobNamespace = "pytorch-namespace"
+	jobNamespace = "tensorflow-namespace"
 )
 
-func dummyPytorchCustomObj(workers int32) *plugins.DistributedPyTorchTrainingTask {
-	return &plugins.DistributedPyTorchTrainingTask{
-		Workers: workers,
+func dummyTensorFlowCustomObj(workers int32, psReplicas int32, chiefReplicas int32) *plugins.DistributedTensorflowTrainingTask {
+	return &plugins.DistributedTensorflowTrainingTask{
+		Workers:       workers,
+		PsReplicas:    psReplicas,
+		ChiefReplicas: chiefReplicas,
 	}
 }
 
-func dummySparkTaskTemplate(id string, pytorchCustomObj *plugins.DistributedPyTorchTrainingTask) *core.TaskTemplate {
+func dummySparkTaskTemplate(id string, tensorflowCustomObj *plugins.DistributedTensorflowTrainingTask) *core.TaskTemplate {
 
-	ptObjJSON, err := utils.MarshalToString(pytorchCustomObj)
+	tfObjJSON, err := utils.MarshalToString(tensorflowCustomObj)
 	if err != nil {
 		panic(err)
 	}
 
 	structObj := structpb.Struct{}
 
-	err = jsonpb.UnmarshalString(ptObjJSON, &structObj)
+	err = jsonpb.UnmarshalString(tfObjJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -98,7 +100,7 @@ func dummySparkTaskTemplate(id string, pytorchCustomObj *plugins.DistributedPyTo
 	}
 }
 
-func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
+func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
@@ -147,7 +149,8 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	return taskCtx
 }
 
-func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandler, workers int32, conditionType commonOp.JobConditionType) *ptOp.PyTorchJob {
+func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorResourceHandler,
+	workers int32, psReplicas int32, chiefReplicas int32, conditionType commonOp.JobConditionType) *tfOp.TFJob {
 	var jobConditions []commonOp.JobCondition
 
 	now := time.Now()
@@ -155,8 +158,8 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	jobCreated := commonOp.JobCondition{
 		Type:    commonOp.JobCreated,
 		Status:  corev1.ConditionTrue,
-		Reason:  "PyTorchJobCreated",
-		Message: "PyTorchJob the-job is created.",
+		Reason:  "TensorFlowJobCreated",
+		Message: "TensorFlowJob the-job is created.",
 		LastUpdateTime: v1.Time{
 			Time: now,
 		},
@@ -167,8 +170,8 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	jobRunningActive := commonOp.JobCondition{
 		Type:    commonOp.JobRunning,
 		Status:  corev1.ConditionTrue,
-		Reason:  "PyTorchJobRunning",
-		Message: "PyTorchJob the-job is running.",
+		Reason:  "TensorFlowJobRunning",
+		Message: "TensorFlowJob the-job is running.",
 		LastUpdateTime: v1.Time{
 			Time: now.Add(time.Minute),
 		},
@@ -181,8 +184,8 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	jobSucceeded := commonOp.JobCondition{
 		Type:    commonOp.JobSucceeded,
 		Status:  corev1.ConditionTrue,
-		Reason:  "PyTorchJobSucceeded",
-		Message: "PyTorchJob the-job is successfully completed.",
+		Reason:  "TensorFlowJobSucceeded",
+		Message: "TensorFlowJob the-job is successfully completed.",
 		LastUpdateTime: v1.Time{
 			Time: now.Add(2 * time.Minute),
 		},
@@ -193,8 +196,8 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	jobFailed := commonOp.JobCondition{
 		Type:    commonOp.JobFailed,
 		Status:  corev1.ConditionTrue,
-		Reason:  "PyTorchJobFailed",
-		Message: "PyTorchJob the-job is failed.",
+		Reason:  "TensorFlowJobFailed",
+		Message: "TensorFlowJob the-job is failed.",
 		LastUpdateTime: v1.Time{
 			Time: now.Add(2 * time.Minute),
 		},
@@ -205,8 +208,8 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	jobRestarting := commonOp.JobCondition{
 		Type:    commonOp.JobRestarting,
 		Status:  corev1.ConditionTrue,
-		Reason:  "PyTorchJobRestarting",
-		Message: "PyTorchJob the-job is restarting because some replica(s) failed.",
+		Reason:  "TensorFlowJobRestarting",
+		Message: "TensorFlowJob the-job is restarting because some replica(s) failed.",
 		LastUpdateTime: v1.Time{
 			Time: now.Add(3 * time.Minute),
 		},
@@ -246,19 +249,19 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 		}
 	}
 
-	ptObj := dummyPytorchCustomObj(workers)
-	taskTemplate := dummySparkTaskTemplate("the job", ptObj)
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	tfObj := dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)
+	taskTemplate := dummySparkTaskTemplate("the job", tfObj)
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
 	if err != nil {
 		panic(err)
 	}
 
-	return &ptOp.PyTorchJob{
+	return &tfOp.TFJob{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      jobName,
 			Namespace: jobNamespace,
 		},
-		Spec: resource.(*ptOp.PyTorchJob).Spec,
+		Spec: resource.(*tfOp.TFJob).Spec,
 		Status: commonOp.JobStatus{
 			Conditions:        jobConditions,
 			ReplicaStatuses:   nil,
@@ -269,69 +272,71 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 	}
 }
 
-func TestBuildResourcePytorch(t *testing.T) {
-	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+func TestBuildResourceTensorFlow(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
-	ptObj := dummyPytorchCustomObj(100)
-	taskTemplate := dummySparkTaskTemplate("the job", ptObj)
+	tfObj := dummyTensorFlowCustomObj(100, 50, 1)
+	taskTemplate := dummySparkTaskTemplate("the job", tfObj)
 
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
-	pytorchJob, ok := resource.(*ptOp.PyTorchJob)
+	tensorflowJob, ok := resource.(*tfOp.TFJob)
 	assert.True(t, ok)
-	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[ptOp.PyTorchReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeWorker].Replicas)
+	assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[tfOp.TFReplicaTypePS].Replicas)
+	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeChief].Replicas)
 
-	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
-		var hasContainerWithDefaultPytorchName = false
+	for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
+		var hasContainerWithDefaultTensorFlowName = false
 
 		for _, container := range replicaSpec.Template.Spec.Containers {
-			if container.Name == ptOp.DefaultContainerName {
-				hasContainerWithDefaultPytorchName = true
+			if container.Name == tfOp.DefaultContainerName {
+				hasContainerWithDefaultTensorFlowName = true
 			}
 
 			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests)
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
 		}
 
-		assert.True(t, hasContainerWithDefaultPytorchName)
+		assert.True(t, hasContainerWithDefaultTensorFlowName)
 	}
 }
 
 func TestGetTaskPhase(t *testing.T) {
-	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	ctx := context.TODO()
 
-	dummyPytorchJobResourceCreator := func(conditionType commonOp.JobConditionType) *ptOp.PyTorchJob {
-		return dummyPytorchJobResource(pytorchResourceHandler, 2, conditionType)
+	dummyTensorFlowJobResourceCreator := func(conditionType commonOp.JobConditionType) *tfOp.TFJob {
+		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, conditionType)
 	}
 
-	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, nil, dummyPytorchJobResourceCreator(commonOp.JobCreated))
+	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, nil, dummyTensorFlowJobResourceCreator(commonOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, nil, dummyPytorchJobResourceCreator(commonOp.JobRunning))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, nil, dummyTensorFlowJobResourceCreator(commonOp.JobRunning))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, nil, dummyPytorchJobResourceCreator(commonOp.JobSucceeded))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, nil, dummyTensorFlowJobResourceCreator(commonOp.JobSucceeded))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, nil, dummyPytorchJobResourceCreator(commonOp.JobFailed))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, nil, dummyTensorFlowJobResourceCreator(commonOp.JobFailed))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
 	assert.Nil(t, err)
 
-	taskPhase, err = pytorchResourceHandler.GetTaskPhase(ctx, nil, dummyPytorchJobResourceCreator(commonOp.JobRestarting))
+	taskPhase, err = tensorflowResourceHandler.GetTaskPhase(ctx, nil, dummyTensorFlowJobResourceCreator(commonOp.JobRestarting))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, taskPhase.Phase())
 	assert.NotNil(t, taskPhase.Info())
@@ -345,13 +350,17 @@ func TestGetLogs(t *testing.T) {
 	}))
 
 	workers := int32(2)
+	psReplicas := int32(1)
+	chiefReplicas := int32(1)
 
-	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	jobLogs, err := common.GetLogs(common.PytorchTaskType, pytorchJob.Name, pytorchJob.Namespace, workers, 0, 0)
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, commonOp.JobRunning)
+	jobLogs, err := common.GetLogs(common.TensorflowTaskType, tensorFlowJob.Name, tensorFlowJob.Namespace,
+		workers, psReplicas, chiefReplicas)
 	assert.NoError(t, err)
-	assert.Equal(t, 3, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[1].Uri)
-	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=pytorch-namespace", jobNamespace, jobName), jobLogs[2].Uri)
+	assert.Equal(t, 4, len(jobLogs))
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[0].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[2].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[3].Uri)
 }
