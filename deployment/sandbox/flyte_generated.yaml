@@ -2130,23 +2130,6 @@ spec:
     app: postgres
   type: NodePort
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: redis-resource-manager
-  name: redis-resource-manager
-  namespace: flyte
-spec:
-  ports:
-  - name: redis
-    port: 6379
-    protocol: TCP
-    targetPort: redis
-  selector:
-    app: redis-resource-manager
-  type: ClusterIP
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2393,7 +2376,7 @@ spec:
         - sh
         - -c
         - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.1
+        image: postgres:10.16-alpine
         name: check-db-ready
       - command:
         - flyteadmin
@@ -2590,7 +2573,7 @@ spec:
         app: postgres
     spec:
       containers:
-      - image: postgres:10.1
+      - image: postgres:10.16-alpine
         name: postgres
         ports:
         - containerPort: 5432
@@ -2601,66 +2584,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: postgres-storage
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: redis
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: redis-resource-manager
-  serviceName: redis-resource-manager
-  template:
-    metadata:
-      labels:
-        app: redis-resource-manager
-    spec:
-      containers:
-      - env:
-        - name: REDIS_PASSWORD
-          value: mypassword
-        image: docker.io/bitnami/redis:4.0.2-r1
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          exec:
-            command:
-            - redis-cli
-            - ping
-          failureThreshold: 3
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: redis-resource-manager
-        ports:
-        - containerPort: 6379
-          name: redis
-          protocol: TCP
-        readinessProbe:
-          exec:
-            command:
-            - redis-cli
-            - ping
-          failureThreshold: 3
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources:
-          requests:
-            cpu: 200m
-            memory: 128Mi
-        volumeMounts:
-        - mountPath: /bitnami
-          name: redis-data
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      volumes:
-      - emptyDir: {}
-        name: redis-data
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
