@@ -1939,10 +1939,6 @@ data:
     logger:
       show-source: true
       level: 2
-  qubole.yaml: |
-    plugins:
-      qubole:
-        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
   resource_manager.yaml: |
     propeller:
       resourcemanager:
@@ -1966,7 +1962,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-929dh4h8kb
+  name: flyte-propeller-config-7gt47kf8m5
   namespace: flyte
 ---
 apiVersion: v1
@@ -2514,7 +2510,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-929dh4h8kb
+          name: flyte-propeller-config-7gt47kf8m5
         name: config-volume
 ---
 apiVersion: apps/v1
