@@ -603,18 +603,10 @@ data:
     logger:
       show-source: true
       level: 2
-  noop_resource_manager.yaml: |
-    propeller:
-      resourcemanager:
-        type: noop
   resource_manager.yaml: |
     propeller:
       resourcemanager:
-        type: redis
-        resourceMaxQuota: 10000
-        redis:
-          hostPath: redis-resource-manager:6379
-          hostKey: mypassword
+        type: noop
   storage.yaml: |+
     storage:
       type: minio
@@ -635,7 +627,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-dg8ghd754d
+  name: flyte-propeller-config-569h4b5459
   namespace: flyte
 ---
 apiVersion: v1
@@ -1062,7 +1054,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-dg8ghd754d
+          name: flyte-propeller-config-569h4b5459
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1130,7 +1122,7 @@ spec:
       - emptyDir: {}
         name: postgres-storage
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -1170,7 +1162,7 @@ spec:
           servicePort: 87
         path: /openapi
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
