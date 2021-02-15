@@ -1122,7 +1122,7 @@ spec:
       - emptyDir: {}
         name: postgres-storage
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
@@ -1162,7 +1162,7 @@ spec:
           servicePort: 87
         path: /openapi
 ---
-apiVersion: networking.k8s.io/v1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
