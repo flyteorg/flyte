@@ -5,59 +5,59 @@ kind: Kustomization
 namespace: flyte
 
 bases:
-- ../../base/single_cluster/complete
+  - ../../base/single_cluster/complete
 
 # All the resources that make up the deployment
-  ########
-  # Operators to be enabled
-  #############
-  # Dependencies to be configured
-  # In local we use minio, but in cloud environment use S3 / GCS / AFS / Oracle Blob store etc
-  # This is used for Resource pooling. On cloud you can use hosted redis (e.g. AWS elasticache)
-  # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
-  # Add node ports for ease of use locally
+########
+# Operators to be enabled
+#############
+# Dependencies to be configured
+# In local we use minio, but in cloud environment use S3 / GCS / AFS / Oracle Blob store etc
+# This is used for Resource pooling. On cloud you can use hosted redis (e.g. AWS elasticache)
+# Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
+# Add node ports for ease of use locally
 resources:
-- ../../base/operators/spark
-- ../../base/operators/kfoperators/pytorch
-- ./dependencies/database
-- ./dependencies/storage
-- ./dependencies/redis
-- ./dependencies/contour_ingress_controller
-- ./dependencies/nodeport-services.yaml
+  - ../../base/operators/spark
+  - ../../base/operators/kfoperators/pytorch
+  - ./dependencies/database
+  - ./dependencies/storage
+  - ./dependencies/redis
+  - ./dependencies/contour_ingress_controller
+  - ./dependencies/nodeport-services.yaml
 
 patchesStrategicMerge:
-- admin/deployment.yaml
+  - admin/deployment.yaml
 
 configMapGenerator:
-- behavior: merge
-  files:
-  - ./config/admin/db.yaml
-  - ./config/common/storage.yaml
-  - ./config/common/logger.yaml
-  name: flyte-admin-config
-- behavior: merge
-  files:
-  - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
-  - ./config/clusterresource-templates/ad_spark-role.yaml
-  - ./config/clusterresource-templates/ae_spark-service-account.yaml
-  - ./config/clusterresource-templates/af_spark-role-binding.yaml
-  name: clusterresource-template
-- behavior: merge
-  files:
-  - ./config/propeller/enabled_plugins.yaml
-  - ./config/propeller/plugins/k8s.yaml
-  - ./config/propeller/plugins/qubole.yaml
-  - ./config/propeller/plugins/spark.yaml
-  - ./config/propeller/plugins/task_logs.yaml
-  - ./config/common/storage.yaml
-  - ./config/common/logger.yaml
-  name: flyte-propeller-config
-- behavior: merge
-  files:
-  - ./config/common/storage.yaml
-  - ./config/common/logger.yaml
-  - ./config/datacatalog/db.yaml
-  name: datacatalog-config
+  - behavior: merge
+    files:
+      - ./config/admin/db.yaml
+      - ./config/common/storage.yaml
+      - ./config/common/logger.yaml
+    name: flyte-admin-config
+  - behavior: merge
+    files:
+      - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
+      - ./config/clusterresource-templates/ad_spark-role.yaml
+      - ./config/clusterresource-templates/ae_spark-service-account.yaml
+      - ./config/clusterresource-templates/af_spark-role-binding.yaml
+    name: clusterresource-template
+  - behavior: merge
+    files:
+      - ./config/propeller/enabled_plugins.yaml
+      - ./config/propeller/plugins/k8s.yaml
+      - ./config/propeller/plugins/qubole.yaml
+      - ./config/propeller/plugins/spark.yaml
+      - ./config/propeller/plugins/task_logs.yaml
+      - ./config/common/storage.yaml
+      - ./config/common/logger.yaml
+    name: flyte-propeller-config
+  - behavior: merge
+    files:
+      - ./config/common/storage.yaml
+      - ./config/common/logger.yaml
+      - ./config/datacatalog/db.yaml
+    name: datacatalog-config
 
 # Images that should be used
 images:
