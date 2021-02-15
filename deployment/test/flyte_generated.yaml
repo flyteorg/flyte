@@ -977,6 +977,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - seed-projects
+        - flytetester
         - flytesnacks
         image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
