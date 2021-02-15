@@ -1946,11 +1946,7 @@ data:
   resource_manager.yaml: |
     propeller:
       resourcemanager:
-        type: redis
-        resourceMaxQuota: 10000
-        redis:
-          hostPath: redis-resource-manager:6379
-          hostKey: mypassword
+        type: noop
   storage.yaml: |+
     storage:
       type: minio
@@ -1970,7 +1966,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-75c2k45mgg
+  name: flyte-propeller-config-929dh4h8kb
   namespace: flyte
 ---
 apiVersion: v1
@@ -2520,7 +2516,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-75c2k45mgg
+          name: flyte-propeller-config-929dh4h8kb
         name: config-volume
 ---
 apiVersion: apps/v1

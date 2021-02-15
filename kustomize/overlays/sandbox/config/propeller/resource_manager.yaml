@@ -1,0 +1,3 @@
+propeller:
+  resourcemanager:
+    type: noop
