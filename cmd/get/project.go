@@ -12,9 +12,9 @@ import (
 	"github.com/lyft/flytectl/pkg/printer"
 )
 
-const(
-projectShort = "Gets project resources"
-projectLong  = `
+const (
+	projectShort = "Gets project resources"
+	projectLong  = `
 Retrieves all the projects.(project,projects can be used interchangeably in these commands)
 ::
 
@@ -48,9 +48,9 @@ Usage
 )
 
 var projectColumns = []printer.Column{
-	{"ID", "$.id"},
-	{"Name", "$.name"},
-	{"Description", "$.description"},
+	{Header: "ID", JSONPath: "$.id"},
+	{Header: "Name", JSONPath: "$.name"},
+	{Header: "Description", JSONPath: "$.description"},
 }
 
 func ProjectToProtoMessages(l []*admin.Project) []proto.Message {

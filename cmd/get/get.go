@@ -22,7 +22,7 @@ func CreateGetCommand() *cobra.Command {
 	getCmd := &cobra.Command{
 		Use:   "get",
 		Short: getCmdShort,
-		Long: getCmdLong,
+		Long:  getCmdLong,
 	}
 
 	getResourcesFuncs := map[string]cmdcore.CommandEntry{

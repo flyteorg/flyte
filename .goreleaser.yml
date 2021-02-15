@@ -11,7 +11,7 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -s -w -X github.com/lyft/flytestdlib/version.Version={{.Version}} -X github.com/lyft/flytestdlib/version.Build={{.ShortCommit}} -X github.com/lyft/flytestdlib/version.BuildTime={{.Date}}
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
 archives:
   - replacements:
       darwin: macOS
@@ -38,7 +38,7 @@ scoop:
 
   # Repository to push the app manifest to.
   bucket:
-    owner: lyft
+    owner: flyteorg
     name: flytectl
 
   # Git author used to commit to the repository.
@@ -49,7 +49,7 @@ scoop:
 
   # Your app's homepage.
   # Default is empty.
-  homepage: "https://godoc.org/github.com/lyft/flytectl"
+  homepage: "https://godoc.org/github.com/flyteorg/flytectl"
 
   # Your app's description.
   # Default is empty.
@@ -61,18 +61,11 @@ scoop:
 
   # Persist data between application updates
   persist:
-    - "data"
     - "config.toml"
 brews:
   - # Name template of the recipe
     # Default to project name
     name: flytectl
-
-    # IDs of the archives to use.
-    # Defaults to all.
-    #    ids:
-    #      - foo
-    #      - bar
 
     # GOARM to specify which 32-bit arm version to use if there are multiple versions
     # from the build section. Brew formulas support atm only one 32-bit version.
@@ -83,21 +76,14 @@ brews:
     # same kind. We will probably unify this in the next major version like it is done with scoop.
 
     # Github repository to push the tap to.
-    github:
-      owner: github-user
-      name: homebrew-tap
-
-    # OR Gitlab
-    # gitlab:
-    #   owner: gitlab-user
-    #   name: homebrew-tap
-
-    # Gitea is not supported yet, but the support coming
+    tap:
+      owner: flyteorg
+      name: flytectl
 
     # Template for the url which is determined by the given Token (github or gitlab)
     # Default for github is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
     # Default for gitlab is "https://gitlab.com/<repo_owner>/<repo_name>/uploads/{{ .ArtifactUploadHash }}/{{ .ArtifactName }}"
-    url_template: "http://github.com/lyft/flytectl/releases/{{ .Tag }}/{{ .ArtifactName }}"
+    url_template: "http://github.com/flyteorg/flytectl/releases/{{ .Tag }}/{{ .ArtifactName }}"
 
     # Allows you to set a custom download strategy. Note that you'll need
     # to implement the strategy and add it to your tap repository.
@@ -112,12 +98,8 @@ brews:
     # Git author used to commit to the repository.
     # Defaults are shown.
     commit_author:
-      name: goreleaserbot
-      email: goreleaser@carlosbecker.com
-
-    # Folder inside the repository to put the formula.
-    # Default is the root folder.
-    folder: Formula
+      name: flytebot
+      email: flytebot@flyte.org
 
     # Caveats for the user of your binary.
     # Default is empty.
@@ -125,7 +107,7 @@ brews:
 
     # Your app's homepage.
     # Default is empty.
-    homepage: "https://godoc.org/github.com/lyft/flytectl"
+    homepage: "https://flytectl.readthedocs.io/en/latest"
 
     # Your app's description.
     # Default is empty.
@@ -138,30 +120,6 @@ brews:
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Default is false.
     skip_upload: auto
-
-    # Custom block for brew.
-    # Can be used to specify alternate downloads for devel or head releases.
-    # Default is empty.
-    #    custom_block: |
-    #      head "https://github.com/some/package.git"
-    #      ...
-
-    # Packages your package depends on.
-    #    dependencies:
-    #      - name: git
-    #      - name: zsh
-    #        type: optional
-
-    # Packages that conflict with your package.
-    #    conflicts:
-    #      - svn
-    #      - bash
-
-    # Specify for packages that run as a service.
-    # Default is empty.
-    #    plist: |
-    #      <?xml version="1.0" encoding="UTF-8"?>
-    #      ...
 
     # So you can `brew test` your formula.
     # Default is empty.
