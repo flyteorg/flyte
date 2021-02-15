@@ -603,10 +603,18 @@ data:
     logger:
       show-source: true
       level: 2
-  resource_manager.yaml: |
+  noop_resource_manager.yaml: |
     propeller:
       resourcemanager:
         type: noop
+  resource_manager.yaml: |
+    propeller:
+      resourcemanager:
+        type: redis
+        resourceMaxQuota: 10000
+        redis:
+          hostPath: redis-resource-manager:6379
+          hostKey: mypassword
   storage.yaml: |+
     storage:
       type: minio
@@ -627,7 +635,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-569h4b5459
+  name: flyte-propeller-config-dg8ghd754d
   namespace: flyte
 ---
 apiVersion: v1
@@ -970,9 +978,6 @@ spec:
         - migrate
         - seed-projects
         - flytesnacks
-        - flytetester
-        - flyteexamples
-        - coo
         image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: seed-projects
@@ -1056,7 +1061,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-569h4b5459
+          name: flyte-propeller-config-dg8ghd754d
         name: config-volume
 ---
 apiVersion: apps/v1

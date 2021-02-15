@@ -40,7 +40,7 @@ configMapGenerator:
   - behavior: merge
     files:
       - ./config/propeller/enabled_plugins.yaml
-      - ./config/propeller/resource_manager.yaml
+      - ./config/propeller/noop_resource_manager.yaml
       - ./config/propeller/plugins/k8s.yaml
       - ./config/propeller/plugins/qubole.yaml
       - ./config/propeller/plugins/task_logs.yaml

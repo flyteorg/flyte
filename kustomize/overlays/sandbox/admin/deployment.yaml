@@ -46,9 +46,6 @@ spec:
               "migrate",
               "seed-projects",
               "flytesnacks",
-              "flytetester",
-              "flyteexamples",
-              "cookbook",
             ]
           volumeMounts:
             - name: config-volume

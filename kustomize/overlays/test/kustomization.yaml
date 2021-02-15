@@ -16,6 +16,7 @@ resources:
   - ./dependencies/storage
     # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
   - ./dependencies/contour_ingress_controller
+  - ../../base/namespace
 
 patches:
   - ./admin/deployment.yaml
@@ -40,7 +41,7 @@ configMapGenerator:
     behavior: merge
     files:
       - ./config/propeller/enabled_plugins.yaml
-      - ./config/propeller/resource_manager.yaml
+      - ./config/propeller/noop_resource_manager.yaml
       - ./config/propeller/plugins/k8s.yaml
       - ./config/common/storage.yaml
       - ./config/common/logger.yaml
