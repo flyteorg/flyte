@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+
 	"github.com/lyft/flytectl/cmd/get"
 	"github.com/lyft/flytectl/cmd/register"
 	"github.com/lyft/flytectl/cmd/update"
@@ -24,9 +25,9 @@ var (
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		PersistentPreRunE: initConfig,
-		Long : "flytectl is CLI tool written in go to interact with flyteadmin service",
-		Short: "flyetcl CLI tool",
-		Use : "flytectl",
+		Long:              "flytectl is CLI tool written in go to interact with flyteadmin service",
+		Short:             "flyetcl CLI tool",
+		Use:               "flytectl",
 	}
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
@@ -43,7 +44,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(get.CreateGetCommand())
 	rootCmd.AddCommand(update.CreateUpdateCommand())
-	rootCmd.AddCommand(register.RegisterCommand())
+	rootCmd.AddCommand(register.RemoteRegisterCommand())
 	config.GetConfig()
 
 	return rootCmd

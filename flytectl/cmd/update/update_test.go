@@ -1,15 +1,16 @@
 package update
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sort"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestUpdateCommand(t *testing.T) {
 	updateCommand := CreateUpdateCommand()
-	assert.Equal(t, updateCommand.Use , "update")
-	assert.Equal(t, updateCommand.Short , "Update various resources.")
+	assert.Equal(t, updateCommand.Use, "update")
+	assert.Equal(t, updateCommand.Short, "\nUsed for updating flyte resources eg: project.\n")
 	assert.Equal(t, len(updateCommand.Commands()), 1)
 	cmdNouns := updateCommand.Commands()
 	// Sort by Use value.

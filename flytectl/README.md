@@ -21,7 +21,7 @@ Generating docs locally can be accomplished by running make gendocs from within 
 ## Installation
 
 ```bash
-curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+curl -s https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | bash
 ```
 
 ## Contributing

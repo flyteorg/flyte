@@ -28,7 +28,8 @@ func TestJSONToTable(t *testing.T) {
 
 	b, err := json.Marshal(j)
 	assert.NoError(t, err)
-	assert.NoError(t, JSONToTable(b, []Column{
+	p := Printer{}
+	assert.NoError(t, p.JSONToTable(b, []Column{
 		{"A", "$.a"},
 		{"S", "$.s.y"},
 	}))

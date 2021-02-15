@@ -2,8 +2,8 @@ package register
 
 import (
 	"context"
-	"errors"
 	"fmt"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytectl/cmd/config"
@@ -14,12 +14,12 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 )
 
-//go:generate pflags RegisterFilesConfig
+//go:generate pflags FilesConfig
 
 var (
-	filesConfig = &RegisterFilesConfig{
-		version:     "v1",
-		skipOnError: false,
+	filesConfig = &FilesConfig{
+		Version:     "v1",
+		SkipOnError: false,
 	}
 )
 
@@ -27,21 +27,22 @@ const registrationProjectPattern = "{{ registration.project }}"
 const registrationDomainPattern = "{{ registration.domain }}"
 const registrationVersionPattern = "{{ registration.version }}"
 
-type RegisterFilesConfig struct {
-	version     string `json:"version" pflag:",version of the entity to be registered with flyte."`
-	skipOnError bool   `json:"skipOnError" pflag:",fail fast when registering files."`
+// FilesConfig
+type FilesConfig struct {
+	Version     string `json:"version" pflag:",version of the entity to be registered with flyte."`
+	SkipOnError bool   `json:"skipOnError" pflag:",fail fast when registering files."`
 }
 
-type RegisterResult struct {
+type Result struct {
 	Name   string
 	Status string
 	Info   string
 }
 
 var projectColumns = []printer.Column{
-	{"Name", "$.Name"},
-	{"Status", "$.Status"},
-	{"Additional Info", "$.Info"},
+	{Header: "Name", JSONPath: "$.Name"},
+	{Header: "Status", JSONPath: "$.Status"},
+	{Header: "Additional Info", JSONPath: "$.Info"},
 }
 
 func unMarshalContents(ctx context.Context, fileContents []byte, fname string) (proto.Message, error) {
@@ -60,12 +61,12 @@ func unMarshalContents(ctx context.Context, fileContents []byte, fname string) (
 		return launchPlan, nil
 	}
 	logger.Debugf(ctx, "Failed to unmarshal file %v for launch plan type", fname)
-	return nil, errors.New(fmt.Sprintf("Failed unmarshalling file %v", fname))
+	return nil, fmt.Errorf("failed unmarshalling file %v", fname)
 
 }
 
 func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.CommandContext) error {
-	switch message.(type) {
+	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
 		_, err := cmdCtx.AdminClient().CreateLaunchPlan(ctx, &admin.LaunchPlanCreateRequest{
@@ -74,7 +75,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Project:      config.GetConfig().Project,
 				Domain:       config.GetConfig().Domain,
 				Name:         launchPlan.Id.Name,
-				Version:      filesConfig.version,
+				Version:      filesConfig.Version,
 			},
 			Spec: launchPlan.Spec,
 		})
@@ -87,7 +88,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Project:      config.GetConfig().Project,
 				Domain:       config.GetConfig().Domain,
 				Name:         workflowSpec.Template.Id.Name,
-				Version:      filesConfig.version,
+				Version:      filesConfig.Version,
 			},
 			Spec: workflowSpec,
 		})
@@ -100,19 +101,19 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Project:      config.GetConfig().Project,
 				Domain:       config.GetConfig().Domain,
 				Name:         taskSpec.Template.Id.Name,
-				Version:      filesConfig.version,
+				Version:      filesConfig.Version,
 			},
 			Spec: taskSpec,
 		})
 		return err
 	default:
-		return errors.New(fmt.Sprintf("Failed registering unknown entity  %v", message))
+		return fmt.Errorf("Failed registering unknown entity  %v", v)
 	}
 }
 
 func hydrateNode(node *core.Node) error {
 	targetNode := node.Target
-	switch targetNode.(type) {
+	switch v := targetNode.(type) {
 	case *core.Node_TaskNode:
 		taskNodeWrapper := targetNode.(*core.Node_TaskNode)
 		taskNodeReference := taskNodeWrapper.TaskNode.Reference.(*core.TaskNode_ReferenceId)
@@ -127,27 +128,34 @@ func hydrateNode(node *core.Node) error {
 			launchPlanNodeReference := workflowNodeWrapper.WorkflowNode.Reference.(*core.WorkflowNode_LaunchplanRef)
 			hydrateIdentifier(launchPlanNodeReference.LaunchplanRef)
 		default:
-			errors.New(fmt.Sprintf("Unknown type %T", workflowNodeWrapper.WorkflowNode.Reference))
+			return fmt.Errorf("unknown type %T", workflowNodeWrapper.WorkflowNode.Reference)
 		}
 	case *core.Node_BranchNode:
 		branchNodeWrapper := targetNode.(*core.Node_BranchNode)
-		hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode)
+		if err := hydrateNode(branchNodeWrapper.BranchNode.IfElse.Case.ThenNode); err != nil {
+			return fmt.Errorf("failed to hydrateNode")
+		}
 		if len(branchNodeWrapper.BranchNode.IfElse.Other) > 0 {
 			for _, ifBlock := range branchNodeWrapper.BranchNode.IfElse.Other {
-				hydrateNode(ifBlock.ThenNode)
+				if err := hydrateNode(ifBlock.ThenNode); err != nil {
+					return fmt.Errorf("failed to hydrateNode")
+				}
 			}
 		}
 		switch branchNodeWrapper.BranchNode.IfElse.Default.(type) {
 		case *core.IfElseBlock_ElseNode:
 			elseNodeReference := branchNodeWrapper.BranchNode.IfElse.Default.(*core.IfElseBlock_ElseNode)
-			hydrateNode(elseNodeReference.ElseNode)
+			if err := hydrateNode(elseNodeReference.ElseNode); err != nil {
+				return fmt.Errorf("failed to hydrateNode")
+			}
+
 		case *core.IfElseBlock_Error:
 			// Do nothing.
 		default:
-			return errors.New(fmt.Sprintf("Unknown type %T", branchNodeWrapper.BranchNode.IfElse.Default))
+			return fmt.Errorf("unknown type %T", branchNodeWrapper.BranchNode.IfElse.Default)
 		}
 	default:
-		return errors.New(fmt.Sprintf("Unknown type %T", targetNode))
+		return fmt.Errorf("unknown type %T", v)
 	}
 	return nil
 }
@@ -160,12 +168,12 @@ func hydrateIdentifier(identifier *core.Identifier) {
 		identifier.Domain = config.GetConfig().Domain
 	}
 	if identifier.Version == "" || identifier.Version == registrationVersionPattern {
-		identifier.Version = filesConfig.version
+		identifier.Version = filesConfig.Version
 	}
 }
 
 func hydrateSpec(message proto.Message) error {
-	switch message.(type) {
+	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
 		hydrateIdentifier(launchPlan.Spec.WorkflowId)
@@ -189,12 +197,12 @@ func hydrateSpec(message proto.Message) error {
 		taskSpec := message.(*admin.TaskSpec)
 		hydrateIdentifier(taskSpec.Template.Id)
 	default:
-		return errors.New(fmt.Sprintf("Unknown type %T", message))
+		return fmt.Errorf("Unknown type %T", v)
 	}
 	return nil
 }
 
-func getJsonSpec(message proto.Message) string {
+func getJSONSpec(message proto.Message) string {
 	marshaller := jsonpb.Marshaler{
 		EnumsAsInts:  false,
 		EmitDefaults: true,

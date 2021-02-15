@@ -7,4 +7,3 @@ func main() {
 		panic(err)
 	}
 }
-

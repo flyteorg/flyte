@@ -5,15 +5,16 @@ package register
 
 import (
 	"encoding/json"
-	"fmt"
 	"reflect"
+
+	"fmt"
 
 	"github.com/spf13/pflag"
 )
 
 // If v is a pointer, it will get its element value or the zero value of the element type.
 // If v is not a pointer, it will return it as is.
-func (RegisterFilesConfig) elemValueOrNil(v interface{}) interface{} {
+func (FilesConfig) elemValueOrNil(v interface{}) interface{} {
 	if t := reflect.TypeOf(v); t.Kind() == reflect.Ptr {
 		if reflect.ValueOf(v).IsNil() {
 			return reflect.Zero(t.Elem()).Interface()
@@ -27,7 +28,7 @@ func (RegisterFilesConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
-func (RegisterFilesConfig) mustMarshalJSON(v json.Marshaler) string {
+func (FilesConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
 		panic(err)
@@ -36,11 +37,11 @@ func (RegisterFilesConfig) mustMarshalJSON(v json.Marshaler) string {
 	return string(raw)
 }
 
-// GetPFlagSet will return strongly types pflags for all fields in RegisterFilesConfig and its nested types. The format of the
+// GetPFlagSet will return strongly types pflags for all fields in FilesConfig and its nested types. The format of the
 // flags is json-name.json-sub-name... etc.
-func (cfg RegisterFilesConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
-	cmdFlags := pflag.NewFlagSet("RegisterFilesConfig", pflag.ExitOnError)
-	cmdFlags.StringVarP(&(filesConfig.version),fmt.Sprintf("%v%v", prefix, "version"), "v", "v1", "version of the entity to be registered with flyte.")
-	cmdFlags.BoolVarP(&(filesConfig.skipOnError), fmt.Sprintf("%v%v", prefix, "skipOnError"), "s", *new(bool), "fail fast when registering files.")
+func (cfg FilesConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
+	cmdFlags := pflag.NewFlagSet("FilesConfig", pflag.ExitOnError)
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "version"), *new(string), "version of the entity to be registered with flyte.")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "skipOnError"), *new(bool), "fail fast when registering files.")
 	return cmdFlags
 }

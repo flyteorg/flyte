@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytestdlib/logger"
 
@@ -14,7 +15,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-const(
+const (
 	taskShort = "Gets task resources"
 	taskLong  = `
 Retrieves all the task within project and domain.(task,tasks can be used interchangeably in these commands)
@@ -50,12 +51,12 @@ Usage
 )
 
 var taskColumns = []printer.Column{
-	{"Version", "$.id.version"},
-	{"Name", "$.id.name"},
-	{"Type", "$.closure.compiledTask.template.type"},
-	{"Discoverable", "$.closure.compiledTask.template.metadata.discoverable"},
-	{"Discovery Version", "$.closure.compiledTask.template.metadata.discoveryVersion"},
-	{"Created At", "$.closure.createdAt"},
+	{Header: "Version", JSONPath: "$.id.version"},
+	{Header: "Name", JSONPath: "$.id.name"},
+	{Header: "Type", JSONPath: "$.closure.compiledTask.template.type"},
+	{Header: "Discoverable", JSONPath: "$.closure.compiledTask.template.metadata.discoverable"},
+	{Header: "Discovery Version", JSONPath: "$.closure.compiledTask.template.metadata.discoveryVersion"},
+	{Header: "Created At", JSONPath: "$.closure.createdAt"},
 }
 
 func TaskToProtoMessages(l []*admin.Task) []proto.Message {

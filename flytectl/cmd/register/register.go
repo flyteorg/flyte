@@ -16,8 +16,8 @@ If the entities are already registered with flyte for the same version then regi
 `
 )
 
-// RegisterCommand will return register command
-func RegisterCommand() *cobra.Command {
+// RemoteRegisterCommand will return register command
+func RemoteRegisterCommand() *cobra.Command {
 	registerCmd := &cobra.Command{
 		Use:   "register",
 		Short: registerCmdShort,

@@ -3,6 +3,7 @@ package update
 import (
 	"context"
 	"fmt"
+
 	"github.com/lyft/flytectl/cmd/config"
 	cmdCore "github.com/lyft/flytectl/cmd/core"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
@@ -16,7 +17,7 @@ type ProjectConfig struct {
 	ArchiveProject  bool `json:"archiveProject" pflag:",Archives the project specified as argument."`
 }
 
-const(
+const (
 	projectShort = "Updates project resources"
 	projectLong  = `
 Updates the project according the flags passed.Allows you to archive or activate a project.
@@ -80,8 +81,7 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 	archiveProject := projectConfig.ArchiveProject
 	activateProject := projectConfig.ActivateProject
 	if activateProject == archiveProject {
-		fmt.Printf(errInvalidUpdate)
-		return nil
+		return fmt.Errorf(errInvalidUpdate)
 	}
 	projectState := admin.Project_ACTIVE
 	if archiveProject {

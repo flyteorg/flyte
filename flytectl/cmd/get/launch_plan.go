@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytectl/cmd/config"
 	cmdCore "github.com/lyft/flytectl/cmd/core"
@@ -11,8 +12,7 @@ import (
 	"github.com/lyft/flytestdlib/logger"
 )
 
-const(
-
+const (
 	launchPlanShort = "Gets launch plan resources"
 	launchPlanLong  = `
 Retrieves all the launch plans within project and domain.(launchplan,launchplans can be used interchangeably in these commands)
@@ -48,11 +48,11 @@ Usage
 )
 
 var launchplanColumns = []printer.Column{
-	{"Version", "$.id.version"},
-	{"Name", "$.id.name"},
-	{"Type", "$.closure.compiledTask.template.type"},
-	{"State", "$.spec.state"},
-	{"Schedule", "$.spec.entityMetadata.schedule"},
+	{Header: "Version", JSONPath: "$.id.version"},
+	{Header: "Name", JSONPath: "$.id.name"},
+	{Header: "Type", JSONPath: "$.closure.compiledTask.template.type"},
+	{Header: "State", JSONPath: "$.spec.state"},
+	{Header: "Schedule", JSONPath: "$.spec.entityMetadata.schedule"},
 }
 
 func LaunchplanToProtoMessages(l []*admin.LaunchPlan) []proto.Message {
@@ -93,5 +93,4 @@ func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 	}
 	logger.Debugf(ctx, "Retrieved %v launch plans", len(launchPlans))
 	return launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), entityColumns, adminutils.NamedEntityToProtoMessage(launchPlans)...)
-	return nil
 }

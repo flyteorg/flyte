@@ -14,22 +14,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var dereferencableKindsRegisterFilesConfig = map[reflect.Kind]struct{}{
+var dereferencableKindsFilesConfig = map[reflect.Kind]struct{}{
 	reflect.Array: {}, reflect.Chan: {}, reflect.Map: {}, reflect.Ptr: {}, reflect.Slice: {},
 }
 
 // Checks if t is a kind that can be dereferenced to get its underlying type.
-func canGetElementRegisterFilesConfig(t reflect.Kind) bool {
-	_, exists := dereferencableKindsRegisterFilesConfig[t]
+func canGetElementFilesConfig(t reflect.Kind) bool {
+	_, exists := dereferencableKindsFilesConfig[t]
 	return exists
 }
 
 // This decoder hook tests types for json unmarshaling capability. If implemented, it uses json unmarshal to build the
 // object. Otherwise, it'll just pass on the original data.
-func jsonUnmarshalerHookRegisterFilesConfig(_, to reflect.Type, data interface{}) (interface{}, error) {
+func jsonUnmarshalerHookFilesConfig(_, to reflect.Type, data interface{}) (interface{}, error) {
 	unmarshalerType := reflect.TypeOf((*json.Unmarshaler)(nil)).Elem()
 	if to.Implements(unmarshalerType) || reflect.PtrTo(to).Implements(unmarshalerType) ||
-		(canGetElementRegisterFilesConfig(to.Kind()) && to.Elem().Implements(unmarshalerType)) {
+		(canGetElementFilesConfig(to.Kind()) && to.Elem().Implements(unmarshalerType)) {
 
 		raw, err := json.Marshal(data)
 		if err != nil {
@@ -50,7 +50,7 @@ func jsonUnmarshalerHookRegisterFilesConfig(_, to reflect.Type, data interface{}
 	return data, nil
 }
 
-func decode_RegisterFilesConfig(input, result interface{}) error {
+func decode_FilesConfig(input, result interface{}) error {
 	config := &mapstructure.DecoderConfig{
 		TagName:          "json",
 		WeaklyTypedInput: true,
@@ -58,7 +58,7 @@ func decode_RegisterFilesConfig(input, result interface{}) error {
 		DecodeHook: mapstructure.ComposeDecodeHookFunc(
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
-			jsonUnmarshalerHookRegisterFilesConfig,
+			jsonUnmarshalerHookFilesConfig,
 		),
 	}
 
@@ -70,7 +70,7 @@ func decode_RegisterFilesConfig(input, result interface{}) error {
 	return decoder.Decode(input)
 }
 
-func join_RegisterFilesConfig(arr interface{}, sep string) string {
+func join_FilesConfig(arr interface{}, sep string) string {
 	listValue := reflect.ValueOf(arr)
 	strs := make([]string, 0, listValue.Len())
 	for i := 0; i < listValue.Len(); i++ {
@@ -80,22 +80,22 @@ func join_RegisterFilesConfig(arr interface{}, sep string) string {
 	return strings.Join(strs, sep)
 }
 
-func testDecodeJson_RegisterFilesConfig(t *testing.T, val, result interface{}) {
-	assert.NoError(t, decode_RegisterFilesConfig(val, result))
+func testDecodeJson_FilesConfig(t *testing.T, val, result interface{}) {
+	assert.NoError(t, decode_FilesConfig(val, result))
 }
 
-func testDecodeSlice_RegisterFilesConfig(t *testing.T, vStringSlice, result interface{}) {
-	assert.NoError(t, decode_RegisterFilesConfig(vStringSlice, result))
+func testDecodeSlice_FilesConfig(t *testing.T, vStringSlice, result interface{}) {
+	assert.NoError(t, decode_FilesConfig(vStringSlice, result))
 }
 
-func TestRegisterFilesConfig_GetPFlagSet(t *testing.T) {
-	val := RegisterFilesConfig{}
+func TestFilesConfig_GetPFlagSet(t *testing.T) {
+	val := FilesConfig{}
 	cmdFlags := val.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 }
 
-func TestRegisterFilesConfig_SetFlags(t *testing.T) {
-	actual := RegisterFilesConfig{}
+func TestFilesConfig_SetFlags(t *testing.T) {
+	actual := FilesConfig{}
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
@@ -103,7 +103,7 @@ func TestRegisterFilesConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("version"); err == nil {
-				assert.Equal(t, string("v1"), vString)
+				assert.Equal(t, string(*new(string)), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -114,7 +114,7 @@ func TestRegisterFilesConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("version", testValue)
 			if vString, err := cmdFlags.GetString("version"); err == nil {
-				testDecodeJson_RegisterFilesConfig(t, fmt.Sprintf("%v", vString), &actual.version)
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.Version)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -136,7 +136,7 @@ func TestRegisterFilesConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("skipOnError", testValue)
 			if vBool, err := cmdFlags.GetBool("skipOnError"); err == nil {
-				testDecodeJson_RegisterFilesConfig(t, fmt.Sprintf("%v", vBool), &actual.skipOnError)
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vBool), &actual.SkipOnError)
 
 			} else {
 				assert.FailNow(t, err.Error())

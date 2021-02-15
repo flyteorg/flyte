@@ -3,14 +3,15 @@ package get
 import (
 	"context"
 	"errors"
+	"io"
+	"testing"
+
 	"github.com/lyft/flytectl/cmd/config"
 	cmdCore "github.com/lyft/flytectl/cmd/core"
 	"github.com/lyft/flyteidl/clients/go/admin/mocks"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
-	"io"
-	"testing"
 )
 
 const projectValue = "dummyProject"
@@ -20,12 +21,13 @@ const launchPlanNameValue = "lp_name"
 const launchPlanVersionValue = "lp_version"
 const workflowNameValue = "wf_name"
 const workflowVersionValue = "wf_version"
+const output = "json"
 
 func TestListExecutionFunc(t *testing.T) {
 	ctx := context.Background()
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = "json"
+	config.GetConfig().Output = output
 	var args []string
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
@@ -61,8 +63,7 @@ func TestListExecutionFunc(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	var executions []*admin.Execution
-	executions = append(executions, executionResponse)
+	executions := []*admin.Execution{executionResponse}
 	executionList := &admin.ExecutionList{
 		Executions: executions,
 	}
@@ -76,7 +77,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 	ctx := context.Background()
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = "json"
+	config.GetConfig().Output = output
 	var args []string
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
@@ -88,7 +89,7 @@ func TestListExecutionFuncWithError(t *testing.T) {
 			Domain:  domainValue,
 		},
 	}
-	executionResponse := &admin.Execution{
+	_ = &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -112,12 +113,10 @@ func TestListExecutionFuncWithError(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	var executions []*admin.Execution
-	executions = append(executions, executionResponse)
-	mockClient.OnListExecutionsMatch(ctx, execListRequest).Return(nil, errors.New("Executions NotFound."))
+	mockClient.OnListExecutionsMatch(ctx, execListRequest).Return(nil, errors.New("executions NotFound"))
 	err := getExecutionFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
-	assert.Equal(t, err, errors.New("Executions NotFound."))
+	assert.Equal(t, err, errors.New("executions NotFound"))
 	mockClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
 }
 
@@ -125,7 +124,7 @@ func TestGetExecutionFunc(t *testing.T) {
 	ctx := context.Background()
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = "json"
+	config.GetConfig().Output = output
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
@@ -160,8 +159,6 @@ func TestGetExecutionFunc(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	var executions []*admin.Execution
-	executions = append(executions, executionResponse)
 	args := []string{executionNameValue}
 	mockClient.OnGetExecutionMatch(ctx, execGetRequest).Return(executionResponse, nil)
 	err := getExecutionFunc(ctx, args, cmdCtx)
@@ -173,7 +170,7 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 	ctx := context.Background()
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
-	config.GetConfig().Output = "json"
+	config.GetConfig().Output = output
 	mockClient := new(mocks.AdminServiceClient)
 	mockOutStream := new(io.Writer)
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
@@ -184,7 +181,7 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 			Name:    executionNameValue,
 		},
 	}
-	executionResponse := &admin.Execution{
+	_ = &admin.Execution{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -208,12 +205,11 @@ func TestGetExecutionFuncWithError(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	var executions []*admin.Execution
-	executions = append(executions, executionResponse)
+
 	args := []string{executionNameValue}
-	mockClient.OnGetExecutionMatch(ctx, execGetRequest).Return(nil, errors.New("Execution NotFound."))
+	mockClient.OnGetExecutionMatch(ctx, execGetRequest).Return(nil, errors.New("execution NotFound"))
 	err := getExecutionFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
-	assert.Equal(t, err, errors.New("Execution NotFound."))
+	assert.Equal(t, err, errors.New("execution NotFound"))
 	mockClient.AssertCalled(t, "GetExecution", ctx, execGetRequest)
 }

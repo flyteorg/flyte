@@ -5,7 +5,7 @@ import (
 )
 
 var entityColumns = []printer.Column{
-	{"Domain", "$.domain"},
-	{"Name", "$.name"},
-	{"Project", "$.project"},
+	{Header: "Domain", JSONPath: "$.domain"},
+	{Header: "Name", JSONPath: "$.name"},
+	{Header: "Project", JSONPath: "$.project"},
 }

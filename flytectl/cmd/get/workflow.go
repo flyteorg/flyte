@@ -2,6 +2,7 @@ package get
 
 import (
 	"context"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/lyft/flytestdlib/logger"
 
@@ -13,7 +14,7 @@ import (
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
-const(
+const (
 	workflowShort = "Gets workflow resources"
 	workflowLong  = `
 Retrieves all the workflows within project and domain.(workflow,workflows can be used interchangeably in these commands)
@@ -49,9 +50,9 @@ Usage
 )
 
 var workflowColumns = []printer.Column{
-	{"Version", "$.id.version"},
-	{"Name", "$.id.name"},
-	{"Created At", "$.closure.createdAt"},
+	{Header: "Version", JSONPath: "$.id.version"},
+	{Header: "Name", JSONPath: "$.id.name"},
+	{Header: "Created At", JSONPath: "$.closure.createdAt"},
 }
 
 func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
