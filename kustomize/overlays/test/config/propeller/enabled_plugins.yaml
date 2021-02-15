@@ -1,0 +1,10 @@
+tasks:
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar
+      - k8s-array
+    default-for-task-types:
+      container: container
+      sidecar: sidecar
+      container_array: k8s-array

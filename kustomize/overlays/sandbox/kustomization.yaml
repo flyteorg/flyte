@@ -72,3 +72,6 @@ images:
   - name: flytepropeller # match images with this name
     newTag: v0.5.13 # override the tag
     newName: ghcr.io/flyteorg/flytepropeller # override the name
+  # Override postgres image to use alpine based (rather smaller) docker image
+  - name: postgres
+    newTag: 10.16-alpine

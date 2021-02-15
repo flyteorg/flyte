@@ -580,14 +580,16 @@ data:
           rate: 10
           capacity: 100
   enabled_plugins.yaml: |
-    ##
-    # TODO  It is important to enable the plugins that you want to deploy here.
     tasks:
       task-plugins:
         enabled-plugins:
           - container
           - sidecar
           - k8s-array
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          container_array: k8s-array
   k8s.yaml: |
     plugins:
       k8s:
@@ -604,11 +606,7 @@ data:
   resource_manager.yaml: |
     propeller:
       resourcemanager:
-        type: redis
-        resourceMaxQuota: 10000
-        redis:
-          hostPath: redis-resource-manager:6379
-          hostKey: mypassword
+        type: noop
   storage.yaml: |+
     storage:
       type: minio
@@ -629,7 +627,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-45fc6m5292
+  name: flyte-propeller-config-569h4b5459
   namespace: flyte
 ---
 apiVersion: v1
@@ -723,23 +721,6 @@ spec:
   - port: 5432
   selector:
     app: postgres
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: redis-resource-manager
-  name: redis-resource-manager
-  namespace: flyte
-spec:
-  ports:
-  - name: redis
-    port: 6379
-    protocol: TCP
-    targetPort: redis
-  selector:
-    app: redis-resource-manager
-  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -964,7 +945,7 @@ spec:
         - sh
         - -c
         - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.1
+        image: postgres:10.16-alpine
         name: check-db-ready
       - command:
         - flyteadmin
@@ -991,6 +972,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
+        - coo
         image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: seed-projects
@@ -1074,7 +1056,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-45fc6m5292
+          name: flyte-propeller-config-569h4b5459
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1127,7 +1109,10 @@ spec:
         app: postgres
     spec:
       containers:
-      - image: postgres:10.1
+      - env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
+        image: postgres:10.16-alpine
         name: postgres
         ports:
         - containerPort: 5432
@@ -1138,66 +1123,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: postgres-storage
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: redis
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: redis-resource-manager
-  serviceName: redis-resource-manager
-  template:
-    metadata:
-      labels:
-        app: redis-resource-manager
-    spec:
-      containers:
-      - env:
-        - name: REDIS_PASSWORD
-          value: mypassword
-        image: docker.io/bitnami/redis:4.0.2-r1
-        imagePullPolicy: IfNotPresent
-        livenessProbe:
-          exec:
-            command:
-            - redis-cli
-            - ping
-          failureThreshold: 3
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 5
-        name: redis-resource-manager
-        ports:
-        - containerPort: 6379
-          name: redis
-          protocol: TCP
-        readinessProbe:
-          exec:
-            command:
-            - redis-cli
-            - ping
-          failureThreshold: 3
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          successThreshold: 1
-          timeoutSeconds: 1
-        resources:
-          requests:
-            cpu: 200m
-            memory: 128Mi
-        volumeMounts:
-        - mountPath: /bitnami
-          name: redis-data
-      dnsPolicy: ClusterFirst
-      restartPolicy: Always
-      volumes:
-      - emptyDir: {}
-        name: redis-data
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress

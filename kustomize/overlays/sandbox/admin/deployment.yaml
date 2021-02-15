@@ -48,6 +48,7 @@ spec:
               "flytesnacks",
               "flytetester",
               "flyteexamples",
+              "cookbook",
             ]
           volumeMounts:
             - name: config-volume

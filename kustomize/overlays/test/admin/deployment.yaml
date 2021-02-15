@@ -28,7 +28,7 @@ spec:
         image: flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
         command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
-                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
+                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples", "cookbook"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
