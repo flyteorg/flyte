@@ -17,22 +17,25 @@ spec:
         - name: postgres-storage
           emptyDir: {}
       containers:
-      - image: "postgres:10.1"
-        name: postgres
-        ports:
-        - containerPort: 5432
+        - image: postgres
           name: postgres
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
 ---
- apiVersion: v1
- kind: Service
- metadata:
-   name: postgres
-   namespace: flyte
- spec:
-   ports:
-   - port: 5432
-   selector:
-     app: postgres
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: flyte
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres

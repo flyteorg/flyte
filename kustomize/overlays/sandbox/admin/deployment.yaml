@@ -7,47 +7,73 @@ spec:
   template:
     spec:
       volumes:
-      - name: resource-templates 
-        configMap:
-          name: clusterresource-template 
+        - name: resource-templates
+          configMap:
+            name: clusterresource-template
       initContainers:
-      - name: check-db-ready
-        image: postgres:10.1
-        command: ['sh', '-c',
-          'until pg_isready -h postgres -p 5432;
-          do echo waiting for database; sleep 2; done;']
-      - name: run-migrations
-        image: flyteadmin:v0.3.29
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
-                  "migrate", "run"]
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/flyte/config
-      - name: seed-projects
-        image: flyteadmin:v0.3.29
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
-                  "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
-        volumeMounts:
-        - name: config-volume
-          mountPath: /etc/flyte/config
-      - name: sync-cluster-resources
-        image: flyteadmin:v0.3.29
-        imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
-        volumeMounts:
-        - name: resource-templates 
-          mountPath: /etc/flyte/clusterresource/templates
-        - name: config-volume
-          mountPath: /etc/flyte/config
+        - name: check-db-ready
+          image: postgres:10.16-alpine
+          command: [
+              "sh",
+              "-c",
+              "until pg_isready -h postgres -p 5432;
+              do echo waiting for database; sleep 2; done;",
+            ]
+        - name: run-migrations
+          image: flyteadmin:v0.3.29
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              "flyteadmin",
+              "--logtostderr",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "migrate",
+              "run",
+            ]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+        - name: seed-projects
+          image: flyteadmin:v0.3.29
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              "flyteadmin",
+              "--logtostderr",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "migrate",
+              "seed-projects",
+              "flytesnacks",
+            ]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+        - name: sync-cluster-resources
+          image: flyteadmin:v0.3.29
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              "flyteadmin",
+              "--logtostderr",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "clusterresource",
+              "sync",
+            ]
+          volumeMounts:
+            - name: resource-templates
+              mountPath: /etc/flyte/clusterresource/templates
+            - name: config-volume
+              mountPath: /etc/flyte/config
       containers:
-      - name: flyteadmin
-        resources:
-          limits:
-            memory: "200Mi"
-            cpu: "0.1"
-            ephemeral-storage: "100Mi"
+        - name: flyteadmin
+          resources:
+            limits:
+              memory: "200Mi"
+              cpu: "0.1"
+              ephemeral-storage: "100Mi"
 ---
 apiVersion: v1
 kind: Service
@@ -56,7 +82,7 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: redoc
-    protocol: TCP
-    port: 87
-    targetPort: 8087
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087

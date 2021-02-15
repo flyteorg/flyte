@@ -17,13 +17,11 @@ bases:
 # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
 # Add node ports for ease of use locally
 resources:
-  - ../../base/operators/spark
-  - ../../base/operators/kfoperators/pytorch
   - ./dependencies/database
   - ./dependencies/storage
-  - ./dependencies/redis
   - ./dependencies/contour_ingress_controller
   - ./dependencies/nodeport-services.yaml
+  - ../../base/namespace
 
 patchesStrategicMerge:
   - admin/deployment.yaml
@@ -38,16 +36,12 @@ configMapGenerator:
   - behavior: merge
     files:
       - ./config/clusterresource-templates/ac_project-copilot-dataconfig.yaml
-      - ./config/clusterresource-templates/ad_spark-role.yaml
-      - ./config/clusterresource-templates/ae_spark-service-account.yaml
-      - ./config/clusterresource-templates/af_spark-role-binding.yaml
     name: clusterresource-template
   - behavior: merge
     files:
       - ./config/propeller/enabled_plugins.yaml
+      - ./config/propeller/resource_manager.yaml
       - ./config/propeller/plugins/k8s.yaml
-      - ./config/propeller/plugins/qubole.yaml
-      - ./config/propeller/plugins/spark.yaml
       - ./config/propeller/plugins/task_logs.yaml
       - ./config/common/storage.yaml
       - ./config/common/logger.yaml
@@ -77,3 +71,6 @@ images:
   - name: flytepropeller # match images with this name
     newTag: v0.5.13 # override the tag
     newName: ghcr.io/flyteorg/flytepropeller # override the name
+  # Override postgres image to use alpine based (rather smaller) docker image
+  - name: postgres
+    newTag: 10.16-alpine
