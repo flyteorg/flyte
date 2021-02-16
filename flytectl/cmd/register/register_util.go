@@ -1,42 +1,49 @@
 package register
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
+	"errors"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"sort"
+	"strings"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+
 	"github.com/lyft/flytectl/cmd/config"
 	cmdCore "github.com/lyft/flytectl/cmd/core"
 	"github.com/lyft/flytectl/pkg/printer"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
-)
-
-//go:generate pflags FilesConfig
-
-var (
-	filesConfig = &FilesConfig{
-		Version:     "v1",
-		SkipOnError: false,
-	}
+	"github.com/lyft/flytestdlib/storage"
 )
 
 const registrationProjectPattern = "{{ registration.project }}"
 const registrationDomainPattern = "{{ registration.domain }}"
 const registrationVersionPattern = "{{ registration.version }}"
 
-// FilesConfig
-type FilesConfig struct {
-	Version     string `json:"version" pflag:",version of the entity to be registered with flyte."`
-	SkipOnError bool   `json:"skipOnError" pflag:",fail fast when registering files."`
-}
-
 type Result struct {
 	Name   string
 	Status string
 	Info   string
+}
+
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var Client HTTPClient
+
+func init() {
+	Client = &http.Client{}
 }
 
 var projectColumns = []printer.Column{
@@ -200,6 +207,155 @@ func hydrateSpec(message proto.Message) error {
 		return fmt.Errorf("Unknown type %T", v)
 	}
 	return nil
+}
+
+func DownloadFileFromHTTP(ctx context.Context, ref storage.DataReference) (io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, ref.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := Client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body, nil
+}
+
+/*
+Get file list from the args list.
+If the archive flag is on then download the archives to temp directory and extract it.
+The o/p of this function would be sorted list of the file locations.
+*/
+func getSortedFileList(ctx context.Context, args []string) ([]string, string, error) {
+	if !filesConfig.Archive {
+		/*
+		 * Sorting is required for non-archived case since its possible for the user to pass in a list of unordered
+		 * serialized protobuf files , but flyte expects them to be registered in topologically sorted order that it had
+		 * generated otherwise the registration can fail if the dependent files are not registered earlier.
+		 */
+		sort.Strings(args)
+		return args, "", nil
+	}
+	tempDir, err := ioutil.TempDir("/tmp", "register")
+
+	if err != nil {
+		return nil, tempDir, err
+	}
+	dataRefs := args
+	var unarchivedFiles []string
+	for i := 0; i < len(dataRefs); i++ {
+		dataRefReaderCloser, err := getArchiveReaderCloser(ctx, dataRefs[i])
+		if err != nil {
+			return unarchivedFiles, tempDir, err
+		}
+		archiveReader := tar.NewReader(dataRefReaderCloser)
+		if unarchivedFiles, err = readAndCopyArchive(archiveReader, tempDir, unarchivedFiles); err != nil {
+			return unarchivedFiles, tempDir, err
+		}
+		if err = dataRefReaderCloser.Close(); err != nil {
+			return unarchivedFiles, tempDir, err
+		}
+	}
+	/*
+	 * Similarly in case of archived files, it possible to have an archive created in totally different order than the
+	 * listing order of the serialized files which is required by flyte. Hence we explicitly sort here after unarchiving it.
+	 */
+	sort.Strings(unarchivedFiles)
+	return unarchivedFiles, tempDir, nil
+}
+
+func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string) ([]string, error) {
+	for {
+		tarReader := src.(*tar.Reader)
+		header, err := tarReader.Next()
+		switch {
+		case err == io.EOF:
+			return unarchivedFiles, nil
+		case err != nil:
+			return unarchivedFiles, err
+		}
+		// Location to untar. FilePath couldnt be used here due to,
+		// G305: File traversal when extracting zip archive
+		target := tempDir + "/" + header.Name
+		if header.Typeflag == tar.TypeDir {
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
+					return unarchivedFiles, err
+				}
+			}
+		} else if header.Typeflag == tar.TypeReg {
+			dest, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return unarchivedFiles, err
+			}
+			if _, err := io.Copy(dest, src); err != nil {
+				return unarchivedFiles, err
+			}
+			unarchivedFiles = append(unarchivedFiles, dest.Name())
+			if err := dest.Close(); err != nil {
+				return unarchivedFiles, err
+			}
+		}
+	}
+}
+
+func registerFile(ctx context.Context, fileName string, registerResults []Result, cmdCtx cmdCore.CommandContext) ([]Result, error) {
+	var registerResult Result
+	var fileContents []byte
+	var err error
+	if fileContents, err = ioutil.ReadFile(fileName); err != nil {
+		registerResults = append(registerResults, Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error reading file due to %v", err)})
+		return registerResults, err
+	}
+	spec, err := unMarshalContents(ctx, fileContents, fileName)
+	if err != nil {
+		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error unmarshalling file due to %v", err)}
+		registerResults = append(registerResults, registerResult)
+		return registerResults, err
+	}
+	if err := hydrateSpec(spec); err != nil {
+		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error hydrating spec due to %v", err)}
+		registerResults = append(registerResults, registerResult)
+		return registerResults, err
+	}
+	logger.Debugf(ctx, "Hydrated spec : %v", getJSONSpec(spec))
+	if err := register(ctx, spec, cmdCtx); err != nil {
+		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error registering file due to %v", err)}
+		registerResults = append(registerResults, registerResult)
+		return registerResults, err
+	}
+	registerResult = Result{Name: fileName, Status: "Success", Info: "Successfully registered file"}
+	logger.Debugf(ctx, "Successfully registered %v", fileName)
+	registerResults = append(registerResults, registerResult)
+	return registerResults, nil
+}
+
+func getArchiveReaderCloser(ctx context.Context, ref string) (io.ReadCloser, error) {
+	dataRef := storage.DataReference(ref)
+	scheme, _, key, err := dataRef.Split()
+	segments := strings.Split(key, ".")
+	ext := segments[len(segments)-1]
+	if err != nil {
+		return nil, err
+	}
+	if ext != "tar" && ext != "tgz" {
+		return nil, errors.New("only .tar and .tgz extension archives are supported")
+	}
+	var dataRefReaderCloser io.ReadCloser
+	if scheme == "http" || scheme == "https" {
+		dataRefReaderCloser, err = DownloadFileFromHTTP(ctx, dataRef)
+	} else {
+		dataRefReaderCloser, err = os.Open(dataRef.String())
+	}
+	if err != nil {
+		return nil, err
+	}
+	if ext == "tgz" {
+		if dataRefReaderCloser, err = gzip.NewReader(dataRefReaderCloser); err != nil {
+			return nil, err
+		}
+	}
+	return dataRefReaderCloser, err
 }
 
 func getJSONSpec(message proto.Message) string {
