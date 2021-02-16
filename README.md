@@ -123,6 +123,7 @@ Resources that would help you get a better understanding of Flyte.
 - [Lyft Rideshare, Mapping](https://www.lyft.com/)
 - [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
 - [Spotify](https://www.spotify.com/)
+- [USU Group](https://www.usu.com/)
 
 # Changelogs
 [Changelogs](CHANGELOG/README.md)
