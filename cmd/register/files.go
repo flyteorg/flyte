@@ -3,14 +3,27 @@ package register
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"sort"
+	"os"
 
 	cmdCore "github.com/lyft/flytectl/cmd/core"
 	"github.com/lyft/flytectl/pkg/printer"
 	"github.com/lyft/flytestdlib/logger"
 )
+
+//go:generate pflags FilesConfig
+var (
+	filesConfig = &FilesConfig{
+		Version:         "v1",
+		ContinueOnError: false,
+	}
+)
+
+// FilesConfig
+type FilesConfig struct {
+	Version         string `json:"version" pflag:",version of the entity to be registered with flyte."`
+	ContinueOnError bool   `json:"continueOnError" pflag:",continue on error when registering files."`
+	Archive         bool   `json:"archive" pflag:",pass in archive file either an http link or local path."`
+}
 
 const (
 	registerFilesShort = "Registers file resources"
@@ -21,17 +34,30 @@ If there are already registered entities with v1 version then the command will f
 
  bin/flytectl register file  _pb_output/* -d development  -p flytesnacks
 
+Using archive file.Currently supported are .tgz and .tar extension files and can be local or remote file served through http/https.
+Use --archive flag.
+
+::
+
+ bin/flytectl register files  http://localhost:8080/_pb_output.tar -d development  -p flytesnacks --archive
+
+Using  local tgz file.
+
+::
+
+ bin/flytectl register files  _pb_output.tgz -d development  -p flytesnacks --archive
+
 If you want to continue executing registration on other files ignoring the errors including version conflicts then pass in
-the skipOnError flag.
+the continueOnError flag.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --skipOnError
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError
 
-Using short format of skipOnError flag
+Using short format of continueOnError flag
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -s
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c
 
 Overriding the default version v1 using version string.
 ::
@@ -42,59 +68,31 @@ Change the o/p format has not effect on registration. The O/p is currently avail
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -s -o yaml
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -o yaml
 
 Usage
 `
 )
 
 func registerFromFilesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	files := args
-	sort.Strings(files)
-	logger.Infof(ctx, "Parsing files... Total(%v)", len(files))
-	logger.Infof(ctx, "Params version %v", filesConfig.Version)
+	dataRefs, tmpDir, _err := getSortedFileList(ctx, args)
+	if _err != nil {
+		logger.Errorf(ctx, "error while un-archiving files in tmp dir due to %v", _err)
+		return _err
+	}
+	logger.Infof(ctx, "Parsing files... Total(%v)", len(dataRefs))
+	fastFail := !filesConfig.ContinueOnError
 	var registerResults []Result
-	adminPrinter := printer.Printer{}
-	fastFail := !filesConfig.SkipOnError
-	logger.Infof(ctx, "Fail fast %v", fastFail)
-	var _err error
-	for i := 0; i < len(files) && !(fastFail && _err != nil); i++ {
-		absFilePath := files[i]
-		var registerResult Result
-		logger.Infof(ctx, "Parsing  %v", absFilePath)
-		fileContents, err := ioutil.ReadFile(absFilePath)
-		if err != nil {
-			registerResult = Result{Name: absFilePath, Status: "Failed", Info: fmt.Sprintf("Error reading file due to %v", err)}
-			registerResults = append(registerResults, registerResult)
-			_err = err
-			continue
-		}
-		spec, err := unMarshalContents(ctx, fileContents, absFilePath)
-		if err != nil {
-			registerResult = Result{Name: absFilePath, Status: "Failed", Info: fmt.Sprintf("Error unmarshalling file due to %v", err)}
-			registerResults = append(registerResults, registerResult)
-			_err = err
-			continue
-		}
-		if err := hydrateSpec(spec); err != nil {
-			registerResult = Result{Name: absFilePath, Status: "Failed", Info: fmt.Sprintf("Error hydrating spec due to %v", err)}
-			registerResults = append(registerResults, registerResult)
-			_err = err
-			continue
-		}
-		logger.Debugf(ctx, "Hydrated spec : %v", getJSONSpec(spec))
-		if err := register(ctx, spec, cmdCtx); err != nil {
-			registerResult = Result{Name: absFilePath, Status: "Failed", Info: fmt.Sprintf("Error registering file due to %v", err)}
-			registerResults = append(registerResults, registerResult)
-			_err = err
-			continue
-		}
-		registerResult = Result{Name: absFilePath, Status: "Success", Info: "Successfully registered file"}
-		registerResults = append(registerResults, registerResult)
+	for i := 0; i < len(dataRefs) && !(fastFail && _err != nil); i++ {
+		registerResults, _err = registerFile(ctx, dataRefs[i], registerResults, cmdCtx)
 	}
 	payload, _ := json.Marshal(registerResults)
-	if err := adminPrinter.JSONToTable(payload, projectColumns); err != nil {
-		return err
+	registerPrinter := printer.Printer{}
+	_ = registerPrinter.JSONToTable(payload, projectColumns)
+	if tmpDir != "" {
+		if _err = os.RemoveAll(tmpDir); _err != nil {
+			logger.Errorf(ctx, "unable to delete temp dir %v due to %v", tmpDir, _err)
+		}
 	}
 	return nil
 }
