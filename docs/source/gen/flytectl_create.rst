@@ -1,18 +1,30 @@
-.. _flytectl:
+.. _flytectl_create:
 
-flytectl
---------
+flytectl create
+---------------
 
-flyetcl CLI tool
+Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
 
 Synopsis
 ~~~~~~~~
 
 
-flytectl is CLI tool written in go to interact with flyteadmin service
+
+Example create.
+::
+
+ bin/flytectl create project --file project.yaml 
+
 
 Options
 ~~~~~~~
+
+::
+
+  -h, --help   help for create
+
+Options inherited from parent commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -32,7 +44,6 @@ Options
       --adminutils.maxRecords int                  Maximum number of records to retrieve. (default 500)
       --config string                              config file (default is $HOME/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
-  -h, --help                                       help for flytectl
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
@@ -59,11 +70,6 @@ Options
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
-* :doc:`flytectl_create` 	 - Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
-* :doc:`flytectl_version` 	 - Displays version information for the client and server.
+* :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`flytectl_create_project` 	 - Create project resources
 
