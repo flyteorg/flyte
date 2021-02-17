@@ -27,6 +27,6 @@ jobs:
           image_tag: latest,${{ github.sha }},${{ github.event.ref }}
           push_git_tag: true
           registry: ghcr.io
-          build_extra_args: "--compress=true --build-arg DOCKER_VERSION=\"${DOCKER_VERSION:-20.10.3}\" --build-arg K3S_VERSION=\"${K3S_VERSION:-v1.20.2%2Bk3s1}\""
+          build_extra_args: "--compress=true"
           context: ./sandbox
           dockerfile: Dockerfile

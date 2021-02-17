@@ -1,6 +1,6 @@
 ARG DOCKER_VERSION
 
-FROM docker:${DOCKER_VERSION}-dind
+FROM docker:20.10.3-dind
 LABEL org.opencontainers.image.source https://github.com/flyteorg/flyte
 
 # Install dependencies
@@ -8,7 +8,7 @@ RUN apk add --no-cache bash git make rsync tini
 
 # Install k3s
 ARG K3S_VERSION
-ADD https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s /usr/local/bin/k3s
+ADD https://github.com/k3s-io/k3s/releases/download/v1.20.2%2Bk3s1/k3s /usr/local/bin/k3s
 RUN chmod +x /usr/local/bin/k3s
 VOLUME /var/lib/kubelet
 VOLUME /var/lib/rancher/k3s
