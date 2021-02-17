@@ -91,7 +91,7 @@ language = None
 exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+# pygments_style = 'sphinx'
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -122,6 +122,19 @@ html_theme_options = {
     "globaltoc_collapse": False,
     # If True, show hidden TOC entries
     "globaltoc_includehidden": False,
+    "nav_links": [
+        {"href": "index", "internal": True, "title": "Flyte Docs"},
+        {
+            "href": "https://flytecookbook.readthedocs.io",
+            "internal": False,
+            "title": "Flyte Learn by Example",
+        },
+        {
+            "href": "https://flytectl.readthedocs.io",
+            "internal": False,
+            "title": "FlyteCtl reference",
+        },
+    ],
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
