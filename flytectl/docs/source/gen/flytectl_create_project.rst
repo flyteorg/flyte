@@ -1,18 +1,54 @@
-.. _flytectl:
+.. _flytectl_create_project:
 
-flytectl
---------
+flytectl create project
+-----------------------
 
-flyetcl CLI tool
+Create project resources
 
 Synopsis
 ~~~~~~~~
 
 
-flytectl is CLI tool written in go to interact with flyteadmin service
+
+Create the projects.(project,projects can be used interchangeably in these commands)
+
+::
+
+ bin/flytectl create project --name flytesnacks --id flytesnacks --description "flytesnacks description"  --labels app=flyte
+
+Create Project by definition file
+::
+
+ bin/flytectl create project --file project.yaml 
+
+.. code-block:: yaml
+
+	id: "project-unique-id"
+	name: "Friendly name"
+	labels:
+	  app: flyte
+	description: "Some description for the project"
+
+
+
+::
+
+  flytectl create project [flags]
 
 Options
 ~~~~~~~
+
+::
+
+      --description string      description for the project specified as argument.
+      --file string             file for the project definition.
+  -h, --help                    help for project
+      --id string               id for the project specified as argument.
+      --labels stringToString   labels for the project specified as argument. (default [])
+      --name string             name for the project specified as argument.
+
+Options inherited from parent commands
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
@@ -32,7 +68,6 @@ Options
       --adminutils.maxRecords int                  Maximum number of records to retrieve. (default 500)
       --config string                              config file (default is $HOME/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
-  -h, --help                                       help for flytectl
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
@@ -59,11 +94,5 @@ Options
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 * :doc:`flytectl_create` 	 - Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
-* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
-* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
-* :doc:`flytectl_version` 	 - Displays version information for the client and server.
 

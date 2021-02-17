@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/lyft/flytectl/cmd/config"
+	"github.com/lyft/flytectl/cmd/create"
 	"github.com/lyft/flytectl/cmd/delete"
 	"github.com/lyft/flytectl/cmd/get"
 	"github.com/lyft/flytectl/cmd/register"
@@ -45,6 +46,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd.AddCommand(viper.GetConfigCommand())
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(get.CreateGetCommand())
+	rootCmd.AddCommand(create.RemoteCreateCommand())
 	rootCmd.AddCommand(update.CreateUpdateCommand())
 	rootCmd.AddCommand(register.RemoteRegisterCommand())
 	rootCmd.AddCommand(delete.RemoteDeleteCommand())
