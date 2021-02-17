@@ -1,73 +1,27 @@
-.. _flytectl_register_files:
+.. _flytectl_delete:
 
-flytectl register files
------------------------
+flytectl delete
+---------------
 
-Registers file resources
+Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Registers all the serialized protobuf files including tasks, workflows and launchplans with default v1 version.
-If there are already registered entities with v1 version then the command will fail immediately on the first such encounter.
+Example Delete executions.
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks
+ bin/flytectl delete execution kxd1i72850  -d development  -p flytesnacks
 
-Using archive file.Currently supported are .tgz and .tar extension files and can be local or remote file served through http/https.
-Use --archive flag.
-
-::
-
- bin/flytectl register files  http://localhost:8080/_pb_output.tar -d development  -p flytesnacks --archive
-
-Using  local tgz file.
-
-::
-
- bin/flytectl register files  _pb_output.tgz -d development  -p flytesnacks --archive
-
-If you want to continue executing registration on other files ignoring the errors including version conflicts then pass in
-the continueOnError flag.
-
-::
-
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError
-
-Using short format of continueOnError flag
-::
-
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c
-
-Overriding the default version v1 using version string.
-::
-
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -v v2
-
-Change the o/p format has not effect on registration. The O/p is currently available only in table format.
-
-::
-
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -o yaml
-
-Usage
-
-
-::
-
-  flytectl register files [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -a, --archive           pass in archive file either an http link or local path.
-  -c, --continueOnError   continue on error when registering files.
-  -h, --help              help for files
-  -v, --version string    version of the entity to be registered with flyte. (default "v1")
+  -h, --help   help for delete
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,5 +70,6 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
+* :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`flytectl_delete_execution` 	 - Terminate/Delete execution resources.
 

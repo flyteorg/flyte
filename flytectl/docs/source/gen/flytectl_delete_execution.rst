@@ -1,73 +1,70 @@
-.. _flytectl_register_files:
+.. _flytectl_delete_execution:
 
-flytectl register files
------------------------
+flytectl delete execution
+-------------------------
 
-Registers file resources
+Terminate/Delete execution resources.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Registers all the serialized protobuf files including tasks, workflows and launchplans with default v1 version.
-If there are already registered entities with v1 version then the command will fail immediately on the first such encounter.
-::
+Terminate executions.(execution,executions can be used interchangeably in these commands)
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks
+Task executions can be aborted only if they are in non-terminal state i.e if they are FAILED,ABORTED or SUCCEEDED then
+calling terminate on them has no effect.
 
-Using archive file.Currently supported are .tgz and .tar extension files and can be local or remote file served through http/https.
-Use --archive flag.
+Terminate a single execution with its name
 
 ::
 
- bin/flytectl register files  http://localhost:8080/_pb_output.tar -d development  -p flytesnacks --archive
+ bin/flytectl delete execution c6a51x2l9e  -d development  -p flytesnacks
 
-Using  local tgz file.
-
-::
-
- bin/flytectl register files  _pb_output.tgz -d development  -p flytesnacks --archive
-
-If you want to continue executing registration on other files ignoring the errors including version conflicts then pass in
-the continueOnError flag.
+You can get executions to check its state.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError
+ bin/flytectl get execution  -d development  -p flytesnacks
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+ | NAME (7)   | WORKFLOW NAME                                                           | TYPE     | PHASE     | STARTED                        | ELAPSED TIME  |
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+ | c6a51x2l9e | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:13:04.680476300Z | 15.540361300s |
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
 
-Using short format of continueOnError flag
+Terminate multiple executions with there names
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c
+ bin/flytectl delete execution eeam9s8sny p4wv4hwgc4  -d development  -p flytesnacks
 
-Overriding the default version v1 using version string.
-::
-
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -v v2
-
-Change the o/p format has not effect on registration. The O/p is currently available only in table format.
+Similarly you can get executions to find the state of previously terminated executions.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -o yaml
+ bin/flytectl get execution  -d development  -p flytesnacks
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+ | NAME (7)   | WORKFLOW NAME                                                           | TYPE     | PHASE     | STARTED                        | ELAPSED TIME  |
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+ | c6a51x2l9e | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:13:04.680476300Z | 15.540361300s |
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+ | eeam9s8sny | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:14:04.803084100Z | 42.306385500s |
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
+ | p4wv4hwgc4 | recipes.core.basic.lp.go_greet                                          | WORKFLOW | ABORTED   | 2021-02-17T08:14:27.476307400Z | 19.727504400s |
+  ------------ ------------------------------------------------------------------------- ---------- ----------- -------------------------------- --------------- 
 
 Usage
 
 
 ::
 
-  flytectl register files [flags]
+  flytectl delete execution [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -a, --archive           pass in archive file either an http link or local path.
-  -c, --continueOnError   continue on error when registering files.
-  -h, --help              help for files
-  -v, --version string    version of the entity to be registered with flyte. (default "v1")
+  -h, --help   help for execution
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -116,5 +113,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
+* :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.
 

@@ -5,6 +5,7 @@ go 1.13
 require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/ghodss/yaml v1.0.0
+	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.2
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27

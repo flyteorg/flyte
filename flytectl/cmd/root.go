@@ -4,17 +4,18 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lyft/flytectl/cmd/config"
+	"github.com/lyft/flytectl/cmd/delete"
 	"github.com/lyft/flytectl/cmd/get"
 	"github.com/lyft/flytectl/cmd/register"
 	"github.com/lyft/flytectl/cmd/update"
 	"github.com/lyft/flytectl/pkg/printer"
 	stdConfig "github.com/lyft/flytestdlib/config"
 	"github.com/lyft/flytestdlib/config/viper"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
-
-	"github.com/lyft/flytectl/cmd/config"
 )
 
 var (
@@ -28,6 +29,7 @@ func newRootCmd() *cobra.Command {
 		Long:              "flytectl is CLI tool written in go to interact with flyteadmin service",
 		Short:             "flyetcl CLI tool",
 		Use:               "flytectl",
+		DisableAutoGenTag: true,
 	}
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
@@ -45,6 +47,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd.AddCommand(get.CreateGetCommand())
 	rootCmd.AddCommand(update.CreateUpdateCommand())
 	rootCmd.AddCommand(register.RemoteRegisterCommand())
+	rootCmd.AddCommand(delete.RemoteDeleteCommand())
 	config.GetConfig()
 
 	return rootCmd
