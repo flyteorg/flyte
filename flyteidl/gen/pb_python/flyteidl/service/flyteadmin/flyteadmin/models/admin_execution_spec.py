@@ -21,6 +21,7 @@ from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_execution_metadata import AdminExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
+from flyteadmin.models.admin_security_context import AdminSecurityContext  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
@@ -48,6 +49,7 @@ class AdminExecutionSpec(object):
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
         'auth_role': 'AdminAuthRole',
+        'security_context': 'AdminSecurityContext',
         'quality_of_service': 'CoreQualityOfService'
     }
 
@@ -60,10 +62,11 @@ class AdminExecutionSpec(object):
         'labels': 'labels',
         'annotations': 'annotations',
         'auth_role': 'auth_role',
+        'security_context': 'security_context',
         'quality_of_service': 'quality_of_service'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, auth_role=None, quality_of_service=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, auth_role=None, security_context=None, quality_of_service=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -74,6 +77,7 @@ class AdminExecutionSpec(object):
         self._labels = None
         self._annotations = None
         self._auth_role = None
+        self._security_context = None
         self._quality_of_service = None
         self.discriminator = None
 
@@ -93,6 +97,8 @@ class AdminExecutionSpec(object):
             self.annotations = annotations
         if auth_role is not None:
             self.auth_role = auth_role
+        if security_context is not None:
+            self.security_context = security_context
         if quality_of_service is not None:
             self.quality_of_service = quality_of_service
 
@@ -273,6 +279,29 @@ class AdminExecutionSpec(object):
         """
 
         self._auth_role = auth_role
+
+    @property
+    def security_context(self):
+        """Gets the security_context of this AdminExecutionSpec.  # noqa: E501
+
+        Optional: security context override to apply this execution.  # noqa: E501
+
+        :return: The security_context of this AdminExecutionSpec.  # noqa: E501
+        :rtype: AdminSecurityContext
+        """
+        return self._security_context
+
+    @security_context.setter
+    def security_context(self, security_context):
+        """Sets the security_context of this AdminExecutionSpec.
+
+        Optional: security context override to apply this execution.  # noqa: E501
+
+        :param security_context: The security_context of this AdminExecutionSpec.  # noqa: E501
+        :type: AdminSecurityContext
+        """
+
+        self._security_context = security_context
 
     @property
     def quality_of_service(self):

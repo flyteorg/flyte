@@ -2672,7 +2672,7 @@ definitions:
       kubernetes_service_account:
         type: "string"
     description: "Defines permissions associated with executions created by this launch\
-      \ plan spec."
+      \ plan spec.\nDeprecated."
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
@@ -2683,7 +2683,7 @@ definitions:
         type: "string"
       kubernetes_service_account:
         type: "string"
-    description: "Defines permissions associated with executions."
+    title: "Defines permissions associated with executions.\nDeprecated"
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
@@ -2886,6 +2886,9 @@ definitions:
               recipients_email:
               - "recipients_email"
               - "recipients_email"
+        security_context:
+          values:
+            key: "values"
         labels:
           values:
             key: "values"
@@ -3189,6 +3192,9 @@ definitions:
                 recipients_email:
                 - "recipients_email"
                 - "recipients_email"
+          security_context:
+            values:
+              key: "values"
           labels:
             values:
               key: "values"
@@ -3323,6 +3329,9 @@ definitions:
                 recipients_email:
                 - "recipients_email"
                 - "recipients_email"
+          security_context:
+            values:
+              key: "values"
           labels:
             values:
               key: "values"
@@ -3440,6 +3449,9 @@ definitions:
       auth_role:
         description: "Optional: auth override to apply this execution."
         $ref: "#/definitions/adminAuthRole"
+      security_context:
+        description: "Optional: security context override to apply this execution."
+        $ref: "#/definitions/adminSecurityContext"
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
@@ -3512,6 +3524,9 @@ definitions:
             recipients_email:
             - "recipients_email"
             - "recipients_email"
+      security_context:
+        values:
+          key: "values"
       labels:
         values:
           key: "values"
@@ -3833,6 +3848,9 @@ definitions:
                     format: "format"
                   simple: {}
               required: true
+        security_context:
+          values:
+            key: "values"
         labels:
           values:
             key: "values"
@@ -4249,6 +4267,9 @@ definitions:
                       format: "format"
                     simple: {}
                 required: true
+          security_context:
+            values:
+              key: "values"
           labels:
             values:
               key: "values"
@@ -4504,6 +4525,9 @@ definitions:
                       format: "format"
                     simple: {}
                 required: true
+          security_context:
+            values:
+              key: "values"
           labels:
             values:
               key: "values"
@@ -4595,6 +4619,10 @@ definitions:
         $ref: "#/definitions/adminAuth"
       auth_role:
         $ref: "#/definitions/adminAuthRole"
+      security_context:
+        title: "Indicates security context for permissions triggered with this launch\
+          \ plan"
+        $ref: "#/definitions/adminSecurityContext"
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
@@ -4739,6 +4767,9 @@ definitions:
                   format: "format"
                 simple: {}
             required: true
+      security_context:
+        values:
+          key: "values"
       labels:
         values:
           key: "values"
@@ -5781,6 +5812,20 @@ definitions:
       rate:
         unit: {}
         value: 0
+  adminSecurityContext:
+    type: "object"
+    properties:
+      values:
+        type: "object"
+        title: "Map of security context values"
+        additionalProperties:
+          type: "string"
+    description: "Security context fields to define privilege and access control settings\n\
+      In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify\
+      \ how to merge security context defined at registration and execution time."
+    example:
+      values:
+        key: "values"
   adminSlackNotification:
     type: "object"
     properties:

@@ -3482,6 +3482,7 @@ public final class LaunchPlanOuterClass {
   /**
    * <pre>
    * Defines permissions associated with executions created by this launch plan spec.
+   * Deprecated.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.Auth}
@@ -3874,6 +3875,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Defines permissions associated with executions created by this launch plan spec.
+     * Deprecated.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.Auth}
@@ -4467,17 +4469,42 @@ public final class LaunchPlanOuterClass {
     @java.lang.Deprecated flyteidl.admin.LaunchPlanOuterClass.AuthOrBuilder getAuthOrBuilder();
 
     /**
-     * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    boolean hasAuthRole();
+    @java.lang.Deprecated boolean hasAuthRole();
     /**
-     * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    flyteidl.admin.Common.AuthRole getAuthRole();
+    @java.lang.Deprecated flyteidl.admin.Common.AuthRole getAuthRole();
     /**
-     * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
+    @java.lang.Deprecated flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
+
+    /**
+     * <pre>
+     * Indicates security context for permissions triggered with this launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    boolean hasSecurityContext();
+    /**
+     * <pre>
+     * Indicates security context for permissions triggered with this launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    flyteidl.admin.Common.SecurityContext getSecurityContext();
+    /**
+     * <pre>
+     * Indicates security context for permissions triggered with this launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    flyteidl.admin.Common.SecurityContextOrBuilder getSecurityContextOrBuilder();
 
     /**
      * <pre>
@@ -4667,6 +4694,19 @@ public final class LaunchPlanOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(authRole_);
                 authRole_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 82: {
+              flyteidl.admin.Common.SecurityContext.Builder subBuilder = null;
+              if (securityContext_ != null) {
+                subBuilder = securityContext_.toBuilder();
+              }
+              securityContext_ = input.readMessage(flyteidl.admin.Common.SecurityContext.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(securityContext_);
+                securityContext_ = subBuilder.buildPartial();
               }
 
               break;
@@ -5005,22 +5045,55 @@ public final class LaunchPlanOuterClass {
     public static final int AUTH_ROLE_FIELD_NUMBER = 9;
     private flyteidl.admin.Common.AuthRole authRole_;
     /**
-     * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    public boolean hasAuthRole() {
+    @java.lang.Deprecated public boolean hasAuthRole() {
       return authRole_ != null;
     }
     /**
-     * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    public flyteidl.admin.Common.AuthRole getAuthRole() {
+    @java.lang.Deprecated public flyteidl.admin.Common.AuthRole getAuthRole() {
       return authRole_ == null ? flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
     }
     /**
-     * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
+    @java.lang.Deprecated public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
       return getAuthRole();
+    }
+
+    public static final int SECURITY_CONTEXT_FIELD_NUMBER = 10;
+    private flyteidl.admin.Common.SecurityContext securityContext_;
+    /**
+     * <pre>
+     * Indicates security context for permissions triggered with this launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    public boolean hasSecurityContext() {
+      return securityContext_ != null;
+    }
+    /**
+     * <pre>
+     * Indicates security context for permissions triggered with this launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    public flyteidl.admin.Common.SecurityContext getSecurityContext() {
+      return securityContext_ == null ? flyteidl.admin.Common.SecurityContext.getDefaultInstance() : securityContext_;
+    }
+    /**
+     * <pre>
+     * Indicates security context for permissions triggered with this launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    public flyteidl.admin.Common.SecurityContextOrBuilder getSecurityContextOrBuilder() {
+      return getSecurityContext();
     }
 
     public static final int QUALITY_OF_SERVICE_FIELD_NUMBER = 16;
@@ -5118,6 +5191,9 @@ public final class LaunchPlanOuterClass {
       if (authRole_ != null) {
         output.writeMessage(9, getAuthRole());
       }
+      if (securityContext_ != null) {
+        output.writeMessage(10, getSecurityContext());
+      }
       if (qualityOfService_ != null) {
         output.writeMessage(16, getQualityOfService());
       }
@@ -5167,6 +5243,10 @@ public final class LaunchPlanOuterClass {
       if (authRole_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, getAuthRole());
+      }
+      if (securityContext_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(10, getSecurityContext());
       }
       if (qualityOfService_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -5233,6 +5313,11 @@ public final class LaunchPlanOuterClass {
         if (!getAuthRole()
             .equals(other.getAuthRole())) return false;
       }
+      if (hasSecurityContext() != other.hasSecurityContext()) return false;
+      if (hasSecurityContext()) {
+        if (!getSecurityContext()
+            .equals(other.getSecurityContext())) return false;
+      }
       if (hasQualityOfService() != other.hasQualityOfService()) return false;
       if (hasQualityOfService()) {
         if (!getQualityOfService()
@@ -5287,6 +5372,10 @@ public final class LaunchPlanOuterClass {
       if (hasAuthRole()) {
         hash = (37 * hash) + AUTH_ROLE_FIELD_NUMBER;
         hash = (53 * hash) + getAuthRole().hashCode();
+      }
+      if (hasSecurityContext()) {
+        hash = (37 * hash) + SECURITY_CONTEXT_FIELD_NUMBER;
+        hash = (53 * hash) + getSecurityContext().hashCode();
       }
       if (hasQualityOfService()) {
         hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
@@ -5483,6 +5572,12 @@ public final class LaunchPlanOuterClass {
           authRole_ = null;
           authRoleBuilder_ = null;
         }
+        if (securityContextBuilder_ == null) {
+          securityContext_ = null;
+        } else {
+          securityContext_ = null;
+          securityContextBuilder_ = null;
+        }
         if (qualityOfServiceBuilder_ == null) {
           qualityOfService_ = null;
         } else {
@@ -5561,6 +5656,11 @@ public final class LaunchPlanOuterClass {
           result.authRole_ = authRole_;
         } else {
           result.authRole_ = authRoleBuilder_.build();
+        }
+        if (securityContextBuilder_ == null) {
+          result.securityContext_ = securityContext_;
+        } else {
+          result.securityContext_ = securityContextBuilder_.build();
         }
         if (qualityOfServiceBuilder_ == null) {
           result.qualityOfService_ = qualityOfService_;
@@ -5647,6 +5747,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasAuthRole()) {
           mergeAuthRole(other.getAuthRole());
+        }
+        if (other.hasSecurityContext()) {
+          mergeSecurityContext(other.getSecurityContext());
         }
         if (other.hasQualityOfService()) {
           mergeQualityOfService(other.getQualityOfService());
@@ -6847,15 +6950,15 @@ public final class LaunchPlanOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.AuthRole, flyteidl.admin.Common.AuthRole.Builder, flyteidl.admin.Common.AuthRoleOrBuilder> authRoleBuilder_;
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public boolean hasAuthRole() {
+      @java.lang.Deprecated public boolean hasAuthRole() {
         return authRoleBuilder_ != null || authRole_ != null;
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public flyteidl.admin.Common.AuthRole getAuthRole() {
+      @java.lang.Deprecated public flyteidl.admin.Common.AuthRole getAuthRole() {
         if (authRoleBuilder_ == null) {
           return authRole_ == null ? flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
         } else {
@@ -6863,9 +6966,9 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder setAuthRole(flyteidl.admin.Common.AuthRole value) {
+      @java.lang.Deprecated public Builder setAuthRole(flyteidl.admin.Common.AuthRole value) {
         if (authRoleBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -6879,9 +6982,9 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder setAuthRole(
+      @java.lang.Deprecated public Builder setAuthRole(
           flyteidl.admin.Common.AuthRole.Builder builderForValue) {
         if (authRoleBuilder_ == null) {
           authRole_ = builderForValue.build();
@@ -6893,9 +6996,9 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder mergeAuthRole(flyteidl.admin.Common.AuthRole value) {
+      @java.lang.Deprecated public Builder mergeAuthRole(flyteidl.admin.Common.AuthRole value) {
         if (authRoleBuilder_ == null) {
           if (authRole_ != null) {
             authRole_ =
@@ -6911,9 +7014,9 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder clearAuthRole() {
+      @java.lang.Deprecated public Builder clearAuthRole() {
         if (authRoleBuilder_ == null) {
           authRole_ = null;
           onChanged();
@@ -6925,17 +7028,17 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public flyteidl.admin.Common.AuthRole.Builder getAuthRoleBuilder() {
+      @java.lang.Deprecated public flyteidl.admin.Common.AuthRole.Builder getAuthRoleBuilder() {
         
         onChanged();
         return getAuthRoleFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
+      @java.lang.Deprecated public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
         if (authRoleBuilder_ != null) {
           return authRoleBuilder_.getMessageOrBuilder();
         } else {
@@ -6944,7 +7047,7 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
-       * <code>.flyteidl.admin.AuthRole auth_role = 9;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.AuthRole, flyteidl.admin.Common.AuthRole.Builder, flyteidl.admin.Common.AuthRoleOrBuilder> 
@@ -6958,6 +7061,159 @@ public final class LaunchPlanOuterClass {
           authRole_ = null;
         }
         return authRoleBuilder_;
+      }
+
+      private flyteidl.admin.Common.SecurityContext securityContext_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.SecurityContext, flyteidl.admin.Common.SecurityContext.Builder, flyteidl.admin.Common.SecurityContextOrBuilder> securityContextBuilder_;
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public boolean hasSecurityContext() {
+        return securityContextBuilder_ != null || securityContext_ != null;
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public flyteidl.admin.Common.SecurityContext getSecurityContext() {
+        if (securityContextBuilder_ == null) {
+          return securityContext_ == null ? flyteidl.admin.Common.SecurityContext.getDefaultInstance() : securityContext_;
+        } else {
+          return securityContextBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder setSecurityContext(flyteidl.admin.Common.SecurityContext value) {
+        if (securityContextBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          securityContext_ = value;
+          onChanged();
+        } else {
+          securityContextBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder setSecurityContext(
+          flyteidl.admin.Common.SecurityContext.Builder builderForValue) {
+        if (securityContextBuilder_ == null) {
+          securityContext_ = builderForValue.build();
+          onChanged();
+        } else {
+          securityContextBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder mergeSecurityContext(flyteidl.admin.Common.SecurityContext value) {
+        if (securityContextBuilder_ == null) {
+          if (securityContext_ != null) {
+            securityContext_ =
+              flyteidl.admin.Common.SecurityContext.newBuilder(securityContext_).mergeFrom(value).buildPartial();
+          } else {
+            securityContext_ = value;
+          }
+          onChanged();
+        } else {
+          securityContextBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder clearSecurityContext() {
+        if (securityContextBuilder_ == null) {
+          securityContext_ = null;
+          onChanged();
+        } else {
+          securityContext_ = null;
+          securityContextBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public flyteidl.admin.Common.SecurityContext.Builder getSecurityContextBuilder() {
+        
+        onChanged();
+        return getSecurityContextFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public flyteidl.admin.Common.SecurityContextOrBuilder getSecurityContextOrBuilder() {
+        if (securityContextBuilder_ != null) {
+          return securityContextBuilder_.getMessageOrBuilder();
+        } else {
+          return securityContext_ == null ?
+              flyteidl.admin.Common.SecurityContext.getDefaultInstance() : securityContext_;
+        }
+      }
+      /**
+       * <pre>
+       * Indicates security context for permissions triggered with this launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.SecurityContext, flyteidl.admin.Common.SecurityContext.Builder, flyteidl.admin.Common.SecurityContextOrBuilder> 
+          getSecurityContextFieldBuilder() {
+        if (securityContextBuilder_ == null) {
+          securityContextBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.SecurityContext, flyteidl.admin.Common.SecurityContext.Builder, flyteidl.admin.Common.SecurityContextOrBuilder>(
+                  getSecurityContext(),
+                  getParentForChildren(),
+                  isClean());
+          securityContext_ = null;
+        }
+        return securityContextBuilder_;
       }
 
       private flyteidl.core.Execution.QualityOfService qualityOfService_;
@@ -13244,7 +13500,7 @@ public final class LaunchPlanOuterClass {
       "\032.flyteidl.admin.LaunchPlan\022\r\n\005token\030\002 \001" +
       "(\t\"T\n\004Auth\022\034\n\022assumable_iam_role\030\001 \001(\tH\000" +
       "\022$\n\032kubernetes_service_account\030\002 \001(\tH\000B\010" +
-      "\n\006method\"\246\004\n\016LaunchPlanSpec\022.\n\013workflow_" +
+      "\n\006method\"\345\004\n\016LaunchPlanSpec\022.\n\013workflow_" +
       "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022;\n\017e" +
       "ntity_metadata\030\002 \001(\0132\".flyteidl.admin.La" +
       "unchPlanMetadata\0223\n\016default_inputs\030\003 \001(\013" +
@@ -13253,33 +13509,34 @@ public final class LaunchPlanOuterClass {
       "\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flyte" +
       "idl.admin.Labels\0220\n\013annotations\030\007 \001(\0132\033." +
       "flyteidl.admin.Annotations\022&\n\004auth\030\010 \001(\013" +
-      "2\024.flyteidl.admin.AuthB\002\030\001\022+\n\tauth_role\030" +
-      "\t \001(\0132\030.flyteidl.admin.AuthRole\022;\n\022quali" +
-      "ty_of_service\030\020 \001(\0132\037.flyteidl.core.Qual" +
-      "ityOfService\022C\n\026raw_output_data_config\030\021" +
-      " \001(\0132#.flyteidl.admin.RawOutputDataConfi" +
-      "g\"\217\002\n\021LaunchPlanClosure\022.\n\005state\030\001 \001(\0162\037" +
-      ".flyteidl.admin.LaunchPlanState\0224\n\017expec" +
-      "ted_inputs\030\002 \001(\0132\033.flyteidl.core.Paramet" +
-      "erMap\0224\n\020expected_outputs\030\003 \001(\0132\032.flytei" +
-      "dl.core.VariableMap\022.\n\ncreated_at\030\004 \001(\0132" +
-      "\032.google.protobuf.Timestamp\022.\n\nupdated_a" +
-      "t\030\005 \001(\0132\032.google.protobuf.Timestamp\"u\n\022L" +
-      "aunchPlanMetadata\022*\n\010schedule\030\001 \001(\0132\030.fl" +
-      "yteidl.admin.Schedule\0223\n\rnotifications\030\002" +
-      " \003(\0132\034.flyteidl.admin.Notification\"p\n\027La" +
-      "unchPlanUpdateRequest\022%\n\002id\030\001 \001(\0132\031.flyt" +
-      "eidl.core.Identifier\022.\n\005state\030\002 \001(\0162\037.fl" +
-      "yteidl.admin.LaunchPlanState\"\032\n\030LaunchPl" +
-      "anUpdateResponse\"L\n\027ActiveLaunchPlanRequ" +
-      "est\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEn" +
-      "tityIdentifier\"\203\001\n\033ActiveLaunchPlanListR" +
-      "equest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022" +
-      "\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by" +
-      "\030\005 \001(\0132\024.flyteidl.admin.Sort*+\n\017LaunchPl" +
-      "anState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B3Z1git" +
-      "hub.com/lyft/flyteidl/gen/pb-go/flyteidl" +
-      "/adminb\006proto3"
+      "2\024.flyteidl.admin.AuthB\002\030\001\022/\n\tauth_role\030" +
+      "\t \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001\0229\n\020s" +
+      "ecurity_context\030\n \001(\0132\037.flyteidl.admin.S" +
+      "ecurityContext\022;\n\022quality_of_service\030\020 \001" +
+      "(\0132\037.flyteidl.core.QualityOfService\022C\n\026r" +
+      "aw_output_data_config\030\021 \001(\0132#.flyteidl.a" +
+      "dmin.RawOutputDataConfig\"\217\002\n\021LaunchPlanC" +
+      "losure\022.\n\005state\030\001 \001(\0162\037.flyteidl.admin.L" +
+      "aunchPlanState\0224\n\017expected_inputs\030\002 \001(\0132" +
+      "\033.flyteidl.core.ParameterMap\0224\n\020expected" +
+      "_outputs\030\003 \001(\0132\032.flyteidl.core.VariableM" +
+      "ap\022.\n\ncreated_at\030\004 \001(\0132\032.google.protobuf" +
+      ".Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032.google." +
+      "protobuf.Timestamp\"u\n\022LaunchPlanMetadata" +
+      "\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.admin.Sche" +
+      "dule\0223\n\rnotifications\030\002 \003(\0132\034.flyteidl.a" +
+      "dmin.Notification\"p\n\027LaunchPlanUpdateReq" +
+      "uest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
+      "ier\022.\n\005state\030\002 \001(\0162\037.flyteidl.admin.Laun" +
+      "chPlanState\"\032\n\030LaunchPlanUpdateResponse\"" +
+      "L\n\027ActiveLaunchPlanRequest\0221\n\002id\030\001 \001(\0132%" +
+      ".flyteidl.admin.NamedEntityIdentifier\"\203\001" +
+      "\n\033ActiveLaunchPlanListRequest\022\017\n\007project" +
+      "\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n" +
+      "\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl" +
+      ".admin.Sort*+\n\017LaunchPlanState\022\014\n\010INACTI" +
+      "VE\020\000\022\n\n\006ACTIVE\020\001B3Z1github.com/lyft/flyt" +
+      "eidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13335,7 +13592,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "QualityOfService", "RawOutputDataConfig", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new

@@ -22,6 +22,7 @@ from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_launch_plan_metadata import AdminLaunchPlanMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
+from flyteadmin.models.admin_security_context import AdminSecurityContext  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_parameter_map import CoreParameterMap  # noqa: F401,E501
@@ -51,6 +52,7 @@ class AdminLaunchPlanSpec(object):
         'annotations': 'AdminAnnotations',
         'auth': 'AdminAuth',
         'auth_role': 'AdminAuthRole',
+        'security_context': 'AdminSecurityContext',
         'quality_of_service': 'CoreQualityOfService',
         'raw_output_data_config': 'AdminRawOutputDataConfig'
     }
@@ -65,11 +67,12 @@ class AdminLaunchPlanSpec(object):
         'annotations': 'annotations',
         'auth': 'auth',
         'auth_role': 'auth_role',
+        'security_context': 'security_context',
         'quality_of_service': 'quality_of_service',
         'raw_output_data_config': 'raw_output_data_config'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, quality_of_service=None, raw_output_data_config=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -81,6 +84,7 @@ class AdminLaunchPlanSpec(object):
         self._annotations = None
         self._auth = None
         self._auth_role = None
+        self._security_context = None
         self._quality_of_service = None
         self._raw_output_data_config = None
         self.discriminator = None
@@ -103,6 +107,8 @@ class AdminLaunchPlanSpec(object):
             self.auth = auth
         if auth_role is not None:
             self.auth_role = auth_role
+        if security_context is not None:
+            self.security_context = security_context
         if quality_of_service is not None:
             self.quality_of_service = quality_of_service
         if raw_output_data_config is not None:
@@ -302,6 +308,27 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._auth_role = auth_role
+
+    @property
+    def security_context(self):
+        """Gets the security_context of this AdminLaunchPlanSpec.  # noqa: E501
+
+
+        :return: The security_context of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: AdminSecurityContext
+        """
+        return self._security_context
+
+    @security_context.setter
+    def security_context(self, security_context):
+        """Sets the security_context of this AdminLaunchPlanSpec.
+
+
+        :param security_context: The security_context of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: AdminSecurityContext
+        """
+
+        self._security_context = security_context
 
     @property
     def quality_of_service(self):

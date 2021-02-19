@@ -9,7 +9,6 @@
 
 package flyteadmin
 
-// Defines permissions associated with executions.
 type AdminAuthRole struct {
 	AssumableIamRole string `json:"assumable_iam_role,omitempty"`
 	KubernetesServiceAccount string `json:"kubernetes_service_account,omitempty"`

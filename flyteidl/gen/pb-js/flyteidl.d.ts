@@ -6645,6 +6645,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a SecurityContext. */
+        interface ISecurityContext {
+
+            /** SecurityContext values */
+            values?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a SecurityContext. */
+        class SecurityContext implements ISecurityContext {
+
+            /**
+             * Constructs a new SecurityContext.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ISecurityContext);
+
+            /** SecurityContext values. */
+            public values: { [k: string]: string };
+
+            /**
+             * Creates a new SecurityContext instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SecurityContext instance
+             */
+            public static create(properties?: flyteidl.admin.ISecurityContext): flyteidl.admin.SecurityContext;
+
+            /**
+             * Encodes the specified SecurityContext message. Does not implicitly {@link flyteidl.admin.SecurityContext.verify|verify} messages.
+             * @param message SecurityContext message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ISecurityContext, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SecurityContext message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SecurityContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SecurityContext;
+
+            /**
+             * Verifies a SecurityContext message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an AuthRole. */
         interface IAuthRole {
 
@@ -8008,6 +8060,9 @@ export namespace flyteidl {
             /** ExecutionSpec authRole */
             authRole?: (flyteidl.admin.IAuthRole|null);
 
+            /** ExecutionSpec securityContext */
+            securityContext?: (flyteidl.admin.ISecurityContext|null);
+
             /** ExecutionSpec qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
         }
@@ -8044,6 +8099,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec authRole. */
             public authRole?: (flyteidl.admin.IAuthRole|null);
+
+            /** ExecutionSpec securityContext. */
+            public securityContext?: (flyteidl.admin.ISecurityContext|null);
 
             /** ExecutionSpec qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);
@@ -8633,6 +8691,9 @@ export namespace flyteidl {
             /** LaunchPlanSpec authRole */
             authRole?: (flyteidl.admin.IAuthRole|null);
 
+            /** LaunchPlanSpec securityContext */
+            securityContext?: (flyteidl.admin.ISecurityContext|null);
+
             /** LaunchPlanSpec qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
 
@@ -8675,6 +8736,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec authRole. */
             public authRole?: (flyteidl.admin.IAuthRole|null);
+
+            /** LaunchPlanSpec securityContext. */
+            public securityContext?: (flyteidl.admin.ISecurityContext|null);
 
             /** LaunchPlanSpec qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);
