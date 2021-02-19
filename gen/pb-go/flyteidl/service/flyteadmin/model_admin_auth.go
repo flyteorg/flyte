@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Defines permissions associated with executions created by this launch plan spec.
+// Defines permissions associated with executions created by this launch plan spec. Deprecated.
 type AdminAuth struct {
 	AssumableIamRole string `json:"assumable_iam_role,omitempty"`
 	KubernetesServiceAccount string `json:"kubernetes_service_account,omitempty"`

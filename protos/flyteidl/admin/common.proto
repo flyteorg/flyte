@@ -237,13 +237,23 @@ message Annotations {
     map<string, string> values          = 1;
 }
 
+// Security context fields to define privilege and access control settings
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge security context defined at registration and execution time.
+message SecurityContext {
+    // Map of security context values
+    map<string, string> values          = 1;
+}
+
 // Defines permissions associated with executions.
+// Deprecated
 message AuthRole {
   oneof method {
     string assumable_iam_role         = 1;
     string kubernetes_service_account = 2;
   }
 }
+
 
 // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
 // See https://github.com/lyft/flyte/issues/211 for more background information.

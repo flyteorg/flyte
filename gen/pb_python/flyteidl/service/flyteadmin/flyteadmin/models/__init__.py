@@ -85,6 +85,7 @@ from flyteadmin.models.admin_project_update_response import AdminProjectUpdateRe
 from flyteadmin.models.admin_projects import AdminProjects
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig
 from flyteadmin.models.admin_schedule import AdminSchedule
+from flyteadmin.models.admin_security_context import AdminSecurityContext
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification
 from flyteadmin.models.admin_sort import AdminSort
 from flyteadmin.models.admin_system_metadata import AdminSystemMetadata

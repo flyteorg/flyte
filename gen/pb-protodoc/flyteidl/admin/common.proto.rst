@@ -712,14 +712,40 @@ values
   
 
 
+.. _api_msg_flyteidl.admin.SecurityContext:
+
+flyteidl.admin.SecurityContext
+------------------------------
+
+`[flyteidl.admin.SecurityContext proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L242>`_
+
+Security context fields to define privilege and access control settings
+In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+to specify how to merge security context defined at registration and execution time.
+
+.. code-block:: json
+
+  {
+    "values": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.SecurityContext.values:
+
+values
+  (map<`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_, `string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_>) Map of security context values
+  
+  
+
+
 .. _api_msg_flyteidl.admin.AuthRole:
 
 flyteidl.admin.AuthRole
 -----------------------
 
-`[flyteidl.admin.AuthRole proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L240>`_
+`[flyteidl.admin.AuthRole proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L249>`_
 
 Defines permissions associated with executions.
+Deprecated
 
 .. code-block:: json
 
@@ -751,7 +777,7 @@ kubernetes_service_account
 flyteidl.admin.RawOutputDataConfig
 ----------------------------------
 
-`[flyteidl.admin.RawOutputDataConfig proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L249>`_
+`[flyteidl.admin.RawOutputDataConfig proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/common.proto#L259>`_
 
 Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
 See https://github.com/lyft/flyte/issues/211 for more background information.

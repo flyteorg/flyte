@@ -967,14 +967,23 @@ class LaunchPlanSpec final :
   PROTOBUF_DEPRECATED ::flyteidl::admin::Auth* mutable_auth();
   PROTOBUF_DEPRECATED void set_allocated_auth(::flyteidl::admin::Auth* auth);
 
-  // .flyteidl.admin.AuthRole auth_role = 9;
-  bool has_auth_role() const;
-  void clear_auth_role();
-  static const int kAuthRoleFieldNumber = 9;
-  const ::flyteidl::admin::AuthRole& auth_role() const;
-  ::flyteidl::admin::AuthRole* release_auth_role();
-  ::flyteidl::admin::AuthRole* mutable_auth_role();
-  void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
+  // .flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_auth_role() const;
+  PROTOBUF_DEPRECATED void clear_auth_role();
+  PROTOBUF_DEPRECATED static const int kAuthRoleFieldNumber = 9;
+  PROTOBUF_DEPRECATED const ::flyteidl::admin::AuthRole& auth_role() const;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::AuthRole* release_auth_role();
+  PROTOBUF_DEPRECATED ::flyteidl::admin::AuthRole* mutable_auth_role();
+  PROTOBUF_DEPRECATED void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
+
+  // .flyteidl.admin.SecurityContext security_context = 10;
+  bool has_security_context() const;
+  void clear_security_context();
+  static const int kSecurityContextFieldNumber = 10;
+  const ::flyteidl::admin::SecurityContext& security_context() const;
+  ::flyteidl::admin::SecurityContext* release_security_context();
+  ::flyteidl::admin::SecurityContext* mutable_security_context();
+  void set_allocated_security_context(::flyteidl::admin::SecurityContext* security_context);
 
   // .flyteidl.core.QualityOfService quality_of_service = 16;
   bool has_quality_of_service() const;
@@ -1008,6 +1017,7 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::Annotations* annotations_;
   ::flyteidl::admin::Auth* auth_;
   ::flyteidl::admin::AuthRole* auth_role_;
+  ::flyteidl::admin::SecurityContext* security_context_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -2732,7 +2742,7 @@ inline void LaunchPlanSpec::set_allocated_auth(::flyteidl::admin::Auth* auth) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.auth)
 }
 
-// .flyteidl.admin.AuthRole auth_role = 9;
+// .flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];
 inline bool LaunchPlanSpec::has_auth_role() const {
   return this != internal_default_instance() && auth_role_ != nullptr;
 }
@@ -2775,6 +2785,51 @@ inline void LaunchPlanSpec::set_allocated_auth_role(::flyteidl::admin::AuthRole*
   }
   auth_role_ = auth_role;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.auth_role)
+}
+
+// .flyteidl.admin.SecurityContext security_context = 10;
+inline bool LaunchPlanSpec::has_security_context() const {
+  return this != internal_default_instance() && security_context_ != nullptr;
+}
+inline const ::flyteidl::admin::SecurityContext& LaunchPlanSpec::security_context() const {
+  const ::flyteidl::admin::SecurityContext* p = security_context_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.security_context)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::SecurityContext*>(
+      &::flyteidl::admin::_SecurityContext_default_instance_);
+}
+inline ::flyteidl::admin::SecurityContext* LaunchPlanSpec::release_security_context() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanSpec.security_context)
+  
+  ::flyteidl::admin::SecurityContext* temp = security_context_;
+  security_context_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::SecurityContext* LaunchPlanSpec::mutable_security_context() {
+  
+  if (security_context_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::SecurityContext>(GetArenaNoVirtual());
+    security_context_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanSpec.security_context)
+  return security_context_;
+}
+inline void LaunchPlanSpec::set_allocated_security_context(::flyteidl::admin::SecurityContext* security_context) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(security_context_);
+  }
+  if (security_context) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      security_context = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, security_context, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  security_context_ = security_context;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.security_context)
 }
 
 // .flyteidl.core.QualityOfService quality_of_service = 16;

@@ -16020,6 +16020,128 @@ export const flyteidl = $root.flyteidl = (() => {
             return Annotations;
         })();
 
+        admin.SecurityContext = (function() {
+
+            /**
+             * Properties of a SecurityContext.
+             * @memberof flyteidl.admin
+             * @interface ISecurityContext
+             * @property {Object.<string,string>|null} [values] SecurityContext values
+             */
+
+            /**
+             * Constructs a new SecurityContext.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a SecurityContext.
+             * @implements ISecurityContext
+             * @constructor
+             * @param {flyteidl.admin.ISecurityContext=} [properties] Properties to set
+             */
+            function SecurityContext(properties) {
+                this.values = {};
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SecurityContext values.
+             * @member {Object.<string,string>} values
+             * @memberof flyteidl.admin.SecurityContext
+             * @instance
+             */
+            SecurityContext.prototype.values = $util.emptyObject;
+
+            /**
+             * Creates a new SecurityContext instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.SecurityContext
+             * @static
+             * @param {flyteidl.admin.ISecurityContext=} [properties] Properties to set
+             * @returns {flyteidl.admin.SecurityContext} SecurityContext instance
+             */
+            SecurityContext.create = function create(properties) {
+                return new SecurityContext(properties);
+            };
+
+            /**
+             * Encodes the specified SecurityContext message. Does not implicitly {@link flyteidl.admin.SecurityContext.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.SecurityContext
+             * @static
+             * @param {flyteidl.admin.ISecurityContext} message SecurityContext message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SecurityContext.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.values != null && message.hasOwnProperty("values"))
+                    for (let keys = Object.keys(message.values), i = 0; i < keys.length; ++i)
+                        writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.values[keys[i]]).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SecurityContext message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.SecurityContext
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.SecurityContext} SecurityContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SecurityContext.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SecurityContext(), key;
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        reader.skip().pos++;
+                        if (message.values === $util.emptyObject)
+                            message.values = {};
+                        key = reader.string();
+                        reader.pos++;
+                        message.values[key] = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SecurityContext message.
+             * @function verify
+             * @memberof flyteidl.admin.SecurityContext
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SecurityContext.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.values != null && message.hasOwnProperty("values")) {
+                    if (!$util.isObject(message.values))
+                        return "values: object expected";
+                    let key = Object.keys(message.values);
+                    for (let i = 0; i < key.length; ++i)
+                        if (!$util.isString(message.values[key[i]]))
+                            return "values: string{k:string} expected";
+                }
+                return null;
+            };
+
+            return SecurityContext;
+        })();
+
         admin.AuthRole = (function() {
 
             /**
@@ -19145,6 +19267,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.ILabels|null} [labels] ExecutionSpec labels
              * @property {flyteidl.admin.IAnnotations|null} [annotations] ExecutionSpec annotations
              * @property {flyteidl.admin.IAuthRole|null} [authRole] ExecutionSpec authRole
+             * @property {flyteidl.admin.ISecurityContext|null} [securityContext] ExecutionSpec securityContext
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] ExecutionSpec qualityOfService
              */
 
@@ -19228,6 +19351,14 @@ export const flyteidl = $root.flyteidl = (() => {
             ExecutionSpec.prototype.authRole = null;
 
             /**
+             * ExecutionSpec securityContext.
+             * @member {flyteidl.admin.ISecurityContext|null|undefined} securityContext
+             * @memberof flyteidl.admin.ExecutionSpec
+             * @instance
+             */
+            ExecutionSpec.prototype.securityContext = null;
+
+            /**
              * ExecutionSpec qualityOfService.
              * @member {flyteidl.core.IQualityOfService|null|undefined} qualityOfService
              * @memberof flyteidl.admin.ExecutionSpec
@@ -19288,7 +19419,9 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.annotations != null && message.hasOwnProperty("annotations"))
                     $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                 if (message.authRole != null && message.hasOwnProperty("authRole"))
-                    $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
+                    $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                    $root.flyteidl.admin.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                 return writer;
@@ -19333,8 +19466,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 8:
                         message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
                         break;
-                    case 16:
+                    case 9:
                         message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
+                        break;
+                    case 10:
+                        message.securityContext = $root.flyteidl.admin.SecurityContext.decode(reader, reader.uint32());
                         break;
                     case 17:
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
@@ -19403,6 +19539,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.AuthRole.verify(message.authRole);
                     if (error)
                         return "authRole." + error;
+                }
+                if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                    let error = $root.flyteidl.admin.SecurityContext.verify(message.securityContext);
+                    if (error)
+                        return "securityContext." + error;
                 }
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
                     let error = $root.flyteidl.core.QualityOfService.verify(message.qualityOfService);
@@ -20606,6 +20747,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.IAnnotations|null} [annotations] LaunchPlanSpec annotations
              * @property {flyteidl.admin.IAuth|null} [auth] LaunchPlanSpec auth
              * @property {flyteidl.admin.IAuthRole|null} [authRole] LaunchPlanSpec authRole
+             * @property {flyteidl.admin.ISecurityContext|null} [securityContext] LaunchPlanSpec securityContext
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] LaunchPlanSpec qualityOfService
              * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] LaunchPlanSpec rawOutputDataConfig
              */
@@ -20698,6 +20840,14 @@ export const flyteidl = $root.flyteidl = (() => {
             LaunchPlanSpec.prototype.authRole = null;
 
             /**
+             * LaunchPlanSpec securityContext.
+             * @member {flyteidl.admin.ISecurityContext|null|undefined} securityContext
+             * @memberof flyteidl.admin.LaunchPlanSpec
+             * @instance
+             */
+            LaunchPlanSpec.prototype.securityContext = null;
+
+            /**
              * LaunchPlanSpec qualityOfService.
              * @member {flyteidl.core.IQualityOfService|null|undefined} qualityOfService
              * @memberof flyteidl.admin.LaunchPlanSpec
@@ -20755,6 +20905,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.Auth.encode(message.auth, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                 if (message.authRole != null && message.hasOwnProperty("authRole"))
                     $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                    $root.flyteidl.admin.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig"))
@@ -20806,6 +20958,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 9:
                         message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
+                        break;
+                    case 10:
+                        message.securityContext = $root.flyteidl.admin.SecurityContext.decode(reader, reader.uint32());
                         break;
                     case 16:
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
@@ -20874,6 +21029,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.admin.AuthRole.verify(message.authRole);
                     if (error)
                         return "authRole." + error;
+                }
+                if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                    let error = $root.flyteidl.admin.SecurityContext.verify(message.securityContext);
+                    if (error)
+                        return "securityContext." + error;
                 }
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
                     let error = $root.flyteidl.core.QualityOfService.verify(message.qualityOfService);

@@ -3006,7 +3006,7 @@
           "type": "string"
         }
       },
-      "description": "Defines permissions associated with executions created by this launch plan spec."
+      "description": "Defines permissions associated with executions created by this launch plan spec.\nDeprecated."
     },
     "adminAuthRole": {
       "type": "object",
@@ -3018,7 +3018,7 @@
           "type": "string"
         }
       },
-      "description": "Defines permissions associated with executions."
+      "title": "Defines permissions associated with executions.\nDeprecated"
     },
     "adminClusterResourceAttributes": {
       "type": "object",
@@ -3305,6 +3305,10 @@
           "$ref": "#/definitions/adminAuthRole",
           "description": "Optional: auth override to apply this execution."
         },
+        "security_context": {
+          "$ref": "#/definitions/adminSecurityContext",
+          "description": "Optional: security context override to apply this execution."
+        },
         "quality_of_service": {
           "$ref": "#/definitions/coreQualityOfService",
           "description": "Indicates the runtime priority of the execution."
@@ -3495,6 +3499,10 @@
         },
         "auth_role": {
           "$ref": "#/definitions/adminAuthRole"
+        },
+        "security_context": {
+          "$ref": "#/definitions/adminSecurityContext",
+          "title": "Indicates security context for permissions triggered with this launch plan"
         },
         "quality_of_service": {
           "$ref": "#/definitions/coreQualityOfService",
@@ -4067,6 +4075,19 @@
         }
       },
       "description": "Defines complete set of information required to trigger an execution on a schedule."
+    },
+    "adminSecurityContext": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Map of security context values"
+        }
+      },
+      "description": "Security context fields to define privilege and access control settings\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge security context defined at registration and execution time."
     },
     "adminSlackNotification": {
       "type": "object",
