@@ -14877,25 +14877,50 @@ public final class ExecutionOuterClass {
      * Optional: auth override to apply this execution.
      * </pre>
      *
-     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    boolean hasAuthRole();
+    @java.lang.Deprecated boolean hasAuthRole();
     /**
      * <pre>
      * Optional: auth override to apply this execution.
      * </pre>
      *
-     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    flyteidl.admin.Common.AuthRole getAuthRole();
+    @java.lang.Deprecated flyteidl.admin.Common.AuthRole getAuthRole();
     /**
      * <pre>
      * Optional: auth override to apply this execution.
      * </pre>
      *
-     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
+    @java.lang.Deprecated flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder();
+
+    /**
+     * <pre>
+     * Optional: security context override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    boolean hasSecurityContext();
+    /**
+     * <pre>
+     * Optional: security context override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    flyteidl.admin.Common.SecurityContext getSecurityContext();
+    /**
+     * <pre>
+     * Optional: security context override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    flyteidl.admin.Common.SecurityContextOrBuilder getSecurityContextOrBuilder();
 
     /**
      * <pre>
@@ -15052,7 +15077,7 @@ public final class ExecutionOuterClass {
 
               break;
             }
-            case 130: {
+            case 74: {
               flyteidl.admin.Common.AuthRole.Builder subBuilder = null;
               if (authRole_ != null) {
                 subBuilder = authRole_.toBuilder();
@@ -15061,6 +15086,19 @@ public final class ExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(authRole_);
                 authRole_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 82: {
+              flyteidl.admin.Common.SecurityContext.Builder subBuilder = null;
+              if (securityContext_ != null) {
+                subBuilder = securityContext_.toBuilder();
+              }
+              securityContext_ = input.readMessage(flyteidl.admin.Common.SecurityContext.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(securityContext_);
+                securityContext_ = subBuilder.buildPartial();
               }
 
               break;
@@ -15372,16 +15410,16 @@ public final class ExecutionOuterClass {
       return getAnnotations();
     }
 
-    public static final int AUTH_ROLE_FIELD_NUMBER = 16;
+    public static final int AUTH_ROLE_FIELD_NUMBER = 9;
     private flyteidl.admin.Common.AuthRole authRole_;
     /**
      * <pre>
      * Optional: auth override to apply this execution.
      * </pre>
      *
-     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    public boolean hasAuthRole() {
+    @java.lang.Deprecated public boolean hasAuthRole() {
       return authRole_ != null;
     }
     /**
@@ -15389,9 +15427,9 @@ public final class ExecutionOuterClass {
      * Optional: auth override to apply this execution.
      * </pre>
      *
-     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    public flyteidl.admin.Common.AuthRole getAuthRole() {
+    @java.lang.Deprecated public flyteidl.admin.Common.AuthRole getAuthRole() {
       return authRole_ == null ? flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
     }
     /**
@@ -15399,10 +15437,43 @@ public final class ExecutionOuterClass {
      * Optional: auth override to apply this execution.
      * </pre>
      *
-     * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+     * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
      */
-    public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
+    @java.lang.Deprecated public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
       return getAuthRole();
+    }
+
+    public static final int SECURITY_CONTEXT_FIELD_NUMBER = 10;
+    private flyteidl.admin.Common.SecurityContext securityContext_;
+    /**
+     * <pre>
+     * Optional: security context override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    public boolean hasSecurityContext() {
+      return securityContext_ != null;
+    }
+    /**
+     * <pre>
+     * Optional: security context override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    public flyteidl.admin.Common.SecurityContext getSecurityContext() {
+      return securityContext_ == null ? flyteidl.admin.Common.SecurityContext.getDefaultInstance() : securityContext_;
+    }
+    /**
+     * <pre>
+     * Optional: security context override to apply this execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+     */
+    public flyteidl.admin.Common.SecurityContextOrBuilder getSecurityContextOrBuilder() {
+      return getSecurityContext();
     }
 
     public static final int QUALITY_OF_SERVICE_FIELD_NUMBER = 17;
@@ -15475,7 +15546,10 @@ public final class ExecutionOuterClass {
         output.writeMessage(8, getAnnotations());
       }
       if (authRole_ != null) {
-        output.writeMessage(16, getAuthRole());
+        output.writeMessage(9, getAuthRole());
+      }
+      if (securityContext_ != null) {
+        output.writeMessage(10, getSecurityContext());
       }
       if (qualityOfService_ != null) {
         output.writeMessage(17, getQualityOfService());
@@ -15520,7 +15594,11 @@ public final class ExecutionOuterClass {
       }
       if (authRole_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(16, getAuthRole());
+          .computeMessageSize(9, getAuthRole());
+      }
+      if (securityContext_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(10, getSecurityContext());
       }
       if (qualityOfService_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -15570,6 +15648,11 @@ public final class ExecutionOuterClass {
       if (hasAuthRole()) {
         if (!getAuthRole()
             .equals(other.getAuthRole())) return false;
+      }
+      if (hasSecurityContext() != other.hasSecurityContext()) return false;
+      if (hasSecurityContext()) {
+        if (!getSecurityContext()
+            .equals(other.getSecurityContext())) return false;
       }
       if (hasQualityOfService() != other.hasQualityOfService()) return false;
       if (hasQualityOfService()) {
@@ -15623,6 +15706,10 @@ public final class ExecutionOuterClass {
       if (hasAuthRole()) {
         hash = (37 * hash) + AUTH_ROLE_FIELD_NUMBER;
         hash = (53 * hash) + getAuthRole().hashCode();
+      }
+      if (hasSecurityContext()) {
+        hash = (37 * hash) + SECURITY_CONTEXT_FIELD_NUMBER;
+        hash = (53 * hash) + getSecurityContext().hashCode();
       }
       if (hasQualityOfService()) {
         hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
@@ -15815,6 +15902,12 @@ public final class ExecutionOuterClass {
           authRole_ = null;
           authRoleBuilder_ = null;
         }
+        if (securityContextBuilder_ == null) {
+          securityContext_ = null;
+        } else {
+          securityContext_ = null;
+          securityContextBuilder_ = null;
+        }
         if (qualityOfServiceBuilder_ == null) {
           qualityOfService_ = null;
         } else {
@@ -15889,6 +15982,11 @@ public final class ExecutionOuterClass {
         } else {
           result.authRole_ = authRoleBuilder_.build();
         }
+        if (securityContextBuilder_ == null) {
+          result.securityContext_ = securityContext_;
+        } else {
+          result.securityContext_ = securityContextBuilder_.build();
+        }
         if (qualityOfServiceBuilder_ == null) {
           result.qualityOfService_ = qualityOfService_;
         } else {
@@ -15960,6 +16058,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasAuthRole()) {
           mergeAuthRole(other.getAuthRole());
+        }
+        if (other.hasSecurityContext()) {
+          mergeSecurityContext(other.getSecurityContext());
         }
         if (other.hasQualityOfService()) {
           mergeQualityOfService(other.getQualityOfService());
@@ -17026,9 +17127,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public boolean hasAuthRole() {
+      @java.lang.Deprecated public boolean hasAuthRole() {
         return authRoleBuilder_ != null || authRole_ != null;
       }
       /**
@@ -17036,9 +17137,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public flyteidl.admin.Common.AuthRole getAuthRole() {
+      @java.lang.Deprecated public flyteidl.admin.Common.AuthRole getAuthRole() {
         if (authRoleBuilder_ == null) {
           return authRole_ == null ? flyteidl.admin.Common.AuthRole.getDefaultInstance() : authRole_;
         } else {
@@ -17050,9 +17151,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder setAuthRole(flyteidl.admin.Common.AuthRole value) {
+      @java.lang.Deprecated public Builder setAuthRole(flyteidl.admin.Common.AuthRole value) {
         if (authRoleBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -17070,9 +17171,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder setAuthRole(
+      @java.lang.Deprecated public Builder setAuthRole(
           flyteidl.admin.Common.AuthRole.Builder builderForValue) {
         if (authRoleBuilder_ == null) {
           authRole_ = builderForValue.build();
@@ -17088,9 +17189,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder mergeAuthRole(flyteidl.admin.Common.AuthRole value) {
+      @java.lang.Deprecated public Builder mergeAuthRole(flyteidl.admin.Common.AuthRole value) {
         if (authRoleBuilder_ == null) {
           if (authRole_ != null) {
             authRole_ =
@@ -17110,9 +17211,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public Builder clearAuthRole() {
+      @java.lang.Deprecated public Builder clearAuthRole() {
         if (authRoleBuilder_ == null) {
           authRole_ = null;
           onChanged();
@@ -17128,9 +17229,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public flyteidl.admin.Common.AuthRole.Builder getAuthRoleBuilder() {
+      @java.lang.Deprecated public flyteidl.admin.Common.AuthRole.Builder getAuthRoleBuilder() {
         
         onChanged();
         return getAuthRoleFieldBuilder().getBuilder();
@@ -17140,9 +17241,9 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
-      public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
+      @java.lang.Deprecated public flyteidl.admin.Common.AuthRoleOrBuilder getAuthRoleOrBuilder() {
         if (authRoleBuilder_ != null) {
           return authRoleBuilder_.getMessageOrBuilder();
         } else {
@@ -17155,7 +17256,7 @@ public final class ExecutionOuterClass {
        * Optional: auth override to apply this execution.
        * </pre>
        *
-       * <code>.flyteidl.admin.AuthRole auth_role = 16;</code>
+       * <code>.flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.AuthRole, flyteidl.admin.Common.AuthRole.Builder, flyteidl.admin.Common.AuthRoleOrBuilder> 
@@ -17169,6 +17270,159 @@ public final class ExecutionOuterClass {
           authRole_ = null;
         }
         return authRoleBuilder_;
+      }
+
+      private flyteidl.admin.Common.SecurityContext securityContext_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.SecurityContext, flyteidl.admin.Common.SecurityContext.Builder, flyteidl.admin.Common.SecurityContextOrBuilder> securityContextBuilder_;
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public boolean hasSecurityContext() {
+        return securityContextBuilder_ != null || securityContext_ != null;
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public flyteidl.admin.Common.SecurityContext getSecurityContext() {
+        if (securityContextBuilder_ == null) {
+          return securityContext_ == null ? flyteidl.admin.Common.SecurityContext.getDefaultInstance() : securityContext_;
+        } else {
+          return securityContextBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder setSecurityContext(flyteidl.admin.Common.SecurityContext value) {
+        if (securityContextBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          securityContext_ = value;
+          onChanged();
+        } else {
+          securityContextBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder setSecurityContext(
+          flyteidl.admin.Common.SecurityContext.Builder builderForValue) {
+        if (securityContextBuilder_ == null) {
+          securityContext_ = builderForValue.build();
+          onChanged();
+        } else {
+          securityContextBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder mergeSecurityContext(flyteidl.admin.Common.SecurityContext value) {
+        if (securityContextBuilder_ == null) {
+          if (securityContext_ != null) {
+            securityContext_ =
+              flyteidl.admin.Common.SecurityContext.newBuilder(securityContext_).mergeFrom(value).buildPartial();
+          } else {
+            securityContext_ = value;
+          }
+          onChanged();
+        } else {
+          securityContextBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public Builder clearSecurityContext() {
+        if (securityContextBuilder_ == null) {
+          securityContext_ = null;
+          onChanged();
+        } else {
+          securityContext_ = null;
+          securityContextBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public flyteidl.admin.Common.SecurityContext.Builder getSecurityContextBuilder() {
+        
+        onChanged();
+        return getSecurityContextFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      public flyteidl.admin.Common.SecurityContextOrBuilder getSecurityContextOrBuilder() {
+        if (securityContextBuilder_ != null) {
+          return securityContextBuilder_.getMessageOrBuilder();
+        } else {
+          return securityContext_ == null ?
+              flyteidl.admin.Common.SecurityContext.getDefaultInstance() : securityContext_;
+        }
+      }
+      /**
+       * <pre>
+       * Optional: security context override to apply this execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.SecurityContext security_context = 10;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.SecurityContext, flyteidl.admin.Common.SecurityContext.Builder, flyteidl.admin.Common.SecurityContextOrBuilder> 
+          getSecurityContextFieldBuilder() {
+        if (securityContextBuilder_ == null) {
+          securityContextBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.SecurityContext, flyteidl.admin.Common.SecurityContext.Builder, flyteidl.admin.Common.SecurityContextOrBuilder>(
+                  getSecurityContext(),
+                  getParentForChildren(),
+                  isClean());
+          securityContext_ = null;
+        }
+        return securityContextBuilder_;
       }
 
       private flyteidl.core.Execution.QualityOfService qualityOfService_;
@@ -20910,7 +21164,7 @@ public final class ExecutionOuterClass {
       "CHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016" +
       "CHILD_WORKFLOW\020\004\"G\n\020NotificationList\0223\n\r" +
       "notifications\030\001 \003(\0132\034.flyteidl.admin.Not" +
-      "ification\"\331\003\n\rExecutionSpec\022.\n\013launch_pl" +
+      "ification\"\230\004\n\rExecutionSpec\022.\n\013launch_pl" +
       "an\030\001 \001(\0132\031.flyteidl.core.Identifier\022-\n\006i" +
       "nputs\030\002 \001(\0132\031.flyteidl.core.LiteralMapB\002" +
       "\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admin.Ex" +
@@ -20918,23 +21172,25 @@ public final class ExecutionOuterClass {
       ".flyteidl.admin.NotificationListH\000\022\025\n\013di" +
       "sable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyt" +
       "eidl.admin.Labels\0220\n\013annotations\030\010 \001(\0132\033" +
-      ".flyteidl.admin.Annotations\022+\n\tauth_role" +
-      "\030\020 \001(\0132\030.flyteidl.admin.AuthRole\022;\n\022qual" +
-      "ity_of_service\030\021 \001(\0132\037.flyteidl.core.Qua" +
-      "lityOfServiceB\030\n\026notification_overridesJ" +
-      "\004\010\004\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe" +
-      "rminateResponse\"Y\n\037WorkflowExecutionGetD" +
-      "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
-      "orkflowExecutionIdentifier\"\326\001\n WorkflowE" +
-      "xecutionGetDataResponse\022(\n\007outputs\030\001 \001(\013" +
-      "2\027.flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(" +
-      "\0132\027.flyteidl.admin.UrlBlob\022.\n\013full_input" +
-      "s\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014fu" +
-      "ll_outputs\030\004 \001(\0132\031.flyteidl.core.Literal" +
-      "MapB3Z1github.com/lyft/flyteidl/gen/pb-g" +
-      "o/flyteidl/adminb\006proto3"
+      ".flyteidl.admin.Annotations\022/\n\tauth_role" +
+      "\030\t \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001\0229\n\020" +
+      "security_context\030\n \001(\0132\037.flyteidl.admin." +
+      "SecurityContext\022;\n\022quality_of_service\030\021 " +
+      "\001(\0132\037.flyteidl.core.QualityOfServiceB\030\n\026" +
+      "notification_overridesJ\004\010\004\020\005\"b\n\031Executio" +
+      "nTerminateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl" +
+      ".core.WorkflowExecutionIdentifier\022\r\n\005cau" +
+      "se\030\002 \001(\t\"\034\n\032ExecutionTerminateResponse\"Y" +
+      "\n\037WorkflowExecutionGetDataRequest\0226\n\002id\030" +
+      "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI" +
+      "dentifier\"\326\001\n WorkflowExecutionGetDataRe" +
+      "sponse\022(\n\007outputs\030\001 \001(\0132\027.flyteidl.admin" +
+      ".UrlBlob\022\'\n\006inputs\030\002 \001(\0132\027.flyteidl.admi" +
+      "n.UrlBlob\022.\n\013full_inputs\030\003 \001(\0132\031.flyteid" +
+      "l.core.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132" +
+      "\031.flyteidl.core.LiteralMapB3Z1github.com" +
+      "/lyft/flyteidl/gen/pb-go/flyteidl/adminb" +
+      "\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21031,7 +21287,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "AuthRole", "QualityOfService", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "AuthRole", "SecurityContext", "QualityOfService", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new

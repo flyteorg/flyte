@@ -57,6 +57,7 @@ message LaunchPlanList {
 }
 
 // Defines permissions associated with executions created by this launch plan spec.
+// Deprecated.
 message Auth {
   oneof method {
     string assumable_iam_role         = 1;
@@ -90,7 +91,10 @@ message LaunchPlanSpec {
     // Indicates the permission associated with workflow executions triggered with this launch plan.
     Auth auth                             = 8 [deprecated=true];
 
-    AuthRole auth_role                    = 9;
+    AuthRole auth_role                    = 9 [deprecated=true];
+
+    // Indicates security context for permissions triggered with this launch plan
+    SecurityContext security_context      = 10;
 
     // Indicates the runtime priority of the execution.
     core.QualityOfService quality_of_service   = 16;
