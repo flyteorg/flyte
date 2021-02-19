@@ -2,7 +2,7 @@ from flytekit.common import notifications as _notifications
 from flytekit.models.common import Labels, Annotations
 from flytekit.models.core import execution as _execution
 
-from recipes.workflows import workflows
+from workflows import workflows
 
 # This is a launchplan that is created with default values of inputs and added some annotations, labels and
 # notification preferences. Default values make it possible to still override when an execution is requested

@@ -16,7 +16,7 @@ SCHEDULE_EXPR = "0/15 * * * ? *"
 The `create_launch_plan` function can take a schedule expression
 
 ```python
-from recipes.workflows import workflows
+from workflows import workflows
 from flytekit.common import schedules
 scale_rotate_cronscheduled_launchplan = workflows.ScaleAndRotateWorkflow.create_launch_plan(
     schedule=schedules.CronSchedule("0/30 * * * ? *")
@@ -27,7 +27,7 @@ A similar result can be achieved with a fixed rate schedule,
 
 ```python
 import datetime
-from recipes.workflows import workflows
+from workflows import workflows
 from flytekit.common import schedules
 scale_rotate_fixedRateScheduled_launchplan = workflows.ScaleAndRotateWorkflow.create_launch_plan(
     schedule=schedules.FixedRate(duration=datetime.timedelta(minutes=30))
@@ -41,7 +41,7 @@ Note that, for convenience, when Flyte Admin launches a scheduled execution, it 
 For example, if your workflow takes a datetime as an input named `trigger_time` and you would like it to receive the scheduled time at launch, you can specify it as,
 
 ```python
-from recipes.multi_schedules.scheduled_workflow import ScheduledWorkflow
+from multi_schedules.scheduled_workflow import ScheduledWorkflow
 from flytekit.common import schedules
 scheduled_time_lp = ScheduledWorkflow.create_launch_plan(
     schedule=schedules.CronSchedule("0/30 * * * ? *", kickoff_time_input_arg='trigger_time')

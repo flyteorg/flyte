@@ -1,2 +1,0 @@
--r recipes/common/requirements-common.in
-opencv-python

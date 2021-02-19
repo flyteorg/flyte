@@ -1,0 +1,3 @@
+flytekit>=0.16.0b6
+wheel
+matplotlib

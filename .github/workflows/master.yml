@@ -6,26 +6,20 @@ on:
       - master
 
 jobs:
-  push-github:
-    name: Push to GHCR
+  bump-version:
+    name: Bump Version
+    if: github.event.commits[0].author.name != 'goreleaserbot'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: cookbook
+    outputs:
+      version: ${{ steps.bump-version.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: '0'
-      - name: Push Docker Image to Github Registry
-        uses: whoan/docker-build-with-cache-action@v5
-        with:
-          # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
-          image_name: flyteorg/flytecookbook
-          image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
-          push_git_tag: true
-          registry: ghcr.io
-          build_extra_args: "--compress=true"
-          context: ./cookbook
-          dockerfile: Dockerfile
+          fetch-depth: "0"
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DEFAULT_BUMP: patch

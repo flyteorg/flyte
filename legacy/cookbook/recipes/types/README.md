@@ -108,7 +108,7 @@ Flytekit implements this `here <https://github.com/lyft/flytekit/blob/1926b12855
 The UI currently does not support passing structs as inputs to workflows, so if you need to rely on this, you'll have to use **flyte-cli** for now. ::
 
 ```bash
-  flyte-cli -p flytesnacks -d development execute-launch-plan -u lp:flytesnacks:development:recipes.types.generic.GenericDemoWorkflow:version -r demo -- a='{"a": "hello", "b": "how are you", "c": ["array"], "d": {"nested": "value"}}'
+  flyte-cli -p flytesnacks -d development execute-launch-plan -u lp:flytesnacks:development:types.generic.GenericDemoWorkflow:version -r demo -- a='{"a": "hello", "b": "how are you", "c": ["array"], "d": {"nested": "value"}}'
 ```
 
 ## Pass your own proto objects

@@ -7,7 +7,7 @@ Launch plans are a simple thin layer on top of workflows that allow users to exe
 In order to create a launch plan we first need a workflow. We can use the `ScaleAndRotateWorkflow` created in the workflows chapter.  A default launch plan can be created by just calling the `.create_launch_plan()` function on the Workflow with no arguments.
 
 ```python
-from recipes.workflows import workflows
+from workflows import workflows
 workflows.ScaleAndRotateWorkflow.create_launch_plan()
 ```
 

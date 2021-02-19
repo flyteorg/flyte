@@ -1,6 +1,11 @@
--r requirements.in
-
-sphinx_rtd_theme
-sphinx-prompt
-sphinx-gallery
 pillow
+sphinx
+sphinx_rtd_theme
+sphinx-gallery
+sphinx-prompt
+sphinx-material
+sphinx-code-include
+sphinx-autoapi
+sphinx-copybutton
+docutils==0.16
+astroid==2.4.2 

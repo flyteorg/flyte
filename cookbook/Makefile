@@ -1,95 +1,74 @@
-include recipes/common/Makefile.common
+.SILENT:
 
-# If you're port-forwarding your service or running the sandbox Flyte deployment, just don't specify anything.
-# If your Flyte Admin is behind SSL, add SECURE=1 before your make command
-ifneq ($(origin SECURE), undefined)
-	INSECURE_FLAG =
-else
-	INSECURE_FLAG = -i
-endif
+include common/Makefile
 
-.PHONY: in_container_serialize_sandbox
-in_container_serialize_sandbox:
-	pyflyte --config /root/sandbox.config serialize workflows -f /tmp/output
+dev-requirements.txt: export CUSTOM_COMPILE_COMMAND := $(MAKE) dev-requirements.txt
+dev-requirements.txt: dev-requirements.in install-piptools
+	$(call PIP_COMPILE,dev-requirements.in)
 
-.PHONY: register_sandbox
-register_sandbox: docker_build serialize_sandbox
-	test $(FLYTE_HOST) || ( echo ">> FLYTE_HOST is not set"; exit 1 )
-	flyte-cli register-files -h ${FLYTE_HOST} ${INSECURE_FLAG} -p ${PROJECT} -d development -v ${VERSION} ${CURDIR}/_pb_output/*
+.PHONY: dev-requirements
+dev-requirements: dev-requirements.txt
 
-.PHONY: serialize_sandbox
-serialize_sandbox: dev_docker_build
-	echo ${CURDIR}
-	mkdir ${CURDIR}/_pb_output || true
-	rm ${CURDIR}/_pb_output/* || true
-	docker run -v ${CURDIR}/_pb_output:/tmp/output ${FULL_IMAGE_NAME}:dev-${VERSION} make in_container_serialize_sandbox
+docs-requirements.txt: export CUSTOM_COMPILE_COMMAND := $(MAKE) docs-requirements.txt
+docs-requirements.txt: docs-requirements.in install-piptools
+	$(call PIP_COMPILE,docs-requirements.in)
 
-.PHONY: serialize
-serialize:
-	echo ${CURDIR}
-	mkdir ${CURDIR}/_pb_output || true
-	rm ${CURDIR}/_pb_output/* || true
-	pyflyte -c sandbox.config --pkgs recipes.core serialize --in-container-config-path /root/sandbox.config --local-source-root ${CURDIR} --image ${FULL_IMAGE_NAME}:${VERSION} workflows -f _pb_output/
-
-.PHONY: register
-register:
-	test $(OUTPUT_DATA_PREFIX) || ( echo ">> OUTPUT_DATA_PREFIX is not set"; exit 1 )
-	test $(FLYTE_HOST) || ( echo ">> FLYTE_HOST is not set"; exit 1 )
-	flyte-cli register-files -h ${FLYTE_HOST} ${INSECURE_FLAG} -p flytetester -d development -v ${VERSION} --kubernetes-service-account default --output-location-prefix ${OUTPUT_DATA_PREFIX} _pb_output/*
-
-.PHONY: fast_serialize
-fast_serialize:
-	echo ${CURDIR}
-	mkdir ${CURDIR}/_pb_output || true
-	rm ${CURDIR}/_pb_output/* || true
-	pyflyte -c sandbox.config --pkgs recipes.core serialize --in-container-config-path /root/sandbox.config --local-source-root ${CURDIR} --image ${FULL_IMAGE_NAME}:${VERSION} fast workflows -f _pb_output/
-
-.PHONY: fast_register
-fast_register:
-	test $(OUTPUT_DATA_PREFIX) || ( echo ">> OUTPUT_DATA_PREFIX is not set"; exit 1 )
-	test $(FLYTE_HOST) || ( echo ">> FLYTE_HOST is not set"; exit 1 )
-	test $(ADDL_DISTRIBUTION_DIR) || ( echo ">> ADDL_DISTRIBUTION_DIR is not set"; exit 1 )
-	flyte-cli fast-register-files -h ${FLYTE_HOST} ${INSECURE_FLAG} -p flytetester -d development --kubernetes-service-account default --output-location-prefix ${OUTPUT_DATA_PREFIX} --additional-distribution-dir ${ADDL_DISTRIBUTION_DIR} _pb_output/*
-
-.PHONY: fast_register_sandbox
-fast_register_sandbox: fast_serialize_sandbox
-	echo "Registering against localhost. Follow the README to use a remote Flyte installation"
-	FLYTE_AWS_ENDPOINT=http://localhost:9000/ FLYTE_AWS_ACCESS_KEY_ID=minio FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage \
-		flyte-cli fast-register-files -h localhost:80 ${INSECURE_FLAG} -p ${PROJECT} -d development ${INSECURE_FLAG} \
-		--additional-distribution-dir s3://my-s3-bucket/fast/ --dest-dir /root/recipes ${CURDIR}/_pb_output/*
-
-.PHONY: in_container_fast_serialize_sandbox
-in_container_fast_serialize_sandbox:
-	pyflyte --config /root/sandbox.config serialize fast workflows -f /tmp/output
-
-.PHONY: fast_serialize_sandbox
-fast_serialize_sandbox: dev_docker_build
-	echo ${CURDIR}
-	mkdir ${CURDIR}/_pb_output || true
-	rm -f ${CURDIR}/_pb_output/*.tar.gz
-	docker run -v ${CURDIR}/_pb_output:/tmp/output ${FULL_IMAGE_NAME}:dev-${VERSION} make in_container_fast_serialize_sandbox
+.PHONY: docs-requirements
+docs-requirements: docs-requirements.txt
 
 .PHONY: enter_sandbox
 enter_sandbox: docker_build
 	docker run -e PROJECT=${PROJECT} -v `pwd`:/root -it ${FULL_IMAGE_NAME}:${VERSION} bash
 
 .PHONE: run-all-examples
-run-examples:
-	sh ./scripts/run-all-examples.sh
+run-examples: ## Runs all examples
+	sh scripts/run-all-examples.sh
 
-PWD=$(CURDIR)
-.PHONY: all_docker_push
-all_docker_push: docker_push
-	REGISTRY=${REGISTRY} IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh sagemaker.Dockerfile sagemaker
-	REGISTRY=${REGISTRY} IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh pod.Dockerfile pod
-	REGISTRY=${REGISTRY} IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh k8sspark.Dockerfile spark
-	REGISTRY=${REGISTRY} IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh kfpytorch.Dockerfile pytorch
-	REGISTRY=${REGISTRY} IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh smpytorch.Dockerfile smpytorch
+.PHONY: all_fast_register
+all_fast_register: ## Registers new code changes using the last built image (assumes current HEAD refers to a built image).
+	$(MAKE) -C core fast_register
+	$(MAKE) -C plugins all_fast_register
+	$(MAKE) -C case_studies all_fast_register
+
+.PHONY: all_fast_serialize
+all_fast_serialize:
+	$(MAKE) -C core fast_serialize
+	$(MAKE) -C plugins all_fast_serialize
+	$(MAKE) -C case_studies all_fast_serialize
 
 .PHONY: all_requirements
-all_requirements: requirements
-	ENV_BASE_PATH="${PWD}/env/" scripts/make-all-docker.sh requirements
+all_requirements: dev-requirements docs-requirements ## Makes all requirements in sub directories
+	$(MAKE) -C core requirements
+	$(MAKE) -C plugins all_requirements
+	$(MAKE) -C case_studies all_requirements
 
-.PHONY: dev_docker_build
-dev_docker_build:
-	NOPUSH=1 IMAGE_NAME=${IMAGE_NAME} flytekit_build_image.sh ./dev.Dockerfile dev
+.PHONY: all_register
+all_register: ## Builds, pushes and registers all docker images, workflows and tasks in all sub directories.
+	$(MAKE) -j10 -C core register
+	$(MAKE) -j10 -C plugins all_register
+	$(MAKE) -j10 -C case_studies all_register
+
+.PHONY: all_serialize
+all_serialize: # Builds and serializes all docker images, workflows and tasks in all sub directories.
+	$(MAKE) -C core serialize
+	$(MAKE) -C plugins all_serialize
+	$(MAKE) -C case_studies all_serialize
+
+.PHONY: all_docker_push
+all_docker_push: # Builds and pushes all docker images.
+	$(MAKE) -j10 -C core docker_push
+	$(MAKE) -j10 -C plugins all_docker_push
+	$(MAKE) -j10 -C case_studies all_docker_push
+
+.PHONY: all_k3d_load_image
+all_k3d_load_image: 
+	$(MAKE) -j10 -C core k3d_load_image
+	$(MAKE) -j10 -C plugins all_k3d_load_image
+	$(MAKE) -j10 -C case_studies all_k3d_load_image
+
+.PHONY: all_clean
+all_clean: # Cleans build directories (e.g. _pb_output/)
+	$(MAKE) -C core clean
+	$(MAKE) -C docs clean
+	$(MAKE) -C plugins all_clean
+	$(MAKE) -C case_studies all_clean

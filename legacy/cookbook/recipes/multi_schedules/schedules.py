@@ -1,9 +1,9 @@
-from recipes.workflows import workflows
+from workflows import workflows
 from flytekit.common import schedules as _schedules, notifications as _notifications
 from flytekit.models.core import execution as _execution
 from flytekit.models.common import Labels, Annotations
 from datetime import timedelta
-from recipes.multi_schedules.scheduled_workflow import ScheduledWorkflow
+from multi_schedules.scheduled_workflow import ScheduledWorkflow
 
 # A Workflow can have multiple schedules. One per launch plan
 

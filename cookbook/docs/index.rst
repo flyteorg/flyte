@@ -8,9 +8,9 @@ If you have access to a whole Flyte platform deployment, this cookbook can also 
 
 The tutorial is divided into 3 sections:
 
-* :ref:`Getting Started <sphx_glr_auto_core>` - This covers the basics of Flytekit, as well as working with a deployed Flyte platform.
+* :ref:`Core Language Examples <flyte-core>` - This covers the basics of Flytekit, as well as working with a deployed Flyte platform.
 * :ref:`Case Studies <sphx_glr_auto_case_studies>` - These are examples that showcase the power of Flyte.
-* :ref:`Plugins <plugins_main>` - This section details flytekit extensibility
+* :ref:`Plugins Examples <plugins_main>` - This section details flytekit extensibility
 
 For more details on Flyte refer to the `Homepage <https://flyte.org>`__. For documentation on how to install, configure, administer Flyte, please refer to the
 `platform documentation <https://lyft.github.io/flyte/>`__
@@ -24,6 +24,7 @@ Please join our Slack channel as well through this `form <https://docs.google.co
    :maxdepth: 4
    :caption: Getting Started
 
+   tutorial
    core
    auto_core_basic/index
    auto_core_intermediate/index
@@ -52,7 +53,7 @@ Please join our Slack channel as well through this `form <https://docs.google.co
    :maxdepth: 4
    :caption: Additional Flyte Documentation
 
-   Flyte Project <https://flyte.readthedocs.io/en/latest//>
+   Flyte Project <https://flyte.readthedocs.io/en/latest/>
    Flytekit Python <https://flytekit.readthedocs.io/en/latest/">
 
 

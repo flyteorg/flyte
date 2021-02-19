@@ -50,4 +50,4 @@ enter_sandbox: docker_build
 .PHONY: run_tests
 run_tests: 
 	export PYTHONPATH=.:$(PYTHONPATH)
-	pytest tests/recipes/
+	pytest tests/

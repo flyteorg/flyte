@@ -1,3 +1,5 @@
+.. _flyte-core:
+
 .. currentmodule:: core
 
 ############################################
@@ -5,7 +7,7 @@ Getting Started with Flytekit [python]
 ############################################
 The first three chapters of this part of the cookbook is organized into increasing levels of complexity. The last chapter shows the reader the optimal way to use flytekit with a live Flyte deployment.
 
-Please see additional information in the `GitHub Readme <https://github.com/lyft/flytesnacks/tree/master/cookbook_se>`_ as well.
+Please see additional information in the `GitHub Readme <https://github.com/lyft/flytesnacks/tree/master/cookbook>`_ as well.
 
 
 .. _flyte_type_system:
@@ -132,4 +134,4 @@ format **10H** (for 10 hours) or **10S** or **2D** (days etc)
 
 .. prompt:: bash
 
-    flyte-cli -p flytesnacks -d development execute-launch-plan -u lp:flytesnacks:development:recipes.types.generic.GenericDemoWorkflow:version -r demo -- a='{"a": "hello", "b": "how are you", "c": ["array"], "d": {"nested": "value"}}'
+    flyte-cli -p flytesnacks -d development execute-launch-plan -u lp:flytesnacks:development:types.generic.GenericDemoWorkflow:version -r demo -- a='{"a": "hello", "b": "how are you", "c": ["array"], "d": {"nested": "value"}}'

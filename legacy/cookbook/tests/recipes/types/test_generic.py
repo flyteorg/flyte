@@ -1,4 +1,4 @@
-from recipes.types.generic import generic_type_task
+from types.generic import generic_type_task
 
 
 def test_generic_task():

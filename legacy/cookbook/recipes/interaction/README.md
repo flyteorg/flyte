@@ -22,7 +22,7 @@ Once the registration is successful, task executions can be independently launch
 
 ### CLI (flyte-cli)
 ```bash
- $ flyte-cli -h localhost:30081 -i list-task-versions -p flytesnacks -d development --name recipes.interaction.interaction.scale
+ $ flyte-cli -h localhost:30081 -i list-task-versions -p flytesnacks -d development --name interaction.interaction.scale
  # Get the URN
  $ flyte-cli -h localhost:30081 -i launch-task -p flytesnacks -d development -u <urn> -- image=https://miro.medium.com/max/1400/1*qL8UYfaStcEo_YVPrA4cbA.png
 ```
@@ -40,19 +40,19 @@ Once the registration is successful, task executions can be independently launch
 
 ### CLI (flyte-cli)
 ```bash
-$ flyte-cli -h localhost:30081 -i list-launch-plan-versions -p flytesnacks -d development --name recipes.interaction.interaction.FailingWorkflow
-  Launch Plan Versions Found for flytesnacks:development:recipes.interaction.interaction.FailingWorkflow
+$ flyte-cli -h localhost:30081 -i list-launch-plan-versions -p flytesnacks -d development --name interaction.interaction.FailingWorkflow
+  Launch Plan Versions Found for flytesnacks:development:interaction.interaction.FailingWorkflow
 
 Version                                            Urn                                                                              Schedule                       Schedule State
-ade80023b74f9810fe720471b8926d6b991fc879           lp:flytesnacks:development:recipes.interaction.interaction.FailingWorkflow:ade80023b74f9810fe720471b8926d6b991fc879 
+ade80023b74f9810fe720471b8926d6b991fc879           lp:flytesnacks:development:interaction.interaction.FailingWorkflow:ade80023b74f9810fe720471b8926d6b991fc879 
 
-$ flyte-cli -h localhost:30081 -i execute-launch-plan -p flytesnacks -d development -u lp:flytesnacks:development:recipes.interaction.interaction.FailingWorkflow:ade80023b74f9810fe720471b8926d6b991fc879 -r <username> -- image=https://miro.medium.com/max/1400/1*qL8UYfaStcEo_YVPrA4cbA.png 
+$ flyte-cli -h localhost:30081 -i execute-launch-plan -p flytesnacks -d development -u lp:flytesnacks:development:interaction.interaction.FailingWorkflow:ade80023b74f9810fe720471b8926d6b991fc879 -r <username> -- image=https://miro.medium.com/max/1400/1*qL8UYfaStcEo_YVPrA4cbA.png 
 ```
 
 ### Console
-1. Navigate to **Console Homepage > Flyte Examples | development > recipes.interaction.interaction.FailingWorkflow**
+1. Navigate to **Console Homepage > Flyte Examples | development > interaction.interaction.FailingWorkflow**
     - If Using console on localhost sandbox (docker for mac mostly then)
-      [Workflow Link](http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/recipes.interaction.interaction.FailingWorkflow)
+      [Workflow Link](http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/interaction.interaction.FailingWorkflow)
 2. Click on the Launch Button
 
 ## Part 3: Retrieving outputs of error from a previous execution
@@ -81,11 +81,11 @@ Welcome to Flyte CLI! Version: 0.10.4
 Execution flytesnacks:development:f696cca32ffa44513b25
 
 	State:          FAILED
-	Launch Plan:    lp:flytesnacks:development:recipes.interaction.interaction.FailingWorkflow:ade80023b74f9810fe720471b8926d6b991fc879
+	Launch Plan:    lp:flytesnacks:development:interaction.interaction.FailingWorkflow:ade80023b74f9810fe720471b8926d6b991fc879
 Error:
 		Code: USER:Unknown
 		Message:
-			Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/tasks.py", line 34, in rotate		        raise Exception("User signaled failure")				Message:				    User signaled failure				User error.
+			Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/interaction/tasks.py", line 34, in rotate		        raise Exception("User signaled failure")				Message:				    User signaled failure				User error.
 
 	Node Executions:
 
@@ -118,7 +118,7 @@ Error:
 Error:
 				Code: USER:Unknown
 				Message:
-					Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/tasks.py", line 34, in rotate		        raise Exception("User signaled failure")		Message:				    User signaled failure				User error.
+					Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/interaction/tasks.py", line 34, in rotate		        raise Exception("User signaled failure")		Message:				    User signaled failure				User error.
 
 			Task Executions:
 
@@ -137,14 +137,14 @@ Error:
 Error:
 						Code: USER:Unknown
 						Message:
-							Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/recipes/interaction/interaction.py", line 34, in rotate		        raise Exception("User signaled failure")				Message:				    User signaled failure				User error.
+							Traceback (most recent call last):				      File "/opt/venv/lib/python3.6/site-packages/flytekit/common/exceptions/scopes.py", line 206, in user_entry_point		        return wrapped(*args, **kwargs)		      File "/root/interaction/interaction.py", line 34, in rotate		        raise Exception("User signaled failure")				Message:				    User signaled failure				User error.
 
 ``` 
 
 ### Console
-1. Navigate to **Console Homepage > Flyte Examples | development > recipes.interaction.interaction.FailingWorkflow**
+1. Navigate to **Console Homepage > Flyte Examples | development > interaction.interaction.FailingWorkflow**
     - If Using console on localhost sandbox (docker for mac mostly then)
-      [Workflow Link](http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/recipes.interaction.interaction.FailingWorkflow)
+      [Workflow Link](http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/interaction.interaction.FailingWorkflow)
 2. find the execution (or filter using the UI dropdowns)
 3. The main list page should show the execution failure reason. If you want to dig deeper, click on the execution for more information.
 
@@ -160,9 +160,9 @@ This CLI has a special function called relaunch
 ```
 
 ### Console
-1. Navigate to **Console Homepage > Flyte Examples | development > recipes.interaction.interaction.FailingWorkflow**
+1. Navigate to **Console Homepage > Flyte Examples | development > interaction.interaction.FailingWorkflow**
     - If Using console on localhost sandbox (docker for mac mostly then)
-      [Workflow Link](http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/recipes.interaction.interaction.FailingWorkflow)
+      [Workflow Link](http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/interaction.interaction.FailingWorkflow)
 2. Find the execution and click on it
 3. On top right corner we have a "relaunch button". This replaces the terminate button and is available only if an execution exits.
 

@@ -1,0 +1,29 @@
+name: Build and Push Core Docker Images
+
+on:
+  pull_request:
+
+jobs:
+  push-github:
+    name: Push Core examples to GHCR
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cookbook
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Push Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: ${{ github.repository_owner }}/flytecookbook
+          image_tag: core-${{ github.sha }},core-${{ github.event.ref }}
+          push_git_tag: true
+          registry: ghcr.io
+          build_extra_args: "--compress=true"
+          context: ./cookbook
+          dockerfile: core/Dockerfile

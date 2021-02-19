@@ -19,3 +19,6 @@ _build/
 *.zip
 auto_*/
 docs/_rsts/
+.sandbox/bin/
+.sandbox/data/
+.vscode/

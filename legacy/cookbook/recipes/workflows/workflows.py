@@ -1,7 +1,7 @@
 from flytekit.sdk.types import Types
 from flytekit.sdk.workflow import workflow_class, Input, Output
 
-from recipes.task import tasks
+from task import tasks
 
 
 ###
