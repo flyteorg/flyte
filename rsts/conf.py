@@ -20,7 +20,7 @@
 
 project = u'Flyte'
 copyright = u'2020, Flyte Authors'
-author = u'Flyte Authors'
+author = u'Flyte'
 
 # The short X.Y version
 version = u''
@@ -90,9 +90,6 @@ language = None
 # This pattern also affects html_static_path and html_extra_path .
 exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 
-# The name of the Pygments (syntax highlighting) style to use.
-# pygments_style = 'sphinx'
-
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -127,12 +124,7 @@ html_theme_options = {
         {
             "href": "https://flytecookbook.readthedocs.io",
             "internal": False,
-            "title": "Flyte Learn by Example",
-        },
-        {
-            "href": "https://flytectl.readthedocs.io",
-            "internal": False,
-            "title": "FlyteCtl reference",
+            "title": "Flyte Tutorials",
         },
     ],
 }
