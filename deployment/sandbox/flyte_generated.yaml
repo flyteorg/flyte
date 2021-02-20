@@ -1934,7 +1934,7 @@ data:
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         default-cpus: 100m
-        default-memory: 100Mi
+        default-memory: 200Mi
   logger.yaml: |
     logger:
       show-source: true
@@ -1962,7 +1962,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-7gt47kf8m5
+  name: flyte-propeller-config-94gbkmm6cm
   namespace: flyte
 ---
 apiVersion: v1
@@ -2510,7 +2510,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-7gt47kf8m5
+          name: flyte-propeller-config-94gbkmm6cm
         name: config-volume
 ---
 apiVersion: apps/v1
