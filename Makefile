@@ -65,6 +65,8 @@ start: _prepare  ## Start a local Flyte sandbox
 		-v $(CURDIR):/usr/src \
 		-v /var/run \
 		-p $(KUBERNETES_API_PORT):$(KUBERNETES_API_PORT) \
+		-p $(FLYTE_PROXY_PORT):30081 \
+		-p $(MINIO_PROXY_PORT):30084 \
 		$(FLYTE_SANDBOX_IMAGE) > /dev/null
 	timeout 30 sh -c "until kubectl explain deployment &> /dev/null; do sleep 1; done"
 
