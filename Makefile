@@ -10,7 +10,7 @@ export KUBECTL_VERSION := v1.20.2
 export FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
 
 # Flyte sandbox configuration variables
-KUBERNETES_API_PORT := 30080
+KUBERNETES_API_PORT := 51234
 FLYTE_PROXY_PORT := 30081
 MINIO_PROXY_PORT := 30084
 FLYTE_SANDBOX_NAME := flyte-sandbox
