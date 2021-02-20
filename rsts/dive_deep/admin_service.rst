@@ -192,7 +192,8 @@ Filterable fields vary based on entity types:
   - execution_updated_at	
   - duration (in seconds)	
   - mode (you must use the integer enum e.g. 1)	
-     - Modes are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96>`__.	
+     - Modes are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96>`__.
+  - user (authenticated user or role from flytekit config)
 
 - Node Executions	
 
