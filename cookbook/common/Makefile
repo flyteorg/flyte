@@ -111,7 +111,18 @@ requirements: requirements.txt
 fast_serialize: clean _pb_output
 	echo ${CURDIR}
 	docker run -it --rm \
+		-e REGISTRY=${REGISTRY} \
 		-e MAKEFLAGS=${MAKEFLAGS} \
+		-e FLYTE_HOST=${FLYTE_HOST} \
+		-e INSECURE_FLAG=${INSECURE_FLAG} \
+		-e PROJECT=${PROJECT} \
+		-e FLYTE_AWS_ENDPOINT=${FLYTE_AWS_ENDPOINT} \
+		-e FLYTE_AWS_ACCESS_KEY_ID=${FLYTE_AWS_ACCESS_KEY_ID} \
+		-e FLYTE_AWS_SECRET_ACCESS_KEY=${FLYTE_AWS_SECRET_ACCESS_KEY} \
+		-e OUTPUT_DATA_PREFIX=${OUTPUT_DATA_PREFIX} \
+		-e ADDL_DISTRIBUTION_DIR=${ADDL_DISTRIBUTION_DIR} \
+		-e SERVICE_ACCOUNT=$(SERVICE_ACCOUNT) \
+		-e VERSION=${VERSION} \
 		-v ${CURDIR}/_pb_output:/tmp/output \
 		-v ${CURDIR}:/root/$(shell basename $(CURDIR)) \
 		${TAGGED_IMAGE} make fast_serialize
@@ -150,7 +161,18 @@ serialize: clean _pb_output docker_build
 	@echo ${VERSION}
 	@echo ${CURDIR}
 	docker run -it --rm \
+		-e REGISTRY=${REGISTRY} \
 		-e MAKEFLAGS=${MAKEFLAGS} \
+		-e FLYTE_HOST=${FLYTE_HOST} \
+		-e INSECURE_FLAG=${INSECURE_FLAG} \
+		-e PROJECT=${PROJECT} \
+		-e FLYTE_AWS_ENDPOINT=${FLYTE_AWS_ENDPOINT} \
+		-e FLYTE_AWS_ACCESS_KEY_ID=${FLYTE_AWS_ACCESS_KEY_ID} \
+		-e FLYTE_AWS_SECRET_ACCESS_KEY=${FLYTE_AWS_SECRET_ACCESS_KEY} \
+		-e OUTPUT_DATA_PREFIX=${OUTPUT_DATA_PREFIX} \
+		-e ADDL_DISTRIBUTION_DIR=${ADDL_DISTRIBUTION_DIR} \
+		-e SERVICE_ACCOUNT=$(SERVICE_ACCOUNT) \
+		-e VERSION=${VERSION} \
 		-v ${CURDIR}/_pb_output:/tmp/output \
 		${TAGGED_IMAGE} make serialize
 

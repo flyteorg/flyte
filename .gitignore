@@ -22,3 +22,5 @@ docs/_rsts/
 .sandbox/bin/
 .sandbox/data/
 .vscode/
+*-out.html
+*-out.ipynb

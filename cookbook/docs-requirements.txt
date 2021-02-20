@@ -6,8 +6,10 @@
 #
 alabaster==0.7.12
     # via sphinx
-astroid==2.5
-    # via sphinx-autoapi
+astroid==2.4.2
+    # via
+    #   -r docs-requirements.in
+    #   sphinx-autoapi
 babel==2.9.0
     # via sphinx
 beautifulsoup4==4.9.3
@@ -20,21 +22,23 @@ chardet==4.0.0
     # via requests
 css-html-js-minify==2.5.5
     # via sphinx-material
-docutils==0.17b1
-    # via sphinx
+docutils==0.16
+    # via
+    #   -r docs-requirements.in
+    #   sphinx
 idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
-jinja2==3.0.0a1
+jinja2==2.11.3
     # via
     #   sphinx
     #   sphinx-autoapi
-lazy-object-proxy==1.5.2
+lazy-object-proxy==1.4.3
     # via astroid
 lxml==4.6.2
     # via sphinx-material
-markupsafe==2.0.0rc1
+markupsafe==1.1.1
     # via jinja2
 packaging==20.9
     # via sphinx
@@ -44,7 +48,7 @@ pygments==2.8.0
     # via
     #   sphinx
     #   sphinx-prompt
-pyparsing==3.0.0b2
+pyparsing==2.4.7
     # via packaging
 python-slugify[unidecode]==4.0.1
     # via sphinx-material
@@ -55,7 +59,9 @@ pyyaml==5.4.1
 requests==2.25.1
     # via sphinx
 six==1.15.0
-    # via sphinx-code-include
+    # via
+    #   astroid
+    #   sphinx-code-include
 snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.2

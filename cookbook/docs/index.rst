@@ -42,11 +42,12 @@ Please join our Slack channel as well through this `form <https://docs.google.co
    :caption: Flytekit Plugins
 
    plugins
+   auto_plugins_pod/index
+   auto_plugins_k8s_spark/index
+   auto_plugins_papermilltasks/index
    auto_plugins_hive/index
    auto_plugins_sagemaker_training/index
-   auto_plugins_k8s_spark/index
    auto_plugins_kfpytorch/index
-   auto_plugins_pod/index
    auto_plugins_sagemaker_pytorch/index
 
 .. toctree::

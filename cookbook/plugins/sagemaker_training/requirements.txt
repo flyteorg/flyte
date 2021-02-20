@@ -18,9 +18,9 @@ attrs==20.3.0
     #   tensorflow-datasets
 bcrypt==3.2.0
     # via paramiko
-boto3==1.17.9
+boto3==1.17.12
     # via sagemaker-training
-botocore==1.20.9
+botocore==1.20.12
     # via
     #   boto3
     #   s3transfer
@@ -57,11 +57,11 @@ flatbuffers==1.12
     # via tensorflow
 flyteidl==0.18.12
     # via flytekit
-flytekit==0.16.0b12
+flytekit==0.16.0b13
     # via
     #   -r ../../common/requirements-common.in
     #   flytekitplugins-awssagemaker
-flytekitplugins-awssagemaker==0.16.0b12
+flytekitplugins-awssagemaker==0.1.1
     # via -r requirements.in
 future==0.18.2
     # via
@@ -79,7 +79,7 @@ google-auth==1.27.0
     #   tensorboard
 google-pasta==0.2.0
     # via tensorflow
-googleapis-common-protos==1.53.0.dev2
+googleapis-common-protos==1.52.0
     # via tensorflow-metadata
 greenlet==1.0.0
     # via gevent
@@ -149,7 +149,7 @@ pillow==8.1.0
     # via matplotlib
 promise==2.3
     # via tensorflow-datasets
-protobuf==3.15.0rc1
+protobuf==3.15.0
     # via
     #   flyteidl
     #   flytekit
@@ -175,7 +175,7 @@ pycparser==2.20
     # via cffi
 pynacl==1.4.0
     # via paramiko
-pyparsing==3.0.0b2
+pyparsing==2.4.7
     # via matplotlib
 python-dateutil==2.8.1
     # via
@@ -213,7 +213,7 @@ sagemaker-training==3.7.3
     # via flytekitplugins-awssagemaker
 scantree==0.0.1
     # via dirhash
-scipy==1.6.0
+scipy==1.6.1
     # via sagemaker-training
 six==1.15.0
     # via
@@ -260,7 +260,7 @@ termcolor==1.1.0
     # via
     #   tensorflow
     #   tensorflow-datasets
-tqdm==4.56.2
+tqdm==4.57.0
     # via tensorflow-datasets
 typing-extensions==3.7.4.3
     # via
@@ -274,7 +274,7 @@ urllib3==1.25.11
     #   flytekit
     #   requests
     #   responses
-werkzeug==2.0.0rc1
+werkzeug==1.0.1
     # via
     #   sagemaker-training
     #   tensorboard

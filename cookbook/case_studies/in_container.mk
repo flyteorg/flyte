@@ -13,7 +13,7 @@ serialize: $(SERIALIZED_PB_OUTPUT_DIR)
 
 .PHONY: register
 register: serialize
-	flyte-cli register-files -h ${FLYTE_HOST} ${INSECURE_FLAG} -p ${PROJECT} -d development -v ${VERSION} $(SERIALIZED_PB_OUTPUT_DIR)/*
+	flyte-cli register-files -h ${FLYTE_HOST} ${INSECURE_FLAG} -p ${PROJECT} -d development -v ${VERSION} --kubernetes-service-account ${SERVICE_ACCOUNT} $(SERIALIZED_PB_OUTPUT_DIR)/*
 
 .PHONY: fast_serialize
 fast_serialize: $(SERIALIZED_PB_OUTPUT_DIR)

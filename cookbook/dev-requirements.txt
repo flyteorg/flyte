@@ -38,9 +38,9 @@ black==19.10b0
     # via
     #   -r dev-requirements.in
     #   flake8-black
-boto3==1.17.11
+boto3==1.17.12
     # via sagemaker-training
-botocore==1.20.11
+botocore==1.20.12
     # via
     #   boto3
     #   s3transfer
@@ -96,7 +96,7 @@ flatbuffers==1.12
     # via tensorflow
 flyteidl==0.18.12
     # via flytekit
-flytekit==0.16.0b12
+flytekit==0.16.0b13
     # via
     #   -r ./case_studies/pima_diabetes/../../common/requirements-common.in
     #   -r ./plugins/hive/../../common/requirements-common.in
@@ -110,17 +110,17 @@ flytekit==0.16.0b12
     #   flytekitplugins-kfpytorch
     #   flytekitplugins-pod
     #   flytekitplugins-spark
-flytekitplugins-awssagemaker==0.16.0b12
+flytekitplugins-awssagemaker==0.1.1
     # via
     #   -r ./plugins/sagemaker_pytorch/requirements.in
     #   -r ./plugins/sagemaker_training/requirements.in
-flytekitplugins-hive==0.16.0b12
+flytekitplugins-hive==0.1.1
     # via -r ./plugins/hive/requirements.in
-flytekitplugins-kfpytorch==0.16.0b12
+flytekitplugins-kfpytorch==0.1.1
     # via -r ./plugins/kfpytorch/requirements.in
-flytekitplugins-pod==0.16.0b7
+flytekitplugins-pod==0.1.1
     # via -r ./plugins/pod/requirements.in
-flytekitplugins-spark==0.16.0b10
+flytekitplugins-spark==0.1.1
     # via -r ./plugins/k8s_spark/requirements.in
 future==0.18.2
     # via
@@ -138,7 +138,7 @@ google-auth==1.27.0
     #   tensorboard
 google-pasta==0.2.0
     # via tensorflow
-googleapis-common-protos==1.53.0.dev2
+googleapis-common-protos==1.52.0
     # via tensorflow-metadata
 greenlet==1.0.0
     # via gevent
@@ -163,7 +163,7 @@ isort==5.7.0
     # via
     #   -r dev-requirements.in
     #   flake8-isort
-jinja2==3.0.0a1
+jinja2==2.11.3
     # via
     #   sphinx
     #   sphinx-autoapi
@@ -189,7 +189,7 @@ lxml==4.6.2
     # via sphinx-material
 markdown==3.3.3
     # via tensorboard
-markupsafe==2.0.0rc1
+markupsafe==1.1.1
     # via jinja2
 marshmallow-enum==1.5.1
     # via dataclasses-json
@@ -256,11 +256,11 @@ pillow==8.1.0
     #   -r ./docs-requirements.in
     #   matplotlib
     #   torchvision
-pluggy==1.0.0.dev0
+pluggy==0.13.1
     # via pytest
 promise==2.3
     # via tensorflow-datasets
-protobuf==3.15.0rc2
+protobuf==3.15.0
     # via
     #   flyteidl
     #   flytekit
@@ -300,11 +300,11 @@ pygments==2.8.0
     #   sphinx-prompt
 pynacl==1.4.0
     # via paramiko
-pyparsing==3.0.0b2
+pyparsing==2.4.7
     # via
     #   matplotlib
     #   packaging
-pyspark==3.0.1
+pyspark==3.0.2
     # via
     #   -r ./plugins/k8s_spark/requirements.in
     #   flytekitplugins-spark
@@ -497,7 +497,7 @@ urllib3==1.25.11
     #   flytekit
     #   requests
     #   responses
-werkzeug==2.0.0rc1
+werkzeug==1.0.1
     # via
     #   sagemaker-training
     #   tensorboard

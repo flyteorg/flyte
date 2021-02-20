@@ -26,15 +26,15 @@ dirhash==0.2.1
     # via flytekit
 flyteidl==0.18.12
     # via flytekit
-flytekit==0.16.0b12
+flytekit==0.16.0b13
     # via
     #   -r ../../common/requirements-common.in
     #   flytekitplugins-pod
-flytekitplugins-pod==0.16.0b7
+flytekitplugins-pod==0.1.1
     # via -r requirements.in
 future==0.18.2
     # via croniter
-grpcio==1.36.0rc1
+grpcio==1.35.0
     # via flytekit
 idna==2.10
     # via requests
@@ -69,7 +69,7 @@ pathspec==0.8.1
     # via scantree
 pillow==8.1.0
     # via matplotlib
-protobuf==3.15.0rc1
+protobuf==3.15.0
     # via
     #   flyteidl
     #   flytekit
@@ -78,7 +78,7 @@ py==1.10.0
     # via retry
 pyarrow==3.0.0
     # via flytekit
-pyparsing==3.0.0b2
+pyparsing==2.4.7
     # via matplotlib
 python-dateutil==2.8.1
     # via
