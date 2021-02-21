@@ -27,6 +27,18 @@ jobs:
           image_tag: latest,${{ github.sha }},${{ github.event.ref }}
           push_git_tag: true
           registry: ghcr.io
-          build_extra_args: "--compress=true"
-          context: ./sandbox
-          dockerfile: Dockerfile
+          build_extra_args: "--target=default --compress=true"
+          context: ./deployment/sandbox
+          dockerfile: docker/Dockerfile
+      - name: Push Sandbox Plugin DIND Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: ${{ github.repository_owner }}/flyte-sandbox
+          image_tag: dind,${{ github.sha }},${{ github.event.ref }}
+          push_git_tag: true
+          registry: ghcr.io
+          build_extra_args: "--target=dind --compress=true"
+          context: ./deployment/sandbox
+          dockerfile: docker/Dockerfile
