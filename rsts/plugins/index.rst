@@ -16,7 +16,7 @@ The following sections will guide you through writing your own extensions - eith
    :maxdepth: 1
    :name: howtoextendtoc
 
-   extend/background
+   extend/intro
    extend/flytekit_python
    extend/flyte_backend
 

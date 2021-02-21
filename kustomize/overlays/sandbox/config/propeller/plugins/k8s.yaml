@@ -5,4 +5,4 @@ plugins:
       - FLYTE_AWS_ACCESS_KEY_ID: minio
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
     default-cpus: 100m
-    default-memory: 100Mi
+    default-memory: 200Mi
