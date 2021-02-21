@@ -6,6 +6,7 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import re
 import logging
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -21,12 +22,13 @@ sys.path.insert(0, os.path.abspath("../"))
 
 # -- Project information -----------------------------------------------------
 
-project = "Flyte Cookbook [Python]"
+project = "Flyte Tutorial"
 copyright = "2021, Flyte"
 author = "Flyte"
 
 # The full version, including alpha/beta/rc tags
-release = "0.16.0b1"
+# The full version, including alpha/beta/rc tags.
+release = re.sub('^v', '', os.popen('git describe').read().strip())
 
 
 class CustomSorter(FileNameSortKey):
