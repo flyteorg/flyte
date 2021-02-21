@@ -2393,6 +2393,7 @@ spec:
         - migrate
         - seed-projects
         - flytesnacks
+        - flyteexamples
         image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: seed-projects
