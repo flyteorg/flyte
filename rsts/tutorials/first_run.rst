@@ -11,9 +11,9 @@ Flyte enables scalable, reproducable and reliable orchestration of massively lar
 
 With `docker installed <https://docs.docker.com/get-docker/>`__, run this command: ::
 
-  docker network create flyte-sandbox | docker run --network flyte-sandbox --rm --privileged -p 30081:30081 ghcr.io/flyteorg/flyte-sandbox
+  docker run --rm --privileged -p 30081:30081 ghcr.io/flyteorg/flyte-sandbox
 
-Once the container is ready, it'll output the Console URL. Go ahead and visit that to check out the Flyte UI.
+This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console.`. Go ahead and visit that to check out the Flyte UI.
 
 A quick visual tour for launching your first Workflow:
 
