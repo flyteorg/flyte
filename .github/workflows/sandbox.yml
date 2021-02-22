@@ -36,7 +36,7 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
-          image_tag: dind,${{ github.sha }},${{ github.event.ref }}
+          image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
           push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--target=dind --compress=true"
