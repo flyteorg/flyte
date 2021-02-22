@@ -67,7 +67,7 @@ OR provide an interface like this
 I want to write a Task Plugin or add a new TaskType
 ===========================================================
 
-Interestingly there are 2 options here. You can write a task plugin simply as an extension in flytekit, or you can go deeper and write a Plugin in Flyte backend itself.
+Interestingly there are 2 options here. You can write a task plugin simply as an extension in flytekit, or you can go deeper and write a Plugin in the Flyte backend itself.
 
 Flytekit only plugin
 ======================
