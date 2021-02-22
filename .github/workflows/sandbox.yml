@@ -6,17 +6,14 @@ on:
     types: [published]
 
 jobs:
-  push-github:
-    name: Push to GHCR
+  push-sandbox-image:
+    name: Push sandbox image to GHCR
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: cookbook
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: "0"
-      - name: Push Sandbox Plugin Docker Image to Github Registry
+      - name: Push Sandbox Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
           # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
@@ -29,7 +26,14 @@ jobs:
           context: ./deployment/sandbox
           dockerfile: docker/Dockerfile
           push_image_and_stages: '[ "${{ github.event.ref }}" = "release" ]'
-      - name: Push Sandbox Plugin DIND Docker Image to Github Registry
+  push-sandbox-dind-image:
+    name: Push sandbox DinD image to GHCR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Push Sandbox DinD Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
