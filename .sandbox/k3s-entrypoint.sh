@@ -17,7 +17,7 @@ monitor() {
 # Start docker daemon
 dockerd &
 DOCKERD_PID=$!
-timeout 10 sh -c "until docker info &> /dev/null; do sleep 1; done"
+timeout 600 sh -c "until docker info &> /dev/null; do sleep 1; done" || ( echo >&2 "Timed out while waiting for dockerd to start"; exit 1 )
 
 # Start k3s
 k3s server --docker --https-listen-port "${KUBERNETES_API_PORT:-6443}" --no-deploy=traefik --no-deploy=servicelb --no-deploy=local-storage --no-deploy=metrics-server &
