@@ -23,8 +23,8 @@ jobs:
           image_tag: latest,${{ github.sha }},${{ github.event.ref }}
           registry: ghcr.io
           build_extra_args: "--target=default --compress=true"
-          context: ./deployment/sandbox
-          dockerfile: docker/Dockerfile
+          context: ./
+          dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: ${{ github.event.name == 'release' }}
   push-sandbox-dind-image:
     name: Push sandbox DinD image to GHCR
@@ -42,6 +42,6 @@ jobs:
           image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
           registry: ghcr.io
           build_extra_args: "--target=dind --compress=true"
-          context: ./deployment/sandbox
-          dockerfile: docker/Dockerfile
+          context: ./
+          dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: ${{ github.event.name == 'release' }}
