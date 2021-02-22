@@ -15,6 +15,5 @@ echo "Done."
 echo "Deploying Flyte..."
 k3s kubectl apply -f /flyteorg/share/flyte_generated.yaml
 wait-for-flyte.sh
-echo "Done."
 
 wait ${K3S_PID}
