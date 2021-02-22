@@ -115,7 +115,12 @@ Doc on how to writed a backend plugins is coming soon. A backend plugin essentia
 How do I decide which path to take?
 ===============================================
 
-.. image:: ../../images/extend_flyte.png
-   :alt: Ok you want to add a plugin, but which type?
+.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/extend_flyte_flowchart.png
+   :alt: Ok you want to add a plugin, but which type? Follow the flowchart and then select the right next steps.
 
 
+Use the conclusion of the flow-chart to refer to the right doc
+================================================================
+
+- :ref:`extend-plugin-flytekit-python`
+- :ref:`extend-plugin-flyte-backend`

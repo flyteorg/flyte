@@ -1,4 +1,4 @@
-.. _extend-plugin-flytekit-python:
+.. _extend-plugin-flyte-backend:
 
 ########################################
 Implement Backend Extensions (advanced)
