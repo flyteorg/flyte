@@ -35,7 +35,7 @@ So often times you want to interact with a service like,
  - a computation platform like (AWS EMR, Databricks etc)
 
 and you want this to be available like a template for all other users - open source or within your organization. This can be done by creating a task plugin.
-A Task-plugin makes it possible for you or other users to use your idea natively within Flyte as it this capability was built into the flyte platform.
+A Task-plugin makes it possible for you or other users to use your idea natively within Flyte as this capability was built into the flyte platform.
 
 Thus for example, if you want users to write code simply using the ``@task`` decorator, but you want to provide a capability of running the function as a spark job or a sagemaker training job - then you can extend Flyte's task system - we will refer to this as the plugin and it could be possible to do the following
 
