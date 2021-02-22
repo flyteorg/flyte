@@ -18,7 +18,6 @@ How Do I...?
    productionize/index
    launchplans
    managing_customizable_resources
-   plugins/index
    enable_and_use_schedules
    enable_backend_plugin
    monitoring/index
@@ -32,3 +31,12 @@ How Do I...?
    labels_annotations
    notifications
    serviceaccount
+
+
+.. _howto_extend:
+
+=======================
+How do I Extend flyte?
+=======================
+
+Flyte was designed to be extensible. The section - :ref:`plugins`- dives into more details on extending Flyte and also provides available examples.
