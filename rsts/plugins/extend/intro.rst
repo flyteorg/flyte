@@ -103,7 +103,7 @@ Doc on how to writed a backend plugins is coming soon. A backend plugin essentia
 #. Resource controls and backpressure management is available
 #. Implement once, use in any SDK or language
 
-**cons**
+**Cons**
 
 #. Need to be implemented in golang
 #. Needs a FlytePropeller build - *currently*
