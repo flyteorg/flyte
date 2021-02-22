@@ -26,10 +26,10 @@ RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
 # Download flyte manifest
-COPY flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
+COPY deployment/sandbox/flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
 
 # Copy scripts
-COPY docker/kubectl docker/wait-for-flyte.sh /flyteorg/bin/
+COPY docker/sandbox/kubectl docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
 
 
 FROM base_ AS default
@@ -38,7 +38,7 @@ FROM base_ AS default
 RUN apk add --no-cache tini
 
 # Copy entrypoints
-COPY docker/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
+COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
@@ -64,7 +64,7 @@ RUN apk add --no-cache tini
 COPY --from=base_ /flyteorg/ /flyteorg/
 
 # Copy entrypoints
-COPY docker/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
+COPY docker/sandbox/flyte-entrypoint-dind.sh /flyteorg/bin/flyte-entrypoint.sh
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
