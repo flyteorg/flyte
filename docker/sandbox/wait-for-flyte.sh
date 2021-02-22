@@ -3,6 +3,7 @@
 set -e
 
 echo "Waiting for Flyte to become ready..."
+
 # Ensure cluster is up and running. We don't need a timeout here, since the container
 # itself will exit with the appropriate error message if the kubernetes cluster is not
 # up within the specified timeout.
