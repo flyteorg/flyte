@@ -2,8 +2,10 @@
 
 set -e
 
-# Ensure cluster is up and running
-timeout 600 sh -c "until k3s kubectl explain deployment &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the Kubernetes cluster to start"; exit 1 )
+# Ensure cluster is up and running. We don't need a timeout here, since the container
+# itself will exit with the appropriate error message if the kubernetes cluster is not
+# up within the specified timeout.
+until k3s kubectl explain deployment &> /dev/null; do sleep 1; done
 
 # Wait for Flyte namespace to be created. This is necessary for the next step.
 timeout 600 sh -c "until k3s kubectl get namespace flyte &> /dev/null; do sleep 1; done"  || ( echo >&2 "Timed out while waiting for the Flyte namespace to be created"; exit 1 )
