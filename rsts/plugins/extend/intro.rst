@@ -15,7 +15,7 @@ But First - Why?
 
 Case 1: I want to use my special Types - e.g. my own DataFrame format
 ==========================================================================
-Flyte just like a programming language has a core type-system, but just like most languages, this type system can be extended, but allowing users to add ``User defined Data types``.
+Flyte, just like a programming language has a core type-system, but just like most languages, this type system can be extended by allowing users to add ``User defined Data types``.
 A User defined data type can be something that Flyte does not really understand, but is extremely useful for a users specific needs. For example it can be a Custom user structure or a grouping of images in a specific encoding.
 
 Flytekit natively supports handling of structured data like User defined structures like DataClasses using JSON as the representation format. An example of this is available in FlyteCookbook - :std:doc:`auto_core_intermediate/custom_objects`.
