@@ -25,7 +25,7 @@ jobs:
           build_extra_args: "--target=default --compress=true"
           context: ./deployment/sandbox
           dockerfile: docker/Dockerfile
-          push_image_and_stages: '[ "${{ github.event.name }}" = "release" ] || echo false'
+          push_image_and_stages: ${{ github.event.name == 'release' }}
   push-sandbox-dind-image:
     name: Push sandbox DinD image to GHCR
     runs-on: ubuntu-latest
@@ -39,9 +39,9 @@ jobs:
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox-dind
-          image_tag: latest,${{ github.sha }},${{ github.event.ref }}
+          image_tag: dind,dind-${{ github.sha }},${{ github.event.ref }}-dind
           registry: ghcr.io
           build_extra_args: "--target=dind --compress=true"
           context: ./deployment/sandbox
           dockerfile: docker/Dockerfile
-          push_image_and_stages: '[ "${{ github.event.name }}" = "release" ] || echo false'
+          push_image_and_stages: ${{ github.event.name == 'release' }}
