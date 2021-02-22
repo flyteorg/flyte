@@ -1,0 +1,47 @@
+name: Build & Push Sandbox Docker Image
+
+on:
+  pull_request:
+  release:
+    types: [published]
+
+jobs:
+  push-sandbox-image:
+    name: Push sandbox image to GHCR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Push Sandbox Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: ${{ github.repository_owner }}/flyte-sandbox
+          image_tag: latest,${{ github.sha }},${{ github.event.ref }}
+          registry: ghcr.io
+          build_extra_args: "--target=default --compress=true"
+          context: ./
+          dockerfile: docker/sandbox/Dockerfile
+          push_image_and_stages: ${{ github.event.name == 'release' }}
+  push-sandbox-dind-image:
+    name: Push sandbox DinD image to GHCR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Push Sandbox DinD Docker Image to Github Registry
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          image_name: ${{ github.repository_owner }}/flyte-sandbox
+          image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
+          registry: ghcr.io
+          build_extra_args: "--target=dind --compress=true"
+          context: ./
+          dockerfile: docker/sandbox/Dockerfile
+          push_image_and_stages: ${{ github.event.name == 'release' }}
