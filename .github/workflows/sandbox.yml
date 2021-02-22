@@ -2,9 +2,8 @@ name: Build & Push Sandbox Docker Image
 
 on:
   pull_request:
-  create:
-    tags:
-      - v*
+  release:
+    types: [published]
 
 jobs:
   push-github:
@@ -25,11 +24,11 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
           image_tag: latest,${{ github.sha }},${{ github.event.ref }}
-          push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--target=default --compress=true"
           context: ./deployment/sandbox
           dockerfile: docker/Dockerfile
+          push_image_and_stages: '[ "${{ github.event.ref }}" = "release" ]'
       - name: Push Sandbox Plugin DIND Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
@@ -37,8 +36,8 @@ jobs:
           password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository_owner }}/flyte-sandbox
           image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
-          push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--target=dind --compress=true"
           context: ./deployment/sandbox
           dockerfile: docker/Dockerfile
+          push_image_and_stages: '[ "${{ github.event.ref }}" = "release" ]'
