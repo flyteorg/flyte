@@ -96,7 +96,7 @@ Doc on how to writed a backend plugins is coming soon. A backend plugin essentia
 
 **Pros**
 
-#. Service oriented way of deploying new plugins - strong contracts. Maintaners can deploy new versions of the backend plugin, fix bugs, without needing the users to upgrade Libraries etc
+#. Service oriented way of deploying new plugins - strong contracts. Maintainers can deploy new versions of the backend plugin, fix bugs, without needing the users to upgrade Libraries etc
 #. Drastically cheaper and more efficient to execute. FlytePropeller is written in Golang and uses an event loop model. Each process of FlytePropeller can execute 1000's of tasks concurrently.
 #. Flyte will guarantee resource cleanup
 #. Flyteconsole plugins (capability coming soon) can be added to customize visualization and progress tracking of the execution
