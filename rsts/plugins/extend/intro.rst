@@ -5,7 +5,7 @@ When & How to Extend Flyte
 ###########################
 
 The Core of Flyte is a container execution engine, where you can write one or more tasks and string them together to form a data dependency DAG - called a ``workflow``.
-If your work involves writing simple python or java tasks that can either perform operations on their own or can call out to external services - then there is ``NO NEED to extend FLYTE``.
+If your work involves writing simple python or java tasks that can either perform operations on their own or can call out to external services - then there is **NO NEED to extend FLYTE**.
 
 But, in that case you can almost do everything using python / java or a container - So Why should you even have to extend Flyte?
 
