@@ -32,7 +32,6 @@ echo "Done."
 echo "Deploying Flyte..."
 k3s kubectl apply -f /flyteorg/share/flyte_generated.yaml
 wait-for-flyte.sh
-echo "Done."
 
 # Monitor running processes. Exit when the first process exits.
 monitor ${DOCKERD_PID} ${K3S_PID}
