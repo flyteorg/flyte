@@ -113,7 +113,7 @@ This allows forcing a matching execution to always execute on a specific kuberne
 
 You can set this using flyte-cli:
 
-.. code-block:: bash
+.. prompt::
 
    flyte-cli -h localhost:30081 -p flyteexamples -d development update-execution-cluster-label --value mycluster
 
