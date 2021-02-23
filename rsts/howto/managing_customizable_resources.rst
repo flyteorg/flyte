@@ -51,7 +51,7 @@ The override values from the database are assigned at execution time.
 
 To update individual project-domain attributes, use the following as an example:
 
-.. code-block:: bash
+.. prompt::
 
     curl --request PUT 'https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging' \
         --header 'Content-Type: application/json' --data-raw \
