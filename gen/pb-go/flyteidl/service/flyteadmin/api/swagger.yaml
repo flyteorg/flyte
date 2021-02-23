@@ -5935,6 +5935,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+            task_type_version: 1
             custom:
               fields:
                 key:
@@ -6075,6 +6076,7 @@ definitions:
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
             timeout: "timeout"
+          task_type_version: 1
           custom:
             fields:
               key:
@@ -6461,6 +6463,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+              task_type_version: 1
               custom:
                 fields:
                   key:
@@ -6594,6 +6597,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+              task_type_version: 1
               custom:
                 fields:
                   key:
@@ -8453,6 +8457,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+              task_type_version: 1
               custom:
                 fields:
                   key:
@@ -8577,6 +8582,7 @@ definitions:
                 deprecated_error_message: "deprecated_error_message"
                 interruptible: true
                 timeout: "timeout"
+              task_type_version: 1
               custom:
                 fields:
                   key:
@@ -11326,6 +11332,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+            task_type_version: 1
             custom:
               fields:
                 key:
@@ -11450,6 +11457,7 @@ definitions:
               deprecated_error_message: "deprecated_error_message"
               interruptible: true
               timeout: "timeout"
+            task_type_version: 1
             custom:
               fields:
                 key:
@@ -14135,6 +14143,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                task_type_version: 1
                 custom:
                   fields:
                     key:
@@ -14259,6 +14268,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                task_type_version: 1
                 custom:
                   fields:
                     key:
@@ -16873,6 +16883,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                task_type_version: 1
                 custom:
                   fields:
                     key:
@@ -16997,6 +17008,7 @@ definitions:
                   deprecated_error_message: "deprecated_error_message"
                   interruptible: true
                   timeout: "timeout"
+                task_type_version: 1
                 custom:
                   fields:
                     key:
@@ -18418,6 +18430,7 @@ definitions:
           deprecated_error_message: "deprecated_error_message"
           interruptible: true
           timeout: "timeout"
+        task_type_version: 1
         custom:
           fields:
             key:
@@ -21061,6 +21074,7 @@ definitions:
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
             timeout: "timeout"
+          task_type_version: 1
           custom:
             fields:
               key:
@@ -21185,6 +21199,7 @@ definitions:
             deprecated_error_message: "deprecated_error_message"
             interruptible: true
             timeout: "timeout"
+          task_type_version: 1
           custom:
             fields:
               key:
@@ -23490,6 +23505,11 @@ definitions:
         $ref: "#/definitions/protobufStruct"
       container:
         $ref: "#/definitions/coreContainer"
+      task_type_version:
+        type: "integer"
+        format: "int32"
+        description: "This can be used to customize task handling at execution time\
+          \ for the same task type."
     description: "A Task structure that uniquely identifies a task in the system\n\
       Tasks are registered as a first step in the system."
     example:
@@ -23545,6 +23565,7 @@ definitions:
         deprecated_error_message: "deprecated_error_message"
         interruptible: true
         timeout: "timeout"
+      task_type_version: 1
       custom:
         fields:
           key:

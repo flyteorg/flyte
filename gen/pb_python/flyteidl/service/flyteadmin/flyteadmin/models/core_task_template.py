@@ -42,7 +42,8 @@ class CoreTaskTemplate(object):
         'metadata': 'CoreTaskMetadata',
         'interface': 'CoreTypedInterface',
         'custom': 'ProtobufStruct',
-        'container': 'CoreContainer'
+        'container': 'CoreContainer',
+        'task_type_version': 'int'
     }
 
     attribute_map = {
@@ -51,10 +52,11 @@ class CoreTaskTemplate(object):
         'metadata': 'metadata',
         'interface': 'interface',
         'custom': 'custom',
-        'container': 'container'
+        'container': 'container',
+        'task_type_version': 'task_type_version'
     }
 
-    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None):  # noqa: E501
+    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, task_type_version=None):  # noqa: E501
         """CoreTaskTemplate - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -63,6 +65,7 @@ class CoreTaskTemplate(object):
         self._interface = None
         self._custom = None
         self._container = None
+        self._task_type_version = None
         self.discriminator = None
 
         if id is not None:
@@ -77,6 +80,8 @@ class CoreTaskTemplate(object):
             self.custom = custom
         if container is not None:
             self.container = container
+        if task_type_version is not None:
+            self.task_type_version = task_type_version
 
     @property
     def id(self):
@@ -213,6 +218,29 @@ class CoreTaskTemplate(object):
         """
 
         self._container = container
+
+    @property
+    def task_type_version(self):
+        """Gets the task_type_version of this CoreTaskTemplate.  # noqa: E501
+
+        This can be used to customize task handling at execution time for the same task type.  # noqa: E501
+
+        :return: The task_type_version of this CoreTaskTemplate.  # noqa: E501
+        :rtype: int
+        """
+        return self._task_type_version
+
+    @task_type_version.setter
+    def task_type_version(self, task_type_version):
+        """Sets the task_type_version of this CoreTaskTemplate.
+
+        This can be used to customize task handling at execution time for the same task type.  # noqa: E501
+
+        :param task_type_version: The task_type_version of this CoreTaskTemplate.  # noqa: E501
+        :type: int
+        """
+
+        self._task_type_version = task_type_version
 
     def to_dict(self):
         """Returns the model properties as a dict"""
