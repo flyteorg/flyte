@@ -60,7 +60,7 @@ Repository
 ----------
 Serialized entities (tasks, workflows, launch plans) and executions (workflow-, node- and task-) are stored as protos defined
 `here <https://github.com/lyft/flyteidl/tree/master/protos/flyteidl/admin>`__.
-We use the excellent `gorm <http://doc.gorm.io/>`__ library to interface with our database, which currently supports a postgres
+We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a postgres
 implementation.  The actual code for issuing queries with gorm can be found in the
 `gormimpl <https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
 
