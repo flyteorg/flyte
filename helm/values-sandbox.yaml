@@ -45,7 +45,15 @@ minio: {}
 # CONTOUR
 #
 
-contour: {}
+contour:
+  contour: {}
+  envoy:
+    service:
+      type: NodePort
+      ports:
+        http: 80
+      nodePorts:
+        http: 30081
 
 #
 # SPARKOPERATOR
