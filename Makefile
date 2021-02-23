@@ -26,15 +26,15 @@ echo "$(shell tput bold)$(shell tput setaf 2)$(1)$(shell tput sgr0)"
 endef
 
 define ERROR
-echo >&2 "$(shell tput bold)$(shell tput setaf 1)$(1)! Please 'make teardown' and 'make start' again to retry.$(shell tput sgr0)"; exit 1
+( echo >&2 "$(shell tput bold)$(shell tput setaf 1)$(1)! Please 'make teardown' and 'make start' again to retry.$(shell tput sgr0)"; exit 1 )
 endef
 
 define RUN_IN_SANDBOX
 docker exec -it \
-	-e MAKEFLAGS \
-	-e REGISTRY=$(REGISTRY) \
 	-e DOCKER_BUILDKIT=1 \
-	-e VERSION=$(VERSION) \
+	-e MAKEFLAGS \
+	-e REGISTRY \
+	-e VERSION \
 	-w /usr/src \
 	$(FLYTE_SANDBOX_NAME) \
 	$(1)
@@ -79,7 +79,7 @@ start: _prepare  ## Start a local Flyte sandbox
 	kubectl wait --for=condition=available deployment/flyteadmin -n flyte --timeout=10m || $(call ERROR,Timed out while waiting for the Flyteadmin component to start)
 
 	$(call LOG,Registering examples from commit: latest)
-	$(call RUN_IN_SANDBOX,bash -c "REGISTRY=ghcr.io/flyteorg VERSION=latest make -C cookbook/$(EXAMPLES_MODULE) fast_register")
+	REGISTRY=ghcr.io/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
 
 	kubectl wait --for=condition=available deployment/{datacatalog,flyteadmin,flyteconsole,flytepropeller} -n flyte --timeout=10m || $(call ERROR,Timed out while waiting for the Flyte deployment to start)
 	$(call LOG,"Flyte deployment ready! Flyte console is now available at http://localhost:$(FLYTE_PROXY_PORT)/console")
