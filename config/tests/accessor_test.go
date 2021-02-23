@@ -18,8 +18,8 @@ import (
 
 	k8sRand "k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/internal/utils"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/internal/utils"
 	"github.com/spf13/pflag"
 
 	"github.com/ghodss/yaml"

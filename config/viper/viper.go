@@ -11,13 +11,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	stdLibErrs "github.com/lyft/flytestdlib/errors"
+	stdLibErrs "github.com/flyteorg/flytestdlib/errors"
 
 	"github.com/spf13/cobra"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/config/files"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/files"
+	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/mitchellh/mapstructure"

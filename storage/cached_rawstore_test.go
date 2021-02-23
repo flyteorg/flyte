@@ -10,12 +10,12 @@ import (
 	"runtime/debug"
 	"testing"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flytestdlib/ioutils"
+	"github.com/flyteorg/flytestdlib/ioutils"
 	"github.com/stretchr/testify/assert"
 )
 

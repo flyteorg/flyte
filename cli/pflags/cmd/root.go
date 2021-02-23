@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lyft/flytestdlib/cli/pflags/api"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/cli/pflags/api"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/spf13/cobra"
 )
 

@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
 )
 
 var (

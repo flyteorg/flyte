@@ -6,9 +6,9 @@ import (
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flytestdlib/utils/prototest"
 	"github.com/golang/protobuf/proto"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/lyft/flytestdlib/utils/prototest"
 )
 
 type SimpleType struct {

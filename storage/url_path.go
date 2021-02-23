@@ -9,7 +9,7 @@ import (
 
 	"net/url"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const separator = "/"

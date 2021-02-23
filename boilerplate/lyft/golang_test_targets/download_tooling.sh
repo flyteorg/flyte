@@ -16,7 +16,7 @@ set -e
 # List of tools to go get
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
-  "github.com/vektra/mockery/cmd/mockery"
+  "github.com/vektra/mockery"
   "github.com/lyft/flytestdlib/cli/pflags"
   "github.com/golangci/golangci-lint/cmd/golangci-lint"
   "github.com/alvaroloes/enumer"

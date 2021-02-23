@@ -12,8 +12,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/rand"
 
+	"github.com/flyteorg/flytestdlib/internal/utils"
 	"github.com/ghodss/yaml"
-	"github.com/lyft/flytestdlib/internal/utils"
 	"github.com/spf13/pflag"
 
 	"github.com/stretchr/testify/assert"

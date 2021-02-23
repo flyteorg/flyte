@@ -19,11 +19,11 @@ import (
 	"github.com/graymeta/stow"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/internal/utils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/internal/utils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
 type mockStowLoc struct {

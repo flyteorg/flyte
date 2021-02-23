@@ -4,7 +4,7 @@ package main
 import (
 	"log"
 
-	"github.com/lyft/flytestdlib/cli/pflags/cmd"
+	"github.com/flyteorg/flytestdlib/cli/pflags/cmd"
 )
 
 func main() {
