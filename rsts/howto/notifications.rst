@@ -107,7 +107,7 @@ Let's look at the following config section and go into what each value represent
     * **sender**: Your verified SES email sender
     * **body**: Configurable email body used in notifications
 
-The full set of parameters which can be used for email templating are checked into `code <https://github.com/lyft/flyteadmin/blob/a84223dab00dfa52d8ba1ed2d057e77b6c6ab6a7/pkg/async/notifications/email.go#L18,L30>`_.
+The full set of parameters which can be used for email templating are checked into `code <https://github.com/flyteorg/flyteadmin/blob/a84223dab00dfa52d8ba1ed2d057e77b6c6ab6a7/pkg/async/notifications/email.go#L18,L30>`_.
 
 .. _admin-config-example:
 

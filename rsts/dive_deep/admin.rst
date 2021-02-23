@@ -18,7 +18,7 @@ RPC
 FlyteAdmin uses the `grpc-gateway <https://github.com/grpc-ecosystem/grpc-gateway>`__ library to serve
 incoming gRPC and HTTP requests with identical handlers. For a more detailed overview of the API,
 including request and response entities, see the admin
-service `definition <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/service/admin.proto>`__. The
+service `definition <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/service/admin.proto>`__. The
 RPC handlers are a thin shim that enforce some request structure validation and call out to appropriate :ref:`manager <divedeep-admin-manager>`.
 methods to process requests.
 
@@ -59,14 +59,14 @@ The managers utilize additional components to process requests. These additional
 Repository
 ----------
 Serialized entities (tasks, workflows, launch plans) and executions (workflow-, node- and task-) are stored as protos defined
-`here <https://github.com/lyft/flyteidl/tree/master/protos/flyteidl/admin>`__.
+`here <https://github.com/flyteorg/flyteidl/tree/master/protos/flyteidl/admin>`__.
 We use the excellent `gorm <https://gorm.io/docs/index.html>`__ library to interface with our database, which currently supports a postgres
 implementation.  The actual code for issuing queries with gorm can be found in the
-`gormimpl <https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
+`gormimpl <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/gormimpl>`__ directory.
 
 Models
 ++++++
-Database models are defined in the `models <https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/models>`__ directory and correspond 1:1 with database tables [0]_.
+Database models are defined in the `models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/models>`__ directory and correspond 1:1 with database tables [0]_.
 
 The full set of database tables includes:
 
@@ -79,9 +79,9 @@ The full set of database tables includes:
 - task_executions
 - workflows
 
-These database models inherit primary keys and indexes as defined in the corresponding `models <https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/models>`__ file.
+These database models inherit primary keys and indexes as defined in the corresponding `models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/models>`__ file.
 
-The repositories code also includes `transformers <https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/transformers>`__.
+The repositories code also includes `transformers <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/transformers>`__.
 These convert entities from the database format to a response format for the external API.
 If you change either of these structures, you will find you must change the corresponding transformers.
 
@@ -114,7 +114,7 @@ As the name implies, ``common`` houses shared components used across different f
 Data
 ----
 
-Data interfaces are primarily handled by the `storage <https://github.com/lyft/flytestdlib>`__ library implemented in flytestdlib. However, neither this nor the underlying `stow <https://github.com/graymeta/stow>`__ library expose `HEAD <https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>`__ support so the data package in admin exists as the layer responsible for additional, remote data operations.
+Data interfaces are primarily handled by the `storage <https://github.com/flyteorg/flytestdlib>`__ library implemented in flytestdlib. However, neither this nor the underlying `stow <https://github.com/graymeta/stow>`__ library expose `HEAD <https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD>`__ support so the data package in admin exists as the layer responsible for additional, remote data operations.
 
 Errors
 ------
@@ -125,7 +125,7 @@ The errors directory contains centrally defined errors that are designed for com
 
 Runtime
 -------
-Values specific to the flyteadmin application as well as task and workflow registration and execution are configured in the `runtime <https://github.com/lyft/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
+Values specific to the flyteadmin application as well as task and workflow registration and execution are configured in the `runtime <https://github.com/flyteorg/flyteadmin/tree/master/pkg/runtime>`__ directory. These interfaces expose values configured in the ``flyteadmin`` top-level key in the application config.
 
 .. _divedeep-admin-workflowengine:
 
@@ -134,4 +134,4 @@ Workflowengine
 
 This directory contains interfaces to build and execute workflows leveraging flytepropeller compiler and client components.
 
-.. [0] Unfortunately, given unique naming constraints, some models are redefined in `migration_models <https://github.com/lyft/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
+.. [0] Unfortunately, given unique naming constraints, some models are redefined in `migration_models <https://github.com/flyteorg/flyteadmin/blob/master/pkg/repositories/config/migration_models.go>`__ to guarantee unique index values.
