@@ -51,7 +51,7 @@ The override values from the database are assigned at execution time.
 
 To update individual project-domain attributes, use the following as an example:
 
-.. prompt::
+.. prompt:: bash
 
     curl --request PUT 'https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging' \
         --header 'Content-Type: application/json' --data-raw \
@@ -70,14 +70,16 @@ Note that these settings can only take on domain, or a project and domain specif
 
 Running the following, will make it so that when Admin fills in cluster resource templates, the K8s namespace ``flyteexamples-development`` will have a resource quota of 1000 CPU cores and 5TB of memory.
 
-.. prompt::
+.. prompt:: bash
 
     flyte-cli -h localhost:30081 -p flyteexamples -d development update-cluster-resource-attributes  \
     --attributes projectQuotaCpu 1000 --attributes projectQuotaMemory 5000Gi
 
 
-These values will in turn be used to fill in the template fields
-`in the file <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml>`__
+These values will in turn be used to fill in the template fields, for example:
+
+.. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml
+
 from the base of this repository for the ``flyteexamples-development`` namespace and that namespace only.
 For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/c9b9fad428e32255b6839e3244ca8f09d57536ae/kustomize/base/single_cluster/headless/config/admin/cluster_resources.yaml>`__ would still be applied.
 
@@ -99,7 +101,7 @@ Execution queues themselves are currently defined in the
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
 stored in the Admin database.
 
-.. prompt::
+.. prompt:: bash
 
     flyte-cli -h localhost:30081 -p flyteexamples -d development update-execution-queue-attributes  \
     --tags critical --tags gpu_intensive
@@ -113,7 +115,7 @@ This allows forcing a matching execution to always execute on a specific kuberne
 
 You can set this using flyte-cli:
 
-.. prompt::
+.. prompt:: bash
 
    flyte-cli -h localhost:30081 -p flyteexamples -d development update-execution-cluster-label --value mycluster
 
