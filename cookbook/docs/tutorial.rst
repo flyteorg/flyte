@@ -62,12 +62,12 @@ Steps
         res = say_hello(name=name)
         return res
 
-6. Update the simple test at the bottom of the file to pass in a name. E.g. 
+6. Update the simple test at the bottom of the file to pass in a name. E.g.
 
 .. tip::
 
   .. code-block:: python
-    
+
     print(f"Running my_wf(name='adam') {my_wf(name='adam')}")
 
 8. When you run this file locally, it should output ``hello world, adam``. Run this command in your terminal:
@@ -82,7 +82,7 @@ Steps
 
 .. prompt:: bash
 
-  make fast_register
+  REGISTRY=ghcr.io/flyteorg make fast_register
 
 7. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
 
