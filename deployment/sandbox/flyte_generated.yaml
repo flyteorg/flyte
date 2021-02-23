@@ -1838,7 +1838,7 @@ data:
     task_resources:
       defaults:
         cpu: 100m
-        memory: 100Mi
+        memory: 200Mi
         storage: 5Mi
       limits:
         cpu: 2
@@ -1847,7 +1847,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-k7f4k7g76c
+  name: flyte-admin-config-5b5g7785h8
   namespace: flyte
 ---
 apiVersion: v1
@@ -1934,7 +1934,7 @@ data:
           - FLYTE_AWS_ACCESS_KEY_ID: minio
           - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         default-cpus: 100m
-        default-memory: 100Mi
+        default-memory: 200Mi
   logger.yaml: |
     logger:
       show-source: true
@@ -1962,7 +1962,7 @@ data:
         kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-7gt47kf8m5
+  name: flyte-propeller-config-94gbkmm6cm
   namespace: flyte
 ---
 apiVersion: v1
@@ -2393,6 +2393,7 @@ spec:
         - migrate
         - seed-projects
         - flytesnacks
+        - flyteexamples
         image: ghcr.io/lyft/flyteadmin:v0.3.29
         imagePullPolicy: IfNotPresent
         name: seed-projects
@@ -2426,7 +2427,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-k7f4k7g76c
+          name: flyte-admin-config-5b5g7785h8
         name: config-volume
       - name: db-pass
         secret:
@@ -2510,7 +2511,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-7gt47kf8m5
+          name: flyte-propeller-config-94gbkmm6cm
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -2613,7 +2614,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-k7f4k7g76c
+              name: flyte-admin-config-5b5g7785h8
             name: config-volume
           - name: db-pass
             secret:

@@ -18,7 +18,7 @@ First install the python Flytekit SDK and clone the ``flytekit-python-template``
 
   pip install flytekit==0.16.0b6
   git clone git@github.com:flyteorg/flytekit-python-template.git flyteexamples
-  cd myflyteproject
+  cd flyteexamples
   rm -rf .git
   git init
 

@@ -30,6 +30,7 @@ configMapGenerator:
   - behavior: merge
     files:
       - ./config/admin/db.yaml
+      - ./config/admin/task_resource_defaults.yaml
       - ./config/common/storage.yaml
       - ./config/common/logger.yaml
     name: flyte-admin-config

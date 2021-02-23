@@ -46,6 +46,7 @@ spec:
               "migrate",
               "seed-projects",
               "flytesnacks",
+              "flyteexamples",
             ]
           volumeMounts:
             - name: config-volume

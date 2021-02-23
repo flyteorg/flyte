@@ -11,6 +11,7 @@ Welcome to the documentation hub for Flyte.
    :caption: Get started with Flyte
    :name: tutorialstoc
 
+   tutorials/first_run
    tutorials/first_example
    tutorials/run_on_flyte
    tutorials/learn
