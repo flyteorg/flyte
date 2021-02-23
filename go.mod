@@ -15,6 +15,7 @@ require (
 	github.com/influxdata/influxdb v1.7.9
 	github.com/lyft/flytestdlib v0.3.0
 	github.com/mitchellh/mapstructure v1.1.2
+	github.com/pkg/errors v0.9.1
 	github.com/pquerna/cachecontrol v0.0.0-20180517163645-1555304b9b35 // indirect
 	github.com/satori/uuid v1.2.0 // indirect
 	github.com/spf13/pflag v1.0.5
