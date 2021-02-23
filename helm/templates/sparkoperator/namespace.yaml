@@ -1,6 +1,0 @@
-{{- if .Values.sparkoperator.enabled }}
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ template "sparkoperator.namespace" . }}
-{{- end }}

@@ -2,5 +2,17 @@ apiVersion: v2
 name: flyte
 description: A Helm chart for Flyte
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: 0.8.0
+dependencies:
+  - name: contour
+    version: 4.1.2
+    repository: https://charts.bitnami.com/bitnami
+    condition: contour.enabled
+  - name: spark-operator
+    alias: sparkoperator
+    version: 1.0.6
+    repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
+    condition: spark.enabled
+
+

@@ -124,47 +124,6 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
-
-{{- define "contour.name" -}}
-contour
-{{- end -}}
-
-{{- define "contour.namespace" -}}
-heptio-contour
-{{- end -}}
-
-{{- define "contour.selectorLabels" -}}
-app.kubernetes.io/name: {{ template "contour.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{- define "contour.labels" -}}
-{{ include "contour.selectorLabels" . }}
-helm.sh/chart: {{ include "flyte.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-
-{{- define "sparkoperator.name" -}}
-sparkoperator
-{{- end -}}
-
-{{- define "sparkoperator.namespace" -}}
-sparkoperator
-{{- end -}}
-
-{{- define "sparkoperator.selectorLabels" -}}
-app.kubernetes.io/name: {{ template "sparkoperator.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{- define "sparkoperator.labels" -}}
-{{ include "sparkoperator.selectorLabels" . }}
-helm.sh/chart: {{ include "flyte.chart" . }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-
 {{- define "pytorch-operator.name" -}}
 pytorch-operator
 {{- end -}}
