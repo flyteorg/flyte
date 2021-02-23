@@ -20,7 +20,7 @@ Flyte allows these custom settings along the following combination of dimensions
 Please see the :ref:`divedeep-projects` document for more information on projects and domains. Along these dimensions, the following settings are configurable. Note that not all three of the combinations above are valid for each of these settings.
 
 - Defaults for task resource requests and limits (when not specified by the author of the task).
-- Settings for the cluster resource configuration that feeds into Admin's cluster resource manager.
+- Settings for project-namespaced cluster resource configuration that feeds into Admin's cluster resource manager.
 - Execution queues that are used for Dynamic Tasks. Read more about execution queues here, but effectively they're meant to be used with constructs like AWS Batch.
 - Determining how workflow executions get assigned to clusters in a multi-cluster Flyte deployment.
 
@@ -28,7 +28,9 @@ The proto definition is the definitive source of which
 `matchable attributes <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`_
 can be customized.
 
-Each of the four above settings are discussed below.  Also, since the flyte-cli tool does not yet hit these endpoints, we are including some sample ``curl`` commands for administrators to reference.
+Each of the four above settings are discussed below. Eventually all of these customizations will be overridable using
+:std:ref:`flytectl`. Until then, flyte-cli command line options can be used to modify frequent use-cases, and barring
+that we show examples using curl.
 
 
 Task Resources
@@ -47,6 +49,15 @@ in the flyteadmin config are used.
 
 The override values from the database are assigned at execution time.
 
+To update individual project-domain attributes, use the following as an example:
+
+.. prompt:: bash
+
+    curl --request PUT 'https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging' \
+        --header 'Content-Type: application/json' --data-raw \
+        '{"attributes":{"matchingAttributes":{"taskResourceAttributes":{"defaults":{"cpu": "1000", "memory": "5000Gi"}, "limits": {"cpu": "4000"}}}}'
+
+
 
 Cluster Resources
 =================
@@ -57,22 +68,31 @@ In the absence of custom override values, templateData from the `flyteadmin conf
 
 Note that these settings can only take on domain, or a project and domain specificity. Since Flyte has not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn't make any sense.
 
+Running the following, will make it so that when Admin fills in cluster resource templates, the K8s namespace ``flyteexamples-development`` will have a resource quota of 1000 CPU cores and 5TB of memory.
 
-Command
--------
-Running the following, will make it so that when Admin fills in cluster resource templates, the K8s namespace ``projectname-staging`` will have a resource quota of 1000 CPU cores and 5TB of memory.
+.. prompt:: bash
 
-.. code-block:: console
+    flyte-cli -h localhost:30081 -p flyteexamples -d development update-cluster-resource-attributes  \
+    --attributes projectQuotaCpu 1000 --attributes projectQuotaMemory 5000Gi
 
-    curl --request PUT 'https://flyte.company.net/api/v1/project_domain_attributes/projectname/staging' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"clusterResourceAttributes":{"attributes":{"projectQuotaCpu": "1000", "projectQuotaMemory": "5000Gi"}}}}}'
 
-These values will in turn be used to fill in the template fields in the file at ``kustomize/overlays/sandbox/admindeployment/clusterresource-templates/ab_project-resource-quota.yaml`` from the base of this repository for the ``projectname-staging`` namespace and that namespace only. For other namespaces, the defaults at the bottom of `this file <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L152>`__ would still be applied.
+These values will in turn be used to fill in the template fields, for example:
 
+.. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml
+
+from the base of this repository for the ``flyteexamples-development`` namespace and that namespace only.
+For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/c9b9fad428e32255b6839e3244ca8f09d57536ae/kustomize/base/single_cluster/headless/config/admin/cluster_resources.yaml>`__ would still be applied.
+
+.. note::
+
+    The template values, e.g. ``projectQuotaCpu`` or ``projectQuotaMemory`` are freeform strings. You must ensure that
+    they match the template placeholders in your `template file <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml>`__
+    for your changes to take effect.
 
 Execution Queues
 ================
 
-Execution queues are use to determine where dynamic tasks run.
+Execution queues are use to determine where tasks yielded by a dynamic :py:func:`flytekit:flytekit.maptask` run.
 
 Execution queues themselves are currently defined in the
 `flyteadmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
@@ -82,13 +102,21 @@ stored in the Admin database.
 
 .. prompt:: bash
 
-    curl --request PUT 'https://flyte.company.net/api/v1/workflow_attributes/project/domain/YourWorkflowName' --header 'Content-Type: application/json' --data-raw '{"attributes":{"matchingAttributes":{"executionQueueAttributes":{"tags":["my_queue"]}}}}'
+    flyte-cli -h localhost:30081 -p flyteexamples -d development update-execution-queue-attributes  \
+    --tags critical --tags gpu_intensive
 
+You can view existing attributes for which tags can be assigned by visting `http://localhost:30081/api/v1/matchable_attributes?resource_type=3 <http://localhost:30081/api/v1/matchable_attributes?resource_type=3>`__.
 
 Execution Cluster Label
 =======================
 
 This allows forcing a matching execution to always execute on a specific kubernetes cluster.
+
+You can set this using flyte-cli:
+
+.. prompt:: bash
+
+   flyte-cli -h localhost:30081 -p flyteexamples -d development update-execution-cluster-label --value mycluster
 
 
 *********
