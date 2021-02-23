@@ -70,7 +70,7 @@ Note that these settings can only take on domain, or a project and domain specif
 
 Running the following, will make it so that when Admin fills in cluster resource templates, the K8s namespace ``flyteexamples-development`` will have a resource quota of 1000 CPU cores and 5TB of memory.
 
-.. code-block:: bash
+.. prompt::
 
     flyte-cli -h localhost:30081 -p flyteexamples -d development update-cluster-resource-attributes  \
     --attributes projectQuotaCpu 1000 --attributes projectQuotaMemory 5000Gi
