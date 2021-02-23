@@ -5196,6 +5196,15 @@ public final class Tasks {
      */
     flyteidl.core.Tasks.ContainerOrBuilder getContainerOrBuilder();
 
+    /**
+     * <pre>
+     * This can be used to customize task handling at execution time for the same task type.
+     * </pre>
+     *
+     * <code>int32 task_type_version = 7;</code>
+     */
+    int getTaskTypeVersion();
+
     public flyteidl.core.Tasks.TaskTemplate.TargetCase getTargetCase();
   }
   /**
@@ -5313,6 +5322,11 @@ public final class Tasks {
                 target_ = subBuilder.buildPartial();
               }
               targetCase_ = 6;
+              break;
+            }
+            case 56: {
+
+              taskTypeVersion_ = input.readInt32();
               break;
             }
             default: {
@@ -5590,6 +5604,19 @@ public final class Tasks {
       return flyteidl.core.Tasks.Container.getDefaultInstance();
     }
 
+    public static final int TASK_TYPE_VERSION_FIELD_NUMBER = 7;
+    private int taskTypeVersion_;
+    /**
+     * <pre>
+     * This can be used to customize task handling at execution time for the same task type.
+     * </pre>
+     *
+     * <code>int32 task_type_version = 7;</code>
+     */
+    public int getTaskTypeVersion() {
+      return taskTypeVersion_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5622,6 +5649,9 @@ public final class Tasks {
       if (targetCase_ == 6) {
         output.writeMessage(6, (flyteidl.core.Tasks.Container) target_);
       }
+      if (taskTypeVersion_ != 0) {
+        output.writeInt32(7, taskTypeVersion_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5653,6 +5683,10 @@ public final class Tasks {
       if (targetCase_ == 6) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, (flyteidl.core.Tasks.Container) target_);
+      }
+      if (taskTypeVersion_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(7, taskTypeVersion_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5691,6 +5725,8 @@ public final class Tasks {
         if (!getCustom()
             .equals(other.getCustom())) return false;
       }
+      if (getTaskTypeVersion()
+          != other.getTaskTypeVersion()) return false;
       if (!getTargetCase().equals(other.getTargetCase())) return false;
       switch (targetCase_) {
         case 6:
@@ -5729,6 +5765,8 @@ public final class Tasks {
         hash = (37 * hash) + CUSTOM_FIELD_NUMBER;
         hash = (53 * hash) + getCustom().hashCode();
       }
+      hash = (37 * hash) + TASK_TYPE_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getTaskTypeVersion();
       switch (targetCase_) {
         case 6:
           hash = (37 * hash) + CONTAINER_FIELD_NUMBER;
@@ -5901,6 +5939,8 @@ public final class Tasks {
           custom_ = null;
           customBuilder_ = null;
         }
+        taskTypeVersion_ = 0;
+
         targetCase_ = 0;
         target_ = null;
         return this;
@@ -5957,6 +5997,7 @@ public final class Tasks {
             result.target_ = containerBuilder_.build();
           }
         }
+        result.taskTypeVersion_ = taskTypeVersion_;
         result.targetCase_ = targetCase_;
         onBuilt();
         return result;
@@ -6021,6 +6062,9 @@ public final class Tasks {
         }
         if (other.hasCustom()) {
           mergeCustom(other.getCustom());
+        }
+        if (other.getTaskTypeVersion() != 0) {
+          setTaskTypeVersion(other.getTaskTypeVersion());
         }
         switch (other.getTargetCase()) {
           case CONTAINER: {
@@ -6929,6 +6973,44 @@ public final class Tasks {
         targetCase_ = 6;
         onChanged();;
         return containerBuilder_;
+      }
+
+      private int taskTypeVersion_ ;
+      /**
+       * <pre>
+       * This can be used to customize task handling at execution time for the same task type.
+       * </pre>
+       *
+       * <code>int32 task_type_version = 7;</code>
+       */
+      public int getTaskTypeVersion() {
+        return taskTypeVersion_;
+      }
+      /**
+       * <pre>
+       * This can be used to customize task handling at execution time for the same task type.
+       * </pre>
+       *
+       * <code>int32 task_type_version = 7;</code>
+       */
+      public Builder setTaskTypeVersion(int value) {
+        
+        taskTypeVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * This can be used to customize task handling at execution time for the same task type.
+       * </pre>
+       *
+       * <code>int32 task_type_version = 7;</code>
+       */
+      public Builder clearTaskTypeVersion() {
+        
+        taskTypeVersion_ = 0;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -13144,36 +13226,37 @@ public final class Tasks {
       "RetryStrategy\022\031\n\021discovery_version\030\006 \001(\t" +
       "\022 \n\030deprecated_error_message\030\007 \001(\t\022\027\n\rin" +
       "terruptible\030\010 \001(\010H\000B\025\n\023interruptible_val" +
-      "ue\"\206\002\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
+      "ue\"\241\002\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
       "dl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010meta" +
       "data\030\003 \001(\0132\033.flyteidl.core.TaskMetadata\022" +
       "0\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Typed" +
       "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto" +
       "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl" +
-      ".core.ContainerH\000B\010\n\006target\"\'\n\rContainer" +
-      "Port\022\026\n\016container_port\030\001 \001(\r\"\241\002\n\tContain" +
-      "er\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004ar" +
-      "gs\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.c" +
-      "ore.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.co" +
-      "re.KeyValuePair\022+\n\006config\030\006 \003(\0132\033.flytei" +
-      "dl.core.KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.fl" +
-      "yteidl.core.ContainerPort\0225\n\013data_config" +
-      "\030\t \001(\0132 .flyteidl.core.DataLoadingConfig" +
-      "\"\233\002\n\nIOStrategy\022=\n\rdownload_mode\030\001 \001(\0162&" +
-      ".flyteidl.core.IOStrategy.DownloadMode\0229" +
-      "\n\013upload_mode\030\002 \001(\0162$.flyteidl.core.IOSt" +
-      "rategy.UploadMode\"L\n\014DownloadMode\022\022\n\016DOW" +
-      "NLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO" +
-      "_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_" +
-      "ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UP" +
-      "LOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabled\030" +
-      "\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_path" +
-      "\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteidl.core.D" +
-      "ataLoadingConfig.LiteralMapFormat\022.\n\013io_" +
-      "strategy\030\005 \001(\0132\031.flyteidl.core.IOStrateg" +
-      "y\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020" +
-      "\001\022\t\n\005PROTO\020\002B2Z0github.com/lyft/flyteidl" +
-      "/gen/pb-go/flyteidl/coreb\006proto3"
+      ".core.ContainerH\000\022\031\n\021task_type_version\030\007" +
+      " \001(\005B\010\n\006target\"\'\n\rContainerPort\022\026\n\016conta" +
+      "iner_port\030\001 \001(\r\"\241\002\n\tContainer\022\r\n\005image\030\001" +
+      " \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tr" +
+      "esources\030\004 \001(\0132\030.flyteidl.core.Resources" +
+      "\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyValuePa" +
+      "ir\022+\n\006config\030\006 \003(\0132\033.flyteidl.core.KeyVa" +
+      "luePair\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.C" +
+      "ontainerPort\0225\n\013data_config\030\t \001(\0132 .flyt" +
+      "eidl.core.DataLoadingConfig\"\233\002\n\nIOStrate" +
+      "gy\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl.cor" +
+      "e.IOStrategy.DownloadMode\0229\n\013upload_mode" +
+      "\030\002 \001(\0162$.flyteidl.core.IOStrategy.Upload" +
+      "Mode\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000" +
+      "\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD" +
+      "\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014" +
+      "UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021Da" +
+      "taLoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninpu" +
+      "t_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006for" +
+      "mat\030\004 \001(\01621.flyteidl.core.DataLoadingCon" +
+      "fig.LiteralMapFormat\022.\n\013io_strategy\030\005 \001(" +
+      "\0132\031.flyteidl.core.IOStrategy\"1\n\020LiteralM" +
+      "apFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002B" +
+      "2Z0github.com/lyft/flyteidl/gen/pb-go/fl" +
+      "yteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13221,7 +13304,7 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskTemplate_descriptor,
-        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "Target", });
+        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "TaskTypeVersion", "Target", });
     internal_static_flyteidl_core_ContainerPort_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_ContainerPort_fieldAccessorTable = new

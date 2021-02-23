@@ -118,6 +118,9 @@ message TaskTemplate {
     oneof target {
         Container container = 6;
     }
+
+    // This can be used to customize task handling at execution time for the same task type.
+    int32 task_type_version = 7;
 }
 
 // ----------------- First class Plugins

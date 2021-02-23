@@ -22,4 +22,6 @@ type CoreTaskTemplate struct {
 	// Custom data about the task. This is extensible to allow various plugins in the system.
 	Custom *ProtobufStruct `json:"custom,omitempty"`
 	Container *CoreContainer `json:"container,omitempty"`
+	// This can be used to customize task handling at execution time for the same task type.
+	TaskTypeVersion int32 `json:"task_type_version,omitempty"`
 }

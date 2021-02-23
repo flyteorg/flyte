@@ -9849,6 +9849,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.ITypedInterface|null} ["interface"] TaskTemplate interface
              * @property {google.protobuf.IStruct|null} [custom] TaskTemplate custom
              * @property {flyteidl.core.IContainer|null} [container] TaskTemplate container
+             * @property {number|null} [taskTypeVersion] TaskTemplate taskTypeVersion
              */
 
             /**
@@ -9914,6 +9915,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskTemplate.prototype.container = null;
 
+            /**
+             * TaskTemplate taskTypeVersion.
+             * @member {number} taskTypeVersion
+             * @memberof flyteidl.core.TaskTemplate
+             * @instance
+             */
+            TaskTemplate.prototype.taskTypeVersion = 0;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -9964,6 +9973,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.google.protobuf.Struct.encode(message.custom, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 if (message.container != null && message.hasOwnProperty("container"))
                     $root.flyteidl.core.Container.encode(message.container, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                if (message.taskTypeVersion != null && message.hasOwnProperty("taskTypeVersion"))
+                    writer.uint32(/* id 7, wireType 0 =*/56).int32(message.taskTypeVersion);
                 return writer;
             };
 
@@ -10002,6 +10013,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 6:
                         message.container = $root.flyteidl.core.Container.decode(reader, reader.uint32());
+                        break;
+                    case 7:
+                        message.taskTypeVersion = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -10054,6 +10068,9 @@ export const flyteidl = $root.flyteidl = (() => {
                             return "container." + error;
                     }
                 }
+                if (message.taskTypeVersion != null && message.hasOwnProperty("taskTypeVersion"))
+                    if (!$util.isInteger(message.taskTypeVersion))
+                        return "taskTypeVersion: integer expected";
                 return null;
             };
 

@@ -275,6 +275,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2ftasks_2eproto::of
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskTemplate, interface_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskTemplate, custom_),
   offsetof(::flyteidl::core::TaskTemplateDefaultTypeInternal, container_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskTemplate, task_type_version_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskTemplate, target_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::ContainerPort, _internal_metadata_),
@@ -319,10 +320,10 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 14, -1, sizeof(::flyteidl::core::RuntimeMetadata)},
   { 22, -1, sizeof(::flyteidl::core::TaskMetadata)},
   { 35, -1, sizeof(::flyteidl::core::TaskTemplate)},
-  { 47, -1, sizeof(::flyteidl::core::ContainerPort)},
-  { 53, -1, sizeof(::flyteidl::core::Container)},
-  { 66, -1, sizeof(::flyteidl::core::IOStrategy)},
-  { 73, -1, sizeof(::flyteidl::core::DataLoadingConfig)},
+  { 48, -1, sizeof(::flyteidl::core::ContainerPort)},
+  { 54, -1, sizeof(::flyteidl::core::Container)},
+  { 67, -1, sizeof(::flyteidl::core::IOStrategy)},
+  { 74, -1, sizeof(::flyteidl::core::DataLoadingConfig)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -367,41 +368,42 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ftasks_2eproto[] =
   "RetryStrategy\022\031\n\021discovery_version\030\006 \001(\t"
   "\022 \n\030deprecated_error_message\030\007 \001(\t\022\027\n\rin"
   "terruptible\030\010 \001(\010H\000B\025\n\023interruptible_val"
-  "ue\"\206\002\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei"
+  "ue\"\241\002\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei"
   "dl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010meta"
   "data\030\003 \001(\0132\033.flyteidl.core.TaskMetadata\022"
   "0\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Typed"
   "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto"
   "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl"
-  ".core.ContainerH\000B\010\n\006target\"\'\n\rContainer"
-  "Port\022\026\n\016container_port\030\001 \001(\r\"\241\002\n\tContain"
-  "er\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004ar"
-  "gs\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.c"
-  "ore.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl.co"
-  "re.KeyValuePair\022+\n\006config\030\006 \003(\0132\033.flytei"
-  "dl.core.KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.fl"
-  "yteidl.core.ContainerPort\0225\n\013data_config"
-  "\030\t \001(\0132 .flyteidl.core.DataLoadingConfig"
-  "\"\233\002\n\nIOStrategy\022=\n\rdownload_mode\030\001 \001(\0162&"
-  ".flyteidl.core.IOStrategy.DownloadMode\0229"
-  "\n\013upload_mode\030\002 \001(\0162$.flyteidl.core.IOSt"
-  "rategy.UploadMode\"L\n\014DownloadMode\022\022\n\016DOW"
-  "NLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO"
-  "_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_"
-  "ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UP"
-  "LOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabled\030"
-  "\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_path"
-  "\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteidl.core.D"
-  "ataLoadingConfig.LiteralMapFormat\022.\n\013io_"
-  "strategy\030\005 \001(\0132\031.flyteidl.core.IOStrateg"
-  "y\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020"
-  "\001\022\t\n\005PROTO\020\002B2Z0github.com/lyft/flyteidl"
-  "/gen/pb-go/flyteidl/coreb\006proto3"
+  ".core.ContainerH\000\022\031\n\021task_type_version\030\007"
+  " \001(\005B\010\n\006target\"\'\n\rContainerPort\022\026\n\016conta"
+  "iner_port\030\001 \001(\r\"\241\002\n\tContainer\022\r\n\005image\030\001"
+  " \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tr"
+  "esources\030\004 \001(\0132\030.flyteidl.core.Resources"
+  "\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyValuePa"
+  "ir\022+\n\006config\030\006 \003(\0132\033.flyteidl.core.KeyVa"
+  "luePair\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.C"
+  "ontainerPort\0225\n\013data_config\030\t \001(\0132 .flyt"
+  "eidl.core.DataLoadingConfig\"\233\002\n\nIOStrate"
+  "gy\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl.cor"
+  "e.IOStrategy.DownloadMode\0229\n\013upload_mode"
+  "\030\002 \001(\0162$.flyteidl.core.IOStrategy.Upload"
+  "Mode\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000"
+  "\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD"
+  "\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014"
+  "UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021Da"
+  "taLoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninpu"
+  "t_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006for"
+  "mat\030\004 \001(\01621.flyteidl.core.DataLoadingCon"
+  "fig.LiteralMapFormat\022.\n\013io_strategy\030\005 \001("
+  "\0132\031.flyteidl.core.IOStrategy\"1\n\020LiteralM"
+  "apFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002B"
+  "2Z0github.com/lyft/flyteidl/gen/pb-go/fl"
+  "yteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ftasks_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ftasks_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ftasks_2eproto,
-  "flyteidl/core/tasks.proto", &assign_descriptors_table_flyteidl_2fcore_2ftasks_2eproto, 2112,
+  "flyteidl/core/tasks.proto", &assign_descriptors_table_flyteidl_2fcore_2ftasks_2eproto, 2139,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ftasks_2eproto() {
@@ -2432,6 +2434,7 @@ const int TaskTemplate::kMetadataFieldNumber;
 const int TaskTemplate::kInterfaceFieldNumber;
 const int TaskTemplate::kCustomFieldNumber;
 const int TaskTemplate::kContainerFieldNumber;
+const int TaskTemplate::kTaskTypeVersionFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskTemplate::TaskTemplate()
@@ -2467,6 +2470,7 @@ TaskTemplate::TaskTemplate(const TaskTemplate& from)
   } else {
     custom_ = nullptr;
   }
+  task_type_version_ = from.task_type_version_;
   clear_has_target();
   switch (from.target_case()) {
     case kContainer: {
@@ -2485,8 +2489,8 @@ void TaskTemplate::SharedCtor() {
       &scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto.base);
   type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&custom_) -
-      reinterpret_cast<char*>(&id_)) + sizeof(custom_));
+      reinterpret_cast<char*>(&task_type_version_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(task_type_version_));
   clear_has_target();
 }
 
@@ -2553,6 +2557,7 @@ void TaskTemplate::Clear() {
     delete custom_;
   }
   custom_ = nullptr;
+  task_type_version_ = 0;
   clear_target();
   _internal_metadata_.Clear();
 }
@@ -2649,6 +2654,13 @@ const char* TaskTemplate::_InternalParse(const char* begin, const char* end, voi
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
             {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // int32 task_type_version = 7;
+      case 7: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 56) goto handle_unusual;
+        msg->set_task_type_version(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -2755,6 +2767,19 @@ bool TaskTemplate::MergePartialFromCodedStream(
         break;
       }
 
+      // int32 task_type_version = 7;
+      case 7: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (56 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &task_type_version_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2822,6 +2847,11 @@ void TaskTemplate::SerializeWithCachedSizes(
       6, HasBitSetters::container(this), output);
   }
 
+  // int32 task_type_version = 7;
+  if (this->task_type_version() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(7, this->task_type_version(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2881,6 +2911,11 @@ void TaskTemplate::SerializeWithCachedSizes(
         6, HasBitSetters::container(this), target);
   }
 
+  // int32 task_type_version = 7;
+  if (this->task_type_version() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(7, this->task_type_version(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -2935,6 +2970,13 @@ size_t TaskTemplate::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *custom_);
+  }
+
+  // int32 task_type_version = 7;
+  if (this->task_type_version() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::Int32Size(
+        this->task_type_version());
   }
 
   switch (target_case()) {
@@ -2992,6 +3034,9 @@ void TaskTemplate::MergeFrom(const TaskTemplate& from) {
   if (from.has_custom()) {
     mutable_custom()->::google::protobuf::Struct::MergeFrom(from.custom());
   }
+  if (from.task_type_version() != 0) {
+    set_task_type_version(from.task_type_version());
+  }
   switch (from.target_case()) {
     case kContainer: {
       mutable_container()->::flyteidl::core::Container::MergeFrom(from.container());
@@ -3034,6 +3079,7 @@ void TaskTemplate::InternalSwap(TaskTemplate* other) {
   swap(metadata_, other->metadata_);
   swap(interface_, other->interface_);
   swap(custom_, other->custom_);
+  swap(task_type_version_, other->task_type_version_);
   swap(target_, other->target_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
