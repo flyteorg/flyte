@@ -25,7 +25,7 @@ jobs:
           build_extra_args: "--target=default --compress=true"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
-          push_image_and_stages: ${{ github.event.name == 'release' }}
+          push_image_and_stages: ${{ github.event_name == 'release' }}
   push-sandbox-dind-image:
     name: Push sandbox DinD image to GHCR
     runs-on: ubuntu-latest
@@ -44,4 +44,4 @@ jobs:
           build_extra_args: "--target=dind --compress=true"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
-          push_image_and_stages: ${{ github.event.name == 'release' }}
+          push_image_and_stages: ${{ github.event_name == 'release' }}
