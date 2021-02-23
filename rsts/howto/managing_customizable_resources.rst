@@ -99,7 +99,7 @@ Execution queues themselves are currently defined in the
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
 stored in the Admin database.
 
-.. code-block:: bash
+.. prompt::
 
     flyte-cli -h localhost:30081 -p flyteexamples -d development update-execution-queue-attributes  \
     --tags critical --tags gpu_intensive
