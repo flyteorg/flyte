@@ -38,7 +38,7 @@ the root directory of the flytecli package, and install the dependencies with
 ``pip install -e .``.
 
 
-.. _doc: https://virtualenv.pypi.io/en/latest/installation/
+.. _doc: https://virtualenv.pypa.io/en/latest/installation.html
 
 Install from pypi [recommended]
 -------------------------------
