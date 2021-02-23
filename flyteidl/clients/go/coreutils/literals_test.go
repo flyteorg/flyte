@@ -1,3 +1,6 @@
+// extract_literal_test.go
+// Test class for the utility methods which construct flyte literals.
+
 package coreutils
 
 import (
@@ -5,8 +8,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/lyft/flytestdlib/storage"
+
+	"github.com/golang/protobuf/ptypes"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -54,6 +60,8 @@ func TestMakePrimitive(t *testing.T) {
 		j, err := ptypes.TimestampProto(v)
 		assert.NoError(t, err)
 		assert.Equal(t, j, p.GetDatetime())
+		_, err = MakePrimitive(time.Date(0, 0, 0, 0, 0, 0, 0, time.UTC))
+		assert.Error(t, err)
 	}
 	{
 		v := time.Second * 10
@@ -170,25 +178,31 @@ func TestMakeBinaryLiteral(t *testing.T) {
 }
 
 func TestMakeDefaultLiteralForType(t *testing.T) {
-
-	tests := [][]interface{}{
-		{"Integer", core.SimpleType_INTEGER, "*core.Primitive_Integer"},
-		{"Float", core.SimpleType_FLOAT, "*core.Primitive_FloatValue"},
-		{"String", core.SimpleType_STRING, "*core.Primitive_StringValue"},
-		{"Boolean", core.SimpleType_BOOLEAN, "*core.Primitive_Boolean"},
-		{"Duration", core.SimpleType_DURATION, "*core.Primitive_Duration"},
-		{"Datetime", core.SimpleType_DATETIME, "*core.Primitive_Datetime"},
+	type args struct {
+		name        string
+		ty          core.SimpleType
+		tyName      string
+		isPrimitive bool
 	}
-
-	for i := range tests {
-		name := tests[i][0].(string)
-		ty := tests[i][1].(core.SimpleType)
-		tyName := tests[i][2].(string)
-
-		t.Run(name, func(t *testing.T) {
-			l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{Simple: ty}})
+	tests := []args{
+		{"None", core.SimpleType_NONE, "*core.Scalar_NoneType", false},
+		{"Binary", core.SimpleType_BINARY, "*core.Scalar_Binary", false},
+		{"Integer", core.SimpleType_INTEGER, "*core.Primitive_Integer", true},
+		{"Float", core.SimpleType_FLOAT, "*core.Primitive_FloatValue", true},
+		{"String", core.SimpleType_STRING, "*core.Primitive_StringValue", true},
+		{"Boolean", core.SimpleType_BOOLEAN, "*core.Primitive_Boolean", true},
+		{"Duration", core.SimpleType_DURATION, "*core.Primitive_Duration", true},
+		{"Datetime", core.SimpleType_DATETIME, "*core.Primitive_Datetime", true},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{Simple: test.ty}})
 			assert.NoError(t, err)
-			assert.Equal(t, tyName, reflect.TypeOf(l.GetScalar().GetPrimitive().Value).String())
+			if test.isPrimitive {
+				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().GetPrimitive().Value).String())
+			} else {
+				assert.Equal(t, test.tyName, reflect.TypeOf(l.GetScalar().Value).String())
+			}
 		})
 	}
 
@@ -197,4 +211,156 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, []byte{'h'}, s.GetScalar().GetBinary().GetValue())
 	})
+
+	t.Run("Blob", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Blob{}})
+		assert.NoError(t, err)
+		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().Value).String())
+	})
+
+	t.Run("Collection", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_CollectionType{CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}})
+		assert.NoError(t, err)
+		assert.Equal(t, "*core.LiteralCollection", reflect.TypeOf(l.GetCollection()).String())
+	})
+
+	t.Run("Map", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_MapValueType{MapValueType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}})
+		assert.NoError(t, err)
+		assert.Equal(t, "*core.LiteralMap", reflect.TypeOf(l.GetMap()).String())
+	})
+
+	t.Run("error", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{
+			Simple: core.SimpleType_ERROR,
+		}})
+		assert.NoError(t, err)
+		assert.NotNil(t, l.GetScalar().GetError())
+	})
+
+	t.Run("struct", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Simple{
+			Simple: core.SimpleType_STRUCT,
+		}})
+		assert.NoError(t, err)
+		assert.NotNil(t, l.GetScalar().GetGeneric())
+	})
+}
+
+func TestMustMakeDefaultLiteralForType(t *testing.T) {
+	t.Run("error", func(t *testing.T) {
+		assert.Panics(t, func() {
+			MustMakeDefaultLiteralForType(nil)
+		})
+	})
+
+	t.Run("Blob", func(t *testing.T) {
+		l := MustMakeDefaultLiteralForType(&core.LiteralType{Type: &core.LiteralType_Blob{}})
+		assert.Equal(t, "*core.Scalar_Blob", reflect.TypeOf(l.GetScalar().Value).String())
+	})
+}
+
+func TestMakePrimitiveForType(t *testing.T) {
+	n := time.Now()
+	type args struct {
+		t core.SimpleType
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *core.Primitive
+		wantErr bool
+	}{
+		{"error-type", args{core.SimpleType_NONE, "x"}, nil, true},
+
+		{"error-int", args{core.SimpleType_INTEGER, "x"}, nil, true},
+		{"int", args{core.SimpleType_INTEGER, "1"}, MustMakePrimitive(1), false},
+
+		{"error-bool", args{core.SimpleType_BOOLEAN, "x"}, nil, true},
+		{"bool", args{core.SimpleType_BOOLEAN, "true"}, MustMakePrimitive(true), false},
+
+		{"error-float", args{core.SimpleType_FLOAT, "x"}, nil, true},
+		{"float", args{core.SimpleType_FLOAT, "3.1416"}, MustMakePrimitive(3.1416), false},
+
+		{"string", args{core.SimpleType_STRING, "string"}, MustMakePrimitive("string"), false},
+
+		{"error-dt", args{core.SimpleType_DATETIME, "x"}, nil, true},
+		{"dt", args{core.SimpleType_DATETIME, n.Format(time.RFC3339Nano)}, MustMakePrimitive(n), false},
+
+		{"error-dur", args{core.SimpleType_DURATION, "x"}, nil, true},
+		{"dur", args{core.SimpleType_DURATION, time.Hour.String()}, MustMakePrimitive(time.Hour), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := MakePrimitiveForType(tt.args.t, tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MakePrimitiveForType() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MakePrimitiveForType() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMakeLiteralForSimpleType(t *testing.T) {
+	type args struct {
+		t core.SimpleType
+		s string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *core.Literal
+		wantErr bool
+	}{
+		{"error-int", args{core.SimpleType_INTEGER, "x"}, nil, true},
+		{"int", args{core.SimpleType_INTEGER, "1"}, MustMakeLiteral(1), false},
+
+		{"error-struct", args{core.SimpleType_STRUCT, "x"}, nil, true},
+		{"struct", args{core.SimpleType_STRUCT, `{"x": 1}`}, MustMakeLiteral(&structpb.Struct{Fields: map[string]*structpb.Value{"x": {Kind: &structpb.Value_NumberValue{NumberValue: 1}}}}), false},
+
+		{"bin", args{core.SimpleType_BINARY, "x"}, MustMakeLiteral([]byte("x")), false},
+
+		{"error", args{core.SimpleType_ERROR, "err"}, MustMakeLiteral(&core.Error{Message: "err"}), false},
+
+		{"none", args{core.SimpleType_NONE, "null"}, MustMakeLiteral(nil), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := MakeLiteralForSimpleType(tt.args.t, tt.args.s)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MakeLiteralForSimpleType() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MakeLiteralForSimpleType() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMakeLiteralForBlob(t *testing.T) {
+	type args struct {
+		path   storage.DataReference
+		isDir  bool
+		format string
+	}
+	tests := []struct {
+		name string
+		args args
+		want *core.Blob
+	}{
+		{"simple-key", args{path: "/key", isDir: false, format: "xyz"}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_SINGLE}}}},
+		{"simple-dir", args{path: "/key", isDir: true, format: "xyz"}, &core.Blob{Uri: "/key", Metadata: &core.BlobMetadata{Type: &core.BlobType{Format: "xyz", Dimensionality: core.BlobType_MULTIPART}}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := MakeLiteralForBlob(tt.args.path, tt.args.isDir, tt.args.format); !reflect.DeepEqual(got.GetScalar().GetBlob(), tt.want) {
+				t.Errorf("MakeLiteralForBlob() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
