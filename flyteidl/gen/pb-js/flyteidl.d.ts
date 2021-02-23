@@ -4144,6 +4144,9 @@ export namespace flyteidl {
 
             /** TaskTemplate container */
             container?: (flyteidl.core.IContainer|null);
+
+            /** TaskTemplate taskTypeVersion */
+            taskTypeVersion?: (number|null);
         }
 
         /** Represents a TaskTemplate. */
@@ -4172,6 +4175,9 @@ export namespace flyteidl {
 
             /** TaskTemplate container. */
             public container?: (flyteidl.core.IContainer|null);
+
+            /** TaskTemplate taskTypeVersion. */
+            public taskTypeVersion: number;
 
             /** TaskTemplate target. */
             public target?: "container";

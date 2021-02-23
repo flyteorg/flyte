@@ -359,6 +359,8 @@ func (m *TaskTemplate) Validate() error {
 		}
 	}
 
+	// no validation rules for TaskTypeVersion
+
 	switch m.Target.(type) {
 
 	case *TaskTemplate_Container:
