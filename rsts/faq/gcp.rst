@@ -13,7 +13,9 @@ I tried to run examples, but task fails with 401 error?
      - More information about WorkloadIdentity at https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
  #. If you are just using a simple Nodepool wide permissions then check the cluster's ServiceACcount for Storage permissions. Do they look fine?
 
- #. If not, then start a dummy pod in the intended namespace and check for ::
+ #. If not, then start a dummy pod in the intended namespace and check for
+
+::
 
     gcloud auth list
 
