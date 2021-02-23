@@ -59,6 +59,95 @@ Flyte Admin Configuration
 =========================
 Please refer to the `inline documentation <https://github.com/lyft/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go>`_ on the ``Config`` object in the ``auth`` package for a discussion on the settings required.
 
+Example Configurations
+======================
+
+Common Configuration
+####################
+
+Flyte Admin secures cookies using AES encryption. In order to achieve that, follow the steps below:
+
+1. Generate secure cookie keys. Run this command to generate new keys:
+
+.. prompt:: bash
+
+ go test -v github.com/lyft/flyteadmin/pkg/auth -run TestSecureCookieLifecycle
+
+2. Create two secrets in the ``flyte`` namespace with the generated keys:
+
+.. prompt:: bash
+
+  kubectl create secret generic flyteadmin-cookie-blockkey -n flyte --from-literal=blockkey=<block key value>
+
+.. prompt:: bash
+
+  kubectl create secret generic flyteadmin-cookie-hashkey -n flyte --from-literal=hashkey=<hash key value>
+
+3. Configure FlyteAdmin deployment to mount them to FlyteAdmin pod.
+   e.g. Add the following to your existing configuration
+
+   .. code-block:: yaml
+
+     containers:
+        name: flyteadmin
+        volumeMounts:
+        - mountPath: /etc/secrets/oauth
+          name: oauth
+          readOnly: true
+        - mountPath: /etc/secrets/hashkey
+          name: hashkey
+          readOnly: true
+        - mountPath: /etc/secrets/blockkey
+          name: blockkey
+          readOnly: true
+      volumes:
+      - name: oauth
+        secret:
+          defaultMode: 420
+          secretName: flyteadmin-oauth-client
+      - name: hashkey
+        secret:
+          defaultMode: 420
+          secretName: flyteadmin-cookie-hashkey
+      - name: blockkey
+        secret:
+          defaultMode: 420
+          secretName: flyteadmin-cookie-blockkey
+
+Google IdP
+##########
+
+1. Follow `Google Docs <https://developers.google.com/identity/protocols/oauth2/openid-connect>`__ on how to configure the IdP for OpenIDConnect.
+
+2. Create a secret in the ``flyte`` namespace with the value of the client password.
+
+.. prompt:: bash
+
+  kubectl create secret generic -n flyte flyteadmin-oauth-client --from-literal=secret=<client secret>
+
+3. Configure Flyte Admin with the following configuration:
+
+.. code-block:: yaml
+
+  server:
+    security:
+      useAuth: true
+      oauth:
+        scopes:
+          - profile
+          - openid
+        claims:
+          iss: https://accounts.google.com
+          aud: <Client Id Generated in the previous step>
+        clientId: <Client Id Generated in the previous step>
+        clientSecretFile: "/etc/secrets/oauth/secret"
+        cookieHashKeyFile: "/etc/secrets/hashkey/hashkey"
+        cookieBlockKeyFile: "/etc/secrets/blockkey/blockkey"
+        authorizeUrl: "https://accounts.google.com/o/oauth2/v2/auth?access_type=offline"
+        tokenUrl: "https://oauth2.googleapis.com/token"
+        callbackUrl: "http://localhost:8088/callback"
+        redirectUrl: "/api/v1/projects"
+
 ******
 CI
 ******
