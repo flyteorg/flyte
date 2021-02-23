@@ -5,7 +5,7 @@
 A Helm chart for Flyte
 
 ### SANDBOX INSTALLATION:
-- Install `helm 3` realese version
+- Install `helm 3` release version
 - Generate `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
 - Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`

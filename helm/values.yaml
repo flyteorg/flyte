@@ -8,8 +8,8 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: docker.io/lyft/flyteadmin
-    tag: v0.3.7
+    repository: ghcr.io/lyft/flyteadmin
+    tag: v0.3.29
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -26,7 +26,7 @@ flyteadmin:
   # -- Service settings for Flyteadmin
   service:
     annotations:
-      contour.heptio.com/upstream-protocol.h2c: grpc
+      projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
   # -- Annotations for ServiceAccount attached to Flyteadmin pods
   serviceAccountAnnotations: {}
@@ -48,8 +48,8 @@ datacatalog:
   replicaCount: 1
   image:
     # -- Docker image for Datacatalog deployment
-    repository: docker.io/lyft/datacatalog
-    tag: v0.2.2
+    repository: ghcr.io/lyft/datacatalog
+    tag: v0.2.130
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -88,8 +88,8 @@ flytepropeller:
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
-    repository: docker.io/lyft/flytepropeller
-    tag: v0.4.2
+    repository: ghcr.io/flyteorg/flytepropeller
+    tag: v0.5.13
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -123,8 +123,8 @@ flyteconsole:
   replicaCount: 1
   image:
     # -- Docker image for Flyteconsole deployment
-    repository: docker.io/lyft/flyteconsole
-    tag: v0.12.1
+    repository: ghcr.io/lyft/flyteconsole
+    tag: v0.19.1
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -229,7 +229,7 @@ minio:
   image:
     # -- Docker image for Minio deployment
     repository: minio/minio
-    tag: RELEASE.2019-06-04T01-15-58Z
+    tag: RELEASE.2020-12-16T05-05-17Z
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Minio deployment
   resources:
@@ -262,11 +262,6 @@ contour:
   # -- Replicas count for Contour deployment
   replicaCount: 1
   contour:
-    image:
-      # -- Docker image for Contour
-      repository: gcr.io/heptio-images/contour
-      tag: v0.6.1
-      pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Contour
     resources:
       requests:
@@ -276,11 +271,6 @@ contour:
         cpu: 100m
         memory: 100Mi
   envoy:
-    image:
-      # -- Docker image for Envoy
-      repository: docker.io/envoyproxy/envoy-alpine
-      tag: v1.6.0
-      pullPolicy: IfNotPresent
     # -- Default resources requests and limits for Envoy
     resources:
       requests:
@@ -289,14 +279,6 @@ contour:
       limits:
         cpu: 100m
         memory: 100Mi
-  # -- Service settings for Contour
-  service:
-    annotations: {}
-    type: NodePort
-    ports:
-    - protocol: TCP
-      port: 80
-      nodePort: 30081
   # -- Annotations for ServiceAccount attached to Contour pods
   serviceAccountAnnotations: {}
   # -- Annotations for Contour pods
@@ -319,9 +301,7 @@ sparkoperator:
   replicaCount: 1
   image:
     # -- Docker image for Sparkoperator
-    repository: gcr.io/spark-operator/spark-operator
-    tag: v2.4.0-v1beta1-0.9.0
-    pullPolicy: IfNotPresent
+    tag: v1beta2-1.2.0-3.0.0 # Set to v1beta2-1.1.2-2.4.5 for Spark 2
   # -- Default resources requests and limits for Sparkoperator
   resources:
     limits:
@@ -330,20 +310,6 @@ sparkoperator:
     requests:
       cpu: 10m
       memory: 50M
-  # -- Service settings for Contour
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for ServiceAccount attached to Sparkoperator pods
-  serviceAccountAnnotations: {}
-  # -- Annotations for Sparkoperator pods
-  podAnnotations: {}
-  # -- nodeSelector for Sparkoperator deployment
-  nodeSelector: {}
-  # -- tolerations for Sparkoperator deployment
-  tolerations: []
-  # -- affinity for Sparkoperator deployment
-  affinity: {}
 
 #
 # PYTORCHOPERATOR SETTINGS
@@ -397,8 +363,8 @@ common:
     enabled: true
     annotations: {}
   flyteNamespaceTemplate:
-    # --- enable or disable creating Flyte namespace in template. Enable whem using helm as template-engine only. Disable when using `helm install ...`.
-    enabled: true
+    # --- enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
+    enabled: false
 
 #
 # CONFIGMAPS SETTINGS
@@ -545,7 +511,7 @@ configmap:
       k8s:
         co-pilot:
           name: flyte-copilot-
-          image: docker.io/lyft/flytecopilot:v0.3.35
+          image: ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
           start-timeout: 30s
 
   # Core propeller configuration
