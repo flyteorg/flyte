@@ -3,7 +3,7 @@ package logger
 import (
 	"context"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var defaultConfig

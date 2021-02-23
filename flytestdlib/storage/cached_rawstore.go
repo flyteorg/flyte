@@ -7,15 +7,15 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/errors"
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/coocood/freecache"
-	"github.com/lyft/flytestdlib/ioutils"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/ioutils"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const neverExpire = 0

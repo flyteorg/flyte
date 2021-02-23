@@ -6,12 +6,12 @@ import (
 	"io"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/lyft/flytestdlib/ioutils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/ioutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	errs "github.com/pkg/errors"
 )
 

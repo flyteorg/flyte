@@ -5,8 +5,8 @@ import (
 	"syscall"
 	"testing"
 
+	flyteerrors "github.com/flyteorg/flytestdlib/errors"
 	"github.com/graymeta/stow"
-	flyteerrors "github.com/lyft/flytestdlib/errors"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )

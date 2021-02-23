@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	random "github.com/lyft/flytestdlib/random"
+	random "github.com/flyteorg/flytestdlib/random"
 	mock "github.com/stretchr/testify/mock"
 )
 

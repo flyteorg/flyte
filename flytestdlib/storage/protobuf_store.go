@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/ioutils"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/ioutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/golang/protobuf/proto"

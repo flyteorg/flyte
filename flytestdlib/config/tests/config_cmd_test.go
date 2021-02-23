@@ -6,7 +6,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"

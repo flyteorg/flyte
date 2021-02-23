@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flytestdlib/version"
+	"github.com/flyteorg/flytestdlib/version"
 
-	"github.com/lyft/flytestdlib/internal/utils"
+	"github.com/flyteorg/flytestdlib/internal/utils"
 
 	"github.com/stretchr/testify/assert"
 )

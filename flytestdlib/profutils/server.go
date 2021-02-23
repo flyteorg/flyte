@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/version"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	// #nosec G108

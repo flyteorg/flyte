@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/internal/utils"
 	"github.com/ghodss/yaml"
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 

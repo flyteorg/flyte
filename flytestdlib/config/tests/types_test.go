@@ -3,8 +3,8 @@ package tests
 import (
 	"fmt"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/viper"
 	"github.com/spf13/pflag"
 )
 

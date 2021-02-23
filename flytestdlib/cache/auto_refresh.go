@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
+	"github.com/flyteorg/flytestdlib/promutils"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/wait"
 )

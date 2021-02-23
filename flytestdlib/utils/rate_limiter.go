@@ -3,7 +3,7 @@ package utils
 import (
 	"context"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 	"golang.org/x/time/rate"
 )
 

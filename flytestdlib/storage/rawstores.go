@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type dataStoreCreateFn func(cfg *Config, metricsScope promutils.Scope) (RawStore, error)

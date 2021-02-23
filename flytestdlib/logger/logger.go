@@ -7,7 +7,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
 
 	"fmt"
 	"runtime"
