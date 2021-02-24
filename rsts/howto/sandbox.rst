@@ -29,11 +29,11 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
 .. tabs::
 
-    .. tab:: Use flyte-sandbox docker image (Recommended)
+    .. tab:: Docker Image
 
         Refer to :ref:`flyte-tutorials-firstrun`
 
-    .. tab:: Using k3d
+    .. tab:: k3d
 
         #. Install k3d Using ``curl``::
 
@@ -71,7 +71,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
                Now connect to `locahost:8083 <localhost:8083>`__. If this does not work, then for sure the networking is impacted, please restart docker daemon.
 
-    .. tab:: Using Docker for Mac
+    .. tab:: Docker-Mac + K8s
 
         #. `Install Docker for mac with Kubernetes as explained here <https://www.docker.com/blog/docker-mac-kubernetes/>`_
         #. Make sure Kubernetes is started and once started make sure your kubectx is set to the `docker-desktop` cluster, typically ::
@@ -104,18 +104,11 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
             - If you are building an image locally and want to execute on Minikube hosted Flyte environment, please push the image to docker registry running on the Minikube VM.
             - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. https://minikube.sigs.k8s.io/docs/handbook/pushing/ provides more detailed information about this process. As a TL;DR, Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to a regisry that is available to Kuberentes. In case on minikube this registry is the one thats running on the VM.
 
-    .. tab:: Install Flyte in EKS/GKE etc
-
-        Refer to the :ref:`howto-sandbox-dedicated-k8s-cluster` guide.
-
-        Once you've deployed flyte sandbox to a cloud provider, read on below to run your first workflow remotely.
-
-
 
 .. _howto-sandbox-dedicated-k8s-cluster:
 
 ******************************************************************
-Deploy Flyte Sandbox environment to a dedicated kubernetes cluster
+Deploy Flyte Sandbox environment to a Cloud Kubernetes cluster
 ******************************************************************
 
 Cluster Requirements
