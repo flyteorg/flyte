@@ -20,7 +20,7 @@ Flyte is a production-grade, container-native, type-safe workflow and pipelines 
 [Documentation](https://docs.flyte.org/en/latest) |
 [Features](#features) |
 [Community & Resources](#community--resources) |
-[Changelogs](#changelogs) |
+[Changelogs](CHANGELOG/README.md) |
 [Components](#component-repos) 
 
 ---
@@ -150,11 +150,6 @@ Resources that would help you get a better understanding of Flyte.
 - [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
 - [Spotify](https://www.spotify.com/)
 - [USU Group](https://www.usu.com/)
-
-## Advanced POC's
-
-# Changelogs
-[Changelogs](CHANGELOG/README.md)
 
 # Component Repos 
 Repo | Language | Purpose | Status
