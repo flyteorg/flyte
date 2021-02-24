@@ -11,11 +11,19 @@
 ![Twitter Follow](https://img.shields.io/twitter/follow/flyteorg?label=Follow&style=social)
 [![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://forms.gle/UVuek9WfBoweiqcJA)
 
-Flyte is a container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for Python, Java and Scala.
+Flyte is a production-grade, container-native, type-safe workflow and pipelines platform optimized for large scale processing and machine learning written in Golang. Workflows can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
 
-# Homepage
-- [flyte.org](https://flyte.org)
-- [Docs](https://flyte.readthedocs.io/en/latest/)
+---
+
+[HomePage](https://flyte.org) |
+[Quickstart](#quickstart) |
+[Documentation](https://docs.flyte.org/en/latest) |
+[Features](#features) |
+[Community & Resources](#community--resources) |
+[Changelogs](#changelogs) |
+[Components](#component-repos) 
+
+---
 
 # Introduction
 Flyte is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
@@ -25,15 +33,28 @@ Flyte is more than a workflow engine, it provides workflows as a core concepts, 
 producer-consumer order creates a workflow. Flyte workflows are pure specification and can be created using any language. Every task can also by any language. We do provide first class support for
 python, making it perfect for modern Machine Learning and Data processing pipelines.
 
-# Resources
+# QuickStart
+With [docker installed](https://docs.docker.com/get-docker/), run this command:
+
+```bash
+  docker run --rm --privileged -p 30081:30081 -p 30084:30084 ghcr.io/flyteorg/flyte-sandbox
+```
+
+This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: ``Flyte is ready! Flyte UI is available at http://localhost:30081/console``. Go ahead and visit http://localhost:30081/console.
+A quick visual tour of the console
+    
+![Flyte console Example](https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif)
+
+# Community & Resources
 Resources that would help you get a better understanding of Flyte.
 
-# Communication channels
+## Communication channels
 - [Slack Org](https://forms.gle/UVuek9WfBoweiqcJA)
 - [Email list](https://groups.google.com/a/flyte.org/g/users)
 
-# Biweekly Community Sync
-- Starting April 21 2020, the Flyte community meets every other Tuesday at 9:00 AM PST (US West coast time).
+## Biweekly Community Sync
+- 📣  Next Flyte OSS Community Sync March 9th, 9am-10am PDT ([convert to your local time](https://greenwichmeantime.com/time/to/pacific-local/))
+
 - You can join the [zoom link]( https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
 - Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
 - Demo Signup [Sheet](https://docs.google.com/spreadsheets/d/1Bz-s3SpMm1hGl6Z5y3HcxrNBcg9ZhSgqVgmCxK_eEhs/edit#gid=0)
@@ -93,30 +114,33 @@ Resources that would help you get a better understanding of Flyte.
  - Snappy Console
  - Python CLI
  - Written in Golang and optimized for performance of large running jobs
-
-## In Progress
  - Golang CLI - flytectl
 
-## Coming Soon
- - Reactive pipelines
+## Inprogress
  - Grafana templates (user/system observability)
- - More integrations
-
+ - helm chart for Flyte
+ - Performance optimization
+ - Flink-K8s
+ 
 # Available Plugins
  - Containers
  - K8s Pods
  - AWS Batch Arrays
  - K8s Pod arrays
  - K8s Spark (native pyspark and java/scala)
+ - AWS Athena
  - Qubole Hive
  - Presto Queries
  - Distributed Pytorch (K8s Native) - Pytorch Operator
  - Sagemaker (builtin algorithms & custom models)
  - Distributed Tensorflow (K8s Native) - TFOperator
  - Papermill Notebook execution (python and spark)
+ - Type safe and data checking for Pandas dataframe using Pandera
+ 
+## Coming Soon
+ - Reactive pipelines
+ - More integrations
 
-## Coming soon
- - Flink-K8s
 
 # Current Usage 
 - [Freenome](https://www.freenome.com/)
@@ -125,9 +149,10 @@ Resources that would help you get a better understanding of Flyte.
 - [Spotify](https://www.spotify.com/)
 - [USU Group](https://www.usu.com/)
 
+## Advanced POC's
+
 # Changelogs
 [Changelogs](CHANGELOG/README.md)
-
 
 # Component Repos 
 Repo | Language | Purpose | Status
