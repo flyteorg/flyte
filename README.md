@@ -55,7 +55,7 @@ Resources that would help you get a better understanding of Flyte.
 - [Email list](https://groups.google.com/a/flyte.org/g/users)
 
 ## Biweekly Community Sync
-- 📣  Next Flyte OSS Community Sync March 9th, 9am-10am PDT ([convert to your local time](https://greenwichmeantime.com/time/to/pacific-local/))
+- 📣  Flyte OSS Community Sync Every alternate Tuesday, 9am-10am PDT ([Checkout the events calendar & subscribe](https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles)
 
 - You can join the [zoom link]( https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
 - Meeting notes are captured in [Doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)
