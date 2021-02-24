@@ -20,7 +20,7 @@ Flyte is a production-grade, container-native, type-safe workflow and pipelines 
 [Documentation](https://docs.flyte.org/en/latest) |
 [Features](#features) |
 [Community & Resources](#community--resources) |
-[Changelogs](CHANGELOG/README.md) |
+[Changelogs](CHANGELOG/) |
 [Components](#component-repos) 
 
 ---
