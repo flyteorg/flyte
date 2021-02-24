@@ -25,7 +25,7 @@ Please see the :ref:`divedeep-projects` document for more information on project
 - Determining how workflow executions get assigned to clusters in a multi-cluster Flyte deployment.
 
 The proto definition is the definitive source of which
-`matchable attributes <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`_
+`matchable attributes <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`_
 can be customized.
 
 Each of the four above settings are discussed below. Eventually all of these customizations will be overridable using
@@ -44,7 +44,7 @@ This includes setting default value for task resource requests and limits for th
 - storage
 
 In the absence of an override the global
-`default values <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L124,L134>`__
+`default values <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L124,L134>`__
 in the flyteadmin config are used.
 
 The override values from the database are assigned at execution time.
@@ -62,9 +62,9 @@ To update individual project-domain attributes, use the following as an example:
 Cluster Resources
 =================
 
-These are free-form key-value pairs which are used when filling in the templates that Admin feeds into its cluster manager. The keys represent templatized variables in `clusterresource template yaml <https://github.com/lyft/flyteadmin/tree/master/sampleresourcetemplates>`__ and the values are what you want to see filled in.
+These are free-form key-value pairs which are used when filling in the templates that Admin feeds into its cluster manager. The keys represent templatized variables in `clusterresource template yaml <https://github.com/flyteorg/flyteadmin/tree/master/sampleresourcetemplates>`__ and the values are what you want to see filled in.
 
-In the absence of custom override values, templateData from the `flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159>`__ is used as a default.
+In the absence of custom override values, templateData from the `flyteadmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L154,L159>`__ is used as a default.
 
 Note that these settings can only take on domain, or a project and domain specificity. Since Flyte has not tied in the notion of a workflow or a launch plan to any Kubernetes constructs, specifying a workflow or launch plan name doesn't make any sense.
 
@@ -83,6 +83,18 @@ These values will in turn be used to fill in the template fields, for example:
 from the base of this repository for the ``flyteexamples-development`` namespace and that namespace only.
 For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/c9b9fad428e32255b6839e3244ca8f09d57536ae/kustomize/base/single_cluster/headless/config/admin/cluster_resources.yaml>`__ would still be applied.
 
+=======
+
+    flyte-cli -h localhost:30081 -p flyteexamples -d development update-cluster-resource-attributes  \
+    --attributes projectQuotaCpu 1000 --attributes projectQuotaMemory 5000Gi
+
+
+These values will in turn be used to fill in the template fields, for example:
+
+.. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml
+
+from the base of this repository for the ``flyteexamples-development`` namespace and that namespace only.
+For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/c9b9fad428e32255b6839e3244ca8f09d57536ae/kustomize/base/single_cluster/headless/config/admin/cluster_resources.yaml>`__ would still be applied.
 
 .. note::
 
@@ -96,7 +108,7 @@ Execution Queues
 Execution queues are use to determine where tasks yielded by a dynamic :py:func:`flytekit:flytekit.maptask` run.
 
 Execution queues themselves are currently defined in the
-`flyteadmin config <https://github.com/lyft/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
+`flyteadmin config <https://github.com/flyteorg/flyteadmin/blob/6a64f00315f8ffeb0472ae96cbc2031b338c5840/flyteadmin_config.yaml#L97,L106>`__.
 
 The **attributes** associated with an execution queue must match the **tags** for workflow executions. The tags are associated with configurable resources
 stored in the Admin database.
@@ -160,11 +172,11 @@ All other inbound CreateExecution requests would use the default values specifie
 Debugging
 *********
 
-Use the `get <https://github.com/lyft/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/service/admin.proto#L395>`__ endpoint
+Use the `get <https://github.com/flyteorg/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/service/admin.proto#L395>`__ endpoint
 to see if overrides exist for a specific resource.
 
 E.g. `https://example.com/api/v1/project_domain_attributes/widgetmodels/production?resource_type=2 <https://example.com/api/v1/project_domain_attributes/widgetmodels/production?resource_type=2>`__
 
 To get the global state of the world, use the list all endpoint, e.g. `https://example.com/api/v1/matchable_attributes?resource_type=2 <https://example.com/api/v1/matchable_attributes?resource_type=2>`__.
 
-The resource type enum (int) is defined in the `proto <https://github.com/lyft/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/admin/matchable_resource.proto#L8,L20>`__.
+The resource type enum (int) is defined in the `proto <https://github.com/flyteorg/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/admin/matchable_resource.proto#L8,L20>`__.
