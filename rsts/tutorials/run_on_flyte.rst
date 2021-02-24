@@ -11,71 +11,16 @@ Installing Flyte Locally
 This guide will walk you through a quick installation of Flyte on your laptop and then how to register and execute your
 workflows against this deployment. (The tabs below have an option to install Flyte on a cloud provider as well)
 
-.. rubric:: Estimated time to complete: 5 minutes.
+.. rubric:: Estimated time to complete: 1 minutes.
 
 Prerequisites
 =============
 
-#. Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
+Make Sure you have followed :ref:`flyte-tutorials-firstrun` and have a running docker container and can access FlyteConsole on http://localhost:30081/console.
 
-    brew install kubectl
+.. tip:: To check if your flyte-sandbox container is running you can run ``docker ps`` and it should show image ``ghcr.io/flyteorg/flyte-sandbox `` running
 
-#. If running locally ensure you have docker installed - as explained `here <https://docs.docker.com/get-docker/>`_
-#. If you prefer to run the Flyte test cluster on a cloud environment like `AWS EKS <https://aws.amazon.com/eks/>`_, `Google GKE <https://cloud.google.com/kubernetes-engine>`__, then follow the instructions in a tab below. The rest of it is mostly the same.
-
-Steps
-======
-
-.. tabs::
-
-    .. tab:: Using k3d
-
-        #. Install k3d Using ``curl``::
-
-            curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
-
-           Or Using ``wget`` ::
-
-            wget -q -O - https://raw.githubusercontent.com/rancher/k3d/main/install.sh | bash
-
-        #. Start a new K3s cluster called flyte::
-
-            k3d cluster create -p "30081:30081" --no-lb --k3s-server-arg '--no-deploy=traefik' --k3s-server-arg '--no-deploy=servicelb' flyte
-
-        #. Ensure the context is set to the new cluster::
-
-            kubectl config set-context flyte
-
-        #. Install Flyte::
-
-            kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
-
-
-        #. Connect to `FlyteConsole <localhost:30081/console>`__
-        #. [Optional] You can delete the cluster once you are done with the tutorial using - ::
-
-            k3d cluster delete flyte
-
-
-        .. note::
-
-            #. Sometimes Flyteconsole will not open up. This is probably because your docker networking is impacted. One solution is to restart docker and re-do the previous steps.
-            #. To debug you can try a simple excercise - run nginx as follows::
-
-                docker run -it --rm -p 8083:80 nginx
-
-               Now connect to `locahost:8083 <localhost:8083>`__. If this does not work, then for sure the networking is impacted, please restart docker daemon.
-
-    .. tab:: Using Docker for Mac
-
-        Coming soon
-
-    .. tab:: Install Flyte in EKS/GKE etc
-
-        Refer to the :ref:`howto-sandbox-dedicated-k8s-cluster` guide.
-
-        Once you've deployed flyte sandbox to a cloud provider, read on below to run your first workflow remotely.
-
+.. tip:: If you prefer using k3d, Minikube, docker for mac, or a hosted Kubernetes cluster like AWS-EKS, GCP-GKE, Azure Kubernetes refer to :ref:`howto-sandbox`. It is recommended that you use a simple Docker based approach when you are first getting started with Flyte.
 
 .. _tutorials-run-flyte-laptop:
 
@@ -85,14 +30,7 @@ Running your Flyte Workflows
 
 Registration
 ============
-
-Set-up
-------
-
-In a separate process, port-forward the flyte minio service. If you're using a locally deployed Flyte sandbox, simply: ::
-
-  kubectl -n flyte port-forward service/minio 9000
-
+Registration is the process of shipping your code to Flyte backend. This creates an immutable, versioned record of your code with FlyteAdmin service.
 
 Register your workflows
 -----------------------
@@ -100,10 +38,11 @@ Register your workflows
 From within root directory of ``flyteexamples`` you created :ref:`previously <tutorials-getting-started-first-example>`
 feel free to make any changes and then register ::
 
-  FLYTE_AWS_ENDPOINT=http://localhost:9000 FLYTE_AWS_ACCESS_KEY_ID=minio  \
-    FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage make fast_register
+  FLYTE_AWS_ENDPOINT=http://localhost:30084/ FLYTE_AWS_ACCESS_KEY_ID=minio \
+  FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage make fast_register
 
-If you're port-forwarding minio somewhere else, substitute the ``FLYTE_AWS_ENDPOINT`` accordingly.
+
+.. tip:: Flyte sandbox uses minio as a substitue for S3/GCS etc, in the first command we port-forwarded it to 30084. If you use s3/gcs or a different port-forward you can drop or change ``FLYTE_AWS_ENDPOINT`` accordingly.
 
 .. rubric:: Boom! It's that simple.
 
