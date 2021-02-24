@@ -83,6 +83,19 @@ These values will in turn be used to fill in the template fields, for example:
 from the base of this repository for the ``flyteexamples-development`` namespace and that namespace only.
 For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/c9b9fad428e32255b6839e3244ca8f09d57536ae/kustomize/base/single_cluster/headless/config/admin/cluster_resources.yaml>`__ would still be applied.
 
+=======
+
+    flyte-cli -h localhost:30081 -p flyteexamples -d development update-cluster-resource-attributes  \
+    --attributes projectQuotaCpu 1000 --attributes projectQuotaMemory 5000Gi
+
+
+These values will in turn be used to fill in the template fields, for example:
+
+.. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml
+
+from the base of this repository for the ``flyteexamples-development`` namespace and that namespace only.
+For other namespaces, the `platform defaults <https://github.com/flyteorg/flyte/blob/c9b9fad428e32255b6839e3244ca8f09d57536ae/kustomize/base/single_cluster/headless/config/admin/cluster_resources.yaml>`__ would still be applied.
+
 .. note::
 
     The template values, e.g. ``projectQuotaCpu`` or ``projectQuotaMemory`` are freeform strings. You must ensure that
