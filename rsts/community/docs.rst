@@ -102,9 +102,9 @@ Here are some examples, first the code and then the link
 
 .. code-block:: text
 
-    Task: :std:doc:`flytekit:tasks`
+    Task: :std:doc:`generated/flytekit.task`
 
-Task: :std:doc:`flytekit:tasks`
+Task: :std:doc:`generated/flytekit.task`
 
 -----
 
