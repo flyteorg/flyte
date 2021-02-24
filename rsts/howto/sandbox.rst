@@ -54,7 +54,7 @@ Flyte configuration on your remote cluster.
 
 #. The Flyte sandbox can be deployed with a single command ::
 
-    kubectl create -f https://raw.githubusercontent.com/lyft/flyte/master/deployment/sandbox/flyte_generated.yaml
+    kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
 
 
 #. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows::

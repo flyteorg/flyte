@@ -6,7 +6,7 @@ FlyteAdmin Service Background
 
 Entities
 ========
-The `admin service definition <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/service/admin.proto>`__ defines REST operations for the entities
+The `admin service definition <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/service/admin.proto>`__ defines REST operations for the entities
 flyteadmin administers.
 
 As a refresher, the primary :ref:`entities <divedeep>` across Flyte map similarly to FlyteAdmin entities.
@@ -26,20 +26,20 @@ Permitted operations:
 - Get
 - List
 
-The above are designated by an `identifier <https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/core/identifier.proto#L16>`_
+The above are designated by an `identifier <https://github.com/flyteorg/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/core/identifier.proto#L16>`_
 which consists of a project, domain, name and version specification. These entities are for the most part immutable. To update one of these specific entities, the updated
 version must be reregistered with a unique and new version identifier attribute.
 
-One caveat is that launch plan state can toggle between `ACTIVE or INACTIVE <https://github.com/lyft/flyteidl/blob/6b8e34af67cbd06d2f20a6f7462e12c7f0d34f3b/protos/flyteidl/admin/launch_plan.proto#L33>`_.
+One caveat is that launch plan state can toggle between `ACTIVE or INACTIVE <https://github.com/flyteorg/flyteidl/blob/6b8e34af67cbd06d2f20a6f7462e12c7f0d34f3b/protos/flyteidl/admin/launch_plan.proto#L33>`_.
 At most one launch plan version across a shared project, domain and name specification can be active at a time. The state affects scheduled launch plans only.
 An inactive launch plan can still be used to launch individual executions. However, only an active launch plan runs on a schedule (if it has a schedule defined).
 
 
 Static entities metadata (Named Entities)
 +++++++++++++++++++++++++++++++++++++++++
-A `named entity <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L45>`__ includes metadata for one of the above entities
+A `named entity <https://github.com/flyteorg/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L45>`__ includes metadata for one of the above entities
 (workflow, task or launch plan) across versions. A named entity includes a resource type (workflow, task or launch plan) and an
-`id <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L12>`__ which is composed of project, domain and name.
+`id <https://github.com/flyteorg/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L12>`__ which is composed of project, domain and name.
 A named entity also includes metadata, which are mutable attributes about the referenced entity.
 
 This metadata includes:
@@ -72,7 +72,7 @@ Permitted operations:
 
 After an execution begins, flyte propeller monitors the execution and sends events which admin uses to update the above executions. 
 
-These `events <https://github.com/lyft/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/event/event.proto>`_ include
+These `events <https://github.com/flyteorg/flyteidl/blob/793b09d190148236f41ad8160b5cec9a3325c16f/protos/flyteidl/event/event.proto>`_ include
 
 - WorkflowExecutionEvent
 - NodeExecutionEvent
@@ -174,11 +174,11 @@ Filterable fields vary based on entity types:
   - updated_at	
   - workflows.{any workflow field above} (for example: workflow.domain)	
   - state (you must use the integer enum e.g. 1)	
-     - States are defined in `launch_plan.proto <https://github.com/lyft/flyteidl/blob/2c17791170ece1cced3e96daa08ea2692efe3d07/protos/flyteidl/admin/launch_plan.proto#L23>`_.	
+     - States are defined in `launch_plan.proto <https://github.com/flyteorg/flyteidl/blob/2c17791170ece1cced3e96daa08ea2692efe3d07/protos/flyteidl/admin/launch_plan.proto#L23>`_.	
 - Named Entity Metadata
 
   - state (you must use the integer enum e.g. 1)	
-     - States are defined in `common.proto <https://github.com/lyft/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L25>`_.
+     - States are defined in `common.proto <https://github.com/flyteorg/flyteidl/blob/c12816cf3f0bde54a67fa77e71c0158a64151ea3/protos/flyteidl/admin/common.proto#L25>`_.
 - Executions (Workflow executions)	
 
   - project	
@@ -187,12 +187,12 @@ Filterable fields vary based on entity types:
   - workflow.{any workflow field above} (for example: workflow.domain)	
   - launch_plan.{any launch plan field above} (for example: launch_plan.name)	
   - phase (you must use the upper-cased string name e.g. RUNNING)	
-     - Phases are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L11,L21>`__.
+     - Phases are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L11,L21>`__.
   - execution_created_at	
   - execution_updated_at	
   - duration (in seconds)	
   - mode (you must use the integer enum e.g. 1)	
-     - Modes are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96>`__.
+     - Modes are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96>`__.
   - user (authenticated user or role from flytekit config)
 
 - Node Executions	
@@ -200,7 +200,7 @@ Filterable fields vary based on entity types:
   - node_id	
   - execution.{any execution field above} (for example: execution.domain)	
   - phase (you must use the upper-cased string name e.g. QUEUED)	
-     - Phases are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L26,L36>`__.	
+     - Phases are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L26,L36>`__.	
   - started_at	
   - node_execution_created_at	
   - node_execution_updated_at	
@@ -212,7 +212,7 @@ Filterable fields vary based on entity types:
   - execution.{any execution field above} (for example: execution.domain)	
   - node_execution.{any node execution field above} (for example: node_execution.phase)	
   - phase (you must use the upper-cased string name e.g. SUCCEEDED)	
-     - Phases are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L42,L49>`__.	
+     - Phases are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L42,L49>`__.	
   - started_at	
   - task_execution_created_at	
   - task_execution_updated_at	
@@ -268,7 +268,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - created_at	
   - updated_at	
   - state (you must use the integer enum e.g. 1)	
-     - States are defined in `launch_plan.proto <https://github.com/lyft/flyteidl/blob/2c17791170ece1cced3e96daa08ea2692efe3d07/protos/flyteidl/admin/launch_plan.proto#L23>`_.	
+     - States are defined in `launch_plan.proto <https://github.com/flyteorg/flyteidl/blob/2c17791170ece1cced3e96daa08ea2692efe3d07/protos/flyteidl/admin/launch_plan.proto#L23>`_.	
 - ListWorkflowIds	
 
   - project	
@@ -279,18 +279,18 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
   - domain	
   - name	
   - phase (you must use the upper-cased string name e.g. RUNNING)	
-     - Phases are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L11,L21>`__.	
+     - Phases are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L11,L21>`__.	
   - execution_created_at	
   - execution_updated_at	
   - duration (in seconds)	
   - mode (you must use the integer enum e.g. 1)	
-     - Modes are defined `execution.proto <https://github.com/lyft/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96>`__.	
+     - Modes are defined `execution.proto <https://github.com/flyteorg/flyteidl/blob/182eeb9e1d0f2369e479a981f30cb51c2d7a0672/protos/flyteidl/admin/execution.proto#L96>`__.	
 - ListNodeExecutions	
 
   - node_id	
   - retry_attempt	
   - phase (you must use the upper-cased string name e.g. QUEUED)	
-     - Phases are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L26,L36>`__.
+     - Phases are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L26,L36>`__.
   - started_at	
   - node_execution_created_at	
   - node_execution_updated_at	
@@ -299,7 +299,7 @@ Only a subset of fields are supported for sorting list queries. The explicit lis
 
   - retry_attempt	
   - phase (you must use the upper-cased string name e.g. SUCCEEDED)	
-     - Phases are defined in `execution.proto <https://github.com/lyft/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L42,L49>`__.
+     - Phases are defined in `execution.proto <https://github.com/flyteorg/flyteidl/blob/223537e15e05bc6925403a8c11c5a09d91008a80/protos/flyteidl/core/execution.proto#L42,L49>`__.
   - started_at	
   - task_execution_created_at	
   - task_execution_updated_at	

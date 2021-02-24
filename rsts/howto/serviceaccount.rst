@@ -1,4 +1,4 @@
-. _howto_serviceaccounts:
+.. _howto-serviceaccounts:
 
 ######################################################################
 How do I use Kubernetes ServiceAccounts to access my cloud resources?
