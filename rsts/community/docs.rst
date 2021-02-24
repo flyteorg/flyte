@@ -102,17 +102,17 @@ Here are some examples, first the code and then the link
 
 .. code-block:: text
 
-    Task: :std:doc:`flytekit:tasks`
+    Task: :std:doc:`generated/flytekit.task`
 
-Task: :std:doc:`flytekit:tasks`
+Task: :std:doc:`generated/flytekit.task`
 
 -----
 
 .. code-block:: text
 
-    :std:doc:`Using custom words<flytekit:tasks>`
+    :std:doc:`Using custom words <generated/flytekit.task>`
 
-:std:doc:`Using custom words<flytekit:tasks>`
+:std:doc:`Using custom words <generated/flytekit.task>`
 
 Python
 ^^^^^^^
