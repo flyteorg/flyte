@@ -33,8 +33,8 @@ def square(n: int) -> int:
 
 
 # %%
-# In the above example, calling `square(n=2)` twice (even if it's across different executions or different workflows), will only actually execution the multiplication operation once. The second time the output will be made
-# available immediately.
+# In the above example, calling `square(n=2)` twice (even if it's across # different executions or different workflows), will only actually execute the multiplication operation once. The second time the output will be made
+# available immediately - (captured from the previous execution with the same inputs)
 
 # %%
 # If, in a subsequent code update, we update the signature of the task to return the original number along with the result, it'll automatically invalidate the cache (even though the cache version remains the same). ::
