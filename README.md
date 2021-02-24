@@ -45,6 +45,8 @@ A quick visual tour of the console
     
 ![Flyte console Example](https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif)
 
+Refer to [Docs - Getting Started](https://docs.flyte.org/en/latest/index.html) for complete end to end example.
+
 # Community & Resources
 Resources that would help you get a better understanding of Flyte.
 
