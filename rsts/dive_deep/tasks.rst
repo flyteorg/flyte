@@ -59,7 +59,7 @@ Types
 -----
 Since it's impossible to define the unit of execution of a task the same way for all kinds of tasks, Flyte allows different task
 types in the system. Flyte comes with a set of defined, battle tested task types but also allows for a very flexible model to
-introducing new :ref:`howto-create-plugins`.
+introducing new :ref:`plugins_extend_intro`.
 
 Fault tolerance
 ---------------
