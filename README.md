@@ -17,7 +17,7 @@ Flyte is a production-grade, container-native, type-safe workflow and pipelines 
 
 [HomePage](https://flyte.org) |
 [Quickstart](#quickstart) |
-[Documentation](https://docs.flyte.org/en/latest) |
+[Documentation](https://docs.flyte.org/) |
 [Features](#features) |
 [Community & Resources](#community--resources) |
 [Changelogs](CHANGELOG/) |
@@ -206,5 +206,4 @@ Thank you to the community for making Flyte possible.
  - [@vsbus](https://github.com/vsbus)
  - [@catalinii](https://github.com/catalinii)
  - [@kumare3](https://github.com/kumare3)
-
 
