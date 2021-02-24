@@ -26,8 +26,12 @@ export const UserInformation: React.FC<{}> = () => {
                 {profile.value == null ? (
                     <LoginLink />
                 ) : (
-                    profile.value.preferredUsername
-                )}
+                        profile.value.preferredUsername == null || profile.value.preferredUsername == "" ? (
+                            profile.value.name
+                        ) : (
+                                profile.value.preferredUsername
+                            )
+                    )}
             </div>
         </WaitForData>
     );
