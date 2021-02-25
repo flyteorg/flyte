@@ -19,7 +19,7 @@ Retrieves task by name within project and domain.
 
 ::
 
- bin/flytectl task -p flytesnacks -d development square
+ bin/flytectl task -p flytesnacks -d development core.basic.lp.greet
 
 Retrieves project by filters.
 ::

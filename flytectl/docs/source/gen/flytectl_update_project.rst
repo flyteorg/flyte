@@ -20,7 +20,7 @@ Archives project named flytesnacks.
 
 ::
 
- bin/flytectl get project flytesnacks --archiveProject
+ bin/flytectl update project -p flytesnacks --archiveProject
 
 Activates project named flytesnacks using short option -t.
 ::
