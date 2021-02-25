@@ -24,7 +24,7 @@ Retrieves launch plan by name within project and domain.
 
 ::
 
- bin/flytectl launchplan -p flytesnacks -d development recipes.core.basic.lp.my_wf
+ bin/flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
 
 Retrieves launchplan by filters.
 ::

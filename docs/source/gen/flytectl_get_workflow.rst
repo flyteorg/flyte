@@ -19,7 +19,7 @@ Retrieves workflow by name within project and domain.
 
 ::
 
- bin/flytectl workflow -p flytesnacks -d development  recipes.plugins.k8s_spark.pyspark_pi.my_spark
+ bin/flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet
 
 Retrieves workflow by filters. 
 ::
