@@ -82,6 +82,7 @@ Flyte Admin secures cookies using AES encryption. In order to achieve that, foll
 .. prompt:: bash
 
   kubectl create secret generic flyteadmin-cookie-hashkey -n flyte --from-literal=hashkey=<hash key value>
+  kubectl create secret generic flytepropeller-oauth -n flyte --from-literal=secret=5aATwGcDZmFd3n0mLDbuR1uA
 
 3. Configure FlyteAdmin deployment to mount them to FlyteAdmin pod.
    e.g. Add the following to your existing configuration
