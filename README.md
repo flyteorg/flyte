@@ -1,7 +1,8 @@
 ![Flyte Logo](rsts/images/flyte_lockup_gradient_on_light.png "Flyte Logo")
 
 [![Current Release](https://img.shields.io/github/release/lyft/flyte.svg)](https://github.com/lyft/flyte/releases/latest)
-[![Build Status](https://travis-ci.org/lyft/flyte.svg?branch=master)](https://travis-ci.org/lyft/flyte)
+[![Sandbox Build](https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml/badge.svg)](https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml)
+[![End to End tests](https://github.com/flyteorg/flyte/actions/workflows/tests.yml/badge.svg)](https://github.com/flyteorg/flyte/actions/workflows/tests.yml)
 [![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic)
 ![Commit since last release](https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic)
