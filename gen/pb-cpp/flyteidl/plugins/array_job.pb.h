@@ -97,6 +97,12 @@ class ArrayJob final :
   }
   static const ArrayJob& default_instance();
 
+  enum SuccessCriteriaCase {
+    kMinSuccesses = 3,
+    kMinSuccessRatio = 4,
+    SUCCESS_CRITERIA_NOT_SET = 0,
+  };
+
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const ArrayJob* internal_default_instance() {
     return reinterpret_cast<const ArrayJob*>(
@@ -173,20 +179,45 @@ class ArrayJob final :
   void set_size(::google::protobuf::int64 value);
 
   // int64 min_successes = 3;
+  private:
+  bool has_min_successes() const;
+  public:
   void clear_min_successes();
   static const int kMinSuccessesFieldNumber = 3;
   ::google::protobuf::int64 min_successes() const;
   void set_min_successes(::google::protobuf::int64 value);
 
+  // float min_success_ratio = 4;
+  private:
+  bool has_min_success_ratio() const;
+  public:
+  void clear_min_success_ratio();
+  static const int kMinSuccessRatioFieldNumber = 4;
+  float min_success_ratio() const;
+  void set_min_success_ratio(float value);
+
+  void clear_success_criteria();
+  SuccessCriteriaCase success_criteria_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.ArrayJob)
  private:
   class HasBitSetters;
+  void set_has_min_successes();
+  void set_has_min_success_ratio();
+
+  inline bool has_success_criteria() const;
+  inline void clear_has_success_criteria();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::int64 parallelism_;
   ::google::protobuf::int64 size_;
-  ::google::protobuf::int64 min_successes_;
+  union SuccessCriteriaUnion {
+    SuccessCriteriaUnion() {}
+    ::google::protobuf::int64 min_successes_;
+    float min_success_ratio_;
+  } success_criteria_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_flyteidl_2fplugins_2farray_5fjob_2eproto;
 };
 // ===================================================================
@@ -229,19 +260,72 @@ inline void ArrayJob::set_size(::google::protobuf::int64 value) {
 }
 
 // int64 min_successes = 3;
+inline bool ArrayJob::has_min_successes() const {
+  return success_criteria_case() == kMinSuccesses;
+}
+inline void ArrayJob::set_has_min_successes() {
+  _oneof_case_[0] = kMinSuccesses;
+}
 inline void ArrayJob::clear_min_successes() {
-  min_successes_ = PROTOBUF_LONGLONG(0);
+  if (has_min_successes()) {
+    success_criteria_.min_successes_ = PROTOBUF_LONGLONG(0);
+    clear_has_success_criteria();
+  }
 }
 inline ::google::protobuf::int64 ArrayJob::min_successes() const {
   // @@protoc_insertion_point(field_get:flyteidl.plugins.ArrayJob.min_successes)
-  return min_successes_;
+  if (has_min_successes()) {
+    return success_criteria_.min_successes_;
+  }
+  return PROTOBUF_LONGLONG(0);
 }
 inline void ArrayJob::set_min_successes(::google::protobuf::int64 value) {
-  
-  min_successes_ = value;
+  if (!has_min_successes()) {
+    clear_success_criteria();
+    set_has_min_successes();
+  }
+  success_criteria_.min_successes_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.plugins.ArrayJob.min_successes)
 }
 
+// float min_success_ratio = 4;
+inline bool ArrayJob::has_min_success_ratio() const {
+  return success_criteria_case() == kMinSuccessRatio;
+}
+inline void ArrayJob::set_has_min_success_ratio() {
+  _oneof_case_[0] = kMinSuccessRatio;
+}
+inline void ArrayJob::clear_min_success_ratio() {
+  if (has_min_success_ratio()) {
+    success_criteria_.min_success_ratio_ = 0;
+    clear_has_success_criteria();
+  }
+}
+inline float ArrayJob::min_success_ratio() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.ArrayJob.min_success_ratio)
+  if (has_min_success_ratio()) {
+    return success_criteria_.min_success_ratio_;
+  }
+  return 0;
+}
+inline void ArrayJob::set_min_success_ratio(float value) {
+  if (!has_min_success_ratio()) {
+    clear_success_criteria();
+    set_has_min_success_ratio();
+  }
+  success_criteria_.min_success_ratio_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.ArrayJob.min_success_ratio)
+}
+
+inline bool ArrayJob::has_success_criteria() const {
+  return success_criteria_case() != SUCCESS_CRITERIA_NOT_SET;
+}
+inline void ArrayJob::clear_has_success_criteria() {
+  _oneof_case_[0] = SUCCESS_CRITERIA_NOT_SET;
+}
+inline ArrayJob::SuccessCriteriaCase ArrayJob::success_criteria_case() const {
+  return ArrayJob::SuccessCriteriaCase(_oneof_case_[0]);
+}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__

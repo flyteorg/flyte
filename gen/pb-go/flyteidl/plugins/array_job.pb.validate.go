@@ -47,7 +47,15 @@ func (m *ArrayJob) Validate() error {
 
 	// no validation rules for Size
 
-	// no validation rules for MinSuccesses
+	switch m.SuccessCriteria.(type) {
+
+	case *ArrayJob_MinSuccesses:
+		// no validation rules for MinSuccesses
+
+	case *ArrayJob_MinSuccessRatio:
+		// no validation rules for MinSuccessRatio
+
+	}
 
 	return nil
 }

@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.plugins',
   syntax='proto3',
   serialized_options=_b('Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n flyteidl/plugins/array_job.proto\x12\x10\x66lyteidl.plugins\"D\n\x08\x41rrayJob\x12\x13\n\x0bparallelism\x18\x01 \x01(\x03\x12\x0c\n\x04size\x18\x02 \x01(\x03\x12\x15\n\rmin_successes\x18\x03 \x01(\x03\x42\x35Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+  serialized_pb=_b('\n flyteidl/plugins/array_job.proto\x12\x10\x66lyteidl.plugins\"w\n\x08\x41rrayJob\x12\x13\n\x0bparallelism\x18\x01 \x01(\x03\x12\x0c\n\x04size\x18\x02 \x01(\x03\x12\x17\n\rmin_successes\x18\x03 \x01(\x03H\x00\x12\x1b\n\x11min_success_ratio\x18\x04 \x01(\x02H\x00\x42\x12\n\x10success_criteriaB5Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
 )
 
 
@@ -54,6 +54,13 @@ _ARRAYJOB = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='min_success_ratio', full_name='flyteidl.plugins.ArrayJob.min_success_ratio', index=3,
+      number=4, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -65,11 +72,20 @@ _ARRAYJOB = _descriptor.Descriptor(
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
+    _descriptor.OneofDescriptor(
+      name='success_criteria', full_name='flyteidl.plugins.ArrayJob.success_criteria',
+      index=0, containing_type=None, fields=[]),
   ],
   serialized_start=54,
-  serialized_end=122,
+  serialized_end=173,
 )
 
+_ARRAYJOB.oneofs_by_name['success_criteria'].fields.append(
+  _ARRAYJOB.fields_by_name['min_successes'])
+_ARRAYJOB.fields_by_name['min_successes'].containing_oneof = _ARRAYJOB.oneofs_by_name['success_criteria']
+_ARRAYJOB.oneofs_by_name['success_criteria'].fields.append(
+  _ARRAYJOB.fields_by_name['min_success_ratio'])
+_ARRAYJOB.fields_by_name['min_success_ratio'].containing_oneof = _ARRAYJOB.oneofs_by_name['success_criteria']
 DESCRIPTOR.message_types_by_name['ArrayJob'] = _ARRAYJOB
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
