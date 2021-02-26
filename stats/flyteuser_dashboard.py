@@ -2,10 +2,12 @@ import typing
 from grafanalib.core import (
     Alert, AlertCondition, Dashboard, Graph,
     GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
-    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, MILLISECONDS_FORMAT, Templating, Template
+    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, MILLISECONDS_FORMAT, Templating, Template,
+    DataSourceInput
 )
 
-DATASOURCE = "Prometheus"
+DATASOURCE_NAME = "DS_PROM"
+DATASOURCE = "${%s}" % DATASOURCE_NAME
 
 
 class FlyteUserDashboard(object):
@@ -260,7 +262,16 @@ wf_template = Template(
 )
 
 dashboard = Dashboard(
-    editable=True,
+    inputs=[
+        DataSourceInput(
+            name=DATASOURCE_NAME,
+            label="Prometheus",
+            description="Flyte user dashboard powered by prometheus",
+            pluginId="prometheus",
+            pluginName="Prometheus",
+        ),
+    ],
+    editable=False,
     title="Flyte User Dashboard (via Prometheus)",
     rows=FlyteUserDashboard.create_all_rows(interval=5),
     templating=Templating(list=[

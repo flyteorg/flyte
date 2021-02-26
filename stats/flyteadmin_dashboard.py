@@ -2,7 +2,7 @@ import typing
 from grafanalib.core import (
     Alert, AlertCondition, Dashboard, Graph,
     GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
-    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis
+    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, DataSourceInput
 )
 
 # ------------------------------
@@ -10,7 +10,8 @@ from grafanalib.core import (
 # Grafana dashboard ID 10826 - https://grafana.com/grafana/dashboards/10826
 #
 
-DATASOURCE = "Prometheus"
+DATASOURCE_NAME = "DS_PROM"
+DATASOURCE = "${%s}" % DATASOURCE_NAME
 
 
 class FlyteAdmin(object):
@@ -128,7 +129,16 @@ class FlyteAdmin(object):
 
 
 dashboard = Dashboard(
-    editable=True,
+    inputs=[
+        DataSourceInput(
+            name=DATASOURCE_NAME,
+            label="Prometheus",
+            description="Flyte admin dashboard powered by prometheus",
+            pluginId="prometheus",
+            pluginName="Prometheus",
+        ),
+    ],
+    editable=False,
     title="Flyte Admin Dashboard (via Prometheus)",
     rows=FlyteAdmin.create_all_apis(interval=5),
 ).auto_panel_ids()
