@@ -158,28 +158,41 @@ class FlyteUserDashboard(object):
     @staticmethod
     def resource_stats(collapse: bool) -> Row:
         return Row(
-            title="Task CPU Usage stats",
+            title="Task stats",
             collapse=collapse,
             panels=[
                 Graph(
-                    title="CPU usage %",
+                    title="Pending tasks",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='kube_resourcequota{image!="", resource="limits.cpu", namespace="$project-$domain", type="hard"}',
+                            expr='sum(kube_pod_container_status_waiting * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"}) by (namespace, label_execution_id, label_task_name, label_node_id, label_workflow_name) > 0',
                             refId='A',
-                            legendFormat="max cpu",
-                        ),
-                        Target(
-                            expr='kube_resourcequota{resource="limits.cpu", namespace="$project-$domain", type="used"}',
-                            refId='B',
-                            legendFormat="used cpu",
                         ),
                     ],
-                    yAxes=YAxes(
-                        YAxis(format=OPS_FORMAT),
-                        YAxis(format=SHORT_FORMAT),
-                    ),
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Memory Usage Percentage",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='(max(container_memory_rss{image!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / max(kube_pod_container_resource_limits_memory_bytes{container!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=""} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="CPU Usage Percentage",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='(sum(rate(container_cpu_usage_seconds_total{image!=""}[2m]) * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !="",namespace=~"$project-$domain",label_workflow_name=~"$workflow"} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / sum(kube_pod_container_resource_limits_cpu_cores{container!=""} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=""} * on(pod) group_left(phase) kube_pod_status_phase{phase="Running"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
             ])
 
@@ -197,8 +210,6 @@ project_template = Template(
     dataSource=DATASOURCE,
     query="label_values(flyte:propeller:all:collector:flyteworkflow, project)",
     sort=True,
-    allValue=".*",
-    includeAll=True,
 )
 
 domain_template = Template(
@@ -206,8 +217,6 @@ domain_template = Template(
     dataSource=DATASOURCE,
     query="label_values(flyte:propeller:all:collector:flyteworkflow, domain)",
     sort=True,
-    allValue=".*",
-    includeAll=True,
 )
 
 wf_template = Template(

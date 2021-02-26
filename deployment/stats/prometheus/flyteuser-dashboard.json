@@ -1070,42 +1070,28 @@
           "renderer": "flot",
           "repeat": null,
           "seriesOverrides": [],
-          "span": 12,
+          "span": 4,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "datasource": "",
-              "expr": "kube_resourcequota{image!=\"\", resource=\"limits.cpu\", namespace=\"$project-$domain\", type=\"hard\"}",
+              "expr": "sum(kube_pod_container_status_waiting * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=\"\",namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"}) by (namespace, label_execution_id, label_task_name, label_node_id, label_workflow_name) > 0",
               "format": "time_series",
               "hide": false,
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "max cpu",
+              "legendFormat": "",
               "metric": "",
               "refId": "A",
-              "step": 10,
-              "target": ""
-            },
-            {
-              "datasource": "",
-              "expr": "kube_resourcequota{resource=\"limits.cpu\", namespace=\"$project-$domain\", type=\"used\"}",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "used cpu",
-              "metric": "",
-              "refId": "B",
               "step": 10,
               "target": ""
             }
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "CPU usage %",
+          "title": "Pending tasks",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1120,7 +1106,219 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ops",
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "Prometheus",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 11,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "seriesOverrides": [],
+          "span": 4,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "",
+              "expr": "(max(container_memory_rss{image!=\"\"} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=\"\",namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / max(kube_pod_container_resource_limits_memory_bytes{container!=\"\"} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=\"\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Memory Usage Percentage",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "show": true
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": 0,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "Prometheus",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 12,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "seriesOverrides": [],
+          "span": 4,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": "",
+              "expr": "(sum(rate(container_cpu_usage_seconds_total{image!=\"\"}[2m]) * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=\"\",namespace=~\"$project-$domain\",label_workflow_name=~\"$workflow\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name) / sum(kube_pod_container_resource_limits_cpu_cores{container!=\"\"} * on(pod) group_left(label_execution_id, label_task_name, label_node_id, label_workflow_name) kube_pod_labels{label_execution_id !=\"\"} * on(pod) group_left(phase) kube_pod_status_phase{phase=\"Running\"}) by (namespace, pod, label_execution_id, label_task_name, label_node_id, label_workflow_name)) > 0",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "CPU Usage Percentage",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "show": true
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "short",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -1141,7 +1339,7 @@
       ],
       "repeat": null,
       "showTitle": true,
-      "title": "Task CPU Usage stats"
+      "title": "Task stats"
     }
   ],
   "schemaVersion": 12,
@@ -1151,7 +1349,7 @@
   "templating": {
     "list": [
       {
-        "allValue": ".*",
+        "allValue": null,
         "current": {
           "tags": [],
           "text": null,
@@ -1159,7 +1357,7 @@
         },
         "datasource": "Prometheus",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": null,
         "multi": false,
         "name": "project",
@@ -1174,7 +1372,7 @@
         "useTags": false
       },
       {
-        "allValue": ".*",
+        "allValue": null,
         "current": {
           "tags": [],
           "text": null,
@@ -1182,7 +1380,7 @@
         },
         "datasource": "Prometheus",
         "hide": 0,
-        "includeAll": true,
+        "includeAll": false,
         "label": null,
         "multi": false,
         "name": "domain",
