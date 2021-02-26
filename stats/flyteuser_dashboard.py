@@ -197,11 +197,42 @@ class FlyteUserDashboard(object):
             ])
 
     @staticmethod
+    def errors(collapse: bool) -> Row:
+        return Row(
+            title="Error (System vs user)",
+            collapse=collapse,
+            panels=[
+                Graph(
+                    title="User errors",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='sum(rate(flyte:propeller:all:node:user_error_duration_ms_count{project=~"$project",domain=~"$domain",wf=~"$project:$domain:$workflow"}[5m]))',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="System errors",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='sum(rate(flyte:propeller:all:node:system_error_duration_ms_count{project=~"$project",domain=~"$domain",wf=~"$project:$domain:$workflow"}[5m]))',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+            ])
+
+    @staticmethod
     def create_all_rows(interval: int) -> typing.List[Row]:
         return [
             FlyteUserDashboard.workflow_stats(False),
             FlyteUserDashboard.quota_stats(True),
             FlyteUserDashboard.resource_stats(True),
+            FlyteUserDashboard.errors(True),
         ]
 
 
