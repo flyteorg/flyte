@@ -21,6 +21,8 @@ namespace plugins {
 class ArrayJobDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ArrayJob> _instance;
+  ::google::protobuf::int64 min_successes_;
+  float min_success_ratio_;
 } _ArrayJob_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
@@ -50,11 +52,13 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2farray_5fjob_2e
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, _internal_metadata_),
   ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, parallelism_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, size_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, min_successes_),
+  offsetof(::flyteidl::plugins::ArrayJobDefaultTypeInternal, min_successes_),
+  offsetof(::flyteidl::plugins::ArrayJobDefaultTypeInternal, min_success_ratio_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::ArrayJob, success_criteria_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::ArrayJob)},
@@ -72,15 +76,16 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fplugins_2farray_5fjob_2eproto[] =
   "\n flyteidl/plugins/array_job.proto\022\020flyt"
-  "eidl.plugins\"D\n\010ArrayJob\022\023\n\013parallelism\030"
-  "\001 \001(\003\022\014\n\004size\030\002 \001(\003\022\025\n\rmin_successes\030\003 \001"
-  "(\003B5Z3github.com/lyft/flyteidl/gen/pb-go"
-  "/flyteidl/pluginsb\006proto3"
+  "eidl.plugins\"w\n\010ArrayJob\022\023\n\013parallelism\030"
+  "\001 \001(\003\022\014\n\004size\030\002 \001(\003\022\027\n\rmin_successes\030\003 \001"
+  "(\003H\000\022\033\n\021min_success_ratio\030\004 \001(\002H\000B\022\n\020suc"
+  "cess_criteriaB5Z3github.com/lyft/flyteid"
+  "l/gen/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2farray_5fjob_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2farray_5fjob_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2farray_5fjob_2eproto,
-  "flyteidl/plugins/array_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto, 185,
+  "flyteidl/plugins/array_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto, 236,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2farray_5fjob_2eproto() {
@@ -98,6 +103,8 @@ namespace plugins {
 // ===================================================================
 
 void ArrayJob::InitAsDefaultInstance() {
+  ::flyteidl::plugins::_ArrayJob_default_instance_.min_successes_ = PROTOBUF_LONGLONG(0);
+  ::flyteidl::plugins::_ArrayJob_default_instance_.min_success_ratio_ = 0;
 }
 class ArrayJob::HasBitSetters {
  public:
@@ -107,6 +114,7 @@ class ArrayJob::HasBitSetters {
 const int ArrayJob::kParallelismFieldNumber;
 const int ArrayJob::kSizeFieldNumber;
 const int ArrayJob::kMinSuccessesFieldNumber;
+const int ArrayJob::kMinSuccessRatioFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ArrayJob::ArrayJob()
@@ -119,15 +127,30 @@ ArrayJob::ArrayJob(const ArrayJob& from)
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&parallelism_, &from.parallelism_,
-    static_cast<size_t>(reinterpret_cast<char*>(&min_successes_) -
-    reinterpret_cast<char*>(&parallelism_)) + sizeof(min_successes_));
+    static_cast<size_t>(reinterpret_cast<char*>(&size_) -
+    reinterpret_cast<char*>(&parallelism_)) + sizeof(size_));
+  clear_has_success_criteria();
+  switch (from.success_criteria_case()) {
+    case kMinSuccesses: {
+      set_min_successes(from.min_successes());
+      break;
+    }
+    case kMinSuccessRatio: {
+      set_min_success_ratio(from.min_success_ratio());
+      break;
+    }
+    case SUCCESS_CRITERIA_NOT_SET: {
+      break;
+    }
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.ArrayJob)
 }
 
 void ArrayJob::SharedCtor() {
   ::memset(&parallelism_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&min_successes_) -
-      reinterpret_cast<char*>(&parallelism_)) + sizeof(min_successes_));
+      reinterpret_cast<char*>(&size_) -
+      reinterpret_cast<char*>(&parallelism_)) + sizeof(size_));
+  clear_has_success_criteria();
 }
 
 ArrayJob::~ArrayJob() {
@@ -136,6 +159,9 @@ ArrayJob::~ArrayJob() {
 }
 
 void ArrayJob::SharedDtor() {
+  if (has_success_criteria()) {
+    clear_success_criteria();
+  }
 }
 
 void ArrayJob::SetCachedSize(int size) const {
@@ -147,6 +173,25 @@ const ArrayJob& ArrayJob::default_instance() {
 }
 
 
+void ArrayJob::clear_success_criteria() {
+// @@protoc_insertion_point(one_of_clear_start:flyteidl.plugins.ArrayJob)
+  switch (success_criteria_case()) {
+    case kMinSuccesses: {
+      // No need to clear
+      break;
+    }
+    case kMinSuccessRatio: {
+      // No need to clear
+      break;
+    }
+    case SUCCESS_CRITERIA_NOT_SET: {
+      break;
+    }
+  }
+  _oneof_case_[0] = SUCCESS_CRITERIA_NOT_SET;
+}
+
+
 void ArrayJob::Clear() {
 // @@protoc_insertion_point(message_clear_start:flyteidl.plugins.ArrayJob)
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -154,8 +199,9 @@ void ArrayJob::Clear() {
   (void) cached_has_bits;
 
   ::memset(&parallelism_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&min_successes_) -
-      reinterpret_cast<char*>(&parallelism_)) + sizeof(min_successes_));
+      reinterpret_cast<char*>(&size_) -
+      reinterpret_cast<char*>(&parallelism_)) + sizeof(size_));
+  clear_success_criteria();
   _internal_metadata_.Clear();
 }
 
@@ -191,6 +237,13 @@ const char* ArrayJob::_InternalParse(const char* begin, const char* end, void* o
         if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         msg->set_min_successes(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // float min_success_ratio = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 37) goto handle_unusual;
+        msg->set_min_success_ratio(::google::protobuf::io::UnalignedLoad<float>(ptr));
+        ptr += sizeof(float);
         break;
       }
       default: {
@@ -249,10 +302,25 @@ bool ArrayJob::MergePartialFromCodedStream(
       // int64 min_successes = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
-
+          clear_success_criteria();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
-                 input, &min_successes_)));
+                 input, &success_criteria_.min_successes_)));
+          set_has_min_successes();
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // float min_success_ratio = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (37 & 0xFF)) {
+          clear_success_criteria();
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   float, ::google::protobuf::internal::WireFormatLite::TYPE_FLOAT>(
+                 input, &success_criteria_.min_success_ratio_)));
+          set_has_min_success_ratio();
         } else {
           goto handle_unusual;
         }
@@ -297,8 +365,13 @@ void ArrayJob::SerializeWithCachedSizes(
   }
 
   // int64 min_successes = 3;
-  if (this->min_successes() != 0) {
+  if (has_min_successes()) {
     ::google::protobuf::internal::WireFormatLite::WriteInt64(3, this->min_successes(), output);
+  }
+
+  // float min_success_ratio = 4;
+  if (has_min_success_ratio()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFloat(4, this->min_success_ratio(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -325,8 +398,13 @@ void ArrayJob::SerializeWithCachedSizes(
   }
 
   // int64 min_successes = 3;
-  if (this->min_successes() != 0) {
+  if (has_min_successes()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(3, this->min_successes(), target);
+  }
+
+  // float min_success_ratio = 4;
+  if (has_min_success_ratio()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFloatToArray(4, this->min_success_ratio(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -364,13 +442,23 @@ size_t ArrayJob::ByteSizeLong() const {
         this->size());
   }
 
-  // int64 min_successes = 3;
-  if (this->min_successes() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int64Size(
-        this->min_successes());
+  switch (success_criteria_case()) {
+    // int64 min_successes = 3;
+    case kMinSuccesses: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int64Size(
+          this->min_successes());
+      break;
+    }
+    // float min_success_ratio = 4;
+    case kMinSuccessRatio: {
+      total_size += 1 + 4;
+      break;
+    }
+    case SUCCESS_CRITERIA_NOT_SET: {
+      break;
+    }
   }
-
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -404,8 +492,18 @@ void ArrayJob::MergeFrom(const ArrayJob& from) {
   if (from.size() != 0) {
     set_size(from.size());
   }
-  if (from.min_successes() != 0) {
-    set_min_successes(from.min_successes());
+  switch (from.success_criteria_case()) {
+    case kMinSuccesses: {
+      set_min_successes(from.min_successes());
+      break;
+    }
+    case kMinSuccessRatio: {
+      set_min_success_ratio(from.min_success_ratio());
+      break;
+    }
+    case SUCCESS_CRITERIA_NOT_SET: {
+      break;
+    }
   }
 }
 
@@ -436,7 +534,8 @@ void ArrayJob::InternalSwap(ArrayJob* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(parallelism_, other->parallelism_);
   swap(size_, other->size_);
-  swap(min_successes_, other->min_successes_);
+  swap(success_criteria_, other->success_criteria_);
+  swap(_oneof_case_[0], other->_oneof_case_[0]);
 }
 
 ::google::protobuf::Metadata ArrayJob::GetMetadata() const {
