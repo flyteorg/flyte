@@ -397,11 +397,12 @@ class FlytePropeller(object):
 
 
 dashboard = Dashboard(
+    tags=["flyte", "prometheus", "flytepropeller", "flyte-dataplane"],
     inputs=[
         DataSourceInput(
             name=DATASOURCE_NAME,
             label="Prometheus",
-            description="Flyte dataplane dashboard powered by prometheus",
+            description="Prometheus server that connects to Flyte",
             pluginId="prometheus",
             pluginName="Prometheus",
         ),
@@ -409,6 +410,7 @@ dashboard = Dashboard(
     editable=False,
     title="Flyte Propeller Dashboard (via Prometheus)",
     rows=FlytePropeller.create_all_rows(interval=5),
+    description="Flyte Propeller Dashboard. This is great for monitoring FlytePropeller / Flyte data plane deployments. This is mostly useful for the Flyte deployment maintainer",
 ).auto_panel_ids()
 
 if __name__ == "__main__":

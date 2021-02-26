@@ -262,11 +262,12 @@ wf_template = Template(
 )
 
 dashboard = Dashboard(
+    tags=["flyte", "prometheus", "flyteuser", "flyte-user"],
     inputs=[
         DataSourceInput(
             name=DATASOURCE_NAME,
             label="Prometheus",
-            description="Flyte user dashboard powered by prometheus",
+            description="Prometheus server that connects to Flyte",
             pluginId="prometheus",
             pluginName="Prometheus",
         ),
@@ -279,6 +280,7 @@ dashboard = Dashboard(
         domain_template,
         wf_template,
     ]),
+    description="Flyte User Dashboard. This is great to get a birds-eye and drill down view of executions in your Flyte cluster. Useful for the user.",
 ).auto_panel_ids()
 
 if __name__ == "__main__":

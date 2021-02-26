@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "description": "Flyte user dashboard powered by prometheus",
+      "description": "Prometheus server that connects to Flyte",
       "label": "Prometheus",
       "name": "DS_PROM",
       "pluginId": "prometheus",
@@ -12,7 +12,7 @@
   "annotations": {
     "list": []
   },
-  "description": "",
+  "description": "Flyte User Dashboard. This is great to get a birds-eye and drill down view of executions in your Flyte cluster. Useful for the user.",
   "editable": false,
   "gnetId": null,
   "hideControls": false,
@@ -1576,7 +1576,12 @@
   "schemaVersion": 12,
   "sharedCrosshair": false,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "flyte",
+    "prometheus",
+    "flyteuser",
+    "flyte-user"
+  ],
   "templating": {
     "list": [
       {

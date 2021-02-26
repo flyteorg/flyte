@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "description": "Flyte dataplane dashboard powered by prometheus",
+      "description": "Prometheus server that connects to Flyte",
       "label": "Prometheus",
       "name": "DS_PROM",
       "pluginId": "prometheus",
@@ -12,7 +12,7 @@
   "annotations": {
     "list": []
   },
-  "description": "",
+  "description": "Flyte Propeller Dashboard. This is great for monitoring FlytePropeller / Flyte data plane deployments. This is mostly useful for the Flyte deployment maintainer",
   "editable": false,
   "gnetId": null,
   "hideControls": false,
@@ -2070,7 +2070,12 @@
   "schemaVersion": 12,
   "sharedCrosshair": false,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "flyte",
+    "prometheus",
+    "flytepropeller",
+    "flyte-dataplane"
+  ],
   "templating": {
     "list": []
   },

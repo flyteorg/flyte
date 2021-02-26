@@ -129,11 +129,12 @@ class FlyteAdmin(object):
 
 
 dashboard = Dashboard(
+    tags=["flyte", "prometheus", "flyteadmin", "flyte-controlplane"],
     inputs=[
         DataSourceInput(
             name=DATASOURCE_NAME,
             label="Prometheus",
-            description="Flyte admin dashboard powered by prometheus",
+            description="Prometheus server that connects to Flyte",
             pluginId="prometheus",
             pluginName="Prometheus",
         ),
@@ -141,6 +142,7 @@ dashboard = Dashboard(
     editable=False,
     title="Flyte Admin Dashboard (via Prometheus)",
     rows=FlyteAdmin.create_all_apis(interval=5),
+    description="Flyte Admin/Control Plane Dashboard. This is great for monitoring FlyteAdmin and the Service API.",
 ).auto_panel_ids()
 
 if __name__ == "__main__":

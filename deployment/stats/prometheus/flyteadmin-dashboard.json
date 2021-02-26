@@ -1,7 +1,7 @@
 {
   "__inputs": [
     {
-      "description": "Flyte admin dashboard powered by prometheus",
+      "description": "Prometheus server that connects to Flyte",
       "label": "Prometheus",
       "name": "DS_PROM",
       "pluginId": "prometheus",
@@ -12,7 +12,7 @@
   "annotations": {
     "list": []
   },
-  "description": "",
+  "description": "Flyte Admin/Control Plane Dashboard. This is great for monitoring FlyteAdmin and the Service API.",
   "editable": false,
   "gnetId": null,
   "hideControls": false,
@@ -7704,7 +7704,12 @@
   "schemaVersion": 12,
   "sharedCrosshair": false,
   "style": "dark",
-  "tags": [],
+  "tags": [
+    "flyte",
+    "prometheus",
+    "flyteadmin",
+    "flyte-controlplane"
+  ],
   "templating": {
     "list": []
   },
