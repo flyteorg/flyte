@@ -3,6 +3,8 @@
 Metrics for your executions
 ===========================
 
+.. tip:: Refer to :ref:`howto-monitoring` to see/use prebuilt dashboards published to Grafana Marketplace. The following section explains some other metrics that are very important.
+
 Flyte-Provided Metrics
 ~~~~~~~~~~~~~~~~~~~~~~~
 Whenever you run a workflow, Flyte Platform automatically emits high-level metrics. These metrics follow a consistent schema and
@@ -56,14 +58,6 @@ can also provide additional tags (or override tags) for custom stats.
 wf               This is the name of the workflow that was executing when this metric was emitted.
                  ``{{project}}:{{domain}}:{{workflow_name}}``
 ===============  =================================================================================
-
-Flyte Task Container Metrics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To be built.
-
-Default Project Dashboard
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To be built.
 
 User Stats With Flyte
 ~~~~~~~~~~~~~~~~~~~~~~
