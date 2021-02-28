@@ -8,7 +8,7 @@ Welcome to the documentation hub for Flyte.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Get started with Flyte
+   :caption: Tutorials
    :name: tutorialstoc
 
    tutorials/first_run
@@ -17,7 +17,7 @@ Welcome to the documentation hub for Flyte.
    tutorials/learn
 
 .. toctree::
-   :caption: How to Guides
+   :caption: Get Answers
    :maxdepth: 1
    :name: howtotoc
 
