@@ -35,7 +35,7 @@ function wait_for_flyte_deploys() {
     echo ""
     kubectl -n flyte rollout status deployment minio
     echo ""
-    kubectl -n flyte rollout status deployment contour
+    kubectl -n projectcontour rollout status deployment contour
     echo ""
 
     echo "Flyte deployed in $SECONDS seconds."
