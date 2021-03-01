@@ -14,7 +14,6 @@ bases:
 # Add node ports for ease of use locally
 - ../../base/addons/database
 - ../../base/addons/storage
-- ../../base/addons/contour_ingress_controller
 
 # Images that should be used
 images:
