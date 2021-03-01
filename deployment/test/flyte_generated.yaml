@@ -2379,6 +2379,7 @@ spec:
   externalTrafficPolicy: Local
   ports:
   - name: http
+    nodePort: 30081
     port: 80
     protocol: TCP
   - name: https
@@ -2386,7 +2387,7 @@ spec:
     protocol: TCP
   selector:
     app: envoy
-  type: LoadBalancer
+  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment

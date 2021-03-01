@@ -2,15 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: contour
-  labels:
-    app: contour
+  name: envoy
+  namespace: projectcontour
 spec:
   # use NodePort to make sure the service is accessible
   type: NodePort
-  selector:
-    app: contour
   ports:
-  - protocol: TCP
-    port: 80
+  - port: 80
+    name: http
+    protocol: TCP
     nodePort: 30081
