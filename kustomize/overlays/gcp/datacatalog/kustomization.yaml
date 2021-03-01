@@ -1,5 +1,0 @@
-resources:
-  - service.yaml
-
-patches:
-  - deployment.yaml
