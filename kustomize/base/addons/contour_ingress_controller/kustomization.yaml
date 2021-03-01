@@ -1,5 +1,3 @@
 resources:
-  # We cannot just import from remote as namespace transformer causes conflicts
-  #- https://projectcontour.io/quickstart/v1.11.0/contour.yaml
-- contour.yaml
+- https://raw.githubusercontent.com/projectcontour/contour/release-1.13/examples/render/contour.yaml
 
