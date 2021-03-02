@@ -1,32 +1,15 @@
 .SILENT:
 
-# Update PATH variable to leverage _bin directory
-export PATH := .sandbox/bin:$(PATH)
-
-# Dependencies
-export DOCKER_VERSION := 20.10.3
-export K3S_VERSION := v1.20.2%2Bk3s1
-export KUBECTL_VERSION := v1.20.2
-export FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
-
 # Flyte sandbox configuration variables
-KUBERNETES_API_PORT := 51234
 FLYTE_PROXY_PORT := 30081
 MINIO_PROXY_PORT := 30084
 FLYTE_SANDBOX_NAME := flyte-sandbox
-
-# Use an ephemeral kubeconfig, so as not to litter the default one
-export KUBECONFIG=$(CURDIR)/.sandbox/data/config/kubeconfig
 
 # Module of cookbook examples to register
 EXAMPLES_MODULE := core
 
 define LOG
 echo "$(shell tput bold)$(shell tput setaf 2)$(1)$(shell tput sgr0)"
-endef
-
-define ERROR
-( echo >&2 "$(shell tput bold)$(shell tput setaf 1)$(1)! Please 'make teardown' and 'make start' again to retry.$(shell tput sgr0)"; exit 1 )
 endef
 
 define RUN_IN_SANDBOX
