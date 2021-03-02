@@ -43,7 +43,6 @@ configMapGenerator:
     - ./config/propeller/enabled_plugins.yaml
     - ./config/propeller/plugins/copilot.yaml
     - ./config/propeller/plugins/k8s.yaml
-    - ./config/propeller/plugins/task_logs.yaml
     - ./config/common/storage.yaml
     - ./config/common/logger.yaml
 
