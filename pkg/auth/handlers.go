@@ -17,7 +17,6 @@ import (
 	"github.com/lyft/flytestdlib/contextutils"
 	"github.com/lyft/flytestdlib/errors"
 	"github.com/lyft/flytestdlib/logger"
-	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -40,28 +39,26 @@ func RefreshTokensIfExists(ctx context.Context, authContext interfaces.Authentic
 	return func(writer http.ResponseWriter, request *http.Request) {
 		// Since we only do one thing if there are no errors anywhere along the chain, we can save code by just
 		// using one variable and checking for errors at the end.
-		var err error
-		accessToken, refreshToken, err := authContext.CookieManager().RetrieveTokenValues(ctx, request)
-
-		if err == nil && accessToken != "" && refreshToken != "" {
-			_, e := ParseAndValidate(ctx, authContext.Claims(), accessToken, authContext.OidcProvider())
-			err = e
-			if err != nil && errors.IsCausedBy(err, ErrTokenExpired) {
-				logger.Debugf(ctx, "Expired access token found, attempting to refresh")
+		idToken, accessToken, refreshToken, err := authContext.CookieManager().RetrieveTokenValues(ctx, request)
+		if err == nil {
+			_, err = ParseAndValidate(ctx, authContext.Claims(), idToken, authContext.OidcProvider())
+			if err != nil && errors.IsCausedBy(err, ErrTokenExpired) && len(refreshToken) > 0 {
+				logger.Debugf(ctx, "Expired id token found, attempting to refresh")
 				newToken, e := GetRefreshedToken(ctx, authContext.OAuth2Config(), accessToken, refreshToken)
 				err = e
 				if err == nil {
-					logger.Debugf(ctx, "Access token refreshed. Saving new tokens into cookies.")
+					logger.Debugf(ctx, "Tokens are refreshed. Saving new tokens into cookies.")
 					err = authContext.CookieManager().SetTokenCookies(ctx, writer, newToken)
 				}
 			}
 		}
 
 		if err != nil {
-			logger.Errorf(ctx, "Non-expiration error in refresh token handler %s, redirecting to login handler", err)
+			logger.Errorf(ctx, "Non-expiration error in refresh token handler, redirecting to login handler. Error: %s", err)
 			handlerFunc(writer, request)
 			return
 		}
+
 		redirectURL := getAuthFlowEndRedirect(ctx, authContext, request)
 		http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 	}
@@ -101,11 +98,7 @@ func GetCallbackHandler(ctx context.Context, authContext interfaces.Authenticati
 			return
 		}
 
-		// TODO: The second parameter is IDP specific but seems to be convention, make configurable anyways.
-		// The second parameter is necessary to get the initial refresh token
-		offlineAccessParam := oauth2.SetAuthURLParam(RefreshToken, OfflineAccessType)
-
-		token, err := authContext.OAuth2Config().Exchange(ctx, authorizationCode, offlineAccessParam)
+		token, err := authContext.OAuth2Config().Exchange(ctx, authorizationCode)
 		if err != nil {
 			logger.Errorf(ctx, "Error when exchanging code %s", err)
 			writer.WriteHeader(http.StatusForbidden)
@@ -180,6 +173,7 @@ func GetAuthenticationInterceptor(authContext interfaces.AuthenticationContext) 
 				return ctx, status.Errorf(codes.Unauthenticated, "no email or empty email found")
 			}
 		}
+
 		if token != nil {
 			newCtx := WithUserEmail(context.WithValue(ctx, bearerTokenContextKey, token), token.Subject)
 			newCtx = WithAuditFields(newCtx, token.Audience, token.IssuedAt)
@@ -214,9 +208,8 @@ func WithAuditFields(ctx context.Context, clientIds []string, tokenIssuedAt time
 func GetHTTPRequestCookieToMetadataHandler(authContext interfaces.AuthenticationContext) HTTPRequestToMetadataAnnotator {
 	return func(ctx context.Context, request *http.Request) metadata.MD {
 		// TODO: Improve error handling
-		accessToken, _, _ := authContext.CookieManager().RetrieveTokenValues(ctx, request)
-		if accessToken == "" {
-
+		idToken, _, _, _ := authContext.CookieManager().RetrieveTokenValues(ctx, request)
+		if len(idToken) == 0 {
 			// If no token was found in the cookies, look for an authorization header, starting with a potentially
 			// custom header set in the Config object
 			if authContext.Options().HTTPAuthorizationHeader != "" {
@@ -233,7 +226,7 @@ func GetHTTPRequestCookieToMetadataHandler(authContext interfaces.Authentication
 			return nil
 		}
 		return metadata.MD{
-			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", BearerScheme, accessToken)},
+			DefaultAuthorizationHeader: []string{fmt.Sprintf("%s %s", BearerScheme, idToken)},
 		}
 	}
 }
@@ -254,14 +247,14 @@ func GetHTTPMetadataTaggingHandler(authContext interfaces.AuthenticationContext)
 func GetMeEndpointHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	idpUserInfoEndpoint := authCtx.GetUserInfoURL().String()
 	return func(writer http.ResponseWriter, request *http.Request) {
-		access, _, err := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
+		_, accessToken, _, err := authCtx.CookieManager().RetrieveTokenValues(ctx, request)
 		if err != nil {
 			http.Error(writer, "Error decoding identify token, try /login in again", http.StatusUnauthorized)
 			return
 		}
 		// TODO: Investigate improving transparency of errors. The errors from this call may be just a local error, or may
 		//       be an error from the HTTP request to the IDP. In the latter case, consider passing along the error code/msg.
-		userInfo, err := postToIdp(ctx, authCtx.GetHTTPClient(), idpUserInfoEndpoint, access)
+		userInfo, err := postToIdp(ctx, authCtx.GetHTTPClient(), idpUserInfoEndpoint, accessToken)
 		if err != nil {
 			logger.Errorf(ctx, "Error getting user info from IDP %s", err)
 			http.Error(writer, "Error getting user info from IDP", http.StatusFailedDependency)
@@ -284,9 +277,18 @@ func GetMeEndpointHandler(ctx context.Context, authCtx interfaces.Authentication
 
 // This returns a handler that will redirect (303) to the well-known metadata endpoint for the OAuth2 authorization server
 // See https://tools.ietf.org/html/rfc8414 for more information.
-func GetMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
+func GetOAuth2MetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		metadataURL := authCtx.GetBaseURL().ResolveReference(authCtx.GetMetadataURL())
+		metadataURL := authCtx.GetBaseURL().ResolveReference(authCtx.GetOAuth2MetadataURL())
+		http.Redirect(writer, request, metadataURL.String(), http.StatusSeeOther)
+	}
+}
+
+// This returns a handler that will redirect (303) to the well-known metadata endpoint for the OAuth2 authorization server
+// See https://tools.ietf.org/html/rfc8414 for more information.
+func GetOIdCMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		metadataURL := authCtx.GetBaseURL().ResolveReference(authCtx.GetOIdCMetadataURL())
 		http.Redirect(writer, request, metadataURL.String(), http.StatusSeeOther)
 	}
 }

@@ -17,13 +17,18 @@ import (
 
 const (
 	// #nosec
-	accessTokenCookieName = "flyte_jwt"
+	accessTokenCookieName = "flyte_at"
 	// #nosec
-	refreshTokenCookieName = "flyte_refresh"
+	idTokenCookieName = "flyte_idt"
+	// #nosec
+	refreshTokenCookieName = "flyte_rt"
 	// #nosec
 	csrfStateCookieName = "flyte_csrf_state"
 	// #nosec
 	redirectURLCookieName = "flyte_redirect_location"
+
+	// #nosec
+	idTokenExtra = "id_token"
 )
 
 const (
@@ -52,6 +57,33 @@ func NewSecureCookie(cookieName, value string, hashKey, blockKey []byte) (http.C
 	}
 
 	return http.Cookie{}, errors.Wrapf(ErrSecureCookie, err, "Error creating secure cookie")
+}
+
+func retrieveSecureCookie(ctx context.Context, request *http.Request, cookieName string, hashKey, blockKey []byte) (string, error) {
+	cookie, err := request.Cookie(cookieName)
+	if err != nil {
+		logger.Infof(ctx, "Could not detect existing cookie [%v]. Error: %v", cookieName, err)
+		return "", errors.Wrapf(ErrTokenNil, err, "Failure to retrieve cookie [%v]", cookieName)
+	}
+
+	if cookie == nil {
+		logger.Infof(ctx, "Retrieved empty cookie [%v].", cookieName)
+		return "", errors.Errorf(ErrTokenNil, "Retrieved empty cookie [%v]", cookieName)
+	}
+
+	logger.Debugf(ctx, "Existing [%v] cookie found", cookieName)
+	token, err := ReadSecureCookie(ctx, *cookie, hashKey, blockKey)
+	if err != nil {
+		logger.Errorf(ctx, "Error reading existing secure cookie [%v]. Error: %s", cookieName, err)
+		return "", errors.Errorf(ErrTokenNil, "Error reading existing secure cookie [%v]. Error: %s", cookieName, err)
+	}
+
+	if len(token) == 0 {
+		logger.Errorf(ctx, "Read empty token from secure cookie [%v].", cookieName)
+		return "", errors.Errorf(ErrTokenNil, "Read empty token from secure cookie [%v].", cookieName)
+	}
+
+	return token, nil
 }
 
 func ReadSecureCookie(ctx context.Context, cookie http.Cookie, hashKey, blockKey []byte) (string, error) {

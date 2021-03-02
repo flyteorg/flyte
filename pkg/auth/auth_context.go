@@ -22,15 +22,16 @@ const (
 
 // Please see the comment on the corresponding AuthenticationContext for more information.
 type Context struct {
-	oauth2        *oauth2.Config
-	claims        config.Claims
-	cookieManager interfaces.CookieHandler
-	oidcProvider  *oidc.Provider
-	options       config.OAuthOptions
-	userInfoURL   *url.URL
-	baseURL       *url.URL
-	metadataURL   *url.URL
-	httpClient    *http.Client
+	oauth2            *oauth2.Config
+	claims            config.Claims
+	cookieManager     interfaces.CookieHandler
+	oidcProvider      *oidc.Provider
+	options           config.OAuthOptions
+	userInfoURL       *url.URL
+	baseURL           *url.URL
+	oauth2MetadataURL *url.URL
+	oidcMetadataURL   *url.URL
+	httpClient        *http.Client
 }
 
 func (c Context) OAuth2Config() *oauth2.Config {
@@ -65,8 +66,12 @@ func (c Context) GetBaseURL() *url.URL {
 	return c.baseURL
 }
 
-func (c Context) GetMetadataURL() *url.URL {
-	return c.metadataURL
+func (c Context) GetOAuth2MetadataURL() *url.URL {
+	return c.oauth2MetadataURL
+}
+
+func (c Context) GetOIdCMetadataURL() *url.URL {
+	return c.oidcMetadataURL
 }
 
 const (
@@ -85,6 +90,7 @@ func NewAuthenticationContext(ctx context.Context, options config.OAuthOptions) 
 	if err != nil {
 		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error creating OAuth2 library configuration")
 	}
+
 	result.oauth2 = &oauth2Config
 
 	// Construct the cookie manager object.
@@ -92,23 +98,27 @@ func NewAuthenticationContext(ctx context.Context, options config.OAuthOptions) 
 	if err != nil {
 		return Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read hash key file")
 	}
+
 	blockKeyBytes, err := ioutil.ReadFile(options.CookieBlockKeyFile)
 	if err != nil {
 		return Context{}, errors.Wrapf(ErrConfigFileRead, err, "Could not read block key file")
 	}
+
 	cookieManager, err := NewCookieManager(ctx, string(hashKeyBytes), string(blockKeyBytes))
 	if err != nil {
 		logger.Errorf(ctx, "Error creating cookie manager %s", err)
 		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error creating cookie manager")
 	}
+
 	result.cookieManager = cookieManager
 
 	// Construct an oidc Provider, which needs its own http Client.
 	oidcCtx := oidc.ClientContext(ctx, &http.Client{})
 	provider, err := oidc.NewProvider(oidcCtx, options.Claims.Issuer)
 	if err != nil {
-		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error creating oidc provider")
+		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error creating oidc provider w/ issuer [%v]", options.Claims.Issuer)
 	}
+
 	result.oidcProvider = provider
 
 	// TODO: Convert all the URLs in this config to the config.URL type
@@ -120,16 +130,25 @@ func NewAuthenticationContext(ctx context.Context, options config.OAuthOptions) 
 		logger.Errorf(ctx, "Error parsing base URL %s", err)
 		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error parsing IDP base URL")
 	}
+
 	logger.Infof(ctx, "Base IDP URL is %s", base)
 	result.baseURL = base
 
-	metadataURL, err := url.Parse(MetadataEndpoint)
+	result.oauth2MetadataURL, err = url.Parse(OAuth2MetadataEndpoint)
 	if err != nil {
-		logger.Errorf(ctx, "Error parsing metadata URL %s", err)
+		logger.Errorf(ctx, "Error parsing oauth2 metadata URL %s", err)
 		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error parsing metadata URL")
 	}
-	logger.Infof(ctx, "Metadata endpoint is %s", metadataURL)
-	result.metadataURL = metadataURL
+
+	logger.Infof(ctx, "Metadata endpoint is %s", result.oauth2MetadataURL)
+
+	result.oidcMetadataURL, err = url.Parse(OIdCMetadataEndpoint)
+	if err != nil {
+		logger.Errorf(ctx, "Error parsing oidc metadata URL %s", err)
+		return Context{}, errors.Wrapf(ErrAuthContext, err, "Error parsing metadata URL")
+	}
+
+	logger.Infof(ctx, "Metadata endpoint is %s", result.oidcMetadataURL)
 
 	// Construct the URL object for the user info endpoint if applicable
 	if options.IdpUserInfoEndpoint != "" {
@@ -158,14 +177,13 @@ func GetOauth2Config(options config.OAuthOptions) (oauth2.Config, error) {
 	if err != nil {
 		return oauth2.Config{}, err
 	}
+
 	secret := strings.TrimSuffix(string(secretBytes), "\n")
 	return oauth2.Config{
 		RedirectURL:  options.CallbackURL,
 		ClientID:     options.ClientID,
 		ClientSecret: secret,
-		// Offline access needs to be specified in order to return a refresh token in the exchange.
-		// TODO: Second parameter is IDP specific - move to config. Also handle case where a refresh token is not allowed
-		Scopes: []string{OidcScope, OfflineAccessType, ProfileScope},
+		Scopes:       options.Scopes,
 		Endpoint: oauth2.Endpoint{
 			AuthURL:  options.AuthorizeURL,
 			TokenURL: options.TokenURL,

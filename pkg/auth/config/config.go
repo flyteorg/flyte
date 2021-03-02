@@ -58,6 +58,11 @@ type OAuthOptions struct {
 	// into the realm of authorization rather than authentication.
 	DisableForHTTP bool `json:"disableForHttp"`
 	DisableForGrpc bool `json:"disableForGrpc"`
+
+	// Provides a list of scopes to request from the IDP when authenticating. Default value requests claims that should
+	// be supported by any OIdC server. Refer to https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims for
+	// a complete list. Other providers might support additional scopes that you can define in a config.
+	Scopes []string `json:"scopes"`
 }
 
 type Claims struct {

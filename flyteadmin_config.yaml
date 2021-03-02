@@ -8,10 +8,13 @@ server:
   grpcServerReflection: true
   security:
     secure: false
-    ssl:
-      certificateFile: "/path/to/server.pem"
-      keyFile: "/path/to/server.key"
     useAuth: false
+    allowCors: true
+    allowedOrigins:
+      # Accepting all domains for Sandbox installation
+      - "*"
+    allowedHeaders:
+      - "Content-Type"
     oauth:
       clientId: yourclientid
       clientSecretFile: "/path/to/oauth/secret"
@@ -73,7 +76,7 @@ notifications:
     accountId: "bar"
   emailer:
     subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
-    sender:  "flyte-notifications@example.com"
+    sender: "flyte-notifications@example.com"
     body: >
       Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
       <a href=\http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>

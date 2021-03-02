@@ -38,12 +38,14 @@ func GetRefreshedToken(ctx context.Context, oauth *oauth2.Config, accessToken, r
 	return newToken, nil
 }
 
-func ParseAndValidate(ctx context.Context, claims config.Claims, accessToken string,
+func ParseAndValidate(ctx context.Context, claims config.Claims, rawIDToken string,
 	provider *oidc.Provider) (*oidc.IDToken, error) {
 
-	var verifier = provider.Verifier(&oidc.Config{ClientID: claims.Audience})
+	var verifier = provider.Verifier(&oidc.Config{
+		ClientID: claims.Audience,
+	})
 
-	idToken, err := verifier.Verify(ctx, accessToken)
+	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
 		logger.Debugf(ctx, "JWT parsing with claims failed %s", err)
 		flyteErr := errors.Wrapf(ErrJwtValidation, err, "jwt parse with claims failed")
@@ -51,8 +53,10 @@ func ParseAndValidate(ctx context.Context, claims config.Claims, accessToken str
 		if strings.Contains(err.Error(), "token is expired") {
 			return idToken, errors.Wrapf(ErrTokenExpired, flyteErr, "token is expired")
 		}
+
 		return idToken, flyteErr
 	}
+
 	return idToken, nil
 }
 
@@ -66,6 +70,7 @@ func GetAndValidateTokenObjectFromContext(ctx context.Context, claims config.Cla
 		logger.Debugf(ctx, "Could not retrieve bearer token from metadata %v", err)
 		return nil, errors.Wrapf(ErrJwtValidation, err, "Could not retrieve bearer token from metadata")
 	}
+
 	if tokenStr == "" {
 		logger.Debugf(ctx, "Found Bearer scheme but token was blank")
 		return nil, errors.Errorf(ErrJwtValidation, "Bearer token is blank")

@@ -44,5 +44,6 @@ func TestHandleFlyteCliConfigFunc(t *testing.T) {
 		clientID:        testClientID,
 		redirectURI:     testRedirectURI,
 		authMetadataKey: testAuthMetadataKey,
+		scopes:          "",
 	}, responseBodyMap)
 }

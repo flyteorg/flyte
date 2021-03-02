@@ -21,6 +21,7 @@ type AuthenticationContext interface {
 	Options() config.OAuthOptions
 	GetUserInfoURL() *url.URL
 	GetBaseURL() *url.URL
-	GetMetadataURL() *url.URL
+	GetOAuth2MetadataURL() *url.URL
+	GetOIdCMetadataURL() *url.URL
 	GetHTTPClient() *http.Client
 }
