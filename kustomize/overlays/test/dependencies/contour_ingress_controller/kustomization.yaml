@@ -1,5 +1,0 @@
-resources:
-- rbac.yaml
-- custom-config.yaml
-- service.yaml
-- deployment.yaml
