@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lyft/flyteadmin/pkg/repositories/models"
+
 	v1 "k8s.io/api/rbac/v1"
 
 	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
@@ -40,6 +42,8 @@ import (
 )
 
 const namespaceVariable = "namespace"
+const projectVariable = "project"
+const domainVariable = "domain"
 const templateVariableFormat = "{{ %s }}"
 const replaceAllInstancesOfString = -1
 
@@ -121,7 +125,7 @@ func populateTemplateValues(data map[string]runtimeInterfaces.DataSource) (templ
 	templateValues := make(templateValuesType, len(data))
 	collectedErrs := make([]error, 0)
 	for templateVar, dataSource := range data {
-		if templateVar == namespaceVariable {
+		if templateVar == namespaceVariable || templateVar == projectVariable || templateVar == domainVariable {
 			// The namespace variable is specifically reserved for system use only.
 			collectedErrs = append(collectedErrs, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 				"Cannot assign namespace template value in user data"))
@@ -220,7 +224,7 @@ func (c *controller) getCustomTemplateValues(
 //   2) substitute templatized variables with their resolved values
 //   3) decode the output of the above into a kubernetes resource
 //   4) create the resource on the kubernetes cluster and cache successful outcomes
-func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
+func (c *controller) syncNamespace(ctx context.Context, project models.Project, domain runtimeInterfaces.Domain, namespace NamespaceName,
 	templateValues, customTemplateValues templateValuesType) error {
 	templateDir := c.config.ClusterResourceConfiguration().GetTemplatePath()
 	if c.lastAppliedTemplateDir != templateDir {
@@ -270,6 +274,9 @@ func (c *controller) syncNamespace(ctx context.Context, namespace NamespaceName,
 		// First, add the special case namespace template which is always substituted by the system
 		// rather than fetched via a user-specified source.
 		templateValues[fmt.Sprintf(templateVariableFormat, namespaceVariable)] = namespace
+		templateValues[fmt.Sprintf(templateVariableFormat, projectVariable)] = project.Name
+		templateValues[fmt.Sprintf(templateVariableFormat, domainVariable)] = domain.Name
+
 		var config = string(template)
 		for templateKey, templateValue := range templateValues {
 			config = strings.Replace(config, templateKey, templateValue, replaceAllInstancesOfString)
@@ -391,7 +398,7 @@ func (c *controller) Sync(ctx context.Context) error {
 				logger.Warningf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
 				errs = append(errs, err)
 			}
-			err = c.syncNamespace(ctx, namespace, templateValues, customTemplateValues)
+			err = c.syncNamespace(ctx, project, domain, namespace, templateValues, customTemplateValues)
 			if err != nil {
 				logger.Warningf(ctx, "Failed to create cluster resources for namespace [%s] with err: %v", namespace, err)
 				c.metrics.ResourceAddErrors.Inc()
