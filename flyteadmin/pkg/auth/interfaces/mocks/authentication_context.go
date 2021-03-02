@@ -157,26 +157,60 @@ func (_m *AuthenticationContext) GetHTTPClient() *http.Client {
 	return r0
 }
 
-type AuthenticationContext_GetMetadataURL struct {
+type AuthenticationContext_GetOAuth2MetadataURL struct {
 	*mock.Call
 }
 
-func (_m AuthenticationContext_GetMetadataURL) Return(_a0 *url.URL) *AuthenticationContext_GetMetadataURL {
-	return &AuthenticationContext_GetMetadataURL{Call: _m.Call.Return(_a0)}
+func (_m AuthenticationContext_GetOAuth2MetadataURL) Return(_a0 *url.URL) *AuthenticationContext_GetOAuth2MetadataURL {
+	return &AuthenticationContext_GetOAuth2MetadataURL{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *AuthenticationContext) OnGetMetadataURL() *AuthenticationContext_GetMetadataURL {
-	c := _m.On("GetMetadataURL")
-	return &AuthenticationContext_GetMetadataURL{Call: c}
+func (_m *AuthenticationContext) OnGetOAuth2MetadataURL() *AuthenticationContext_GetOAuth2MetadataURL {
+	c := _m.On("GetOAuth2MetadataURL")
+	return &AuthenticationContext_GetOAuth2MetadataURL{Call: c}
 }
 
-func (_m *AuthenticationContext) OnGetMetadataURLMatch(matchers ...interface{}) *AuthenticationContext_GetMetadataURL {
-	c := _m.On("GetMetadataURL", matchers...)
-	return &AuthenticationContext_GetMetadataURL{Call: c}
+func (_m *AuthenticationContext) OnGetOAuth2MetadataURLMatch(matchers ...interface{}) *AuthenticationContext_GetOAuth2MetadataURL {
+	c := _m.On("GetOAuth2MetadataURL", matchers...)
+	return &AuthenticationContext_GetOAuth2MetadataURL{Call: c}
 }
 
-// GetMetadataURL provides a mock function with given fields:
-func (_m *AuthenticationContext) GetMetadataURL() *url.URL {
+// GetOAuth2MetadataURL provides a mock function with given fields:
+func (_m *AuthenticationContext) GetOAuth2MetadataURL() *url.URL {
+	ret := _m.Called()
+
+	var r0 *url.URL
+	if rf, ok := ret.Get(0).(func() *url.URL); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*url.URL)
+		}
+	}
+
+	return r0
+}
+
+type AuthenticationContext_GetOIdCMetadataURL struct {
+	*mock.Call
+}
+
+func (_m AuthenticationContext_GetOIdCMetadataURL) Return(_a0 *url.URL) *AuthenticationContext_GetOIdCMetadataURL {
+	return &AuthenticationContext_GetOIdCMetadataURL{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *AuthenticationContext) OnGetOIdCMetadataURL() *AuthenticationContext_GetOIdCMetadataURL {
+	c := _m.On("GetOIdCMetadataURL")
+	return &AuthenticationContext_GetOIdCMetadataURL{Call: c}
+}
+
+func (_m *AuthenticationContext) OnGetOIdCMetadataURLMatch(matchers ...interface{}) *AuthenticationContext_GetOIdCMetadataURL {
+	c := _m.On("GetOIdCMetadataURL", matchers...)
+	return &AuthenticationContext_GetOIdCMetadataURL{Call: c}
+}
+
+// GetOIdCMetadataURL provides a mock function with given fields:
+func (_m *AuthenticationContext) GetOIdCMetadataURL() *url.URL {
 	ret := _m.Called()
 
 	var r0 *url.URL

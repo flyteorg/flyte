@@ -52,6 +52,12 @@ var defaultServerConfig = &ServerConfig{
 			// Please see the comments in this struct's definition for more information
 			HTTPAuthorizationHeader: "flyte-authorization",
 			GrpcAuthorizationHeader: "flyte-authorization",
+			// Default claims that should be supported by any OIdC server. Refer to https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
+			// for a complete list.
+			Scopes: []string{
+				"openid",
+				"profile",
+			},
 		},
 	},
 }

@@ -21,18 +21,23 @@ func TestCookieManager_SetTokenCookies(t *testing.T) {
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded)
 	assert.NoError(t, err)
 
-	token := oauth2.Token{
+	token := &oauth2.Token{
 		AccessToken:  "access",
 		RefreshToken: "refresh",
 	}
 
+	token = token.WithExtra(map[string]interface{}{
+		"id_token": "id token",
+	})
+
 	w := httptest.NewRecorder()
-	err = manager.SetTokenCookies(ctx, w, &token)
+	err = manager.SetTokenCookies(ctx, w, token)
 	assert.NoError(t, err)
 	fmt.Println(w.Header().Get("Set-Cookie"))
 	c := w.Result().Cookies()
-	assert.Equal(t, "flyte_jwt", c[0].Name)
-	assert.Equal(t, "flyte_refresh", c[1].Name)
+	assert.Equal(t, "flyte_at", c[0].Name)
+	assert.Equal(t, "flyte_idt", c[1].Name)
+	assert.Equal(t, "flyte_rt", c[2].Name)
 }
 
 func TestCookieManager_RetrieveTokenValues(t *testing.T) {
@@ -44,23 +49,29 @@ func TestCookieManager_RetrieveTokenValues(t *testing.T) {
 	manager, err := NewCookieManager(ctx, hashKeyEncoded, blockKeyEncoded)
 	assert.NoError(t, err)
 
-	token := oauth2.Token{
+	token := &oauth2.Token{
 		AccessToken:  "access",
 		RefreshToken: "refresh",
 	}
 
+	token = token.WithExtra(map[string]interface{}{
+		"id_token": "id token",
+	})
+
 	w := httptest.NewRecorder()
-	err = manager.SetTokenCookies(ctx, w, &token)
+	err = manager.SetTokenCookies(ctx, w, token)
 	assert.NoError(t, err)
 
 	cookies := w.Result().Cookies()
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
-	req.AddCookie(cookies[0])
-	req.AddCookie(cookies[1])
+	for _, c := range cookies {
+		req.AddCookie(c)
+	}
 
-	access, refresh, err := manager.RetrieveTokenValues(ctx, req)
+	idToken, access, refresh, err := manager.RetrieveTokenValues(ctx, req)
 	assert.NoError(t, err)
+	assert.Equal(t, "id token", idToken)
 	assert.Equal(t, "access", access)
 	assert.Equal(t, "refresh", refresh)
 }

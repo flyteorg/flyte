@@ -49,12 +49,19 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	assert.NoError(t, err)
 	mockAuthCtx := mocks.AuthenticationContext{}
 	mockAuthCtx.On("CookieManager").Return(&cookieManager)
+	mockAuthCtx.OnOptions().Return(config.OAuthOptions{})
 	handler := GetHTTPRequestCookieToMetadataHandler(&mockAuthCtx)
 	req, err := http.NewRequest("GET", "/api/v1/projects", nil)
 	assert.NoError(t, err)
-	jwtCookie, err := NewSecureCookie(accessTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey)
+
+	accessTokenCookie, err := NewSecureCookie(accessTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey)
 	assert.NoError(t, err)
-	req.AddCookie(&jwtCookie)
+	req.AddCookie(&accessTokenCookie)
+
+	idCookie, err := NewSecureCookie(idTokenCookieName, "a.b.c", cookieManager.hashKey, cookieManager.blockKey)
+	assert.NoError(t, err)
+	req.AddCookie(&idCookie)
+
 	assert.Equal(t, "Bearer a.b.c", handler(ctx, req)["authorization"][0])
 }
 
@@ -92,12 +99,12 @@ func TestGetMetadataEndpointRedirectHandler(t *testing.T) {
 	ctx := context.Background()
 	baseURL, err := url.Parse("http://www.google.com")
 	assert.NoError(t, err)
-	metadataPath, err := url.Parse(MetadataEndpoint)
+	metadataPath, err := url.Parse(OAuth2MetadataEndpoint)
 	assert.NoError(t, err)
 	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.On("GetBaseURL").Return(baseURL)
-	mockAuthCtx.On("GetMetadataURL").Return(metadataPath)
-	handler := GetMetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
+	mockAuthCtx.OnGetBaseURL().Return(baseURL)
+	mockAuthCtx.OnGetOAuth2MetadataURL().Return(metadataPath)
+	handler := GetOAuth2MetadataEndpointRedirectHandler(ctx, &mockAuthCtx)
 	req, err := http.NewRequest("GET", "/xyz", nil)
 	assert.NoError(t, err)
 	w := httptest.NewRecorder()
