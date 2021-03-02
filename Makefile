@@ -51,38 +51,21 @@ ifeq ($(shell docker ps -f name=$(FLYTE_SANDBOX_NAME) --format={.ID}),)
 	$(error Cluster has not been started! Use 'make start' to start a cluster)
 endif
 
-.PHONY: _prepare
-_prepare:
-	$(call LOG,Preparing dependencies)
-	.sandbox/prepare.sh
-
 .PHONY: start
-start: _prepare  ## Start a local Flyte sandbox
-	$(call LOG,Starting sandboxed Kubernetes cluster)
+start: ## Start a local Flyte sandbox
+	$(call LOG,Starting Flyte sandbox)
 	docker run -d --rm --privileged --name $(FLYTE_SANDBOX_NAME) \
-		-e KUBERNETES_API_PORT=$(KUBERNETES_API_PORT) \
-		-e K3S_KUBECONFIG_OUTPUT=/config/kubeconfig \
 		-e SANDBOX=1 \
 		-e FLYTE_HOST=localhost:30081 \
 		-e FLYTE_AWS_ENDPOINT=http://localhost:30084/ \
-		-v $(CURDIR)/.sandbox/data/config:/config \
 		-v $(CURDIR):/usr/src \
-		-v /var/run \
-		-p $(KUBERNETES_API_PORT):$(KUBERNETES_API_PORT) \
 		-p $(FLYTE_PROXY_PORT):30081 \
 		-p $(MINIO_PROXY_PORT):30084 \
-		$(FLYTE_SANDBOX_IMAGE) > /dev/null
-	timeout 600 sh -c "until kubectl explain deployment &> /dev/null; do sleep 1; done" || $(call ERROR,Timed out while waiting for the Kubernetes cluster to start)
-
-	$(call LOG,Deploying Flyte)
-	kubectl apply -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
-	kubectl wait --for=condition=available deployment/flyteadmin -n flyte --timeout=10m || $(call ERROR,Timed out while waiting for the Flyteadmin component to start)
+		ghcr.io/flyteorg/flyte-sandbox:dind > /dev/null
+	$(call RUN_IN_SANDBOX, wait-for-flyte.sh)
 
 	$(call LOG,Registering examples from commit: latest)
 	REGISTRY=ghcr.io/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
-
-	kubectl wait --for=condition=available deployment/{datacatalog,flyteadmin,flyteconsole,flytepropeller} -n flyte --timeout=10m || $(call ERROR,Timed out while waiting for the Flyte deployment to start)
-	$(call LOG,"Flyte deployment ready! Flyte console is now available at http://localhost:$(FLYTE_PROXY_PORT)/console")
 
 .PHONY: teardown
 teardown: _requires-sandbox-up  ## Teardown Flyte sandbox
