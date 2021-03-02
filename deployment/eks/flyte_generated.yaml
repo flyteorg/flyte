@@ -3,6 +3,16 @@ kind: Namespace
 metadata:
   name: flyte
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubeflow
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sparkoperator
+---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -7621,13 +7631,13 @@ metadata:
     app: pytorch-operator
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -7924,7 +7934,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -7937,7 +7947,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 ---
 apiVersion: v1
 data:
@@ -8367,6 +8377,22 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    cloud.google.com/load-balancer-type: Internal
+  name: datacatalog-metrics
+  namespace: flyte
+spec:
+  ports:
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
+  selector:
+    app: datacatalog
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
     external-dns.alpha.kubernetes.io/hostname: flyteadmin.subdomain.mydomain.com
     projectcontour.io/upstream-protocol.h2c: grpc
     service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
@@ -8414,23 +8440,17 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/path: /metrics
-    prometheus.io/port: "8443"
-    prometheus.io/scrape: "true"
-  labels:
-    app: pytorch-operator
-    kustomize.component: pytorch-operator
-  name: pytorch-operator
+    cloud.google.com/load-balancer-type: Internal
+  name: flytepropeller
   namespace: flyte
 spec:
   ports:
-  - name: monitoring-port
-    port: 8443
-    targetPort: 8443
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
   selector:
-    kustomize.component: pytorch-operator
-    name: pytorch-operator
-  type: ClusterIP
+    app: flytepropeller
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: Service
@@ -8452,8 +8472,30 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8443"
+    prometheus.io/scrape: "true"
+  labels:
+    app: pytorch-operator
+    kustomize.component: pytorch-operator
+  name: pytorch-operator
+  namespace: kubeflow
+spec:
+  ports:
+  - name: monitoring-port
+    port: 8443
+    targetPort: 8443
+  selector:
+    kustomize.component: pytorch-operator
+    name: pytorch-operator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: spark-webhook
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   ports:
   - name: webhook
@@ -8760,7 +8802,7 @@ metadata:
   labels:
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 spec:
   replicas: 1
   selector:
@@ -8799,7 +8841,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.5-v1beta2
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   replicas: 1
   selector:
@@ -8954,7 +8996,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.5-v1beta2
   name: sparkoperator-init
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   backoffLimit: 3
   template:
@@ -8967,7 +9009,7 @@ spec:
       - command:
         - /usr/bin/gencerts.sh
         - --namespace
-        - flyte
+        - sparkoperator
         - -p
         image: gcr.io/spark-operator/spark-operator:v1beta2-1.1.2-2.4.5
         imagePullPolicy: IfNotPresent

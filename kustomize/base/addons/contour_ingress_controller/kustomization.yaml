@@ -1,0 +1,4 @@
+resources:
+- https://raw.githubusercontent.com/projectcontour/contour/release-1.13/examples/render/contour.yaml
+patchesStrategicMerge:
+- service.yaml
