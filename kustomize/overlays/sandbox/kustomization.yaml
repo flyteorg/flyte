@@ -36,7 +36,7 @@ images:
   newName: ghcr.io/lyft/datacatalog # override the name
 # FlytePropeller
 - name: flytepropeller # match images with this name
-  newTag: v0.5.13 # override the tag
+  newTag: v0.6.1 # override the tag
   newName: ghcr.io/flyteorg/flytepropeller # override the name
 # Override postgres image to use alpine based (rather smaller) docker image
 - name: postgres

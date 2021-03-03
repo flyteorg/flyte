@@ -2280,10 +2280,10 @@ data:
     plugins:
       logs:
         kubernetes-enabled: true
-        kubernetes-url: "http://localhost:30082"
+        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-94gbkmm6cm
+  name: flyte-propeller-config-492gkfhbgk
   namespace: flyte
 ---
 apiVersion: v1
@@ -2898,7 +2898,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.5.13
+        image: ghcr.io/flyteorg/flytepropeller:v0.6.1
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -2909,7 +2909,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-94gbkmm6cm
+          name: flyte-propeller-config-492gkfhbgk
         name: config-volume
 ---
 apiVersion: apps/v1
