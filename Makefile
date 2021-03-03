@@ -2,6 +2,7 @@
 
 # Flyte sandbox configuration variables
 FLYTE_PROXY_PORT := 30081
+K8S_DASHBOARD_PROXY_PORT := 30082
 MINIO_PROXY_PORT := 30084
 FLYTE_SANDBOX_NAME := flyte-sandbox
 
@@ -43,6 +44,7 @@ start: ## Start a local Flyte sandbox
 		-e FLYTE_AWS_ENDPOINT=http://localhost:30084/ \
 		-v $(CURDIR):/usr/src \
 		-p $(FLYTE_PROXY_PORT):30081 \
+		-p $(K8S_DASHBOARD_PROXY_PORT):30082 \
 		-p $(MINIO_PROXY_PORT):30084 \
 		ghcr.io/flyteorg/flyte-sandbox:dind > /dev/null
 	$(call RUN_IN_SANDBOX, wait-for-flyte.sh)
