@@ -2,9 +2,9 @@ package flytek8s
 
 import (
 	"context"
-	"regexp"
 
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/lyft/flytestdlib/logger"
@@ -17,8 +17,6 @@ import (
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
 )
-
-var isAcceptableK8sName, _ = regexp.Compile("[a-z0-9]([-a-z0-9]*[a-z0-9])?")
 
 const resourceGPU = "gpu"
 
@@ -115,7 +113,7 @@ func ToK8sContainer(ctx context.Context, taskExecutionMetadata pluginsCore.TaskE
 	// Make the container name the same as the pod name, unless it violates K8s naming conventions
 	// Container names are subject to the DNS-1123 standard
 	containerName := taskExecutionMetadata.GetTaskExecutionID().GetGeneratedName()
-	if !isAcceptableK8sName.MatchString(containerName) || len(containerName) > 63 {
+	if errs := validation.IsDNS1123Label(containerName); len(errs) > 0 {
 		containerName = rand.String(4)
 	}
 	c := &v1.Container{
