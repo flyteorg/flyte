@@ -1619,7 +1619,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_node_execution:codes:OK[5m]))",
+              "expr": "sum(irate(flyte:admin:create_node_execution_event:codes:OK[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1633,7 +1633,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_node_execution:codes:InvalidArgument[5m]))",
+              "expr": "sum(irate(flyte:admin:create_node_execution_event:codes:InvalidArgument[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1647,7 +1647,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_node_execution:codes:AlreadyExists[5m]))",
+              "expr": "sum(irate(flyte:admin:create_node_execution_event:codes:AlreadyExists[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1661,7 +1661,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_node_execution:codes:FailedPrecondition[5m]))",
+              "expr": "sum(irate(flyte:admin:create_node_execution_event:codes:FailedPrecondition[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1676,7 +1676,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "create_node_execution return codes",
+          "title": "create_node_execution_event return codes",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1767,7 +1767,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_node_execution:errors[5m]))",
+              "expr": "sum(irate(flyte:admin:create_node_execution_event:errors[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1781,7 +1781,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_node_execution:success[5m]))",
+              "expr": "sum(irate(flyte:admin:create_node_execution_event:success[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1796,7 +1796,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "create_node_execution success vs errors",
+          "title": "create_node_execution_event success vs errors",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1887,7 +1887,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(rate(flyte:admin:create_node_execution:duration_ms[5m])) by (quantile)",
+              "expr": "sum(rate(flyte:admin:create_node_execution_event:duration_ms[5m])) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1902,7 +1902,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "create_node_execution Latency",
+          "title": "create_node_execution_event Latency",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -1938,7 +1938,7 @@
       ],
       "repeat": null,
       "showTitle": true,
-      "title": "create_node_execution stats"
+      "title": "create_node_execution_event stats"
     },
     {
       "collapse": true,
@@ -2003,7 +2003,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_task_execution:codes:OK[5m]))",
+              "expr": "sum(irate(flyte:admin:create_task_execution_event:codes:OK[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2017,7 +2017,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_task_execution:codes:InvalidArgument[5m]))",
+              "expr": "sum(irate(flyte:admin:create_task_execution_event:codes:InvalidArgument[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2031,7 +2031,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_task_execution:codes:AlreadyExists[5m]))",
+              "expr": "sum(irate(flyte:admin:create_task_execution_event:codes:AlreadyExists[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2045,7 +2045,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_task_execution:codes:FailedPrecondition[5m]))",
+              "expr": "sum(irate(flyte:admin:create_task_execution_event:codes:FailedPrecondition[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2060,7 +2060,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "create_task_execution return codes",
+          "title": "create_task_execution_event return codes",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2151,7 +2151,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_task_execution:errors[5m]))",
+              "expr": "sum(irate(flyte:admin:create_task_execution_event:errors[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2165,7 +2165,7 @@
             },
             {
               "datasource": "",
-              "expr": "sum(irate(flyte:admin:create_task_execution:success[5m]))",
+              "expr": "sum(irate(flyte:admin:create_task_execution_event:success[5m]))",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2180,7 +2180,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "create_task_execution success vs errors",
+          "title": "create_task_execution_event success vs errors",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2271,7 +2271,7 @@
           "targets": [
             {
               "datasource": "",
-              "expr": "sum(rate(flyte:admin:create_task_execution:duration_ms[5m])) by (quantile)",
+              "expr": "sum(rate(flyte:admin:create_task_execution_event:duration_ms[5m])) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -2286,7 +2286,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "create_task_execution Latency",
+          "title": "create_task_execution_event Latency",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2322,7 +2322,7 @@
       ],
       "repeat": null,
       "showTitle": true,
-      "title": "create_task_execution stats"
+      "title": "create_task_execution_event stats"
     },
     {
       "collapse": true,
