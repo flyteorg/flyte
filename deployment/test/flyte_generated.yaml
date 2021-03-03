@@ -415,15 +415,9 @@ data:
         region: us-east-1
       container: "my-s3-bucket"
 
-  task_logs.yaml: |
-    # TODO this is used to enable log links in the UI.
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-569h4b5459
+  name: flyte-propeller-config-ttk5h2hkmg
   namespace: flyte
 ---
 apiVersion: v1
@@ -741,7 +735,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.5.13
+        image: ghcr.io/flyteorg/flytepropeller:v0.6.1
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -752,7 +746,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-569h4b5459
+          name: flyte-propeller-config-ttk5h2hkmg
         name: config-volume
 ---
 apiVersion: apps/v1
