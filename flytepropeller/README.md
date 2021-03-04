@@ -24,6 +24,11 @@ This command will install kubectl-flyte and flytepropeller to `~/go/bin`
    $ make compile
 ```
 
+You can also use [Krew](https://github.com/kubernetes-sigs/krew) to install the kubectl-flyte CLI:
+```
+   $ kubectl krew install flyte
+```
+
 Use
 ---
 Two ways to execute the command, either standalone *kubectl-flyte* or as a subcommand of *kubectl*
