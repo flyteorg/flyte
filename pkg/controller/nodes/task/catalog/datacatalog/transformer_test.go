@@ -34,7 +34,7 @@ func TestNilParamTask(t *testing.T) {
 	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, datasetID.Version)
-	assert.Equal(t, "1.0.0-V-K42BDF-V-K42BDF", datasetID.Version)
+	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.Version)
 }
 
 // Ensure that empty parameters generate the same dataset as nil parameters
@@ -55,7 +55,7 @@ func TestEmptyParamTask(t *testing.T) {
 	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, datasetID.Version)
-	assert.Equal(t, "1.0.0-V-K42BDF-V-K42BDF", datasetID.Version)
+	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.Version)
 
 	key.TypedInterface.Inputs = nil
 	key.TypedInterface.Outputs = nil
@@ -86,7 +86,7 @@ func TestVariableMapOrder(t *testing.T) {
 	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, datasetID.Version)
-	assert.Equal(t, "1.0.0-UxVtPm0k-V-K42BDF", datasetID.Version)
+	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetID.Version)
 
 	key.TypedInterface.Inputs = &core.VariableMap{
 		Variables: map[string]*core.Variable{
@@ -97,7 +97,7 @@ func TestVariableMapOrder(t *testing.T) {
 	datasetIDDupe, err := GenerateDatasetIDForTask(context.TODO(), key)
 	assert.NoError(t, err)
 
-	assert.Equal(t, "1.0.0-UxVtPm0k-V-K42BDF", datasetIDDupe.Version)
+	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetIDDupe.Version)
 	assert.True(t, proto.Equal(datasetID, datasetIDDupe))
 }
 
@@ -122,11 +122,11 @@ func TestInputValueSorted(t *testing.T) {
 func TestNoInputValues(t *testing.T) {
 	tag, err := GenerateArtifactTagName(context.TODO(), nil)
 	assert.NoError(t, err)
-	assert.Equal(t, "flyte_cached-m4vFNUOHOFEFIiZSyOyid92TkWFFBDha4UOkkBb47XU", tag)
+	assert.Equal(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", tag)
 
 	tagDupe, err := GenerateArtifactTagName(context.TODO(), &core.LiteralMap{Literals: nil})
 	assert.NoError(t, err)
-	assert.Equal(t, "flyte_cached-m4vFNUOHOFEFIiZSyOyid92TkWFFBDha4UOkkBb47XU", tagDupe)
+	assert.Equal(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", tagDupe)
 	assert.Equal(t, tagDupe, tag)
 }
 

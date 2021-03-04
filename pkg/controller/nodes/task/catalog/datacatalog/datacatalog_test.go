@@ -351,14 +351,14 @@ func TestCatalog_Get(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
-				Version: "1.0.0-V-K42BDF-V-K42BDF",
+				Version: "1.0.0-GKw-c0Pw-GKw-c0Pw",
 			},
 		}
 
 		mockClient.On("GetDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetDatasetRequest) bool {
-				assert.EqualValues(t, "1.0.0-V-K42BDF-V-K42BDF", o.Dataset.Version)
+				assert.EqualValues(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.Dataset.Version)
 				return true
 			}),
 		).Return(&datacatalog.GetDatasetResponse{Dataset: sampleDataSet}, nil)
@@ -371,8 +371,8 @@ func TestCatalog_Get(t *testing.T) {
 		mockClient.On("GetArtifact",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.GetArtifactRequest) bool {
-				assert.EqualValues(t, "1.0.0-V-K42BDF-V-K42BDF", o.Dataset.Version)
-				assert.Equal(t, "flyte_cached-m4vFNUOHOFEFIiZSyOyid92TkWFFBDha4UOkkBb47XU", o.GetTagName())
+				assert.EqualValues(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.Dataset.Version)
+				assert.Equal(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", o.GetTagName())
 				return true
 			}),
 		).Return(&datacatalog.GetArtifactResponse{Artifact: sampleArtifact}, nil)
@@ -454,7 +454,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.Equal(t, "1.0.0-V-K42BDF-V-K42BDF", o.Dataset.Id.Version)
+				assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", o.Dataset.Id.Version)
 				return true
 			}),
 		).Return(&datacatalog.CreateDatasetResponse{}, nil)
@@ -470,7 +470,7 @@ func TestCatalog_Put(t *testing.T) {
 		mockClient.On("AddTag",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.AddTagRequest) bool {
-				assert.EqualValues(t, "flyte_cached-m4vFNUOHOFEFIiZSyOyid92TkWFFBDha4UOkkBb47XU", o.Tag.Name)
+				assert.EqualValues(t, "flyte_cached-GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", o.Tag.Name)
 				return true
 			}),
 		).Return(&datacatalog.AddTagResponse{}, nil)
