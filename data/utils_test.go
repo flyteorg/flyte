@@ -8,9 +8,9 @@ import (
 	"path"
 	"testing"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -81,7 +81,7 @@ func TestUploadFile(t *testing.T) {
 }
 
 func TestDownloadFromHttp(t *testing.T) {
-	loc := storage.DataReference("https://raw.githubusercontent.com/lyft/flyte/master/README.md")
+	loc := storage.DataReference("https://raw.githubusercontent.com/flyteorg/flyte/master/README.md")
 	badLoc := storage.DataReference("https://no-exist")
 	f, err := DownloadFileFromHTTP(context.TODO(), loc)
 	if assert.NoError(t, err) {

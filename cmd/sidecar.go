@@ -3,17 +3,16 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flytecopilot/cmd/containerwatcher"
+	"github.com/flyteorg/flytecopilot/data"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/storage"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-
-	"github.com/lyft/flyteplugins/copilot/cmd/containerwatcher"
-	"github.com/lyft/flyteplugins/copilot/data"
 )
 
 const (

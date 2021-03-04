@@ -1,15 +1,15 @@
-module github.com/lyft/flyteplugins/copilot
+module github.com/flyteorg/flytecopilot
 
 go 1.13
 
 require (
 	github.com/aws/aws-sdk-go v1.37.1
+	github.com/flyteorg/flyteidl v0.18.14
+	github.com/flyteorg/flytestdlib v0.3.12
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.4.3
-	github.com/lyft/flyteidl v0.18.12
-	github.com/lyft/flyteplugins v0.4.4
-	github.com/lyft/flytestdlib v0.3.9
+	github.com/imdario/mergo v0.3.11 // indirect
+	github.com/lyft/flyteidl v0.18.14 // indirect
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.1
@@ -20,11 +20,10 @@ require (
 	k8s.io/apimachinery v0.20.2
 	k8s.io/client-go v11.0.1-0.20190918222721-c0e3722d5cf0+incompatible
 	k8s.io/klog v1.0.0
+	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009 // indirect
 )
 
 replace (
-	github.com/GoogleCloudPlatform/spark-on-k8s-operator => github.com/lyft/spark-on-k8s-operator v0.1.3
-	github.com/lyft/flyteidl => ../../flyteidl
-	github.com/lyft/flyteplugins => ../
-	github.com/lyft/flytestdlib => ../../flytestdlib
+	github.com/flyteorg/flyteidl => github.com/lyft/flyteidl v0.18.14
+	github.com/flyteorg/flytestdlib => github.com/lyft/flytestdlib v0.3.12
 )

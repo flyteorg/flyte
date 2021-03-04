@@ -10,12 +10,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 )
 
 func TestDownloadOptions_Download(t *testing.T) {
@@ -85,8 +85,8 @@ func TestDownloadOptions_Download(t *testing.T) {
 
 		assert.NoError(t, store.WriteProtobuf(ctx, storage.DataReference(inputPath), storage.Options{}, &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
-				"y": utils.MustMakePrimitiveLiteral("hello"),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
+				"y": coreutils.MustMakePrimitiveLiteral("hello"),
 			},
 		}))
 		assert.NoError(t, dopts.Download(ctx), "Download Operation failed")
@@ -114,8 +114,8 @@ func TestDownloadOptions_Download(t *testing.T) {
 		assert.NoError(t, store.WriteRaw(ctx, blobLoc, int64(br.Len()), storage.Options{}, br))
 		assert.NoError(t, store.WriteProtobuf(ctx, storage.DataReference(inputPath), storage.Options{}, &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
-				"y": utils.MustMakePrimitiveLiteral("hello"),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
+				"y": coreutils.MustMakePrimitiveLiteral("hello"),
 				"blob": {Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Blob{
@@ -156,8 +156,8 @@ func TestDownloadOptions_Download(t *testing.T) {
 
 		assert.NoError(t, store.WriteProtobuf(ctx, storage.DataReference(inputPath), storage.Options{}, &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
-				"y": utils.MustMakePrimitiveLiteral("hello"),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
+				"y": coreutils.MustMakePrimitiveLiteral("hello"),
 				"blob": {Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Blob{

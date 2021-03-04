@@ -7,13 +7,13 @@ import (
 	"path"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flyteplugins/copilot/cmd/containerwatcher"
+	"github.com/flyteorg/flytecopilot/cmd/containerwatcher"
 )
 
 func TestUploadOptions_Upload(t *testing.T) {

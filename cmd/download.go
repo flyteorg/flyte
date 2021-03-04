@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/spf13/cobra"
-
-	"github.com/lyft/flyteplugins/copilot/data"
 )
 
 type DownloadOptions struct {
