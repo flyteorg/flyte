@@ -5,7 +5,6 @@ go 1.13
 require (
 	github.com/aws/aws-sdk-go v1.29.23
 	github.com/fsnotify/fsnotify v1.4.9
-	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.2
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/lyft/flyteidl v0.18.11
