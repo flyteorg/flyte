@@ -10,14 +10,14 @@ import (
 	"path/filepath"
 	"reflect"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/futures"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/futures"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/storage"
 	"github.com/pkg/errors"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 )
 
 const maxPrimitiveSize = 1024
@@ -53,7 +53,7 @@ func (u Uploader) handleSimpleType(_ context.Context, t core.SimpleType, filePat
 	if err != nil {
 		return nil, err
 	}
-	return utils.MakeLiteralForSimpleType(t, string(b))
+	return coreutils.MakeLiteralForSimpleType(t, string(b))
 }
 
 func (u Uploader) handleBlobType(ctx context.Context, localPath string, toPath storage.DataReference) (*core.Literal, error) {

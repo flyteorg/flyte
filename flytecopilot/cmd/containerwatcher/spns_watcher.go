@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/mitchellh/go-ps"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"

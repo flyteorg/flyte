@@ -6,8 +6,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/fsnotify/fsnotify"
-	"github.com/lyft/flytestdlib/logger"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
