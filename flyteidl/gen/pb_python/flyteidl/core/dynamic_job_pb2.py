@@ -22,8 +22,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/core/dynamic_job.proto',
   package='flyteidl.core',
   syntax='proto3',
-  serialized_options=_b('Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/core'),
-  serialized_pb=_b('\n\x1f\x66lyteidl/core/dynamic_job.proto\x12\rflyteidl.core\x1a\x19\x66lyteidl/core/tasks.proto\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x1c\x66lyteidl/core/literals.proto\"\xd7\x01\n\x0e\x44ynamicJobSpec\x12\"\n\x05nodes\x18\x01 \x03(\x0b\x32\x13.flyteidl.core.Node\x12\x15\n\rmin_successes\x18\x02 \x01(\x03\x12\'\n\x07outputs\x18\x03 \x03(\x0b\x32\x16.flyteidl.core.Binding\x12*\n\x05tasks\x18\x04 \x03(\x0b\x32\x1b.flyteidl.core.TaskTemplate\x12\x35\n\x0csubworkflows\x18\x05 \x03(\x0b\x32\x1f.flyteidl.core.WorkflowTemplateB2Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
+  serialized_options=_b('Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core'),
+  serialized_pb=_b('\n\x1f\x66lyteidl/core/dynamic_job.proto\x12\rflyteidl.core\x1a\x19\x66lyteidl/core/tasks.proto\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x1c\x66lyteidl/core/literals.proto\"\xd7\x01\n\x0e\x44ynamicJobSpec\x12\"\n\x05nodes\x18\x01 \x03(\x0b\x32\x13.flyteidl.core.Node\x12\x15\n\rmin_successes\x18\x02 \x01(\x03\x12\'\n\x07outputs\x18\x03 \x03(\x0b\x32\x16.flyteidl.core.Binding\x12*\n\x05tasks\x18\x04 \x03(\x0b\x32\x1b.flyteidl.core.TaskTemplate\x12\x35\n\x0csubworkflows\x18\x05 \x03(\x0b\x32\x1f.flyteidl.core.WorkflowTemplateB6Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_tasks__pb2.DESCRIPTOR,flyteidl_dot_core_dot_workflow__pb2.DESCRIPTOR,flyteidl_dot_core_dot_literals__pb2.DESCRIPTOR,])
 

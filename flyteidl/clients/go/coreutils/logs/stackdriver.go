@@ -3,7 +3,7 @@ package logs
 import (
 	"fmt"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // TL;DR Log links in Stackdriver for configured GCP project and log Resource

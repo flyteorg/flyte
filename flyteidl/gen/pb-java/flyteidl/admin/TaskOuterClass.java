@@ -5037,8 +5037,9 @@ public final class TaskOuterClass {
       "teidl.core.TaskTemplate\"q\n\013TaskClosure\0222" +
       "\n\rcompiled_task\030\001 \001(\0132\033.flyteidl.core.Co" +
       "mpiledTask\022.\n\ncreated_at\030\002 \001(\0132\032.google." +
-      "protobuf.TimestampB3Z1github.com/lyft/fl" +
-      "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "protobuf.TimestampB7Z5github.com/flyteor" +
+      "g/flyteidl/gen/pb-go/flyteidl/adminb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

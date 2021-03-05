@@ -242,13 +242,13 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fsagemaker_2fhyperparam
   "arameterTuningObjective\022h\n training_job_"
   "early_stopping_type\030\004 \001(\0162>.flyteidl.plu"
   "gins.sagemaker.TrainingJobEarlyStoppingT"
-  "ype.ValueB5Z3github.com/lyft/flyteidl/ge"
-  "n/pb-go/flyteidl/pluginsb\006proto3"
+  "ype.ValueB9Z7github.com/flyteorg/flyteid"
+  "l/gen/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fsagemaker_2fhyperparameter_5ftuning_5fjob_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fsagemaker_2fhyperparameter_5ftuning_5fjob_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fsagemaker_2fhyperparameter_5ftuning_5fjob_2eproto,
-  "flyteidl/plugins/sagemaker/hyperparameter_tuning_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsagemaker_2fhyperparameter_5ftuning_5fjob_2eproto, 1152,
+  "flyteidl/plugins/sagemaker/hyperparameter_tuning_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsagemaker_2fhyperparameter_5ftuning_5fjob_2eproto, 1156,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fsagemaker_2fhyperparameter_5ftuning_5fjob_2eproto() {

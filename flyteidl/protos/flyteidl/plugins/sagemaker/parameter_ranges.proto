@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.plugins.sagemaker;
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // HyperparameterScalingType defines the way to increase or decrease the value of the hyperparameter
 // For details, refer to: https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-define-ranges.html

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package flyteidl.admin;
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/compiler.proto";
 import "flyteidl/core/identifier.proto";
@@ -62,4 +62,3 @@ message WorkflowClosure {
     // Time at which the workflow was created.
     google.protobuf.Timestamp created_at           = 2;
 }
-

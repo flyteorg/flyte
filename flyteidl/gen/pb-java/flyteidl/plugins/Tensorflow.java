@@ -677,9 +677,9 @@ public final class Tensorflow {
       "\n!flyteidl/plugins/tensorflow.proto\022\020fly" +
       "teidl.plugins\"a\n!DistributedTensorflowTr" +
       "ainingTask\022\017\n\007workers\030\001 \001(\005\022\023\n\013ps_replic" +
-      "as\030\002 \001(\005\022\026\n\016chief_replicas\030\003 \001(\005B5Z3gith" +
-      "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/" +
-      "pluginsb\006proto3"
+      "as\030\002 \001(\005\022\026\n\016chief_replicas\030\003 \001(\005B9Z7gith" +
+      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
+      "idl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

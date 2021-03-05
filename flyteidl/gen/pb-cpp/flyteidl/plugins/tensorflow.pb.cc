@@ -74,14 +74,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2ftensorflow_2eproto[] =
   "\n!flyteidl/plugins/tensorflow.proto\022\020fly"
   "teidl.plugins\"a\n!DistributedTensorflowTr"
   "ainingTask\022\017\n\007workers\030\001 \001(\005\022\023\n\013ps_replic"
-  "as\030\002 \001(\005\022\026\n\016chief_replicas\030\003 \001(\005B5Z3gith"
-  "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/"
-  "pluginsb\006proto3"
+  "as\030\002 \001(\005\022\026\n\016chief_replicas\030\003 \001(\005B9Z7gith"
+  "ub.com/flyteorg/flyteidl/gen/pb-go/flyte"
+  "idl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2ftensorflow_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2ftensorflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2ftensorflow_2eproto,
-  "flyteidl/plugins/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2ftensorflow_2eproto, 215,
+  "flyteidl/plugins/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2ftensorflow_2eproto, 219,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2ftensorflow_2eproto() {

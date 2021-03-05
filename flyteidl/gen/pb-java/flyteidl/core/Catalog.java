@@ -2262,8 +2262,8 @@ public final class Catalog {
       "ogCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCAC" +
       "HE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPULA" +
       "TED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACHE" +
-      "_PUT_FAILURE\020\005B2Z0github.com/lyft/flytei" +
-      "dl/gen/pb-go/flyteidl/coreb\006proto3"
+      "_PUT_FAILURE\020\005B6Z4github.com/flyteorg/fl" +
+      "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

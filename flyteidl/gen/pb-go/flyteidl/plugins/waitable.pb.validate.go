@@ -17,7 +17,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // ensure the imports are used

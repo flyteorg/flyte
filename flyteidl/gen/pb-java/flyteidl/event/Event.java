@@ -11981,9 +11981,9 @@ public final class Event {
       "\"\225\001\n\025TaskExecutionMetadata\022K\n\016instance_c" +
       "lass\030\020 \001(\01623.flyteidl.event.TaskExecutio" +
       "nMetadata.InstanceClass\"/\n\rInstanceClass" +
-      "\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B3Z1gith" +
-      "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/" +
-      "eventb\006proto3"
+      "\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5gith" +
+      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
+      "idl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

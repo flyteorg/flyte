@@ -601,13 +601,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fliterals_2eproto[] =
   "\t\022+\n\007binding\030\002 \001(\0132\032.flyteidl.core.Bindi"
   "ngData\"*\n\014KeyValuePair\022\013\n\003key\030\001 \001(\t\022\r\n\005v"
   "alue\030\002 \001(\t\" \n\rRetryStrategy\022\017\n\007retries\030\005"
-  " \001(\rB2Z0github.com/lyft/flyteidl/gen/pb-"
-  "go/flyteidl/coreb\006proto3"
+  " \001(\rB6Z4github.com/flyteorg/flyteidl/gen"
+  "/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fliterals_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fliterals_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fliterals_2eproto,
-  "flyteidl/core/literals.proto", &assign_descriptors_table_flyteidl_2fcore_2fliterals_2eproto, 1944,
+  "flyteidl/core/literals.proto", &assign_descriptors_table_flyteidl_2fcore_2fliterals_2eproto, 1948,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fliterals_2eproto() {

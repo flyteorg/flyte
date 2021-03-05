@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	datacatalog "github.com/lyft/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	grpc "google.golang.org/grpc"
 
 	mock "github.com/stretchr/testify/mock"

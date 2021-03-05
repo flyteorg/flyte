@@ -142,14 +142,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fqubole_2eproto[] =
   "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001("
   "\0132%.flyteidl.plugins.HiveQueryCollection"
   "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt"
-  "eidl.plugins.HiveQueryB5Z3github.com/lyf"
-  "t/flyteidl/gen/pb-go/flyteidl/pluginsb\006p"
-  "roto3"
+  "eidl.plugins.HiveQueryB9Z7github.com/fly"
+  "teorg/flyteidl/gen/pb-go/flyteidl/plugin"
+  "sb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fqubole_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fqubole_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fqubole_2eproto,
-  "flyteidl/plugins/qubole.proto", &assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto, 445,
+  "flyteidl/plugins/qubole.proto", &assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto, 449,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fqubole_2eproto() {

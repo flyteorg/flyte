@@ -1,6 +1,6 @@
 {
   "name": "@flyteorg/flyteidl",
-  "version": "0.18.14",
+  "version": "0.18.15",
   "description": "Compiled protocol buffers and gRPC service clients/servers for Flyte IDLs",
   "repository": {
     "type": "git",

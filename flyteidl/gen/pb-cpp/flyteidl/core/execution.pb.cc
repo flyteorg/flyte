@@ -272,13 +272,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto[] =
   "ce.TierH\000\0223\n\004spec\030\002 \001(\0132#.flyteidl.core."
   "QualityOfServiceSpecH\000\"4\n\004Tier\022\r\n\tUNDEFI"
   "NED\020\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013"
-  "designationB2Z0github.com/lyft/flyteidl/"
-  "gen/pb-go/flyteidl/coreb\006proto3"
+  "designationB6Z4github.com/flyteorg/flyte"
+  "idl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto,
-  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 1231,
+  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 1235,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fexecution_2eproto() {

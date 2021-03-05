@@ -5176,8 +5176,8 @@ public final class Compiler {
       "yteidl.core.CompiledWorkflow\0226\n\rsub_work" +
       "flows\030\002 \003(\0132\037.flyteidl.core.CompiledWork" +
       "flow\022*\n\005tasks\030\003 \003(\0132\033.flyteidl.core.Comp" +
-      "iledTaskB2Z0github.com/lyft/flyteidl/gen" +
-      "/pb-go/flyteidl/coreb\006proto3"
+      "iledTaskB6Z4github.com/flyteorg/flyteidl" +
+      "/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

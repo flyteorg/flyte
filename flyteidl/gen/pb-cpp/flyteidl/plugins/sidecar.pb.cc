@@ -76,14 +76,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fsidecar_2eproto[] =
   "dl.plugins\032\"k8s.io/api/core/v1/generated"
   ".proto\"[\n\nSidecarJob\022-\n\010pod_spec\030\001 \001(\0132\033"
   ".k8s.io.api.core.v1.PodSpec\022\036\n\026primary_c"
-  "ontainer_name\030\002 \001(\tB5Z3github.com/lyft/f"
-  "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot"
-  "o3"
+  "ontainer_name\030\002 \001(\tB9Z7github.com/flyteo"
+  "rg/flyteidl/gen/pb-go/flyteidl/pluginsb\006"
+  "proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fsidecar_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fsidecar_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fsidecar_2eproto,
-  "flyteidl/plugins/sidecar.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto, 242,
+  "flyteidl/plugins/sidecar.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto, 246,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fsidecar_2eproto() {

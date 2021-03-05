@@ -13535,8 +13535,9 @@ public final class LaunchPlanOuterClass {
       "\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n" +
       "\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl" +
       ".admin.Sort*+\n\017LaunchPlanState\022\014\n\010INACTI" +
-      "VE\020\000\022\n\n\006ACTIVE\020\001B3Z1github.com/lyft/flyt" +
-      "eidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "VE\020\000\022\n\n\006ACTIVE\020\001B7Z5github.com/flyteorg/" +
+      "flyteidl/gen/pb-go/flyteidl/adminb\006proto" +
+      "3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

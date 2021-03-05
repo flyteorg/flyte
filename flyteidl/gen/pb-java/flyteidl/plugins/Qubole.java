@@ -2658,9 +2658,9 @@ public final class Qubole {
       "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001(" +
       "\0132%.flyteidl.plugins.HiveQueryCollection" +
       "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt" +
-      "eidl.plugins.HiveQueryB5Z3github.com/lyf" +
-      "t/flyteidl/gen/pb-go/flyteidl/pluginsb\006p" +
-      "roto3"
+      "eidl.plugins.HiveQueryB9Z7github.com/fly" +
+      "teorg/flyteidl/gen/pb-go/flyteidl/plugin" +
+      "sb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

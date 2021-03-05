@@ -280,14 +280,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fsagemaker_2fparameter_
   ".ParameterRanges.ParameterRangeMapEntry\032"
   "i\n\026ParameterRangeMapEntry\022\013\n\003key\030\001 \001(\t\022>"
   "\n\005value\030\002 \001(\0132/.flyteidl.plugins.sagemak"
-  "er.ParameterRangeOneOf:\0028\001B5Z3github.com"
-  "/lyft/flyteidl/gen/pb-go/flyteidl/plugin"
-  "sb\006proto3"
+  "er.ParameterRangeOneOf:\0028\001B9Z7github.com"
+  "/flyteorg/flyteidl/gen/pb-go/flyteidl/pl"
+  "uginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fsagemaker_2fparameter_5franges_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fsagemaker_2fparameter_5franges_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fsagemaker_2fparameter_5franges_2eproto,
-  "flyteidl/plugins/sagemaker/parameter_ranges.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsagemaker_2fparameter_5franges_2eproto, 1129,
+  "flyteidl/plugins/sagemaker/parameter_ranges.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsagemaker_2fparameter_5franges_2eproto, 1133,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fsagemaker_2fparameter_5franges_2eproto() {

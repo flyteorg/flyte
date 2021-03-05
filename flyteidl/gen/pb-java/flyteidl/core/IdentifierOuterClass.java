@@ -4019,8 +4019,8 @@ public final class IdentifierOuterClass {
       "e.NodeExecutionIdentifier\022\025\n\rretry_attem" +
       "pt\030\003 \001(\r*U\n\014ResourceType\022\017\n\013UNSPECIFIED\020" +
       "\000\022\010\n\004TASK\020\001\022\014\n\010WORKFLOW\020\002\022\017\n\013LAUNCH_PLAN" +
-      "\020\003\022\013\n\007DATASET\020\004B2Z0github.com/lyft/flyte" +
-      "idl/gen/pb-go/flyteidl/coreb\006proto3"
+      "\020\003\022\013\n\007DATASET\020\004B6Z4github.com/flyteorg/f" +
+      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

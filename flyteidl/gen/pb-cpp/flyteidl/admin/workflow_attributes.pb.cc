@@ -262,13 +262,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_5fattributes_2e
   "ect\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010workflow\030\003 "
   "\001(\t\0228\n\rresource_type\030\004 \001(\0162!.flyteidl.ad"
   "min.MatchableResource\"\"\n WorkflowAttribu"
-  "tesDeleteResponseB3Z1github.com/lyft/fly"
-  "teidl/gen/pb-go/flyteidl/adminb\006proto3"
+  "tesDeleteResponseB7Z5github.com/flyteorg"
+  "/flyteidl/gen/pb-go/flyteidl/adminb\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto,
-  "flyteidl/admin/workflow_attributes.proto", &assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 838,
+  "flyteidl/admin/workflow_attributes.proto", &assign_descriptors_table_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto, 842,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto() {

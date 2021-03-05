@@ -1847,8 +1847,9 @@ public final class Errors {
       "l.core.ExecutionError.ErrorKind\",\n\004Kind\022" +
       "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n" +
       "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl" +
-      ".core.ContainerErrorB2Z0github.com/lyft/" +
-      "flyteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      ".core.ContainerErrorB6Z4github.com/flyte" +
+      "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

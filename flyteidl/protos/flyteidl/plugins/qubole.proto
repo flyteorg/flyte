@@ -4,7 +4,7 @@ package flyteidl.plugins;
 
 import "flyteidl/core/tasks.proto";
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // Defines a query to execute on a hive cluster.
 message HiveQuery {

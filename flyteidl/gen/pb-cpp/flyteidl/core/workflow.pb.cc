@@ -432,13 +432,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "core.Binding\022)\n\014failure_node\030\006 \001(\0132\023.fly"
   "teidl.core.Node\022B\n\021metadata_defaults\030\007 \001"
   "(\0132\'.flyteidl.core.WorkflowMetadataDefau"
-  "ltsB2Z0github.com/lyft/flyteidl/gen/pb-g"
-  "o/flyteidl/coreb\006proto3"
+  "ltsB6Z4github.com/flyteorg/flyteidl/gen/"
+  "pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2063,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2067,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
