@@ -3,12 +3,12 @@ package gormimpl
 import (
 	"context"
 
+	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	idl_datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/datacatalog/pkg/repositories/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	idl_datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flytestdlib/promutils"
 )
 
 type tagRepo struct {

@@ -17,10 +17,11 @@ linux_compile:
 
 .PHONY: generate_idl
 generate_idl:
-	protoc -I ./vendor/github.com/lyft/flyteidl/protos/ -I ./protos/idl/. --go_out=plugins=grpc:protos/gen ./protos/idl/service.proto
+	# TODO, move the protos to flyteidl. Currently to generate protos it is
+	# assumed that the flyteidl repo is checked out in an adjoining directory.
+	# We could use vendoring - but that causes problems when compiling
+	protoc -I ../flyteidl/protos/ -I ./protos/idl/. --go_out=plugins=grpc:protos/gen ./protos/idl/service.proto
 
 .PHONY: generate
 generate:
-	which pflags || (go get github.com/lyft/flytestdlib/cli/pflags)
-	which mockery || (go get github.com/enghabu/mockery/cmd/mockery)
 	@go generate ./...

@@ -5,21 +5,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
-	"github.com/lyft/datacatalog/pkg/manager/interfaces"
-	"github.com/lyft/datacatalog/pkg/repositories"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
+	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/datacatalog/pkg/repositories"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	"github.com/lyft/datacatalog/pkg/repositories/transformers"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"
 
-	"github.com/lyft/datacatalog/pkg/common"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 )
 
@@ -48,7 +48,7 @@ type artifactManager struct {
 }
 
 // Create an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an offloaded location.
-func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalog.CreateArtifactRequest) (*datacatalog.CreateArtifactResponse, error) {
+func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatalog.CreateArtifactRequest) (*datacatalog.CreateArtifactResponse, error) {
 	timer := m.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
@@ -61,7 +61,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 	}
 
 	ctx = contextutils.WithProjectDomain(ctx, artifact.Dataset.Project, artifact.Dataset.Domain)
-	datasetKey := transformers.FromDatasetID(*artifact.Dataset)
+	datasetKey := transformers.FromDatasetID(artifact.Dataset)
 
 	// The dataset must exist for the artifact, let's verify that first
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
@@ -84,7 +84,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 	// create Artifact Data offloaded storage files
 	artifactDataModels := make([]models.ArtifactData, len(request.Artifact.Data))
 	for i, artifactData := range request.Artifact.Data {
-		dataLocation, err := m.artifactStore.PutData(ctx, *artifact, *artifactData)
+		dataLocation, err := m.artifactStore.PutData(ctx, artifact, artifactData)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to store artifact data err: %v", err)
 			m.systemMetrics.createDataFailureCounter.Inc(ctx)
@@ -124,7 +124,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request datacatalo
 }
 
 // Get the Artifact and its associated ArtifactData. The request can query by ArtifactID or TagName.
-func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.GetArtifactRequest) (*datacatalog.GetArtifactResponse, error) {
+func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.GetArtifactRequest) (*datacatalog.GetArtifactResponse, error) {
 	timer := m.systemMetrics.getResponseTime.Start(ctx)
 	defer timer.Stop()
 
@@ -156,7 +156,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 		}
 	case *datacatalog.GetArtifactRequest_TagName:
 		logger.Debugf(ctx, "Get artifact by tag %v", request.GetTagName())
-		tagKey := transformers.ToTagKey(*datasetID, request.GetTagName())
+		tagKey := transformers.ToTagKey(datasetID, request.GetTagName())
 		tag, err := m.repo.TagRepo().Get(ctx, tagKey)
 
 		if err != nil {
@@ -194,7 +194,7 @@ func (m *artifactManager) GetArtifact(ctx context.Context, request datacatalog.G
 	logger.Debugf(ctx, "Retrieved artifact dataset %v, id: %v", artifact.Dataset, artifact.Id)
 	m.systemMetrics.getSuccessCounter.Inc(ctx)
 	return &datacatalog.GetArtifactResponse{
-		Artifact: &artifact,
+		Artifact: artifact,
 	}, nil
 }
 
@@ -216,8 +216,8 @@ func (m *artifactManager) getArtifactDataList(ctx context.Context, artifactDataM
 	return artifactDataList, nil
 }
 
-func (m *artifactManager) ListArtifacts(ctx context.Context, request datacatalog.ListArtifactsRequest) (*datacatalog.ListArtifactsResponse, error) {
-	err := validators.ValidateListArtifactRequest(&request)
+func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalog.ListArtifactsRequest) (*datacatalog.ListArtifactsResponse, error) {
+	err := validators.ValidateListArtifactRequest(request)
 	if err != nil {
 		logger.Warningf(ctx, "Invalid list artifact request %v, err: %v", request, err)
 		m.systemMetrics.validationErrorCounter.Inc(ctx)
@@ -225,7 +225,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request datacatalog
 	}
 
 	// Verify the dataset exists before listing artifacts
-	datasetKey := transformers.FromDatasetID(*request.Dataset)
+	datasetKey := transformers.FromDatasetID(request.Dataset)
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to get dataset for listing artifacts %v, err: %v", datasetKey, err)

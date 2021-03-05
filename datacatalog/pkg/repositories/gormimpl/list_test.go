@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/lyft/datacatalog/pkg/common"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	"github.com/lyft/datacatalog/pkg/repositories/utils"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/repositories/utils"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"github.com/stretchr/testify/assert"
 )
 

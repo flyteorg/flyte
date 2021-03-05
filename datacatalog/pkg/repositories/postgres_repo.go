@@ -1,11 +1,11 @@
 package repositories
 
 import (
+	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/gormimpl"
+	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/datacatalog/pkg/repositories/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/gormimpl"
-	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
-	"github.com/lyft/flytestdlib/promutils"
 )
 
 type PostgresRepo struct {

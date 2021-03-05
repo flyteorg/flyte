@@ -3,11 +3,11 @@ package impl
 import (
 	"context"
 
-	"github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 )
 
@@ -15,7 +15,7 @@ const artifactDataFile = "data.pb"
 
 // ArtifactDataStore stores and retrieves ArtifactData values in a data.pb
 type ArtifactDataStore interface {
-	PutData(ctx context.Context, artifact datacatalog.Artifact, data datacatalog.ArtifactData) (storage.DataReference, error)
+	PutData(ctx context.Context, artifact *datacatalog.Artifact, data *datacatalog.ArtifactData) (storage.DataReference, error)
 	GetData(ctx context.Context, dataModel models.ArtifactData) (*core.Literal, error)
 }
 
@@ -24,13 +24,13 @@ type artifactDataStore struct {
 	storagePrefix storage.DataReference
 }
 
-func (m *artifactDataStore) getDataLocation(ctx context.Context, artifact datacatalog.Artifact, data datacatalog.ArtifactData) (storage.DataReference, error) {
+func (m *artifactDataStore) getDataLocation(ctx context.Context, artifact *datacatalog.Artifact, data *datacatalog.ArtifactData) (storage.DataReference, error) {
 	dataset := artifact.Dataset
 	return m.store.ConstructReference(ctx, m.storagePrefix, dataset.Project, dataset.Domain, dataset.Name, dataset.Version, artifact.Id, data.Name, artifactDataFile)
 }
 
 // Store marshalled data in data.pb under the storage prefix
-func (m *artifactDataStore) PutData(ctx context.Context, artifact datacatalog.Artifact, data datacatalog.ArtifactData) (storage.DataReference, error) {
+func (m *artifactDataStore) PutData(ctx context.Context, artifact *datacatalog.Artifact, data *datacatalog.ArtifactData) (storage.DataReference, error) {
 	dataLocation, err := m.getDataLocation(ctx, artifact, data)
 	if err != nil {
 		return "", errors.NewDataCatalogErrorf(codes.Internal, "Unable to generate data location %s, err %v", dataLocation.String(), err)

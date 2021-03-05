@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/viper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -64,7 +64,7 @@ To get started run the serve subcommand which will start a server on localhost:8
 
 func initConfig(flags *pflag.FlagSet) error {
 	configAccessor = viper.NewAccessor(config.Options{
-		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/lyft/datacatalog"},
+		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/datacatalog"},
 		StrictMode:  false,
 	})
 

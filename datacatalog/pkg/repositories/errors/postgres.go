@@ -3,9 +3,9 @@ package errors
 import (
 	"fmt"
 
+	"github.com/flyteorg/datacatalog/pkg/errors"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
-	"github.com/lyft/datacatalog/pkg/errors"
 	"google.golang.org/grpc/codes"
 )
 

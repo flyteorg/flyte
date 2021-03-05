@@ -5,17 +5,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/datacatalog/pkg/common"
-	"github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
-	"github.com/lyft/datacatalog/pkg/manager/interfaces"
-	"github.com/lyft/datacatalog/pkg/repositories"
-	"github.com/lyft/datacatalog/pkg/repositories/transformers"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
+	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/datacatalog/pkg/repositories"
+	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 )
 
@@ -41,7 +41,7 @@ type datasetManager struct {
 	systemMetrics datasetMetrics
 }
 
-func (dm *datasetManager) validateCreateRequest(request datacatalog.CreateDatasetRequest) error {
+func (dm *datasetManager) validateCreateRequest(request *datacatalog.CreateDatasetRequest) error {
 	errorSet := make([]error, 0)
 	err := validators.ValidateDatasetID(request.Dataset.Id)
 	if err != nil {
@@ -61,7 +61,7 @@ func (dm *datasetManager) validateCreateRequest(request datacatalog.CreateDatase
 }
 
 // Create a Dataset with optional metadata. If one already exists a grpc AlreadyExists err will be returned
-func (dm *datasetManager) CreateDataset(ctx context.Context, request datacatalog.CreateDatasetRequest) (*datacatalog.CreateDatasetResponse, error) {
+func (dm *datasetManager) CreateDataset(ctx context.Context, request *datacatalog.CreateDatasetRequest) (*datacatalog.CreateDatasetResponse, error) {
 	timer := dm.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
@@ -95,7 +95,7 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request datacatalog
 }
 
 // Get a Dataset with the given DatasetID if it exists. If none exist a grpc NotFound err will be returned
-func (dm *datasetManager) GetDataset(ctx context.Context, request datacatalog.GetDatasetRequest) (*datacatalog.GetDatasetResponse, error) {
+func (dm *datasetManager) GetDataset(ctx context.Context, request *datacatalog.GetDatasetRequest) (*datacatalog.GetDatasetResponse, error) {
 	timer := dm.systemMetrics.getResponseTime.Start(ctx)
 	defer timer.Stop()
 
@@ -106,7 +106,7 @@ func (dm *datasetManager) GetDataset(ctx context.Context, request datacatalog.Ge
 		return nil, err
 	}
 
-	datasetKey := transformers.FromDatasetID(*request.Dataset)
+	datasetKey := transformers.FromDatasetID(request.Dataset)
 	datasetModel, err := dm.repo.DatasetRepo().Get(ctx, datasetKey)
 
 	if err != nil {
@@ -133,8 +133,8 @@ func (dm *datasetManager) GetDataset(ctx context.Context, request datacatalog.Ge
 }
 
 // List Datasets with optional filtering and pagination
-func (dm *datasetManager) ListDatasets(ctx context.Context, request datacatalog.ListDatasetsRequest) (*datacatalog.ListDatasetsResponse, error) {
-	err := validators.ValidateListDatasetsRequest(&request)
+func (dm *datasetManager) ListDatasets(ctx context.Context, request *datacatalog.ListDatasetsRequest) (*datacatalog.ListDatasetsResponse, error) {
+	err := validators.ValidateListDatasetsRequest(request)
 	if err != nil {
 		logger.Warningf(ctx, "Invalid list datasets request %v, err: %v", request, err)
 		dm.systemMetrics.validationErrorCounter.Inc(ctx)

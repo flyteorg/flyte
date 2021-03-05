@@ -3,9 +3,9 @@ package gormimpl
 import (
 	"fmt"
 
-	"github.com/lyft/datacatalog/pkg/common"
-	"github.com/lyft/datacatalog/pkg/repositories/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 )
 
 // String formats for various GORM expression queries

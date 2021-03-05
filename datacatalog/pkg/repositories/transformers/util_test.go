@@ -7,7 +7,7 @@ import (
 )
 
 func TestMarshaling(t *testing.T) {
-	marshaledMetadata, err := marshalMetadata(&metadata)
+	marshaledMetadata, err := marshalMetadata(metadata)
 	assert.NoError(t, err)
 
 	unmarshaledMetadata, err := unmarshalMetadata(marshaledMetadata)

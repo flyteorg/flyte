@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	mockScope "github.com/lyft/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 )

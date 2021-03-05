@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/lyft/datacatalog/pkg/manager/impl"
-	"github.com/lyft/datacatalog/pkg/manager/interfaces"
-	"github.com/lyft/datacatalog/pkg/repositories"
-	"github.com/lyft/datacatalog/pkg/repositories/config"
-	"github.com/lyft/datacatalog/pkg/runtime"
-	catalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/profutils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/datacatalog/pkg/manager/impl"
+	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/datacatalog/pkg/repositories"
+	"github.com/flyteorg/datacatalog/pkg/repositories/config"
+	"github.com/flyteorg/datacatalog/pkg/runtime"
+	catalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/profutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 type DataCatalogService struct {
@@ -26,31 +26,31 @@ type DataCatalogService struct {
 }
 
 func (s *DataCatalogService) CreateDataset(ctx context.Context, request *catalog.CreateDatasetRequest) (*catalog.CreateDatasetResponse, error) {
-	return s.DatasetManager.CreateDataset(ctx, *request)
+	return s.DatasetManager.CreateDataset(ctx, request)
 }
 
 func (s *DataCatalogService) CreateArtifact(ctx context.Context, request *catalog.CreateArtifactRequest) (*catalog.CreateArtifactResponse, error) {
-	return s.ArtifactManager.CreateArtifact(ctx, *request)
+	return s.ArtifactManager.CreateArtifact(ctx, request)
 }
 
 func (s *DataCatalogService) GetDataset(ctx context.Context, request *catalog.GetDatasetRequest) (*catalog.GetDatasetResponse, error) {
-	return s.DatasetManager.GetDataset(ctx, *request)
+	return s.DatasetManager.GetDataset(ctx, request)
 }
 
 func (s *DataCatalogService) GetArtifact(ctx context.Context, request *catalog.GetArtifactRequest) (*catalog.GetArtifactResponse, error) {
-	return s.ArtifactManager.GetArtifact(ctx, *request)
+	return s.ArtifactManager.GetArtifact(ctx, request)
 }
 
 func (s *DataCatalogService) ListArtifacts(ctx context.Context, request *catalog.ListArtifactsRequest) (*catalog.ListArtifactsResponse, error) {
-	return s.ArtifactManager.ListArtifacts(ctx, *request)
+	return s.ArtifactManager.ListArtifacts(ctx, request)
 }
 
 func (s *DataCatalogService) AddTag(ctx context.Context, request *catalog.AddTagRequest) (*catalog.AddTagResponse, error) {
-	return s.TagManager.AddTag(ctx, *request)
+	return s.TagManager.AddTag(ctx, request)
 }
 
 func (s *DataCatalogService) ListDatasets(ctx context.Context, request *catalog.ListDatasetsRequest) (*catalog.ListDatasetsResponse, error) {
-	return s.DatasetManager.ListDatasets(ctx, *request)
+	return s.DatasetManager.ListDatasets(ctx, request)
 }
 
 func NewDataCatalogService() *DataCatalogService {

@@ -7,18 +7,18 @@ import (
 
 	"fmt"
 
+	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/mocks"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/datacatalog/pkg/common"
-	"github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/mocks"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/contextutils"
-	mockScope "github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -206,7 +206,7 @@ func TestCreateArtifact(t *testing.T) {
 					artifact.Partitions[1].DatasetUUID == expectedDataset.Id.UUID
 			})).Return(nil)
 
-		request := datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
+		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.NoError(t, err)
@@ -225,7 +225,7 @@ func TestCreateArtifact(t *testing.T) {
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(models.Dataset{}, status.Error(codes.NotFound, "not found"))
 
-		request := datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
+		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
@@ -235,7 +235,7 @@ func TestCreateArtifact(t *testing.T) {
 	})
 
 	t.Run("Artifact missing ID", func(t *testing.T) {
-		request := datacatalog.CreateArtifactRequest{
+		request := &datacatalog.CreateArtifactRequest{
 			Artifact: &datacatalog.Artifact{
 				// missing artifact id
 				Dataset: getTestDataset().Id,
@@ -250,7 +250,7 @@ func TestCreateArtifact(t *testing.T) {
 	})
 
 	t.Run("Artifact missing artifact data", func(t *testing.T) {
-		request := datacatalog.CreateArtifactRequest{
+		request := &datacatalog.CreateArtifactRequest{
 			Artifact: &datacatalog.Artifact{
 				Id:      "test",
 				Dataset: getTestDataset().Id,
@@ -283,7 +283,7 @@ func TestCreateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version
 			})).Return(status.Error(codes.AlreadyExists, "test already exists"))
 
-		request := datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
+		request := &datacatalog.CreateArtifactRequest{Artifact: getTestArtifact()}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
@@ -304,7 +304,7 @@ func TestCreateArtifact(t *testing.T) {
 				return false
 			})).Return(fmt.Errorf("Validation should happen before this happens"))
 
-		request := datacatalog.CreateArtifactRequest{Artifact: artifact}
+		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
@@ -329,7 +329,7 @@ func TestCreateArtifact(t *testing.T) {
 		artifact.Partitions = []*datacatalog.Partition{}
 		dcRepo.MockArtifactRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 
-		request := datacatalog.CreateArtifactRequest{Artifact: artifact}
+		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		_, err := artifactManager.CreateArtifact(ctx, request)
 		assert.NoError(t, err)
@@ -346,7 +346,7 @@ func TestCreateArtifact(t *testing.T) {
 				return false
 			})).Return(fmt.Errorf("Validation should happen before this happens"))
 
-		request := datacatalog.CreateArtifactRequest{Artifact: artifact}
+		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.CreateArtifact(ctx, request)
 		assert.Error(t, err)
@@ -385,7 +385,7 @@ func TestGetArtifact(t *testing.T) {
 			})).Return(mockArtifactModel, nil)
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
-		artifactResponse, err := artifactManager.GetArtifact(ctx, datacatalog.GetArtifactRequest{
+		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{
 			Dataset:     getTestDataset().Id,
 			QueryHandle: &datacatalog.GetArtifactRequest_ArtifactId{ArtifactId: expectedArtifact.Id},
 		})
@@ -418,7 +418,7 @@ func TestGetArtifact(t *testing.T) {
 		}, nil)
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
-		artifactResponse, err := artifactManager.GetArtifact(ctx, datacatalog.GetArtifactRequest{
+		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{
 			Dataset:     getTestDataset().Id,
 			QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: expectedTag.TagName},
 		})
@@ -428,7 +428,7 @@ func TestGetArtifact(t *testing.T) {
 
 	t.Run("Get missing input", func(t *testing.T) {
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
-		artifactResponse, err := artifactManager.GetArtifact(ctx, datacatalog.GetArtifactRequest{Dataset: getTestDataset().Id})
+		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{Dataset: getTestDataset().Id})
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
 		responseCode := status.Code(err)
@@ -439,7 +439,7 @@ func TestGetArtifact(t *testing.T) {
 		dcRepo.MockTagRepo.On("Get", mock.Anything, mock.Anything).Return(
 			models.Tag{}, errors.NewDataCatalogError(codes.NotFound, "tag with artifact does not exist"))
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
-		artifactResponse, err := artifactManager.GetArtifact(ctx, datacatalog.GetArtifactRequest{Dataset: getTestDataset().Id, QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: "test"}})
+		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{Dataset: getTestDataset().Id, QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: "test"}})
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
 		responseCode := status.Code(err)
@@ -489,7 +489,7 @@ func TestListArtifact(t *testing.T) {
 			},
 		}
 
-		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: getTestDataset().Id, Filter: filter})
+		artifactResponse, err := artifactManager.ListArtifacts(ctx, &datacatalog.ListArtifactsRequest{Dataset: getTestDataset().Id, Filter: filter})
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
 		responseCode := status.Code(err)
@@ -562,7 +562,7 @@ func TestListArtifact(t *testing.T) {
 					listInput.Offset == 0
 			})).Return(mockArtifacts, nil)
 
-		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})
+		artifactResponse, err := artifactManager.ListArtifacts(ctx, &datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})
 		assert.NoError(t, err)
 		assert.NotEmpty(t, artifactResponse)
 	})
@@ -594,7 +594,7 @@ func TestListArtifact(t *testing.T) {
 				return len(listInput.ModelFilters) == 0
 			})).Return(mockArtifacts, nil)
 
-		artifactResponse, err := artifactManager.ListArtifacts(ctx, datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})
+		artifactResponse, err := artifactManager.ListArtifacts(ctx, &datacatalog.ListArtifactsRequest{Dataset: expectedDataset.Id, Filter: filter})
 		assert.NoError(t, err)
 		assert.NotEmpty(t, artifactResponse)
 	})

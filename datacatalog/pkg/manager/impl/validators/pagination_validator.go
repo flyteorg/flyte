@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lyft/datacatalog/pkg/errors"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"google.golang.org/grpc/codes"
 )
 
@@ -25,7 +25,7 @@ func ValidateToken(token string) error {
 }
 
 // Validate the pagination options and set default limits
-func ValidatePagination(options datacatalog.PaginationOptions) error {
+func ValidatePagination(options *datacatalog.PaginationOptions) error {
 	err := ValidateToken(options.Token)
 	if err != nil {
 		return err

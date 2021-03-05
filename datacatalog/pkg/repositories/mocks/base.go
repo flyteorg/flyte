@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/lyft/datacatalog/pkg/repositories/interfaces"
+import "github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
 
 type DataCatalogRepo struct {
 	MockDatasetRepo  *DatasetRepo

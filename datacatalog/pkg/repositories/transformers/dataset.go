@@ -1,8 +1,8 @@
 package transformers
 
 import (
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 )
 
 // Create a dataset model from the Dataset api object. This will serialize the metadata in the dataset as part of the transform
@@ -34,7 +34,7 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 }
 
 // Create a dataset ID from the dataset key model
-func FromDatasetID(datasetID datacatalog.DatasetID) models.DatasetKey {
+func FromDatasetID(datasetID *datacatalog.DatasetID) models.DatasetKey {
 	return models.DatasetKey{
 		Project: datasetID.Project,
 		Domain:  datasetID.Domain,

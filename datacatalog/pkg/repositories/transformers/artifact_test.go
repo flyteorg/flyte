@@ -5,10 +5,10 @@ import (
 
 	"time"
 
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -55,12 +55,12 @@ func getDatasetModel() models.Dataset {
 
 func TestCreateArtifactModel(t *testing.T) {
 
-	createArtifactRequest := datacatalog.CreateArtifactRequest{
+	createArtifactRequest := &datacatalog.CreateArtifactRequest{
 		Artifact: &datacatalog.Artifact{
 			Id:       "artifactID-1",
-			Dataset:  &datasetID,
+			Dataset:  datasetID,
 			Data:     getTestArtifactData(),
-			Metadata: &metadata,
+			Metadata: metadata,
 			Partitions: []*datacatalog.Partition{
 				{Key: "key1", Value: "value1"},
 				{Key: "key2", Value: "value2"},
@@ -85,10 +85,10 @@ func TestCreateArtifactModel(t *testing.T) {
 }
 
 func TestCreateArtifactModelNoMetdata(t *testing.T) {
-	createArtifactRequest := datacatalog.CreateArtifactRequest{
+	createArtifactRequest := &datacatalog.CreateArtifactRequest{
 		Artifact: &datacatalog.Artifact{
 			Id:      "artifactID-1",
-			Dataset: &datasetID,
+			Dataset: datasetID,
 			Data:    getTestArtifactData(),
 		},
 	}
@@ -145,7 +145,7 @@ func TestFromArtifactModel(t *testing.T) {
 }
 
 func TestToArtifactKey(t *testing.T) {
-	artifactKey := ToArtifactKey(&datasetID, "artifactID-1")
+	artifactKey := ToArtifactKey(datasetID, "artifactID-1")
 	assert.Equal(t, datasetID.Project, artifactKey.DatasetProject)
 	assert.Equal(t, datasetID.Domain, artifactKey.DatasetDomain)
 	assert.Equal(t, datasetID.Name, artifactKey.DatasetName)

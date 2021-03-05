@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/lyft/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 )
 
 type TagRepo interface {
