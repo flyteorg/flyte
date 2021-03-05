@@ -40,10 +40,6 @@ jobs:
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
     steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v2
         with:
           fetch-depth: '0'
@@ -86,8 +82,8 @@ jobs:
       - name: Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         with:
-          username: "${{ secrets.PUBLISH_CONTAINER_ACTOR }}"
-          password: "${{ secrets.PUBLISH_CONTAINER }}"
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
           image_name: ${{ github.repository }}
           image_tag: latest,${{ github.sha }},${{ needs.bump-version.outputs.version }}
           push_git_tag: true
