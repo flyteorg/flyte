@@ -10,3 +10,4 @@ How Do I productionize my Flyte cluster
    :name: howtoprovguidestoc
 
    production
+   production_eks
