@@ -739,7 +739,7 @@ func (*TaskExecutionEvent) XXX_OneofWrappers() []interface{} {
 }
 
 // Holds metadata around how a task was executed.
-// TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+// TODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325).
 type TaskExecutionMetadata struct {
 	InstanceClass        TaskExecutionMetadata_InstanceClass `protobuf:"varint,16,opt,name=instance_class,json=instanceClass,proto3,enum=flyteidl.event.TaskExecutionMetadata_InstanceClass" json:"instance_class,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`

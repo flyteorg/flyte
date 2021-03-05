@@ -3,9 +3,9 @@
 tasks.proto
 =========================
 
-For interruptible we will populate it at the node level but require it be part of TaskMetadata 
+For interruptible we will populate it at the node level but require it be part of TaskMetadata
 for a user to set the value.
-We are using oneof instead of bool because otherwise we would be unable to distinguish between value being 
+We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
 set by the user or defaulting to false.
 The logic of handling precedence will be done as part of flytepropeller.
 
@@ -14,7 +14,7 @@ The logic of handling precedence will be done as part of flytepropeller.
 flyteidl.core.Resources
 -----------------------
 
-`[flyteidl.core.Resources proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L14>`_
+`[flyteidl.core.Resources proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L15>`_
 
 A customizable interface to convey resources requested for a container. This can be interpretted differently for different
 container engines.
@@ -44,7 +44,7 @@ limits
 flyteidl.core.Resources.ResourceEntry
 -------------------------------------
 
-`[flyteidl.core.Resources.ResourceEntry proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L25>`_
+`[flyteidl.core.Resources.ResourceEntry proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L26>`_
 
 Encapsulates a resource name and value.
 
@@ -75,7 +75,7 @@ value
 Enum flyteidl.core.Resources.ResourceName
 -----------------------------------------
 
-`[flyteidl.core.Resources.ResourceName proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L16>`_
+`[flyteidl.core.Resources.ResourceName proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L17>`_
 
 Known resource names.
 
@@ -110,7 +110,7 @@ STORAGE
 flyteidl.core.RuntimeMetadata
 -----------------------------
 
-`[flyteidl.core.RuntimeMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L43>`_
+`[flyteidl.core.RuntimeMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L44>`_
 
 Runtime information. This is losely defined to allow for extensibility.
 
@@ -147,7 +147,7 @@ flavor
 Enum flyteidl.core.RuntimeMetadata.RuntimeType
 ----------------------------------------------
 
-`[flyteidl.core.RuntimeMetadata.RuntimeType proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L44>`_
+`[flyteidl.core.RuntimeMetadata.RuntimeType proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L45>`_
 
 
 .. _api_enum_value_flyteidl.core.RuntimeMetadata.RuntimeType.OTHER:
@@ -166,7 +166,7 @@ FLYTE_SDK
 flyteidl.core.TaskMetadata
 --------------------------
 
-`[flyteidl.core.TaskMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L61>`_
+`[flyteidl.core.TaskMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L62>`_
 
 Task Metadata
 
@@ -233,7 +233,7 @@ interruptible
 flyteidl.core.TaskTemplate
 --------------------------
 
-`[flyteidl.core.TaskTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L95>`_
+`[flyteidl.core.TaskTemplate proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L96>`_
 
 A Task structure that uniquely identifies a task in the system
 Tasks are registered as a first step in the system.
@@ -247,7 +247,8 @@ Tasks are registered as a first step in the system.
     "interface": "{...}",
     "custom": "{...}",
     "container": "{...}",
-    "task_type_version": "..."
+    "task_type_version": "...",
+    "security_context": "{...}"
   }
 
 .. _api_field_flyteidl.core.TaskTemplate.id:
@@ -298,6 +299,12 @@ task_type_version
   (`int32 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) This can be used to customize task handling at execution time for the same task type.
   
   
+.. _api_field_flyteidl.core.TaskTemplate.security_context:
+
+security_context
+  (:ref:`flyteidl.core.SecurityContext <api_msg_flyteidl.core.SecurityContext>`) security_context encapsulates security attributes requested to run this task.
+  
+  
 
 
 .. _api_msg_flyteidl.core.ContainerPort:
@@ -305,7 +312,7 @@ task_type_version
 flyteidl.core.ContainerPort
 ---------------------------
 
-`[flyteidl.core.ContainerPort proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L128>`_
+`[flyteidl.core.ContainerPort proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L132>`_
 
 Defines port properties for a container.
 
@@ -329,7 +336,7 @@ container_port
 flyteidl.core.Container
 -----------------------
 
-`[flyteidl.core.Container proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L134>`_
+`[flyteidl.core.Container proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L138>`_
 
 
 .. code-block:: json
@@ -398,7 +405,7 @@ data_config
   (:ref:`flyteidl.core.DataLoadingConfig <api_msg_flyteidl.core.DataLoadingConfig>`) BETA: Optional configuration for DataLoading. If not specified, then default values are used.
   This makes it possible to to run a completely portable container, that uses inputs and outputs
   only from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.
-  If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories 
+  If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
   are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
   to understand the default paths.
   Only K8s
@@ -411,7 +418,7 @@ data_config
 flyteidl.core.IOStrategy
 ------------------------
 
-`[flyteidl.core.IOStrategy proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L172>`_
+`[flyteidl.core.IOStrategy proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L176>`_
 
 Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)
 
@@ -440,7 +447,7 @@ upload_mode
 Enum flyteidl.core.IOStrategy.DownloadMode
 ------------------------------------------
 
-`[flyteidl.core.IOStrategy.DownloadMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L174>`_
+`[flyteidl.core.IOStrategy.DownloadMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L178>`_
 
 Mode to use for downloading
 
@@ -468,7 +475,7 @@ DO_NOT_DOWNLOAD
 Enum flyteidl.core.IOStrategy.UploadMode
 ----------------------------------------
 
-`[flyteidl.core.IOStrategy.UploadMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L183>`_
+`[flyteidl.core.IOStrategy.UploadMode proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L187>`_
 
 Mode to use for uploading
 
@@ -496,7 +503,7 @@ DO_NOT_UPLOAD
 flyteidl.core.DataLoadingConfig
 -------------------------------
 
-`[flyteidl.core.DataLoadingConfig proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L200>`_
+`[flyteidl.core.DataLoadingConfig proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L204>`_
 
 This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.
 Flyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path
@@ -515,15 +522,15 @@ Any outputs generated by the user container - within output_path are automatical
 .. _api_field_flyteidl.core.DataLoadingConfig.enabled:
 
 enabled
-  (`bool <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Flag enables DataLoading Config. If this is not set, data loading will not be used! 
+  (`bool <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Flag enables DataLoading Config. If this is not set, data loading will not be used!
   
   
 .. _api_field_flyteidl.core.DataLoadingConfig.input_path:
 
 input_path
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) File system path (start at root). This folder will contain all the inputs exploded to a separate file. 
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) File system path (start at root). This folder will contain all the inputs exploded to a separate file.
   Example, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is "/var/flyte/inputs", then the file system will look like
-  /var/flyte/inputs/inputs.<metadata format dependent -> .pb .json .yaml> -> Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations 
+  /var/flyte/inputs/inputs.<metadata format dependent -> .pb .json .yaml> -> Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations
   /var/flyte/inputs/x -> X is a file that contains the value of x (integer) in string format
   /var/flyte/inputs/y -> Y is a file in Binary format
   /var/flyte/inputs/z/... -> Note Z itself is a directory
@@ -554,9 +561,9 @@ io_strategy
 Enum flyteidl.core.DataLoadingConfig.LiteralMapFormat
 -----------------------------------------------------
 
-`[flyteidl.core.DataLoadingConfig.LiteralMapFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L205>`_
+`[flyteidl.core.DataLoadingConfig.LiteralMapFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L209>`_
 
-LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers. 
+LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.
 If the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.
 JSON and YAML do not need any protobuf definitions to read it
 All remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)

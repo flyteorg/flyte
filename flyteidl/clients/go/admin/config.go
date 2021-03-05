@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 )
 
-//go:generate pflags Config
+//go:generate pflags Config --default-var=defaultConfig
 
 const configSectionKey = "admin"
 

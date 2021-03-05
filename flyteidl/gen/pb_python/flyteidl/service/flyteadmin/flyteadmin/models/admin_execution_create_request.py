@@ -97,7 +97,7 @@ class AdminExecutionCreateRequest(object):
     def domain(self):
         """Gets the domain of this AdminExecutionCreateRequest.  # noqa: E501
 
-        Name of the domain the execution belongs to.  A domain can be considered as a subset within a specific project.  # noqa: E501
+        Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project.  # noqa: E501
 
         :return: The domain of this AdminExecutionCreateRequest.  # noqa: E501
         :rtype: str
@@ -108,7 +108,7 @@ class AdminExecutionCreateRequest(object):
     def domain(self, domain):
         """Sets the domain of this AdminExecutionCreateRequest.
 
-        Name of the domain the execution belongs to.  A domain can be considered as a subset within a specific project.  # noqa: E501
+        Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project.  # noqa: E501
 
         :param domain: The domain of this AdminExecutionCreateRequest.  # noqa: E501
         :type: str

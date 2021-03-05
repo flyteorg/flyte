@@ -24,4 +24,6 @@ type CoreTaskTemplate struct {
 	Container *CoreContainer `json:"container,omitempty"`
 	// This can be used to customize task handling at execution time for the same task type.
 	TaskTypeVersion int32 `json:"task_type_version,omitempty"`
+	// security_context encapsulates security attributes requested to run this task.
+	SecurityContext *CoreSecurityContext `json:"security_context,omitempty"`
 }

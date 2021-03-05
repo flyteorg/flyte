@@ -7,6 +7,7 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
+import "flyteidl/core/security.proto";
 import "flyteidl/admin/schedule.proto";
 import "flyteidl/admin/common.proto";
 import "google/protobuf/timestamp.proto";
@@ -16,10 +17,10 @@ import "google/protobuf/timestamp.proto";
 // set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan.
 message LaunchPlanCreateRequest {
     // Uniquely identifies a launch plan entity.
-    core.Identifier id       = 1;
+    core.Identifier id = 1;
 
     // User-provided launch plan details, including reference workflow, inputs and other metadata.
-    LaunchPlanSpec spec      = 2;
+    LaunchPlanSpec spec = 2;
 }
 
 message LaunchPlanCreateResponse {
@@ -32,8 +33,8 @@ message LaunchPlanCreateResponse {
 // active at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier
 // group will be observed and trigger executions at a defined cadence.
 enum LaunchPlanState {
-    INACTIVE		= 0;
-    ACTIVE		= 1;
+    INACTIVE = 0;
+    ACTIVE = 1;
 }
 
 // A LaunchPlan provides the capability to templatize workflow executions.
@@ -41,10 +42,10 @@ enum LaunchPlanState {
 // Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow
 // definition doesn't necessarily have a default value for said input.
 message LaunchPlan {
-    core.Identifier id       	= 1;
+    core.Identifier id = 1;
 
-    LaunchPlanSpec spec 	= 2;
-    LaunchPlanClosure closure	= 3;
+    LaunchPlanSpec spec = 2;
+    LaunchPlanClosure closure = 3;
 }
 
 // Response object for list launch plan requests.
@@ -53,51 +54,51 @@ message LaunchPlanList {
 
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query. If there are no more results, this value will be empty.
-    string token                     = 2;
+    string token = 2;
 }
 
 // Defines permissions associated with executions created by this launch plan spec.
 // Deprecated.
 message Auth {
-  oneof method {
-    string assumable_iam_role         = 1;
-    string kubernetes_service_account = 2;
-  }
+    oneof method {
+        string assumable_iam_role = 1;
+        string kubernetes_service_account = 2;
+    }
 }
 
 // User-provided launch plan definition and configuration values.
 message LaunchPlanSpec {
     // Reference to the Workflow template that the launch plan references
-    core.Identifier workflow_id           = 1;
+    core.Identifier workflow_id = 1;
 
     // Metadata for the Launch Plan
-    LaunchPlanMetadata entity_metadata    = 2;
+    LaunchPlanMetadata entity_metadata = 2;
 
     // Input values to be passed for the execution
-    core.ParameterMap default_inputs      = 3;
+    core.ParameterMap default_inputs = 3;
 
     // Fixed, non-overridable inputs for the Launch Plan
-    core.LiteralMap fixed_inputs          = 4;
+    core.LiteralMap fixed_inputs = 4;
 
     // String to indicate the role to use to execute the workflow underneath
-    string role                           = 5 [deprecated=true];
+    string role = 5 [deprecated = true];
 
     // Custom labels to be applied to the execution resource.
-    Labels labels                         = 6;
+    Labels labels = 6;
 
     // Custom annotations to be applied to the execution resource.
-    Annotations annotations               = 7;
+    Annotations annotations = 7;
 
     // Indicates the permission associated with workflow executions triggered with this launch plan.
-    Auth auth                             = 8 [deprecated=true];
+    Auth auth = 8 [deprecated = true];
 
-    AuthRole auth_role                    = 9 [deprecated=true];
+    AuthRole auth_role = 9 [deprecated = true];
 
     // Indicates security context for permissions triggered with this launch plan
-    SecurityContext security_context      = 10;
+    core.SecurityContext security_context = 10;
 
     // Indicates the runtime priority of the execution.
-    core.QualityOfService quality_of_service   = 16;
+    core.QualityOfService quality_of_service = 16;
 
     RawOutputDataConfig raw_output_data_config = 17;
 }
@@ -107,17 +108,17 @@ message LaunchPlanSpec {
 // to launch the reference workflow as well timestamp values associated with the launch plan.
 message LaunchPlanClosure {
     // Indicate the Launch plan phase
-    LaunchPlanState state		= 1;
+    LaunchPlanState state = 1;
 
     // Indicates the set of inputs to execute the Launch plan
-    core.ParameterMap expected_inputs	= 2;
+    core.ParameterMap expected_inputs = 2;
 
     // Indicates the set of outputs from the Launch plan
-    core.VariableMap expected_outputs	= 3;
+    core.VariableMap expected_outputs = 3;
 
     // Time at which the launch plan was created.
     google.protobuf.Timestamp created_at = 4;
-    
+
     // Time at which the launch plan was last updated.
     google.protobuf.Timestamp updated_at = 5;
 }
@@ -126,19 +127,19 @@ message LaunchPlanClosure {
 // the reference workflow.
 message LaunchPlanMetadata {
     // Schedule to execute the Launch Plan
-    Schedule schedule                    = 1;
+    Schedule schedule = 1;
 
     // List of notifications based on Execution status transitions
-    repeated Notification notifications  = 2;
+    repeated Notification notifications = 2;
 }
 
 // Request to set the referenced launch plan state to the configured value.
 message LaunchPlanUpdateRequest {
     // Identifier of launch plan for which to change state.
-    core.Identifier id                   = 1;
+    core.Identifier id = 1;
 
     // Desired state to apply to the launch plan.
-    LaunchPlanState state                = 2;
+    LaunchPlanState state = 2;
 }
 
 // Purposefully empty, may be populated in the future.
@@ -153,17 +154,17 @@ message ActiveLaunchPlanRequest {
 // Represents a request structure to list active launch plans within a project/domain.
 message ActiveLaunchPlanListRequest {
     // Name of the project that contains the identifiers.
-    string project    = 1;  // [(validate.rules).string.min_bytes = 1];
+    string project = 1;  // [(validate.rules).string.min_bytes = 1];
     // Name of the domain the identifiers belongs to within the project.
-    string domain     = 2;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 2;  // [(validate.rules).string.min_bytes = 1];
     // Indicates the number of resources to be returned.
-    uint32 limit      = 3;
+    uint32 limit = 3;
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query.
     // +optional
-    string token      = 4;
+    string token = 4;
 
     // Sort ordering.
     // +optional
-    Sort sort_by      = 5;
+    Sort sort_by = 5;
 }

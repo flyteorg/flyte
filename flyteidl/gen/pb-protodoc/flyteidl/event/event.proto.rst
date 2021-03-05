@@ -418,7 +418,7 @@ flyteidl.event.TaskExecutionMetadata
 `[flyteidl.event.TaskExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L159>`_
 
 Holds metadata around how a task was executed.
-TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+TODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325).
 
 .. code-block:: json
 

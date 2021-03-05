@@ -11259,7 +11259,7 @@ public final class Event {
   /**
    * <pre>
    * Holds metadata around how a task was executed.
-   * TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+   * TODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325).
    * </pre>
    *
    * Protobuf type {@code flyteidl.event.TaskExecutionMetadata}
@@ -11631,7 +11631,7 @@ public final class Event {
     /**
      * <pre>
      * Holds metadata around how a task was executed.
-     * TODO(katrogan): Extend to include freeform fields (https://github.com/lyft/flyte/issues/325).
+     * TODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325).
      * </pre>
      *
      * Protobuf type {@code flyteidl.event.TaskExecutionMetadata}
