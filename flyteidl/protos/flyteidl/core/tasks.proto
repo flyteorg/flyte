@@ -8,7 +8,7 @@ import "google/protobuf/struct.proto";
 
 package flyteidl.core;
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 
 // A customizable interface to convey resources requested for a container. This can be interpretted differently for different
 // container engines.

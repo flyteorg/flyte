@@ -6082,9 +6082,9 @@ public final class ProjectOuterClass {
       " \001(\0132\024.flyteidl.admin.Sort\"B\n\026ProjectReg" +
       "isterRequest\022(\n\007project\030\001 \001(\0132\027.flyteidl" +
       ".admin.Project\"\031\n\027ProjectRegisterRespons" +
-      "e\"\027\n\025ProjectUpdateResponseB3Z1github.com" +
-      "/lyft/flyteidl/gen/pb-go/flyteidl/adminb" +
-      "\006proto3"
+      "e\"\027\n\025ProjectUpdateResponseB7Z5github.com" +
+      "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad" +
+      "minb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

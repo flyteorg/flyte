@@ -6,7 +6,7 @@ import "flyteidl/core/literals.proto";
 
 package flyteidl.core;
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 
 // Describes a set of tasks to execute and how the final outputs are produced.
 message DynamicJobSpec {

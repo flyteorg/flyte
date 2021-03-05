@@ -4023,8 +4023,8 @@ public final class Condition {
       "l.core.BooleanExpression\022:\n\020right_expres" +
       "sion\030\003 \001(\0132 .flyteidl.core.BooleanExpres" +
       "sion\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n\002OR\020\001" +
-      "B2Z0github.com/lyft/flyteidl/gen/pb-go/f" +
-      "lyteidl/coreb\006proto3"
+      "B6Z4github.com/flyteorg/flyteidl/gen/pb-" +
+      "go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

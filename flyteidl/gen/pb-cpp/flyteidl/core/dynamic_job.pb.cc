@@ -89,14 +89,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fdynamic_5fjob_2eproto[] =
   "ccesses\030\002 \001(\003\022\'\n\007outputs\030\003 \003(\0132\026.flyteid"
   "l.core.Binding\022*\n\005tasks\030\004 \003(\0132\033.flyteidl"
   ".core.TaskTemplate\0225\n\014subworkflows\030\005 \003(\013"
-  "2\037.flyteidl.core.WorkflowTemplateB2Z0git"
-  "hub.com/lyft/flyteidl/gen/pb-go/flyteidl"
-  "/coreb\006proto3"
+  "2\037.flyteidl.core.WorkflowTemplateB6Z4git"
+  "hub.com/flyteorg/flyteidl/gen/pb-go/flyt"
+  "eidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fdynamic_5fjob_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fdynamic_5fjob_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fdynamic_5fjob_2eproto,
-  "flyteidl/core/dynamic_job.proto", &assign_descriptors_table_flyteidl_2fcore_2fdynamic_5fjob_2eproto, 413,
+  "flyteidl/core/dynamic_job.proto", &assign_descriptors_table_flyteidl_2fcore_2fdynamic_5fjob_2eproto, 417,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fdynamic_5fjob_2eproto() {

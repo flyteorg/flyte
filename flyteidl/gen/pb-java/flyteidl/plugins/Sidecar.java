@@ -787,9 +787,9 @@ public final class Sidecar {
       "dl.plugins\032\"k8s.io/api/core/v1/generated" +
       ".proto\"[\n\nSidecarJob\022-\n\010pod_spec\030\001 \001(\0132\033" +
       ".k8s.io.api.core.v1.PodSpec\022\036\n\026primary_c" +
-      "ontainer_name\030\002 \001(\tB5Z3github.com/lyft/f" +
-      "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot" +
-      "o3"
+      "ontainer_name\030\002 \001(\tB9Z7github.com/flyteo" +
+      "rg/flyteidl/gen/pb-go/flyteidl/pluginsb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -5699,8 +5699,8 @@ public final class Execution {
       "ce.TierH\000\0223\n\004spec\030\002 \001(\0132#.flyteidl.core." +
       "QualityOfServiceSpecH\000\"4\n\004Tier\022\r\n\tUNDEFI" +
       "NED\020\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013" +
-      "designationB2Z0github.com/lyft/flyteidl/" +
-      "gen/pb-go/flyteidl/coreb\006proto3"
+      "designationB6Z4github.com/flyteorg/flyte" +
+      "idl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

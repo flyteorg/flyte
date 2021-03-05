@@ -21366,8 +21366,8 @@ public final class Common {
       "g\022\036\n\026output_location_prefix\030\001 \001(\t*\\\n\020Nam" +
       "edEntityState\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031" +
       "\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_GENE" +
-      "RATED\020\002B3Z1github.com/lyft/flyteidl/gen/" +
-      "pb-go/flyteidl/adminb\006proto3"
+      "RATED\020\002B7Z5github.com/flyteorg/flyteidl/" +
+      "gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

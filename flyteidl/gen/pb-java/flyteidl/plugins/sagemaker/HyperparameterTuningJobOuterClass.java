@@ -4435,8 +4435,8 @@ public final class HyperparameterTuningJobOuterClass {
       "arameterTuningObjective\022h\n training_job_" +
       "early_stopping_type\030\004 \001(\0162>.flyteidl.plu" +
       "gins.sagemaker.TrainingJobEarlyStoppingT" +
-      "ype.ValueB5Z3github.com/lyft/flyteidl/ge" +
-      "n/pb-go/flyteidl/pluginsb\006proto3"
+      "ype.ValueB9Z7github.com/flyteorg/flyteid" +
+      "l/gen/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -284,13 +284,13 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fevent_2eproto[] =
   "se\"b\n\031TaskExecutionEventRequest\022\022\n\nreque"
   "st_id\030\001 \001(\t\0221\n\005event\030\002 \001(\0132\".flyteidl.ev"
   "ent.TaskExecutionEvent\"\034\n\032TaskExecutionE"
-  "ventResponseB3Z1github.com/lyft/flyteidl"
-  "/gen/pb-go/flyteidl/adminb\006proto3"
+  "ventResponseB7Z5github.com/flyteorg/flyt"
+  "eidl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fevent_2eproto,
-  "flyteidl/admin/event.proto", &assign_descriptors_table_flyteidl_2fadmin_2fevent_2eproto, 713,
+  "flyteidl/admin/event.proto", &assign_descriptors_table_flyteidl_2fadmin_2fevent_2eproto, 717,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fevent_2eproto() {

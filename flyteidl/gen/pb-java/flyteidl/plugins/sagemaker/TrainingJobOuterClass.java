@@ -6250,8 +6250,8 @@ public final class TrainingJobOuterClass {
       "ker.AlgorithmSpecification\022[\n\034training_j" +
       "ob_resource_config\030\002 \001(\01325.flyteidl.plug" +
       "ins.sagemaker.TrainingJobResourceConfigB" +
-      "5Z3github.com/lyft/flyteidl/gen/pb-go/fl" +
-      "yteidl/pluginsb\006proto3"
+      "9Z7github.com/flyteorg/flyteidl/gen/pb-g" +
+      "o/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

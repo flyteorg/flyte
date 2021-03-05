@@ -99,7 +99,7 @@ html_theme_options = {
     "google_analytics_account": "G-YQL24L5CKY",
     # Specify a base_url used to generate sitemap.xml. If not
     # specified, then no sitemap will be built.
-    "base_url": "https://github.com/lyft/flyteidl",
+    "base_url": "https://github.com/flyteorg/flyteidl",
     # Set the color and the accent color
     "color_primary": "deep-purple",
     "color_accent": "blue",

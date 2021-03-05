@@ -5310,8 +5310,9 @@ public final class WorkflowAttributesOuterClass {
       "ect\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010workflow\030\003 " +
       "\001(\t\0228\n\rresource_type\030\004 \001(\0162!.flyteidl.ad" +
       "min.MatchableResource\"\"\n WorkflowAttribu" +
-      "tesDeleteResponseB3Z1github.com/lyft/fly" +
-      "teidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "tesDeleteResponseB7Z5github.com/flyteorg" +
+      "/flyteidl/gen/pb-go/flyteidl/adminb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

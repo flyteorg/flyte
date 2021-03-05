@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 //go:generate pflags Config

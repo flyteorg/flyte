@@ -237,13 +237,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_2eproto[] =
   "teidl.core.TaskTemplate\"q\n\013TaskClosure\0222"
   "\n\rcompiled_task\030\001 \001(\0132\033.flyteidl.core.Co"
   "mpiledTask\022.\n\ncreated_at\030\002 \001(\0132\032.google."
-  "protobuf.TimestampB3Z1github.com/lyft/fl"
-  "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
+  "protobuf.TimestampB7Z5github.com/flyteor"
+  "g/flyteidl/gen/pb-go/flyteidl/adminb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_2eproto,
-  "flyteidl/admin/task.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_2eproto, 679,
+  "flyteidl/admin/task.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_2eproto, 683,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_2eproto() {

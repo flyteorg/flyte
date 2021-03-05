@@ -6347,9 +6347,9 @@ public final class Types {
       "\n\007message\030\002 \001(\t*\206\001\n\nSimpleType\022\010\n\004NONE\020\000" +
       "\022\013\n\007INTEGER\020\001\022\t\n\005FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007" +
       "BOOLEAN\020\004\022\014\n\010DATETIME\020\005\022\014\n\010DURATION\020\006\022\n\n" +
-      "\006BINARY\020\007\022\t\n\005ERROR\020\010\022\n\n\006STRUCT\020\tB2Z0gith" +
-      "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/" +
-      "coreb\006proto3"
+      "\006BINARY\020\007\022\t\n\005ERROR\020\010\022\n\n\006STRUCT\020\tB6Z4gith" +
+      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
+      "idl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

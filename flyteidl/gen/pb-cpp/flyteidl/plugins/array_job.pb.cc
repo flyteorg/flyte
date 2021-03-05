@@ -79,13 +79,13 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2farray_5fjob_2eproto[] 
   "eidl.plugins\"w\n\010ArrayJob\022\023\n\013parallelism\030"
   "\001 \001(\003\022\014\n\004size\030\002 \001(\003\022\027\n\rmin_successes\030\003 \001"
   "(\003H\000\022\033\n\021min_success_ratio\030\004 \001(\002H\000B\022\n\020suc"
-  "cess_criteriaB5Z3github.com/lyft/flyteid"
-  "l/gen/pb-go/flyteidl/pluginsb\006proto3"
+  "cess_criteriaB9Z7github.com/flyteorg/fly"
+  "teidl/gen/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2farray_5fjob_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2farray_5fjob_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2farray_5fjob_2eproto,
-  "flyteidl/plugins/array_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto, 236,
+  "flyteidl/plugins/array_job.proto", &assign_descriptors_table_flyteidl_2fplugins_2farray_5fjob_2eproto, 240,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2farray_5fjob_2eproto() {

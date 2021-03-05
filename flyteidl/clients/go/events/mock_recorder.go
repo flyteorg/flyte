@@ -3,7 +3,7 @@ package events
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 )
 
 type MockRecorder struct {

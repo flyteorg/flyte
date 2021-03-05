@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.event;
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/event";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event";
 
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";

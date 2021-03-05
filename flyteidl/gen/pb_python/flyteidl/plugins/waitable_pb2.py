@@ -21,8 +21,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/plugins/waitable.proto',
   package='flyteidl.plugins',
   syntax='proto3',
-  serialized_options=_b('Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n\x1f\x66lyteidl/plugins/waitable.proto\x12\x10\x66lyteidl.plugins\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\"\x96\x01\n\x08Waitable\x12>\n\nwf_exec_id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\x35\n\x05phase\x18\x02 \x01(\x0e\x32&.flyteidl.core.WorkflowExecution.Phase\x12\x13\n\x0bworkflow_id\x18\x03 \x01(\tB5Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+  serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins'),
+  serialized_pb=_b('\n\x1f\x66lyteidl/plugins/waitable.proto\x12\x10\x66lyteidl.plugins\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\"\x96\x01\n\x08Waitable\x12>\n\nwf_exec_id\x18\x01 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifier\x12\x35\n\x05phase\x18\x02 \x01(\x0e\x32&.flyteidl.core.WorkflowExecution.Phase\x12\x13\n\x0bworkflow_id\x18\x03 \x01(\tB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,])
 

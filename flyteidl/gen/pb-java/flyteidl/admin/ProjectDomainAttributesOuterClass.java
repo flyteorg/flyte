@@ -4791,8 +4791,8 @@ public final class ProjectDomainAttributesOuterClass {
       "\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\0228\n\rres" +
       "ource_type\030\003 \001(\0162!.flyteidl.admin.Matcha" +
       "bleResource\"\'\n%ProjectDomainAttributesDe" +
-      "leteResponseB3Z1github.com/lyft/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "leteResponseB7Z5github.com/flyteorg/flyt" +
+      "eidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

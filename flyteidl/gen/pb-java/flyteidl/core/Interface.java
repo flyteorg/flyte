@@ -4436,8 +4436,8 @@ public final class Interface {
       "\0132+.flyteidl.core.ParameterMap.Parameter" +
       "sEntry\032K\n\017ParametersEntry\022\013\n\003key\030\001 \001(\t\022\'" +
       "\n\005value\030\002 \001(\0132\030.flyteidl.core.Parameter:" +
-      "\0028\001B2Z0github.com/lyft/flyteidl/gen/pb-g" +
-      "o/flyteidl/coreb\006proto3"
+      "\0028\001B6Z4github.com/flyteorg/flyteidl/gen/" +
+      "pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

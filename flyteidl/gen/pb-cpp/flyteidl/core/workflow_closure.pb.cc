@@ -79,14 +79,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_5fclosure_2eprot
   "oto\032\031flyteidl/core/tasks.proto\"p\n\017Workfl"
   "owClosure\0221\n\010workflow\030\001 \001(\0132\037.flyteidl.c"
   "ore.WorkflowTemplate\022*\n\005tasks\030\002 \003(\0132\033.fl"
-  "yteidl.core.TaskTemplateB2Z0github.com/l"
-  "yft/flyteidl/gen/pb-go/flyteidl/coreb\006pr"
-  "oto3"
+  "yteidl.core.TaskTemplateB6Z4github.com/f"
+  "lyteorg/flyteidl/gen/pb-go/flyteidl/core"
+  "b\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_5fclosure_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_5fclosure_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_5fclosure_2eproto,
-  "flyteidl/core/workflow_closure.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_5fclosure_2eproto, 284,
+  "flyteidl/core/workflow_closure.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_5fclosure_2eproto, 288,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_5fclosure_2eproto() {

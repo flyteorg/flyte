@@ -19,8 +19,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/plugins/pytorch.proto',
   package='flyteidl.plugins',
   syntax='proto3',
-  serialized_options=_b('Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n\x1e\x66lyteidl/plugins/pytorch.proto\x12\x10\x66lyteidl.plugins\"1\n\x1e\x44istributedPyTorchTrainingTask\x12\x0f\n\x07workers\x18\x01 \x01(\x05\x42\x35Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+  serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins'),
+  serialized_pb=_b('\n\x1e\x66lyteidl/plugins/pytorch.proto\x12\x10\x66lyteidl.plugins\"1\n\x1e\x44istributedPyTorchTrainingTask\x12\x0f\n\x07workers\x18\x01 \x01(\x05\x42\x39Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
 )
 
 

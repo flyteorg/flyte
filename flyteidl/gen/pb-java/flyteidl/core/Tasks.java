@@ -13255,8 +13255,8 @@ public final class Tasks {
       "fig.LiteralMapFormat\022.\n\013io_strategy\030\005 \001(" +
       "\0132\031.flyteidl.core.IOStrategy\"1\n\020LiteralM" +
       "apFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002B" +
-      "2Z0github.com/lyft/flyteidl/gen/pb-go/fl" +
-      "yteidl/coreb\006proto3"
+      "6Z4github.com/flyteorg/flyteidl/gen/pb-g" +
+      "o/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
