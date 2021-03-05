@@ -10,15 +10,15 @@ import (
 
 	"database/sql/driver"
 
-	datacatalog_error "github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/errors"
+	datacatalog_error "github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
 
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/lib/pq"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	"github.com/lyft/datacatalog/pkg/repositories/utils"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
 	"google.golang.org/grpc/codes"
 )
 

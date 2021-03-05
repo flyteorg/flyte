@@ -5,16 +5,16 @@ import (
 
 	"context"
 
+	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/mocks"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/datacatalog/pkg/common"
-	"github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/mocks"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	"github.com/lyft/datacatalog/pkg/repositories/transformers"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flytestdlib/contextutils"
-	mockScope "github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -66,7 +66,7 @@ func TestCreateDataset(t *testing.T) {
 					dataset.PartitionKeys[0].Name == expectedDataset.PartitionKeys[0] &&
 					dataset.PartitionKeys[1].Name == expectedDataset.PartitionKeys[1]
 			})).Return(nil)
-		request := datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
+		request := &datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
 		datasetResponse, err := datasetManager.CreateDataset(context.Background(), request)
 		assert.NoError(t, err)
 		assert.NotNil(t, datasetResponse)
@@ -87,7 +87,7 @@ func TestCreateDataset(t *testing.T) {
 			})).Return(nil)
 
 		expectedDataset.PartitionKeys = nil
-		request := datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
+		request := &datacatalog.CreateDatasetRequest{Dataset: expectedDataset}
 		datasetResponse, err := datasetManager.CreateDataset(context.Background(), request)
 		assert.NoError(t, err)
 		assert.NotNil(t, datasetResponse)
@@ -96,7 +96,7 @@ func TestCreateDataset(t *testing.T) {
 	t.Run("MissingInput", func(t *testing.T) {
 		dcRepo := getDataCatalogRepo()
 		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
-		request := datacatalog.CreateDatasetRequest{
+		request := &datacatalog.CreateDatasetRequest{
 			Dataset: &datacatalog.Dataset{
 				Id: &datacatalog.DatasetID{
 					Domain:  "missing-domain",
@@ -119,7 +119,7 @@ func TestCreateDataset(t *testing.T) {
 		dcRepo.MockDatasetRepo.On("Create",
 			mock.Anything,
 			mock.Anything).Return(status.Error(codes.AlreadyExists, "test already exists"))
-		request := datacatalog.CreateDatasetRequest{
+		request := &datacatalog.CreateDatasetRequest{
 			Dataset: getTestDataset(),
 		}
 
@@ -138,7 +138,7 @@ func TestCreateDataset(t *testing.T) {
 		dcRepo.MockDatasetRepo.On("Create",
 			mock.Anything,
 			mock.Anything).Return(status.Error(codes.AlreadyExists, "test already exists"))
-		request := datacatalog.CreateDatasetRequest{
+		request := &datacatalog.CreateDatasetRequest{
 			Dataset: badDataset,
 		}
 		_, err := datasetManager.CreateDataset(context.Background(), request)
@@ -167,7 +167,7 @@ func TestGetDataset(t *testing.T) {
 					datasetKey.Domain == expectedDataset.Id.Domain &&
 					datasetKey.Version == expectedDataset.Id.Version
 			})).Return(*datasetModelResponse, nil)
-		request := datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
+		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
 		datasetResponse, err := datasetManager.GetDataset(context.Background(), request)
 		assert.NoError(t, err)
 		assert.NotNil(t, datasetResponse)
@@ -188,7 +188,7 @@ func TestGetDataset(t *testing.T) {
 					datasetKey.Domain == expectedDataset.Id.Domain &&
 					datasetKey.Version == expectedDataset.Id.Version
 			})).Return(models.Dataset{}, errors.NewDataCatalogError(codes.NotFound, "dataset does not exist"))
-		request := datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
+		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
 		_, err := datasetManager.GetDataset(context.Background(), request)
 		assert.Error(t, err)
 		responseCode := status.Code(err)
@@ -218,7 +218,7 @@ func TestListDatasets(t *testing.T) {
 			},
 		}
 
-		artifactResponse, err := datasetManager.ListDatasets(ctx, datacatalog.ListDatasetsRequest{Filter: filter})
+		artifactResponse, err := datasetManager.ListDatasets(ctx, &datacatalog.ListDatasetsRequest{Filter: filter})
 		assert.Error(t, err)
 		assert.Nil(t, artifactResponse)
 		responseCode := status.Code(err)
@@ -264,7 +264,7 @@ func TestListDatasets(t *testing.T) {
 					listInput.Offset == 0
 			})).Return([]models.Dataset{*datasetModel}, nil)
 
-		datasetResponse, err := datasetManager.ListDatasets(ctx, datacatalog.ListDatasetsRequest{Filter: filter})
+		datasetResponse, err := datasetManager.ListDatasets(ctx, &datacatalog.ListDatasetsRequest{Filter: filter})
 		assert.NoError(t, err)
 		assert.NotEmpty(t, datasetResponse)
 		assert.Len(t, datasetResponse.Datasets, 1)
@@ -283,7 +283,7 @@ func TestListDatasets(t *testing.T) {
 					listInput.Offset == 0
 			})).Return([]models.Dataset{*datasetModel}, nil)
 
-		datasetResponse, err := datasetManager.ListDatasets(ctx, datacatalog.ListDatasetsRequest{})
+		datasetResponse, err := datasetManager.ListDatasets(ctx, &datacatalog.ListDatasetsRequest{})
 		assert.NoError(t, err)
 		assert.NotEmpty(t, datasetResponse)
 		assert.Len(t, datasetResponse.Datasets, 1)

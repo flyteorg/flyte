@@ -3,10 +3,10 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/lyft/datacatalog/pkg/repositories/config"
-	"github.com/lyft/datacatalog/pkg/repositories/errors"
-	"github.com/lyft/datacatalog/pkg/repositories/interfaces"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/datacatalog/pkg/repositories/config"
+	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type RepoConfig int32

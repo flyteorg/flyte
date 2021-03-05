@@ -4,20 +4,20 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
-	"github.com/lyft/datacatalog/pkg/manager/interfaces"
-	"github.com/lyft/datacatalog/pkg/repositories"
+	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
+	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/datacatalog/pkg/repositories"
 
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	"github.com/lyft/datacatalog/pkg/repositories/transformers"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 
-	"github.com/lyft/datacatalog/pkg/errors"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 type tagMetrics struct {
@@ -35,7 +35,7 @@ type tagManager struct {
 	systemMetrics tagMetrics
 }
 
-func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error) {
+func (m *tagManager) AddTag(ctx context.Context, request *datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error) {
 	timer := m.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
 
@@ -49,7 +49,7 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 	datasetID := request.Tag.Dataset
 	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
 
-	datasetKey := transformers.FromDatasetID(*datasetID)
+	datasetKey := transformers.FromDatasetID(datasetID)
 	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
 	if err != nil {
 		m.systemMetrics.addTagFailureCounter.Inc(ctx)
@@ -63,7 +63,7 @@ func (m *tagManager) AddTag(ctx context.Context, request datacatalog.AddTagReque
 		return nil, err
 	}
 
-	tagKey := transformers.ToTagKey(*datasetID, request.Tag.Name)
+	tagKey := transformers.ToTagKey(datasetID, request.Tag.Name)
 	err = m.repo.TagRepo().Create(ctx, models.Tag{
 		TagKey:      tagKey,
 		ArtifactID:  request.Tag.ArtifactId,

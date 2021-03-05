@@ -3,13 +3,13 @@ package transformers
 import (
 	"testing"
 
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestToTagKey(t *testing.T) {
-	datasetID := datacatalog.DatasetID{
+	datasetID := &datacatalog.DatasetID{
 		Project: "testProj",
 		Domain:  "testDomain",
 		Name:    "testName",
@@ -28,7 +28,7 @@ func TestToTagKey(t *testing.T) {
 }
 
 func TestFromTagModel(t *testing.T) {
-	datasetID := datacatalog.DatasetID{
+	datasetID := &datacatalog.DatasetID{
 		Project: "testProj",
 		Domain:  "testDomain",
 		Name:    "testName",

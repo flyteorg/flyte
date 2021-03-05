@@ -3,19 +3,19 @@ package transformers
 import (
 	"testing"
 
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"github.com/stretchr/testify/assert"
 )
 
-var metadata = datacatalog.Metadata{
+var metadata = &datacatalog.Metadata{
 	KeyMap: map[string]string{
 		"testKey1": "testValue1",
 		"testKey2": "testValue2",
 	},
 }
 
-var datasetID = datacatalog.DatasetID{
+var datasetID = &datacatalog.DatasetID{
 	Project: "test-project",
 	Domain:  "test-domain",
 	Name:    "test-name",
@@ -33,8 +33,8 @@ func assertDatasetIDEqualsModel(t *testing.T, idlDataset *datacatalog.DatasetID,
 
 func TestCreateDatasetModelNoParitions(t *testing.T) {
 	dataset := &datacatalog.Dataset{
-		Id:       &datasetID,
-		Metadata: &metadata,
+		Id:       datasetID,
+		Metadata: metadata,
 	}
 
 	datasetModel, err := CreateDatasetModel(dataset)
@@ -50,8 +50,8 @@ func TestCreateDatasetModelNoParitions(t *testing.T) {
 
 func TestCreateDatasetModel(t *testing.T) {
 	dataset := &datacatalog.Dataset{
-		Id:            &datasetID,
-		Metadata:      &metadata,
+		Id:            datasetID,
+		Metadata:      metadata,
 		PartitionKeys: []string{"key1", "key2"},
 	}
 
@@ -70,7 +70,7 @@ func TestCreateDatasetModel(t *testing.T) {
 
 func TestFromDatasetID(t *testing.T) {
 	datasetKey := FromDatasetID(datasetID)
-	assertDatasetIDEqualsModel(t, &datasetID, &datasetKey)
+	assertDatasetIDEqualsModel(t, datasetID, &datasetKey)
 }
 
 func TestFromDatasetModelNoPartitionsOrMetadata(t *testing.T) {

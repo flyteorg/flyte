@@ -3,8 +3,8 @@ package validators
 import (
 	"fmt"
 
-	"github.com/lyft/datacatalog/pkg/errors"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	"github.com/flyteorg/datacatalog/pkg/errors"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"google.golang.org/grpc/codes"
 )
 

@@ -3,9 +3,9 @@ package interfaces
 import (
 	"context"
 
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 )
 
 type TagManager interface {
-	AddTag(ctx context.Context, request datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error)
+	AddTag(ctx context.Context, request *datacatalog.AddTagRequest) (*datacatalog.AddTagResponse, error)
 }

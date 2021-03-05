@@ -3,13 +3,13 @@ package transformers
 import (
 	"context"
 
-	"github.com/lyft/datacatalog/pkg/common"
+	"github.com/flyteorg/datacatalog/pkg/common"
 
-	"github.com/lyft/datacatalog/pkg/manager/impl/validators"
-	"github.com/lyft/datacatalog/pkg/repositories/gormimpl"
-	"github.com/lyft/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
+	"github.com/flyteorg/datacatalog/pkg/repositories/gormimpl"
+	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const (

@@ -8,7 +8,7 @@ import (
 
 	"database/sql/driver"
 
-	"github.com/lyft/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/datacatalog/pkg/repositories/utils"
 )
 
 func TestCreateDB(t *testing.T) {

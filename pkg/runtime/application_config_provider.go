@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 
-	dbconfig "github.com/lyft/datacatalog/pkg/repositories/config"
-	"github.com/lyft/datacatalog/pkg/runtime/configs"
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/logger"
+	dbconfig "github.com/flyteorg/datacatalog/pkg/repositories/config"
+	"github.com/flyteorg/datacatalog/pkg/runtime/configs"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const database = "database"
