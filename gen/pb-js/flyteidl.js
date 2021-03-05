@@ -9850,6 +9850,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {google.protobuf.IStruct|null} [custom] TaskTemplate custom
              * @property {flyteidl.core.IContainer|null} [container] TaskTemplate container
              * @property {number|null} [taskTypeVersion] TaskTemplate taskTypeVersion
+             * @property {flyteidl.core.ISecurityContext|null} [securityContext] TaskTemplate securityContext
              */
 
             /**
@@ -9923,6 +9924,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskTemplate.prototype.taskTypeVersion = 0;
 
+            /**
+             * TaskTemplate securityContext.
+             * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
+             * @memberof flyteidl.core.TaskTemplate
+             * @instance
+             */
+            TaskTemplate.prototype.securityContext = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -9975,6 +9984,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.Container.encode(message.container, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                 if (message.taskTypeVersion != null && message.hasOwnProperty("taskTypeVersion"))
                     writer.uint32(/* id 7, wireType 0 =*/56).int32(message.taskTypeVersion);
+                if (message.securityContext != null && message.hasOwnProperty("securityContext"))
+                    $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                 return writer;
             };
 
@@ -10016,6 +10027,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 7:
                         message.taskTypeVersion = reader.int32();
+                        break;
+                    case 8:
+                        message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -10071,6 +10085,11 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.taskTypeVersion != null && message.hasOwnProperty("taskTypeVersion"))
                     if (!$util.isInteger(message.taskTypeVersion))
                         return "taskTypeVersion: integer expected";
+                if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
+                    let error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
+                    if (error)
+                        return "securityContext." + error;
+                }
                 return null;
             };
 
@@ -10837,6 +10856,789 @@ export const flyteidl = $root.flyteidl = (() => {
             })();
 
             return DataLoadingConfig;
+        })();
+
+        core.Secret = (function() {
+
+            /**
+             * Properties of a Secret.
+             * @memberof flyteidl.core
+             * @interface ISecret
+             * @property {string|null} [name] Secret name
+             * @property {flyteidl.core.Secret.MountType|null} [mountRequirement] Secret mountRequirement
+             */
+
+            /**
+             * Constructs a new Secret.
+             * @memberof flyteidl.core
+             * @classdesc Represents a Secret.
+             * @implements ISecret
+             * @constructor
+             * @param {flyteidl.core.ISecret=} [properties] Properties to set
+             */
+            function Secret(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Secret name.
+             * @member {string} name
+             * @memberof flyteidl.core.Secret
+             * @instance
+             */
+            Secret.prototype.name = "";
+
+            /**
+             * Secret mountRequirement.
+             * @member {flyteidl.core.Secret.MountType} mountRequirement
+             * @memberof flyteidl.core.Secret
+             * @instance
+             */
+            Secret.prototype.mountRequirement = 0;
+
+            /**
+             * Creates a new Secret instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.Secret
+             * @static
+             * @param {flyteidl.core.ISecret=} [properties] Properties to set
+             * @returns {flyteidl.core.Secret} Secret instance
+             */
+            Secret.create = function create(properties) {
+                return new Secret(properties);
+            };
+
+            /**
+             * Encodes the specified Secret message. Does not implicitly {@link flyteidl.core.Secret.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.Secret
+             * @static
+             * @param {flyteidl.core.ISecret} message Secret message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Secret.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.name != null && message.hasOwnProperty("name"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+                if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.mountRequirement);
+                return writer;
+            };
+
+            /**
+             * Decodes a Secret message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.Secret
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.Secret} Secret
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Secret.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Secret();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.name = reader.string();
+                        break;
+                    case 2:
+                        message.mountRequirement = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a Secret message.
+             * @function verify
+             * @memberof flyteidl.core.Secret
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Secret.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.name != null && message.hasOwnProperty("name"))
+                    if (!$util.isString(message.name))
+                        return "name: string expected";
+                if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
+                    switch (message.mountRequirement) {
+                    default:
+                        return "mountRequirement: enum value expected";
+                    case 0:
+                    case 1:
+                        break;
+                    }
+                return null;
+            };
+
+            /**
+             * MountType enum.
+             * @name flyteidl.core.Secret.MountType
+             * @enum {string}
+             * @property {number} ENV_VAR=0 ENV_VAR value
+             * @property {number} FILE=1 FILE value
+             */
+            Secret.MountType = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "ENV_VAR"] = 0;
+                values[valuesById[1] = "FILE"] = 1;
+                return values;
+            })();
+
+            return Secret;
+        })();
+
+        core.OAuth2Client = (function() {
+
+            /**
+             * Properties of a OAuth2Client.
+             * @memberof flyteidl.core
+             * @interface IOAuth2Client
+             * @property {string|null} [clientId] OAuth2Client clientId
+             * @property {flyteidl.core.ISecret|null} [clientSecret] OAuth2Client clientSecret
+             */
+
+            /**
+             * Constructs a new OAuth2Client.
+             * @memberof flyteidl.core
+             * @classdesc Represents a OAuth2Client.
+             * @implements IOAuth2Client
+             * @constructor
+             * @param {flyteidl.core.IOAuth2Client=} [properties] Properties to set
+             */
+            function OAuth2Client(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * OAuth2Client clientId.
+             * @member {string} clientId
+             * @memberof flyteidl.core.OAuth2Client
+             * @instance
+             */
+            OAuth2Client.prototype.clientId = "";
+
+            /**
+             * OAuth2Client clientSecret.
+             * @member {flyteidl.core.ISecret|null|undefined} clientSecret
+             * @memberof flyteidl.core.OAuth2Client
+             * @instance
+             */
+            OAuth2Client.prototype.clientSecret = null;
+
+            /**
+             * Creates a new OAuth2Client instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.OAuth2Client
+             * @static
+             * @param {flyteidl.core.IOAuth2Client=} [properties] Properties to set
+             * @returns {flyteidl.core.OAuth2Client} OAuth2Client instance
+             */
+            OAuth2Client.create = function create(properties) {
+                return new OAuth2Client(properties);
+            };
+
+            /**
+             * Encodes the specified OAuth2Client message. Does not implicitly {@link flyteidl.core.OAuth2Client.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.OAuth2Client
+             * @static
+             * @param {flyteidl.core.IOAuth2Client} message OAuth2Client message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            OAuth2Client.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.clientId != null && message.hasOwnProperty("clientId"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.clientId);
+                if (message.clientSecret != null && message.hasOwnProperty("clientSecret"))
+                    $root.flyteidl.core.Secret.encode(message.clientSecret, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a OAuth2Client message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.OAuth2Client
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.OAuth2Client} OAuth2Client
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            OAuth2Client.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.OAuth2Client();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.clientId = reader.string();
+                        break;
+                    case 2:
+                        message.clientSecret = $root.flyteidl.core.Secret.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a OAuth2Client message.
+             * @function verify
+             * @memberof flyteidl.core.OAuth2Client
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            OAuth2Client.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.clientId != null && message.hasOwnProperty("clientId"))
+                    if (!$util.isString(message.clientId))
+                        return "clientId: string expected";
+                if (message.clientSecret != null && message.hasOwnProperty("clientSecret")) {
+                    let error = $root.flyteidl.core.Secret.verify(message.clientSecret);
+                    if (error)
+                        return "clientSecret." + error;
+                }
+                return null;
+            };
+
+            return OAuth2Client;
+        })();
+
+        core.Identity = (function() {
+
+            /**
+             * Properties of an Identity.
+             * @memberof flyteidl.core
+             * @interface IIdentity
+             * @property {string|null} [iamRole] Identity iamRole
+             * @property {string|null} [k8sServiceAccount] Identity k8sServiceAccount
+             * @property {flyteidl.core.IOAuth2Client|null} [oauth2Client] Identity oauth2Client
+             */
+
+            /**
+             * Constructs a new Identity.
+             * @memberof flyteidl.core
+             * @classdesc Represents an Identity.
+             * @implements IIdentity
+             * @constructor
+             * @param {flyteidl.core.IIdentity=} [properties] Properties to set
+             */
+            function Identity(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Identity iamRole.
+             * @member {string} iamRole
+             * @memberof flyteidl.core.Identity
+             * @instance
+             */
+            Identity.prototype.iamRole = "";
+
+            /**
+             * Identity k8sServiceAccount.
+             * @member {string} k8sServiceAccount
+             * @memberof flyteidl.core.Identity
+             * @instance
+             */
+            Identity.prototype.k8sServiceAccount = "";
+
+            /**
+             * Identity oauth2Client.
+             * @member {flyteidl.core.IOAuth2Client|null|undefined} oauth2Client
+             * @memberof flyteidl.core.Identity
+             * @instance
+             */
+            Identity.prototype.oauth2Client = null;
+
+            /**
+             * Creates a new Identity instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.Identity
+             * @static
+             * @param {flyteidl.core.IIdentity=} [properties] Properties to set
+             * @returns {flyteidl.core.Identity} Identity instance
+             */
+            Identity.create = function create(properties) {
+                return new Identity(properties);
+            };
+
+            /**
+             * Encodes the specified Identity message. Does not implicitly {@link flyteidl.core.Identity.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.Identity
+             * @static
+             * @param {flyteidl.core.IIdentity} message Identity message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Identity.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.iamRole != null && message.hasOwnProperty("iamRole"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.iamRole);
+                if (message.k8sServiceAccount != null && message.hasOwnProperty("k8sServiceAccount"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.k8sServiceAccount);
+                if (message.oauth2Client != null && message.hasOwnProperty("oauth2Client"))
+                    $root.flyteidl.core.OAuth2Client.encode(message.oauth2Client, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes an Identity message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.Identity
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.Identity} Identity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Identity.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Identity();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.iamRole = reader.string();
+                        break;
+                    case 2:
+                        message.k8sServiceAccount = reader.string();
+                        break;
+                    case 3:
+                        message.oauth2Client = $root.flyteidl.core.OAuth2Client.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an Identity message.
+             * @function verify
+             * @memberof flyteidl.core.Identity
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Identity.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.iamRole != null && message.hasOwnProperty("iamRole"))
+                    if (!$util.isString(message.iamRole))
+                        return "iamRole: string expected";
+                if (message.k8sServiceAccount != null && message.hasOwnProperty("k8sServiceAccount"))
+                    if (!$util.isString(message.k8sServiceAccount))
+                        return "k8sServiceAccount: string expected";
+                if (message.oauth2Client != null && message.hasOwnProperty("oauth2Client")) {
+                    let error = $root.flyteidl.core.OAuth2Client.verify(message.oauth2Client);
+                    if (error)
+                        return "oauth2Client." + error;
+                }
+                return null;
+            };
+
+            return Identity;
+        })();
+
+        core.OAuth2TokenRequest = (function() {
+
+            /**
+             * Properties of a OAuth2TokenRequest.
+             * @memberof flyteidl.core
+             * @interface IOAuth2TokenRequest
+             * @property {string|null} [name] OAuth2TokenRequest name
+             * @property {flyteidl.core.OAuth2TokenRequest.Type|null} [type] OAuth2TokenRequest type
+             * @property {flyteidl.core.IOAuth2Client|null} [client] OAuth2TokenRequest client
+             * @property {string|null} [idpDiscoveryEndpoint] OAuth2TokenRequest idpDiscoveryEndpoint
+             * @property {string|null} [tokenEndpoint] OAuth2TokenRequest tokenEndpoint
+             */
+
+            /**
+             * Constructs a new OAuth2TokenRequest.
+             * @memberof flyteidl.core
+             * @classdesc Represents a OAuth2TokenRequest.
+             * @implements IOAuth2TokenRequest
+             * @constructor
+             * @param {flyteidl.core.IOAuth2TokenRequest=} [properties] Properties to set
+             */
+            function OAuth2TokenRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * OAuth2TokenRequest name.
+             * @member {string} name
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @instance
+             */
+            OAuth2TokenRequest.prototype.name = "";
+
+            /**
+             * OAuth2TokenRequest type.
+             * @member {flyteidl.core.OAuth2TokenRequest.Type} type
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @instance
+             */
+            OAuth2TokenRequest.prototype.type = 0;
+
+            /**
+             * OAuth2TokenRequest client.
+             * @member {flyteidl.core.IOAuth2Client|null|undefined} client
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @instance
+             */
+            OAuth2TokenRequest.prototype.client = null;
+
+            /**
+             * OAuth2TokenRequest idpDiscoveryEndpoint.
+             * @member {string} idpDiscoveryEndpoint
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @instance
+             */
+            OAuth2TokenRequest.prototype.idpDiscoveryEndpoint = "";
+
+            /**
+             * OAuth2TokenRequest tokenEndpoint.
+             * @member {string} tokenEndpoint
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @instance
+             */
+            OAuth2TokenRequest.prototype.tokenEndpoint = "";
+
+            /**
+             * Creates a new OAuth2TokenRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @static
+             * @param {flyteidl.core.IOAuth2TokenRequest=} [properties] Properties to set
+             * @returns {flyteidl.core.OAuth2TokenRequest} OAuth2TokenRequest instance
+             */
+            OAuth2TokenRequest.create = function create(properties) {
+                return new OAuth2TokenRequest(properties);
+            };
+
+            /**
+             * Encodes the specified OAuth2TokenRequest message. Does not implicitly {@link flyteidl.core.OAuth2TokenRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @static
+             * @param {flyteidl.core.IOAuth2TokenRequest} message OAuth2TokenRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            OAuth2TokenRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.name != null && message.hasOwnProperty("name"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+                if (message.type != null && message.hasOwnProperty("type"))
+                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.type);
+                if (message.client != null && message.hasOwnProperty("client"))
+                    $root.flyteidl.core.OAuth2Client.encode(message.client, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.idpDiscoveryEndpoint != null && message.hasOwnProperty("idpDiscoveryEndpoint"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.idpDiscoveryEndpoint);
+                if (message.tokenEndpoint != null && message.hasOwnProperty("tokenEndpoint"))
+                    writer.uint32(/* id 5, wireType 2 =*/42).string(message.tokenEndpoint);
+                return writer;
+            };
+
+            /**
+             * Decodes a OAuth2TokenRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.OAuth2TokenRequest} OAuth2TokenRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            OAuth2TokenRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.OAuth2TokenRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.name = reader.string();
+                        break;
+                    case 2:
+                        message.type = reader.int32();
+                        break;
+                    case 3:
+                        message.client = $root.flyteidl.core.OAuth2Client.decode(reader, reader.uint32());
+                        break;
+                    case 4:
+                        message.idpDiscoveryEndpoint = reader.string();
+                        break;
+                    case 5:
+                        message.tokenEndpoint = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a OAuth2TokenRequest message.
+             * @function verify
+             * @memberof flyteidl.core.OAuth2TokenRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            OAuth2TokenRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.name != null && message.hasOwnProperty("name"))
+                    if (!$util.isString(message.name))
+                        return "name: string expected";
+                if (message.type != null && message.hasOwnProperty("type"))
+                    switch (message.type) {
+                    default:
+                        return "type: enum value expected";
+                    case 0:
+                        break;
+                    }
+                if (message.client != null && message.hasOwnProperty("client")) {
+                    let error = $root.flyteidl.core.OAuth2Client.verify(message.client);
+                    if (error)
+                        return "client." + error;
+                }
+                if (message.idpDiscoveryEndpoint != null && message.hasOwnProperty("idpDiscoveryEndpoint"))
+                    if (!$util.isString(message.idpDiscoveryEndpoint))
+                        return "idpDiscoveryEndpoint: string expected";
+                if (message.tokenEndpoint != null && message.hasOwnProperty("tokenEndpoint"))
+                    if (!$util.isString(message.tokenEndpoint))
+                        return "tokenEndpoint: string expected";
+                return null;
+            };
+
+            /**
+             * Type enum.
+             * @name flyteidl.core.OAuth2TokenRequest.Type
+             * @enum {string}
+             * @property {number} CLIENT_CREDENTIALS=0 CLIENT_CREDENTIALS value
+             */
+            OAuth2TokenRequest.Type = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "CLIENT_CREDENTIALS"] = 0;
+                return values;
+            })();
+
+            return OAuth2TokenRequest;
+        })();
+
+        core.SecurityContext = (function() {
+
+            /**
+             * Properties of a SecurityContext.
+             * @memberof flyteidl.core
+             * @interface ISecurityContext
+             * @property {flyteidl.core.IIdentity|null} [runAs] SecurityContext runAs
+             * @property {Array.<flyteidl.core.ISecret>|null} [secrets] SecurityContext secrets
+             * @property {Array.<flyteidl.core.IOAuth2TokenRequest>|null} [tokens] SecurityContext tokens
+             */
+
+            /**
+             * Constructs a new SecurityContext.
+             * @memberof flyteidl.core
+             * @classdesc Represents a SecurityContext.
+             * @implements ISecurityContext
+             * @constructor
+             * @param {flyteidl.core.ISecurityContext=} [properties] Properties to set
+             */
+            function SecurityContext(properties) {
+                this.secrets = [];
+                this.tokens = [];
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * SecurityContext runAs.
+             * @member {flyteidl.core.IIdentity|null|undefined} runAs
+             * @memberof flyteidl.core.SecurityContext
+             * @instance
+             */
+            SecurityContext.prototype.runAs = null;
+
+            /**
+             * SecurityContext secrets.
+             * @member {Array.<flyteidl.core.ISecret>} secrets
+             * @memberof flyteidl.core.SecurityContext
+             * @instance
+             */
+            SecurityContext.prototype.secrets = $util.emptyArray;
+
+            /**
+             * SecurityContext tokens.
+             * @member {Array.<flyteidl.core.IOAuth2TokenRequest>} tokens
+             * @memberof flyteidl.core.SecurityContext
+             * @instance
+             */
+            SecurityContext.prototype.tokens = $util.emptyArray;
+
+            /**
+             * Creates a new SecurityContext instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.SecurityContext
+             * @static
+             * @param {flyteidl.core.ISecurityContext=} [properties] Properties to set
+             * @returns {flyteidl.core.SecurityContext} SecurityContext instance
+             */
+            SecurityContext.create = function create(properties) {
+                return new SecurityContext(properties);
+            };
+
+            /**
+             * Encodes the specified SecurityContext message. Does not implicitly {@link flyteidl.core.SecurityContext.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.SecurityContext
+             * @static
+             * @param {flyteidl.core.ISecurityContext} message SecurityContext message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            SecurityContext.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.runAs != null && message.hasOwnProperty("runAs"))
+                    $root.flyteidl.core.Identity.encode(message.runAs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.secrets != null && message.secrets.length)
+                    for (let i = 0; i < message.secrets.length; ++i)
+                        $root.flyteidl.core.Secret.encode(message.secrets[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.tokens != null && message.tokens.length)
+                    for (let i = 0; i < message.tokens.length; ++i)
+                        $root.flyteidl.core.OAuth2TokenRequest.encode(message.tokens[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a SecurityContext message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.SecurityContext
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.SecurityContext} SecurityContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            SecurityContext.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SecurityContext();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.runAs = $root.flyteidl.core.Identity.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        if (!(message.secrets && message.secrets.length))
+                            message.secrets = [];
+                        message.secrets.push($root.flyteidl.core.Secret.decode(reader, reader.uint32()));
+                        break;
+                    case 3:
+                        if (!(message.tokens && message.tokens.length))
+                            message.tokens = [];
+                        message.tokens.push($root.flyteidl.core.OAuth2TokenRequest.decode(reader, reader.uint32()));
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a SecurityContext message.
+             * @function verify
+             * @memberof flyteidl.core.SecurityContext
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            SecurityContext.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.runAs != null && message.hasOwnProperty("runAs")) {
+                    let error = $root.flyteidl.core.Identity.verify(message.runAs);
+                    if (error)
+                        return "runAs." + error;
+                }
+                if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                    if (!Array.isArray(message.secrets))
+                        return "secrets: array expected";
+                    for (let i = 0; i < message.secrets.length; ++i) {
+                        let error = $root.flyteidl.core.Secret.verify(message.secrets[i]);
+                        if (error)
+                            return "secrets." + error;
+                    }
+                }
+                if (message.tokens != null && message.hasOwnProperty("tokens")) {
+                    if (!Array.isArray(message.tokens))
+                        return "tokens: array expected";
+                    for (let i = 0; i < message.tokens.length; ++i) {
+                        let error = $root.flyteidl.core.OAuth2TokenRequest.verify(message.tokens[i]);
+                        if (error)
+                            return "tokens." + error;
+                    }
+                }
+                return null;
+            };
+
+            return SecurityContext;
         })();
 
         core.DynamicJobSpec = (function() {
@@ -16037,128 +16839,6 @@ export const flyteidl = $root.flyteidl = (() => {
             return Annotations;
         })();
 
-        admin.SecurityContext = (function() {
-
-            /**
-             * Properties of a SecurityContext.
-             * @memberof flyteidl.admin
-             * @interface ISecurityContext
-             * @property {Object.<string,string>|null} [values] SecurityContext values
-             */
-
-            /**
-             * Constructs a new SecurityContext.
-             * @memberof flyteidl.admin
-             * @classdesc Represents a SecurityContext.
-             * @implements ISecurityContext
-             * @constructor
-             * @param {flyteidl.admin.ISecurityContext=} [properties] Properties to set
-             */
-            function SecurityContext(properties) {
-                this.values = {};
-                if (properties)
-                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                        if (properties[keys[i]] != null)
-                            this[keys[i]] = properties[keys[i]];
-            }
-
-            /**
-             * SecurityContext values.
-             * @member {Object.<string,string>} values
-             * @memberof flyteidl.admin.SecurityContext
-             * @instance
-             */
-            SecurityContext.prototype.values = $util.emptyObject;
-
-            /**
-             * Creates a new SecurityContext instance using the specified properties.
-             * @function create
-             * @memberof flyteidl.admin.SecurityContext
-             * @static
-             * @param {flyteidl.admin.ISecurityContext=} [properties] Properties to set
-             * @returns {flyteidl.admin.SecurityContext} SecurityContext instance
-             */
-            SecurityContext.create = function create(properties) {
-                return new SecurityContext(properties);
-            };
-
-            /**
-             * Encodes the specified SecurityContext message. Does not implicitly {@link flyteidl.admin.SecurityContext.verify|verify} messages.
-             * @function encode
-             * @memberof flyteidl.admin.SecurityContext
-             * @static
-             * @param {flyteidl.admin.ISecurityContext} message SecurityContext message or plain object to encode
-             * @param {$protobuf.Writer} [writer] Writer to encode to
-             * @returns {$protobuf.Writer} Writer
-             */
-            SecurityContext.encode = function encode(message, writer) {
-                if (!writer)
-                    writer = $Writer.create();
-                if (message.values != null && message.hasOwnProperty("values"))
-                    for (let keys = Object.keys(message.values), i = 0; i < keys.length; ++i)
-                        writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.values[keys[i]]).ldelim();
-                return writer;
-            };
-
-            /**
-             * Decodes a SecurityContext message from the specified reader or buffer.
-             * @function decode
-             * @memberof flyteidl.admin.SecurityContext
-             * @static
-             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-             * @param {number} [length] Message length if known beforehand
-             * @returns {flyteidl.admin.SecurityContext} SecurityContext
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            SecurityContext.decode = function decode(reader, length) {
-                if (!(reader instanceof $Reader))
-                    reader = $Reader.create(reader);
-                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.SecurityContext(), key;
-                while (reader.pos < end) {
-                    let tag = reader.uint32();
-                    switch (tag >>> 3) {
-                    case 1:
-                        reader.skip().pos++;
-                        if (message.values === $util.emptyObject)
-                            message.values = {};
-                        key = reader.string();
-                        reader.pos++;
-                        message.values[key] = reader.string();
-                        break;
-                    default:
-                        reader.skipType(tag & 7);
-                        break;
-                    }
-                }
-                return message;
-            };
-
-            /**
-             * Verifies a SecurityContext message.
-             * @function verify
-             * @memberof flyteidl.admin.SecurityContext
-             * @static
-             * @param {Object.<string,*>} message Plain object to verify
-             * @returns {string|null} `null` if valid, otherwise the reason why it is not
-             */
-            SecurityContext.verify = function verify(message) {
-                if (typeof message !== "object" || message === null)
-                    return "object expected";
-                if (message.values != null && message.hasOwnProperty("values")) {
-                    if (!$util.isObject(message.values))
-                        return "values: object expected";
-                    let key = Object.keys(message.values);
-                    for (let i = 0; i < key.length; ++i)
-                        if (!$util.isString(message.values[key[i]]))
-                            return "values: string{k:string} expected";
-                }
-                return null;
-            };
-
-            return SecurityContext;
-        })();
-
         admin.AuthRole = (function() {
 
             /**
@@ -19284,7 +19964,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.ILabels|null} [labels] ExecutionSpec labels
              * @property {flyteidl.admin.IAnnotations|null} [annotations] ExecutionSpec annotations
              * @property {flyteidl.admin.IAuthRole|null} [authRole] ExecutionSpec authRole
-             * @property {flyteidl.admin.ISecurityContext|null} [securityContext] ExecutionSpec securityContext
+             * @property {flyteidl.core.ISecurityContext|null} [securityContext] ExecutionSpec securityContext
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] ExecutionSpec qualityOfService
              */
 
@@ -19369,7 +20049,7 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * ExecutionSpec securityContext.
-             * @member {flyteidl.admin.ISecurityContext|null|undefined} securityContext
+             * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
              * @memberof flyteidl.admin.ExecutionSpec
              * @instance
              */
@@ -19438,7 +20118,7 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.authRole != null && message.hasOwnProperty("authRole"))
                     $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                 if (message.securityContext != null && message.hasOwnProperty("securityContext"))
-                    $root.flyteidl.admin.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                    $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                 return writer;
@@ -19487,7 +20167,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
                         break;
                     case 10:
-                        message.securityContext = $root.flyteidl.admin.SecurityContext.decode(reader, reader.uint32());
+                        message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
                         break;
                     case 17:
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
@@ -19558,7 +20238,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         return "authRole." + error;
                 }
                 if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
-                    let error = $root.flyteidl.admin.SecurityContext.verify(message.securityContext);
+                    let error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
                     if (error)
                         return "securityContext." + error;
                 }
@@ -20764,7 +21444,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.IAnnotations|null} [annotations] LaunchPlanSpec annotations
              * @property {flyteidl.admin.IAuth|null} [auth] LaunchPlanSpec auth
              * @property {flyteidl.admin.IAuthRole|null} [authRole] LaunchPlanSpec authRole
-             * @property {flyteidl.admin.ISecurityContext|null} [securityContext] LaunchPlanSpec securityContext
+             * @property {flyteidl.core.ISecurityContext|null} [securityContext] LaunchPlanSpec securityContext
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] LaunchPlanSpec qualityOfService
              * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] LaunchPlanSpec rawOutputDataConfig
              */
@@ -20858,7 +21538,7 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * LaunchPlanSpec securityContext.
-             * @member {flyteidl.admin.ISecurityContext|null|undefined} securityContext
+             * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
              * @memberof flyteidl.admin.LaunchPlanSpec
              * @instance
              */
@@ -20923,7 +21603,7 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.authRole != null && message.hasOwnProperty("authRole"))
                     $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                 if (message.securityContext != null && message.hasOwnProperty("securityContext"))
-                    $root.flyteidl.admin.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                    $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig"))
@@ -20977,7 +21657,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
                         break;
                     case 10:
-                        message.securityContext = $root.flyteidl.admin.SecurityContext.decode(reader, reader.uint32());
+                        message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
                         break;
                     case 16:
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
@@ -21048,7 +21728,7 @@ export const flyteidl = $root.flyteidl = (() => {
                         return "authRole." + error;
                 }
                 if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
-                    let error = $root.flyteidl.admin.SecurityContext.verify(message.securityContext);
+                    let error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
                     if (error)
                         return "securityContext." + error;
                 }

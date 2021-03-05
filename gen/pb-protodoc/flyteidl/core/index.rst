@@ -21,6 +21,7 @@ of the various entities in Flyte as well as the type system.
 	identifier.proto
 	interface.proto
 	literals.proto
+	security.proto
 	tasks.proto
 	types.proto
 	workflow.proto

@@ -47,7 +47,7 @@ struct TableStruct_flyteidl_2fadmin_2fcommon_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[26]
+  static const ::google::protobuf::internal::ParseTable schema[24]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -119,12 +119,6 @@ extern RawOutputDataConfigDefaultTypeInternal _RawOutputDataConfig_default_insta
 class ResourceListRequest;
 class ResourceListRequestDefaultTypeInternal;
 extern ResourceListRequestDefaultTypeInternal _ResourceListRequest_default_instance_;
-class SecurityContext;
-class SecurityContextDefaultTypeInternal;
-extern SecurityContextDefaultTypeInternal _SecurityContext_default_instance_;
-class SecurityContext_ValuesEntry_DoNotUse;
-class SecurityContext_ValuesEntry_DoNotUseDefaultTypeInternal;
-extern SecurityContext_ValuesEntry_DoNotUseDefaultTypeInternal _SecurityContext_ValuesEntry_DoNotUse_default_instance_;
 class SlackNotification;
 class SlackNotificationDefaultTypeInternal;
 extern SlackNotificationDefaultTypeInternal _SlackNotification_default_instance_;
@@ -159,8 +153,6 @@ template<> ::flyteidl::admin::ObjectGetRequest* Arena::CreateMaybeMessage<::flyt
 template<> ::flyteidl::admin::PagerDutyNotification* Arena::CreateMaybeMessage<::flyteidl::admin::PagerDutyNotification>(Arena*);
 template<> ::flyteidl::admin::RawOutputDataConfig* Arena::CreateMaybeMessage<::flyteidl::admin::RawOutputDataConfig>(Arena*);
 template<> ::flyteidl::admin::ResourceListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ResourceListRequest>(Arena*);
-template<> ::flyteidl::admin::SecurityContext* Arena::CreateMaybeMessage<::flyteidl::admin::SecurityContext>(Arena*);
-template<> ::flyteidl::admin::SecurityContext_ValuesEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::SecurityContext_ValuesEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::admin::SlackNotification* Arena::CreateMaybeMessage<::flyteidl::admin::SlackNotification>(Arena*);
 template<> ::flyteidl::admin::Sort* Arena::CreateMaybeMessage<::flyteidl::admin::Sort>(Arena*);
 template<> ::flyteidl::admin::UrlBlob* Arena::CreateMaybeMessage<::flyteidl::admin::UrlBlob>(Arena*);
@@ -3017,151 +3009,6 @@ class Annotations final :
 };
 // -------------------------------------------------------------------
 
-class SecurityContext_ValuesEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<SecurityContext_ValuesEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > {
-public:
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<SecurityContext_ValuesEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > SuperType;
-  SecurityContext_ValuesEntry_DoNotUse();
-  SecurityContext_ValuesEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const SecurityContext_ValuesEntry_DoNotUse& other);
-  static const SecurityContext_ValuesEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SecurityContext_ValuesEntry_DoNotUse*>(&_SecurityContext_ValuesEntry_DoNotUse_default_instance_); }
-  void MergeFrom(const ::google::protobuf::Message& other) final;
-  ::google::protobuf::Metadata GetMetadata() const;
-};
-
-// -------------------------------------------------------------------
-
-class SecurityContext final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.SecurityContext) */ {
- public:
-  SecurityContext();
-  virtual ~SecurityContext();
-
-  SecurityContext(const SecurityContext& from);
-
-  inline SecurityContext& operator=(const SecurityContext& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  SecurityContext(SecurityContext&& from) noexcept
-    : SecurityContext() {
-    *this = ::std::move(from);
-  }
-
-  inline SecurityContext& operator=(SecurityContext&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const SecurityContext& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const SecurityContext* internal_default_instance() {
-    return reinterpret_cast<const SecurityContext*>(
-               &_SecurityContext_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    23;
-
-  void Swap(SecurityContext* other);
-  friend void swap(SecurityContext& a, SecurityContext& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline SecurityContext* New() const final {
-    return CreateMaybeMessage<SecurityContext>(nullptr);
-  }
-
-  SecurityContext* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<SecurityContext>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const SecurityContext& from);
-  void MergeFrom(const SecurityContext& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(SecurityContext* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-
-  // accessors -------------------------------------------------------
-
-  // map<string, string> values = 1;
-  int values_size() const;
-  void clear_values();
-  static const int kValuesFieldNumber = 1;
-  const ::google::protobuf::Map< ::std::string, ::std::string >&
-      values() const;
-  ::google::protobuf::Map< ::std::string, ::std::string >*
-      mutable_values();
-
-  // @@protoc_insertion_point(class_scope:flyteidl.admin.SecurityContext)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::MapField<
-      SecurityContext_ValuesEntry_DoNotUse,
-      ::std::string, ::std::string,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      0 > values_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
-};
-// -------------------------------------------------------------------
-
 class AuthRole final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.AuthRole) */ {
  public:
@@ -3206,7 +3053,7 @@ class AuthRole final :
                &_AuthRole_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    22;
 
   void Swap(AuthRole* other);
   friend void swap(AuthRole& a, AuthRole& b) {
@@ -3359,7 +3206,7 @@ class RawOutputDataConfig final :
                &_RawOutputDataConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    23;
 
   void Swap(RawOutputDataConfig* other);
   friend void swap(RawOutputDataConfig& a, RawOutputDataConfig& b) {
@@ -5595,30 +5442,6 @@ Annotations::mutable_values() {
 
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
-// SecurityContext
-
-// map<string, string> values = 1;
-inline int SecurityContext::values_size() const {
-  return values_.size();
-}
-inline void SecurityContext::clear_values() {
-  values_.Clear();
-}
-inline const ::google::protobuf::Map< ::std::string, ::std::string >&
-SecurityContext::values() const {
-  // @@protoc_insertion_point(field_map:flyteidl.admin.SecurityContext.values)
-  return values_.GetMap();
-}
-inline ::google::protobuf::Map< ::std::string, ::std::string >*
-SecurityContext::mutable_values() {
-  // @@protoc_insertion_point(field_mutable_map:flyteidl.admin.SecurityContext.values)
-  return values_.MutableMap();
-}
-
-// -------------------------------------------------------------------
-
 // AuthRole
 
 // string assumable_iam_role = 1;
@@ -5874,10 +5697,6 @@ inline void RawOutputDataConfig::set_allocated_output_location_prefix(::std::str
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

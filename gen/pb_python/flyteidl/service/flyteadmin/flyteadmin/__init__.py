@@ -92,7 +92,6 @@ from flyteadmin.models.admin_project_update_response import AdminProjectUpdateRe
 from flyteadmin.models.admin_projects import AdminProjects
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig
 from flyteadmin.models.admin_schedule import AdminSchedule
-from flyteadmin.models.admin_security_context import AdminSecurityContext
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification
 from flyteadmin.models.admin_sort import AdminSort
 from flyteadmin.models.admin_system_metadata import AdminSystemMetadata
@@ -156,6 +155,7 @@ from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_error import CoreExecutionError
 from flyteadmin.models.core_io_strategy import CoreIOStrategy
 from flyteadmin.models.core_identifier import CoreIdentifier
+from flyteadmin.models.core_identity import CoreIdentity
 from flyteadmin.models.core_if_block import CoreIfBlock
 from flyteadmin.models.core_if_else_block import CoreIfElseBlock
 from flyteadmin.models.core_key_value_pair import CoreKeyValuePair
@@ -167,6 +167,9 @@ from flyteadmin.models.core_node import CoreNode
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier
 from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase
 from flyteadmin.models.core_node_metadata import CoreNodeMetadata
+from flyteadmin.models.core_o_auth2_client import CoreOAuth2Client
+from flyteadmin.models.core_o_auth2_token_request import CoreOAuth2TokenRequest
+from flyteadmin.models.core_o_auth2_token_request_type import CoreOAuth2TokenRequestType
 from flyteadmin.models.core_operand import CoreOperand
 from flyteadmin.models.core_output_reference import CoreOutputReference
 from flyteadmin.models.core_parameter import CoreParameter
@@ -180,6 +183,8 @@ from flyteadmin.models.core_retry_strategy import CoreRetryStrategy
 from flyteadmin.models.core_runtime_metadata import CoreRuntimeMetadata
 from flyteadmin.models.core_scalar import CoreScalar
 from flyteadmin.models.core_schema_type import CoreSchemaType
+from flyteadmin.models.core_secret import CoreSecret
+from flyteadmin.models.core_security_context import CoreSecurityContext
 from flyteadmin.models.core_simple_type import CoreSimpleType
 from flyteadmin.models.core_task_execution_identifier import CoreTaskExecutionIdentifier
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase
@@ -227,6 +232,7 @@ from flyteadmin.models.resources_resource_name import ResourcesResourceName
 from flyteadmin.models.runtime_metadata_runtime_type import RuntimeMetadataRuntimeType
 from flyteadmin.models.schema_column_schema_column_type import SchemaColumnSchemaColumnType
 from flyteadmin.models.schema_type_schema_column import SchemaTypeSchemaColumn
+from flyteadmin.models.secret_mount_type import SecretMountType
 from flyteadmin.models.sort_direction import SortDirection
 from flyteadmin.models.task_execution_metadata_instance_class import TaskExecutionMetadataInstanceClass
 from flyteadmin.models.task_log_message_format import TaskLogMessageFormat

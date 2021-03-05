@@ -23,7 +23,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\x1b\x66lyteidl/admin/common.proto\x12\x0e\x66lyteidl.admin\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\"F\n\x15NamedEntityIdentifier\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\"[\n\x13NamedEntityMetadata\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12/\n\x05state\x18\x02 \x01(\x0e\x32 .flyteidl.admin.NamedEntityState\"\xab\x01\n\x0bNamedEntity\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x31\n\x02id\x18\x02 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\x35\n\x08metadata\x18\x03 \x01(\x0b\x32#.flyteidl.admin.NamedEntityMetadata\"r\n\x04Sort\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x31\n\tdirection\x18\x02 \x01(\x0e\x32\x1e.flyteidl.admin.Sort.Direction\"*\n\tDirection\x12\x0e\n\nDESCENDING\x10\x00\x12\r\n\tASCENDING\x10\x01\"\x99\x01\n NamedEntityIdentifierListRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\r\n\x05limit\x18\x03 \x01(\r\x12\r\n\x05token\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\x12\x0f\n\x07\x66ilters\x18\x06 \x01(\t\"\xc3\x01\n\x16NamedEntityListRequest\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x0f\n\x07project\x18\x02 \x01(\t\x12\x0e\n\x06\x64omain\x18\x03 \x01(\t\x12\r\n\x05limit\x18\x04 \x01(\r\x12\r\n\x05token\x18\x05 \x01(\t\x12%\n\x07sort_by\x18\x06 \x01(\x0b\x32\x14.flyteidl.admin.Sort\x12\x0f\n\x07\x66ilters\x18\x07 \x01(\t\"c\n\x19NamedEntityIdentifierList\x12\x37\n\x08\x65ntities\x18\x01 \x03(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\r\n\x05token\x18\x02 \x01(\t\"O\n\x0fNamedEntityList\x12-\n\x08\x65ntities\x18\x01 \x03(\x0b\x32\x1b.flyteidl.admin.NamedEntity\x12\r\n\x05token\x18\x02 \x01(\t\"~\n\x15NamedEntityGetRequest\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x31\n\x02id\x18\x02 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\"\xb8\x01\n\x18NamedEntityUpdateRequest\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x31\n\x02id\x18\x02 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\x35\n\x08metadata\x18\x03 \x01(\x0b\x32#.flyteidl.admin.NamedEntityMetadata\"\x1b\n\x19NamedEntityUpdateResponse\"9\n\x10ObjectGetRequest\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\"\x9e\x01\n\x13ResourceListRequest\x12\x31\n\x02id\x18\x01 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\r\n\x05limit\x18\x02 \x01(\r\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x66ilters\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\"-\n\x11\x45mailNotification\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\"1\n\x15PagerDutyNotification\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\"-\n\x11SlackNotification\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\"\xf3\x01\n\x0cNotification\x12\x36\n\x06phases\x18\x01 \x03(\x0e\x32&.flyteidl.core.WorkflowExecution.Phase\x12\x32\n\x05\x65mail\x18\x02 \x01(\x0b\x32!.flyteidl.admin.EmailNotificationH\x00\x12;\n\npager_duty\x18\x03 \x01(\x0b\x32%.flyteidl.admin.PagerDutyNotificationH\x00\x12\x32\n\x05slack\x18\x04 \x01(\x0b\x32!.flyteidl.admin.SlackNotificationH\x00\x42\x06\n\x04type\"%\n\x07UrlBlob\x12\x0b\n\x03url\x18\x01 \x01(\t\x12\r\n\x05\x62ytes\x18\x02 \x01(\x03\"k\n\x06Labels\x12\x32\n\x06values\x18\x01 \x03(\x0b\x32\".flyteidl.admin.Labels.ValuesEntry\x1a-\n\x0bValuesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"u\n\x0b\x41nnotations\x12\x37\n\x06values\x18\x01 \x03(\x0b\x32\'.flyteidl.admin.Annotations.ValuesEntry\x1a-\n\x0bValuesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"}\n\x0fSecurityContext\x12;\n\x06values\x18\x01 \x03(\x0b\x32+.flyteidl.admin.SecurityContext.ValuesEntry\x1a-\n\x0bValuesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"X\n\x08\x41uthRole\x12\x1c\n\x12\x61ssumable_iam_role\x18\x01 \x01(\tH\x00\x12$\n\x1akubernetes_service_account\x18\x02 \x01(\tH\x00\x42\x08\n\x06method\"5\n\x13RawOutputDataConfig\x12\x1e\n\x16output_location_prefix\x18\x01 \x01(\t*\\\n\x10NamedEntityState\x12\x17\n\x13NAMED_ENTITY_ACTIVE\x10\x00\x12\x19\n\x15NAMED_ENTITY_ARCHIVED\x10\x01\x12\x14\n\x10SYSTEM_GENERATED\x10\x02\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\x1b\x66lyteidl/admin/common.proto\x12\x0e\x66lyteidl.admin\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\"F\n\x15NamedEntityIdentifier\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\"[\n\x13NamedEntityMetadata\x12\x13\n\x0b\x64\x65scription\x18\x01 \x01(\t\x12/\n\x05state\x18\x02 \x01(\x0e\x32 .flyteidl.admin.NamedEntityState\"\xab\x01\n\x0bNamedEntity\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x31\n\x02id\x18\x02 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\x35\n\x08metadata\x18\x03 \x01(\x0b\x32#.flyteidl.admin.NamedEntityMetadata\"r\n\x04Sort\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x31\n\tdirection\x18\x02 \x01(\x0e\x32\x1e.flyteidl.admin.Sort.Direction\"*\n\tDirection\x12\x0e\n\nDESCENDING\x10\x00\x12\r\n\tASCENDING\x10\x01\"\x99\x01\n NamedEntityIdentifierListRequest\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\r\n\x05limit\x18\x03 \x01(\r\x12\r\n\x05token\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\x12\x0f\n\x07\x66ilters\x18\x06 \x01(\t\"\xc3\x01\n\x16NamedEntityListRequest\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x0f\n\x07project\x18\x02 \x01(\t\x12\x0e\n\x06\x64omain\x18\x03 \x01(\t\x12\r\n\x05limit\x18\x04 \x01(\r\x12\r\n\x05token\x18\x05 \x01(\t\x12%\n\x07sort_by\x18\x06 \x01(\x0b\x32\x14.flyteidl.admin.Sort\x12\x0f\n\x07\x66ilters\x18\x07 \x01(\t\"c\n\x19NamedEntityIdentifierList\x12\x37\n\x08\x65ntities\x18\x01 \x03(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\r\n\x05token\x18\x02 \x01(\t\"O\n\x0fNamedEntityList\x12-\n\x08\x65ntities\x18\x01 \x03(\x0b\x32\x1b.flyteidl.admin.NamedEntity\x12\r\n\x05token\x18\x02 \x01(\t\"~\n\x15NamedEntityGetRequest\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x31\n\x02id\x18\x02 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\"\xb8\x01\n\x18NamedEntityUpdateRequest\x12\x32\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceType\x12\x31\n\x02id\x18\x02 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\x35\n\x08metadata\x18\x03 \x01(\x0b\x32#.flyteidl.admin.NamedEntityMetadata\"\x1b\n\x19NamedEntityUpdateResponse\"9\n\x10ObjectGetRequest\x12%\n\x02id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.Identifier\"\x9e\x01\n\x13ResourceListRequest\x12\x31\n\x02id\x18\x01 \x01(\x0b\x32%.flyteidl.admin.NamedEntityIdentifier\x12\r\n\x05limit\x18\x02 \x01(\r\x12\r\n\x05token\x18\x03 \x01(\t\x12\x0f\n\x07\x66ilters\x18\x04 \x01(\t\x12%\n\x07sort_by\x18\x05 \x01(\x0b\x32\x14.flyteidl.admin.Sort\"-\n\x11\x45mailNotification\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\"1\n\x15PagerDutyNotification\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\"-\n\x11SlackNotification\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\"\xf3\x01\n\x0cNotification\x12\x36\n\x06phases\x18\x01 \x03(\x0e\x32&.flyteidl.core.WorkflowExecution.Phase\x12\x32\n\x05\x65mail\x18\x02 \x01(\x0b\x32!.flyteidl.admin.EmailNotificationH\x00\x12;\n\npager_duty\x18\x03 \x01(\x0b\x32%.flyteidl.admin.PagerDutyNotificationH\x00\x12\x32\n\x05slack\x18\x04 \x01(\x0b\x32!.flyteidl.admin.SlackNotificationH\x00\x42\x06\n\x04type\"%\n\x07UrlBlob\x12\x0b\n\x03url\x18\x01 \x01(\t\x12\r\n\x05\x62ytes\x18\x02 \x01(\x03\"k\n\x06Labels\x12\x32\n\x06values\x18\x01 \x03(\x0b\x32\".flyteidl.admin.Labels.ValuesEntry\x1a-\n\x0bValuesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"u\n\x0b\x41nnotations\x12\x37\n\x06values\x18\x01 \x03(\x0b\x32\'.flyteidl.admin.Annotations.ValuesEntry\x1a-\n\x0bValuesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"X\n\x08\x41uthRole\x12\x1c\n\x12\x61ssumable_iam_role\x18\x01 \x01(\tH\x00\x12$\n\x1akubernetes_service_account\x18\x02 \x01(\tH\x00\x42\x08\n\x06method\"5\n\x13RawOutputDataConfig\x12\x1e\n\x16output_location_prefix\x18\x01 \x01(\t*\\\n\x10NamedEntityState\x12\x17\n\x13NAMED_ENTITY_ACTIVE\x10\x00\x12\x19\n\x15NAMED_ENTITY_ARCHIVED\x10\x01\x12\x14\n\x10SYSTEM_GENERATED\x10\x02\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,flyteidl_dot_core_dot_identifier__pb2.DESCRIPTOR,])
 
@@ -48,8 +48,8 @@ _NAMEDENTITYSTATE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=2595,
-  serialized_end=2687,
+  serialized_start=2468,
+  serialized_end=2560,
 )
 _sym_db.RegisterEnumDescriptor(_NAMEDENTITYSTATE)
 
@@ -983,74 +983,6 @@ _ANNOTATIONS = _descriptor.Descriptor(
 )
 
 
-_SECURITYCONTEXT_VALUESENTRY = _descriptor.Descriptor(
-  name='ValuesEntry',
-  full_name='flyteidl.admin.SecurityContext.ValuesEntry',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='key', full_name='flyteidl.admin.SecurityContext.ValuesEntry.key', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='flyteidl.admin.SecurityContext.ValuesEntry.value', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=_b('8\001'),
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=2157,
-  serialized_end=2202,
-)
-
-_SECURITYCONTEXT = _descriptor.Descriptor(
-  name='SecurityContext',
-  full_name='flyteidl.admin.SecurityContext',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='values', full_name='flyteidl.admin.SecurityContext.values', index=0,
-      number=1, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[_SECURITYCONTEXT_VALUESENTRY, ],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=2323,
-  serialized_end=2448,
-)
-
-
 _AUTHROLE = _descriptor.Descriptor(
   name='AuthRole',
   full_name='flyteidl.admin.AuthRole',
@@ -1087,8 +1019,8 @@ _AUTHROLE = _descriptor.Descriptor(
       name='method', full_name='flyteidl.admin.AuthRole.method',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=2450,
-  serialized_end=2538,
+  serialized_start=2323,
+  serialized_end=2411,
 )
 
 
@@ -1118,8 +1050,8 @@ _RAWOUTPUTDATACONFIG = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2540,
-  serialized_end=2593,
+  serialized_start=2413,
+  serialized_end=2466,
 )
 
 _NAMEDENTITYMETADATA.fields_by_name['state'].enum_type = _NAMEDENTITYSTATE
@@ -1158,8 +1090,6 @@ _LABELS_VALUESENTRY.containing_type = _LABELS
 _LABELS.fields_by_name['values'].message_type = _LABELS_VALUESENTRY
 _ANNOTATIONS_VALUESENTRY.containing_type = _ANNOTATIONS
 _ANNOTATIONS.fields_by_name['values'].message_type = _ANNOTATIONS_VALUESENTRY
-_SECURITYCONTEXT_VALUESENTRY.containing_type = _SECURITYCONTEXT
-_SECURITYCONTEXT.fields_by_name['values'].message_type = _SECURITYCONTEXT_VALUESENTRY
 _AUTHROLE.oneofs_by_name['method'].fields.append(
   _AUTHROLE.fields_by_name['assumable_iam_role'])
 _AUTHROLE.fields_by_name['assumable_iam_role'].containing_oneof = _AUTHROLE.oneofs_by_name['method']
@@ -1186,7 +1116,6 @@ DESCRIPTOR.message_types_by_name['Notification'] = _NOTIFICATION
 DESCRIPTOR.message_types_by_name['UrlBlob'] = _URLBLOB
 DESCRIPTOR.message_types_by_name['Labels'] = _LABELS
 DESCRIPTOR.message_types_by_name['Annotations'] = _ANNOTATIONS
-DESCRIPTOR.message_types_by_name['SecurityContext'] = _SECURITYCONTEXT
 DESCRIPTOR.message_types_by_name['AuthRole'] = _AUTHROLE
 DESCRIPTOR.message_types_by_name['RawOutputDataConfig'] = _RAWOUTPUTDATACONFIG
 DESCRIPTOR.enum_types_by_name['NamedEntityState'] = _NAMEDENTITYSTATE
@@ -1348,21 +1277,6 @@ Annotations = _reflection.GeneratedProtocolMessageType('Annotations', (_message.
 _sym_db.RegisterMessage(Annotations)
 _sym_db.RegisterMessage(Annotations.ValuesEntry)
 
-SecurityContext = _reflection.GeneratedProtocolMessageType('SecurityContext', (_message.Message,), dict(
-
-  ValuesEntry = _reflection.GeneratedProtocolMessageType('ValuesEntry', (_message.Message,), dict(
-    DESCRIPTOR = _SECURITYCONTEXT_VALUESENTRY,
-    __module__ = 'flyteidl.admin.common_pb2'
-    # @@protoc_insertion_point(class_scope:flyteidl.admin.SecurityContext.ValuesEntry)
-    ))
-  ,
-  DESCRIPTOR = _SECURITYCONTEXT,
-  __module__ = 'flyteidl.admin.common_pb2'
-  # @@protoc_insertion_point(class_scope:flyteidl.admin.SecurityContext)
-  ))
-_sym_db.RegisterMessage(SecurityContext)
-_sym_db.RegisterMessage(SecurityContext.ValuesEntry)
-
 AuthRole = _reflection.GeneratedProtocolMessageType('AuthRole', (_message.Message,), dict(
   DESCRIPTOR = _AUTHROLE,
   __module__ = 'flyteidl.admin.common_pb2'
@@ -1381,5 +1295,4 @@ _sym_db.RegisterMessage(RawOutputDataConfig)
 DESCRIPTOR._options = None
 _LABELS_VALUESENTRY._options = None
 _ANNOTATIONS_VALUESENTRY._options = None
-_SECURITYCONTEXT_VALUESENTRY._options = None
 # @@protoc_insertion_point(module_scope)

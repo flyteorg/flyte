@@ -35,6 +35,7 @@
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/interface.pb.h"
 #include "flyteidl/core/literals.pb.h"
+#include "flyteidl/core/security.pb.h"
 #include <google/protobuf/duration.pb.h>
 #include <google/protobuf/struct.pb.h>
 // @@protoc_insertion_point(includes)
@@ -1022,6 +1023,15 @@ class TaskTemplate final :
   ::google::protobuf::Struct* mutable_custom();
   void set_allocated_custom(::google::protobuf::Struct* custom);
 
+  // .flyteidl.core.SecurityContext security_context = 8;
+  bool has_security_context() const;
+  void clear_security_context();
+  static const int kSecurityContextFieldNumber = 8;
+  const ::flyteidl::core::SecurityContext& security_context() const;
+  ::flyteidl::core::SecurityContext* release_security_context();
+  ::flyteidl::core::SecurityContext* mutable_security_context();
+  void set_allocated_security_context(::flyteidl::core::SecurityContext* security_context);
+
   // int32 task_type_version = 7;
   void clear_task_type_version();
   static const int kTaskTypeVersionFieldNumber = 7;
@@ -1053,6 +1063,7 @@ class TaskTemplate final :
   ::flyteidl::core::TaskMetadata* metadata_;
   ::flyteidl::core::TypedInterface* interface_;
   ::google::protobuf::Struct* custom_;
+  ::flyteidl::core::SecurityContext* security_context_;
   ::google::protobuf::int32 task_type_version_;
   union TargetUnion {
     TargetUnion() {}
@@ -2629,6 +2640,51 @@ inline void TaskTemplate::set_task_type_version(::google::protobuf::int32 value)
   
   task_type_version_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.core.TaskTemplate.task_type_version)
+}
+
+// .flyteidl.core.SecurityContext security_context = 8;
+inline bool TaskTemplate::has_security_context() const {
+  return this != internal_default_instance() && security_context_ != nullptr;
+}
+inline const ::flyteidl::core::SecurityContext& TaskTemplate::security_context() const {
+  const ::flyteidl::core::SecurityContext* p = security_context_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskTemplate.security_context)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::SecurityContext*>(
+      &::flyteidl::core::_SecurityContext_default_instance_);
+}
+inline ::flyteidl::core::SecurityContext* TaskTemplate::release_security_context() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.TaskTemplate.security_context)
+  
+  ::flyteidl::core::SecurityContext* temp = security_context_;
+  security_context_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::SecurityContext* TaskTemplate::mutable_security_context() {
+  
+  if (security_context_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::SecurityContext>(GetArenaNoVirtual());
+    security_context_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.TaskTemplate.security_context)
+  return security_context_;
+}
+inline void TaskTemplate::set_allocated_security_context(::flyteidl::core::SecurityContext* security_context) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(security_context_);
+  }
+  if (security_context) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      security_context = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, security_context, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  security_context_ = security_context;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskTemplate.security_context)
 }
 
 inline bool TaskTemplate::has_target() const {

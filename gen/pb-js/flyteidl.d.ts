@@ -4147,6 +4147,9 @@ export namespace flyteidl {
 
             /** TaskTemplate taskTypeVersion */
             taskTypeVersion?: (number|null);
+
+            /** TaskTemplate securityContext */
+            securityContext?: (flyteidl.core.ISecurityContext|null);
         }
 
         /** Represents a TaskTemplate. */
@@ -4178,6 +4181,9 @@ export namespace flyteidl {
 
             /** TaskTemplate taskTypeVersion. */
             public taskTypeVersion: number;
+
+            /** TaskTemplate securityContext. */
+            public securityContext?: (flyteidl.core.ISecurityContext|null);
 
             /** TaskTemplate target. */
             public target?: "container";
@@ -4520,6 +4526,343 @@ export namespace flyteidl {
                 YAML = 1,
                 PROTO = 2
             }
+        }
+
+        /** Properties of a Secret. */
+        interface ISecret {
+
+            /** Secret name */
+            name?: (string|null);
+
+            /** Secret mountRequirement */
+            mountRequirement?: (flyteidl.core.Secret.MountType|null);
+        }
+
+        /** Represents a Secret. */
+        class Secret implements ISecret {
+
+            /**
+             * Constructs a new Secret.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISecret);
+
+            /** Secret name. */
+            public name: string;
+
+            /** Secret mountRequirement. */
+            public mountRequirement: flyteidl.core.Secret.MountType;
+
+            /**
+             * Creates a new Secret instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Secret instance
+             */
+            public static create(properties?: flyteidl.core.ISecret): flyteidl.core.Secret;
+
+            /**
+             * Encodes the specified Secret message. Does not implicitly {@link flyteidl.core.Secret.verify|verify} messages.
+             * @param message Secret message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISecret, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Secret message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Secret
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Secret;
+
+            /**
+             * Verifies a Secret message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Secret {
+
+            /** MountType enum. */
+            enum MountType {
+                ENV_VAR = 0,
+                FILE = 1
+            }
+        }
+
+        /** Properties of a OAuth2Client. */
+        interface IOAuth2Client {
+
+            /** OAuth2Client clientId */
+            clientId?: (string|null);
+
+            /** OAuth2Client clientSecret */
+            clientSecret?: (flyteidl.core.ISecret|null);
+        }
+
+        /** Represents a OAuth2Client. */
+        class OAuth2Client implements IOAuth2Client {
+
+            /**
+             * Constructs a new OAuth2Client.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IOAuth2Client);
+
+            /** OAuth2Client clientId. */
+            public clientId: string;
+
+            /** OAuth2Client clientSecret. */
+            public clientSecret?: (flyteidl.core.ISecret|null);
+
+            /**
+             * Creates a new OAuth2Client instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OAuth2Client instance
+             */
+            public static create(properties?: flyteidl.core.IOAuth2Client): flyteidl.core.OAuth2Client;
+
+            /**
+             * Encodes the specified OAuth2Client message. Does not implicitly {@link flyteidl.core.OAuth2Client.verify|verify} messages.
+             * @param message OAuth2Client message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IOAuth2Client, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a OAuth2Client message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OAuth2Client
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.OAuth2Client;
+
+            /**
+             * Verifies a OAuth2Client message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Identity. */
+        interface IIdentity {
+
+            /** Identity iamRole */
+            iamRole?: (string|null);
+
+            /** Identity k8sServiceAccount */
+            k8sServiceAccount?: (string|null);
+
+            /** Identity oauth2Client */
+            oauth2Client?: (flyteidl.core.IOAuth2Client|null);
+        }
+
+        /** Represents an Identity. */
+        class Identity implements IIdentity {
+
+            /**
+             * Constructs a new Identity.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IIdentity);
+
+            /** Identity iamRole. */
+            public iamRole: string;
+
+            /** Identity k8sServiceAccount. */
+            public k8sServiceAccount: string;
+
+            /** Identity oauth2Client. */
+            public oauth2Client?: (flyteidl.core.IOAuth2Client|null);
+
+            /**
+             * Creates a new Identity instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Identity instance
+             */
+            public static create(properties?: flyteidl.core.IIdentity): flyteidl.core.Identity;
+
+            /**
+             * Encodes the specified Identity message. Does not implicitly {@link flyteidl.core.Identity.verify|verify} messages.
+             * @param message Identity message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IIdentity, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Identity message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Identity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Identity;
+
+            /**
+             * Verifies an Identity message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a OAuth2TokenRequest. */
+        interface IOAuth2TokenRequest {
+
+            /** OAuth2TokenRequest name */
+            name?: (string|null);
+
+            /** OAuth2TokenRequest type */
+            type?: (flyteidl.core.OAuth2TokenRequest.Type|null);
+
+            /** OAuth2TokenRequest client */
+            client?: (flyteidl.core.IOAuth2Client|null);
+
+            /** OAuth2TokenRequest idpDiscoveryEndpoint */
+            idpDiscoveryEndpoint?: (string|null);
+
+            /** OAuth2TokenRequest tokenEndpoint */
+            tokenEndpoint?: (string|null);
+        }
+
+        /** Represents a OAuth2TokenRequest. */
+        class OAuth2TokenRequest implements IOAuth2TokenRequest {
+
+            /**
+             * Constructs a new OAuth2TokenRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IOAuth2TokenRequest);
+
+            /** OAuth2TokenRequest name. */
+            public name: string;
+
+            /** OAuth2TokenRequest type. */
+            public type: flyteidl.core.OAuth2TokenRequest.Type;
+
+            /** OAuth2TokenRequest client. */
+            public client?: (flyteidl.core.IOAuth2Client|null);
+
+            /** OAuth2TokenRequest idpDiscoveryEndpoint. */
+            public idpDiscoveryEndpoint: string;
+
+            /** OAuth2TokenRequest tokenEndpoint. */
+            public tokenEndpoint: string;
+
+            /**
+             * Creates a new OAuth2TokenRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns OAuth2TokenRequest instance
+             */
+            public static create(properties?: flyteidl.core.IOAuth2TokenRequest): flyteidl.core.OAuth2TokenRequest;
+
+            /**
+             * Encodes the specified OAuth2TokenRequest message. Does not implicitly {@link flyteidl.core.OAuth2TokenRequest.verify|verify} messages.
+             * @param message OAuth2TokenRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IOAuth2TokenRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a OAuth2TokenRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns OAuth2TokenRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.OAuth2TokenRequest;
+
+            /**
+             * Verifies a OAuth2TokenRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace OAuth2TokenRequest {
+
+            /** Type enum. */
+            enum Type {
+                CLIENT_CREDENTIALS = 0
+            }
+        }
+
+        /** Properties of a SecurityContext. */
+        interface ISecurityContext {
+
+            /** SecurityContext runAs */
+            runAs?: (flyteidl.core.IIdentity|null);
+
+            /** SecurityContext secrets */
+            secrets?: (flyteidl.core.ISecret[]|null);
+
+            /** SecurityContext tokens */
+            tokens?: (flyteidl.core.IOAuth2TokenRequest[]|null);
+        }
+
+        /** Represents a SecurityContext. */
+        class SecurityContext implements ISecurityContext {
+
+            /**
+             * Constructs a new SecurityContext.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ISecurityContext);
+
+            /** SecurityContext runAs. */
+            public runAs?: (flyteidl.core.IIdentity|null);
+
+            /** SecurityContext secrets. */
+            public secrets: flyteidl.core.ISecret[];
+
+            /** SecurityContext tokens. */
+            public tokens: flyteidl.core.IOAuth2TokenRequest[];
+
+            /**
+             * Creates a new SecurityContext instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SecurityContext instance
+             */
+            public static create(properties?: flyteidl.core.ISecurityContext): flyteidl.core.SecurityContext;
+
+            /**
+             * Encodes the specified SecurityContext message. Does not implicitly {@link flyteidl.core.SecurityContext.verify|verify} messages.
+             * @param message SecurityContext message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ISecurityContext, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a SecurityContext message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns SecurityContext
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.SecurityContext;
+
+            /**
+             * Verifies a SecurityContext message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
         }
 
         /** Properties of a DynamicJobSpec. */
@@ -6651,58 +6994,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a SecurityContext. */
-        interface ISecurityContext {
-
-            /** SecurityContext values */
-            values?: ({ [k: string]: string }|null);
-        }
-
-        /** Represents a SecurityContext. */
-        class SecurityContext implements ISecurityContext {
-
-            /**
-             * Constructs a new SecurityContext.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ISecurityContext);
-
-            /** SecurityContext values. */
-            public values: { [k: string]: string };
-
-            /**
-             * Creates a new SecurityContext instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns SecurityContext instance
-             */
-            public static create(properties?: flyteidl.admin.ISecurityContext): flyteidl.admin.SecurityContext;
-
-            /**
-             * Encodes the specified SecurityContext message. Does not implicitly {@link flyteidl.admin.SecurityContext.verify|verify} messages.
-             * @param message SecurityContext message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ISecurityContext, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a SecurityContext message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns SecurityContext
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.SecurityContext;
-
-            /**
-             * Verifies a SecurityContext message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of an AuthRole. */
         interface IAuthRole {
 
@@ -8067,7 +8358,7 @@ export namespace flyteidl {
             authRole?: (flyteidl.admin.IAuthRole|null);
 
             /** ExecutionSpec securityContext */
-            securityContext?: (flyteidl.admin.ISecurityContext|null);
+            securityContext?: (flyteidl.core.ISecurityContext|null);
 
             /** ExecutionSpec qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
@@ -8107,7 +8398,7 @@ export namespace flyteidl {
             public authRole?: (flyteidl.admin.IAuthRole|null);
 
             /** ExecutionSpec securityContext. */
-            public securityContext?: (flyteidl.admin.ISecurityContext|null);
+            public securityContext?: (flyteidl.core.ISecurityContext|null);
 
             /** ExecutionSpec qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);
@@ -8698,7 +8989,7 @@ export namespace flyteidl {
             authRole?: (flyteidl.admin.IAuthRole|null);
 
             /** LaunchPlanSpec securityContext */
-            securityContext?: (flyteidl.admin.ISecurityContext|null);
+            securityContext?: (flyteidl.core.ISecurityContext|null);
 
             /** LaunchPlanSpec qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
@@ -8744,7 +9035,7 @@ export namespace flyteidl {
             public authRole?: (flyteidl.admin.IAuthRole|null);
 
             /** LaunchPlanSpec securityContext. */
-            public securityContext?: (flyteidl.admin.ISecurityContext|null);
+            public securityContext?: (flyteidl.core.ISecurityContext|null);
 
             /** LaunchPlanSpec qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);

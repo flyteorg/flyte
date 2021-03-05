@@ -13,7 +13,7 @@ package flyteadmin
 type AdminExecutionCreateRequest struct {
 	// Name of the project the execution belongs to.
 	Project string `json:"project,omitempty"`
-	// Name of the domain the execution belongs to.  A domain can be considered as a subset within a specific project.
+	// Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project.
 	Domain string `json:"domain,omitempty"`
 	Name string `json:"name,omitempty"`
 	// Additional fields necessary to launch the execution.
