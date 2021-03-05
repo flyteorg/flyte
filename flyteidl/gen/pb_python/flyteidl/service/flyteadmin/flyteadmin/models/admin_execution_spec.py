@@ -21,10 +21,10 @@ from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_execution_metadata import AdminExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
-from flyteadmin.models.admin_security_context import AdminSecurityContext  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
+from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
 
 
 class AdminExecutionSpec(object):
@@ -49,7 +49,7 @@ class AdminExecutionSpec(object):
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
         'auth_role': 'AdminAuthRole',
-        'security_context': 'AdminSecurityContext',
+        'security_context': 'CoreSecurityContext',
         'quality_of_service': 'CoreQualityOfService'
     }
 
@@ -287,7 +287,7 @@ class AdminExecutionSpec(object):
         Optional: security context override to apply this execution.  # noqa: E501
 
         :return: The security_context of this AdminExecutionSpec.  # noqa: E501
-        :rtype: AdminSecurityContext
+        :rtype: CoreSecurityContext
         """
         return self._security_context
 
@@ -298,7 +298,7 @@ class AdminExecutionSpec(object):
         Optional: security context override to apply this execution.  # noqa: E501
 
         :param security_context: The security_context of this AdminExecutionSpec.  # noqa: E501
-        :type: AdminSecurityContext
+        :type: CoreSecurityContext
         """
 
         self._security_context = security_context

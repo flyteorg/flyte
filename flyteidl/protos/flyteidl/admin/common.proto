@@ -11,14 +11,14 @@ import "flyteidl/core/identifier.proto";
 // A resource can internally have multiple versions.
 message NamedEntityIdentifier {
     // Name of the project the resource belongs to.
-    string project               = 1;  // [(validate.rules).string.min_bytes = 1];
+    string project = 1;  // [(validate.rules).string.min_bytes = 1];
     // Name of the domain the resource belongs to.
     // A domain can be considered as a subset within a specific project.
-    string domain                = 2;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 2;  // [(validate.rules).string.min_bytes = 1];
     // User provided value for the resource.
     // The combination of project + domain + name uniquely identifies the resource.
     // +optional - in certain contexts - like 'List API', 'Launch plans'
-    string name                  = 3;
+    string name = 3;
 }
 
 // The status of the named entity is used to control its visibility in the UI.
@@ -47,95 +47,95 @@ message NamedEntityMetadata {
 // domain / name / resource type combination
 message NamedEntity {
     flyteidl.core.ResourceType resource_type = 1;
-    NamedEntityIdentifier id                 = 2;
-    NamedEntityMetadata metadata             = 3;
+    NamedEntityIdentifier id = 2;
+    NamedEntityMetadata metadata = 3;
 }
 
 // Species sort ordering in a list request.
 message Sort {
     enum Direction {
-        DESCENDING        = 0;
-        ASCENDING         = 1;
+        DESCENDING = 0;
+        ASCENDING = 1;
     }
     // Indicates an attribute to sort the response values.
     // TODO(katrogan): Add string validation here. This should never be empty.
-    string key            = 1;
+    string key = 1;
 
     // Indicates the direction to apply sort key for response values.
     // +optional
-    Direction direction   = 2;
+    Direction direction = 2;
 }
 
 // Represents a request structure to list identifiers.
 message NamedEntityIdentifierListRequest {
     // Name of the project that contains the identifiers.
-    string project    = 1;  // [(validate.rules).string.min_bytes = 1];
+    string project = 1;  // [(validate.rules).string.min_bytes = 1];
     // Name of the domain the identifiers belongs to within the project.
-    string domain     = 2;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 2;  // [(validate.rules).string.min_bytes = 1];
     // Indicates the number of resources to be returned.
-    uint32 limit      = 3;
+    uint32 limit = 3;
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query.
     // +optional
-    string token      = 4;
+    string token = 4;
 
     // Sort ordering.
     // +optional
-    Sort sort_by      = 5;
+    Sort sort_by = 5;
 
     // Indicates a list of filters passed as string.
     // +optional
-    string filters    = 6;
+    string filters = 6;
 }
 
 // Represents a request structure to list NamedEntity objects
 message NamedEntityListRequest {
     flyteidl.core.ResourceType resource_type = 1;
     // Name of the project that contains the identifiers.
-    string project                           = 2;  // [(validate.rules).string.min_bytes = 1];
+    string project = 2;  // [(validate.rules).string.min_bytes = 1];
     // Name of the domain the identifiers belongs to within the project.
-    string domain                            = 3;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 3;  // [(validate.rules).string.min_bytes = 1];
     // Indicates the number of resources to be returned.
-    uint32 limit                             = 4;
+    uint32 limit = 4;
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query.
     // +optional
-    string token                             = 5;
+    string token = 5;
 
     // Sort ordering.
     // +optional
-    Sort sort_by                             = 6;
+    Sort sort_by = 6;
 
     // Indicates a list of filters passed as string.
     // +optional
-    string filters                           = 7;
+    string filters = 7;
 
 }
 
 // Represents a list of NamedEntityIdentifiers.
 message NamedEntityIdentifierList {
     // A list of identifiers.
-    repeated NamedEntityIdentifier entities                = 1;
+    repeated NamedEntityIdentifier entities = 1;
 
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query. If there are no more results, this value will be empty.
-    string token                                           = 2;
+    string token = 2;
 }
 
 // Represents a list of NamedEntityIdentifiers.
 message NamedEntityList {
     // A list of NamedEntity objects
-    repeated NamedEntity entities                = 1;
+    repeated NamedEntity entities = 1;
 
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query. If there are no more results, this value will be empty.
-    string token                                           = 2;
+    string token = 2;
 }
 
 // A request to retrieve the metadata associated with a NamedEntityIdentifier
 message NamedEntityGetRequest {
     flyteidl.core.ResourceType resource_type = 1;
-    NamedEntityIdentifier id                 = 2;
+    NamedEntityIdentifier id = 2;
 }
 
 // Request to set the referenced launch plan state to the configured value.
@@ -143,10 +143,10 @@ message NamedEntityUpdateRequest {
     // Resource type of the metadata to update
     flyteidl.core.ResourceType resource_type = 1;
     // Identifier of the metadata to update
-    NamedEntityIdentifier id                 = 2;
+    NamedEntityIdentifier id = 2;
 
     // Metadata object to set as the new value
-    NamedEntityMetadata metadata             = 3;
+    NamedEntityMetadata metadata = 3;
 }
 
 // Purposefully empty, may be populated in the future.
@@ -156,28 +156,28 @@ message NamedEntityUpdateResponse {
 // Represents a structure to fetch a single resource.
 message ObjectGetRequest {
     // Indicates a unique version of resource.
-    core.Identifier id   = 1;
+    core.Identifier id = 1;
 }
 
 // Represents a request structure to retrieve a list of resources.
 // Resources include: Task, Workflow, LaunchPlan
 message ResourceListRequest {
     // id represents the unique identifier of the resource.
-    NamedEntityIdentifier id   = 1;
+    NamedEntityIdentifier id = 1;
     // Indicates the number of resources to be returned.
-    uint32 limit    = 2;
+    uint32 limit = 2;
     // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
     // in a query.
     // +optional
-    string token    = 3;
+    string token = 3;
     // Indicates a list of filters passed as string.
     // More info on constructing filters : <Link>
     // +optional
-    string filters  = 4;
+    string filters = 4;
 
     // Sort ordering.
     // +optional
-    Sort sort_by    = 5;
+    Sort sort_by = 5;
 }
 
 message EmailNotification {
@@ -215,10 +215,10 @@ message Notification {
 // Represents a string url and associated metadata used throughout the platform.
 message UrlBlob {
     // Actual url value.
-    string url                         = 1;
+    string url = 1;
 
     // Represents the size of the file accessible at the above url.
-    int64 bytes                        = 2;
+    int64 bytes = 2;
 }
 
 // Label values to be applied to an execution resource.
@@ -226,7 +226,7 @@ message UrlBlob {
 // to specify how to merge labels defined at registration and execution time.
 message Labels {
     // Map of custom labels to be applied to the execution resource.
-    map<string, string> values          = 1;
+    map<string, string> values = 1;
 }
 
 // Annotation values to be applied to an execution resource.
@@ -234,31 +234,23 @@ message Labels {
 // to specify how to merge annotations defined at registration and execution time.
 message Annotations {
     // Map of custom annotations to be applied to the execution resource.
-    map<string, string> values          = 1;
-}
-
-// Security context fields to define privilege and access control settings
-// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
-// to specify how to merge security context defined at registration and execution time.
-message SecurityContext {
-    // Map of security context values
-    map<string, string> values          = 1;
+    map<string, string> values = 1;
 }
 
 // Defines permissions associated with executions.
-// Deprecated
+// Deprecated, please use core.SecurityContext
 message AuthRole {
-  oneof method {
-    string assumable_iam_role         = 1;
-    string kubernetes_service_account = 2;
-  }
+    oneof method {
+        string assumable_iam_role = 1;
+        string kubernetes_service_account = 2;
+    }
 }
 
 
 // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
-// See https://github.com/lyft/flyte/issues/211 for more background information.
+// See https://github.com/flyteorg/flyte/issues/211 for more background information.
 message RawOutputDataConfig {
     // Prefix for where offloaded data from user workflows will be written
     // e.g. s3://bucket/key or s3://bucket/
-    string output_location_prefix            = 1;
+    string output_location_prefix = 1;
 }

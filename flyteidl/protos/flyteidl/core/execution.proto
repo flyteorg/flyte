@@ -58,9 +58,9 @@ message TaskExecution{
 message ExecutionError {
     // Error code indicates a grouping of a type of error.
     // More Info: <Link>
-    string code     = 1;
+    string code = 1;
     // Detailed description of the error - including stack trace.
-    string message  = 2;
+    string message = 2;
     // Full error contents accessible via a URI
     string error_uri = 3;
     // Error type: System or User
@@ -69,7 +69,7 @@ message ExecutionError {
         USER = 1;
         SYSTEM = 2;
     }
-    ErrorKind kind = 4; 
+    ErrorKind kind = 4;
 }
 
 // Log information for the task that is specific to a log sink
@@ -84,30 +84,30 @@ message TaskLog {
 
     string uri = 1;
     string name = 2;
-    MessageFormat message_format = 3; 
+    MessageFormat message_format = 3;
     google.protobuf.Duration ttl = 4;
 }
 
 // Represents customized execution run-time attributes.
 message QualityOfServiceSpec {
-  // Indicates how much queueing delay an execution can tolerate.
-  google.protobuf.Duration queueing_budget = 1;
+    // Indicates how much queueing delay an execution can tolerate.
+    google.protobuf.Duration queueing_budget = 1;
 
-  // Add future, user-configurable options here
+    // Add future, user-configurable options here
 }
 
 // Indicates the priority of an execution.
 message QualityOfService {
-  enum Tier {
-    // Default: no quality of service specified.
-    UNDEFINED = 0;
-    HIGH = 1;
-    MEDIUM = 2;
-    LOW = 3;
-  }
+    enum Tier {
+        // Default: no quality of service specified.
+        UNDEFINED = 0;
+        HIGH = 1;
+        MEDIUM = 2;
+        LOW = 3;
+    }
 
-  oneof designation {
-    Tier tier = 1;
-    QualityOfServiceSpec spec = 2;
-  }
+    oneof designation {
+        Tier tier = 1;
+        QualityOfServiceSpec spec = 2;
+    }
 }

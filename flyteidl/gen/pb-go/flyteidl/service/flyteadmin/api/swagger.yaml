@@ -2457,7 +2457,7 @@ definitions:
   DataLoadingConfigLiteralMapFormat:
     type: "string"
     title: "LiteralMapFormat decides the encoding format in which the input metadata\
-      \ should be made available to the containers. \nIf the user has access to the\
+      \ should be made available to the containers.\nIf the user has access to the\
       \ protocol buffer definitions, it is recommended to use the PROTO format.\n\
       JSON and YAML do not need any protobuf definitions to read it\nAll remote references\
       \ in core.LiteralMap are replaced with local filesystem references (the data\
@@ -2599,6 +2599,15 @@ definitions:
     example:
       name: "name"
       type: {}
+  SecretMountType:
+    type: "string"
+    description: " - ENV_VAR: ENV_VAR indicates the secret needs to be mounted as\
+      \ an environment variable.\n - FILE: FILE indicates the secret needs to be mounted\
+      \ as a file."
+    enum:
+    - "ENV_VAR"
+    - "FILE"
+    default: "ENV_VAR"
   SortDirection:
     type: "string"
     enum:
@@ -2683,7 +2692,8 @@ definitions:
         type: "string"
       kubernetes_service_account:
         type: "string"
-    title: "Defines permissions associated with executions.\nDeprecated"
+    title: "Defines permissions associated with executions.\nDeprecated, please use\
+      \ core.SecurityContext"
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
@@ -2887,8 +2897,38 @@ definitions:
               - "recipients_email"
               - "recipients_email"
         security_context:
-          values:
-            key: "values"
+          run_as:
+            iam_role: "iam_role"
+            oauth2_client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            k8s_service_account: "k8s_service_account"
+          tokens:
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          secrets:
+          - mount_requirement: {}
+            name: "name"
+          - mount_requirement: {}
+            name: "name"
         labels:
           values:
             key: "values"
@@ -3020,8 +3060,8 @@ definitions:
         description: "Name of the project the execution belongs to."
       domain:
         type: "string"
-        description: "Name of the domain the execution belongs to. \nA domain can\
-          \ be considered as a subset within a specific project."
+        description: "Name of the domain the execution belongs to.\nA domain can be\
+          \ considered as a subset within a specific project."
       name:
         type: "string"
         title: "User provided value for the resource.\nIf none is provided the system\
@@ -3193,8 +3233,38 @@ definitions:
                 - "recipients_email"
                 - "recipients_email"
           security_context:
-            values:
-              key: "values"
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
           labels:
             values:
               key: "values"
@@ -3330,8 +3400,38 @@ definitions:
                 - "recipients_email"
                 - "recipients_email"
           security_context:
-            values:
-              key: "values"
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
           labels:
             values:
               key: "values"
@@ -3451,7 +3551,7 @@ definitions:
         $ref: "#/definitions/adminAuthRole"
       security_context:
         description: "Optional: security context override to apply this execution."
-        $ref: "#/definitions/adminSecurityContext"
+        $ref: "#/definitions/coreSecurityContext"
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
@@ -3525,8 +3625,38 @@ definitions:
             - "recipients_email"
             - "recipients_email"
       security_context:
-        values:
-          key: "values"
+        run_as:
+          iam_role: "iam_role"
+          oauth2_client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          k8s_service_account: "k8s_service_account"
+        tokens:
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        secrets:
+        - mount_requirement: {}
+          name: "name"
+        - mount_requirement: {}
+          name: "name"
       labels:
         values:
           key: "values"
@@ -3849,8 +3979,38 @@ definitions:
                   simple: {}
               required: true
         security_context:
-          values:
-            key: "values"
+          run_as:
+            iam_role: "iam_role"
+            oauth2_client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            k8s_service_account: "k8s_service_account"
+          tokens:
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          secrets:
+          - mount_requirement: {}
+            name: "name"
+          - mount_requirement: {}
+            name: "name"
         labels:
           values:
             key: "values"
@@ -4268,8 +4428,38 @@ definitions:
                     simple: {}
                 required: true
           security_context:
-            values:
-              key: "values"
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
           labels:
             values:
               key: "values"
@@ -4526,8 +4716,38 @@ definitions:
                     simple: {}
                 required: true
           security_context:
-            values:
-              key: "values"
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
           labels:
             values:
               key: "values"
@@ -4622,7 +4842,7 @@ definitions:
       security_context:
         title: "Indicates security context for permissions triggered with this launch\
           \ plan"
-        $ref: "#/definitions/adminSecurityContext"
+        $ref: "#/definitions/coreSecurityContext"
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
@@ -4768,8 +4988,38 @@ definitions:
                 simple: {}
             required: true
       security_context:
-        values:
-          key: "values"
+        run_as:
+          iam_role: "iam_role"
+          oauth2_client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          k8s_service_account: "k8s_service_account"
+        tokens:
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        secrets:
+        - mount_requirement: {}
+          name: "name"
+        - mount_requirement: {}
+          name: "name"
       labels:
         values:
           key: "values"
@@ -5782,8 +6032,8 @@ definitions:
         title: "Prefix for where offloaded data from user workflows will be written\n\
           e.g. s3://bucket/key or s3://bucket/"
     description: "Encapsulates user settings pertaining to offloaded data (i.e. Blobs,\
-      \ Schema, query data, etc.).\nSee https://github.com/lyft/flyte/issues/211 for\
-      \ more background information."
+      \ Schema, query data, etc.).\nSee https://github.com/flyteorg/flyte/issues/211\
+      \ for more background information."
     example:
       output_location_prefix: "output_location_prefix"
   adminSchedule:
@@ -5812,20 +6062,6 @@ definitions:
       rate:
         unit: {}
         value: 0
-  adminSecurityContext:
-    type: "object"
-    properties:
-      values:
-        type: "object"
-        title: "Map of security context values"
-        additionalProperties:
-          type: "string"
-    description: "Security context fields to define privilege and access control settings\n\
-      In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify\
-      \ how to merge security context defined at registration and execution time."
-    example:
-      values:
-        key: "values"
   adminSlackNotification:
     type: "object"
     properties:
@@ -6007,6 +6243,39 @@ definitions:
                         dimensionality: {}
                         format: "format"
                       simple: {}
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                name: "name"
+              - mount_requirement: {}
+                name: "name"
   adminTaskClosure:
     type: "object"
     properties:
@@ -6148,6 +6417,39 @@ definitions:
                       dimensionality: {}
                       format: "format"
                     simple: {}
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
   adminTaskCreateRequest:
     type: "object"
     properties:
@@ -6535,6 +6837,39 @@ definitions:
                           dimensionality: {}
                           format: "format"
                         simple: {}
+              security_context:
+                run_as:
+                  iam_role: "iam_role"
+                  oauth2_client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  k8s_service_account: "k8s_service_account"
+                tokens:
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                secrets:
+                - mount_requirement: {}
+                  name: "name"
+                - mount_requirement: {}
+                  name: "name"
       - id:
           domain: "domain"
           resource_type: {}
@@ -6669,6 +7004,39 @@ definitions:
                           dimensionality: {}
                           format: "format"
                         simple: {}
+              security_context:
+                run_as:
+                  iam_role: "iam_role"
+                  oauth2_client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  k8s_service_account: "k8s_service_account"
+                tokens:
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                secrets:
+                - mount_requirement: {}
+                  name: "name"
+                - mount_requirement: {}
+                  name: "name"
       token: "token"
   adminTaskResourceAttributes:
     type: "object"
@@ -8529,6 +8897,39 @@ definitions:
                           dimensionality: {}
                           format: "format"
                         simple: {}
+              security_context:
+                run_as:
+                  iam_role: "iam_role"
+                  oauth2_client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  k8s_service_account: "k8s_service_account"
+                tokens:
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                secrets:
+                - mount_requirement: {}
+                  name: "name"
+                - mount_requirement: {}
+                  name: "name"
           - template:
               container:
                 args:
@@ -8654,6 +9055,39 @@ definitions:
                           dimensionality: {}
                           format: "format"
                         simple: {}
+              security_context:
+                run_as:
+                  iam_role: "iam_role"
+                  oauth2_client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  k8s_service_account: "k8s_service_account"
+                tokens:
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                - idp_discovery_endpoint: "idp_discovery_endpoint"
+                  name: "name"
+                  client:
+                    client_secret:
+                      mount_requirement: {}
+                      name: "name"
+                    client_id: "client_id"
+                  type: {}
+                  token_endpoint: "token_endpoint"
+                secrets:
+                - mount_requirement: {}
+                  name: "name"
+                - mount_requirement: {}
+                  name: "name"
           primary:
             template:
               outputs:
@@ -11404,6 +11838,39 @@ definitions:
                         dimensionality: {}
                         format: "format"
                       simple: {}
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                name: "name"
+              - mount_requirement: {}
+                name: "name"
         - template:
             container:
               args:
@@ -11529,6 +11996,39 @@ definitions:
                         dimensionality: {}
                         format: "format"
                       simple: {}
+            security_context:
+              run_as:
+                iam_role: "iam_role"
+                oauth2_client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                k8s_service_account: "k8s_service_account"
+              tokens:
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              - idp_discovery_endpoint: "idp_discovery_endpoint"
+                name: "name"
+                client:
+                  client_secret:
+                    mount_requirement: {}
+                    name: "name"
+                  client_id: "client_id"
+                type: {}
+                token_endpoint: "token_endpoint"
+              secrets:
+              - mount_requirement: {}
+                name: "name"
+              - mount_requirement: {}
+                name: "name"
         primary:
           template:
             outputs:
@@ -14215,6 +14715,39 @@ definitions:
                             dimensionality: {}
                             format: "format"
                           simple: {}
+                security_context:
+                  run_as:
+                    iam_role: "iam_role"
+                    oauth2_client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    k8s_service_account: "k8s_service_account"
+                  tokens:
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  secrets:
+                  - mount_requirement: {}
+                    name: "name"
+                  - mount_requirement: {}
+                    name: "name"
             - template:
                 container:
                   args:
@@ -14340,6 +14873,39 @@ definitions:
                             dimensionality: {}
                             format: "format"
                           simple: {}
+                security_context:
+                  run_as:
+                    iam_role: "iam_role"
+                    oauth2_client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    k8s_service_account: "k8s_service_account"
+                  tokens:
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  secrets:
+                  - mount_requirement: {}
+                    name: "name"
+                  - mount_requirement: {}
+                    name: "name"
             primary:
               template:
                 outputs:
@@ -16955,6 +17521,39 @@ definitions:
                             dimensionality: {}
                             format: "format"
                           simple: {}
+                security_context:
+                  run_as:
+                    iam_role: "iam_role"
+                    oauth2_client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    k8s_service_account: "k8s_service_account"
+                  tokens:
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  secrets:
+                  - mount_requirement: {}
+                    name: "name"
+                  - mount_requirement: {}
+                    name: "name"
             - template:
                 container:
                   args:
@@ -17080,6 +17679,39 @@ definitions:
                             dimensionality: {}
                             format: "format"
                           simple: {}
+                security_context:
+                  run_as:
+                    iam_role: "iam_role"
+                    oauth2_client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    k8s_service_account: "k8s_service_account"
+                  tokens:
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  - idp_discovery_endpoint: "idp_discovery_endpoint"
+                    name: "name"
+                    client:
+                      client_secret:
+                        mount_requirement: {}
+                        name: "name"
+                      client_id: "client_id"
+                    type: {}
+                    token_endpoint: "token_endpoint"
+                  secrets:
+                  - mount_requirement: {}
+                    name: "name"
+                  - mount_requirement: {}
+                    name: "name"
             primary:
               template:
                 outputs:
@@ -18502,6 +19134,39 @@ definitions:
                     dimensionality: {}
                     format: "format"
                   simple: {}
+        security_context:
+          run_as:
+            iam_role: "iam_role"
+            oauth2_client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            k8s_service_account: "k8s_service_account"
+          tokens:
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          - idp_discovery_endpoint: "idp_discovery_endpoint"
+            name: "name"
+            client:
+              client_secret:
+                mount_requirement: {}
+                name: "name"
+              client_id: "client_id"
+            type: {}
+            token_endpoint: "token_endpoint"
+          secrets:
+          - mount_requirement: {}
+            name: "name"
+          - mount_requirement: {}
+            name: "name"
   coreCompiledWorkflow:
     type: "object"
     properties:
@@ -21146,6 +21811,39 @@ definitions:
                       dimensionality: {}
                       format: "format"
                     simple: {}
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
       - template:
           container:
             args:
@@ -21271,6 +21969,39 @@ definitions:
                       dimensionality: {}
                       format: "format"
                     simple: {}
+          security_context:
+            run_as:
+              iam_role: "iam_role"
+              oauth2_client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              k8s_service_account: "k8s_service_account"
+            tokens:
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            - idp_discovery_endpoint: "idp_discovery_endpoint"
+              name: "name"
+              client:
+                client_secret:
+                  mount_requirement: {}
+                  name: "name"
+                client_id: "client_id"
+              type: {}
+              token_endpoint: "token_endpoint"
+            secrets:
+            - mount_requirement: {}
+              name: "name"
+            - mount_requirement: {}
+              name: "name"
       primary:
         template:
           outputs:
@@ -22186,7 +22917,7 @@ definitions:
           \ file-system and without having any reference to flyteidl. This is supported\
           \ only on K8s at the moment.\nIf data loading is enabled, then data will\
           \ be mounted in accompanying directories specified in the DataLoadingConfig.\
-          \ If the directories \nare not specified, inputs will be mounted onto and\
+          \ If the directories\nare not specified, inputs will be mounted onto and\
           \ outputs will be uploaded from a pre-determined file-system path. Refer\
           \ to the documentation\nto understand the default paths.\nOnly K8s"
         $ref: "#/definitions/coreDataLoadingConfig"
@@ -22252,12 +22983,12 @@ definitions:
       input_path:
         type: "string"
         title: "File system path (start at root). This folder will contain all the\
-          \ inputs exploded to a separate file. \nExample, if the input interface\
-          \ needs (x: int, y: blob, z: multipart_blob) and the input path is \"/var/flyte/inputs\"\
+          \ inputs exploded to a separate file.\nExample, if the input interface needs\
+          \ (x: int, y: blob, z: multipart_blob) and the input path is \"/var/flyte/inputs\"\
           , then the file system will look like\n/var/flyte/inputs/inputs.<metadata\
           \ format dependent -> .pb .json .yaml> -> Format as defined previously.\
           \ The Blob and Multipart blob will reference local filesystem instead of\
-          \ remote locations \n/var/flyte/inputs/x -> X is a file that contains the\
+          \ remote locations\n/var/flyte/inputs/x -> X is a file that contains the\
           \ value of x (integer) in string format\n/var/flyte/inputs/y -> Y is a file\
           \ in Binary format\n/var/flyte/inputs/z/... -> Note Z itself is a directory\n\
           More information about the protocol - refer to docs #TODO reference docs\
@@ -22361,6 +23092,32 @@ definitions:
       name: "name"
       project: "project"
       version: "version"
+  coreIdentity:
+    type: "object"
+    properties:
+      iam_role:
+        type: "string"
+        description: "iam_role references the fully qualified name of Identity & Access\
+          \ Management role to impersonate."
+      k8s_service_account:
+        type: "string"
+        description: "k8s_service_account references a kubernetes service account\
+          \ to impersonate."
+      oauth2_client:
+        description: "oauth2_client references an oauth2 client. Backend plugins can\
+          \ use this information to impersonate the client when\nmaking external calls."
+        $ref: "#/definitions/coreOAuth2Client"
+    description: "Identity encapsulates the various security identities a task can\
+      \ run as. It's up to the underlying plugin to pick the\nright identity for the\
+      \ execution environment."
+    example:
+      iam_role: "iam_role"
+      oauth2_client:
+        client_secret:
+          mount_requirement: {}
+          name: "name"
+        client_id: "client_id"
+      k8s_service_account: "k8s_service_account"
   coreIfBlock:
     type: "object"
     properties:
@@ -22945,6 +23702,72 @@ definitions:
       name: "name"
       interruptible: true
       timeout: "timeout"
+  coreOAuth2Client:
+    type: "object"
+    properties:
+      client_id:
+        type: "string"
+        description: "client_id is the public id for the client to use. The system\
+          \ will not perform any pre-auth validation that the\nsecret requested matches\
+          \ the client_id indicated here."
+      client_secret:
+        description: "client_secret is a reference to the secret used to authenticate\
+          \ the OAuth2 client."
+        $ref: "#/definitions/coreSecret"
+    description: "OAuth2Client encapsulates OAuth2 Client Credentials to be used when\
+      \ making calls on behalf of that task."
+    example:
+      client_secret:
+        mount_requirement: {}
+        name: "name"
+      client_id: "client_id"
+  coreOAuth2TokenRequest:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "name indicates a unique id for the token request within this\
+          \ task token requests. It'll be used as a suffix for\nenvironment variables\
+          \ and as a filename for mounting tokens as files."
+      type:
+        description: "type indicates the type of the request to make. Defaults to\
+          \ CLIENT_CREDENTIALS."
+        $ref: "#/definitions/coreOAuth2TokenRequestType"
+      client:
+        description: "client references the client_id/secret to use to request the\
+          \ OAuth2 token."
+        $ref: "#/definitions/coreOAuth2Client"
+      idp_discovery_endpoint:
+        type: "string"
+        title: "idp_discovery_endpoint references the discovery endpoint used to retrieve\
+          \ token endpoint and other related\ninformation.\n+optional"
+      token_endpoint:
+        type: "string"
+        title: "token_endpoint references the token issuance endpoint. If idp_discovery_endpoint\
+          \ is not provided, this parameter is\nmandatory.\n+optional"
+    description: "OAuth2TokenRequest encapsulates information needed to request an\
+      \ OAuth2 token.\nFLYTE_TOKENS_ENV_PREFIX will be passed to indicate the prefix\
+      \ of the environment variables that will be present if\ntokens are passed through\
+      \ environment variables.\nFLYTE_TOKENS_PATH_PREFIX will be passed to indicate\
+      \ the prefix of the path where secrets will be mounted if tokens\nare passed\
+      \ through file mounts."
+    example:
+      idp_discovery_endpoint: "idp_discovery_endpoint"
+      name: "name"
+      client:
+        client_secret:
+          mount_requirement: {}
+          name: "name"
+        client_id: "client_id"
+      type: {}
+      token_endpoint: "token_endpoint"
+  coreOAuth2TokenRequestType:
+    type: "string"
+    description: "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS\
+      \ indicates a 2-legged OAuth token requested using client credentials."
+    enum:
+    - "CLIENT_CREDENTIALS"
+    default: "CLIENT_CREDENTIALS"
   coreOperand:
     type: "object"
     properties:
@@ -23348,6 +24171,92 @@ definitions:
         type: {}
       - name: "name"
         type: {}
+  coreSecret:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "The name of the secret to mount. This has to match an existing\
+          \ secret in the system. It's up to the implementation\nof the secret management\
+          \ system to require case sensitivity."
+      mount_requirement:
+        title: "mount_requirement is optional. Indicates where the secret has to be\
+          \ mounted. If provided, the execution will fail\nif the underlying key management\
+          \ system cannot satisfy that requirement. If not provided, the default location\n\
+          will depend on the key management system.\n+optional"
+        $ref: "#/definitions/SecretMountType"
+    description: "Secret encapsulates information about the secret a task needs to\
+      \ proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed\
+      \ to indicate the prefix of the environment variables that will be present if\n\
+      secrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR\
+      \ will be passed to indicate the prefix of the path where secrets will be mounted\
+      \ if secrets\nare passed through file mounts."
+    example:
+      mount_requirement: {}
+      name: "name"
+  coreSecurityContext:
+    type: "object"
+    properties:
+      run_as:
+        description: "run_as encapsulates the identity a pod should run as. If the\
+          \ task fills in multiple fields here, it'll be up to the\nbackend plugin\
+          \ to choose the appropriate identity for the execution engine the task will\
+          \ run on."
+        $ref: "#/definitions/coreIdentity"
+      secrets:
+        type: "array"
+        description: "secrets indicate the list of secrets the task needs in order\
+          \ to proceed. Secrets will be mounted/passed to the\npod as it starts. If\
+          \ the plugin responsible for kicking of the task will not run it on a flyte\
+          \ cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch\
+          \ the secret (which means propeller identity will need access\nto the secret)\
+          \ and to pass it to the remote execution engine."
+        items:
+          $ref: "#/definitions/coreSecret"
+      tokens:
+        type: "array"
+        description: "tokens indicate the list of token requests the task needs in\
+          \ order to proceed. Tokens will be mounted/passed to the\npod as it starts.\
+          \ If the plugin responsible for kicking of the task will not run it on a\
+          \ flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin\
+          \ to fetch the secret (which means propeller identity will need access\n\
+          to the secret) and to pass it to the remote execution engine."
+        items:
+          $ref: "#/definitions/coreOAuth2TokenRequest"
+    description: "SecurityContext holds security attributes that apply to tasks."
+    example:
+      run_as:
+        iam_role: "iam_role"
+        oauth2_client:
+          client_secret:
+            mount_requirement: {}
+            name: "name"
+          client_id: "client_id"
+        k8s_service_account: "k8s_service_account"
+      tokens:
+      - idp_discovery_endpoint: "idp_discovery_endpoint"
+        name: "name"
+        client:
+          client_secret:
+            mount_requirement: {}
+            name: "name"
+          client_id: "client_id"
+        type: {}
+        token_endpoint: "token_endpoint"
+      - idp_discovery_endpoint: "idp_discovery_endpoint"
+        name: "name"
+        client:
+          client_secret:
+            mount_requirement: {}
+            name: "name"
+          client_id: "client_id"
+        type: {}
+        token_endpoint: "token_endpoint"
+      secrets:
+      - mount_requirement: {}
+        name: "name"
+      - mount_requirement: {}
+        name: "name"
   coreSimpleType:
     type: "string"
     description: "Define a set of simple types."
@@ -23510,6 +24419,10 @@ definitions:
         format: "int32"
         description: "This can be used to customize task handling at execution time\
           \ for the same task type."
+      security_context:
+        description: "security_context encapsulates security attributes requested\
+          \ to run this task."
+        $ref: "#/definitions/coreSecurityContext"
     description: "A Task structure that uniquely identifies a task in the system\n\
       Tasks are registered as a first step in the system."
     example:
@@ -23637,6 +24550,39 @@ definitions:
                   dimensionality: {}
                   format: "format"
                 simple: {}
+      security_context:
+        run_as:
+          iam_role: "iam_role"
+          oauth2_client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          k8s_service_account: "k8s_service_account"
+        tokens:
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        - idp_discovery_endpoint: "idp_discovery_endpoint"
+          name: "name"
+          client:
+            client_secret:
+              mount_requirement: {}
+              name: "name"
+            client_id: "client_id"
+          type: {}
+          token_endpoint: "token_endpoint"
+        secrets:
+        - mount_requirement: {}
+          name: "name"
+        - mount_requirement: {}
+          name: "name"
   coreTypedInterface:
     type: "object"
     properties:
@@ -24845,7 +25791,7 @@ definitions:
       instance_class:
         $ref: "#/definitions/TaskExecutionMetadataInstanceClass"
     description: "Holds metadata around how a task was executed.\nTODO(katrogan):\
-      \ Extend to include freeform fields (https://github.com/lyft/flyte/issues/325)."
+      \ Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325)."
   eventWorkflowExecutionEvent:
     type: "object"
     properties:

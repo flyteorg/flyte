@@ -22,11 +22,11 @@ from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_launch_plan_metadata import AdminLaunchPlanMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
-from flyteadmin.models.admin_security_context import AdminSecurityContext  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_parameter_map import CoreParameterMap  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
+from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
 
 
 class AdminLaunchPlanSpec(object):
@@ -52,7 +52,7 @@ class AdminLaunchPlanSpec(object):
         'annotations': 'AdminAnnotations',
         'auth': 'AdminAuth',
         'auth_role': 'AdminAuthRole',
-        'security_context': 'AdminSecurityContext',
+        'security_context': 'CoreSecurityContext',
         'quality_of_service': 'CoreQualityOfService',
         'raw_output_data_config': 'AdminRawOutputDataConfig'
     }
@@ -315,7 +315,7 @@ class AdminLaunchPlanSpec(object):
 
 
         :return: The security_context of this AdminLaunchPlanSpec.  # noqa: E501
-        :rtype: AdminSecurityContext
+        :rtype: CoreSecurityContext
         """
         return self._security_context
 
@@ -325,7 +325,7 @@ class AdminLaunchPlanSpec(object):
 
 
         :param security_context: The security_context of this AdminLaunchPlanSpec.  # noqa: E501
-        :type: AdminSecurityContext
+        :type: CoreSecurityContext
         """
 
         self._security_context = security_context

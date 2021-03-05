@@ -11,3 +11,5 @@ gen/pb_python/flyteidl.egg-info/
 
 .virtualgo
 docs/build/
+
+.vscode/
