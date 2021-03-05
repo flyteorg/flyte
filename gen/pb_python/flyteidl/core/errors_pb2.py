@@ -20,8 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/core/errors.proto',
   package='flyteidl.core',
   syntax='proto3',
-  serialized_options=_b('Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/core'),
-  serialized_pb=_b('\n\x1a\x66lyteidl/core/errors.proto\x12\rflyteidl.core\x1a\x1d\x66lyteidl/core/execution.proto\"\xc8\x01\n\x0e\x43ontainerError\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x30\n\x04kind\x18\x03 \x01(\x0e\x32\".flyteidl.core.ContainerError.Kind\x12\x37\n\x06origin\x18\x04 \x01(\x0e\x32\'.flyteidl.core.ExecutionError.ErrorKind\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"=\n\rErrorDocument\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.flyteidl.core.ContainerErrorB2Z0github.com/lyft/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
+  serialized_options=_b('Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core'),
+  serialized_pb=_b('\n\x1a\x66lyteidl/core/errors.proto\x12\rflyteidl.core\x1a\x1d\x66lyteidl/core/execution.proto\"\xc8\x01\n\x0e\x43ontainerError\x12\x0c\n\x04\x63ode\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\x30\n\x04kind\x18\x03 \x01(\x0e\x32\".flyteidl.core.ContainerError.Kind\x12\x37\n\x06origin\x18\x04 \x01(\x0e\x32\'.flyteidl.core.ExecutionError.ErrorKind\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"=\n\rErrorDocument\x12,\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.flyteidl.core.ContainerErrorB6Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
   ,
   dependencies=[flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,])
 

@@ -119,13 +119,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fcatalog_2eproto[] =
   "ogCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCAC"
   "HE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPULA"
   "TED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACHE"
-  "_PUT_FAILURE\020\005B2Z0github.com/lyft/flytei"
-  "dl/gen/pb-go/flyteidl/coreb\006proto3"
+  "_PUT_FAILURE\020\005B6Z4github.com/flyteorg/fl"
+  "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcatalog_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fcatalog_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fcatalog_2eproto,
-  "flyteidl/core/catalog.proto", &assign_descriptors_table_flyteidl_2fcore_2fcatalog_2eproto, 554,
+  "flyteidl/core/catalog.proto", &assign_descriptors_table_flyteidl_2fcore_2fcatalog_2eproto, 558,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fcatalog_2eproto() {

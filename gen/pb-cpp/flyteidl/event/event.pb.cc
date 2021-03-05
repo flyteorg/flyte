@@ -390,14 +390,14 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   "\"\225\001\n\025TaskExecutionMetadata\022K\n\016instance_c"
   "lass\030\020 \001(\01623.flyteidl.event.TaskExecutio"
   "nMetadata.InstanceClass\"/\n\rInstanceClass"
-  "\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B3Z1gith"
-  "ub.com/lyft/flyteidl/gen/pb-go/flyteidl/"
-  "eventb\006proto3"
+  "\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5gith"
+  "ub.com/flyteorg/flyteidl/gen/pb-go/flyte"
+  "idl/eventb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fevent_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fevent_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto,
-  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 2293,
+  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 2297,
 };
 
 void AddDescriptors_flyteidl_2fevent_2fevent_2eproto() {

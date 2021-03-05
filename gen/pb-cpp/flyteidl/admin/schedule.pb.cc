@@ -146,13 +146,13 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fschedule_2eproto[] =
   "2\034.flyteidl.admin.CronScheduleH\000\022\036\n\026kick"
   "off_time_input_arg\030\003 \001(\tB\024\n\022ScheduleExpr"
   "ession*.\n\rFixedRateUnit\022\n\n\006MINUTE\020\000\022\010\n\004H"
-  "OUR\020\001\022\007\n\003DAY\020\002B3Z1github.com/lyft/flytei"
-  "dl/gen/pb-go/flyteidl/adminb\006proto3"
+  "OUR\020\001\022\007\n\003DAY\020\002B7Z5github.com/flyteorg/fl"
+  "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fschedule_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fschedule_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fschedule_2eproto,
-  "flyteidl/admin/schedule.proto", &assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto, 475,
+  "flyteidl/admin/schedule.proto", &assign_descriptors_table_flyteidl_2fadmin_2fschedule_2eproto, 479,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fschedule_2eproto() {

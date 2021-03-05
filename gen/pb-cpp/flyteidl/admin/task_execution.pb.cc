@@ -316,14 +316,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto
   "teidl.admin.UrlBlob\022(\n\007outputs\030\002 \001(\0132\027.f"
   "lyteidl.admin.UrlBlob\022.\n\013full_inputs\030\003 \001"
   "(\0132\031.flyteidl.core.LiteralMap\022/\n\014full_ou"
-  "tputs\030\004 \001(\0132\031.flyteidl.core.LiteralMapB3"
-  "Z1github.com/lyft/flyteidl/gen/pb-go/fly"
-  "teidl/adminb\006proto3"
+  "tputs\030\004 \001(\0132\031.flyteidl.core.LiteralMapB7"
+  "Z5github.com/flyteorg/flyteidl/gen/pb-go"
+  "/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto,
-  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1579,
+  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1583,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto() {

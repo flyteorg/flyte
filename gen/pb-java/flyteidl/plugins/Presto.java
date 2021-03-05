@@ -1002,8 +1002,8 @@ public final class Presto {
       "l.plugins\032\031flyteidl/core/tasks.proto\"X\n\013" +
       "PrestoQuery\022\025\n\rrouting_group\030\001 \001(\t\022\017\n\007ca" +
       "talog\030\002 \001(\t\022\016\n\006schema\030\003 \001(\t\022\021\n\tstatement" +
-      "\030\004 \001(\tB5Z3github.com/lyft/flyteidl/gen/p" +
-      "b-go/flyteidl/pluginsb\006proto3"
+      "\030\004 \001(\tB9Z7github.com/flyteorg/flyteidl/g" +
+      "en/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

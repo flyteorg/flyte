@@ -3,7 +3,7 @@
 package logs
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // Deprecated: Please use Plugin interface from github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog instead.

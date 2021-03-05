@@ -460,13 +460,13 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto
   "\027.flyteidl.admin.UrlBlob\022.\n\013full_inputs\030"
   "\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014full"
   "_outputs\030\004 \001(\0132\031.flyteidl.core.LiteralMa"
-  "pB3Z1github.com/lyft/flyteidl/gen/pb-go/"
-  "flyteidl/adminb\006proto3"
+  "pB7Z5github.com/flyteorg/flyteidl/gen/pb"
+  "-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto,
-  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2222,
+  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2226,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fnode_5fexecution_2eproto() {

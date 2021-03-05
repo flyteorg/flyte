@@ -79,14 +79,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fwaitable_2eproto[] =
   "aitable\022>\n\nwf_exec_id\030\001 \001(\0132*.flyteidl.c"
   "ore.WorkflowExecutionIdentifier\0225\n\005phase"
   "\030\002 \001(\0162&.flyteidl.core.WorkflowExecution"
-  ".Phase\022\023\n\013workflow_id\030\003 \001(\tB5Z3github.co"
-  "m/lyft/flyteidl/gen/pb-go/flyteidl/plugi"
-  "nsb\006proto3"
+  ".Phase\022\023\n\013workflow_id\030\003 \001(\tB9Z7github.co"
+  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/p"
+  "luginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fwaitable_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fwaitable_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fwaitable_2eproto,
-  "flyteidl/plugins/waitable.proto", &assign_descriptors_table_flyteidl_2fplugins_2fwaitable_2eproto, 330,
+  "flyteidl/plugins/waitable.proto", &assign_descriptors_table_flyteidl_2fplugins_2fwaitable_2eproto, 334,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fwaitable_2eproto() {

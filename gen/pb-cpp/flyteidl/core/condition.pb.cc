@@ -180,13 +180,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fcondition_2eproto[] =
   "l.core.BooleanExpression\022:\n\020right_expres"
   "sion\030\003 \001(\0132 .flyteidl.core.BooleanExpres"
   "sion\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n\002OR\020\001"
-  "B2Z0github.com/lyft/flyteidl/gen/pb-go/f"
-  "lyteidl/coreb\006proto3"
+  "B6Z4github.com/flyteorg/flyteidl/gen/pb-"
+  "go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcondition_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fcondition_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fcondition_2eproto,
-  "flyteidl/core/condition.proto", &assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto, 860,
+  "flyteidl/core/condition.proto", &assign_descriptors_table_flyteidl_2fcore_2fcondition_2eproto, 864,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fcondition_2eproto() {

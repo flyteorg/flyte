@@ -71,14 +71,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_flyteidl_2fplugins_2fpytorch_2eproto[] =
   "\n\036flyteidl/plugins/pytorch.proto\022\020flytei"
   "dl.plugins\"1\n\036DistributedPyTorchTraining"
-  "Task\022\017\n\007workers\030\001 \001(\005B5Z3github.com/lyft"
-  "/flyteidl/gen/pb-go/flyteidl/pluginsb\006pr"
-  "oto3"
+  "Task\022\017\n\007workers\030\001 \001(\005B9Z7github.com/flyt"
+  "eorg/flyteidl/gen/pb-go/flyteidl/plugins"
+  "b\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fpytorch_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fpytorch_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fpytorch_2eproto,
-  "flyteidl/plugins/pytorch.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpytorch_2eproto, 164,
+  "flyteidl/plugins/pytorch.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpytorch_2eproto, 168,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fpytorch_2eproto() {

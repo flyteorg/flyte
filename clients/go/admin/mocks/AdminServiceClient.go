@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	admin "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	grpc "google.golang.org/grpc"
 

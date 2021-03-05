@@ -879,9 +879,9 @@ public final class WaitableOuterClass {
       "aitable\022>\n\nwf_exec_id\030\001 \001(\0132*.flyteidl.c" +
       "ore.WorkflowExecutionIdentifier\0225\n\005phase" +
       "\030\002 \001(\0162&.flyteidl.core.WorkflowExecution" +
-      ".Phase\022\023\n\013workflow_id\030\003 \001(\tB5Z3github.co" +
-      "m/lyft/flyteidl/gen/pb-go/flyteidl/plugi" +
-      "nsb\006proto3"
+      ".Phase\022\023\n\013workflow_id\030\003 \001(\tB9Z7github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/p" +
+      "luginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

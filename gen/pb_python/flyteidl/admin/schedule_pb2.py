@@ -20,8 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/admin/schedule.proto',
   package='flyteidl.admin',
   syntax='proto3',
-  serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\x1d\x66lyteidl/admin/schedule.proto\x12\x0e\x66lyteidl.admin\"G\n\tFixedRate\x12\r\n\x05value\x18\x01 \x01(\r\x12+\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl.admin.FixedRateUnit\"0\n\x0c\x43ronSchedule\x12\x10\n\x08schedule\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\t\"\xc1\x01\n\x08Schedule\x12\x1d\n\x0f\x63ron_expression\x18\x01 \x01(\tB\x02\x18\x01H\x00\x12)\n\x04rate\x18\x02 \x01(\x0b\x32\x19.flyteidl.admin.FixedRateH\x00\x12\x35\n\rcron_schedule\x18\x04 \x01(\x0b\x32\x1c.flyteidl.admin.CronScheduleH\x00\x12\x1e\n\x16kickoff_time_input_arg\x18\x03 \x01(\tB\x14\n\x12ScheduleExpression*.\n\rFixedRateUnit\x12\n\n\x06MINUTE\x10\x00\x12\x08\n\x04HOUR\x10\x01\x12\x07\n\x03\x44\x41Y\x10\x02\x42\x33Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
+  serialized_pb=_b('\n\x1d\x66lyteidl/admin/schedule.proto\x12\x0e\x66lyteidl.admin\"G\n\tFixedRate\x12\r\n\x05value\x18\x01 \x01(\r\x12+\n\x04unit\x18\x02 \x01(\x0e\x32\x1d.flyteidl.admin.FixedRateUnit\"0\n\x0c\x43ronSchedule\x12\x10\n\x08schedule\x18\x01 \x01(\t\x12\x0e\n\x06offset\x18\x02 \x01(\t\"\xc1\x01\n\x08Schedule\x12\x1d\n\x0f\x63ron_expression\x18\x01 \x01(\tB\x02\x18\x01H\x00\x12)\n\x04rate\x18\x02 \x01(\x0b\x32\x19.flyteidl.admin.FixedRateH\x00\x12\x35\n\rcron_schedule\x18\x04 \x01(\x0b\x32\x1c.flyteidl.admin.CronScheduleH\x00\x12\x1e\n\x16kickoff_time_input_arg\x18\x03 \x01(\tB\x14\n\x12ScheduleExpression*.\n\rFixedRateUnit\x12\n\n\x06MINUTE\x10\x00\x12\x08\n\x04HOUR\x10\x01\x12\x07\n\x03\x44\x41Y\x10\x02\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
 )
 
 _FIXEDRATEUNIT = _descriptor.EnumDescriptor(

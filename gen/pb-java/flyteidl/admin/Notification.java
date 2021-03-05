@@ -1297,9 +1297,9 @@ public final class Notification {
       "\n!flyteidl/admin/notification.proto\022\016fly" +
       "teidl.admin\"b\n\014EmailMessage\022\030\n\020recipient" +
       "s_email\030\001 \003(\t\022\024\n\014sender_email\030\002 \001(\t\022\024\n\014s" +
-      "ubject_line\030\003 \001(\t\022\014\n\004body\030\004 \001(\tB3Z1githu" +
-      "b.com/lyft/flyteidl/gen/pb-go/flyteidl/a" +
-      "dminb\006proto3"
+      "ubject_line\030\003 \001(\t\022\014\n\004body\030\004 \001(\tB7Z5githu" +
+      "b.com/flyteorg/flyteidl/gen/pb-go/flytei" +
+      "dl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

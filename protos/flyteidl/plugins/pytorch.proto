@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.plugins;
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // Custom proto for plugin that enables distributed training using https://github.com/kubeflow/pytorch-operator
 message DistributedPyTorchTrainingTask {

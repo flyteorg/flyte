@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 // Log Writer writes to the log output

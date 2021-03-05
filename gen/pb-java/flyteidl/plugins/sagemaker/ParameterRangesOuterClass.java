@@ -4404,9 +4404,9 @@ public final class ParameterRangesOuterClass {
       ".ParameterRanges.ParameterRangeMapEntry\032" +
       "i\n\026ParameterRangeMapEntry\022\013\n\003key\030\001 \001(\t\022>" +
       "\n\005value\030\002 \001(\0132/.flyteidl.plugins.sagemak" +
-      "er.ParameterRangeOneOf:\0028\001B5Z3github.com" +
-      "/lyft/flyteidl/gen/pb-go/flyteidl/plugin" +
-      "sb\006proto3"
+      "er.ParameterRangeOneOf:\0028\001B9Z7github.com" +
+      "/flyteorg/flyteidl/gen/pb-go/flyteidl/pl" +
+      "uginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

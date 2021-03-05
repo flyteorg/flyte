@@ -19,8 +19,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/admin/notification.proto',
   package='flyteidl.admin',
   syntax='proto3',
-  serialized_options=_b('Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n!flyteidl/admin/notification.proto\x12\x0e\x66lyteidl.admin\"b\n\x0c\x45mailMessage\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\x12\x14\n\x0csender_email\x18\x02 \x01(\t\x12\x14\n\x0csubject_line\x18\x03 \x01(\t\x12\x0c\n\x04\x62ody\x18\x04 \x01(\tB3Z1github.com/lyft/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
+  serialized_pb=_b('\n!flyteidl/admin/notification.proto\x12\x0e\x66lyteidl.admin\"b\n\x0c\x45mailMessage\x12\x18\n\x10recipients_email\x18\x01 \x03(\t\x12\x14\n\x0csender_email\x18\x02 \x01(\t\x12\x14\n\x0csubject_line\x18\x03 \x01(\t\x12\x0c\n\x04\x62ody\x18\x04 \x01(\tB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
 )
 
 

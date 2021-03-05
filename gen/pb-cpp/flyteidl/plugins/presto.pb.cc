@@ -76,13 +76,13 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fpresto_2eproto[] =
   "l.plugins\032\031flyteidl/core/tasks.proto\"X\n\013"
   "PrestoQuery\022\025\n\rrouting_group\030\001 \001(\t\022\017\n\007ca"
   "talog\030\002 \001(\t\022\016\n\006schema\030\003 \001(\t\022\021\n\tstatement"
-  "\030\004 \001(\tB5Z3github.com/lyft/flyteidl/gen/p"
-  "b-go/flyteidl/pluginsb\006proto3"
+  "\030\004 \001(\tB9Z7github.com/flyteorg/flyteidl/g"
+  "en/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fpresto_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fpresto_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fpresto_2eproto,
-  "flyteidl/plugins/presto.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpresto_2eproto, 229,
+  "flyteidl/plugins/presto.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpresto_2eproto, 233,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fpresto_2eproto() {

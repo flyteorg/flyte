@@ -5579,8 +5579,8 @@ public final class WorkflowOuterClass {
       "WorkflowClosure\022A\n\021compiled_workflow\030\001 \001" +
       "(\0132&.flyteidl.core.CompiledWorkflowClosu" +
       "re\022.\n\ncreated_at\030\002 \001(\0132\032.google.protobuf" +
-      ".TimestampB3Z1github.com/lyft/flyteidl/g" +
-      "en/pb-go/flyteidl/adminb\006proto3"
+      ".TimestampB7Z5github.com/flyteorg/flytei" +
+      "dl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

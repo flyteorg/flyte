@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.core;
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 
 import "flyteidl/core/condition.proto";
 import "flyteidl/core/execution.proto";
@@ -194,5 +194,3 @@ message WorkflowTemplate {
     // workflow defaults
     WorkflowMetadataDefaults metadata_defaults = 7;
 }
-
-

@@ -2134,8 +2134,8 @@ public final class Spark {
       "ConfEntry\022\024\n\014executorPath\030\006 \001(\t\0320\n\016Spark" +
       "ConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028" +
       "\001\0321\n\017HadoopConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val" +
-      "ue\030\002 \001(\t:\0028\001B5Z3github.com/lyft/flyteidl" +
-      "/gen/pb-go/flyteidl/pluginsb\006proto3"
+      "ue\030\002 \001(\t:\0028\001B9Z7github.com/flyteorg/flyt" +
+      "eidl/gen/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

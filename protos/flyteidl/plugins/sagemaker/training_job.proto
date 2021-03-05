@@ -4,7 +4,7 @@ package flyteidl.plugins.sagemaker;
 
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // The input mode that the algorithm supports. When using the File input mode, SageMaker downloads
 // the training data from S3 to the provisioned ML storage Volume, and mounts the directory to docker

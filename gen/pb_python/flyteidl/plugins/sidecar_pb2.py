@@ -20,8 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/plugins/sidecar.proto',
   package='flyteidl.plugins',
   syntax='proto3',
-  serialized_options=_b('Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n\x1e\x66lyteidl/plugins/sidecar.proto\x12\x10\x66lyteidl.plugins\x1a\"k8s.io/api/core/v1/generated.proto\"[\n\nSidecarJob\x12-\n\x08pod_spec\x18\x01 \x01(\x0b\x32\x1b.k8s.io.api.core.v1.PodSpec\x12\x1e\n\x16primary_container_name\x18\x02 \x01(\tB5Z3github.com/lyft/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+  serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins'),
+  serialized_pb=_b('\n\x1e\x66lyteidl/plugins/sidecar.proto\x12\x10\x66lyteidl.plugins\x1a\"k8s.io/api/core/v1/generated.proto\"[\n\nSidecarJob\x12-\n\x08pod_spec\x18\x01 \x01(\x0b\x32\x1b.k8s.io.api.core.v1.PodSpec\x12\x1e\n\x16primary_container_name\x18\x02 \x01(\tB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
   ,
   dependencies=[k8s_dot_io_dot_api_dot_core_dot_v1_dot_generated__pb2.DESCRIPTOR,])
 
