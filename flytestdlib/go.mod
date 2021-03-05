@@ -53,12 +53,6 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	k8s.io/apimachinery v0.20.2
-	k8s.io/client-go v11.0.0+incompatible
+	k8s.io/client-go v0.0.0-20210217172142-7279fc64d847
 	k8s.io/klog/v2 v2.5.0 // indirect
 )
-
-// Pin the version of client-go to something that's compatible with katrogan's fork of api and apimachinery
-// Type the following
-//   replace k8s.io/client-go => k8s.io/client-go kubernetes-1.16.2
-// and it will be replaced with the 'sha' variant of the version
-replace k8s.io/client-go => k8s.io/client-go v0.0.0-20191016111102-bec269661e48
