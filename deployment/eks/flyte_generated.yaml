@@ -8607,7 +8607,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/lyft/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8653,7 +8653,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8671,7 +8671,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: ghcr.io/lyft/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8686,7 +8686,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/lyft/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8733,7 +8733,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: ghcr.io/lyft/flyteconsole:v0.19.1
+        image: ghcr.io/flyteorg/flyteconsole:v0.19.6
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -8965,7 +8965,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/lyft/flyteadmin:v0.3.37
+            image: ghcr.io/flyteorg/flyteadmin:v0.3.37
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
