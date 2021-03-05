@@ -17,6 +17,10 @@ Flyte can be run using a Kubernetes cluster only. This installs all the dependen
     #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your flyte deployment, checkout the :ref:`howto_productionize`.
 
 
+.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_sandbox_single_k8s_cluster.png
+   :alt: Architecture of Sandbox deployment of Flyte. Single K8s cluster
+
+
 *********************************************************
 Deploy Flyte Sandbox environment locally - on your laptop
 *********************************************************
