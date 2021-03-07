@@ -37,6 +37,7 @@ from flyteadmin.models.admin_execution_terminate_request import AdminExecutionTe
 from flyteadmin.models.admin_execution_terminate_response import AdminExecutionTerminateResponse
 from flyteadmin.models.admin_fixed_rate import AdminFixedRate
 from flyteadmin.models.admin_fixed_rate_unit import AdminFixedRateUnit
+from flyteadmin.models.admin_get_version_request import AdminGetVersionRequest
 from flyteadmin.models.admin_labels import AdminLabels
 from flyteadmin.models.admin_launch_plan import AdminLaunchPlan
 from flyteadmin.models.admin_launch_plan_closure import AdminLaunchPlanClosure
@@ -102,6 +103,7 @@ from flyteadmin.models.admin_task_resource_attributes import AdminTaskResourceAt
 from flyteadmin.models.admin_task_resource_spec import AdminTaskResourceSpec
 from flyteadmin.models.admin_task_spec import AdminTaskSpec
 from flyteadmin.models.admin_url_blob import AdminUrlBlob
+from flyteadmin.models.admin_version import AdminVersion
 from flyteadmin.models.admin_workflow import AdminWorkflow
 from flyteadmin.models.admin_workflow_attributes import AdminWorkflowAttributes
 from flyteadmin.models.admin_workflow_attributes_delete_request import AdminWorkflowAttributesDeleteRequest

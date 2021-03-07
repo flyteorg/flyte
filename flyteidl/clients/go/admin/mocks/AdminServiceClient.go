@@ -977,6 +977,54 @@ func (_m *AdminServiceClient) GetTaskExecutionData(ctx context.Context, in *admi
 	return r0, r1
 }
 
+type AdminServiceClient_GetVersion struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetVersion) Return(_a0 *admin.Version, _a1 error) *AdminServiceClient_GetVersion {
+	return &AdminServiceClient_GetVersion{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetVersion(ctx context.Context, in *admin.GetVersionRequest, opts ...grpc.CallOption) *AdminServiceClient_GetVersion {
+	c := _m.On("GetVersion", ctx, in, opts)
+	return &AdminServiceClient_GetVersion{Call: c}
+}
+
+func (_m *AdminServiceClient) OnGetVersionMatch(matchers ...interface{}) *AdminServiceClient_GetVersion {
+	c := _m.On("GetVersion", matchers...)
+	return &AdminServiceClient_GetVersion{Call: c}
+}
+
+// GetVersion provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetVersion(ctx context.Context, in *admin.GetVersionRequest, opts ...grpc.CallOption) (*admin.Version, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.Version
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetVersionRequest, ...grpc.CallOption) *admin.Version); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.Version)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetVersionRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetWorkflow struct {
 	*mock.Call
 }

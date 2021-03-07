@@ -2415,6 +2415,25 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflow"
+  /api/version:
+    put:
+      tags:
+      - "AdminService"
+      description: "Retrieve the Version (including the Build  information) for FlyteAdmin\
+        \ service"
+      operationId: "GetVersion"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/adminGetVersionRequest"
+        x-exportParamName: "Body"
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminVersion"
 definitions:
   BlobTypeBlobDimensionality:
     type: "string"
@@ -3700,6 +3719,9 @@ definitions:
     - "HOUR"
     - "DAY"
     default: "MINUTE"
+  adminGetVersionRequest:
+    type: "object"
+    description: "Represents a get version request."
   adminLabels:
     type: "object"
     properties:
@@ -7096,6 +7118,23 @@ definitions:
     example:
       bytes: "bytes"
       url: "url"
+  adminVersion:
+    type: "object"
+    properties:
+      Build:
+        type: "string"
+        title: "Specifies the GIT sha of the build"
+      Version:
+        type: "string"
+        title: "Version for the build, should follow a semver"
+      BuildTime:
+        type: "string"
+        title: "Build timestamp"
+    description: "Represents a request structure to get version of flyteadmin."
+    example:
+      Version: "Version"
+      Build: "Build"
+      BuildTime: "BuildTime"
   adminWorkflow:
     type: "object"
     properties:

@@ -89,6 +89,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**get_task**](docs/AdminServiceApi.md#get_task) | **GET** /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**get_task_execution**](docs/AdminServiceApi.md#get_task_execution) | **GET** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | 
 *AdminServiceApi* | [**get_task_execution_data**](docs/AdminServiceApi.md#get_task_execution_data) | **GET** /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | 
+*AdminServiceApi* | [**get_version**](docs/AdminServiceApi.md#get_version) | **PUT** /api/version | 
 *AdminServiceApi* | [**get_workflow**](docs/AdminServiceApi.md#get_workflow) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | 
 *AdminServiceApi* | [**get_workflow_attributes**](docs/AdminServiceApi.md#get_workflow_attributes) | **GET** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | 
 *AdminServiceApi* | [**list_active_launch_plans**](docs/AdminServiceApi.md#list_active_launch_plans) | **GET** /api/v1/active_launch_plans/{project}/{domain} | 
@@ -142,6 +143,7 @@ Class | Method | HTTP request | Description
  - [AdminExecutionTerminateResponse](docs/AdminExecutionTerminateResponse.md)
  - [AdminFixedRate](docs/AdminFixedRate.md)
  - [AdminFixedRateUnit](docs/AdminFixedRateUnit.md)
+ - [AdminGetVersionRequest](docs/AdminGetVersionRequest.md)
  - [AdminLabels](docs/AdminLabels.md)
  - [AdminLaunchPlan](docs/AdminLaunchPlan.md)
  - [AdminLaunchPlanClosure](docs/AdminLaunchPlanClosure.md)
@@ -207,6 +209,7 @@ Class | Method | HTTP request | Description
  - [AdminTaskResourceSpec](docs/AdminTaskResourceSpec.md)
  - [AdminTaskSpec](docs/AdminTaskSpec.md)
  - [AdminUrlBlob](docs/AdminUrlBlob.md)
+ - [AdminVersion](docs/AdminVersion.md)
  - [AdminWorkflow](docs/AdminWorkflow.md)
  - [AdminWorkflowAttributes](docs/AdminWorkflowAttributes.md)
  - [AdminWorkflowAttributesDeleteRequest](docs/AdminWorkflowAttributesDeleteRequest.md)

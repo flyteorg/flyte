@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+// Represents a request structure to get version of flyteadmin.
+message Version {
+    // Specifies the GIT sha of the build
+    string	Build = 1;
+
+    // Version for the build, should follow a semver
+    string Version = 2;
+
+    // Build timestamp
+    string BuildTime = 3;
+}
+
+// Represents a get version request.
+message GetVersionRequest {
+
+}

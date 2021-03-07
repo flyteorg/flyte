@@ -149,6 +149,12 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_version(self):
+        """Test case for get_version
+
+        """
+        pass
+
     def test_get_workflow(self):
         """Test case for get_workflow
 
