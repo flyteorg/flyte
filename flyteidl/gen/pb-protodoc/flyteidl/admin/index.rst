@@ -22,5 +22,6 @@ Flyte Admin service over gRPC or REST. The endpoint specification is defined in 
 	schedule.proto
 	task.proto
 	task_execution.proto
+	version.proto
 	workflow.proto
 	workflow_attributes.proto

@@ -15,6 +15,7 @@ import "flyteidl/admin/execution.proto";
 import "flyteidl/admin/matchable_resource.proto";
 import "flyteidl/admin/node_execution.proto";
 import "flyteidl/admin/task_execution.proto";
+import "flyteidl/admin/version.proto";
 import "flyteidl/admin/common.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
@@ -487,4 +488,16 @@ service AdminService {
       description: "Update the fields associated with a NamedEntity"
     };
   }
+
+  rpc GetVersion (flyteidl.admin.GetVersionRequest) returns (flyteidl.admin.Version) {
+      option (google.api.http) = {
+        put: "/api/version"
+        body: "*"
+      };
+      option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+        description: "Retrieve the Version (including the Build  information) for FlyteAdmin service"
+      };
+  }
+
 }
+

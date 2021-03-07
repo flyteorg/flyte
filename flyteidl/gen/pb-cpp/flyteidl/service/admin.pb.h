@@ -41,6 +41,7 @@
 #include "flyteidl/admin/matchable_resource.pb.h"
 #include "flyteidl/admin/node_execution.pb.h"
 #include "flyteidl/admin/task_execution.pb.h"
+#include "flyteidl/admin/version.pb.h"
 #include "flyteidl/admin/common.pb.h"
 #include "protoc-gen-swagger/options/annotations.pb.h"
 // @@protoc_insertion_point(includes)

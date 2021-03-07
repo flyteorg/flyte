@@ -64,6 +64,7 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/ListNamedEntities",
   "/flyteidl.service.AdminService/GetNamedEntity",
   "/flyteidl.service.AdminService/UpdateNamedEntity",
+  "/flyteidl.service.AdminService/GetVersion",
 };
 
 std::unique_ptr< AdminService::Stub> AdminService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -117,6 +118,7 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_ListNamedEntities_(AdminService_method_names[41], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetNamedEntity_(AdminService_method_names[42], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_UpdateNamedEntity_(AdminService_method_names[43], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetVersion_(AdminService_method_names[44], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AdminService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::TaskCreateRequest& request, ::flyteidl::admin::TaskCreateResponse* response) {
@@ -1351,6 +1353,34 @@ void AdminService::Stub::experimental_async::UpdateNamedEntity(::grpc::ClientCon
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NamedEntityUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateNamedEntity_, context, request, false);
 }
 
+::grpc::Status AdminService::Stub::GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::flyteidl::admin::Version* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetVersion_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetVersion_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Version* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetVersion_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetVersion_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetVersion_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>* AdminService::Stub::AsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::Version>::Create(channel_.get(), cq, rpcmethod_GetVersion_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>* AdminService::Stub::PrepareAsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::Version>::Create(channel_.get(), cq, rpcmethod_GetVersion_, context, request, false);
+}
+
 AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[0],
@@ -1572,6 +1602,11 @@ AdminService::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityUpdateRequest, ::flyteidl::admin::NamedEntityUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateNamedEntity), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[44],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::Version>(
+          std::mem_fn(&AdminService::Service::GetVersion), this)));
 }
 
 AdminService::Service::~Service() {
@@ -1879,6 +1914,13 @@ AdminService::Service::~Service() {
 }
 
 ::grpc::Status AdminService::Service::UpdateNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) {
   (void) context;
   (void) request;
   (void) response;
