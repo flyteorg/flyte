@@ -12753,6 +12753,116 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a Version. */
+        interface IVersion {
+
+            /** Version Build */
+            Build?: (string|null);
+
+            /** Version Version */
+            Version?: (string|null);
+
+            /** Version BuildTime */
+            BuildTime?: (string|null);
+        }
+
+        /** Represents a Version. */
+        class Version implements IVersion {
+
+            /**
+             * Constructs a new Version.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IVersion);
+
+            /** Version Build. */
+            public Build: string;
+
+            /** Version Version. */
+            public Version: string;
+
+            /** Version BuildTime. */
+            public BuildTime: string;
+
+            /**
+             * Creates a new Version instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Version instance
+             */
+            public static create(properties?: flyteidl.admin.IVersion): flyteidl.admin.Version;
+
+            /**
+             * Encodes the specified Version message. Does not implicitly {@link flyteidl.admin.Version.verify|verify} messages.
+             * @param message Version message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IVersion, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Version message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Version
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Version;
+
+            /**
+             * Verifies a Version message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetVersionRequest. */
+        interface IGetVersionRequest {
+        }
+
+        /** Represents a GetVersionRequest. */
+        class GetVersionRequest implements IGetVersionRequest {
+
+            /**
+             * Constructs a new GetVersionRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetVersionRequest);
+
+            /**
+             * Creates a new GetVersionRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetVersionRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IGetVersionRequest): flyteidl.admin.GetVersionRequest;
+
+            /**
+             * Encodes the specified GetVersionRequest message. Does not implicitly {@link flyteidl.admin.GetVersionRequest.verify|verify} messages.
+             * @param message GetVersionRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetVersionRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetVersionRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetVersionRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetVersionRequest;
+
+            /**
+             * Verifies a GetVersionRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a WorkflowCreateRequest. */
         interface IWorkflowCreateRequest {
 
@@ -14134,6 +14244,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public updateNamedEntity(request: flyteidl.admin.INamedEntityUpdateRequest): Promise<flyteidl.admin.NamedEntityUpdateResponse>;
+
+            /**
+             * Calls GetVersion.
+             * @param request GetVersionRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and Version
+             */
+            public getVersion(request: flyteidl.admin.IGetVersionRequest, callback: flyteidl.service.AdminService.GetVersionCallback): void;
+
+            /**
+             * Calls GetVersion.
+             * @param request GetVersionRequest message or plain object
+             * @returns Promise
+             */
+            public getVersion(request: flyteidl.admin.IGetVersionRequest): Promise<flyteidl.admin.Version>;
         }
 
         namespace AdminService {
@@ -14445,6 +14569,13 @@ export namespace flyteidl {
              * @param [response] NamedEntityUpdateResponse
              */
             type UpdateNamedEntityCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntityUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getVersion}.
+             * @param error Error, if any
+             * @param [response] Version
+             */
+            type GetVersionCallback = (error: (Error|null), response?: flyteidl.admin.Version) => void;
         }
     }
 }

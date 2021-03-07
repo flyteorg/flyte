@@ -30372,6 +30372,243 @@ export const flyteidl = $root.flyteidl = (() => {
             return TaskExecutionGetDataResponse;
         })();
 
+        admin.Version = (function() {
+
+            /**
+             * Properties of a Version.
+             * @memberof flyteidl.admin
+             * @interface IVersion
+             * @property {string|null} [Build] Version Build
+             * @property {string|null} [Version] Version Version
+             * @property {string|null} [BuildTime] Version BuildTime
+             */
+
+            /**
+             * Constructs a new Version.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a Version.
+             * @implements IVersion
+             * @constructor
+             * @param {flyteidl.admin.IVersion=} [properties] Properties to set
+             */
+            function Version(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Version Build.
+             * @member {string} Build
+             * @memberof flyteidl.admin.Version
+             * @instance
+             */
+            Version.prototype.Build = "";
+
+            /**
+             * Version Version.
+             * @member {string} Version
+             * @memberof flyteidl.admin.Version
+             * @instance
+             */
+            Version.prototype.Version = "";
+
+            /**
+             * Version BuildTime.
+             * @member {string} BuildTime
+             * @memberof flyteidl.admin.Version
+             * @instance
+             */
+            Version.prototype.BuildTime = "";
+
+            /**
+             * Creates a new Version instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.Version
+             * @static
+             * @param {flyteidl.admin.IVersion=} [properties] Properties to set
+             * @returns {flyteidl.admin.Version} Version instance
+             */
+            Version.create = function create(properties) {
+                return new Version(properties);
+            };
+
+            /**
+             * Encodes the specified Version message. Does not implicitly {@link flyteidl.admin.Version.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.Version
+             * @static
+             * @param {flyteidl.admin.IVersion} message Version message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            Version.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.Build != null && message.hasOwnProperty("Build"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.Build);
+                if (message.Version != null && message.hasOwnProperty("Version"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.Version);
+                if (message.BuildTime != null && message.hasOwnProperty("BuildTime"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.BuildTime);
+                return writer;
+            };
+
+            /**
+             * Decodes a Version message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.Version
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.Version} Version
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            Version.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Version();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.Build = reader.string();
+                        break;
+                    case 2:
+                        message.Version = reader.string();
+                        break;
+                    case 3:
+                        message.BuildTime = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a Version message.
+             * @function verify
+             * @memberof flyteidl.admin.Version
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            Version.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.Build != null && message.hasOwnProperty("Build"))
+                    if (!$util.isString(message.Build))
+                        return "Build: string expected";
+                if (message.Version != null && message.hasOwnProperty("Version"))
+                    if (!$util.isString(message.Version))
+                        return "Version: string expected";
+                if (message.BuildTime != null && message.hasOwnProperty("BuildTime"))
+                    if (!$util.isString(message.BuildTime))
+                        return "BuildTime: string expected";
+                return null;
+            };
+
+            return Version;
+        })();
+
+        admin.GetVersionRequest = (function() {
+
+            /**
+             * Properties of a GetVersionRequest.
+             * @memberof flyteidl.admin
+             * @interface IGetVersionRequest
+             */
+
+            /**
+             * Constructs a new GetVersionRequest.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a GetVersionRequest.
+             * @implements IGetVersionRequest
+             * @constructor
+             * @param {flyteidl.admin.IGetVersionRequest=} [properties] Properties to set
+             */
+            function GetVersionRequest(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * Creates a new GetVersionRequest instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.GetVersionRequest
+             * @static
+             * @param {flyteidl.admin.IGetVersionRequest=} [properties] Properties to set
+             * @returns {flyteidl.admin.GetVersionRequest} GetVersionRequest instance
+             */
+            GetVersionRequest.create = function create(properties) {
+                return new GetVersionRequest(properties);
+            };
+
+            /**
+             * Encodes the specified GetVersionRequest message. Does not implicitly {@link flyteidl.admin.GetVersionRequest.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.GetVersionRequest
+             * @static
+             * @param {flyteidl.admin.IGetVersionRequest} message GetVersionRequest message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            GetVersionRequest.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                return writer;
+            };
+
+            /**
+             * Decodes a GetVersionRequest message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.GetVersionRequest
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.GetVersionRequest} GetVersionRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            GetVersionRequest.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.GetVersionRequest();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a GetVersionRequest message.
+             * @function verify
+             * @memberof flyteidl.admin.GetVersionRequest
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            GetVersionRequest.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                return null;
+            };
+
+            return GetVersionRequest;
+        })();
+
         admin.WorkflowCreateRequest = (function() {
 
             /**
@@ -33540,6 +33777,39 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              * @param {flyteidl.admin.INamedEntityUpdateRequest} request NamedEntityUpdateRequest message or plain object
              * @returns {Promise<flyteidl.admin.NamedEntityUpdateResponse>} Promise
+             * @variation 2
+             */
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getVersion}.
+             * @memberof flyteidl.service.AdminService
+             * @typedef GetVersionCallback
+             * @type {function}
+             * @param {Error|null} error Error, if any
+             * @param {flyteidl.admin.Version} [response] Version
+             */
+
+            /**
+             * Calls GetVersion.
+             * @function getVersion
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IGetVersionRequest} request GetVersionRequest message or plain object
+             * @param {flyteidl.service.AdminService.GetVersionCallback} callback Node-style callback called with the error, if any, and Version
+             * @returns {undefined}
+             * @variation 1
+             */
+            Object.defineProperty(AdminService.prototype.getVersion = function getVersion(request, callback) {
+                return this.rpcCall(getVersion, $root.flyteidl.admin.GetVersionRequest, $root.flyteidl.admin.Version, request, callback);
+            }, "name", { value: "GetVersion" });
+
+            /**
+             * Calls GetVersion.
+             * @function getVersion
+             * @memberof flyteidl.service.AdminService
+             * @instance
+             * @param {flyteidl.admin.IGetVersionRequest} request GetVersionRequest message or plain object
+             * @returns {Promise<flyteidl.admin.Version>} Promise
              * @variation 2
              */
 
