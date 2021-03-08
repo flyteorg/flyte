@@ -1,68 +1,9 @@
-project_name: copilot
-before:
-  hooks:
-    - go mod download
+project_name: flyteplugins
 builds:
-  - id: copilot
-    env:
-      - CGO_ENABLED=0
-    main: ./copilot/main.go
-    binary: copilot
-    goos:
-      - linux
-      - windows
-      - darwin
-    ldflags:
-      - -s -w -X github.com/lyft/flytestdlib/version.Version={{.Version}} -X github.com/lyft/flytestdlib/version.Build={{.ShortCommit}} -X github.com/lyft/flytestdlib/version.BuildTime={{.Date}}
-archives:
-  - id: copilot-archive
-    name_template: |-
-      kubectl-flyte_{{ .Tag }}_{{ .Os }}_{{ .Arch -}}
-      {{- with .Arm -}}
-      {{- if (eq . "6") -}}hf
-      {{- else -}}v{{- . -}}
-      {{- end -}}
-      {{- end -}}
-    builds:
-      - kubectl-flyte
-    replacements:
-      386: i386
-      amd64: x86_64
-    format_overrides:
-      - goos: windows
-        format: zip
-
-checksum:
-  name_template: 'checksums.txt'
+  - skip: true
 changelog:
   sort: asc
   filters:
     exclude:
       - '^docs:'
       - '^test:'
-# scoop:
-#   # Default is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-#   # url_template: "http://github.mycompany.com/foo/bar/releases/{{ .Tag }}/{{ .ArtifactName }}"
-
-#   # Repository to push the app manifest to.
-#   bucket:
-#     owner: lyft
-#     name: flytepropeller
-
-#   # Git author used to commit to the repository.
-#   # Defaults are shown.
-#   commit_author:
-#     name: goreleaserbot
-#     email: goreleaser@carlosbecker.com
-
-#   # Your app's homepage.
-#   # Default is empty.
-#   homepage: "https://godoc.org/github.com/lyft/flytepropeller"
-
-#   # Your app's description.
-#   # Default is empty.
-#   description: "kubectl-flyte is an command line tool that can be used as an extension to kubectl"
-
-#   # Your app's license
-#   # Default is empty.
-#   license: Apache-2.0
