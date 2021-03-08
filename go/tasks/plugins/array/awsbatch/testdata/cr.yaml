@@ -1,4 +1,4 @@
-apiVersion: flyte.lyft.com/v1alpha1
+apiVersion: flyte.flyteorg.com/v1alpha1
 kind: DynamicJob
 metadata:
   annotations:
@@ -22,11 +22,11 @@ spec:
     batch_master_task_queue: arn:aws:batch:us-east-1:173840052742:job-queue/FlyteNonProductionTaskCPU-staging-iad
   env:
   - name: FLYTE_INTERNAL_IMAGE
-    value: registry.ingress.ktensorgym.us-east-1.k8s.lyft.net/sdk:latest
-  image: registry.ingress.ktensorgym.us-east-1.k8s.lyft.net/sdk:latest
-  input: s3://lyft-modelbuilder/empty_inputs.pb
+    value: registry.ingress.ktensorgym.us-east-1.k8s.flyteorg.net/sdk:latest
+  image: registry.ingress.ktensorgym.us-east-1.k8s.flyteorg.net/sdk:latest
+  input: s3://flyteorg-modelbuilder/empty_inputs.pb
   name: ""
-  output: s3://lyft-modelbuilder/metadata/BetaOneSecondFunctionalTest/00011450-52d6-4dd4-805c-9de8a981acee/dummy2/
+  output: s3://flyteorg-modelbuilder/metadata/BetaOneSecondFunctionalTest/00011450-52d6-4dd4-805c-9de8a981acee/dummy2/
   resources:
     requests:
       cpu: "1"

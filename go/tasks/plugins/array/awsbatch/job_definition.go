@@ -4,16 +4,16 @@ import (
 	"context"
 	"regexp"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
-	awsUtils "github.com/lyft/flyteplugins/go/tasks/plugins/awsutils"
-	"github.com/lyft/flytestdlib/errors"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	awsUtils "github.com/flyteorg/flyteplugins/go/tasks/plugins/awsutils"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 )
 
 func getContainerImage(_ context.Context, task *core.TaskTemplate) string {

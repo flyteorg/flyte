@@ -5,15 +5,15 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-	batchMocks "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
-	"github.com/lyft/flytestdlib/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	batchMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flytestdlib/utils"
 	"golang.org/x/net/context"
 
 	"github.com/stretchr/testify/assert"

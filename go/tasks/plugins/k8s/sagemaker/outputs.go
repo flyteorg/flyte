@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
 
 	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 func createOutputLiteralMap(tk *core.TaskTemplate, outputPath string) *core.LiteralMap {
@@ -59,13 +60,13 @@ func createOutputPath(prefix string, subdir string) string {
 	return fmt.Sprintf("%s/%s", prefix, subdir)
 }
 
-func createModelOutputPath(job k8s.Resource, prefix, jobName string) string {
+func createModelOutputPath(job client.Object, prefix, jobName string) string {
 	switch job.(type) {
 	case *trainingjobv1.TrainingJob:
 		return fmt.Sprintf("%s/%s/output/model.tar.gz", createOutputPath(prefix, TrainingJobOutputPathSubDir), jobName)
 	case *hpojobv1.HyperparameterTuningJob:
 		return fmt.Sprintf("%s/%s/output/model.tar.gz", createOutputPath(prefix, HyperparameterOutputPathSubDir), jobName)
 	default:
-		return fmt.Sprintf("")
+		return ""
 	}
 }

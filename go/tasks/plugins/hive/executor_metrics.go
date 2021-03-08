@@ -1,8 +1,8 @@
 package hive
 
 import (
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

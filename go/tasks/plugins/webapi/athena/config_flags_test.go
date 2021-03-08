@@ -99,10 +99,10 @@ func TestConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
-	t.Run("Test_WebAPI.readRateLimiter.qps", func(t *testing.T) {
+	t.Run("Test_webApi.readRateLimiter.qps", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.readRateLimiter.qps"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.readRateLimiter.qps"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.ReadRateLimiter.QPS), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -112,8 +112,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.readRateLimiter.qps", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.readRateLimiter.qps"); err == nil {
+			cmdFlags.Set("webApi.readRateLimiter.qps", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.readRateLimiter.qps"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.ReadRateLimiter.QPS)
 
 			} else {
@@ -121,10 +121,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.readRateLimiter.burst", func(t *testing.T) {
+	t.Run("Test_webApi.readRateLimiter.burst", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.readRateLimiter.burst"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.readRateLimiter.burst"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.ReadRateLimiter.Burst), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -134,8 +134,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.readRateLimiter.burst", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.readRateLimiter.burst"); err == nil {
+			cmdFlags.Set("webApi.readRateLimiter.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.readRateLimiter.burst"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.ReadRateLimiter.Burst)
 
 			} else {
@@ -143,10 +143,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.writeRateLimiter.qps", func(t *testing.T) {
+	t.Run("Test_webApi.writeRateLimiter.qps", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.writeRateLimiter.qps"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.writeRateLimiter.qps"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.WriteRateLimiter.QPS), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -156,8 +156,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.writeRateLimiter.qps", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.writeRateLimiter.qps"); err == nil {
+			cmdFlags.Set("webApi.writeRateLimiter.qps", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.writeRateLimiter.qps"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.WriteRateLimiter.QPS)
 
 			} else {
@@ -165,10 +165,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.writeRateLimiter.burst", func(t *testing.T) {
+	t.Run("Test_webApi.writeRateLimiter.burst", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.writeRateLimiter.burst"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.writeRateLimiter.burst"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.WriteRateLimiter.Burst), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -178,8 +178,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.writeRateLimiter.burst", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.writeRateLimiter.burst"); err == nil {
+			cmdFlags.Set("webApi.writeRateLimiter.burst", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.writeRateLimiter.burst"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.WriteRateLimiter.Burst)
 
 			} else {
@@ -187,10 +187,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.caching.size", func(t *testing.T) {
+	t.Run("Test_webApi.caching.size", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.caching.size"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.caching.size"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.Caching.Size), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -200,8 +200,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.caching.size", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.caching.size"); err == nil {
+			cmdFlags.Set("webApi.caching.size", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.caching.size"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.Caching.Size)
 
 			} else {
@@ -209,10 +209,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.caching.resyncInterval", func(t *testing.T) {
+	t.Run("Test_webApi.caching.resyncInterval", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("WebAPI.caching.resyncInterval"); err == nil {
+			if vString, err := cmdFlags.GetString("webApi.caching.resyncInterval"); err == nil {
 				assert.Equal(t, string(defaultConfig.WebAPI.Caching.ResyncInterval.String()), vString)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -222,8 +222,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := defaultConfig.WebAPI.Caching.ResyncInterval.String()
 
-			cmdFlags.Set("WebAPI.caching.resyncInterval", testValue)
-			if vString, err := cmdFlags.GetString("WebAPI.caching.resyncInterval"); err == nil {
+			cmdFlags.Set("webApi.caching.resyncInterval", testValue)
+			if vString, err := cmdFlags.GetString("webApi.caching.resyncInterval"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.WebAPI.Caching.ResyncInterval)
 
 			} else {
@@ -231,10 +231,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.caching.workers", func(t *testing.T) {
+	t.Run("Test_webApi.caching.workers", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.caching.workers"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.caching.workers"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.Caching.Workers), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -244,8 +244,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.caching.workers", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.caching.workers"); err == nil {
+			cmdFlags.Set("webApi.caching.workers", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.caching.workers"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.Caching.Workers)
 
 			} else {
@@ -253,10 +253,10 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_WebAPI.caching.maxSystemFailures", func(t *testing.T) {
+	t.Run("Test_webApi.caching.maxSystemFailures", func(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("WebAPI.caching.maxSystemFailures"); err == nil {
+			if vInt, err := cmdFlags.GetInt("webApi.caching.maxSystemFailures"); err == nil {
 				assert.Equal(t, int(defaultConfig.WebAPI.Caching.MaxSystemFailures), vInt)
 			} else {
 				assert.FailNow(t, err.Error())
@@ -266,8 +266,8 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("WebAPI.caching.maxSystemFailures", testValue)
-			if vInt, err := cmdFlags.GetInt("WebAPI.caching.maxSystemFailures"); err == nil {
+			cmdFlags.Set("webApi.caching.maxSystemFailures", testValue)
+			if vInt, err := cmdFlags.GetInt("webApi.caching.maxSystemFailures"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.WebAPI.Caching.MaxSystemFailures)
 
 			} else {

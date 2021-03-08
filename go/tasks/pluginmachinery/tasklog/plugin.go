@@ -1,6 +1,6 @@
 package tasklog
 
-import "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 // Input contains all available information about task's execution that a log plugin can use to construct task's
 // log links.

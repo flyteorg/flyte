@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	mocks2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
-	"github.com/lyft/flytestdlib/cache"
-	cacheMocks "github.com/lyft/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
+	"github.com/flyteorg/flytestdlib/cache"
+	cacheMocks "github.com/flyteorg/flytestdlib/cache/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

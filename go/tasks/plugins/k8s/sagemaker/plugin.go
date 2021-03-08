@@ -3,17 +3,19 @@ package sagemaker
 import (
 	"context"
 
-	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
 	"k8s.io/client-go/kubernetes/scheme"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 // Sanity test that the plugin implements method of k8s.Plugin
@@ -23,7 +25,7 @@ type awsSagemakerPlugin struct {
 	TaskType pluginsCore.TaskType
 }
 
-func (m awsSagemakerPlugin) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (k8s.Resource, error) {
+func (m awsSagemakerPlugin) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	if m.TaskType == trainingJobTaskType || m.TaskType == customTrainingJobTaskType {
 		return &trainingjobv1.TrainingJob{}, nil
 	}
@@ -33,7 +35,7 @@ func (m awsSagemakerPlugin) BuildIdentityResource(_ context.Context, _ pluginsCo
 	return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "The sagemaker plugin is unable to build identity resource for an unknown task type [%v]", m.TaskType)
 }
 
-func (m awsSagemakerPlugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
+func (m awsSagemakerPlugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 
 	// Unmarshal the custom field of the task template back into the HyperparameterTuningJob struct generated in flyteidl
 	if m.TaskType == trainingJobTaskType {
@@ -48,7 +50,7 @@ func (m awsSagemakerPlugin) BuildResource(ctx context.Context, taskCtx pluginsCo
 	return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "The SageMaker plugin is unable to build resource for unknown task type [%s]", m.TaskType)
 }
 
-func (m awsSagemakerPlugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource k8s.Resource) (pluginsCore.PhaseInfo, error) {
+func (m awsSagemakerPlugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	if m.TaskType == trainingJobTaskType {
 		job := resource.(*trainingjobv1.TrainingJob)
 		return m.getTaskPhaseForTrainingJob(ctx, pluginContext, job)

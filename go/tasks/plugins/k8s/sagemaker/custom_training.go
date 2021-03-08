@@ -7,27 +7,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go/service/sagemaker"
-	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	taskError "github.com/lyft/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/lyft/flytestdlib/logger"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
+	"github.com/aws/aws-sdk-go/service/sagemaker"
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	taskError "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flytestdlib/logger"
+
+	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
-	flyteSageMakerIdl "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	flyteSageMakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 )
 
 func (m awsSagemakerPlugin) buildResourceForCustomTrainingJob(
-	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
+	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 
 	logger.Infof(ctx, "Building a training job resource for task [%v]", taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 	taskTemplate, err := getTaskTemplate(ctx, taskCtx)
@@ -184,8 +186,7 @@ func (m awsSagemakerPlugin) getTaskPhaseForCustomTrainingJob(
 		}
 		return pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execError, info), nil
 	case sagemaker.TrainingJobStatusStopped:
-		reason := fmt.Sprintf("Training Job Stopped")
-		return pluginsCore.PhaseInfoRetryableFailure(taskError.DownstreamSystemError, reason, info), nil
+		return pluginsCore.PhaseInfoRetryableFailure(taskError.DownstreamSystemError, "Training Job Stopped", info), nil
 	case sagemaker.TrainingJobStatusCompleted:
 		// Now that it is a success we will set the outputs as expected by the task
 

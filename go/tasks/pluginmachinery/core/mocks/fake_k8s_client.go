@@ -26,7 +26,7 @@ func formatKey(name types.NamespacedName, kind schema.GroupVersionKind) string {
 	return key
 }
 
-func (m *FakeKubeClient) Get(ctx context.Context, key client.ObjectKey, out runtime.Object) error {
+func (m *FakeKubeClient) Get(ctx context.Context, key client.ObjectKey, out client.Object) error {
 	m.syncObj.RLock()
 	defer m.syncObj.RUnlock()
 
@@ -57,7 +57,7 @@ func (m *FakeKubeClient) Get(ctx context.Context, key client.ObjectKey, out runt
 	return errors.NewNotFound(schema.GroupResource{}, key.Name)
 }
 
-func (m *FakeKubeClient) List(ctx context.Context, list runtime.Object, opts ...client.ListOption) error {
+func (m *FakeKubeClient) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
 	m.syncObj.RLock()
 	defer m.syncObj.RUnlock()
 
@@ -85,7 +85,7 @@ func (m *FakeKubeClient) List(ctx context.Context, list runtime.Object, opts ...
 	return meta.SetList(list, objs)
 }
 
-func (m *FakeKubeClient) Create(ctx context.Context, obj runtime.Object, opts ...client.CreateOption) (err error) {
+func (m *FakeKubeClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) (err error) {
 	m.syncObj.Lock()
 	defer m.syncObj.Unlock()
 
@@ -107,7 +107,7 @@ func (m *FakeKubeClient) Create(ctx context.Context, obj runtime.Object, opts ..
 	return errors.NewAlreadyExists(schema.GroupResource{}, accessor.GetName())
 }
 
-func (m *FakeKubeClient) Delete(ctx context.Context, obj runtime.Object, opts ...client.DeleteOption) error {
+func (m *FakeKubeClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	m.syncObj.Lock()
 	defer m.syncObj.Unlock()
 
@@ -126,7 +126,7 @@ func (m *FakeKubeClient) Delete(ctx context.Context, obj runtime.Object, opts ..
 	return nil
 }
 
-func (m *FakeKubeClient) Update(ctx context.Context, obj runtime.Object, opts ...client.UpdateOption) error {
+func (m *FakeKubeClient) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
 	m.syncObj.Lock()
 	defer m.syncObj.Unlock()
 
@@ -154,13 +154,21 @@ func (*FakeKubeClient) Status() client.StatusWriter {
 
 // Patch patches the given obj in the Kubernetes cluster. obj must be a
 // struct pointer so that obj can be updated with the content returned by the Server.
-func (*FakeKubeClient) Patch(ctx context.Context, obj runtime.Object, patch client.Patch, opts ...client.PatchOption) error {
+func (*FakeKubeClient) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
 	panic("implement me")
 
 }
 
 // DeleteAllOf deletes all objects of the given type matching the given options.
-func (*FakeKubeClient) DeleteAllOf(ctx context.Context, obj runtime.Object, opts ...client.DeleteAllOfOption) error {
+func (*FakeKubeClient) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
+	panic("implement me")
+}
+
+func (*FakeKubeClient) Scheme() *runtime.Scheme {
+	panic("implement me")
+}
+
+func (*FakeKubeClient) RESTMapper() meta.RESTMapper {
 	panic("implement me")
 }
 

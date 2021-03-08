@@ -5,24 +5,24 @@ import (
 	"sort"
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
 	"github.com/golang/protobuf/ptypes/duration"
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	config2 "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	config2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
 	"github.com/aws/aws-sdk-go/service/batch"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	v1 "k8s.io/api/core/v1"
 )
 

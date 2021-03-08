@@ -1,8 +1,8 @@
 package catalog
 
 import (
-	"github.com/lyft/flyteplugins/go/tasks/config"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

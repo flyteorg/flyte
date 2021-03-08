@@ -4,13 +4,13 @@ import (
 	"context"
 	"sync"
 
-	internalRemote "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/internal/webapi"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
+	internalRemote "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/internal/webapi"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 type taskPluginRegistry struct {

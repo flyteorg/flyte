@@ -5,13 +5,13 @@ import (
 	"sort"
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	flyteerr "github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -127,7 +127,7 @@ func OverrideDefaultContainerName(taskCtx pluginsCore.TaskExecutionContext, podS
 	// Tensorflow operator forces pod to have container named 'tensorflow'
 	// https://github.com/kubeflow/tf-operator/blob/984adc287e6fe82841e4ca282dc9a2cbb71e2d4a/pkg/apis/tensorflow/validation/validation.go#L55-L63
 	// hence we have to override the name set here
-	// https://github.com/lyft/flyteplugins/blob/209c52d002b4e6a39be5d175bc1046b7e631c153/go/tasks/pluginmachinery/flytek8s/container_helper.go#L116
+	// https://github.com/flyteorg/flyteplugins/blob/209c52d002b4e6a39be5d175bc1046b7e631c153/go/tasks/pluginmachinery/flytek8s/container_helper.go#L116
 	flyteDefaultContainerName := taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
 	for idx, c := range podSpec.Containers {
 		if c.Name == flyteDefaultContainerName {

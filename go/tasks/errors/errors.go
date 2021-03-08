@@ -1,7 +1,7 @@
 package errors
 
 import (
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/errors"
 )
 
 const (

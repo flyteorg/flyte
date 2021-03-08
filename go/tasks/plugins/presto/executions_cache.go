@@ -5,16 +5,16 @@ import (
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/lyft/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/cache"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	stdErrors "github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/presto/client"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/presto/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/config"
 
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 const (

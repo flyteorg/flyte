@@ -6,10 +6,10 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
+	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
 )
 
 const quboleConfigSectionKey = "qubole"
@@ -19,10 +19,11 @@ func MustParse(s string) config.URL {
 	if err != nil {
 		logger.Panicf(context.TODO(), "Bad Qubole URL Specified as default, error: %s", err)
 	}
-	if r == nil {
-		logger.Panicf(context.TODO(), "Nil Qubole URL specified.", err)
+	if r != nil {
+		return config.URL{URL: *r}
 	}
-	return config.URL{URL: *r}
+	logger.Panicf(context.TODO(), "Nil Qubole URL specified.", err)
+	return config.URL{}
 }
 
 type ClusterConfig struct {

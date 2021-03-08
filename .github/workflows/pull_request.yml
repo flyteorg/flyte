@@ -3,20 +3,6 @@ name: Pull Request
 on: pull_request
 
 jobs:
-  build-copilot:
-    name: Build Co-Pilot Docker Image
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: Push Docker Image to Github Registry
-        uses: whoan/docker-build-with-cache-action@v5
-        with:
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
-          image_name: ${{ github.repository_owner }}/flytecopilot
-          image_tag: ${{ github.sha }}
-          push_git_tag: true
-          registry: ghcr.io
   tests-lint:
     name: Run tests and lint
     runs-on: ubuntu-latest

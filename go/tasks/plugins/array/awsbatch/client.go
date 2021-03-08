@@ -9,12 +9,12 @@ import (
 	"context"
 	"fmt"
 
-	definition2 "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	definition2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 
-	"github.com/lyft/flyteplugins/go/tasks/aws"
-	"github.com/lyft/flytestdlib/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/aws"
+	"github.com/flyteorg/flytestdlib/utils"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
 	a "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"

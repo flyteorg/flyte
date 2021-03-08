@@ -5,8 +5,11 @@ package mocks
 import (
 	context "context"
 
-	core "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	k8s "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
+	client "sigs.k8s.io/controller-runtime/pkg/client"
+
+	core "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+
+	k8s "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -20,7 +23,7 @@ type Plugin_BuildIdentityResource struct {
 	*mock.Call
 }
 
-func (_m Plugin_BuildIdentityResource) Return(_a0 k8s.Resource, _a1 error) *Plugin_BuildIdentityResource {
+func (_m Plugin_BuildIdentityResource) Return(_a0 client.Object, _a1 error) *Plugin_BuildIdentityResource {
 	return &Plugin_BuildIdentityResource{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -35,15 +38,15 @@ func (_m *Plugin) OnBuildIdentityResourceMatch(matchers ...interface{}) *Plugin_
 }
 
 // BuildIdentityResource provides a mock function with given fields: ctx, taskCtx
-func (_m *Plugin) BuildIdentityResource(ctx context.Context, taskCtx core.TaskExecutionMetadata) (k8s.Resource, error) {
+func (_m *Plugin) BuildIdentityResource(ctx context.Context, taskCtx core.TaskExecutionMetadata) (client.Object, error) {
 	ret := _m.Called(ctx, taskCtx)
 
-	var r0 k8s.Resource
-	if rf, ok := ret.Get(0).(func(context.Context, core.TaskExecutionMetadata) k8s.Resource); ok {
+	var r0 client.Object
+	if rf, ok := ret.Get(0).(func(context.Context, core.TaskExecutionMetadata) client.Object); ok {
 		r0 = rf(ctx, taskCtx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(k8s.Resource)
+			r0 = ret.Get(0).(client.Object)
 		}
 	}
 
@@ -61,7 +64,7 @@ type Plugin_BuildResource struct {
 	*mock.Call
 }
 
-func (_m Plugin_BuildResource) Return(_a0 k8s.Resource, _a1 error) *Plugin_BuildResource {
+func (_m Plugin_BuildResource) Return(_a0 client.Object, _a1 error) *Plugin_BuildResource {
 	return &Plugin_BuildResource{Call: _m.Call.Return(_a0, _a1)}
 }
 
@@ -76,15 +79,15 @@ func (_m *Plugin) OnBuildResourceMatch(matchers ...interface{}) *Plugin_BuildRes
 }
 
 // BuildResource provides a mock function with given fields: ctx, taskCtx
-func (_m *Plugin) BuildResource(ctx context.Context, taskCtx core.TaskExecutionContext) (k8s.Resource, error) {
+func (_m *Plugin) BuildResource(ctx context.Context, taskCtx core.TaskExecutionContext) (client.Object, error) {
 	ret := _m.Called(ctx, taskCtx)
 
-	var r0 k8s.Resource
-	if rf, ok := ret.Get(0).(func(context.Context, core.TaskExecutionContext) k8s.Resource); ok {
+	var r0 client.Object
+	if rf, ok := ret.Get(0).(func(context.Context, core.TaskExecutionContext) client.Object); ok {
 		r0 = rf(ctx, taskCtx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(k8s.Resource)
+			r0 = ret.Get(0).(client.Object)
 		}
 	}
 
@@ -106,7 +109,7 @@ func (_m Plugin_GetTaskPhase) Return(_a0 core.PhaseInfo, _a1 error) *Plugin_GetT
 	return &Plugin_GetTaskPhase{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *Plugin) OnGetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource k8s.Resource) *Plugin_GetTaskPhase {
+func (_m *Plugin) OnGetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) *Plugin_GetTaskPhase {
 	c := _m.On("GetTaskPhase", ctx, pluginContext, resource)
 	return &Plugin_GetTaskPhase{Call: c}
 }
@@ -117,18 +120,18 @@ func (_m *Plugin) OnGetTaskPhaseMatch(matchers ...interface{}) *Plugin_GetTaskPh
 }
 
 // GetTaskPhase provides a mock function with given fields: ctx, pluginContext, resource
-func (_m *Plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource k8s.Resource) (core.PhaseInfo, error) {
+func (_m *Plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (core.PhaseInfo, error) {
 	ret := _m.Called(ctx, pluginContext, resource)
 
 	var r0 core.PhaseInfo
-	if rf, ok := ret.Get(0).(func(context.Context, k8s.PluginContext, k8s.Resource) core.PhaseInfo); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, k8s.PluginContext, client.Object) core.PhaseInfo); ok {
 		r0 = rf(ctx, pluginContext, resource)
 	} else {
 		r0 = ret.Get(0).(core.PhaseInfo)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, k8s.PluginContext, k8s.Resource) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, k8s.PluginContext, client.Object) error); ok {
 		r1 = rf(ctx, pluginContext, resource)
 	} else {
 		r1 = ret.Error(1)

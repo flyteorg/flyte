@@ -24,25 +24,7 @@
 			}, {
 				"name": "FLYTE_INTERNAL_VERSION",
 				"value": ""
-			}],
-			"resources": {
-				"requests": {
-				    "gpu": {
-				    	"string": "2"
-				    },
-					"cpu": {
-						"string": "10"
-					}
-				},
-				"limits": {
-					"nvidia.com/gpu": {
-						"string": "3"
-					},
-					"cpu": {
-						"string": "10"
-					}
-				}
-			}
+			}]
 		}, {
 			"name": "another container"
 		}],

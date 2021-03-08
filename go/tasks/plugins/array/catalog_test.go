@@ -5,30 +5,30 @@ import (
 	"errors"
 	"testing"
 
-	stdErrors "github.com/lyft/flytestdlib/errors"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
 
-	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
+	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/bitarray"
 
-	core2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	core2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	catalogMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	catalogMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	pluginMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
 	"github.com/go-test/deep"
 )

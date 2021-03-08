@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/errorcollector"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	errors2 "github.com/lyft/flytestdlib/errors"
+	errors2 "github.com/flyteorg/flytestdlib/errors"
 
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const (

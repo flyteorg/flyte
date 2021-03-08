@@ -7,28 +7,28 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flyteplugins/go/tasks/aws"
+	"github.com/flyteorg/flyteplugins/go/tasks/aws"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	pluginMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	queueMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
+	pluginMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	queueMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
-	batchConfig "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	cacheMocks "github.com/lyft/flytestdlib/cache/mocks"
-	"github.com/lyft/flytestdlib/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
+	batchConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	cacheMocks "github.com/flyteorg/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flytestdlib/utils"
 )
 
 func TestExecutor_Handle(t *testing.T) {

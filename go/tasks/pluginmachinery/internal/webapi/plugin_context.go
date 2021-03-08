@@ -1,7 +1,7 @@
 package webapi
 
 import (
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 )
 
 type pluginContext struct {

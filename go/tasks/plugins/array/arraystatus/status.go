@@ -5,8 +5,8 @@
 package arraystatus
 
 import (
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytestdlib/bitarray"
 )
 
 type JobID = string

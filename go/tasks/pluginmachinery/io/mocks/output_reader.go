@@ -5,8 +5,8 @@ package mocks
 import (
 	context "context"
 
-	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	io "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	io "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
 	mock "github.com/stretchr/testify/mock"
 )

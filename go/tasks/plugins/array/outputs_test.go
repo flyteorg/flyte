@@ -8,32 +8,32 @@ import (
 
 	"github.com/go-test/deep"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	mocks3 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
-	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/bitarray"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	mocks2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 func TestOutputAssembler_Queue(t *testing.T) {
