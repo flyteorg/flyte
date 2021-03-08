@@ -7,28 +7,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	ioMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
-	mocks2 "github.com/lyft/flytestdlib/cache/mocks"
+	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	pluginsCoreMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/client"
-	quboleMocks "github.com/lyft/flyteplugins/go/tasks/plugins/hive/client/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginsCoreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
+	quboleMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
 )
 
 func init() {

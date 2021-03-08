@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	core "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	core "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	mock "github.com/stretchr/testify/mock"
 
 	types "k8s.io/apimachinery/pkg/types"

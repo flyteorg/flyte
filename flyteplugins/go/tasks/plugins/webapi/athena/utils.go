@@ -3,17 +3,17 @@ package athena
 import (
 	"context"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	pluginsIdl "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/lyft/flytestdlib/utils"
+	pluginsIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flytestdlib/utils"
 
-	pb "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/lyft/flytestdlib/logger"
+	pb "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocation string) error {

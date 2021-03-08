@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 //go:generate pflags Config

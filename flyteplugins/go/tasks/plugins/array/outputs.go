@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/lyft/flytestdlib/bitarray"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/errorcollector"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 var (

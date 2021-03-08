@@ -2,38 +2,39 @@ package sagemaker
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
-	awsUtils "github.com/lyft/flyteplugins/go/tasks/plugins/awsutils"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginErrors "github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flytestdlib/logger"
+	awsUtils "github.com/flyteorg/flyteplugins/go/tasks/plugins/awsutils"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	flyteIdlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
 	"github.com/aws/aws-sdk-go/service/sagemaker"
 
-	taskError "github.com/lyft/flyteplugins/go/tasks/errors"
+	taskError "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	flyteSageMakerIdl "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	flyteSageMakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )
 
 const ReconcilingTuningJobStatus = "ReconcilingTuningJob"
 
 func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
-	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
+	ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 
 	logger.Infof(ctx, "Building a hyperparameter tuning job resource for task [%v]", taskCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 
@@ -241,8 +242,7 @@ func (m awsSagemakerPlugin) getTaskPhaseForHyperparameterTuningJob(
 		}
 		return pluginsCore.PhaseInfoFailed(pluginsCore.PhasePermanentFailure, execError, info), nil
 	case sagemaker.HyperParameterTuningJobStatusStopped:
-		reason := fmt.Sprintf("Hyperparameter tuning job stopped")
-		return pluginsCore.PhaseInfoRetryableFailure(taskError.DownstreamSystemError, reason, info), nil
+		return pluginsCore.PhaseInfoRetryableFailure(taskError.DownstreamSystemError, "Hyperparameter tuning job stopped", info), nil
 	case sagemaker.HyperParameterTuningJobStatusCompleted:
 		// Now that it is a success we will set the outputs as expected by the task
 

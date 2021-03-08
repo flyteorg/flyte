@@ -6,17 +6,17 @@ import (
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/lyft/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/cache"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	stdErrors "github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/client"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
 
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 const ResyncDuration = 30 * time.Second

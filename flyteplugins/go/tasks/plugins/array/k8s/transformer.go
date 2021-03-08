@@ -3,18 +3,18 @@ package k8s
 import (
 	"context"
 
-	core2 "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	core2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
-	idlPlugins "github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
+	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
 	v1 "k8s.io/api/core/v1"
 )

@@ -4,17 +4,17 @@ import (
 	"context"
 	"testing"
 
-	sagemakerConfig "github.com/lyft/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
+	sagemakerConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config/viper"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
-	"github.com/lyft/flyteplugins/go/tasks/logs"
-	flyteK8sConfig "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/spark"
+	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/spark"
 )
 
 func TestLoadConfig(t *testing.T) {

@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	client "github.com/lyft/flyteplugins/go/tasks/plugins/hive/client"
+	client "github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
 
 	mock "github.com/stretchr/testify/mock"
 )

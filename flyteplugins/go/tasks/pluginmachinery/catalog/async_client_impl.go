@@ -7,13 +7,13 @@ import (
 	"hash/fnv"
 	"reflect"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/bitarray"
 
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 )
 
 const specialEncoderKey = "abcdefghijklmnopqrstuvwxyz123456"

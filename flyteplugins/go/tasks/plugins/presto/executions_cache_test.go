@@ -4,16 +4,16 @@ import (
 	"context"
 	"testing"
 
-	prestoMocks "github.com/lyft/flyteplugins/go/tasks/plugins/presto/client/mocks"
+	prestoMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client/mocks"
 
-	"github.com/lyft/flytestdlib/cache"
-	cacheMocks "github.com/lyft/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flytestdlib/cache"
+	cacheMocks "github.com/flyteorg/flytestdlib/cache/mocks"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/presto/client"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/presto/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/config"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

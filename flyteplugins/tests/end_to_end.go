@@ -21,24 +21,24 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
-	catalogMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalogMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/stretchr/testify/mock"
 
-	coreMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	coreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func createSampleContainerTask() *idlCore.Container {

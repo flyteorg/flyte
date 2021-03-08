@@ -4,18 +4,20 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
-	flyteerr "github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	flyteerr "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	//commonOp "github.com/kubeflow/common/pkg/apis/common/v1" // switch to real 'common' once https://github.com/kubeflow/pytorch-operator/issues/263 resolved
 	commonOp "github.com/kubeflow/tf-operator/pkg/apis/common/v1"
@@ -31,7 +33,7 @@ var _ k8s.Plugin = tensorflowOperatorResourceHandler{}
 
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
 // resources.
-func (tensorflowOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (k8s.Resource, error) {
+func (tensorflowOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	return &tfOp.TFJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       tfOp.Kind,
@@ -41,7 +43,7 @@ func (tensorflowOperatorResourceHandler) BuildIdentityResource(ctx context.Conte
 }
 
 // Defines a func to create the full resource object that will be posted to k8s.
-func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (k8s.Resource, error) {
+func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 
 	if err != nil {
@@ -108,7 +110,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 // Analyses the k8s resource and reports the status as TaskPhase. This call is expected to be relatively fast,
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
-func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource k8s.Resource) (pluginsCore.PhaseInfo, error) {
+func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	app := resource.(*tfOp.TFJob)
 
 	workersCount := app.Spec.TFReplicaSpecs[tfOp.TFReplicaTypeWorker].Replicas

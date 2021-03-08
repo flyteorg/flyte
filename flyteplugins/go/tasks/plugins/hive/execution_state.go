@@ -6,23 +6,23 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/lyft/flytestdlib/cache"
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/contextutils"
 
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/hive/client"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 type ExecutionPhase int

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	workqueue "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	workqueue "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	mock "github.com/stretchr/testify/mock"
 )
 

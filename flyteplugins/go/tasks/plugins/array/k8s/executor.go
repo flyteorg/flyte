@@ -6,17 +6,17 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const executorName = "k8s-array"

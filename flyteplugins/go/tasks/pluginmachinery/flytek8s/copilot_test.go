@@ -7,19 +7,19 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	config2 "github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	config2 "github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	pluginsCoreMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginsIOMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	pluginsCoreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 )
 
 var resourceRequirements = &v1.ResourceRequirements{
@@ -212,7 +212,8 @@ func assertPodHasSNPS(t *testing.T, pod *v1.PodSpec) {
 	for _, c := range pod.Containers {
 		if c.Name == "test" {
 			found = true
-			assertContainerHasPTrace(t, &c)
+			cntr := c
+			assertContainerHasPTrace(t, &cntr)
 		}
 	}
 	assert.False(t, found, "user container absent?")
@@ -221,7 +222,8 @@ func assertPodHasSNPS(t *testing.T, pod *v1.PodSpec) {
 func assertPodHasCoPilot(t *testing.T, cfg config.FlyteCoPilotConfig, pilot *core.DataLoadingConfig, iFace *core.TypedInterface, pod *v1.PodSpec) {
 	for _, c := range pod.Containers {
 		if c.Name == "test" {
-			assertContainerHasVolumeMounts(t, cfg, pilot, iFace, &c)
+			cntr := c
+			assertContainerHasVolumeMounts(t, cfg, pilot, iFace, &cntr)
 		} else {
 			if c.Name == cfg.NamePrefix+flyteInitContainerName || c.Name == cfg.NamePrefix+flyteSidecarContainerName {
 				if iFace != nil {

@@ -3,19 +3,19 @@ package webapi
 import (
 	"context"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 
-	"github.com/lyft/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/cache"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	stdErrors "github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 //go:generate mockery -all -case=underscore

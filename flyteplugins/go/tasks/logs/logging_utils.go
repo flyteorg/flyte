@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
 	v1 "k8s.io/api/core/v1"
 )
 

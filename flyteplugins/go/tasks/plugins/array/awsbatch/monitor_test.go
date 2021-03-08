@@ -3,30 +3,30 @@ package awsbatch
 import (
 	"testing"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/batch"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	batchMocks "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	"github.com/lyft/flytestdlib/utils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	batchMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	"github.com/flyteorg/flytestdlib/utils"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/bitarray"
 )
 
 func init() {

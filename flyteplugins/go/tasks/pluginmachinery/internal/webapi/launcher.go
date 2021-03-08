@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flytestdlib/cache"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 )
 
 func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionContext, cache cache.AutoRefresh,

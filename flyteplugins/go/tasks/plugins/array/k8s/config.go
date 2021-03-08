@@ -13,8 +13,8 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

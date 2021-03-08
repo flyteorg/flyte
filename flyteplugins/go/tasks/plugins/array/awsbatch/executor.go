@@ -3,23 +3,23 @@ package awsbatch
 import (
 	"context"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array"
-	batchConfig "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
+	batchConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/utils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/utils"
 
-	"github.com/lyft/flyteplugins/go/tasks/aws"
+	"github.com/flyteorg/flyteplugins/go/tasks/aws"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const (

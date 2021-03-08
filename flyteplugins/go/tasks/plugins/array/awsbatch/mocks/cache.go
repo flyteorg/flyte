@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	definition "github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	definition "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 	mock "github.com/stretchr/testify/mock"
 )
 

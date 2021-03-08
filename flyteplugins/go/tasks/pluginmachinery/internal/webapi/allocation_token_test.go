@@ -7,21 +7,21 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	mocks2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
 
 	"github.com/stretchr/testify/assert"
 
 	testing2 "k8s.io/utils/clock/testing"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/go-test/deep"
-	"github.com/lyft/flytestdlib/promutils"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
 )
 
 func init() {

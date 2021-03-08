@@ -7,14 +7,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
 
 	"github.com/go-test/deep"
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type singleStatusProcessor struct {

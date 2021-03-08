@@ -3,10 +3,10 @@ package example
 import (
 	"time"
 
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/lyft/flytestdlib/config"
+	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

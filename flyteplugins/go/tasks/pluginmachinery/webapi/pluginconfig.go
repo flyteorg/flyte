@@ -3,8 +3,8 @@ package webapi
 import (
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags PluginConfig --default-var=DefaultPluginConfig

@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 // This type is meant only to encapsulate the response coming from Qubole as a type, it is

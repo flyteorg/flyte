@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	catalog "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalog "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 
 	mock "github.com/stretchr/testify/mock"
 )

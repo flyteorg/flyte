@@ -12,19 +12,19 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytestdlib/logger"
 
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/aws/aws-sdk-go/service/batch"
-	"github.com/lyft/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/cache"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type JobName = string

@@ -1,8 +1,8 @@
 package awsbatch
 
 import (
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 )
 
 type State struct {

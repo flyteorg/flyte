@@ -2,33 +2,30 @@ package sidecar
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"os"
 	"path"
 	"testing"
 
-	errors2 "github.com/lyft/flyteplugins/go/tasks/errors"
+	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/mock"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/golang/protobuf/jsonpb"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCoreMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	pluginsIOMock "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 )
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
@@ -40,13 +37,13 @@ var resourceRequirements = &v1.ResourceRequirements{
 	},
 }
 
-func getSidecarTaskTemplateForTest(sideCarJob plugins.SidecarJob) *core.TaskTemplate {
-	sidecarJSON, err := utils.MarshalToString(&sideCarJob)
+func getSidecarTaskTemplateForTest(sideCarJob sidecarJob) *core.TaskTemplate {
+	sidecarJSON, err := json.Marshal(&sideCarJob)
 	if err != nil {
 		panic(err)
 	}
 	structObj := structpb.Struct{}
-	err = jsonpb.UnmarshalString(sidecarJSON, &structObj)
+	err = json.Unmarshal(sidecarJSON, &structObj)
 	if err != nil {
 		panic(err)
 	}
@@ -111,6 +108,7 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	taskCtx.On("TaskReader").Return(taskReader)
 
 	taskCtx.On("TaskExecutionMetadata").Return(dummyTaskMetadata)
+
 	return taskCtx
 }
 
@@ -124,7 +122,7 @@ func TestBuildSidecarResource(t *testing.T) {
 		t.Fatal(sidecarCustomJSON)
 	}
 	sidecarCustom := structpb.Struct{}
-	if err := jsonpb.UnmarshalString(string(sidecarCustomJSON), &sidecarCustom); err != nil {
+	if err := json.Unmarshal(sidecarCustomJSON, &sidecarCustom); err != nil {
 		t.Fatal(err)
 	}
 	task := core.TaskTemplate{
@@ -159,18 +157,6 @@ func TestBuildSidecarResource(t *testing.T) {
 	assert.EqualValues(t, map[string]string{
 		primaryContainerKey: "a container",
 	}, res.GetAnnotations())
-	assert.Contains(t, res.(*v1.Pod).Spec.Tolerations, tolGPU)
-
-	// Test GPU overrides
-	expectedGpuRequest := resource.NewQuantity(2, resource.DecimalSI)
-	actualGpuRequest, ok := res.(*v1.Pod).Spec.Containers[0].Resources.Requests[ResourceNvidiaGPU]
-	assert.True(t, ok)
-	assert.True(t, expectedGpuRequest.Equal(actualGpuRequest))
-
-	expectedGpuLimit := resource.NewQuantity(3, resource.DecimalSI)
-	actualGpuLimit, ok := res.(*v1.Pod).Spec.Containers[0].Resources.Limits[ResourceNvidiaGPU]
-	assert.True(t, ok)
-	assert.True(t, expectedGpuLimit.Equal(actualGpuLimit))
 
 	// Assert volumes & volume mounts are preserved
 	assert.Len(t, res.(*v1.Pod).Spec.Volumes, 1)
@@ -180,7 +166,7 @@ func TestBuildSidecarResource(t *testing.T) {
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 
 	// Assert user-specified tolerations don't get overridden
-	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 2)
+	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 1)
 	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
 		if tol.Key == "flyte/gpu" {
 			assert.Equal(t, tol.Value, "dedicated")
@@ -195,7 +181,7 @@ func TestBuildSidecarResource(t *testing.T) {
 }
 
 func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
-	sideCarJob := plugins.SidecarJob{
+	sideCarJob := sidecarJob{
 		PrimaryContainerName: "PrimaryContainer",
 		PodSpec: &v1.PodSpec{
 			Containers: []v1.Container{
@@ -215,7 +201,7 @@ func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
 }
 
 func TestGetTaskSidecarStatus(t *testing.T) {
-	sideCarJob := plugins.SidecarJob{
+	sideCarJob := sidecarJob{
 		PrimaryContainerName: "PrimaryContainer",
 		PodSpec: &v1.PodSpec{
 			Containers: []v1.Container{

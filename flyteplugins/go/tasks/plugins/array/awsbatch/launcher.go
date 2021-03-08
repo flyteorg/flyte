@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 )
 
 func LaunchSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, batchClient Client, pluginConfig *config.Config,

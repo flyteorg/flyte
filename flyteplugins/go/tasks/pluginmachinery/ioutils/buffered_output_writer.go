@@ -3,7 +3,7 @@ package ioutils
 import (
 	"context"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 )
 
 // A Buffered outputWriter just records the io.OutputReader and can be accessed using special methods.

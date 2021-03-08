@@ -10,9 +10,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	awsConfig "github.com/aws/aws-sdk-go-v2/config"
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 
-	pluginsConfig "github.com/lyft/flyteplugins/go/tasks/config"
+	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
 )
 
 //go:generate pflags Config --default-var defaultConfig

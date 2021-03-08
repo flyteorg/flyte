@@ -3,15 +3,15 @@ package awsbatch
 import (
 	"fmt"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	errors2 "github.com/lyft/flyteplugins/go/tasks/errors"
-	"github.com/lyft/flytestdlib/errors"
+	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"golang.org/x/net/context"
 )
 
@@ -31,7 +31,7 @@ func GetJobURI(jobSize int, accountID, region, queue, jobID string) string {
 
 func GetJobTaskLog(jobSize int, accountID, region, queue, jobID string) *idlCore.TaskLog {
 	return &idlCore.TaskLog{
-		Name: fmt.Sprintf("AWS Batch Job"),
+		Name: "AWS Batch Job",
 		Uri:  GetJobURI(jobSize, accountID, region, queue, jobID),
 	}
 }

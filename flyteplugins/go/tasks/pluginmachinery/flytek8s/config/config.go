@@ -8,10 +8,10 @@ package config
 import (
 	"time"
 
-	config2 "github.com/lyft/flytestdlib/config"
+	config2 "github.com/flyteorg/flytestdlib/config"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/config"
 )
 
 //go:generate pflags K8sPluginConfig --default-var=defaultK8sConfig
@@ -27,7 +27,7 @@ var (
 		},
 		CoPilot: FlyteCoPilotConfig{
 			NamePrefix:           "flyte-copilot-",
-			Image:                "docker.pkg.github.com/lyft/flyteplugins/operator:v0.4.0",
+			Image:                "docker.pkg.github.com/flyteorg/flyteplugins/operator:v0.4.0",
 			DefaultInputDataPath: "/var/flyte/inputs",
 			InputVolumeName:      "flyte-inputs",
 			DefaultOutputPath:    "/var/flyte/outputs",

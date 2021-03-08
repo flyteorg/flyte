@@ -7,20 +7,20 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	mocks3 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pb "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
-	mocks2 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/lyft/flytestdlib/utils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pb "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flytestdlib/utils"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
 )
 
 func Test_writeOutput(t *testing.T) {

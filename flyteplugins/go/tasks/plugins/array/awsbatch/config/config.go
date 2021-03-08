@@ -3,9 +3,9 @@ package config
 import (
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/aws"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/aws"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var defaultConfig

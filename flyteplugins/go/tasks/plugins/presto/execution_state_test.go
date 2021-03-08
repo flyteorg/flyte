@@ -6,22 +6,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/presto/client"
-	prestoMocks "github.com/lyft/flyteplugins/go/tasks/plugins/presto/client/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/presto/config"
-	mocks2 "github.com/lyft/flytestdlib/cache/mocks"
-	stdConfig "github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client"
+	prestoMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/config"
+	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
+	stdConfig "github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func init() {
@@ -82,7 +82,7 @@ func TestValidatePrestoStatement(t *testing.T) {
 }
 
 func TestConstructTaskLog(t *testing.T) {
-	expected := "https://prestoproxy-internal.lyft.net:443"
+	expected := "https://prestoproxy-internal.flyteorg.net:443"
 	u, err := url.Parse(expected)
 	assert.NoError(t, err)
 	taskLog := ConstructTaskLog(ExecutionState{CommandID: "123", URI: u.String()})
@@ -93,7 +93,7 @@ func TestConstructTaskInfo(t *testing.T) {
 	empty := ConstructTaskInfo(ExecutionState{})
 	assert.Nil(t, empty)
 
-	expected := "https://prestoproxy-internal.lyft.net:443"
+	expected := "https://prestoproxy-internal.flyteorg.net:443"
 	u, err := url.Parse(expected)
 	assert.NoError(t, err)
 
@@ -105,7 +105,7 @@ func TestConstructTaskInfo(t *testing.T) {
 	}
 
 	taskInfo := ConstructTaskInfo(e)
-	assert.Equal(t, "https://prestoproxy-internal.lyft.net:443", taskInfo.Logs[0].Uri)
+	assert.Equal(t, "https://prestoproxy-internal.flyteorg.net:443", taskInfo.Logs[0].Uri)
 }
 
 func TestMapExecutionStateToPhaseInfo(t *testing.T) {

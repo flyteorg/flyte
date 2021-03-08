@@ -6,28 +6,28 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 
-	arrayCore "github.com/lyft/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/lyft/flytestdlib/bitarray"
+	"github.com/flyteorg/flytestdlib/bitarray"
 
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/lyft/flyteplugins/go/tasks/plugins/array/errorcollector"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
 
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 
-	idlCore "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	errors2 "github.com/lyft/flytestdlib/errors"
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	errors2 "github.com/flyteorg/flytestdlib/errors"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 
-	"github.com/lyft/flyteplugins/go/tasks/logs"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const (

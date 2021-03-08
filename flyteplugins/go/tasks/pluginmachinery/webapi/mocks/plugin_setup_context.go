@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	promutils "github.com/lyft/flytestdlib/promutils"
+	promutils "github.com/flyteorg/flytestdlib/promutils"
 	mock "github.com/stretchr/testify/mock"
 )
 
