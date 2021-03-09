@@ -3,6 +3,7 @@ package array
 import (
 	"context"
 	"fmt"
+	"math"
 	"strconv"
 
 	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
@@ -37,34 +38,66 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 	}
 
 	// Extract the custom plugin pb
-	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom())
+	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
 	if err != nil {
 		return state, err
 	}
 
+	var arrayJobSize int64
+
 	// Save this in the state
-	state = state.SetOriginalArraySize(arrayJob.Size)
-	state = state.SetOriginalMinSuccesses(arrayJob.GetMinSuccesses())
+	if taskTemplate.TaskTypeVersion == 0 {
+		state = state.SetOriginalArraySize(arrayJob.Size)
+		arrayJobSize = arrayJob.Size
+		state = state.SetOriginalMinSuccesses(arrayJob.GetMinSuccesses())
+	} else {
+		inputs, err := tCtx.InputReader().Get(ctx)
+		if err != nil {
+			return state, errors.Errorf(errors.MetadataAccessFailed, "Could not read inputs and therefore failed to determine array job size")
+		}
+		size := 0
+		for _, literal := range inputs.Literals {
+			if literal.GetCollection() != nil {
+				size = len(literal.GetCollection().Literals)
+				break
+			}
+		}
+		if size == 0 {
+			// Something is wrong, we should have inferred the array size when it is not specified by the size of the
+			// input collection (for any input value). Non-collection type inputs are not currently supported for
+			// taskTypeVersion > 0.
+			return state, errors.Errorf(errors.BadTaskSpecification, "Unable to determine array size from inputs")
+		}
+		minSuccesses := math.Ceil(float64(arrayJob.GetMinSuccessRatio()) * float64(size))
+
+		logger.Debugf(ctx, "Computed state: size [%d] and minSuccesses [%d]", int64(size), int64(minSuccesses))
+		state = state.SetOriginalArraySize(int64(size))
+		// We can cast the min successes because we already computed the ceiling value from the ratio
+		state = state.SetOriginalMinSuccesses(int64(minSuccesses))
+
+		arrayJobSize = int64(size)
+	}
 
 	// If the task is not discoverable, then skip data catalog work and move directly to launch
 	if taskTemplate.Metadata == nil || !taskTemplate.Metadata.Discoverable {
 		logger.Infof(ctx, "Task is not discoverable, moving to launch phase...")
 		// Set an all set indexes to cache. This task won't try to write to catalog anyway.
-		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJob.Size)), uint(arrayJob.Size)))
-		state = state.SetExecutionArraySize(int(arrayJob.Size))
+		state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
 		state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason("Task is not discoverable.")
+
+		state.SetExecutionArraySize(int(arrayJobSize))
 		return state, nil
 	}
 
 	// Otherwise, run the data catalog steps - create and submit work items to the catalog processor,
 	// build input readers
-	inputReaders, err := ConstructInputReaders(ctx, tCtx.DataStore(), tCtx.InputReader().GetInputPrefixPath(), int(arrayJob.Size))
+	inputReaders, err := ConstructInputReaders(ctx, tCtx.DataStore(), tCtx.InputReader().GetInputPrefixPath(), int(arrayJobSize))
 	if err != nil {
 		return state, err
 	}
 
 	// build output writers
-	outputWriters, err := ConstructOutputWriters(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), int(arrayJob.Size))
+	outputWriters, err := ConstructOutputWriters(ctx, tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), int(arrayJobSize))
 	if err != nil {
 		return state, err
 	}
@@ -87,8 +120,8 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 			// TODO: maybe add a config option to decide the behavior on catalog failure.
 			logger.Warnf(ctx, "Failing to lookup catalog. Will move on to launching the task. Error: %v", err)
 
-			state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJob.Size)), uint(arrayJob.Size)))
-			state = state.SetExecutionArraySize(int(arrayJob.Size))
+			state = state.SetIndexesToCache(arrayCore.InvertBitSet(bitarray.NewBitSet(uint(arrayJobSize)), uint(arrayJobSize)))
+			state = state.SetExecutionArraySize(int(arrayJobSize))
 			state = state.SetPhase(arrayCore.PhasePreLaunch, core.DefaultPhaseVersion).SetReason(fmt.Sprintf("Skipping cache check due to err [%v]", err))
 			return state, nil
 		}
@@ -100,11 +133,11 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		}
 
 		cachedResults := resp.GetCachedResults()
-		state = state.SetIndexesToCache(arrayCore.InvertBitSet(cachedResults, uint(arrayJob.Size)))
-		state = state.SetExecutionArraySize(int(arrayJob.Size) - resp.GetCachedCount())
+		state = state.SetIndexesToCache(arrayCore.InvertBitSet(cachedResults, uint(arrayJobSize)))
+		state = state.SetExecutionArraySize(int(arrayJobSize) - resp.GetCachedCount())
 
 		// If all the sub-tasks are actually done, then we can just move on.
-		if resp.GetCachedCount() == int(arrayJob.Size) {
+		if resp.GetCachedCount() == int(arrayJobSize) {
 			state.SetPhase(arrayCore.PhaseAssembleFinalOutput, core.DefaultPhaseVersion).SetReason("All subtasks are cached. assembling final outputs.")
 			return state, nil
 		}
@@ -117,7 +150,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		}
 
 		logger.Infof(ctx, "Writing indexlookup file to [%s], cached count [%d/%d], ",
-			indexLookupPath, resp.GetCachedCount(), arrayJob.Size)
+			indexLookupPath, resp.GetCachedCount(), arrayJobSize)
 		err = tCtx.DataStore().WriteProtobuf(ctx, indexLookupPath, storage.Options{}, indexLookup)
 		if err != nil {
 			return state, err
@@ -150,7 +183,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	}
 
 	// Extract the custom plugin pb
-	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom())
+	arrayJob, err := arrayCore.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
 	if err != nil {
 		return state, err
 	} else if arrayJob == nil {

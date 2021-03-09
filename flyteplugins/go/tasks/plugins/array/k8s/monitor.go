@@ -112,6 +112,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 
 		var monitorResult MonitorResult
 		monitorResult, err = task.Monitor(ctx, tCtx, kubeClient, dataStore, outputPrefix, baseOutputDataSandbox)
+		logLinks = task.LogLinks
 
 		if monitorResult != MonitorSuccess {
 			if err != nil {

@@ -131,13 +131,23 @@ const (
 	ErrorK8sArrayGeneric  errors.ErrorCode = "ARRAY_JOB_GENERIC_FAILURE"
 )
 
-func ToArrayJob(structObj *structpb.Struct) (*idlPlugins.ArrayJob, error) {
+func ToArrayJob(structObj *structpb.Struct, taskTypeVersion int32) (*idlPlugins.ArrayJob, error) {
 	if structObj == nil {
+		if taskTypeVersion == 0 {
+
+			return &idlPlugins.ArrayJob{
+				Parallelism: 1,
+				Size:        1,
+				SuccessCriteria: &idlPlugins.ArrayJob_MinSuccesses{
+					MinSuccesses: 1,
+				},
+			}, nil
+		}
 		return &idlPlugins.ArrayJob{
 			Parallelism: 1,
 			Size:        1,
-			SuccessCriteria: &idlPlugins.ArrayJob_MinSuccesses{
-				MinSuccesses: 1,
+			SuccessCriteria: &idlPlugins.ArrayJob_MinSuccessRatio{
+				MinSuccessRatio: 1.0,
 			},
 		}, nil
 	}

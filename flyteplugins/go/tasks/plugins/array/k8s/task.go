@@ -75,8 +75,15 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	})
 
 	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, arrayJobEnvVars...)
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return LaunchError, errors2.Wrapf(ErrGetTaskTypeVersion, err, "Unable to read task template")
+	} else if taskTemplate == nil {
+		return LaunchError, errors2.Wrapf(ErrGetTaskTypeVersion, err, "Missing task template")
+	}
+	inputReader := array.GetInputReader(tCtx, taskTemplate)
 	pod.Spec.Containers[0].Args, err = template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), args,
-		arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
+		inputReader, tCtx.OutputWriter())
 	if err != nil {
 		return LaunchError, errors2.Wrapf(ErrReplaceCmdTemplate, err, "Failed to replace cmd args")
 	}
@@ -116,7 +123,7 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	return LaunchSuccess, nil
 }
 
-func (t Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference) (MonitorResult, error) {
+func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference) (MonitorResult, error) {
 	indexStr := strconv.Itoa(t.ChildIdx)
 	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 	phaseInfo, err := CheckPodStatus(ctx, kubeClient,
