@@ -1,0 +1,18 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: flyte-data-config
+  namespace: {{ namespace }}
+data:
+  config.yaml: |
+    storage:
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        disable-ssl: true
+        endpoint: http://minio.flyte.svc.cluster.local:9000
+        region: us-east-1
+        secret-key: miniostorage
+      type: minio
+      container: my-s3-bucket
+      enable-multicontainer: true
