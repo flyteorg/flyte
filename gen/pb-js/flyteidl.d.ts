@@ -12753,6 +12753,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a GetVersionResponse. */
+        interface IGetVersionResponse {
+
+            /** GetVersionResponse controlPlaneVersion */
+            controlPlaneVersion?: (flyteidl.admin.IVersion|null);
+        }
+
+        /** Represents a GetVersionResponse. */
+        class GetVersionResponse implements IGetVersionResponse {
+
+            /**
+             * Constructs a new GetVersionResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetVersionResponse);
+
+            /** GetVersionResponse controlPlaneVersion. */
+            public controlPlaneVersion?: (flyteidl.admin.IVersion|null);
+
+            /**
+             * Creates a new GetVersionResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetVersionResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IGetVersionResponse): flyteidl.admin.GetVersionResponse;
+
+            /**
+             * Encodes the specified GetVersionResponse message. Does not implicitly {@link flyteidl.admin.GetVersionResponse.verify|verify} messages.
+             * @param message GetVersionResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetVersionResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetVersionResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetVersionResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetVersionResponse;
+
+            /**
+             * Verifies a GetVersionResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Version. */
         interface IVersion {
 
@@ -14248,7 +14300,7 @@ export namespace flyteidl {
             /**
              * Calls GetVersion.
              * @param request GetVersionRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and Version
+             * @param callback Node-style callback called with the error, if any, and GetVersionResponse
              */
             public getVersion(request: flyteidl.admin.IGetVersionRequest, callback: flyteidl.service.AdminService.GetVersionCallback): void;
 
@@ -14257,7 +14309,7 @@ export namespace flyteidl {
              * @param request GetVersionRequest message or plain object
              * @returns Promise
              */
-            public getVersion(request: flyteidl.admin.IGetVersionRequest): Promise<flyteidl.admin.Version>;
+            public getVersion(request: flyteidl.admin.IGetVersionRequest): Promise<flyteidl.admin.GetVersionResponse>;
         }
 
         namespace AdminService {
@@ -14573,9 +14625,9 @@ export namespace flyteidl {
             /**
              * Callback as used by {@link flyteidl.service.AdminService#getVersion}.
              * @param error Error, if any
-             * @param [response] Version
+             * @param [response] GetVersionResponse
              */
-            type GetVersionCallback = (error: (Error|null), response?: flyteidl.admin.Version) => void;
+            type GetVersionCallback = (error: (Error|null), response?: flyteidl.admin.GetVersionResponse) => void;
         }
     }
 }

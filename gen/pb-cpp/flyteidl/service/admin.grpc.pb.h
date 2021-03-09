@@ -360,12 +360,12 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityUpdateResponse>> PrepareAsyncUpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityUpdateResponse>>(PrepareAsyncUpdateNamedEntityRaw(context, request, cq));
     }
-    virtual ::grpc::Status GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::flyteidl::admin::Version* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Version>> AsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Version>>(AsyncGetVersionRaw(context, request, cq));
+    virtual ::grpc::Status GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::flyteidl::admin::GetVersionResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetVersionResponse>> AsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetVersionResponse>>(AsyncGetVersionRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Version>> PrepareAsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Version>>(PrepareAsyncGetVersionRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetVersionResponse>> PrepareAsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetVersionResponse>>(PrepareAsyncGetVersionRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
@@ -548,10 +548,10 @@ class AdminService final {
       virtual void UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Version* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetVersionResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetVersionResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
@@ -643,8 +643,8 @@ class AdminService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntity>* PrepareAsyncGetNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityUpdateResponse>* AsyncUpdateNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityUpdateResponse>* PrepareAsyncUpdateNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Version>* AsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Version>* PrepareAsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetVersionResponse>* AsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetVersionResponse>* PrepareAsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -957,12 +957,12 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityUpdateResponse>> PrepareAsyncUpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityUpdateResponse>>(PrepareAsyncUpdateNamedEntityRaw(context, request, cq));
     }
-    ::grpc::Status GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::flyteidl::admin::Version* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>> AsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>>(AsyncGetVersionRaw(context, request, cq));
+    ::grpc::Status GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::flyteidl::admin::GetVersionResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetVersionResponse>> AsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetVersionResponse>>(AsyncGetVersionRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>> PrepareAsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>>(PrepareAsyncGetVersionRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetVersionResponse>> PrepareAsyncGetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetVersionResponse>>(PrepareAsyncGetVersionRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
@@ -1143,10 +1143,10 @@ class AdminService final {
       void UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, std::function<void(::grpc::Status)>) override;
       void UpdateNamedEntity(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void UpdateNamedEntity(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, std::function<void(::grpc::Status)>) override;
-      void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Version* response, std::function<void(::grpc::Status)>) override;
-      void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetVersionResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetVersion(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetVersion(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetVersionResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -1246,8 +1246,8 @@ class AdminService final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntity>* PrepareAsyncGetNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityGetRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityUpdateResponse>* AsyncUpdateNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityUpdateResponse>* PrepareAsyncUpdateNamedEntityRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>* AsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Version>* PrepareAsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetVersionResponse>* AsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetVersionResponse>* PrepareAsyncGetVersionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetVersionRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateTask_;
     const ::grpc::internal::RpcMethod rpcmethod_GetTask_;
     const ::grpc::internal::RpcMethod rpcmethod_ListTaskIds_;
@@ -1346,7 +1346,7 @@ class AdminService final {
     virtual ::grpc::Status ListNamedEntities(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityListRequest* request, ::flyteidl::admin::NamedEntityList* response);
     virtual ::grpc::Status GetNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityGetRequest* request, ::flyteidl::admin::NamedEntity* response);
     virtual ::grpc::Status UpdateNamedEntity(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityUpdateRequest* request, ::flyteidl::admin::NamedEntityUpdateResponse* response);
-    virtual ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response);
+    virtual ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_CreateTask : public BaseClass {
@@ -2240,11 +2240,11 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) override {
+    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestGetVersion(::grpc::ServerContext* context, ::flyteidl::admin::GetVersionRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::Version>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestGetVersion(::grpc::ServerContext* context, ::flyteidl::admin::GetVersionRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::GetVersionResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(44, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -3620,17 +3620,17 @@ class AdminService final {
    public:
     ExperimentalWithCallbackMethod_GetVersion() {
       ::grpc::Service::experimental().MarkMethodCallback(44,
-        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::Version>(
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::GetVersionResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::GetVersionRequest* request,
-                 ::flyteidl::admin::Version* response,
+                 ::flyteidl::admin::GetVersionResponse* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
                    return this->GetVersion(context, request, response, controller);
                  }));
     }
     void SetMessageAllocatorFor_GetVersion(
-        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::Version>* allocator) {
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::Version>*>(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::GetVersionResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::GetVersionResponse>*>(
           ::grpc::Service::experimental().GetHandler(44))
               ->SetMessageAllocator(allocator);
     }
@@ -3638,11 +3638,11 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) override {
+    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   typedef ExperimentalWithCallbackMethod_CreateTask<ExperimentalWithCallbackMethod_GetTask<ExperimentalWithCallbackMethod_ListTaskIds<ExperimentalWithCallbackMethod_ListTasks<ExperimentalWithCallbackMethod_CreateWorkflow<ExperimentalWithCallbackMethod_GetWorkflow<ExperimentalWithCallbackMethod_ListWorkflowIds<ExperimentalWithCallbackMethod_ListWorkflows<ExperimentalWithCallbackMethod_CreateLaunchPlan<ExperimentalWithCallbackMethod_GetLaunchPlan<ExperimentalWithCallbackMethod_GetActiveLaunchPlan<ExperimentalWithCallbackMethod_ListActiveLaunchPlans<ExperimentalWithCallbackMethod_ListLaunchPlanIds<ExperimentalWithCallbackMethod_ListLaunchPlans<ExperimentalWithCallbackMethod_UpdateLaunchPlan<ExperimentalWithCallbackMethod_CreateExecution<ExperimentalWithCallbackMethod_RelaunchExecution<ExperimentalWithCallbackMethod_GetExecution<ExperimentalWithCallbackMethod_GetExecutionData<ExperimentalWithCallbackMethod_ListExecutions<ExperimentalWithCallbackMethod_TerminateExecution<ExperimentalWithCallbackMethod_GetNodeExecution<ExperimentalWithCallbackMethod_ListNodeExecutions<ExperimentalWithCallbackMethod_ListNodeExecutionsForTask<ExperimentalWithCallbackMethod_GetNodeExecutionData<ExperimentalWithCallbackMethod_RegisterProject<ExperimentalWithCallbackMethod_UpdateProject<ExperimentalWithCallbackMethod_ListProjects<ExperimentalWithCallbackMethod_CreateWorkflowEvent<ExperimentalWithCallbackMethod_CreateNodeEvent<ExperimentalWithCallbackMethod_CreateTaskEvent<ExperimentalWithCallbackMethod_GetTaskExecution<ExperimentalWithCallbackMethod_ListTaskExecutions<ExperimentalWithCallbackMethod_GetTaskExecutionData<ExperimentalWithCallbackMethod_UpdateProjectDomainAttributes<ExperimentalWithCallbackMethod_GetProjectDomainAttributes<ExperimentalWithCallbackMethod_DeleteProjectDomainAttributes<ExperimentalWithCallbackMethod_UpdateWorkflowAttributes<ExperimentalWithCallbackMethod_GetWorkflowAttributes<ExperimentalWithCallbackMethod_DeleteWorkflowAttributes<ExperimentalWithCallbackMethod_ListMatchableAttributes<ExperimentalWithCallbackMethod_ListNamedEntities<ExperimentalWithCallbackMethod_GetNamedEntity<ExperimentalWithCallbackMethod_UpdateNamedEntity<ExperimentalWithCallbackMethod_GetVersion<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
@@ -4405,7 +4405,7 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) override {
+    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -5302,7 +5302,7 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) override {
+    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -6429,7 +6429,7 @@ class AdminService final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) override {
+    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -7322,18 +7322,18 @@ class AdminService final {
    public:
     WithStreamedUnaryMethod_GetVersion() {
       ::grpc::Service::MarkMethodStreamed(44,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::Version>(std::bind(&WithStreamedUnaryMethod_GetVersion<BaseClass>::StreamedGetVersion, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetVersionRequest, ::flyteidl::admin::GetVersionResponse>(std::bind(&WithStreamedUnaryMethod_GetVersion<BaseClass>::StreamedGetVersion, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetVersion() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::Version* response) override {
+    ::grpc::Status GetVersion(::grpc::ServerContext* context, const ::flyteidl::admin::GetVersionRequest* request, ::flyteidl::admin::GetVersionResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedGetVersion(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetVersionRequest,::flyteidl::admin::Version>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedGetVersion(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetVersionRequest,::flyteidl::admin::GetVersionResponse>* server_unary_streamer) = 0;
   };
   typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_ListTaskIds<WithStreamedUnaryMethod_ListTasks<WithStreamedUnaryMethod_CreateWorkflow<WithStreamedUnaryMethod_GetWorkflow<WithStreamedUnaryMethod_ListWorkflowIds<WithStreamedUnaryMethod_ListWorkflows<WithStreamedUnaryMethod_CreateLaunchPlan<WithStreamedUnaryMethod_GetLaunchPlan<WithStreamedUnaryMethod_GetActiveLaunchPlan<WithStreamedUnaryMethod_ListActiveLaunchPlans<WithStreamedUnaryMethod_ListLaunchPlanIds<WithStreamedUnaryMethod_ListLaunchPlans<WithStreamedUnaryMethod_UpdateLaunchPlan<WithStreamedUnaryMethod_CreateExecution<WithStreamedUnaryMethod_RelaunchExecution<WithStreamedUnaryMethod_GetExecution<WithStreamedUnaryMethod_GetExecutionData<WithStreamedUnaryMethod_ListExecutions<WithStreamedUnaryMethod_TerminateExecution<WithStreamedUnaryMethod_GetNodeExecution<WithStreamedUnaryMethod_ListNodeExecutions<WithStreamedUnaryMethod_ListNodeExecutionsForTask<WithStreamedUnaryMethod_GetNodeExecutionData<WithStreamedUnaryMethod_RegisterProject<WithStreamedUnaryMethod_UpdateProject<WithStreamedUnaryMethod_ListProjects<WithStreamedUnaryMethod_CreateWorkflowEvent<WithStreamedUnaryMethod_CreateNodeEvent<WithStreamedUnaryMethod_CreateTaskEvent<WithStreamedUnaryMethod_GetTaskExecution<WithStreamedUnaryMethod_ListTaskExecutions<WithStreamedUnaryMethod_GetTaskExecutionData<WithStreamedUnaryMethod_UpdateProjectDomainAttributes<WithStreamedUnaryMethod_GetProjectDomainAttributes<WithStreamedUnaryMethod_DeleteProjectDomainAttributes<WithStreamedUnaryMethod_UpdateWorkflowAttributes<WithStreamedUnaryMethod_GetWorkflowAttributes<WithStreamedUnaryMethod_DeleteWorkflowAttributes<WithStreamedUnaryMethod_ListMatchableAttributes<WithStreamedUnaryMethod_ListNamedEntities<WithStreamedUnaryMethod_GetNamedEntity<WithStreamedUnaryMethod_UpdateNamedEntity<WithStreamedUnaryMethod_GetVersion<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;

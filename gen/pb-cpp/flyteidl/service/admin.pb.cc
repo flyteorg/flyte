@@ -51,7 +51,7 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto[] =
   "dmin/task_execution.proto\032\034flyteidl/admi"
   "n/version.proto\032\033flyteidl/admin/common.p"
   "roto\032,protoc-gen-swagger/options/annotat"
-  "ions.proto2\232a\n\014AdminService\022\305\002\n\nCreateTa"
+  "ions.proto2\245a\n\014AdminService\022\305\002\n\nCreateTa"
   "sk\022!.flyteidl.admin.TaskCreateRequest\032\"."
   "flyteidl.admin.TaskCreateResponse\"\357\001\202\323\344\223"
   "\002\022\"\r/api/v1/tasks:\001*\222A\323\001\032&Create and reg"
@@ -357,19 +357,19 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto[] =
   "pdateResponse\"\210\001\202\323\344\223\002N\032I/api/v1/named_en"
   "tities/{resource_type}/{id.project}/{id."
   "domain}/{id.name}:\001*\222A1\032/Update the fiel"
-  "ds associated with a NamedEntity\022\264\001\n\nGet"
+  "ds associated with a NamedEntity\022\277\001\n\nGet"
   "Version\022!.flyteidl.admin.GetVersionReque"
-  "st\032\027.flyteidl.admin.Version\"j\202\323\344\223\002\021\032\014/ap"
-  "i/version:\001*\222AP\032NRetrieve the Version (i"
-  "ncluding the Build  information) for Fly"
-  "teAdmin serviceB9Z7github.com/flyteorg/f"
-  "lyteidl/gen/pb-go/flyteidl/serviceb\006prot"
-  "o3"
+  "st\032\".flyteidl.admin.GetVersionResponse\"j"
+  "\202\323\344\223\002\021\032\014/api/version:\001*\222AP\032NRetrieve the"
+  " Version (including the Build  informati"
+  "on) for FlyteAdmin serviceB9Z7github.com"
+  "/flyteorg/flyteidl/gen/pb-go/flyteidl/se"
+  "rviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fadmin_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fadmin_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto,
-  "flyteidl/service/admin.proto", &assign_descriptors_table_flyteidl_2fservice_2fadmin_2eproto, 13082,
+  "flyteidl/service/admin.proto", &assign_descriptors_table_flyteidl_2fservice_2fadmin_2eproto, 13093,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fadmin_2eproto() {

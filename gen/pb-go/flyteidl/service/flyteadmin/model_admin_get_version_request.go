@@ -9,6 +9,5 @@
 
 package flyteadmin
 
-// Represents a get version request.
 type AdminGetVersionRequest struct {
 }

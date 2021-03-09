@@ -41,7 +41,7 @@ struct TableStruct_flyteidl_2fadmin_2fversion_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -53,6 +53,9 @@ namespace admin {
 class GetVersionRequest;
 class GetVersionRequestDefaultTypeInternal;
 extern GetVersionRequestDefaultTypeInternal _GetVersionRequest_default_instance_;
+class GetVersionResponse;
+class GetVersionResponseDefaultTypeInternal;
+extern GetVersionResponseDefaultTypeInternal _GetVersionResponse_default_instance_;
 class Version;
 class VersionDefaultTypeInternal;
 extern VersionDefaultTypeInternal _Version_default_instance_;
@@ -61,6 +64,7 @@ extern VersionDefaultTypeInternal _Version_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::admin::GetVersionRequest* Arena::CreateMaybeMessage<::flyteidl::admin::GetVersionRequest>(Arena*);
+template<> ::flyteidl::admin::GetVersionResponse* Arena::CreateMaybeMessage<::flyteidl::admin::GetVersionResponse>(Arena*);
 template<> ::flyteidl::admin::Version* Arena::CreateMaybeMessage<::flyteidl::admin::Version>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -68,6 +72,121 @@ namespace flyteidl {
 namespace admin {
 
 // ===================================================================
+
+class GetVersionResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.GetVersionResponse) */ {
+ public:
+  GetVersionResponse();
+  virtual ~GetVersionResponse();
+
+  GetVersionResponse(const GetVersionResponse& from);
+
+  inline GetVersionResponse& operator=(const GetVersionResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  GetVersionResponse(GetVersionResponse&& from) noexcept
+    : GetVersionResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline GetVersionResponse& operator=(GetVersionResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const GetVersionResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const GetVersionResponse* internal_default_instance() {
+    return reinterpret_cast<const GetVersionResponse*>(
+               &_GetVersionResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  void Swap(GetVersionResponse* other);
+  friend void swap(GetVersionResponse& a, GetVersionResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GetVersionResponse* New() const final {
+    return CreateMaybeMessage<GetVersionResponse>(nullptr);
+  }
+
+  GetVersionResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<GetVersionResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const GetVersionResponse& from);
+  void MergeFrom(const GetVersionResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetVersionResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.Version control_plane_version = 1;
+  bool has_control_plane_version() const;
+  void clear_control_plane_version();
+  static const int kControlPlaneVersionFieldNumber = 1;
+  const ::flyteidl::admin::Version& control_plane_version() const;
+  ::flyteidl::admin::Version* release_control_plane_version();
+  ::flyteidl::admin::Version* mutable_control_plane_version();
+  void set_allocated_control_plane_version(::flyteidl::admin::Version* control_plane_version);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.GetVersionResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::Version* control_plane_version_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fversion_2eproto;
+};
+// -------------------------------------------------------------------
 
 class Version final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Version) */ {
@@ -107,7 +226,7 @@ class Version final :
                &_Version_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   void Swap(Version* other);
   friend void swap(Version& a, Version& b) {
@@ -257,7 +376,7 @@ class GetVersionRequest final :
                &_GetVersionRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   void Swap(GetVersionRequest* other);
   friend void swap(GetVersionRequest& a, GetVersionRequest& b) {
@@ -331,6 +450,61 @@ class GetVersionRequest final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// GetVersionResponse
+
+// .flyteidl.admin.Version control_plane_version = 1;
+inline bool GetVersionResponse::has_control_plane_version() const {
+  return this != internal_default_instance() && control_plane_version_ != nullptr;
+}
+inline void GetVersionResponse::clear_control_plane_version() {
+  if (GetArenaNoVirtual() == nullptr && control_plane_version_ != nullptr) {
+    delete control_plane_version_;
+  }
+  control_plane_version_ = nullptr;
+}
+inline const ::flyteidl::admin::Version& GetVersionResponse::control_plane_version() const {
+  const ::flyteidl::admin::Version* p = control_plane_version_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetVersionResponse.control_plane_version)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Version*>(
+      &::flyteidl::admin::_Version_default_instance_);
+}
+inline ::flyteidl::admin::Version* GetVersionResponse::release_control_plane_version() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetVersionResponse.control_plane_version)
+  
+  ::flyteidl::admin::Version* temp = control_plane_version_;
+  control_plane_version_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Version* GetVersionResponse::mutable_control_plane_version() {
+  
+  if (control_plane_version_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Version>(GetArenaNoVirtual());
+    control_plane_version_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetVersionResponse.control_plane_version)
+  return control_plane_version_;
+}
+inline void GetVersionResponse::set_allocated_control_plane_version(::flyteidl::admin::Version* control_plane_version) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete control_plane_version_;
+  }
+  if (control_plane_version) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      control_plane_version = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, control_plane_version, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  control_plane_version_ = control_plane_version;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetVersionResponse.control_plane_version)
+}
+
+// -------------------------------------------------------------------
+
 // Version
 
 // string Build = 1;
@@ -499,6 +673,8 @@ inline void Version::set_allocated_buildtime(::std::string* buildtime) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 
