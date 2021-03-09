@@ -250,7 +250,7 @@ class AdminServiceStub(object):
     self.GetVersion = channel.unary_unary(
         '/flyteidl.service.AdminService/GetVersion',
         request_serializer=flyteidl_dot_admin_dot_version__pb2.GetVersionRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_admin_dot_version__pb2.Version.FromString,
+        response_deserializer=flyteidl_dot_admin_dot_version__pb2.GetVersionResponse.FromString,
         )
 
 
@@ -801,7 +801,7 @@ def add_AdminServiceServicer_to_server(servicer, server):
       'GetVersion': grpc.unary_unary_rpc_method_handler(
           servicer.GetVersion,
           request_deserializer=flyteidl_dot_admin_dot_version__pb2.GetVersionRequest.FromString,
-          response_serializer=flyteidl_dot_admin_dot_version__pb2.Version.SerializeToString,
+          response_serializer=flyteidl_dot_admin_dot_version__pb2.GetVersionResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(

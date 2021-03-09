@@ -144,6 +144,7 @@ Class | Method | HTTP request | Description
  - [AdminFixedRate](docs/AdminFixedRate.md)
  - [AdminFixedRateUnit](docs/AdminFixedRateUnit.md)
  - [AdminGetVersionRequest](docs/AdminGetVersionRequest.md)
+ - [AdminGetVersionResponse](docs/AdminGetVersionResponse.md)
  - [AdminLabels](docs/AdminLabels.md)
  - [AdminLaunchPlan](docs/AdminLaunchPlan.md)
  - [AdminLaunchPlanClosure](docs/AdminLaunchPlanClosure.md)
