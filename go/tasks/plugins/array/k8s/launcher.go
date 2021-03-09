@@ -19,6 +19,7 @@ const (
 	ErrBuildPodTemplate       errors2.ErrorCode = "POD_TEMPLATE_FAILED"
 	ErrReplaceCmdTemplate     errors2.ErrorCode = "CMD_TEMPLATE_FAILED"
 	ErrSubmitJob              errors2.ErrorCode = "SUBMIT_JOB_FAILED"
+	ErrGetTaskTypeVersion     errors2.ErrorCode = "GET_TASK_TYPE_VERSION_FAILED"
 	JobIndexVarName           string            = "BATCH_JOB_ARRAY_INDEX_VAR_NAME"
 	FlyteK8sArrayIndexVarName string            = "FLYTE_K8S_ARRAY_INDEX"
 )

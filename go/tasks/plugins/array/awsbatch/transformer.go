@@ -5,41 +5,25 @@ import (
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
-
-	"github.com/golang/protobuf/ptypes/duration"
-
-	"k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flytestdlib/storage"
-
-	config2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 
 	"github.com/aws/aws-sdk-go/service/batch"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	config2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/golang/protobuf/ptypes/duration"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 const (
 	ArrayJobIndex       = "BATCH_JOB_ARRAY_INDEX_VAR_NAME"
 	arrayJobIDFormatter = "%v:%v"
 )
-
-// A proxy inputreader that overrides the inputpath to be the inputpathprefix for array jobs
-type arrayJobInputReader struct {
-	io.InputReader
-}
-
-// We override the inputpath to return the prefix path for array jobs
-func (i arrayJobInputReader) GetInputPath() storage.DataReference {
-	return i.GetInputPrefixPath()
-}
 
 // Note that Name is not set on the result object.
 // It's up to the caller to set the Name before creating the object in K8s.
@@ -70,9 +54,9 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	if err != nil {
 		return nil, err
 	}
-
+	inputReader := array.GetInputReader(tCtx, taskTemplate)
 	args, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), taskTemplate.GetContainer().GetArgs(),
-		arrayJobInputReader{tCtx.InputReader()}, tCtx.OutputWriter())
+		inputReader, tCtx.OutputWriter())
 	taskTemplate.GetContainer().GetEnv()
 	if err != nil {
 		return nil, err

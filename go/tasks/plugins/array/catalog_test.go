@@ -5,6 +5,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	structpb "github.com/golang/protobuf/ptypes/struct"
+
 	stdErrors "github.com/flyteorg/flytestdlib/errors"
 
 	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
@@ -66,6 +70,32 @@ func runDetermineDiscoverabilityTest(t testing.TB, taskTemplate *core.TaskTempla
 
 	ir := &ioMocks.InputReader{}
 	ir.OnGetInputPrefixPath().Return("/prefix/")
+	dummyInputLiteral := &core.Literal{
+		Value: &core.Literal_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_Primitive{
+					Primitive: &core.Primitive{
+						Value: &core.Primitive_Integer{
+							Integer: 3,
+						},
+					},
+				},
+			},
+		},
+	}
+	ir.On("Get", mock.Anything).Return(&core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							dummyInputLiteral, dummyInputLiteral, dummyInputLiteral,
+						},
+					},
+				},
+			},
+		},
+	}, nil)
 
 	ow := &ioMocks.OutputWriter{}
 	ow.OnGetOutputPrefixPath().Return("/prefix/")
@@ -195,6 +225,68 @@ func TestDetermineDiscoverability(t *testing.T) {
 			OriginalMinSuccesses: 1,
 			IndexesToCache:       toCache,
 			Reason:               "Finished cache lookup.",
+		}, nil)
+	})
+}
+
+func TestDiscoverabilityTaskType1(t *testing.T) {
+
+	download := &catalogMocks.DownloadResponse{}
+	download.OnGetCachedCount().Return(0)
+	download.OnGetResultsSize().Return(1)
+
+	f := &catalogMocks.DownloadFuture{}
+	f.OnGetResponseStatus().Return(catalog.ResponseStatusReady)
+	f.OnGetResponseError().Return(nil)
+	f.OnGetResponse().Return(download, nil)
+
+	t.Run("Not discoverable", func(t *testing.T) {
+		download.OnGetCachedResults().Return(bitarray.NewBitSet(1)).Once()
+		toCache := arrayCore.InvertBitSet(bitarray.NewBitSet(uint(3)), uint(3))
+
+		arrayJob := &plugins.ArrayJob{
+			SuccessCriteria: &plugins.ArrayJob_MinSuccessRatio{
+				MinSuccessRatio: 0.5,
+			},
+		}
+		var arrayJobCustom structpb.Struct
+		err := utils.MarshalStruct(arrayJob, &arrayJobCustom)
+		assert.NoError(t, err)
+		templateType1 := &core.TaskTemplate{
+			Id: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "p",
+				Domain:       "d",
+				Name:         "n",
+				Version:      "1",
+			},
+			Interface: &core.TypedInterface{
+				Inputs: &core.VariableMap{Variables: map[string]*core.Variable{
+					"foo": {
+						Description: "foo",
+					},
+				}},
+				Outputs: &core.VariableMap{Variables: map[string]*core.Variable{}},
+			},
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Command: []string{"cmd"},
+					Args:    []string{"{{$inputPrefix}}"},
+					Image:   "img1",
+				},
+			},
+			TaskTypeVersion: 1,
+			Custom:          &arrayJobCustom,
+		}
+
+		runDetermineDiscoverabilityTest(t, templateType1, f, &arrayCore.State{
+			CurrentPhase:         arrayCore.PhasePreLaunch,
+			PhaseVersion:         core2.DefaultPhaseVersion,
+			ExecutionArraySize:   3,
+			OriginalArraySize:    3,
+			OriginalMinSuccesses: 2,
+			IndexesToCache:       toCache,
+			Reason:               "Task is not discoverable.",
 		}, nil)
 	})
 }
