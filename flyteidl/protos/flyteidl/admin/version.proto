@@ -3,7 +3,14 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
-// Represents a request structure to get version of flyteadmin.
+// Response for the GetVersion API
+message GetVersionResponse {
+    // The control plane version information. FlyteAdmin and related components
+    // form the control plane of Flyte
+    Version control_plane_version = 1;
+}
+
+// Provides Version information for a component
 message Version {
     // Specifies the GIT sha of the build
     string	Build = 1;
@@ -15,7 +22,6 @@ message Version {
     string BuildTime = 3;
 }
 
-// Represents a get version request.
+// Empty request for GetVersion
 message GetVersionRequest {
-
 }

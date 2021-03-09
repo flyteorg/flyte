@@ -3,14 +3,38 @@
 version.proto
 ============================
 
+.. _api_msg_flyteidl.admin.GetVersionResponse:
+
+flyteidl.admin.GetVersionResponse
+---------------------------------
+
+`[flyteidl.admin.GetVersionResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/version.proto#L6>`_
+
+Response for the GetVersion API
+
+.. code-block:: json
+
+  {
+    "control_plane_version": "{...}"
+  }
+
+.. _api_field_flyteidl.admin.GetVersionResponse.control_plane_version:
+
+control_plane_version
+  (:ref:`flyteidl.admin.Version <api_msg_flyteidl.admin.Version>`) The control plane version information. FlyteAdmin and related components
+  form the control plane of Flyte
+  
+  
+
+
 .. _api_msg_flyteidl.admin.Version:
 
 flyteidl.admin.Version
 ----------------------
 
-`[flyteidl.admin.Version proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/version.proto#L6>`_
+`[flyteidl.admin.Version proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/version.proto#L13>`_
 
-Represents a request structure to get version of flyteadmin.
+Provides Version information for a component
 
 .. code-block:: json
 
@@ -45,9 +69,9 @@ BuildTime
 flyteidl.admin.GetVersionRequest
 --------------------------------
 
-`[flyteidl.admin.GetVersionRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/version.proto#L18>`_
+`[flyteidl.admin.GetVersionRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/version.proto#L25>`_
 
-Represents a get version request.
+Empty request for GetVersion
 
 .. code-block:: json
 

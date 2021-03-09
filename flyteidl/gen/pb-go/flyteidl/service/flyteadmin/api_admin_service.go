@@ -2023,15 +2023,15 @@ Retrieve the Version (including the Build  information) for FlyteAdmin service
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
-@return AdminVersion
+@return AdminGetVersionResponse
 */
-func (a *AdminServiceApiService) GetVersion(ctx context.Context, body AdminGetVersionRequest) (AdminVersion, *http.Response, error) {
+func (a *AdminServiceApiService) GetVersion(ctx context.Context, body AdminGetVersionRequest) (AdminGetVersionResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
 		localVarFileName   string
 		localVarFileBytes  []byte
-		localVarReturnValue AdminVersion
+		localVarReturnValue AdminGetVersionResponse
 	)
 
 	// create path and map variables
@@ -2091,7 +2091,7 @@ func (a *AdminServiceApiService) GetVersion(ctx context.Context, body AdminGetVe
 		}
 		
 		if localVarHttpResponse.StatusCode == 200 {
-			var v AdminVersion
+			var v AdminGetVersionResponse
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
 				if err != nil {
 					newErr.error = err.Error()

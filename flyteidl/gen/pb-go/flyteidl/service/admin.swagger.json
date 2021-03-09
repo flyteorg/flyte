@@ -2753,7 +2753,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminVersion"
+              "$ref": "#/definitions/adminGetVersionResponse"
             }
           }
         },
@@ -3394,7 +3394,17 @@
     },
     "adminGetVersionRequest": {
       "type": "object",
-      "description": "Represents a get version request."
+      "title": "Empty request for GetVersion"
+    },
+    "adminGetVersionResponse": {
+      "type": "object",
+      "properties": {
+        "control_plane_version": {
+          "$ref": "#/definitions/adminVersion",
+          "title": "The control plane version information. FlyteAdmin and related components\nform the control plane of Flyte"
+        }
+      },
+      "title": "Response for the GetVersion API"
     },
     "adminLabels": {
       "type": "object",
@@ -4388,7 +4398,7 @@
           "title": "Build timestamp"
         }
       },
-      "description": "Represents a request structure to get version of flyteadmin."
+      "title": "Provides Version information for a component"
     },
     "adminWorkflow": {
       "type": "object",

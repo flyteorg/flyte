@@ -2433,7 +2433,7 @@ paths:
         200:
           description: "A successful response."
           schema:
-            $ref: "#/definitions/adminVersion"
+            $ref: "#/definitions/adminGetVersionResponse"
 definitions:
   BlobTypeBlobDimensionality:
     type: "string"
@@ -3721,7 +3721,20 @@ definitions:
     default: "MINUTE"
   adminGetVersionRequest:
     type: "object"
-    description: "Represents a get version request."
+    title: "Empty request for GetVersion"
+  adminGetVersionResponse:
+    type: "object"
+    properties:
+      control_plane_version:
+        title: "The control plane version information. FlyteAdmin and related components\n\
+          form the control plane of Flyte"
+        $ref: "#/definitions/adminVersion"
+    title: "Response for the GetVersion API"
+    example:
+      control_plane_version:
+        Version: "Version"
+        Build: "Build"
+        BuildTime: "BuildTime"
   adminLabels:
     type: "object"
     properties:
@@ -7130,7 +7143,7 @@ definitions:
       BuildTime:
         type: "string"
         title: "Build timestamp"
-    description: "Represents a request structure to get version of flyteadmin."
+    title: "Provides Version information for a component"
     example:
       Version: "Version"
       Build: "Build"

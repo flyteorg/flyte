@@ -20,10 +20,41 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\x1c\x66lyteidl/admin/version.proto\x12\x0e\x66lyteidl.admin\"<\n\x07Version\x12\r\n\x05\x42uild\x18\x01 \x01(\t\x12\x0f\n\x07Version\x18\x02 \x01(\t\x12\x11\n\tBuildTime\x18\x03 \x01(\t\"\x13\n\x11GetVersionRequestB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\x1c\x66lyteidl/admin/version.proto\x12\x0e\x66lyteidl.admin\"L\n\x12GetVersionResponse\x12\x36\n\x15\x63ontrol_plane_version\x18\x01 \x01(\x0b\x32\x17.flyteidl.admin.Version\"<\n\x07Version\x12\r\n\x05\x42uild\x18\x01 \x01(\t\x12\x0f\n\x07Version\x18\x02 \x01(\t\x12\x11\n\tBuildTime\x18\x03 \x01(\t\"\x13\n\x11GetVersionRequestB7Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
 )
 
 
+
+
+_GETVERSIONRESPONSE = _descriptor.Descriptor(
+  name='GetVersionResponse',
+  full_name='flyteidl.admin.GetVersionResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='control_plane_version', full_name='flyteidl.admin.GetVersionResponse.control_plane_version', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=48,
+  serialized_end=124,
+)
 
 
 _VERSION = _descriptor.Descriptor(
@@ -66,8 +97,8 @@ _VERSION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=48,
-  serialized_end=108,
+  serialized_start=126,
+  serialized_end=186,
 )
 
 
@@ -90,13 +121,22 @@ _GETVERSIONREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=110,
-  serialized_end=129,
+  serialized_start=188,
+  serialized_end=207,
 )
 
+_GETVERSIONRESPONSE.fields_by_name['control_plane_version'].message_type = _VERSION
+DESCRIPTOR.message_types_by_name['GetVersionResponse'] = _GETVERSIONRESPONSE
 DESCRIPTOR.message_types_by_name['Version'] = _VERSION
 DESCRIPTOR.message_types_by_name['GetVersionRequest'] = _GETVERSIONREQUEST
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
+
+GetVersionResponse = _reflection.GeneratedProtocolMessageType('GetVersionResponse', (_message.Message,), dict(
+  DESCRIPTOR = _GETVERSIONRESPONSE,
+  __module__ = 'flyteidl.admin.version_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.admin.GetVersionResponse)
+  ))
+_sym_db.RegisterMessage(GetVersionResponse)
 
 Version = _reflection.GeneratedProtocolMessageType('Version', (_message.Message,), dict(
   DESCRIPTOR = _VERSION,

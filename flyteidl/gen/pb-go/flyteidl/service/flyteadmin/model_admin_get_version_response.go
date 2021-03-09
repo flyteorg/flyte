@@ -9,8 +9,6 @@
 
 package flyteadmin
 
-type AdminVersion struct {
-	Build string `json:"Build,omitempty"`
-	Version string `json:"Version,omitempty"`
-	BuildTime string `json:"BuildTime,omitempty"`
+type AdminGetVersionResponse struct {
+	ControlPlaneVersion *AdminVersion `json:"control_plane_version,omitempty"`
 }

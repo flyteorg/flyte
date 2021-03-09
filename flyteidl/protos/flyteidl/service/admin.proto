@@ -489,7 +489,7 @@ service AdminService {
     };
   }
 
-  rpc GetVersion (flyteidl.admin.GetVersionRequest) returns (flyteidl.admin.Version) {
+  rpc GetVersion (flyteidl.admin.GetVersionRequest) returns (flyteidl.admin.GetVersionResponse) {
       option (google.api.http) = {
         put: "/api/version"
         body: "*"
