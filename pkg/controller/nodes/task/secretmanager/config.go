@@ -1,6 +1,6 @@
 package secretmanager
 
-import "github.com/lyft/flytestdlib/config"
+import "github.com/flyteorg/flytestdlib/config"
 
 //go:generate pflags Config --default-var defaultConfig
 

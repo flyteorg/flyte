@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 

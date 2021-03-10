@@ -5,9 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

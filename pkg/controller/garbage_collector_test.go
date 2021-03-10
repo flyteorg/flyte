@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
-	config2 "github.com/lyft/flytepropeller/pkg/controller/config"
+	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
 
-	"github.com/lyft/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	corev1Types "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -72,8 +72,8 @@ type mockWfClient struct {
 	DeleteCollectionCb func(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 }
 
-func (m *mockWfClient) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
-	return m.DeleteCollectionCb(options, listOptions)
+func (m *mockWfClient) DeleteCollection(ctx context.Context, options v1.DeleteOptions, listOptions v1.ListOptions) error {
+	return m.DeleteCollectionCb(&options, listOptions)
 }
 
 type mockClient struct {
@@ -90,7 +90,7 @@ type mockNamespaceClient struct {
 	ListCb func(opts v1.ListOptions) (*corev1Types.NamespaceList, error)
 }
 
-func (m *mockNamespaceClient) List(opts v1.ListOptions) (*corev1Types.NamespaceList, error) {
+func (m *mockNamespaceClient) List(ctx context.Context, opts v1.ListOptions) (*corev1Types.NamespaceList, error) {
 	return m.ListCb(opts)
 }
 

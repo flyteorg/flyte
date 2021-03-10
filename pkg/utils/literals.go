@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/pkg/errors"
 )
 

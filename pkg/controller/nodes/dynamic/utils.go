@@ -5,11 +5,11 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/lyft/flytepropeller/pkg/compiler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 // Constructs the expected interface of a given node.

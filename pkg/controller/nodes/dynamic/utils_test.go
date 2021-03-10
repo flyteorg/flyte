@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	mocks2 "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
+	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/stretchr/testify/mock"
 

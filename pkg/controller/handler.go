@@ -7,18 +7,18 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/config"
-	"github.com/lyft/flytepropeller/pkg/controller/workflowstore"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
 
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 )
 
 // TODO Lets move everything to use controller runtime

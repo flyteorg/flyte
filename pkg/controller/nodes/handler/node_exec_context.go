@@ -3,18 +3,18 @@ package handler
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/clients/go/events"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 )
 
 type TaskReader interface {

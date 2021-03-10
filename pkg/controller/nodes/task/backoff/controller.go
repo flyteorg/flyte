@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	stdAtomic "github.com/lyft/flytestdlib/atomic"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/lyft/flytestdlib/logger"
+	stdAtomic "github.com/flyteorg/flytestdlib/atomic"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flytestdlib/logger"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 )
@@ -51,8 +52,8 @@ func (m *Controller) GetBackOffHandler(key string) (*ComputeResourceAwareBackOff
 	return m.backOffHandlerMap.Get(key)
 }
 
-func ComposeResourceKey(o k8s.Resource) string {
-	return fmt.Sprintf("%v,%v", o.GroupVersionKind().String(), o.GetNamespace())
+func ComposeResourceKey(o client.Object) string {
+	return fmt.Sprintf("%v,%v", o.GetObjectKind().GroupVersionKind().String(), o.GetNamespace())
 }
 
 func NewController(ctx context.Context) *Controller {

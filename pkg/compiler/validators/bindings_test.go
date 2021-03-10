@@ -5,13 +5,13 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler/common/mocks"
-	compilerErrors "github.com/lyft/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
+	compilerErrors "github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 )
 
 func TestValidateBindings(t *testing.T) {

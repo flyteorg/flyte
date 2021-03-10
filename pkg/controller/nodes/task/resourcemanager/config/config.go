@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/lyft/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

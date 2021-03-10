@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	gotree "github.com/DiSiqueira/GoTree"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/spf13/cobra"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flytepropeller/cmd/kubectl-flyte/cmd/printers"
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/cmd/kubectl-flyte/cmd/printers"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 type GetOpts struct {
@@ -59,7 +59,7 @@ func (g *GetOpts) getWorkflow(ctx context.Context, name string) error {
 		g.ConfigOverrides.Context.Namespace = parts[0]
 		name = parts[1]
 	}
-	w, err := g.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(g.ConfigOverrides.Context.Namespace).Get(name, v1.GetOptions{})
+	w, err := g.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(g.ConfigOverrides.Context.Namespace).Get(context.TODO(), name, v1.GetOptions{})
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (g *GetOpts) iterateOverWorkflows(f func(*v1alpha1.FlyteWorkflow) error, ba
 	}
 	var counter int64
 	for {
-		wList, err := g.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(g.ConfigOverrides.Context.Namespace).List(*opts)
+		wList, err := g.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(g.ConfigOverrides.Context.Namespace).List(context.TODO(), *opts)
 		if err != nil {
 			return err
 		}
@@ -123,7 +123,7 @@ func (g *GetOpts) iterateOverQuotas(f func(quota *v12.ResourceQuota) error, batc
 
 	var counter int64
 	for {
-		rq, err := g.kubeClient.CoreV1().ResourceQuotas(g.ConfigOverrides.Context.Namespace).List(opts)
+		rq, err := g.kubeClient.CoreV1().ResourceQuotas(g.ConfigOverrides.Context.Namespace).List(context.TODO(), opts)
 		if err != nil {
 			return err
 		}

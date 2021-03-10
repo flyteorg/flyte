@@ -4,10 +4,10 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

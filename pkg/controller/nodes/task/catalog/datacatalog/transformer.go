@@ -8,13 +8,13 @@ import (
 	"strconv"
 	"strings"
 
-	datacatalog "github.com/lyft/datacatalog/protos/gen"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
+	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	"github.com/lyft/flytepropeller/pkg/compiler/validators"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/validators"
 
-	"github.com/lyft/flytestdlib/pbhash"
+	"github.com/flyteorg/flytestdlib/pbhash"
 )
 
 const cachedTaskTag = "flyte_cached"

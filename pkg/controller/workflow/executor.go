@@ -5,21 +5,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flyteidl/clients/go/events"
-	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/clients/go/events"
+	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/record"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/workflow/errors"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 type workflowMetrics struct {

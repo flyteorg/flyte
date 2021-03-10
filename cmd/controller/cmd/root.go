@@ -8,28 +8,24 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"k8s.io/klog"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	config2 "github.com/lyft/flytepropeller/pkg/controller/config"
+	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flytestdlib/config/viper"
-	"github.com/lyft/flytestdlib/version"
+	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/version"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/profutils"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/profutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/pkg/errors"
 	"github.com/spf13/pflag"
 
@@ -40,10 +36,10 @@ import (
 
 	restclient "k8s.io/client-go/rest"
 
-	clientset "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	informers "github.com/lyft/flytepropeller/pkg/client/informers/externalversions"
-	"github.com/lyft/flytepropeller/pkg/controller"
-	"github.com/lyft/flytepropeller/pkg/signals"
+	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
+	"github.com/flyteorg/flytepropeller/pkg/controller"
+	"github.com/flyteorg/flytepropeller/pkg/signals"
 )
 
 const (
@@ -196,23 +192,9 @@ func executeRootCmd(cfg *config2.Config) {
 	}
 
 	mgr, err := manager.New(kubecfg, manager.Options{
-		Namespace:  limitNamespace,
-		SyncPeriod: &cfg.DownstreamEval.Duration,
-		NewClient: func(cache cache.Cache, config *restclient.Config, options client.Options) (i client.Client, e error) {
-			rawClient, err := client.New(kubecfg, client.Options{})
-			if err != nil {
-				return nil, err
-			}
-
-			return executors.NewFallbackClient(&client.DelegatingClient{
-				Reader: &client.DelegatingReader{
-					CacheReader:  cache,
-					ClientReader: rawClient,
-				},
-				Writer:       rawClient,
-				StatusClient: rawClient,
-			}, rawClient), nil
-		},
+		Namespace:     limitNamespace,
+		SyncPeriod:    &cfg.DownstreamEval.Duration,
+		ClientBuilder: executors.NewFallbackClientBuilder(),
 	})
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to initialize controller run-time manager. Error: %v", err)
@@ -226,7 +208,7 @@ func executeRootCmd(cfg *config2.Config) {
 		ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
 		pprof.SetGoroutineLabels(ctx)
 		logger.Infof(ctx, "Starting controller-runtime manager")
-		err := mgr.Start(ctx.Done())
+		err := mgr.Start(ctx)
 		if err != nil {
 			logger.Fatalf(ctx, "Failed to start manager. Error: %v", err)
 		}

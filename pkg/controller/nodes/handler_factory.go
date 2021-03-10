@@ -3,23 +3,23 @@ package nodes
 import (
 	"context"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/dynamic"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/dynamic"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/pkg/errors"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/branch"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/end"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/start"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/branch"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/end"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/start"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
 )
 
 //go:generate mockery -name HandlerFactory -case=underscore

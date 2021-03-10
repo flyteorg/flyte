@@ -10,13 +10,13 @@ import (
 
 	"github.com/ghodss/yaml"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler"
-	"github.com/lyft/flytepropeller/pkg/compiler/common"
-	"github.com/lyft/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/lyft/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 

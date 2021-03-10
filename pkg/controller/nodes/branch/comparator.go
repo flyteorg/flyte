@@ -3,8 +3,8 @@ package branch
 import (
 	"reflect"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/errors"
 )
 
 type comparator func(lValue *core.Primitive, rValue *core.Primitive) bool

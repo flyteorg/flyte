@@ -5,23 +5,23 @@ import (
 	"fmt"
 	"strconv"
 
-	node_common "github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+	node_common "github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/errors"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/compiler"
-	"github.com/lyft/flytepropeller/pkg/compiler/common"
-	"github.com/lyft/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 type dynamicWorkflowContext struct {
@@ -182,7 +182,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 
 	// TODO: In addition to querying Admin for launch plans, we also need to get all the tasks that are missing from the dynamic job spec.
 	// 	 	 The reason they might be missing is because if a user yields a task that is SdkTask.fetch'ed, it should not be included
-	// 	     See https://github.com/lyft/flyte/issues/219 for more information.
+	// 	     See https://github.com/flyteorg/flyte/issues/219 for more information.
 
 	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, launchPlanInterfaces)
 	if err != nil {

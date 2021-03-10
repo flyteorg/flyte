@@ -3,10 +3,10 @@ package resourcemanager
 import (
 	"context"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/go-redis/redis"
-	"github.com/lyft/flytestdlib/logger"
 )
 
 //go:generate mockery -name RedisClient -case=underscore

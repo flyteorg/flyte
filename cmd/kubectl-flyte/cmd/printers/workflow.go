@@ -8,8 +8,8 @@ import (
 	gotree "github.com/DiSiqueira/GoTree"
 	"github.com/fatih/color"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/visualize"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/visualize"
 )
 
 func ColorizeWorkflowPhase(p v1alpha1.WorkflowPhase) string {

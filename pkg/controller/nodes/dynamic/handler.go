@@ -4,27 +4,27 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	stdErrors "github.com/lyft/flytestdlib/errors"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 )
 
 //go:generate mockery -all -case=underscore

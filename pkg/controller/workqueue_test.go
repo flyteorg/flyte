@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	config2 "github.com/lyft/flytepropeller/pkg/controller/config"
+	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 	"github.com/stretchr/testify/assert"
 )
 

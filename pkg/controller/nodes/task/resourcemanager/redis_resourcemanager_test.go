@@ -5,9 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/resourcemanager/mocks"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/mocks"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

@@ -7,14 +7,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 const resourceLevelMonitorCycleDuration = 10 * time.Second
@@ -84,7 +84,7 @@ func (r *ResourceLevelMonitor) RunCollector(ctx context.Context) {
 	collectorCtx := contextutils.WithGoroutineLabel(ctx, "k8s-resource-level-monitor")
 	// Since the idea is that one of these objects is always only responsible for exactly one type of K8s resource, we
 	// can safely set the context here for that kind for all downstream usage
-	collectorCtx = context.WithValue(ctx, KindKey, strings.ToLower(r.gvk.Kind))
+	collectorCtx = context.WithValue(collectorCtx, KindKey, strings.ToLower(r.gvk.Kind))
 
 	go func() {
 		defer ticker.Stop()

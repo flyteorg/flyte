@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	v1alpha1 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	v1alpha1 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mock "github.com/stretchr/testify/mock"
 )
 

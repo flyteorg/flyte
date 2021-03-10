@@ -3,10 +3,10 @@ package k8s
 import (
 	"testing"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler/common"
-	"github.com/lyft/flytepropeller/pkg/compiler/errors"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 )

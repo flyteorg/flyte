@@ -3,9 +3,9 @@ package compiler
 import (
 	"fmt"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler/common"
-	"github.com/lyft/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 

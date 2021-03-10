@@ -3,9 +3,9 @@
 package fake
 
 import (
-	clientset "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	flyteworkflowv1alpha1 "github.com/lyft/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
-	fakeflyteworkflowv1alpha1 "github.com/lyft/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1/fake"
+	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	flyteworkflowv1alpha1 "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	fakeflyteworkflowv1alpha1 "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

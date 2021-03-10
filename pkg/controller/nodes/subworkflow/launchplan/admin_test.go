@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flyteidl/clients/go/admin/mocks"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"

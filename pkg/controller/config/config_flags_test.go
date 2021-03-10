@@ -1023,4 +1023,26 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_max-streak-length", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vInt, err := cmdFlags.GetInt("max-streak-length"); err == nil {
+				assert.Equal(t, int(defaultConfig.MaxStreakLength), vInt)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("max-streak-length", testValue)
+			if vInt, err := cmdFlags.GetInt("max-streak-length"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.MaxStreakLength)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

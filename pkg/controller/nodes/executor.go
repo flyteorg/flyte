@@ -5,34 +5,34 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	errors2 "github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	errors2 "github.com/flyteorg/flytestdlib/errors"
 
+	"github.com/flyteorg/flyteidl/clients/go/events"
+	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/flyteidl/clients/go/events"
-	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
-	"github.com/lyft/flytestdlib/storage"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 )
 
 type nodeMetrics struct {

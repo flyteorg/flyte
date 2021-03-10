@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 // TODO - optimization maybe? we can move this to predicate check, before we add it to the queue?

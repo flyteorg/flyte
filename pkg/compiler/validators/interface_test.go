@@ -3,11 +3,11 @@ package validators
 import (
 	"testing"
 
-	"github.com/lyft/flyteidl/clients/go/coreutils"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	c "github.com/lyft/flytepropeller/pkg/compiler/common"
-	"github.com/lyft/flytepropeller/pkg/compiler/common/mocks"
-	"github.com/lyft/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

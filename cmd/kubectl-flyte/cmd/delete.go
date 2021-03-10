@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/lyft/flytepropeller/pkg/controller"
+	"github.com/flyteorg/flytepropeller/pkg/controller"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -60,7 +61,8 @@ func (d *DeleteOpts) deleteCompletedWorkflows() error {
 
 	p := v1.DeletePropagationBackground
 	return d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).DeleteCollection(
-		&v1.DeleteOptions{PropagationPolicy: &p}, v1.ListOptions{
+		context.TODO(),
+		v1.DeleteOptions{PropagationPolicy: &p}, v1.ListOptions{
 			TimeoutSeconds: &t,
 			LabelSelector:  v1.FormatLabelSelector(controller.CompletedWorkflowsLabelSelector()),
 		},
@@ -70,16 +72,16 @@ func (d *DeleteOpts) deleteCompletedWorkflows() error {
 
 func (d *DeleteOpts) deleteWorkflow(name string) error {
 	p := v1.DeletePropagationBackground
-	if err := d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).Delete(name, &v1.DeleteOptions{PropagationPolicy: &p}); err != nil {
+	if err := d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).Delete(context.TODO(), name, v1.DeleteOptions{PropagationPolicy: &p}); err != nil {
 		return err
 	}
 	if d.force {
-		w, err := d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).Get(name, v1.GetOptions{})
+		w, err := d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).Get(context.TODO(), name, v1.GetOptions{})
 		if err != nil {
 			return err
 		}
 		w.SetFinalizers([]string{})
-		if _, err := d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).Update(w); err != nil {
+		if _, err := d.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(d.ConfigOverrides.Context.Namespace).Update(context.TODO(), w, v1.UpdateOptions{}); err != nil {
 			return err
 		}
 	}

@@ -3,10 +3,11 @@
 package v1alpha1
 
 import (
+	"context"
 	"time"
 
-	v1alpha1 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	scheme "github.com/lyft/flytepropeller/pkg/client/clientset/versioned/scheme"
+	v1alpha1 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	scheme "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -21,15 +22,15 @@ type FlyteWorkflowsGetter interface {
 
 // FlyteWorkflowInterface has methods to work with FlyteWorkflow resources.
 type FlyteWorkflowInterface interface {
-	Create(*v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)
-	Update(*v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)
-	UpdateStatus(*v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error)
-	Delete(name string, options *v1.DeleteOptions) error
-	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
-	Get(name string, options v1.GetOptions) (*v1alpha1.FlyteWorkflow, error)
-	List(opts v1.ListOptions) (*v1alpha1.FlyteWorkflowList, error)
-	Watch(opts v1.ListOptions) (watch.Interface, error)
-	Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.FlyteWorkflow, err error)
+	Create(ctx context.Context, flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error)
+	Update(ctx context.Context, flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error)
+	UpdateStatus(ctx context.Context, flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.UpdateOptions) (*v1alpha1.FlyteWorkflow, error)
+	Delete(ctx context.Context, name string, opts v1.DeleteOptions) error
+	DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error
+	Get(ctx context.Context, name string, opts v1.GetOptions) (*v1alpha1.FlyteWorkflow, error)
+	List(ctx context.Context, opts v1.ListOptions) (*v1alpha1.FlyteWorkflowList, error)
+	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
+	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FlyteWorkflow, err error)
 	FlyteWorkflowExpansion
 }
 
@@ -48,20 +49,20 @@ func newFlyteWorkflows(c *FlyteworkflowV1alpha1Client, namespace string) *flyteW
 }
 
 // Get takes name of the flyteWorkflow, and returns the corresponding flyteWorkflow object, and an error if there is any.
-func (c *flyteWorkflows) Get(name string, options v1.GetOptions) (result *v1alpha1.FlyteWorkflow, err error) {
+func (c *flyteWorkflows) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.FlyteWorkflow, err error) {
 	result = &v1alpha1.FlyteWorkflow{}
 	err = c.client.Get().
 		Namespace(c.ns).
 		Resource("flyteworkflows").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // List takes label and field selectors, and returns the list of FlyteWorkflows that match those selectors.
-func (c *flyteWorkflows) List(opts v1.ListOptions) (result *v1alpha1.FlyteWorkflowList, err error) {
+func (c *flyteWorkflows) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.FlyteWorkflowList, err error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -72,13 +73,13 @@ func (c *flyteWorkflows) List(opts v1.ListOptions) (result *v1alpha1.FlyteWorkfl
 		Resource("flyteworkflows").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested flyteWorkflows.
-func (c *flyteWorkflows) Watch(opts v1.ListOptions) (watch.Interface, error) {
+func (c *flyteWorkflows) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	var timeout time.Duration
 	if opts.TimeoutSeconds != nil {
 		timeout = time.Duration(*opts.TimeoutSeconds) * time.Second
@@ -89,87 +90,90 @@ func (c *flyteWorkflows) Watch(opts v1.ListOptions) (watch.Interface, error) {
 		Resource("flyteworkflows").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Watch()
+		Watch(ctx)
 }
 
 // Create takes the representation of a flyteWorkflow and creates it.  Returns the server's representation of the flyteWorkflow, and an error, if there is any.
-func (c *flyteWorkflows) Create(flyteWorkflow *v1alpha1.FlyteWorkflow) (result *v1alpha1.FlyteWorkflow, err error) {
+func (c *flyteWorkflows) Create(ctx context.Context, flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (result *v1alpha1.FlyteWorkflow, err error) {
 	result = &v1alpha1.FlyteWorkflow{}
 	err = c.client.Post().
 		Namespace(c.ns).
 		Resource("flyteworkflows").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(flyteWorkflow).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Update takes the representation of a flyteWorkflow and updates it. Returns the server's representation of the flyteWorkflow, and an error, if there is any.
-func (c *flyteWorkflows) Update(flyteWorkflow *v1alpha1.FlyteWorkflow) (result *v1alpha1.FlyteWorkflow, err error) {
+func (c *flyteWorkflows) Update(ctx context.Context, flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.UpdateOptions) (result *v1alpha1.FlyteWorkflow, err error) {
 	result = &v1alpha1.FlyteWorkflow{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("flyteworkflows").
 		Name(flyteWorkflow.Name).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(flyteWorkflow).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-
-func (c *flyteWorkflows) UpdateStatus(flyteWorkflow *v1alpha1.FlyteWorkflow) (result *v1alpha1.FlyteWorkflow, err error) {
+func (c *flyteWorkflows) UpdateStatus(ctx context.Context, flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.UpdateOptions) (result *v1alpha1.FlyteWorkflow, err error) {
 	result = &v1alpha1.FlyteWorkflow{}
 	err = c.client.Put().
 		Namespace(c.ns).
 		Resource("flyteworkflows").
 		Name(flyteWorkflow.Name).
 		SubResource("status").
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(flyteWorkflow).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }
 
 // Delete takes name of the flyteWorkflow and deletes it. Returns an error if one occurs.
-func (c *flyteWorkflows) Delete(name string, options *v1.DeleteOptions) error {
+func (c *flyteWorkflows) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("flyteworkflows").
 		Name(name).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *flyteWorkflows) DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error {
+func (c *flyteWorkflows) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	var timeout time.Duration
-	if listOptions.TimeoutSeconds != nil {
-		timeout = time.Duration(*listOptions.TimeoutSeconds) * time.Second
+	if listOpts.TimeoutSeconds != nil {
+		timeout = time.Duration(*listOpts.TimeoutSeconds) * time.Second
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
 		Resource("flyteworkflows").
-		VersionedParams(&listOptions, scheme.ParameterCodec).
+		VersionedParams(&listOpts, scheme.ParameterCodec).
 		Timeout(timeout).
-		Body(options).
-		Do().
+		Body(&opts).
+		Do(ctx).
 		Error()
 }
 
 // Patch applies the patch and returns the patched flyteWorkflow.
-func (c *flyteWorkflows) Patch(name string, pt types.PatchType, data []byte, subresources ...string) (result *v1alpha1.FlyteWorkflow, err error) {
+func (c *flyteWorkflows) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.FlyteWorkflow, err error) {
 	result = &v1alpha1.FlyteWorkflow{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
 		Resource("flyteworkflows").
-		SubResource(subresources...).
 		Name(name).
+		SubResource(subresources...).
+		VersionedParams(&opts, scheme.ParameterCodec).
 		Body(data).
-		Do().
+		Do(ctx).
 		Into(result)
 	return
 }

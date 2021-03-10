@@ -3,12 +3,12 @@ package nodes
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/clients/go/events"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/pkg/errors"
 
-	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
+	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 )
 
 type taskEventRecorder struct {

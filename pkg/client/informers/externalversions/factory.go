@@ -7,9 +7,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	flyteworkflow "github.com/lyft/flytepropeller/pkg/client/informers/externalversions/flyteworkflow"
-	internalinterfaces "github.com/lyft/flytepropeller/pkg/client/informers/externalversions/internalinterfaces"
+	versioned "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	flyteworkflow "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions/flyteworkflow"
+	internalinterfaces "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

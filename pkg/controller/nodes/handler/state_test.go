@@ -6,7 +6,7 @@ import (
 	"encoding/gob"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/k8s"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
 
 	"github.com/stretchr/testify/assert"
 )

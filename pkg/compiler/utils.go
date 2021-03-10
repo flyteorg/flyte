@@ -1,8 +1,8 @@
 package compiler
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 

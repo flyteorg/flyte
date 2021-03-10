@@ -3,11 +3,11 @@ package k8s
 import (
 	"context"
 
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/lyft/flytestdlib/logger"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 var _ k8s.PluginContext = &pluginContext{}

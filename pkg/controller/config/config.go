@@ -3,7 +3,7 @@ package config
 import (
 	"time"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 	"k8s.io/apimachinery/pkg/types"
 )
 

@@ -3,9 +3,9 @@ package subworkflow
 import (
 	"strconv"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 const maxLengthForSubWorkflow = 20

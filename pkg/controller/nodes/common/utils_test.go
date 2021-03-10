@@ -3,7 +3,7 @@ package common
 import (
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/stretchr/testify/assert"
 )
 

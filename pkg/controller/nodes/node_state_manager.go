@@ -3,10 +3,10 @@ package nodes
 import (
 	"context"
 
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 )
 
 type nodeStateManager struct {

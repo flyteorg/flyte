@@ -3,7 +3,7 @@ package validators
 import (
 	"testing"
 
-	flyte "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 

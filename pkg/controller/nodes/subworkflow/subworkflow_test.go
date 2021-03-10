@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	coreMocks "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	execMocks "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
+	coreMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	execMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
 
 func TestGetSubWorkflow(t *testing.T) {
