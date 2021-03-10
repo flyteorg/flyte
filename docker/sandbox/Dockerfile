@@ -39,6 +39,7 @@ RUN apk add --no-cache bash git make tini
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
+COPY docker/sandbox/bashrc /root/.bashrc
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
