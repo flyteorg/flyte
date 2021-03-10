@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 )
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/stretchr/testify/assert"
 )
 

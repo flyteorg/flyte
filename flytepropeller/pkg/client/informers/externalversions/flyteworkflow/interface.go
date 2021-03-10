@@ -3,8 +3,8 @@
 package flyteworkflow
 
 import (
-	v1alpha1 "github.com/lyft/flytepropeller/pkg/client/informers/externalversions/flyteworkflow/v1alpha1"
-	internalinterfaces "github.com/lyft/flytepropeller/pkg/client/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions/flyteworkflow/v1alpha1"
+	internalinterfaces "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

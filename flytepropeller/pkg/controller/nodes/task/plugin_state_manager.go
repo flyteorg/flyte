@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/codex"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/codex"
 )
 
 type CodecVersion uint8

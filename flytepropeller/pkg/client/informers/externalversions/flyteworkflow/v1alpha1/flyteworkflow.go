@@ -3,12 +3,13 @@
 package v1alpha1
 
 import (
+	"context"
 	time "time"
 
-	flyteworkflowv1alpha1 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	versioned "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	internalinterfaces "github.com/lyft/flytepropeller/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
+	flyteworkflowv1alpha1 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	versioned "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	internalinterfaces "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions/internalinterfaces"
+	v1alpha1 "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -45,13 +46,13 @@ func NewFilteredFlyteWorkflowInformer(client versioned.Interface, namespace stri
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FlyteworkflowV1alpha1().FlyteWorkflows(namespace).List(options)
+				return client.FlyteworkflowV1alpha1().FlyteWorkflows(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.FlyteworkflowV1alpha1().FlyteWorkflows(namespace).Watch(options)
+				return client.FlyteworkflowV1alpha1().FlyteWorkflows(namespace).Watch(context.TODO(), options)
 			},
 		},
 		&flyteworkflowv1alpha1.FlyteWorkflow{},

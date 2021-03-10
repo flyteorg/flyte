@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 func MakeBindingDataPromise(fromNode, fromVar string) *core.BindingData {
 	return &core.BindingData{

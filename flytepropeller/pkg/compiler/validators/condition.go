@@ -3,9 +3,9 @@ package validators
 import (
 	"fmt"
 
-	flyte "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	c "github.com/lyft/flytepropeller/pkg/compiler/common"
-	"github.com/lyft/flytepropeller/pkg/compiler/errors"
+	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 )
 
 func validateOperand(node c.NodeBuilder, paramName string, operand *flyte.Operand,

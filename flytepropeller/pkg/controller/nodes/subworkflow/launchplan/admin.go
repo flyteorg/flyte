@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flytestdlib/cache"
+	"github.com/flyteorg/flytestdlib/cache"
 	"golang.org/x/time/rate"
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/errors"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

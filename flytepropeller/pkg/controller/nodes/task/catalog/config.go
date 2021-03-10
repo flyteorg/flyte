@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flytestdlib/config"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog"
 )
 
 //go:generate pflags Config --default-var defaultConfig

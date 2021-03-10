@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	listers "github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	listers "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
 
-	"github.com/lyft/flytepropeller/pkg/client/clientset/versioned/fake"
+	"github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/fake"
 
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 )
@@ -105,7 +105,7 @@ func TestPassthroughWorkflowStore_UpdateStatus(t *testing.T) {
 		wf := dummyWf(namespace, "x")
 		_, err := wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
 		assert.NoError(t, err)
-		updated, err := mockClient.FlyteWorkflows(namespace).Get("x", v1.GetOptions{})
+		updated, err := mockClient.FlyteWorkflows(namespace).Get(ctx, "x", v1.GetOptions{})
 		assert.Error(t, err)
 		assert.Nil(t, updated)
 	})
@@ -115,15 +115,15 @@ func TestPassthroughWorkflowStore_UpdateStatus(t *testing.T) {
 		wf := dummyWf(namespace, "x")
 		wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseSucceeding, "", nil)
 		wf.ResourceVersion = "r1"
-		_, err := n.Create(wf)
+		_, err := n.Create(ctx, wf, v1.CreateOptions{})
 		assert.NoError(t, err)
-		updated, err := n.Get("x", v1.GetOptions{})
+		updated, err := n.Get(ctx, "x", v1.GetOptions{})
 		if assert.NoError(t, err) {
 			assert.Equal(t, v1alpha1.WorkflowPhaseSucceeding, updated.GetExecutionStatus().GetPhase())
 			wf.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "", &core.ExecutionError{})
 			_, err := wfStore.UpdateStatus(ctx, wf, PriorityClassCritical)
 			assert.NoError(t, err)
-			newVal, err := n.Get("x", v1.GetOptions{})
+			newVal, err := n.Get(ctx, "x", v1.GetOptions{})
 			assert.NoError(t, err)
 			assert.Equal(t, v1alpha1.WorkflowPhaseFailed, newVal.GetExecutionStatus().GetPhase())
 		}

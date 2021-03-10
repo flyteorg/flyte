@@ -8,15 +8,15 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/lyft/flytestdlib/config/viper"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/version"
+	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/version"
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	flyteclient "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
+	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
 	"github.com/spf13/cobra"
 )
 

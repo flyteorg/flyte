@@ -4,21 +4,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/lyft/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	handlerMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	handlerMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
 )
 
 func TestToTaskEventPhase(t *testing.T) {

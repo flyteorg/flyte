@@ -7,40 +7,42 @@ import (
 	"strings"
 	"time"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/lyft/flytestdlib/contextutils"
-	stdErrors "github.com/lyft/flytestdlib/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
 	"k8s.io/client-go/util/workqueue"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	pluginsCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	"github.com/lyft/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
 
-	nodeTaskConfig "github.com/lyft/flytepropeller/pkg/controller/nodes/task/config"
+	nodeTaskConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 )
 
@@ -82,7 +84,7 @@ func newPluginMetrics(s promutils.Scope) PluginMetrics {
 	}
 }
 
-func AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o k8s.Resource, cfg *config.K8sPluginConfig) {
+func AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
 	o.SetNamespace(taskCtx.GetNamespace())
 	o.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), utils.CopyMap(taskCtx.GetAnnotations())))
 	o.SetLabels(utils.UnionMaps(o.GetLabels(), utils.CopyMap(taskCtx.GetLabels()), cfg.DefaultLabels))
@@ -174,7 +176,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	}
 
 	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
-	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GroupVersionKind(), o.GetNamespace(), o.GetName())
+	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	key := backoff.ComposeResourceKey(o)
 
@@ -324,7 +326,7 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 	return nil
 }
 
-func (e *PluginManager) ClearFinalizers(ctx context.Context, o k8s.Resource) error {
+func (e *PluginManager) ClearFinalizers(ctx context.Context, o client.Object) error {
 	if len(o.GetFinalizers()) > 0 {
 		o.SetFinalizers([]string{})
 		err := e.kubeClient.GetClient().Update(ctx, o)
@@ -422,31 +424,32 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 
 	enqueueOwner := iCtx.EnqueueOwner()
 	err := src.Start(
+		ctx,
 		// Handlers
 		handler.Funcs{
 			CreateFunc: func(evt event.CreateEvent, q2 workqueue.RateLimitingInterface) {
-				logger.Debugf(context.Background(), "Create received for %s, ignoring.", evt.Meta.GetName())
+				logger.Debugf(context.Background(), "Create received for %s, ignoring.", evt.Object.GetName())
 			},
 			UpdateFunc: func(evt event.UpdateEvent, q2 workqueue.RateLimitingInterface) {
-				if evt.MetaNew == nil {
+				if evt.ObjectNew == nil {
 					logger.Warn(context.Background(), "Received an Update event with nil MetaNew.")
-				} else if evt.MetaOld == nil || evt.MetaOld.GetResourceVersion() != evt.MetaNew.GetResourceVersion() {
-					newCtx := contextutils.WithNamespace(context.Background(), evt.MetaNew.GetNamespace())
-					logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.MetaNew.GetNamespace(), evt.MetaNew.GetName())
-					if err := enqueueOwner(k8stypes.NamespacedName{Name: evt.MetaNew.GetName(), Namespace: evt.MetaNew.GetNamespace()}); err != nil {
-						logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", evt.MetaNew.GetName())
+				} else if evt.ObjectOld == nil || evt.ObjectOld.GetResourceVersion() != evt.ObjectNew.GetResourceVersion() {
+					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
+					logger.Debugf(ctx, "Enqueueing owner for updated object [%v/%v]", evt.ObjectNew.GetNamespace(), evt.ObjectNew.GetName())
+					if err := enqueueOwner(k8stypes.NamespacedName{Name: evt.ObjectNew.GetName(), Namespace: evt.ObjectNew.GetNamespace()}); err != nil {
+						logger.Warnf(context.Background(), "Failed to handle Update event for object [%v]", evt.ObjectNew.GetName())
 					}
 					updateCount.Inc(newCtx)
 				} else {
-					newCtx := contextutils.WithNamespace(context.Background(), evt.MetaNew.GetNamespace())
+					newCtx := contextutils.WithNamespace(context.Background(), evt.ObjectNew.GetNamespace())
 					droppedUpdateCount.Inc(newCtx)
 				}
 			},
 			DeleteFunc: func(evt event.DeleteEvent, q2 workqueue.RateLimitingInterface) {
-				logger.Debugf(context.Background(), "Delete received for %s, ignoring.", evt.Meta.GetName())
+				logger.Debugf(context.Background(), "Delete received for %s, ignoring.", evt.Object.GetName())
 			},
 			GenericFunc: func(evt event.GenericEvent, q2 workqueue.RateLimitingInterface) {
-				logger.Debugf(context.Background(), "Generic received for %s, ignoring.", evt.Meta.GetName())
+				logger.Debugf(context.Background(), "Generic received for %s, ignoring.", evt.Object.GetName())
 				genericCount.Inc(ctx)
 			},
 		},
@@ -461,13 +464,13 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 			},
 			UpdateFunc: func(updateEvent event.UpdateEvent) bool {
 				// TODO we should filter out events in case there are no updates observed between the old and new?
-				return workflowParentPredicate(updateEvent.MetaNew)
+				return workflowParentPredicate(updateEvent.ObjectNew)
 			},
 			DeleteFunc: func(deleteEvent event.DeleteEvent) bool {
 				return false
 			},
 			GenericFunc: func(genericEvent event.GenericEvent) bool {
-				return workflowParentPredicate(genericEvent.Meta)
+				return workflowParentPredicate(genericEvent.Object)
 			},
 		})
 
@@ -480,7 +483,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	if err != nil {
 		return nil, err
 	}
-	sharedInformer, err := getPluginSharedInformer(iCtx, entry.ResourceToWatch)
+	sharedInformer, err := getPluginSharedInformer(ctx, iCtx, entry.ResourceToWatch)
 	if err != nil {
 		return nil, err
 	}
@@ -506,8 +509,8 @@ func getPluginGvk(resourceToWatch runtime.Object) (schema.GroupVersionKind, erro
 	return kinds[0], nil
 }
 
-func getPluginSharedInformer(iCtx pluginsCore.SetupContext, resourceToWatch runtime.Object) (cache.SharedIndexInformer, error) {
-	i, err := iCtx.KubeClient().GetCache().GetInformer(resourceToWatch)
+func getPluginSharedInformer(ctx context.Context, iCtx pluginsCore.SetupContext, resourceToWatch client.Object) (cache.SharedIndexInformer, error) {
+	i, err := iCtx.KubeClient().GetCache().GetInformer(ctx, resourceToWatch)
 	if err != nil {
 		return nil, errors.Wrapf(errors.PluginInitializationFailed, err, "Error getting informer for %s", reflect.TypeOf(i))
 	}

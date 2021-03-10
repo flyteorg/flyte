@@ -2,19 +2,22 @@ package cmd
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler"
-	"github.com/lyft/flytepropeller/pkg/compiler/common"
-	compilerErrors "github.com/lyft/flytepropeller/pkg/compiler/errors"
-	"github.com/lyft/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
+	compilerErrors "github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -217,7 +220,7 @@ func (c *CreateOpts) createWorkflowFromProto() error {
 		}
 		fmt.Println(string(y))
 	} else {
-		wf, err := c.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(c.ConfigOverrides.Context.Namespace).Create(flyteWf)
+		wf, err := c.flyteClient.FlyteworkflowV1alpha1().FlyteWorkflows(c.ConfigOverrides.Context.Namespace).Create(context.TODO(), flyteWf, v1.CreateOptions{})
 		if err != nil {
 			return err
 		}

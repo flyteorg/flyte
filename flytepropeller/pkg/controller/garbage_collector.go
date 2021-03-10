@@ -5,15 +5,15 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/lyft/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
 	"strings"
 
-	"github.com/lyft/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/clock"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -44,7 +44,7 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 
 	// Delete doesn't support 'all' namespaces. Let's fetch namespaces and loop over each.
 	if g.namespace == "" || strings.ToLower(g.namespace) == "all" || strings.ToLower(g.namespace) == "all-namespaces" {
-		namespaceList, err := g.namespaceClient.List(v1.ListOptions{})
+		namespaceList, err := g.namespaceClient.List(ctx, v1.ListOptions{})
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 			namespaceCtx := contextutils.WithNamespace(ctx, n.GetName())
 			logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", n.GetName())
 
-			if err := g.deleteWorkflowsForNamespace(n.GetName(), s); err != nil {
+			if err := g.deleteWorkflowsForNamespace(ctx, n.GetName(), s); err != nil {
 				g.metrics.gcRoundFailure.Inc(namespaceCtx)
 				logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", n.GetName(), err)
 			} else {
@@ -62,7 +62,7 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 	} else {
 		namespaceCtx := contextutils.WithNamespace(ctx, g.namespace)
 		logger.Infof(namespaceCtx, "Triggering Workflow delete for namespace: [%s]", g.namespace)
-		if err := g.deleteWorkflowsForNamespace(g.namespace, s); err != nil {
+		if err := g.deleteWorkflowsForNamespace(ctx, g.namespace, s); err != nil {
 			g.metrics.gcRoundFailure.Inc(namespaceCtx)
 			logger.Errorf(namespaceCtx, "Garbage collection failed for for namespace: [%s]. Error : [%v]", g.namespace, err)
 		} else {
@@ -72,12 +72,13 @@ func (g *GarbageCollector) deleteWorkflows(ctx context.Context) error {
 	return nil
 }
 
-func (g *GarbageCollector) deleteWorkflowsForNamespace(namespace string, labelSelector *v1.LabelSelector) error {
+func (g *GarbageCollector) deleteWorkflowsForNamespace(ctx context.Context, namespace string, labelSelector *v1.LabelSelector) error {
 	gracePeriodZero := int64(0)
 	propagation := v1.DeletePropagationBackground
 
 	return g.wfClient.FlyteWorkflows(namespace).DeleteCollection(
-		&v1.DeleteOptions{
+		ctx,
+		v1.DeleteOptions{
 			GracePeriodSeconds: &gracePeriodZero,
 			PropagationPolicy:  &propagation,
 		},

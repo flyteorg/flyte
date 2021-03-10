@@ -4,25 +4,25 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	mocks3 "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	mocks2 "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	mocks4 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
-	mocks6 "github.com/lyft/flytepropeller/pkg/controller/nodes/dynamic/mocks"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
-	mocks5 "github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	mocks2 "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	mocks4 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
+	mocks6 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/dynamic/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	mocks5 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
 )
 
 func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *testing.T) {

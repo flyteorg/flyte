@@ -5,25 +5,25 @@ import (
 	"context"
 	"testing"
 
-	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
+	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	ioMocks "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	flyteMocks "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
-	nodeMocks "github.com/lyft/flytepropeller/pkg/controller/nodes/handler/mocks"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/codex"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	flyteMocks "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	nodeMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/codex"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
 )
 
 func TestHandler_newTaskExecutionContext(t *testing.T) {

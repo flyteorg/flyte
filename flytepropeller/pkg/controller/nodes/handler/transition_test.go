@@ -3,7 +3,7 @@ package handler
 import (
 	"testing"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 )
 

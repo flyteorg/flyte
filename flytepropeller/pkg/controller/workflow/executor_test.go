@@ -9,44 +9,44 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	eventsErr "github.com/lyft/flyteidl/clients/go/events/errors"
+	eventsErr "github.com/flyteorg/flyteidl/clients/go/events/errors"
 
-	mocks2 "github.com/lyft/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/fakeplugins"
+	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/fakeplugins"
 
-	wfErrors "github.com/lyft/flytepropeller/pkg/controller/workflow/errors"
+	wfErrors "github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
 
+	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/yamlutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/flyteidl/clients/go/events"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
-	"github.com/lyft/flytestdlib/yamlutils"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/tools/record"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/config"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 var (

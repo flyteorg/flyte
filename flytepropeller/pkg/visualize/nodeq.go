@@ -1,6 +1,6 @@
 package visualize
 
-import "github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+import "github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
 type NodeQ []v1alpha1.NodeID
 

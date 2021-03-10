@@ -4,13 +4,13 @@ import (
 	"context"
 	"strings"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/backoff"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
 
-	"github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/config"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/k8s"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
 )
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) ([]core.PluginEntry, error) {

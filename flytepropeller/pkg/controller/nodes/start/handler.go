@@ -3,7 +3,7 @@ package start
 import (
 	"context"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 )
 
 type startHandler struct {

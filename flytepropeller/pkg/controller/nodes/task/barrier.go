@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 	"k8s.io/apimachinery/pkg/util/cache"
 
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
 )
 
 type BarrierKey = string

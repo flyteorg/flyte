@@ -3,7 +3,7 @@ package executors
 import (
 	"context"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 // NodeLookup provides a structure that enables looking up all nodes within the current execution hierarchy/context.

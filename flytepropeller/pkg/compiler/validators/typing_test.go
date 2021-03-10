@@ -3,8 +3,8 @@ package validators
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 

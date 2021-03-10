@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var defaultConfig

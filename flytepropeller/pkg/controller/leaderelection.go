@@ -7,7 +7,7 @@ import (
 
 	v12 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 
-	"github.com/lyft/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
 	"k8s.io/apimachinery/pkg/util/rand"
 

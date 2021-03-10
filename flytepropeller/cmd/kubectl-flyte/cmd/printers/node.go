@@ -12,9 +12,9 @@ import (
 	gotree "github.com/DiSiqueira/GoTree"
 	"github.com/fatih/color"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task"
-	"github.com/lyft/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 var boldString = color.New(color.Bold)

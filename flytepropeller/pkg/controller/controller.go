@@ -5,26 +5,26 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	"github.com/lyft/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/contextutils"
 	"k8s.io/apimachinery/pkg/labels"
 
-	stdErrs "github.com/lyft/flytestdlib/errors"
+	stdErrs "github.com/flyteorg/flytestdlib/errors"
 
-	errors3 "github.com/lyft/flytepropeller/pkg/controller/nodes/errors"
+	errors3 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 
-	"github.com/lyft/flytepropeller/pkg/controller/executors"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/task/catalog"
+	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog"
 
-	"github.com/lyft/flytepropeller/pkg/controller/config"
-	"github.com/lyft/flytepropeller/pkg/controller/workflowstore"
+	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
 
-	"github.com/lyft/flyteidl/clients/go/admin"
-	"github.com/lyft/flyteidl/clients/go/events"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyteidl/clients/go/events"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	corev1 "k8s.io/api/core/v1"
@@ -36,14 +36,14 @@ import (
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/record"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	clientset "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	flyteScheme "github.com/lyft/flytepropeller/pkg/client/clientset/versioned/scheme"
-	informers "github.com/lyft/flytepropeller/pkg/client/informers/externalversions"
-	lister "github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes"
-	"github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/lyft/flytepropeller/pkg/controller/workflow"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	clientset "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	flyteScheme "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/scheme"
+	informers "github.com/flyteorg/flytepropeller/pkg/client/informers/externalversions"
+	lister "github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflow"
 )
 
 const resourceLevelMonitorCycleDuration = 5 * time.Second

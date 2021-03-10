@@ -1,7 +1,7 @@
 package launchplan
 
 import (
-	errors2 "github.com/lyft/flytestdlib/errors"
+	errors2 "github.com/flyteorg/flytestdlib/errors"
 )
 
 type ErrorCode = errors2.ErrorCode

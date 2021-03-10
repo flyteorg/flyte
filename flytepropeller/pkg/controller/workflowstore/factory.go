@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	flyteworkflowv1alpha1 "github.com/lyft/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
-	"github.com/lyft/flytestdlib/promutils"
+	flyteworkflowv1alpha1 "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 func NewWorkflowStore(ctx context.Context, cfg *Config, lister v1alpha1.FlyteWorkflowLister,

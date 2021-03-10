@@ -1,8 +1,8 @@
 package resourcemanager
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 type ResourceConstraint interface {

@@ -3,10 +3,10 @@ package handler
 import (
 	"time"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/lyft/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 // This is the legacy state structure that gets translated to node status

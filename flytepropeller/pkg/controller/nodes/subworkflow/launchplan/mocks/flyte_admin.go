@@ -5,11 +5,11 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	admin "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	core "github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	launchplan "github.com/lyft/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	launchplan "github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 
 	mock "github.com/stretchr/testify/mock"
 )

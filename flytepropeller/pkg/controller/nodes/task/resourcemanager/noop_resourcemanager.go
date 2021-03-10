@@ -3,7 +3,7 @@ package resourcemanager
 import (
 	"context"
 
-	pluginCore "github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 const NoopResourceManagerID = "noopresourcemanager"
