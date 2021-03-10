@@ -53,19 +53,6 @@ var fQNFn = map[string]func(string) DataReference{
 	},
 }
 
-// Checks if the error is AWS S3 bucket not found error
-func awsBucketIsNotFound(err error) bool {
-	if IsNotFound(err) {
-		return true
-	}
-
-	if awsErr, errOk := errs.Cause(err).(awserr.Error); errOk {
-		return awsErr.Code() == s32.ErrCodeNoSuchBucket
-	}
-
-	return false
-}
-
 // Checks if the error is AWS S3 bucket already exists error.
 func awsBucketAlreadyExists(err error) bool {
 	if IsExists(err) {
@@ -124,21 +111,20 @@ type StowStore struct {
 }
 
 func (s *StowStore) LoadContainer(ctx context.Context, container string, createIfNotFound bool) (stow.Container, error) {
+	// TODO: As of stow v0.2.6 elides the container lookup when a bucket region is set,
+	// so we always just attempt to create it when createIfNotFound is true.
+
+	if createIfNotFound {
+		logger.Infof(ctx, "Attempting to create container [%s]", container)
+		_, err := s.loc.CreateContainer(container)
+		if err != nil && !awsBucketAlreadyExists(err) && !IsExists(err) {
+			return nil, fmt.Errorf("unable to initialize container [%v]. Error: %v", container, err)
+		}
+	}
+
 	c, err := s.loc.Container(container)
 	if err != nil {
-		if createIfNotFound {
-			logger.Infof(ctx, "Container [%s] lookup failed, err [%s], will try to create a new one", container, err)
-			if IsNotFound(err) || awsBucketIsNotFound(err) {
-				c, err := s.loc.CreateContainer(container)
-				// If the container's already created, move on. Otherwise, fail with error.
-				if err != nil && !awsBucketAlreadyExists(err) && !IsExists(err) {
-					return nil, fmt.Errorf("unable to initialize container [%v]. Error: %v", container, err)
-				}
-				return c, nil
-			}
-		} else {
-			logger.Errorf(ctx, "Container [%s] lookup failed. Error %s", container, err)
-		}
+		logger.Errorf(ctx, "Container [%s] lookup failed. Error %s", container, err)
 		return nil, err
 	}
 	return c, nil
