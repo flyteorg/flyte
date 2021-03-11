@@ -4,7 +4,7 @@ import grpc
 from flyteidl.datacatalog import datacatalog_pb2 as flyteidl_dot_datacatalog_dot_datacatalog__pb2
 
 
-class ArtifactsStub(object):
+class DataCatalogStub(object):
   # missing associated documentation comment in .proto file
   pass
 
@@ -14,54 +14,90 @@ class ArtifactsStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.Get = channel.unary_unary(
-        '/pb.lyft.datacatalog.Artifacts/Get',
-        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetResponse.FromString,
+    self.CreateDataset = channel.unary_unary(
+        '/datacatalog.DataCatalog/CreateDataset',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateDatasetRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateDatasetResponse.FromString,
         )
-    self.Query = channel.unary_unary(
-        '/pb.lyft.datacatalog.Artifacts/Query',
-        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.QueryRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.QueryResponse.FromString,
+    self.GetDataset = channel.unary_unary(
+        '/datacatalog.DataCatalog/GetDataset',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetDatasetRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetDatasetResponse.FromString,
         )
-    self.Create = channel.unary_unary(
-        '/pb.lyft.datacatalog.Artifacts/Create',
-        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateResponse.FromString,
+    self.CreateArtifact = channel.unary_unary(
+        '/datacatalog.DataCatalog/CreateArtifact',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactResponse.FromString,
         )
-    self.GenerateProvenance = channel.unary_unary(
-        '/pb.lyft.datacatalog.Artifacts/GenerateProvenance',
-        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GenerateProvenanceRequest.SerializeToString,
-        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GenerateProvenanceResponse.FromString,
+    self.GetArtifact = channel.unary_unary(
+        '/datacatalog.DataCatalog/GetArtifact',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.FromString,
+        )
+    self.AddTag = channel.unary_unary(
+        '/datacatalog.DataCatalog/AddTag',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.AddTagRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.AddTagResponse.FromString,
+        )
+    self.ListArtifacts = channel.unary_unary(
+        '/datacatalog.DataCatalog/ListArtifacts',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListArtifactsRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListArtifactsResponse.FromString,
+        )
+    self.ListDatasets = channel.unary_unary(
+        '/datacatalog.DataCatalog/ListDatasets',
+        request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsRequest.SerializeToString,
+        response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsResponse.FromString,
         )
 
 
-class ArtifactsServicer(object):
+class DataCatalogServicer(object):
   # missing associated documentation comment in .proto file
   pass
 
-  def Get(self, request, context):
+  def CreateDataset(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def Query(self, request, context):
+  def GetDataset(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def Create(self, request, context):
+  def CreateArtifact(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
-  def GenerateProvenance(self, request, context):
+  def GetArtifact(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def AddTag(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ListArtifacts(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
+  def ListDatasets(self, request, context):
     # missing associated documentation comment in .proto file
     pass
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -69,29 +105,44 @@ class ArtifactsServicer(object):
     raise NotImplementedError('Method not implemented!')
 
 
-def add_ArtifactsServicer_to_server(servicer, server):
+def add_DataCatalogServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'Get': grpc.unary_unary_rpc_method_handler(
-          servicer.Get,
-          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetRequest.FromString,
-          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetResponse.SerializeToString,
+      'CreateDataset': grpc.unary_unary_rpc_method_handler(
+          servicer.CreateDataset,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateDatasetRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateDatasetResponse.SerializeToString,
       ),
-      'Query': grpc.unary_unary_rpc_method_handler(
-          servicer.Query,
-          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.QueryRequest.FromString,
-          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.QueryResponse.SerializeToString,
+      'GetDataset': grpc.unary_unary_rpc_method_handler(
+          servicer.GetDataset,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetDatasetRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetDatasetResponse.SerializeToString,
       ),
-      'Create': grpc.unary_unary_rpc_method_handler(
-          servicer.Create,
-          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateRequest.FromString,
-          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateResponse.SerializeToString,
+      'CreateArtifact': grpc.unary_unary_rpc_method_handler(
+          servicer.CreateArtifact,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.CreateArtifactResponse.SerializeToString,
       ),
-      'GenerateProvenance': grpc.unary_unary_rpc_method_handler(
-          servicer.GenerateProvenance,
-          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GenerateProvenanceRequest.FromString,
-          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GenerateProvenanceResponse.SerializeToString,
+      'GetArtifact': grpc.unary_unary_rpc_method_handler(
+          servicer.GetArtifact,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetArtifactResponse.SerializeToString,
+      ),
+      'AddTag': grpc.unary_unary_rpc_method_handler(
+          servicer.AddTag,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.AddTagRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.AddTagResponse.SerializeToString,
+      ),
+      'ListArtifacts': grpc.unary_unary_rpc_method_handler(
+          servicer.ListArtifacts,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListArtifactsRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListArtifactsResponse.SerializeToString,
+      ),
+      'ListDatasets': grpc.unary_unary_rpc_method_handler(
+          servicer.ListDatasets,
+          request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsRequest.FromString,
+          response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ListDatasetsResponse.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'pb.lyft.datacatalog.Artifacts', rpc_method_handlers)
+      'datacatalog.DataCatalog', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))

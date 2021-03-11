@@ -36,23 +36,30 @@ var (
 // define the regex for a UUID once up-front
 var _datacatalog_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
-// Validate checks the field values on Parameter with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *Parameter) Validate() error {
+// Validate checks the field values on CreateDatasetRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateDatasetRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for Name
-
-	// no validation rules for Value
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreateDatasetRequestValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	return nil
 }
 
-// ParameterValidationError is the validation error returned by
-// Parameter.Validate if the designated constraints aren't met.
-type ParameterValidationError struct {
+// CreateDatasetRequestValidationError is the validation error returned by
+// CreateDatasetRequest.Validate if the designated constraints aren't met.
+type CreateDatasetRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -60,22 +67,24 @@ type ParameterValidationError struct {
 }
 
 // Field function returns field value.
-func (e ParameterValidationError) Field() string { return e.field }
+func (e CreateDatasetRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ParameterValidationError) Reason() string { return e.reason }
+func (e CreateDatasetRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ParameterValidationError) Cause() error { return e.cause }
+func (e CreateDatasetRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ParameterValidationError) Key() bool { return e.key }
+func (e CreateDatasetRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ParameterValidationError) ErrorName() string { return "ParameterValidationError" }
+func (e CreateDatasetRequestValidationError) ErrorName() string {
+	return "CreateDatasetRequestValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e ParameterValidationError) Error() string {
+func (e CreateDatasetRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -87,14 +96,14 @@ func (e ParameterValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sParameter.%s: %s%s",
+		"invalid %sCreateDatasetRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ParameterValidationError{}
+var _ error = CreateDatasetRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -102,7 +111,1254 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ParameterValidationError{}
+} = CreateDatasetRequestValidationError{}
+
+// Validate checks the field values on CreateDatasetResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateDatasetResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// CreateDatasetResponseValidationError is the validation error returned by
+// CreateDatasetResponse.Validate if the designated constraints aren't met.
+type CreateDatasetResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateDatasetResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateDatasetResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateDatasetResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateDatasetResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateDatasetResponseValidationError) ErrorName() string {
+	return "CreateDatasetResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateDatasetResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateDatasetResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateDatasetResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateDatasetResponseValidationError{}
+
+// Validate checks the field values on GetDatasetRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *GetDatasetRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDatasetRequestValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetDatasetRequestValidationError is the validation error returned by
+// GetDatasetRequest.Validate if the designated constraints aren't met.
+type GetDatasetRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDatasetRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDatasetRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDatasetRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDatasetRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDatasetRequestValidationError) ErrorName() string {
+	return "GetDatasetRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDatasetRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDatasetRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDatasetRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDatasetRequestValidationError{}
+
+// Validate checks the field values on GetDatasetResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetDatasetResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetDatasetResponseValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetDatasetResponseValidationError is the validation error returned by
+// GetDatasetResponse.Validate if the designated constraints aren't met.
+type GetDatasetResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetDatasetResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetDatasetResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetDatasetResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetDatasetResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetDatasetResponseValidationError) ErrorName() string {
+	return "GetDatasetResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetDatasetResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetDatasetResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetDatasetResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetDatasetResponseValidationError{}
+
+// Validate checks the field values on GetArtifactRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetArtifactRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArtifactRequestValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	switch m.QueryHandle.(type) {
+
+	case *GetArtifactRequest_ArtifactId:
+		// no validation rules for ArtifactId
+
+	case *GetArtifactRequest_TagName:
+		// no validation rules for TagName
+
+	}
+
+	return nil
+}
+
+// GetArtifactRequestValidationError is the validation error returned by
+// GetArtifactRequest.Validate if the designated constraints aren't met.
+type GetArtifactRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArtifactRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArtifactRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArtifactRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArtifactRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArtifactRequestValidationError) ErrorName() string {
+	return "GetArtifactRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArtifactRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArtifactRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArtifactRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArtifactRequestValidationError{}
+
+// Validate checks the field values on GetArtifactResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetArtifactResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetArtifact()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetArtifactResponseValidationError{
+				field:  "Artifact",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetArtifactResponseValidationError is the validation error returned by
+// GetArtifactResponse.Validate if the designated constraints aren't met.
+type GetArtifactResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetArtifactResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetArtifactResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetArtifactResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetArtifactResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetArtifactResponseValidationError) ErrorName() string {
+	return "GetArtifactResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetArtifactResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetArtifactResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetArtifactResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetArtifactResponseValidationError{}
+
+// Validate checks the field values on CreateArtifactRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateArtifactRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetArtifact()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreateArtifactRequestValidationError{
+				field:  "Artifact",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// CreateArtifactRequestValidationError is the validation error returned by
+// CreateArtifactRequest.Validate if the designated constraints aren't met.
+type CreateArtifactRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateArtifactRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateArtifactRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateArtifactRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateArtifactRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateArtifactRequestValidationError) ErrorName() string {
+	return "CreateArtifactRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateArtifactRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateArtifactRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateArtifactRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateArtifactRequestValidationError{}
+
+// Validate checks the field values on CreateArtifactResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CreateArtifactResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// CreateArtifactResponseValidationError is the validation error returned by
+// CreateArtifactResponse.Validate if the designated constraints aren't met.
+type CreateArtifactResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CreateArtifactResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CreateArtifactResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CreateArtifactResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CreateArtifactResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CreateArtifactResponseValidationError) ErrorName() string {
+	return "CreateArtifactResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CreateArtifactResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCreateArtifactResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CreateArtifactResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CreateArtifactResponseValidationError{}
+
+// Validate checks the field values on AddTagRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *AddTagRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetTag()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return AddTagRequestValidationError{
+				field:  "Tag",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddTagRequestValidationError is the validation error returned by
+// AddTagRequest.Validate if the designated constraints aren't met.
+type AddTagRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddTagRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddTagRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddTagRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddTagRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddTagRequestValidationError) ErrorName() string { return "AddTagRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddTagRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddTagRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddTagRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddTagRequestValidationError{}
+
+// Validate checks the field values on AddTagResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *AddTagResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// AddTagResponseValidationError is the validation error returned by
+// AddTagResponse.Validate if the designated constraints aren't met.
+type AddTagResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AddTagResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AddTagResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AddTagResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AddTagResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AddTagResponseValidationError) ErrorName() string { return "AddTagResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AddTagResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAddTagResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AddTagResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AddTagResponseValidationError{}
+
+// Validate checks the field values on ListArtifactsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListArtifactsRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListArtifactsRequestValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetFilter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListArtifactsRequestValidationError{
+				field:  "Filter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetPagination()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListArtifactsRequestValidationError{
+				field:  "Pagination",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ListArtifactsRequestValidationError is the validation error returned by
+// ListArtifactsRequest.Validate if the designated constraints aren't met.
+type ListArtifactsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListArtifactsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListArtifactsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListArtifactsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListArtifactsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListArtifactsRequestValidationError) ErrorName() string {
+	return "ListArtifactsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListArtifactsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListArtifactsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListArtifactsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListArtifactsRequestValidationError{}
+
+// Validate checks the field values on ListArtifactsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListArtifactsResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetArtifacts() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListArtifactsResponseValidationError{
+					field:  fmt.Sprintf("Artifacts[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for NextToken
+
+	return nil
+}
+
+// ListArtifactsResponseValidationError is the validation error returned by
+// ListArtifactsResponse.Validate if the designated constraints aren't met.
+type ListArtifactsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListArtifactsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListArtifactsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListArtifactsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListArtifactsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListArtifactsResponseValidationError) ErrorName() string {
+	return "ListArtifactsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListArtifactsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListArtifactsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListArtifactsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListArtifactsResponseValidationError{}
+
+// Validate checks the field values on ListDatasetsRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListDatasetsRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetFilter()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListDatasetsRequestValidationError{
+				field:  "Filter",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetPagination()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListDatasetsRequestValidationError{
+				field:  "Pagination",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ListDatasetsRequestValidationError is the validation error returned by
+// ListDatasetsRequest.Validate if the designated constraints aren't met.
+type ListDatasetsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListDatasetsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListDatasetsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListDatasetsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListDatasetsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListDatasetsRequestValidationError) ErrorName() string {
+	return "ListDatasetsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListDatasetsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListDatasetsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListDatasetsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListDatasetsRequestValidationError{}
+
+// Validate checks the field values on ListDatasetsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListDatasetsResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetDatasets() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListDatasetsResponseValidationError{
+					field:  fmt.Sprintf("Datasets[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for NextToken
+
+	return nil
+}
+
+// ListDatasetsResponseValidationError is the validation error returned by
+// ListDatasetsResponse.Validate if the designated constraints aren't met.
+type ListDatasetsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListDatasetsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListDatasetsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListDatasetsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListDatasetsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListDatasetsResponseValidationError) ErrorName() string {
+	return "ListDatasetsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListDatasetsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListDatasetsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListDatasetsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListDatasetsResponseValidationError{}
+
+// Validate checks the field values on Dataset with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Dataset) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DatasetValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DatasetValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DatasetValidationError is the validation error returned by Dataset.Validate
+// if the designated constraints aren't met.
+type DatasetValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DatasetValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DatasetValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DatasetValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DatasetValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DatasetValidationError) ErrorName() string { return "DatasetValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DatasetValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDataset.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DatasetValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DatasetValidationError{}
+
+// Validate checks the field values on Partition with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Partition) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Key
+
+	// no validation rules for Value
+
+	return nil
+}
+
+// PartitionValidationError is the validation error returned by
+// Partition.Validate if the designated constraints aren't met.
+type PartitionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PartitionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PartitionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PartitionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PartitionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PartitionValidationError) ErrorName() string { return "PartitionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PartitionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPartition.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PartitionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PartitionValidationError{}
+
+// Validate checks the field values on DatasetID with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *DatasetID) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Project
+
+	// no validation rules for Name
+
+	// no validation rules for Domain
+
+	// no validation rules for Version
+
+	// no validation rules for UUID
+
+	return nil
+}
+
+// DatasetIDValidationError is the validation error returned by
+// DatasetID.Validate if the designated constraints aren't met.
+type DatasetIDValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DatasetIDValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DatasetIDValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DatasetIDValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DatasetIDValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DatasetIDValidationError) ErrorName() string { return "DatasetIDValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DatasetIDValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDatasetID.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DatasetIDValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DatasetIDValidationError{}
 
 // Validate checks the field values on Artifact with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
@@ -111,25 +1367,25 @@ func (m *Artifact) Validate() error {
 		return nil
 	}
 
-	// no validation rules for Provenance
+	// no validation rules for Id
 
-	// no validation rules for Name
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
-	// no validation rules for Version
-
-	// no validation rules for Revision
-
-	// no validation rules for CreatedAt
-
-	// no validation rules for ReferenceId
-
-	for idx, item := range m.GetInputs() {
+	for idx, item := range m.GetData() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ArtifactValidationError{
-					field:  fmt.Sprintf("Inputs[%v]", idx),
+					field:  fmt.Sprintf("Data[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -138,19 +1394,54 @@ func (m *Artifact) Validate() error {
 
 	}
 
-	for idx, item := range m.GetOutputs() {
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	for idx, item := range m.GetPartitions() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return ArtifactValidationError{
-					field:  fmt.Sprintf("Outputs[%v]", idx),
+					field:  fmt.Sprintf("Partitions[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
+	}
+
+	for idx, item := range m.GetTags() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ArtifactValidationError{
+					field:  fmt.Sprintf("Tags[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ArtifactValidationError{
+				field:  "CreatedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
 	}
 
 	return nil
@@ -210,184 +1501,20 @@ var _ interface {
 	ErrorName() string
 } = ArtifactValidationError{}
 
-// Validate checks the field values on ArtifactId with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *ArtifactId) Validate() error {
+// Validate checks the field values on ArtifactData with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *ArtifactData) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	// no validation rules for Name
 
-	// no validation rules for Version
-
-	for idx, item := range m.GetInputs() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return ArtifactIdValidationError{
-					field:  fmt.Sprintf("Inputs[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ArtifactIdValidationError is the validation error returned by
-// ArtifactId.Validate if the designated constraints aren't met.
-type ArtifactIdValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e ArtifactIdValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e ArtifactIdValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e ArtifactIdValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e ArtifactIdValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e ArtifactIdValidationError) ErrorName() string { return "ArtifactIdValidationError" }
-
-// Error satisfies the builtin error interface
-func (e ArtifactIdValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sArtifactId.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = ArtifactIdValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = ArtifactIdValidationError{}
-
-// Validate checks the field values on GetRequest with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *GetRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	switch m.Id.(type) {
-
-	case *GetRequest_Provenance:
-		// no validation rules for Provenance
-
-	case *GetRequest_ArtifactId:
-
-		if v, ok := interface{}(m.GetArtifactId()).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return GetRequestValidationError{
-					field:  "ArtifactId",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// GetRequestValidationError is the validation error returned by
-// GetRequest.Validate if the designated constraints aren't met.
-type GetRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e GetRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e GetRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e GetRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e GetRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e GetRequestValidationError) ErrorName() string { return "GetRequestValidationError" }
-
-// Error satisfies the builtin error interface
-func (e GetRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sGetRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = GetRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = GetRequestValidationError{}
-
-// Validate checks the field values on GetResponse with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *GetResponse) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if v, ok := interface{}(m.GetArtifact()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetValue()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return GetResponseValidationError{
-				field:  "Artifact",
+			return ArtifactDataValidationError{
+				field:  "Value",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -397,9 +1524,9 @@ func (m *GetResponse) Validate() error {
 	return nil
 }
 
-// GetResponseValidationError is the validation error returned by
-// GetResponse.Validate if the designated constraints aren't met.
-type GetResponseValidationError struct {
+// ArtifactDataValidationError is the validation error returned by
+// ArtifactData.Validate if the designated constraints aren't met.
+type ArtifactDataValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -407,22 +1534,22 @@ type GetResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e GetResponseValidationError) Field() string { return e.field }
+func (e ArtifactDataValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GetResponseValidationError) Reason() string { return e.reason }
+func (e ArtifactDataValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GetResponseValidationError) Cause() error { return e.cause }
+func (e ArtifactDataValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GetResponseValidationError) Key() bool { return e.key }
+func (e ArtifactDataValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GetResponseValidationError) ErrorName() string { return "GetResponseValidationError" }
+func (e ArtifactDataValidationError) ErrorName() string { return "ArtifactDataValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GetResponseValidationError) Error() string {
+func (e ArtifactDataValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -434,14 +1561,14 @@ func (e GetResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGetResponse.%s: %s%s",
+		"invalid %sArtifactData.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GetResponseValidationError{}
+var _ error = ArtifactDataValidationError{}
 
 var _ interface {
 	Field() string
@@ -449,173 +1576,286 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GetResponseValidationError{}
+} = ArtifactDataValidationError{}
 
-// Validate checks the field values on IntFilter with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *IntFilter) Validate() error {
+// Validate checks the field values on Tag with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *Tag) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for Value
+	// no validation rules for Name
+
+	// no validation rules for ArtifactId
+
+	if v, ok := interface{}(m.GetDataset()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TagValidationError{
+				field:  "Dataset",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// TagValidationError is the validation error returned by Tag.Validate if the
+// designated constraints aren't met.
+type TagValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TagValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TagValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TagValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TagValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TagValidationError) ErrorName() string { return "TagValidationError" }
+
+// Error satisfies the builtin error interface
+func (e TagValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTag.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TagValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TagValidationError{}
+
+// Validate checks the field values on Metadata with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Metadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for KeyMap
+
+	return nil
+}
+
+// MetadataValidationError is the validation error returned by
+// Metadata.Validate if the designated constraints aren't met.
+type MetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MetadataValidationError) ErrorName() string { return "MetadataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e MetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MetadataValidationError{}
+
+// Validate checks the field values on FilterExpression with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *FilterExpression) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetFilters() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return FilterExpressionValidationError{
+					field:  fmt.Sprintf("Filters[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// FilterExpressionValidationError is the validation error returned by
+// FilterExpression.Validate if the designated constraints aren't met.
+type FilterExpressionValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FilterExpressionValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FilterExpressionValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FilterExpressionValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FilterExpressionValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FilterExpressionValidationError) ErrorName() string { return "FilterExpressionValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FilterExpressionValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFilterExpression.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FilterExpressionValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FilterExpressionValidationError{}
+
+// Validate checks the field values on SinglePropertyFilter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *SinglePropertyFilter) Validate() error {
+	if m == nil {
+		return nil
+	}
 
 	// no validation rules for Operator
 
-	return nil
-}
+	switch m.PropertyFilter.(type) {
 
-// IntFilterValidationError is the validation error returned by
-// IntFilter.Validate if the designated constraints aren't met.
-type IntFilterValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
+	case *SinglePropertyFilter_TagFilter:
 
-// Field function returns field value.
-func (e IntFilterValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e IntFilterValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e IntFilterValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e IntFilterValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e IntFilterValidationError) ErrorName() string { return "IntFilterValidationError" }
-
-// Error satisfies the builtin error interface
-func (e IntFilterValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sIntFilter.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = IntFilterValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = IntFilterValidationError{}
-
-// Validate checks the field values on IntRangeFilter with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *IntRangeFilter) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Min
-
-	// no validation rules for Max
-
-	return nil
-}
-
-// IntRangeFilterValidationError is the validation error returned by
-// IntRangeFilter.Validate if the designated constraints aren't met.
-type IntRangeFilterValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e IntRangeFilterValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e IntRangeFilterValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e IntRangeFilterValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e IntRangeFilterValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e IntRangeFilterValidationError) ErrorName() string { return "IntRangeFilterValidationError" }
-
-// Error satisfies the builtin error interface
-func (e IntRangeFilterValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sIntRangeFilter.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = IntRangeFilterValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = IntRangeFilterValidationError{}
-
-// Validate checks the field values on IntQueryKey with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *IntQueryKey) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	switch m.Filter.(type) {
-
-	case *IntQueryKey_Val:
-
-		if v, ok := interface{}(m.GetVal()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetTagFilter()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return IntQueryKeyValidationError{
-					field:  "Val",
+				return SinglePropertyFilterValidationError{
+					field:  "TagFilter",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
 			}
 		}
 
-	case *IntQueryKey_Range:
+	case *SinglePropertyFilter_PartitionFilter:
 
-		if v, ok := interface{}(m.GetRange()).(interface{ Validate() error }); ok {
+		if v, ok := interface{}(m.GetPartitionFilter()).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return IntQueryKeyValidationError{
-					field:  "Range",
+				return SinglePropertyFilterValidationError{
+					field:  "PartitionFilter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *SinglePropertyFilter_ArtifactFilter:
+
+		if v, ok := interface{}(m.GetArtifactFilter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SinglePropertyFilterValidationError{
+					field:  "ArtifactFilter",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *SinglePropertyFilter_DatasetFilter:
+
+		if v, ok := interface{}(m.GetDatasetFilter()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SinglePropertyFilterValidationError{
+					field:  "DatasetFilter",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -627,9 +1867,9 @@ func (m *IntQueryKey) Validate() error {
 	return nil
 }
 
-// IntQueryKeyValidationError is the validation error returned by
-// IntQueryKey.Validate if the designated constraints aren't met.
-type IntQueryKeyValidationError struct {
+// SinglePropertyFilterValidationError is the validation error returned by
+// SinglePropertyFilter.Validate if the designated constraints aren't met.
+type SinglePropertyFilterValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -637,22 +1877,24 @@ type IntQueryKeyValidationError struct {
 }
 
 // Field function returns field value.
-func (e IntQueryKeyValidationError) Field() string { return e.field }
+func (e SinglePropertyFilterValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e IntQueryKeyValidationError) Reason() string { return e.reason }
+func (e SinglePropertyFilterValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e IntQueryKeyValidationError) Cause() error { return e.cause }
+func (e SinglePropertyFilterValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e IntQueryKeyValidationError) Key() bool { return e.key }
+func (e SinglePropertyFilterValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e IntQueryKeyValidationError) ErrorName() string { return "IntQueryKeyValidationError" }
+func (e SinglePropertyFilterValidationError) ErrorName() string {
+	return "SinglePropertyFilterValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e IntQueryKeyValidationError) Error() string {
+func (e SinglePropertyFilterValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -664,14 +1906,14 @@ func (e IntQueryKeyValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sIntQueryKey.%s: %s%s",
+		"invalid %sSinglePropertyFilter.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = IntQueryKeyValidationError{}
+var _ error = SinglePropertyFilterValidationError{}
 
 var _ interface {
 	Field() string
@@ -679,366 +1921,186 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = IntQueryKeyValidationError{}
+} = SinglePropertyFilterValidationError{}
 
-// Validate checks the field values on QueryRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *QueryRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	// no validation rules for Name
-
-	// no validation rules for Version
-
-	if v, ok := interface{}(m.GetRevision()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return QueryRequestValidationError{
-				field:  "Revision",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for CreatedAt
-
-	// no validation rules for ReferenceId
-
-	return nil
-}
-
-// QueryRequestValidationError is the validation error returned by
-// QueryRequest.Validate if the designated constraints aren't met.
-type QueryRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e QueryRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e QueryRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e QueryRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e QueryRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e QueryRequestValidationError) ErrorName() string { return "QueryRequestValidationError" }
-
-// Error satisfies the builtin error interface
-func (e QueryRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sQueryRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = QueryRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = QueryRequestValidationError{}
-
-// Validate checks the field values on QueryResponse with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *QueryResponse) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	for idx, item := range m.GetArtifact() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return QueryResponseValidationError{
-					field:  fmt.Sprintf("Artifact[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// QueryResponseValidationError is the validation error returned by
-// QueryResponse.Validate if the designated constraints aren't met.
-type QueryResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e QueryResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e QueryResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e QueryResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e QueryResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e QueryResponseValidationError) ErrorName() string { return "QueryResponseValidationError" }
-
-// Error satisfies the builtin error interface
-func (e QueryResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sQueryResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = QueryResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = QueryResponseValidationError{}
-
-// Validate checks the field values on CreateRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *CreateRequest) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if v, ok := interface{}(m.GetRef()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CreateRequestValidationError{
-				field:  "Ref",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for ReferenceId
-
-	// no validation rules for Revision
-
-	for idx, item := range m.GetOutputs() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CreateRequestValidationError{
-					field:  fmt.Sprintf("Outputs[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// CreateRequestValidationError is the validation error returned by
-// CreateRequest.Validate if the designated constraints aren't met.
-type CreateRequestValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e CreateRequestValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e CreateRequestValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e CreateRequestValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e CreateRequestValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e CreateRequestValidationError) ErrorName() string { return "CreateRequestValidationError" }
-
-// Error satisfies the builtin error interface
-func (e CreateRequestValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sCreateRequest.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = CreateRequestValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = CreateRequestValidationError{}
-
-// Validate checks the field values on CreateResponse with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *CreateResponse) Validate() error {
-	if m == nil {
-		return nil
-	}
-
-	if v, ok := interface{}(m.GetArtifact()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CreateResponseValidationError{
-				field:  "Artifact",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	// no validation rules for Status
-
-	return nil
-}
-
-// CreateResponseValidationError is the validation error returned by
-// CreateResponse.Validate if the designated constraints aren't met.
-type CreateResponseValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e CreateResponseValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e CreateResponseValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e CreateResponseValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e CreateResponseValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e CreateResponseValidationError) ErrorName() string { return "CreateResponseValidationError" }
-
-// Error satisfies the builtin error interface
-func (e CreateResponseValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sCreateResponse.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = CreateResponseValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = CreateResponseValidationError{}
-
-// Validate checks the field values on GenerateProvenanceRequest with the rules
+// Validate checks the field values on ArtifactPropertyFilter with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *GenerateProvenanceRequest) Validate() error {
+func (m *ArtifactPropertyFilter) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return GenerateProvenanceRequestValidationError{
-				field:  "Id",
-				reason: "embedded message failed validation",
-				cause:  err,
+	switch m.Property.(type) {
+
+	case *ArtifactPropertyFilter_ArtifactId:
+		// no validation rules for ArtifactId
+
+	}
+
+	return nil
+}
+
+// ArtifactPropertyFilterValidationError is the validation error returned by
+// ArtifactPropertyFilter.Validate if the designated constraints aren't met.
+type ArtifactPropertyFilterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ArtifactPropertyFilterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ArtifactPropertyFilterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ArtifactPropertyFilterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ArtifactPropertyFilterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ArtifactPropertyFilterValidationError) ErrorName() string {
+	return "ArtifactPropertyFilterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ArtifactPropertyFilterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sArtifactPropertyFilter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ArtifactPropertyFilterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ArtifactPropertyFilterValidationError{}
+
+// Validate checks the field values on TagPropertyFilter with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *TagPropertyFilter) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Property.(type) {
+
+	case *TagPropertyFilter_TagName:
+		// no validation rules for TagName
+
+	}
+
+	return nil
+}
+
+// TagPropertyFilterValidationError is the validation error returned by
+// TagPropertyFilter.Validate if the designated constraints aren't met.
+type TagPropertyFilterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TagPropertyFilterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TagPropertyFilterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TagPropertyFilterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TagPropertyFilterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TagPropertyFilterValidationError) ErrorName() string {
+	return "TagPropertyFilterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TagPropertyFilterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTagPropertyFilter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TagPropertyFilterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TagPropertyFilterValidationError{}
+
+// Validate checks the field values on PartitionPropertyFilter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PartitionPropertyFilter) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Property.(type) {
+
+	case *PartitionPropertyFilter_KeyVal:
+
+		if v, ok := interface{}(m.GetKeyVal()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return PartitionPropertyFilterValidationError{
+					field:  "KeyVal",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
 			}
 		}
+
 	}
 
 	return nil
 }
 
-// GenerateProvenanceRequestValidationError is the validation error returned by
-// GenerateProvenanceRequest.Validate if the designated constraints aren't met.
-type GenerateProvenanceRequestValidationError struct {
+// PartitionPropertyFilterValidationError is the validation error returned by
+// PartitionPropertyFilter.Validate if the designated constraints aren't met.
+type PartitionPropertyFilterValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1046,24 +2108,24 @@ type GenerateProvenanceRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e GenerateProvenanceRequestValidationError) Field() string { return e.field }
+func (e PartitionPropertyFilterValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GenerateProvenanceRequestValidationError) Reason() string { return e.reason }
+func (e PartitionPropertyFilterValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GenerateProvenanceRequestValidationError) Cause() error { return e.cause }
+func (e PartitionPropertyFilterValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GenerateProvenanceRequestValidationError) Key() bool { return e.key }
+func (e PartitionPropertyFilterValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GenerateProvenanceRequestValidationError) ErrorName() string {
-	return "GenerateProvenanceRequestValidationError"
+func (e PartitionPropertyFilterValidationError) ErrorName() string {
+	return "PartitionPropertyFilterValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e GenerateProvenanceRequestValidationError) Error() string {
+func (e PartitionPropertyFilterValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1075,14 +2137,14 @@ func (e GenerateProvenanceRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGenerateProvenanceRequest.%s: %s%s",
+		"invalid %sPartitionPropertyFilter.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GenerateProvenanceRequestValidationError{}
+var _ error = PartitionPropertyFilterValidationError{}
 
 var _ interface {
 	Field() string
@@ -1090,24 +2152,26 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GenerateProvenanceRequestValidationError{}
+} = PartitionPropertyFilterValidationError{}
 
-// Validate checks the field values on GenerateProvenanceResponse with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *GenerateProvenanceResponse) Validate() error {
+// Validate checks the field values on KeyValuePair with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *KeyValuePair) Validate() error {
 	if m == nil {
 		return nil
 	}
 
-	// no validation rules for Provenance
+	// no validation rules for Key
+
+	// no validation rules for Value
 
 	return nil
 }
 
-// GenerateProvenanceResponseValidationError is the validation error returned
-// by GenerateProvenanceResponse.Validate if the designated constraints aren't met.
-type GenerateProvenanceResponseValidationError struct {
+// KeyValuePairValidationError is the validation error returned by
+// KeyValuePair.Validate if the designated constraints aren't met.
+type KeyValuePairValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1115,24 +2179,22 @@ type GenerateProvenanceResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e GenerateProvenanceResponseValidationError) Field() string { return e.field }
+func (e KeyValuePairValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e GenerateProvenanceResponseValidationError) Reason() string { return e.reason }
+func (e KeyValuePairValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e GenerateProvenanceResponseValidationError) Cause() error { return e.cause }
+func (e KeyValuePairValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e GenerateProvenanceResponseValidationError) Key() bool { return e.key }
+func (e KeyValuePairValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e GenerateProvenanceResponseValidationError) ErrorName() string {
-	return "GenerateProvenanceResponseValidationError"
-}
+func (e KeyValuePairValidationError) ErrorName() string { return "KeyValuePairValidationError" }
 
 // Error satisfies the builtin error interface
-func (e GenerateProvenanceResponseValidationError) Error() string {
+func (e KeyValuePairValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1144,14 +2206,14 @@ func (e GenerateProvenanceResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sGenerateProvenanceResponse.%s: %s%s",
+		"invalid %sKeyValuePair.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = GenerateProvenanceResponseValidationError{}
+var _ error = KeyValuePairValidationError{}
 
 var _ interface {
 	Field() string
@@ -1159,4 +2221,162 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = GenerateProvenanceResponseValidationError{}
+} = KeyValuePairValidationError{}
+
+// Validate checks the field values on DatasetPropertyFilter with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DatasetPropertyFilter) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Property.(type) {
+
+	case *DatasetPropertyFilter_Project:
+		// no validation rules for Project
+
+	case *DatasetPropertyFilter_Name:
+		// no validation rules for Name
+
+	case *DatasetPropertyFilter_Domain:
+		// no validation rules for Domain
+
+	case *DatasetPropertyFilter_Version:
+		// no validation rules for Version
+
+	}
+
+	return nil
+}
+
+// DatasetPropertyFilterValidationError is the validation error returned by
+// DatasetPropertyFilter.Validate if the designated constraints aren't met.
+type DatasetPropertyFilterValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DatasetPropertyFilterValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DatasetPropertyFilterValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DatasetPropertyFilterValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DatasetPropertyFilterValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DatasetPropertyFilterValidationError) ErrorName() string {
+	return "DatasetPropertyFilterValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DatasetPropertyFilterValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDatasetPropertyFilter.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DatasetPropertyFilterValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DatasetPropertyFilterValidationError{}
+
+// Validate checks the field values on PaginationOptions with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *PaginationOptions) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Limit
+
+	// no validation rules for Token
+
+	// no validation rules for SortKey
+
+	// no validation rules for SortOrder
+
+	return nil
+}
+
+// PaginationOptionsValidationError is the validation error returned by
+// PaginationOptions.Validate if the designated constraints aren't met.
+type PaginationOptionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PaginationOptionsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PaginationOptionsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PaginationOptionsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PaginationOptionsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PaginationOptionsValidationError) ErrorName() string {
+	return "PaginationOptionsValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PaginationOptionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPaginationOptions.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PaginationOptionsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PaginationOptionsValidationError{}
