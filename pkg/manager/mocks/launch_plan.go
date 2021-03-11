@@ -3,9 +3,9 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type CreateLaunchPlanFunc func(ctx context.Context, request admin.LaunchPlanCreateRequest) (

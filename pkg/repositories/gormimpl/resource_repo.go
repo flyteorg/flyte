@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/flyteadmin/pkg/repositories/errors"
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flytestdlib/promutils"
 	"google.golang.org/grpc/codes"
 
-	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 )
 
 type ResourceRepo struct {

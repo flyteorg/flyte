@@ -3,15 +3,15 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyteadmin/pkg/runtime"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories/config"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
-	"github.com/lyft/flyteadmin/pkg/repositories/config"
 	"github.com/spf13/cobra"
 	gormigrate "gopkg.in/gormigrate.v1"
 )

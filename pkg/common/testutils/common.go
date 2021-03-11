@@ -1,6 +1,6 @@
 package testutils
 
-import "github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 // Convenience method to wrap verbose boilerplate for initializing a PluginOverrides MatchingAttributes.
 func GetPluginOverridesAttributes(vals map[string][]string) *admin.MatchingAttributes {

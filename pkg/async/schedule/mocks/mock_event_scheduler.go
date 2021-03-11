@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/async/schedule/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
 )
 
 type AddScheduleFunc func(ctx context.Context, input interfaces.AddScheduleInput) error

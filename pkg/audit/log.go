@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/common"
-	"github.com/lyft/flyteadmin/pkg/errors"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 )
 

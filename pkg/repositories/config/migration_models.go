@@ -3,7 +3,7 @@ package config
 import (
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 /*

@@ -3,8 +3,8 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 type CreateExecutionFunc func(ctx context.Context, input models.Execution) error

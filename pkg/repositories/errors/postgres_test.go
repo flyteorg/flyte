@@ -4,10 +4,10 @@ import (
 	"errors"
 	"testing"
 
-	mockScope "github.com/lyft/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
 
+	flyteAdminError "github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/lib/pq"
-	flyteAdminError "github.com/lyft/flyteadmin/pkg/errors"
 	"github.com/magiconair/properties/assert"
 	"google.golang.org/grpc/codes"
 )

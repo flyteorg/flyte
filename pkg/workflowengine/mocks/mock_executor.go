@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
 )
 
 type ExecuteWorkflowFunc func(input interfaces.ExecuteWorkflowInput) (*interfaces.ExecutionInfo, error)

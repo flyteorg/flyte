@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
-	"github.com/lyft/flyteadmin/pkg/executioncluster/interfaces"
-	"github.com/lyft/flyteadmin/pkg/flytek8s"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/flytek8s"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/pkg/errors"
+	"k8s.io/client-go/dynamic"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -42,10 +43,16 @@ func NewInCluster(scope promutils.Scope, kubeConfig, master string) (interfaces.
 	if err != nil {
 		return nil, err
 	}
+	dynamicClient, err := dynamic.NewForConfig(clientConfig)
+	if err != nil {
+		return nil, err
+	}
 	return &InCluster{
 		target: executioncluster.ExecutionTarget{
-			Client:      client,
-			FlyteClient: flyteClient,
+			Client:        client,
+			FlyteClient:   flyteClient,
+			DynamicClient: dynamicClient,
+			Config:        *clientConfig,
 		},
 	}, nil
 }

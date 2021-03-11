@@ -4,13 +4,13 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/audit"
+	"github.com/flyteorg/flyteadmin/pkg/audit"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flyteadmin/pkg/rpc/adminservice/util"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice/util"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/coreos/go-oidc"
-	"github.com/lyft/flyteadmin/pkg/auth/config"
+	"github.com/flyteorg/flyteadmin/pkg/auth/config"
 	"golang.org/x/oauth2"
 )
 

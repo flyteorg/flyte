@@ -6,16 +6,16 @@ import (
 	"testing"
 	"time"
 
-	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
+	"github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	repoErrors "github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteadmin/pkg/manager/mocks"
-	repoErrors "github.com/lyft/flyteadmin/pkg/repositories/errors"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/stretchr/testify/assert"
 )
 

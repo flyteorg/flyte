@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 )
 
 // Interface for the Execution Cluster

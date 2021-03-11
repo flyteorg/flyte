@@ -3,10 +3,10 @@ package implementations
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/data/interfaces"
-	"github.com/lyft/flyteadmin/pkg/errors"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flyteadmin/pkg/data/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 )
 

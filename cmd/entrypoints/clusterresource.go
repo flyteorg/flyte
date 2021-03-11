@@ -3,18 +3,18 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/clusterresource"
-	executioncluster "github.com/lyft/flyteadmin/pkg/executioncluster/impl"
+	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
+	executioncluster "github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
 
-	"github.com/lyft/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyteadmin/pkg/runtime"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
+	"github.com/flyteorg/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	repositoryConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flytestdlib/promutils"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
-	"github.com/lyft/flyteadmin/pkg/config"
-	"github.com/lyft/flyteadmin/pkg/repositories"
-	repositoryConfig "github.com/lyft/flyteadmin/pkg/repositories/config"
-	"github.com/lyft/flytestdlib/promutils"
 	"github.com/spf13/cobra"
 )
 

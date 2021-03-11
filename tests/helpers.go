@@ -3,7 +3,7 @@ package tests
 import (
 	"fmt"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/grpclog"
 )

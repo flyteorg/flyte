@@ -3,11 +3,11 @@ package gormimpl
 import (
 	"fmt"
 
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/flyteadmin/pkg/common"
-	adminErrors "github.com/lyft/flyteadmin/pkg/errors"
-	"github.com/lyft/flyteadmin/pkg/repositories/errors"
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
 	"google.golang.org/grpc/codes"
 )
 

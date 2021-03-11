@@ -4,9 +4,9 @@ package noop
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/async/schedule/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 type EventScheduler struct{}

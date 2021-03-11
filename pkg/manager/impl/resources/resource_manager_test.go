@@ -5,18 +5,18 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
-	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
-	repoInterfaces "github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 
+	commonTestUtils "github.com/flyteorg/flyteadmin/pkg/common/testutils"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
-	commonTestUtils "github.com/lyft/flyteadmin/pkg/common/testutils"
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/lyft/flyteadmin/pkg/repositories/mocks"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
 

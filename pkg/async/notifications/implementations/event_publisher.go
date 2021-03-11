@@ -5,14 +5,14 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/lyft/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

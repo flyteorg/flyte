@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc"
+	"github.com/flyteorg/flyteadmin/pkg/auth/config"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/lyft/flyteadmin/pkg/auth/config"
-	"github.com/lyft/flytestdlib/errors"
-	"github.com/lyft/flytestdlib/logger"
 	"golang.org/x/oauth2"
 )
 

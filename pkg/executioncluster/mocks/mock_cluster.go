@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
 )
 
 type GetTargetFunc func(context.Context, *executioncluster.ExecutionTargetSpec) (*executioncluster.ExecutionTarget, error)

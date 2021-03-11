@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	authConfig "github.com/lyft/flyteadmin/pkg/auth/config"
-	"github.com/lyft/flyteadmin/pkg/config"
+	authConfig "github.com/flyteorg/flyteadmin/pkg/auth/config"
+	"github.com/flyteorg/flyteadmin/pkg/config"
 	"github.com/stretchr/testify/assert"
 )
 

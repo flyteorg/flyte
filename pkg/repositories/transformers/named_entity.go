@@ -1,8 +1,8 @@
 package transformers
 
 import (
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.NamedEntity {

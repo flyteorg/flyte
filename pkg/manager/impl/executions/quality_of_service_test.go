@@ -5,15 +5,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	runtimeIFaceMocks "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/lyft/flyteadmin/pkg/manager/interfaces"
-	managerMocks "github.com/lyft/flyteadmin/pkg/manager/mocks"
-	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	runtimeIFaceMocks "github.com/lyft/flyteadmin/pkg/runtime/interfaces/mocks"
-	"github.com/lyft/flyteadmin/pkg/runtime/mocks"
-	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 

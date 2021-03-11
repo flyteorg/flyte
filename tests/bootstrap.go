@@ -7,8 +7,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	database_config "github.com/lyft/flyteadmin/pkg/repositories/config"
-	"github.com/lyft/flytestdlib/promutils"
+	database_config "github.com/flyteorg/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 const insertExecutionQueryStr = `INSERT INTO "executions" ` +

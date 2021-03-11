@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -53,9 +53,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 					Name: "proj",
 				},
 			},
-			expectedError: "invalid project id [%)(*&]: [a DNS-1123 label must consist of lower case alphanumeric " +
-				"characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or " +
-				"'123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid project id [%)(*&]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 		{
 			request: admin.ProjectRegisterRequest{
@@ -116,7 +114,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "invalid label key [#badkey]: [a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid label key [#badkey]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 		{
 			request: admin.ProjectRegisterRequest{
@@ -131,7 +129,7 @@ func TestValidateProjectRegisterRequest(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "invalid label value [.bad-label-value]: [a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid label value [.bad-label-value]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 	}
 
@@ -178,9 +176,7 @@ func TestValidateProject(t *testing.T) {
 				Id:   "%)(*&",
 				Name: "proj",
 			},
-			expectedError: "invalid project id [%)(*&]: [a DNS-1123 label must consist of lower case alphanumeric " +
-				"characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or " +
-				"'123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid project id [%)(*&]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 		{
 			project: admin.Project{
@@ -235,7 +231,7 @@ func TestValidateProject(t *testing.T) {
 					},
 				},
 			},
-			expectedError: "invalid label key [#badkey]: [a DNS-1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
+			expectedError: "invalid label key [#badkey]: [a lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?')]",
 		},
 	}
 

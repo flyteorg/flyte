@@ -5,16 +5,16 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lyft/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/async/notifications/mocks"
 
 	"encoding/base64"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

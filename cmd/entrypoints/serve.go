@@ -7,36 +7,36 @@ import (
 
 	"github.com/gorilla/handlers"
 
+	"github.com/flyteorg/flyteadmin/pkg/auth"
+	"github.com/flyteorg/flyteadmin/pkg/auth/interfaces"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/lyft/flyteadmin/pkg/auth"
-	"github.com/lyft/flyteadmin/pkg/auth/interfaces"
 
 	"net"
 	"net/http"
 	_ "net/http/pprof" // Required to serve application.
 	"strings"
 
-	"github.com/lyft/flyteadmin/pkg/server"
+	"github.com/flyteorg/flyteadmin/pkg/server"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	flyteService "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/lyft/flyteadmin/pkg/common"
-	flyteService "github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/lyft/flytestdlib/logger"
 
-	"github.com/lyft/flyteadmin/pkg/config"
-	"github.com/lyft/flyteadmin/pkg/rpc/adminservice"
-	rpcConfig "github.com/lyft/flyteadmin/pkg/rpc/config"
+	"github.com/flyteorg/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice"
+	rpcConfig "github.com/flyteorg/flyteadmin/pkg/rpc/config"
 
 	"github.com/spf13/cobra"
 
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )

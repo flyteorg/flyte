@@ -398,17 +398,17 @@ spec:
         - name: run-migrations
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent
-          command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "run"]
+          command: ["flyteadmin", "migrate", "run", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
         - name: seed-projects
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent
-          command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "migrate", "seed-projects",
-                    "project", "admintests", "flytekit"]
+          command: ["flyteadmin", "migrate", "seed-projects",
+                    "project", "admintests", "flytekit", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -422,8 +422,8 @@ spec:
             httpGet:
               path: /healthcheck
               port: 8088
-          command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
-                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml", "serve"]
+          command: ["flyteadmin", "serve", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
           ports:
             - containerPort: 8088
           volumeMounts:

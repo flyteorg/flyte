@@ -3,8 +3,8 @@ package interfaces
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // Defines the interface for interacting with task execution models.

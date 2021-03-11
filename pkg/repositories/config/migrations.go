@@ -1,8 +1,8 @@
 package config
 
 import (
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
 	gormigrate "gopkg.in/gormigrate.v1"
 )
 

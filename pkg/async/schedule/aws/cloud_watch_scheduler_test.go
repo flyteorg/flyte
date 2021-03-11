@@ -4,19 +4,19 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lyft/flyteadmin/pkg/async/schedule/aws/interfaces"
-	"github.com/lyft/flyteadmin/pkg/async/schedule/aws/mocks"
-	scheduleInterfaces "github.com/lyft/flyteadmin/pkg/async/schedule/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/schedule/aws/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/schedule/aws/mocks"
+	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
-	flyteAdminErrors "github.com/lyft/flyteadmin/pkg/errors"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 )

@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/lyft/flyteadmin/pkg/auth/config"
-	"github.com/lyft/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/auth/config"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 
-	"github.com/lyft/flyteadmin/pkg/auth/interfaces/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/auth/interfaces/mocks"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 

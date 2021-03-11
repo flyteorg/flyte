@@ -3,7 +3,7 @@ package mocks
 import (
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 )
 
 type MockClusterResourceConfiguration struct {

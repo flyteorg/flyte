@@ -1,8 +1,10 @@
 package executioncluster
 
 import (
-	flyteclient "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	"github.com/lyft/flytestdlib/random"
+	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	"github.com/flyteorg/flytestdlib/random"
+	"k8s.io/client-go/dynamic"
+	restclient "k8s.io/client-go/rest"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -19,10 +21,12 @@ type ExecutionTargetSpec struct {
 
 // Client object of the target execution cluster
 type ExecutionTarget struct {
-	ID          string
-	FlyteClient flyteclient.Interface
-	Client      client.Client
-	Enabled     bool
+	ID            string
+	FlyteClient   flyteclient.Interface
+	Client        client.Client
+	DynamicClient dynamic.Interface
+	Enabled       bool
+	Config        restclient.Config
 }
 
 func (e ExecutionTarget) Compare(to random.Comparable) bool {

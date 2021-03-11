@@ -1,9 +1,9 @@
 package interfaces
 
 import (
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
-	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type ExecutionTargetProvider interface {

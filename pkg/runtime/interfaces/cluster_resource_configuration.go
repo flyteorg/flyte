@@ -3,7 +3,7 @@ package interfaces
 import (
 	"time"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 type DataSourceValueFrom struct {

@@ -3,12 +3,12 @@ package implementations
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

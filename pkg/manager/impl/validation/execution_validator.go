@@ -5,14 +5,14 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/lyft/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
 
-	"github.com/lyft/flyteadmin/pkg/errors"
-	"github.com/lyft/flyteadmin/pkg/manager/impl/shared"
-	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytepropeller/pkg/compiler/validators"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytepropeller/pkg/compiler/validators"
 	"google.golang.org/grpc/codes"
 )
 
@@ -50,7 +50,7 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 		return shared.GetMissingArgumentError(shared.Spec)
 	}
 	// TODO(katrogan): Change the name of Spec.LaunchPlan to something more generic to permit reference Tasks.
-	// https://github.com/lyft/flyte/issues/262
+	// https://github.com/flyteorg/flyte/issues/262
 	if err := ValidateIdentifierFieldsSet(request.Spec.LaunchPlan); err != nil {
 		return err
 	}

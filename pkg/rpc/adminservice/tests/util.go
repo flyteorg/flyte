@@ -1,9 +1,9 @@
 package tests
 
 import (
-	"github.com/lyft/flyteadmin/pkg/manager/mocks"
-	"github.com/lyft/flyteadmin/pkg/rpc/adminservice"
-	mockScope "github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
 )
 
 type NewMockAdminServerInput struct {
