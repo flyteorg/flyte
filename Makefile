@@ -1,10 +1,12 @@
 .SILENT:
 
 # Flyte sandbox configuration variables
+KUBERNETES_API_PORT := 30086
 FLYTE_PROXY_PORT := 30081
 K8S_DASHBOARD_PROXY_PORT := 30082
 MINIO_PROXY_PORT := 30084
 FLYTE_SANDBOX_NAME := flyte-sandbox
+KUBE_CONFIG := ~/kubeconfig
 
 # Module of cookbook examples to register
 EXAMPLES_MODULE := core
@@ -40,17 +42,23 @@ start: ## Start a local Flyte sandbox
 	$(call LOG,Starting Flyte sandbox)
 	docker run -d --rm --privileged --name $(FLYTE_SANDBOX_NAME) \
 		-e SANDBOX=1 \
+		-e KUBERNETES_API_PORT=$(KUBERNETES_API_PORT) \
 		-e FLYTE_HOST=localhost:30081 \
 		-e FLYTE_AWS_ENDPOINT=http://localhost:30084/ \
 		-v $(CURDIR):/usr/src \
+		-v $(KUBE_CONFIG):/etc/rancher/ \
+		-p $(KUBERNETES_API_PORT):$(KUBERNETES_API_PORT) \
 		-p $(FLYTE_PROXY_PORT):30081 \
 		-p $(K8S_DASHBOARD_PROXY_PORT):30082 \
 		-p $(MINIO_PROXY_PORT):30084 \
 		ghcr.io/flyteorg/flyte-sandbox:dind > /dev/null
+	
 	$(call RUN_IN_SANDBOX, wait-for-flyte.sh)
 
 	$(call LOG,Registering examples from commit: latest)
 	REGISTRY=ghcr.io/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
+	
+	echo "Flyte is ready! Flyte UI is available at http://localhost:$(FLYTE_PROXY_PORT)/console."
 
 .PHONY: teardown
 teardown: _requires-sandbox-up  ## Teardown Flyte sandbox
@@ -74,3 +82,11 @@ register: _requires-sandbox-up  ## Register Flyte cookbook workflows
 fast_register: _requires-sandbox-up  ## Fast register Flyte cookbook workflows
 	$(call LOG,Fast registering example workflows in cookbook/$(EXAMPLES_MODULE))
 	$(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
+
+.PHONY: setup-kubectl
+kubectl-config: 
+	# In shell/bash, run: `eval $(make kubectl-config)`
+	# Makefiles run recipes in sub-processes. A sub-process cannot modify the parent process's environment.
+	# The best I (@EngHabu) can think of at the moment is to output this for the user to eval in the
+	# parent process.
+	echo "export KUBECONFIG=$(KUBECONFIG):~/.kube/config:$(KUBE_CONFIG)/k3s/k3s.yaml"
