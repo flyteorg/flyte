@@ -31,7 +31,7 @@ type OAuthOptions struct {
 	IdpUserInfoEndpoint string `json:"idpUserInfoEndpoint"`
 
 	// These should point to files that contain base64 encoded secrets.
-	// You can run `go test -v github.com/lyft/flyteadmin/pkg/auth -run TestSecureCookieLifecycle` to generate new ones.
+	// You can run `go test -v github.com/flyteorg/flyteadmin/pkg/auth -run TestSecureCookieLifecycle` to generate new ones.
 	// See https://github.com/gorilla/securecookie#examples for more information
 	CookieHashKeyFile  string `json:"cookieHashKeyFile"`
 	CookieBlockKeyFile string `json:"cookieBlockKeyFile"`

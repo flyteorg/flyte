@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"github.com/lyft/flyteadmin/pkg/repositories"
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 )
 
 type MockRepository struct {

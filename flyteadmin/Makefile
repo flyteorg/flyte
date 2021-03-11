@@ -29,15 +29,15 @@ linux_compile:
 
 .PHONY: server
 server:
-	go run cmd/main.go --logtostderr --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml serve
+	go run cmd/main.go serve --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 .PHONY: migrate
 migrate:
-	go run cmd/main.go --logtostderr --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml migrate run
+	go run cmd/main.go migrate run --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 .PHONY: seed_projects
 seed_projects:
-	go run cmd/main.go --logtostderr --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml migrate seed-projects project admintests flytekit
+	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 all: compile
 

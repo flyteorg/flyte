@@ -1,13 +1,13 @@
 package interfaces
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 type TierName = string
 
-// Just incrementally start using mockery, replace with -all when working on https://github.com/lyft/flyte/issues/149
+// Just incrementally start using mockery, replace with -all when working on https://github.com/flyteorg/flyte/issues/149
 //go:generate mockery -name QualityOfServiceConfiguration -output=mocks -case=underscore
 
 type QualityOfServiceSpec struct {

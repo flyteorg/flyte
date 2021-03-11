@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/flyteadmin/pkg/common"
 )
 
 const project = "project"

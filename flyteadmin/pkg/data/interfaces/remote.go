@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // Defines an interface for fetching pre-signed URLs.

@@ -7,16 +7,16 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/audit"
-	"github.com/lyft/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/audit"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 	"google.golang.org/grpc/peer"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 
-	"github.com/lyft/flyteadmin/pkg/auth/interfaces"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/errors"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteadmin/pkg/auth/interfaces"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"

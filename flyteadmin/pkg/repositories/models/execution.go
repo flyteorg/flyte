@@ -3,7 +3,7 @@ package models
 import (
 	"time"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 // IMPORTANT: If you update the model below, be sure to double check model definitions in

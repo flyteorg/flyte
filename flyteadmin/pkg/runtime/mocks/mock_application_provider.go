@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 )
 
 type MockApplicationProvider struct {

@@ -1,7 +1,7 @@
 package impl
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const project = "project"

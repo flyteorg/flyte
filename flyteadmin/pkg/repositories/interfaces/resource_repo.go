@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 type ResourceRepoInterface interface {

@@ -9,12 +9,12 @@ package errors
 import (
 	"fmt"
 
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
-	"github.com/lyft/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 )
 

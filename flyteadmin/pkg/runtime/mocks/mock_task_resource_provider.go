@@ -1,6 +1,6 @@
 package mocks
 
-import "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+import "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 
 type MockTaskResourceConfiguration struct {
 	Defaults interfaces.TaskResourceSet

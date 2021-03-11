@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type CreateTaskFunc func(ctx context.Context, request admin.TaskCreateRequest) (*admin.TaskCreateResponse, error)

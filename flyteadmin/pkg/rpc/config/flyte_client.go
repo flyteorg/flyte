@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/lyft/flyteadmin/pkg/config"
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flyteadmin/pkg/config"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const (

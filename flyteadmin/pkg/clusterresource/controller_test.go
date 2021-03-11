@@ -7,20 +7,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
 
-	"github.com/lyft/flyteadmin/pkg/manager/impl/resources"
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/transformers"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	runtimeInterfaces "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	mockScope "github.com/lyft/flytestdlib/promutils"
+	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 
-	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
+	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
 var testScope = mockScope.NewTestScope()

@@ -4,18 +4,18 @@ import (
 	"context"
 	"time"
 
-	"github.com/lyft/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyteadmin/pkg/async"
 
-	"github.com/lyft/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 
 	"encoding/base64"
 	"encoding/json"
 
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flytestdlib/logger"
-	"github.com/lyft/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

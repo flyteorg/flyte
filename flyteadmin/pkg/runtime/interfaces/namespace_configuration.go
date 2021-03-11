@@ -1,6 +1,6 @@
 package interfaces
 
-import "github.com/lyft/flyteadmin/pkg/common"
+import "github.com/flyteorg/flyteadmin/pkg/common"
 
 type NamespaceMappingConfig struct {
 	Mapping string `json:"mapping"`

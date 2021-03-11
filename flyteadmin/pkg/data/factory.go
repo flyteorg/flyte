@@ -5,16 +5,16 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/graymeta/stow"
 	"github.com/graymeta/stow/s3"
-	"github.com/lyft/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/lyft/flyteadmin/pkg/common"
-	"github.com/lyft/flyteadmin/pkg/data/implementations"
-	"github.com/lyft/flyteadmin/pkg/data/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/data/implementations"
+	"github.com/flyteorg/flyteadmin/pkg/data/interfaces"
 )
 
 type RemoteDataHandlerConfig struct {

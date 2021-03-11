@@ -3,10 +3,10 @@ package repositories
 import (
 	"fmt"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/config"
-	"github.com/lyft/flyteadmin/pkg/repositories/errors"
-	"github.com/lyft/flyteadmin/pkg/repositories/interfaces"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 type RepoConfig int32

@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/jinzhu/gorm"
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flytestdlib/logger"
 )
 
 // Returns a function to seed the database with default values.

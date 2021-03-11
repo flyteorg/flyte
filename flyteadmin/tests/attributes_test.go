@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	databaseConfig "github.com/lyft/flyteadmin/pkg/repositories/config"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	databaseConfig "github.com/flyteorg/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 var matchingAttributes = &admin.MatchingAttributes{

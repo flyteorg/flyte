@@ -5,12 +5,12 @@ import (
 	"errors"
 	"testing"
 
-	runtimeMocks "github.com/lyft/flyteadmin/pkg/runtime/mocks"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

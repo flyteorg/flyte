@@ -2,7 +2,7 @@ package mocks
 
 import (
 	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
-	"github.com/lyft/flyteadmin/pkg/async/schedule/aws/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/async/schedule/aws/interfaces"
 )
 
 type putRuleFunc func(input *cloudwatchevents.PutRuleInput) (*cloudwatchevents.PutRuleOutput, error)

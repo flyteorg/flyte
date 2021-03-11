@@ -1,11 +1,12 @@
 package impl
 
 import (
-	"github.com/lyft/flyteadmin/pkg/executioncluster"
-	"github.com/lyft/flyteadmin/pkg/flytek8s"
-	runtime "github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	flyteclient "github.com/lyft/flytepropeller/pkg/client/clientset/versioned"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyteadmin/pkg/flytek8s"
+	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -26,11 +27,17 @@ func (c *clusterExecutionTargetProvider) GetExecutionTarget(scope promutils.Scop
 	if err != nil {
 		return nil, err
 	}
+	dynamicClient, err := dynamic.NewForConfig(kubeConf)
+	if err != nil {
+		return nil, err
+	}
 	return &executioncluster.ExecutionTarget{
-		FlyteClient: flyteClient,
-		Client:      client,
-		ID:          k8sCluster.Name,
-		Enabled:     k8sCluster.Enabled,
+		FlyteClient:   flyteClient,
+		Client:        client,
+		DynamicClient: dynamicClient,
+		ID:            k8sCluster.Name,
+		Enabled:       k8sCluster.Enabled,
+		Config:        *kubeConf,
 	}, nil
 }
 

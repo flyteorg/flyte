@@ -17,7 +17,7 @@ set -e
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
   "github.com/vektra/mockery/cmd/mockery"
-  "github.com/lyft/flytestdlib/cli/pflags"
+  "github.com/flyteorg/flytestdlib/cli/pflags"
   "github.com/golangci/golangci-lint/cmd/golangci-lint"
   "github.com/alvaroloes/enumer"
 )

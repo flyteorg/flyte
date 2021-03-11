@@ -3,11 +3,11 @@ package runtime
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 
-	"github.com/lyft/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/logger"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 const queuesKey = "queues"

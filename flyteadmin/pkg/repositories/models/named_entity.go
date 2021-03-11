@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // NamedEntityMetadata primary key

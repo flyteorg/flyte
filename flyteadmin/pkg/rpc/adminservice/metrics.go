@@ -2,8 +2,8 @@
 package adminservice
 
 import (
-	"github.com/lyft/flyteadmin/pkg/rpc/adminservice/util"
-	"github.com/lyft/flytestdlib/promutils"
+	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice/util"
+	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

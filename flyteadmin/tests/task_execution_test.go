@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lyft/flytestdlib/config"
-	"github.com/lyft/flytestdlib/contextutils"
-	"github.com/lyft/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
-	mockScope "github.com/lyft/flytestdlib/promutils"
-	"github.com/lyft/flytestdlib/storage"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/golang/protobuf/ptypes/timestamp"
 
@@ -22,11 +22,11 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/lyft/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 
 	"google.golang.org/grpc"

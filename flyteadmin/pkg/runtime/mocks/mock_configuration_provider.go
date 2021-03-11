@@ -1,9 +1,9 @@
 package mocks
 
 import (
-	"github.com/lyft/flyteadmin/pkg/runtime/interfaces"
-	ifaceMocks "github.com/lyft/flyteadmin/pkg/runtime/interfaces/mocks"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	ifaceMocks "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type MockConfigurationProvider struct {

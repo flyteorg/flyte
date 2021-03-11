@@ -3,7 +3,7 @@ package common
 import (
 	"math/rand"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const ExecutionIDLength = 10
@@ -15,6 +15,7 @@ const AllowedExecutionIDStr = "abcdefghijklmnopqrstuvwxyz1234567890"
 var AllowedExecutionIDStartChars = []rune(AllowedExecutionIDStartCharStr)
 var AllowedExecutionIDChars = []rune(AllowedExecutionIDStr)
 
+/* #nosec */
 func GetExecutionName(seed int64) string {
 	executionName := make([]rune, ExecutionIDLength)
 	rand.Seed(seed)

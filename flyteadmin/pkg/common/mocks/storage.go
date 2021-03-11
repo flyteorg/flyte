@@ -6,8 +6,8 @@ import (
 	"io"
 	"strings"
 
+	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
-	"github.com/lyft/flytestdlib/storage"
 )
 
 type NopCloser struct {

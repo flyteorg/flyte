@@ -3,11 +3,11 @@ package testutils
 import (
 	"context"
 
-	"github.com/lyft/flyteadmin/pkg/repositories/models"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/lyft/flyteadmin/pkg/repositories"
-	repositoryMocks "github.com/lyft/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
 )
 
 func GetRepoWithDefaultProjectAndErr(err error) repositories.RepositoryInterface {

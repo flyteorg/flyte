@@ -38,4 +38,4 @@ kubectl -n flyte rollout status deployment flyteadmin
 POD_NAME=$(kubectl get pods -n flyte -o go-template="{{range .items}}{{.metadata.name}}:{{end}}" | tr ":" "\n" | grep flyteadmin)
 
 # Launch the integration tests
-kubectl exec -it -n flyte "$POD_NAME" -- make -C /go/src/github.com/lyft/flyteadmin integration
+kubectl exec -it -n flyte "$POD_NAME" -- make -C /go/src/github.com/flyteorg/flyteadmin integration

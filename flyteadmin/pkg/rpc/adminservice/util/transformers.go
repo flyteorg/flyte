@@ -1,8 +1,8 @@
 package util
 
 import (
-	"github.com/lyft/flyteadmin/pkg/common"
-	"github.com/lyft/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/errors"
 
 	"google.golang.org/grpc/codes"
 )

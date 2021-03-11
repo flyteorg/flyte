@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/lyft/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyteadmin/pkg/common"
 
-	adminErrors "github.com/lyft/flyteadmin/pkg/errors"
-	mockScope "github.com/lyft/flytestdlib/promutils"
+	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

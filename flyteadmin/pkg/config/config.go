@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 
-	config2 "github.com/lyft/flyteadmin/pkg/auth/config"
-	"github.com/lyft/flytestdlib/config"
+	config2 "github.com/flyteorg/flyteadmin/pkg/auth/config"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 const SectionKey = "server"
