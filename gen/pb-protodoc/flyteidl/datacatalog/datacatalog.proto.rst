@@ -3,188 +3,129 @@
 datacatalog.proto
 ======================================
 
-.. _api_msg_pb.lyft.datacatalog.Parameter:
+.. _api_msg_datacatalog.CreateDatasetRequest:
 
-pb.lyft.datacatalog.Parameter
+datacatalog.CreateDatasetRequest
+--------------------------------
+
+`[datacatalog.CreateDatasetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L17>`_
+
+
+.. code-block:: json
+
+  {
+    "dataset": "{...}"
+  }
+
+.. _api_field_datacatalog.CreateDatasetRequest.dataset:
+
+dataset
+  (:ref:`datacatalog.Dataset <api_msg_datacatalog.Dataset>`) 
+  
+
+
+.. _api_msg_datacatalog.CreateDatasetResponse:
+
+datacatalog.CreateDatasetResponse
+---------------------------------
+
+`[datacatalog.CreateDatasetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L21>`_
+
+
+.. code-block:: json
+
+  {}
+
+
+
+
+.. _api_msg_datacatalog.GetDatasetRequest:
+
+datacatalog.GetDatasetRequest
 -----------------------------
 
-`[pb.lyft.datacatalog.Parameter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L7>`_
+`[datacatalog.GetDatasetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L25>`_
 
 
 .. code-block:: json
 
   {
-    "name": "...",
-    "value": "..."
+    "dataset": "{...}"
   }
 
-.. _api_field_pb.lyft.datacatalog.Parameter.name:
+.. _api_field_datacatalog.GetDatasetRequest.dataset:
 
-name
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Parameter.value:
-
-value
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+dataset
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
   
 
 
-.. _api_msg_pb.lyft.datacatalog.Artifact:
+.. _api_msg_datacatalog.GetDatasetResponse:
 
-pb.lyft.datacatalog.Artifact
-----------------------------
-
-`[pb.lyft.datacatalog.Artifact proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L33>`_
-
-Before jumping to message definition, lets go over the expected flow-
-  An Artifact represents an unit-of-work identified by (task, version, inputs). This is
-  encoded as unique hash for faster queries(called provenance). An artifact is persisted with some other
-  attributes (revision, createdAt, reference_id, outputs).
-  Only Discovery service knows about the hashing algorithm; one can use the closure (task, version, inputs)
-  to query an artifact if it doesnt have the provenance value.
-
-  Before starting the work on a task, programming-model first checks if the task has been done.
-    Request:   GET (task, version, inputs)
-    Response:  (Exists, Artifact) or (NotFound, nil)
-  if not found, Task executor goes ahead with the execution and at the end of execution creates a new entry in
-  the discovery service
-    Request:  CREATE (task, version, inputs) + (revision, reference_id, outputs)
-    Response: (Exists, Artifact) or (Created, Artifact)
-
-  One can also Query all the artifacts by querying any subset of properties.
-Message Artifact represents the complete information of an artifact- field that unique define the artifact +
-properties.
-Message ArtifactInternal is our storage model where we create an additional derived column for faster queries.
-Message ArtifactId only represents field that uniquely define the artifact.
-
-.. code-block:: json
-
-  {
-    "provenance": "...",
-    "name": "...",
-    "version": "...",
-    "revision": "...",
-    "created_at": "...",
-    "reference_id": "...",
-    "inputs": [],
-    "outputs": []
-  }
-
-.. _api_field_pb.lyft.datacatalog.Artifact.provenance:
-
-provenance
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.name:
-
-name
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.version:
-
-version
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.revision:
-
-revision
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.created_at:
-
-created_at
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.reference_id:
-
-reference_id
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.inputs:
-
-inputs
-  (:ref:`pb.lyft.datacatalog.Parameter <api_msg_pb.lyft.datacatalog.Parameter>`) 
-  
-.. _api_field_pb.lyft.datacatalog.Artifact.outputs:
-
-outputs
-  (:ref:`pb.lyft.datacatalog.Parameter <api_msg_pb.lyft.datacatalog.Parameter>`) 
-  
-
-
-.. _api_msg_pb.lyft.datacatalog.ArtifactId:
-
-pb.lyft.datacatalog.ArtifactId
+datacatalog.GetDatasetResponse
 ------------------------------
 
-`[pb.lyft.datacatalog.ArtifactId proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L44>`_
+`[datacatalog.GetDatasetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L29>`_
 
 
 .. code-block:: json
 
   {
-    "name": "...",
-    "version": "...",
-    "inputs": []
+    "dataset": "{...}"
   }
 
-.. _api_field_pb.lyft.datacatalog.ArtifactId.name:
+.. _api_field_datacatalog.GetDatasetResponse.dataset:
 
-name
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.ArtifactId.version:
-
-version
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.ArtifactId.inputs:
-
-inputs
-  (:ref:`pb.lyft.datacatalog.Parameter <api_msg_pb.lyft.datacatalog.Parameter>`) 
+dataset
+  (:ref:`datacatalog.Dataset <api_msg_datacatalog.Dataset>`) 
   
 
 
-.. _api_msg_pb.lyft.datacatalog.GetRequest:
+.. _api_msg_datacatalog.GetArtifactRequest:
 
-pb.lyft.datacatalog.GetRequest
+datacatalog.GetArtifactRequest
 ------------------------------
 
-`[pb.lyft.datacatalog.GetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L50>`_
+`[datacatalog.GetArtifactRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L33>`_
 
 
 .. code-block:: json
 
   {
-    "provenance": "...",
-    "artifact_id": "{...}"
+    "dataset": "{...}",
+    "artifact_id": "...",
+    "tag_name": "..."
   }
 
-.. _api_field_pb.lyft.datacatalog.GetRequest.provenance:
+.. _api_field_datacatalog.GetArtifactRequest.dataset:
 
-provenance
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+dataset
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
   
-  
-  Only one of :ref:`provenance <api_field_pb.lyft.datacatalog.GetRequest.provenance>`, :ref:`artifact_id <api_field_pb.lyft.datacatalog.GetRequest.artifact_id>` may be set.
-  
-.. _api_field_pb.lyft.datacatalog.GetRequest.artifact_id:
+.. _api_field_datacatalog.GetArtifactRequest.artifact_id:
 
 artifact_id
-  (:ref:`pb.lyft.datacatalog.ArtifactId <api_msg_pb.lyft.datacatalog.ArtifactId>`) 
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
   
   
-  Only one of :ref:`provenance <api_field_pb.lyft.datacatalog.GetRequest.provenance>`, :ref:`artifact_id <api_field_pb.lyft.datacatalog.GetRequest.artifact_id>` may be set.
+  Only one of :ref:`artifact_id <api_field_datacatalog.GetArtifactRequest.artifact_id>`, :ref:`tag_name <api_field_datacatalog.GetArtifactRequest.tag_name>` may be set.
+  
+.. _api_field_datacatalog.GetArtifactRequest.tag_name:
+
+tag_name
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+  
+  Only one of :ref:`artifact_id <api_field_datacatalog.GetArtifactRequest.artifact_id>`, :ref:`tag_name <api_field_datacatalog.GetArtifactRequest.tag_name>` may be set.
   
 
 
-.. _api_msg_pb.lyft.datacatalog.GetResponse:
+.. _api_msg_datacatalog.GetArtifactResponse:
 
-pb.lyft.datacatalog.GetResponse
+datacatalog.GetArtifactResponse
 -------------------------------
 
-`[pb.lyft.datacatalog.GetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L57>`_
+`[datacatalog.GetArtifactResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L42>`_
 
 
 .. code-block:: json
@@ -193,313 +134,769 @@ pb.lyft.datacatalog.GetResponse
     "artifact": "{...}"
   }
 
-.. _api_field_pb.lyft.datacatalog.GetResponse.artifact:
+.. _api_field_datacatalog.GetArtifactResponse.artifact:
 
 artifact
-  (:ref:`pb.lyft.datacatalog.Artifact <api_msg_pb.lyft.datacatalog.Artifact>`) 
+  (:ref:`datacatalog.Artifact <api_msg_datacatalog.Artifact>`) 
   
 
 
-.. _api_msg_pb.lyft.datacatalog.IntFilter:
+.. _api_msg_datacatalog.CreateArtifactRequest:
 
-pb.lyft.datacatalog.IntFilter
------------------------------
+datacatalog.CreateArtifactRequest
+---------------------------------
 
-`[pb.lyft.datacatalog.IntFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L67>`_
+`[datacatalog.CreateArtifactRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L46>`_
 
 
 .. code-block:: json
 
   {
-    "value": "...",
-    "operator": "..."
+    "artifact": "{...}"
   }
 
-.. _api_field_pb.lyft.datacatalog.IntFilter.value:
+.. _api_field_datacatalog.CreateArtifactRequest.artifact:
 
-value
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.IntFilter.operator:
-
-operator
-  (:ref:`pb.lyft.datacatalog.QueryOperator <api_enum_pb.lyft.datacatalog.QueryOperator>`) 
+artifact
+  (:ref:`datacatalog.Artifact <api_msg_datacatalog.Artifact>`) 
   
 
 
-.. _api_msg_pb.lyft.datacatalog.IntRangeFilter:
+.. _api_msg_datacatalog.CreateArtifactResponse:
 
-pb.lyft.datacatalog.IntRangeFilter
+datacatalog.CreateArtifactResponse
 ----------------------------------
 
-`[pb.lyft.datacatalog.IntRangeFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L72>`_
+`[datacatalog.CreateArtifactResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L50>`_
+
+
+.. code-block:: json
+
+  {}
+
+
+
+
+.. _api_msg_datacatalog.AddTagRequest:
+
+datacatalog.AddTagRequest
+-------------------------
+
+`[datacatalog.AddTagRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L54>`_
 
 
 .. code-block:: json
 
   {
-    "min": "...",
-    "max": "..."
+    "tag": "{...}"
   }
 
-.. _api_field_pb.lyft.datacatalog.IntRangeFilter.min:
+.. _api_field_datacatalog.AddTagRequest.tag:
 
-min
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.IntRangeFilter.max:
-
-max
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+tag
+  (:ref:`datacatalog.Tag <api_msg_datacatalog.Tag>`) 
   
 
 
-.. _api_msg_pb.lyft.datacatalog.IntQueryKey:
+.. _api_msg_datacatalog.AddTagResponse:
 
-pb.lyft.datacatalog.IntQueryKey
--------------------------------
+datacatalog.AddTagResponse
+--------------------------
 
-`[pb.lyft.datacatalog.IntQueryKey proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L77>`_
+`[datacatalog.AddTagResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L58>`_
 
 
 .. code-block:: json
 
-  {
-    "val": "{...}",
-    "range": "{...}"
-  }
-
-.. _api_field_pb.lyft.datacatalog.IntQueryKey.val:
-
-val
-  (:ref:`pb.lyft.datacatalog.IntFilter <api_msg_pb.lyft.datacatalog.IntFilter>`) 
-  
-  
-  Only one of :ref:`val <api_field_pb.lyft.datacatalog.IntQueryKey.val>`, :ref:`range <api_field_pb.lyft.datacatalog.IntQueryKey.range>` may be set.
-  
-.. _api_field_pb.lyft.datacatalog.IntQueryKey.range:
-
-range
-  (:ref:`pb.lyft.datacatalog.IntRangeFilter <api_msg_pb.lyft.datacatalog.IntRangeFilter>`) 
-  
-  
-  Only one of :ref:`val <api_field_pb.lyft.datacatalog.IntQueryKey.val>`, :ref:`range <api_field_pb.lyft.datacatalog.IntQueryKey.range>` may be set.
-  
+  {}
 
 
-.. _api_msg_pb.lyft.datacatalog.QueryRequest:
 
-pb.lyft.datacatalog.QueryRequest
+
+.. _api_msg_datacatalog.ListArtifactsRequest:
+
+datacatalog.ListArtifactsRequest
 --------------------------------
 
-`[pb.lyft.datacatalog.QueryRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L86>`_
+`[datacatalog.ListArtifactsRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L63>`_
 
-QueryRequest allows queries on a range of values for revision column and point queries on created_at
-and reference_id
+List the artifacts that belong to the Dataset
+
+.. code-block:: json
+
+  {
+    "dataset": "{...}",
+    "filter": "{...}",
+    "pagination": "{...}"
+  }
+
+.. _api_field_datacatalog.ListArtifactsRequest.dataset:
+
+dataset
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
+  
+.. _api_field_datacatalog.ListArtifactsRequest.filter:
+
+filter
+  (:ref:`datacatalog.FilterExpression <api_msg_datacatalog.FilterExpression>`) Apply the filter expression to this query
+  
+  
+.. _api_field_datacatalog.ListArtifactsRequest.pagination:
+
+pagination
+  (:ref:`datacatalog.PaginationOptions <api_msg_datacatalog.PaginationOptions>`) Pagination options to get a page of artifacts
+  
+  
+
+
+.. _api_msg_datacatalog.ListArtifactsResponse:
+
+datacatalog.ListArtifactsResponse
+---------------------------------
+
+`[datacatalog.ListArtifactsResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L72>`_
+
+Response to list artifacts
+
+.. code-block:: json
+
+  {
+    "artifacts": [],
+    "next_token": "..."
+  }
+
+.. _api_field_datacatalog.ListArtifactsResponse.artifacts:
+
+artifacts
+  (:ref:`datacatalog.Artifact <api_msg_datacatalog.Artifact>`) The list of artifacts
+  
+  
+.. _api_field_datacatalog.ListArtifactsResponse.next_token:
+
+next_token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Token to use to request the next page, pass this into the next requests PaginationOptions
+  
+  
+
+
+.. _api_msg_datacatalog.ListDatasetsRequest:
+
+datacatalog.ListDatasetsRequest
+-------------------------------
+
+`[datacatalog.ListDatasetsRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L80>`_
+
+List the datasets for the given query
+
+.. code-block:: json
+
+  {
+    "filter": "{...}",
+    "pagination": "{...}"
+  }
+
+.. _api_field_datacatalog.ListDatasetsRequest.filter:
+
+filter
+  (:ref:`datacatalog.FilterExpression <api_msg_datacatalog.FilterExpression>`) Apply the filter expression to this query
+  
+  
+.. _api_field_datacatalog.ListDatasetsRequest.pagination:
+
+pagination
+  (:ref:`datacatalog.PaginationOptions <api_msg_datacatalog.PaginationOptions>`) Pagination options to get a page of datasets
+  
+  
+
+
+.. _api_msg_datacatalog.ListDatasetsResponse:
+
+datacatalog.ListDatasetsResponse
+--------------------------------
+
+`[datacatalog.ListDatasetsResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L88>`_
+
+List the datasets response with token for next pagination
+
+.. code-block:: json
+
+  {
+    "datasets": [],
+    "next_token": "..."
+  }
+
+.. _api_field_datacatalog.ListDatasetsResponse.datasets:
+
+datasets
+  (:ref:`datacatalog.Dataset <api_msg_datacatalog.Dataset>`) The list of datasets
+  
+  
+.. _api_field_datacatalog.ListDatasetsResponse.next_token:
+
+next_token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Token to use to request the next page, pass this into the next requests PaginationOptions
+  
+  
+
+
+.. _api_msg_datacatalog.Dataset:
+
+datacatalog.Dataset
+-------------------
+
+`[datacatalog.Dataset proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L95>`_
+
+
+.. code-block:: json
+
+  {
+    "id": "{...}",
+    "metadata": "{...}",
+    "partitionKeys": []
+  }
+
+.. _api_field_datacatalog.Dataset.id:
+
+id
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
+  
+.. _api_field_datacatalog.Dataset.metadata:
+
+metadata
+  (:ref:`datacatalog.Metadata <api_msg_datacatalog.Metadata>`) 
+  
+.. _api_field_datacatalog.Dataset.partitionKeys:
+
+partitionKeys
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+
+
+.. _api_msg_datacatalog.Partition:
+
+datacatalog.Partition
+---------------------
+
+`[datacatalog.Partition proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L101>`_
+
+
+.. code-block:: json
+
+  {
+    "key": "...",
+    "value": "..."
+  }
+
+.. _api_field_datacatalog.Partition.key:
+
+key
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.Partition.value:
+
+value
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+
+
+.. _api_msg_datacatalog.DatasetID:
+
+datacatalog.DatasetID
+---------------------
+
+`[datacatalog.DatasetID proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L106>`_
+
+
+.. code-block:: json
+
+  {
+    "project": "...",
+    "name": "...",
+    "domain": "...",
+    "version": "...",
+    "UUID": "..."
+  }
+
+.. _api_field_datacatalog.DatasetID.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.DatasetID.name:
+
+name
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.DatasetID.domain:
+
+domain
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.DatasetID.version:
+
+version
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.DatasetID.UUID:
+
+UUID
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+
+
+.. _api_msg_datacatalog.Artifact:
+
+datacatalog.Artifact
+--------------------
+
+`[datacatalog.Artifact proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L114>`_
+
+
+.. code-block:: json
+
+  {
+    "id": "...",
+    "dataset": "{...}",
+    "data": [],
+    "metadata": "{...}",
+    "partitions": [],
+    "tags": [],
+    "created_at": "{...}"
+  }
+
+.. _api_field_datacatalog.Artifact.id:
+
+id
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.Artifact.dataset:
+
+dataset
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
+  
+.. _api_field_datacatalog.Artifact.data:
+
+data
+  (:ref:`datacatalog.ArtifactData <api_msg_datacatalog.ArtifactData>`) 
+  
+.. _api_field_datacatalog.Artifact.metadata:
+
+metadata
+  (:ref:`datacatalog.Metadata <api_msg_datacatalog.Metadata>`) 
+  
+.. _api_field_datacatalog.Artifact.partitions:
+
+partitions
+  (:ref:`datacatalog.Partition <api_msg_datacatalog.Partition>`) 
+  
+.. _api_field_datacatalog.Artifact.tags:
+
+tags
+  (:ref:`datacatalog.Tag <api_msg_datacatalog.Tag>`) 
+  
+.. _api_field_datacatalog.Artifact.created_at:
+
+created_at
+  (:ref:`google.protobuf.Timestamp <api_msg_google.protobuf.Timestamp>`) 
+  
+
+
+.. _api_msg_datacatalog.ArtifactData:
+
+datacatalog.ArtifactData
+------------------------
+
+`[datacatalog.ArtifactData proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L124>`_
+
 
 .. code-block:: json
 
   {
     "name": "...",
-    "version": "...",
-    "revision": "{...}",
-    "created_at": "...",
-    "reference_id": "..."
+    "value": "{...}"
   }
 
-.. _api_field_pb.lyft.datacatalog.QueryRequest.name:
+.. _api_field_datacatalog.ArtifactData.name:
 
 name
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
   
-.. _api_field_pb.lyft.datacatalog.QueryRequest.version:
+.. _api_field_datacatalog.ArtifactData.value:
+
+value
+  (:ref:`flyteidl.core.Literal <api_msg_flyteidl.core.Literal>`) 
+  
+
+
+.. _api_msg_datacatalog.Tag:
+
+datacatalog.Tag
+---------------
+
+`[datacatalog.Tag proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L129>`_
+
+
+.. code-block:: json
+
+  {
+    "name": "...",
+    "artifact_id": "...",
+    "dataset": "{...}"
+  }
+
+.. _api_field_datacatalog.Tag.name:
+
+name
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.Tag.artifact_id:
+
+artifact_id
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.Tag.dataset:
+
+dataset
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
+  
+
+
+.. _api_msg_datacatalog.Metadata:
+
+datacatalog.Metadata
+--------------------
+
+`[datacatalog.Metadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L135>`_
+
+
+.. code-block:: json
+
+  {
+    "key_map": "{...}"
+  }
+
+.. _api_field_datacatalog.Metadata.key_map:
+
+key_map
+  (map<`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_, `string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_>) 
+  
+
+
+.. _api_msg_datacatalog.FilterExpression:
+
+datacatalog.FilterExpression
+----------------------------
+
+`[datacatalog.FilterExpression proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L140>`_
+
+Filter expression that is composed of a combination of single filters
+
+.. code-block:: json
+
+  {
+    "filters": []
+  }
+
+.. _api_field_datacatalog.FilterExpression.filters:
+
+filters
+  (:ref:`datacatalog.SinglePropertyFilter <api_msg_datacatalog.SinglePropertyFilter>`) 
+  
+
+
+.. _api_msg_datacatalog.SinglePropertyFilter:
+
+datacatalog.SinglePropertyFilter
+--------------------------------
+
+`[datacatalog.SinglePropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L145>`_
+
+A single property to filter on.
+
+.. code-block:: json
+
+  {
+    "tag_filter": "{...}",
+    "partition_filter": "{...}",
+    "artifact_filter": "{...}",
+    "dataset_filter": "{...}",
+    "operator": "..."
+  }
+
+.. _api_field_datacatalog.SinglePropertyFilter.tag_filter:
+
+tag_filter
+  (:ref:`datacatalog.TagPropertyFilter <api_msg_datacatalog.TagPropertyFilter>`) 
+  
+  
+  Only one of :ref:`tag_filter <api_field_datacatalog.SinglePropertyFilter.tag_filter>`, :ref:`partition_filter <api_field_datacatalog.SinglePropertyFilter.partition_filter>`, :ref:`artifact_filter <api_field_datacatalog.SinglePropertyFilter.artifact_filter>`, :ref:`dataset_filter <api_field_datacatalog.SinglePropertyFilter.dataset_filter>` may be set.
+  
+.. _api_field_datacatalog.SinglePropertyFilter.partition_filter:
+
+partition_filter
+  (:ref:`datacatalog.PartitionPropertyFilter <api_msg_datacatalog.PartitionPropertyFilter>`) 
+  
+  
+  Only one of :ref:`tag_filter <api_field_datacatalog.SinglePropertyFilter.tag_filter>`, :ref:`partition_filter <api_field_datacatalog.SinglePropertyFilter.partition_filter>`, :ref:`artifact_filter <api_field_datacatalog.SinglePropertyFilter.artifact_filter>`, :ref:`dataset_filter <api_field_datacatalog.SinglePropertyFilter.dataset_filter>` may be set.
+  
+.. _api_field_datacatalog.SinglePropertyFilter.artifact_filter:
+
+artifact_filter
+  (:ref:`datacatalog.ArtifactPropertyFilter <api_msg_datacatalog.ArtifactPropertyFilter>`) 
+  
+  
+  Only one of :ref:`tag_filter <api_field_datacatalog.SinglePropertyFilter.tag_filter>`, :ref:`partition_filter <api_field_datacatalog.SinglePropertyFilter.partition_filter>`, :ref:`artifact_filter <api_field_datacatalog.SinglePropertyFilter.artifact_filter>`, :ref:`dataset_filter <api_field_datacatalog.SinglePropertyFilter.dataset_filter>` may be set.
+  
+.. _api_field_datacatalog.SinglePropertyFilter.dataset_filter:
+
+dataset_filter
+  (:ref:`datacatalog.DatasetPropertyFilter <api_msg_datacatalog.DatasetPropertyFilter>`) 
+  
+  
+  Only one of :ref:`tag_filter <api_field_datacatalog.SinglePropertyFilter.tag_filter>`, :ref:`partition_filter <api_field_datacatalog.SinglePropertyFilter.partition_filter>`, :ref:`artifact_filter <api_field_datacatalog.SinglePropertyFilter.artifact_filter>`, :ref:`dataset_filter <api_field_datacatalog.SinglePropertyFilter.dataset_filter>` may be set.
+  
+.. _api_field_datacatalog.SinglePropertyFilter.operator:
+
+operator
+  (:ref:`datacatalog.SinglePropertyFilter.ComparisonOperator <api_enum_datacatalog.SinglePropertyFilter.ComparisonOperator>`) 
+  
+
+.. _api_enum_datacatalog.SinglePropertyFilter.ComparisonOperator:
+
+Enum datacatalog.SinglePropertyFilter.ComparisonOperator
+--------------------------------------------------------
+
+`[datacatalog.SinglePropertyFilter.ComparisonOperator proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L154>`_
+
+as use-cases come up we can add more operators, ex: gte, like, not eq etc.
+
+.. _api_enum_value_datacatalog.SinglePropertyFilter.ComparisonOperator.EQUALS:
+
+EQUALS
+  *(DEFAULT)* ⁣
+  
+
+.. _api_msg_datacatalog.ArtifactPropertyFilter:
+
+datacatalog.ArtifactPropertyFilter
+----------------------------------
+
+`[datacatalog.ArtifactPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L163>`_
+
+Artifact properties we can filter by
+
+.. code-block:: json
+
+  {
+    "artifact_id": "..."
+  }
+
+.. _api_field_datacatalog.ArtifactPropertyFilter.artifact_id:
+
+artifact_id
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  oneof because we can add more properties in the future
+  
+  
+
+
+.. _api_msg_datacatalog.TagPropertyFilter:
+
+datacatalog.TagPropertyFilter
+-----------------------------
+
+`[datacatalog.TagPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L171>`_
+
+Tag properties we can filter by
+
+.. code-block:: json
+
+  {
+    "tag_name": "..."
+  }
+
+.. _api_field_datacatalog.TagPropertyFilter.tag_name:
+
+tag_name
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+  
+
+
+.. _api_msg_datacatalog.PartitionPropertyFilter:
+
+datacatalog.PartitionPropertyFilter
+-----------------------------------
+
+`[datacatalog.PartitionPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L178>`_
+
+Partition properties we can filter by
+
+.. code-block:: json
+
+  {
+    "key_val": "{...}"
+  }
+
+.. _api_field_datacatalog.PartitionPropertyFilter.key_val:
+
+key_val
+  (:ref:`datacatalog.KeyValuePair <api_msg_datacatalog.KeyValuePair>`) 
+  
+  
+
+
+.. _api_msg_datacatalog.KeyValuePair:
+
+datacatalog.KeyValuePair
+------------------------
+
+`[datacatalog.KeyValuePair proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L184>`_
+
+
+.. code-block:: json
+
+  {
+    "key": "...",
+    "value": "..."
+  }
+
+.. _api_field_datacatalog.KeyValuePair.key:
+
+key
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+.. _api_field_datacatalog.KeyValuePair.value:
+
+value
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+
+
+.. _api_msg_datacatalog.DatasetPropertyFilter:
+
+datacatalog.DatasetPropertyFilter
+---------------------------------
+
+`[datacatalog.DatasetPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L190>`_
+
+Dataset properties we can filter by
+
+.. code-block:: json
+
+  {
+    "project": "...",
+    "name": "...",
+    "domain": "...",
+    "version": "..."
+  }
+
+.. _api_field_datacatalog.DatasetPropertyFilter.project:
+
+project
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+  
+  Only one of :ref:`project <api_field_datacatalog.DatasetPropertyFilter.project>`, :ref:`name <api_field_datacatalog.DatasetPropertyFilter.name>`, :ref:`domain <api_field_datacatalog.DatasetPropertyFilter.domain>`, :ref:`version <api_field_datacatalog.DatasetPropertyFilter.version>` may be set.
+  
+.. _api_field_datacatalog.DatasetPropertyFilter.name:
+
+name
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+  
+  Only one of :ref:`project <api_field_datacatalog.DatasetPropertyFilter.project>`, :ref:`name <api_field_datacatalog.DatasetPropertyFilter.name>`, :ref:`domain <api_field_datacatalog.DatasetPropertyFilter.domain>`, :ref:`version <api_field_datacatalog.DatasetPropertyFilter.version>` may be set.
+  
+.. _api_field_datacatalog.DatasetPropertyFilter.domain:
+
+domain
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  
+  
+  Only one of :ref:`project <api_field_datacatalog.DatasetPropertyFilter.project>`, :ref:`name <api_field_datacatalog.DatasetPropertyFilter.name>`, :ref:`domain <api_field_datacatalog.DatasetPropertyFilter.domain>`, :ref:`version <api_field_datacatalog.DatasetPropertyFilter.version>` may be set.
+  
+.. _api_field_datacatalog.DatasetPropertyFilter.version:
 
 version
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
   
-.. _api_field_pb.lyft.datacatalog.QueryRequest.revision:
-
-revision
-  (:ref:`pb.lyft.datacatalog.IntQueryKey <api_msg_pb.lyft.datacatalog.IntQueryKey>`) 
   
-.. _api_field_pb.lyft.datacatalog.QueryRequest.created_at:
-
-created_at
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.QueryRequest.reference_id:
-
-reference_id
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
+  Only one of :ref:`project <api_field_datacatalog.DatasetPropertyFilter.project>`, :ref:`name <api_field_datacatalog.DatasetPropertyFilter.name>`, :ref:`domain <api_field_datacatalog.DatasetPropertyFilter.domain>`, :ref:`version <api_field_datacatalog.DatasetPropertyFilter.version>` may be set.
   
 
 
-.. _api_msg_pb.lyft.datacatalog.QueryResponse:
+.. _api_msg_datacatalog.PaginationOptions:
 
-pb.lyft.datacatalog.QueryResponse
----------------------------------
+datacatalog.PaginationOptions
+-----------------------------
 
-`[pb.lyft.datacatalog.QueryResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L94>`_
+`[datacatalog.PaginationOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L200>`_
 
+Pagination options for making list requests
 
 .. code-block:: json
 
   {
-    "artifact": []
+    "limit": "...",
+    "token": "...",
+    "sortKey": "...",
+    "sortOrder": "..."
   }
 
-.. _api_field_pb.lyft.datacatalog.QueryResponse.artifact:
+.. _api_field_datacatalog.PaginationOptions.limit:
 
-artifact
-  (:ref:`pb.lyft.datacatalog.Artifact <api_msg_pb.lyft.datacatalog.Artifact>`) 
+limit
+  (`uint32 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) the max number of results to return
+  
+  
+.. _api_field_datacatalog.PaginationOptions.token:
+
+token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) the token to pass to fetch the next page
+  
+  
+.. _api_field_datacatalog.PaginationOptions.sortKey:
+
+sortKey
+  (:ref:`datacatalog.PaginationOptions.SortKey <api_enum_datacatalog.PaginationOptions.SortKey>`) the property that we want to sort the results by
+  
+  
+.. _api_field_datacatalog.PaginationOptions.sortOrder:
+
+sortOrder
+  (:ref:`datacatalog.PaginationOptions.SortOrder <api_enum_datacatalog.PaginationOptions.SortOrder>`) the sort order of the results
+  
   
 
+.. _api_enum_datacatalog.PaginationOptions.SortOrder:
 
-.. _api_msg_pb.lyft.datacatalog.CreateRequest:
+Enum datacatalog.PaginationOptions.SortOrder
+--------------------------------------------
 
-pb.lyft.datacatalog.CreateRequest
----------------------------------
-
-`[pb.lyft.datacatalog.CreateRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L98>`_
-
-
-.. code-block:: json
-
-  {
-    "ref": "{...}",
-    "reference_id": "...",
-    "revision": "...",
-    "outputs": []
-  }
-
-.. _api_field_pb.lyft.datacatalog.CreateRequest.ref:
-
-ref
-  (:ref:`pb.lyft.datacatalog.ArtifactId <api_msg_pb.lyft.datacatalog.ArtifactId>`) 
-  
-.. _api_field_pb.lyft.datacatalog.CreateRequest.reference_id:
-
-reference_id
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.CreateRequest.revision:
-
-revision
-  (`int64 <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-.. _api_field_pb.lyft.datacatalog.CreateRequest.outputs:
-
-outputs
-  (:ref:`pb.lyft.datacatalog.Parameter <api_msg_pb.lyft.datacatalog.Parameter>`) 
-  
+`[datacatalog.PaginationOptions.SortOrder proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L214>`_
 
 
-.. _api_msg_pb.lyft.datacatalog.CreateResponse:
+.. _api_enum_value_datacatalog.PaginationOptions.SortOrder.DESCENDING:
 
-pb.lyft.datacatalog.CreateResponse
-----------------------------------
-
-`[pb.lyft.datacatalog.CreateResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L105>`_
-
-
-.. code-block:: json
-
-  {
-    "artifact": "{...}",
-    "status": "..."
-  }
-
-.. _api_field_pb.lyft.datacatalog.CreateResponse.artifact:
-
-artifact
-  (:ref:`pb.lyft.datacatalog.Artifact <api_msg_pb.lyft.datacatalog.Artifact>`) 
-  
-.. _api_field_pb.lyft.datacatalog.CreateResponse.status:
-
-status
-  (:ref:`pb.lyft.datacatalog.CreateResponse.Status <api_enum_pb.lyft.datacatalog.CreateResponse.Status>`) 
-  
-
-.. _api_enum_pb.lyft.datacatalog.CreateResponse.Status:
-
-Enum pb.lyft.datacatalog.CreateResponse.Status
-----------------------------------------------
-
-`[pb.lyft.datacatalog.CreateResponse.Status proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L107>`_
-
-
-.. _api_enum_value_pb.lyft.datacatalog.CreateResponse.Status.ALREADY_EXISTS:
-
-ALREADY_EXISTS
+DESCENDING
   *(DEFAULT)* ⁣
   
-.. _api_enum_value_pb.lyft.datacatalog.CreateResponse.Status.CREATED:
+.. _api_enum_value_datacatalog.PaginationOptions.SortOrder.ASCENDING:
 
-CREATED
+ASCENDING
   ⁣
   
 
-.. _api_msg_pb.lyft.datacatalog.GenerateProvenanceRequest:
+.. _api_enum_datacatalog.PaginationOptions.SortKey:
 
-pb.lyft.datacatalog.GenerateProvenanceRequest
----------------------------------------------
+Enum datacatalog.PaginationOptions.SortKey
+------------------------------------------
 
-`[pb.lyft.datacatalog.GenerateProvenanceRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L114>`_
-
-
-.. code-block:: json
-
-  {
-    "id": "{...}"
-  }
-
-.. _api_field_pb.lyft.datacatalog.GenerateProvenanceRequest.id:
-
-id
-  (:ref:`pb.lyft.datacatalog.ArtifactId <api_msg_pb.lyft.datacatalog.ArtifactId>`) 
-  
+`[datacatalog.PaginationOptions.SortKey proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L219>`_
 
 
-.. _api_msg_pb.lyft.datacatalog.GenerateProvenanceResponse:
+.. _api_enum_value_datacatalog.PaginationOptions.SortKey.CREATION_TIME:
 
-pb.lyft.datacatalog.GenerateProvenanceResponse
-----------------------------------------------
-
-`[pb.lyft.datacatalog.GenerateProvenanceResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L118>`_
-
-
-.. code-block:: json
-
-  {
-    "provenance": "..."
-  }
-
-.. _api_field_pb.lyft.datacatalog.GenerateProvenanceResponse.provenance:
-
-provenance
-  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) 
-  
-
-.. _api_enum_pb.lyft.datacatalog.QueryOperator:
-
-Enum pb.lyft.datacatalog.QueryOperator
---------------------------------------
-
-`[pb.lyft.datacatalog.QueryOperator proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L61>`_
-
-
-.. _api_enum_value_pb.lyft.datacatalog.QueryOperator.EQUAL:
-
-EQUAL
+CREATION_TIME
   *(DEFAULT)* ⁣
-  
-.. _api_enum_value_pb.lyft.datacatalog.QueryOperator.GREATER_THAN:
-
-GREATER_THAN
-  ⁣
-  
-.. _api_enum_value_pb.lyft.datacatalog.QueryOperator.LESSER_THAN:
-
-LESSER_THAN
-  ⁣
   
