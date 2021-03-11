@@ -45,7 +45,8 @@ class CoreTaskTemplate(object):
         'custom': 'ProtobufStruct',
         'container': 'CoreContainer',
         'task_type_version': 'int',
-        'security_context': 'CoreSecurityContext'
+        'security_context': 'CoreSecurityContext',
+        'config': 'dict(str, str)'
     }
 
     attribute_map = {
@@ -56,10 +57,11 @@ class CoreTaskTemplate(object):
         'custom': 'custom',
         'container': 'container',
         'task_type_version': 'task_type_version',
-        'security_context': 'security_context'
+        'security_context': 'security_context',
+        'config': 'config'
     }
 
-    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, task_type_version=None, security_context=None):  # noqa: E501
+    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, task_type_version=None, security_context=None, config=None):  # noqa: E501
         """CoreTaskTemplate - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -70,6 +72,7 @@ class CoreTaskTemplate(object):
         self._container = None
         self._task_type_version = None
         self._security_context = None
+        self._config = None
         self.discriminator = None
 
         if id is not None:
@@ -88,6 +91,8 @@ class CoreTaskTemplate(object):
             self.task_type_version = task_type_version
         if security_context is not None:
             self.security_context = security_context
+        if config is not None:
+            self.config = config
 
     @property
     def id(self):
@@ -270,6 +275,27 @@ class CoreTaskTemplate(object):
         """
 
         self._security_context = security_context
+
+    @property
+    def config(self):
+        """Gets the config of this CoreTaskTemplate.  # noqa: E501
+
+
+        :return: The config of this CoreTaskTemplate.  # noqa: E501
+        :rtype: dict(str, str)
+        """
+        return self._config
+
+    @config.setter
+    def config(self, config):
+        """Sets the config of this CoreTaskTemplate.
+
+
+        :param config: The config of this CoreTaskTemplate.  # noqa: E501
+        :type: dict(str, str)
+        """
+
+        self._config = config
 
     def to_dict(self):
         """Returns the model properties as a dict"""

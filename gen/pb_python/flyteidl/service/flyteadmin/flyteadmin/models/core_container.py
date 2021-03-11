@@ -204,7 +204,7 @@ class CoreContainer(object):
     def config(self):
         """Gets the config of this CoreContainer.  # noqa: E501
 
-        Allows extra configs to be available for the container. TODO: elaborate on how configs will become available.  # noqa: E501
+        Allows extra configs to be available for the container. TODO: elaborate on how configs will become available. Deprecated, please use TaskTemplate.config instead.  # noqa: E501
 
         :return: The config of this CoreContainer.  # noqa: E501
         :rtype: list[CoreKeyValuePair]
@@ -215,7 +215,7 @@ class CoreContainer(object):
     def config(self, config):
         """Sets the config of this CoreContainer.
 
-        Allows extra configs to be available for the container. TODO: elaborate on how configs will become available.  # noqa: E501
+        Allows extra configs to be available for the container. TODO: elaborate on how configs will become available. Deprecated, please use TaskTemplate.config instead.  # noqa: E501
 
         :param config: The config of this CoreContainer.  # noqa: E501
         :type: list[CoreKeyValuePair]

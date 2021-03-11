@@ -125,6 +125,12 @@ message TaskTemplate {
 
     // security_context encapsulates security attributes requested to run this task.
     SecurityContext security_context = 8;
+
+    // Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+    // to use as required.
+    // reserve the field numbers 1 through 15 for very frequently occurring message elements
+    map<string, string> config = 16;
+
 }
 
 // ----------------- First class Plugins
@@ -156,7 +162,8 @@ message Container {
 
     // Allows extra configs to be available for the container.
     // TODO: elaborate on how configs will become available.
-    repeated KeyValuePair config = 6;
+    // Deprecated, please use TaskTemplate.config instead.
+    repeated KeyValuePair config = 6 [deprecated = true];
 
     // Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but
     // not supported on AWS Batch)
