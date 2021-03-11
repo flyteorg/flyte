@@ -6,7 +6,9 @@ package datacatalog
 import (
 	context "context"
 	fmt "fmt"
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	proto "github.com/golang/protobuf/proto"
+	timestamp "github.com/golang/protobuf/ptypes/timestamp"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,145 +26,890 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type QueryOperator int32
+// as use-cases come up we can add more operators, ex: gte, like, not eq etc.
+type SinglePropertyFilter_ComparisonOperator int32
 
 const (
-	QueryOperator_EQUAL        QueryOperator = 0
-	QueryOperator_GREATER_THAN QueryOperator = 1
-	QueryOperator_LESSER_THAN  QueryOperator = 2
+	SinglePropertyFilter_EQUALS SinglePropertyFilter_ComparisonOperator = 0
 )
 
-var QueryOperator_name = map[int32]string{
-	0: "EQUAL",
-	1: "GREATER_THAN",
-	2: "LESSER_THAN",
+var SinglePropertyFilter_ComparisonOperator_name = map[int32]string{
+	0: "EQUALS",
 }
 
-var QueryOperator_value = map[string]int32{
-	"EQUAL":        0,
-	"GREATER_THAN": 1,
-	"LESSER_THAN":  2,
+var SinglePropertyFilter_ComparisonOperator_value = map[string]int32{
+	"EQUALS": 0,
 }
 
-func (x QueryOperator) String() string {
-	return proto.EnumName(QueryOperator_name, int32(x))
+func (x SinglePropertyFilter_ComparisonOperator) String() string {
+	return proto.EnumName(SinglePropertyFilter_ComparisonOperator_name, int32(x))
 }
 
-func (QueryOperator) EnumDescriptor() ([]byte, []int) {
+func (SinglePropertyFilter_ComparisonOperator) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{22, 0}
+}
+
+type PaginationOptions_SortOrder int32
+
+const (
+	PaginationOptions_DESCENDING PaginationOptions_SortOrder = 0
+	PaginationOptions_ASCENDING  PaginationOptions_SortOrder = 1
+)
+
+var PaginationOptions_SortOrder_name = map[int32]string{
+	0: "DESCENDING",
+	1: "ASCENDING",
+}
+
+var PaginationOptions_SortOrder_value = map[string]int32{
+	"DESCENDING": 0,
+	"ASCENDING":  1,
+}
+
+func (x PaginationOptions_SortOrder) String() string {
+	return proto.EnumName(PaginationOptions_SortOrder_name, int32(x))
+}
+
+func (PaginationOptions_SortOrder) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{28, 0}
+}
+
+type PaginationOptions_SortKey int32
+
+const (
+	PaginationOptions_CREATION_TIME PaginationOptions_SortKey = 0
+)
+
+var PaginationOptions_SortKey_name = map[int32]string{
+	0: "CREATION_TIME",
+}
+
+var PaginationOptions_SortKey_value = map[string]int32{
+	"CREATION_TIME": 0,
+}
+
+func (x PaginationOptions_SortKey) String() string {
+	return proto.EnumName(PaginationOptions_SortKey_name, int32(x))
+}
+
+func (PaginationOptions_SortKey) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{28, 1}
+}
+
+type CreateDatasetRequest struct {
+	Dataset              *Dataset `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateDatasetRequest) Reset()         { *m = CreateDatasetRequest{} }
+func (m *CreateDatasetRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateDatasetRequest) ProtoMessage()    {}
+func (*CreateDatasetRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_275951237ff4368a, []int{0}
 }
 
-type CreateResponse_Status int32
-
-const (
-	CreateResponse_ALREADY_EXISTS CreateResponse_Status = 0
-	CreateResponse_CREATED        CreateResponse_Status = 1
-)
-
-var CreateResponse_Status_name = map[int32]string{
-	0: "ALREADY_EXISTS",
-	1: "CREATED",
+func (m *CreateDatasetRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateDatasetRequest.Unmarshal(m, b)
+}
+func (m *CreateDatasetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateDatasetRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateDatasetRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateDatasetRequest.Merge(m, src)
+}
+func (m *CreateDatasetRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateDatasetRequest.Size(m)
+}
+func (m *CreateDatasetRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateDatasetRequest.DiscardUnknown(m)
 }
 
-var CreateResponse_Status_value = map[string]int32{
-	"ALREADY_EXISTS": 0,
-	"CREATED":        1,
+var xxx_messageInfo_CreateDatasetRequest proto.InternalMessageInfo
+
+func (m *CreateDatasetRequest) GetDataset() *Dataset {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
 }
 
-func (x CreateResponse_Status) String() string {
-	return proto.EnumName(CreateResponse_Status_name, int32(x))
+type CreateDatasetResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
-func (CreateResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{11, 0}
+func (m *CreateDatasetResponse) Reset()         { *m = CreateDatasetResponse{} }
+func (m *CreateDatasetResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateDatasetResponse) ProtoMessage()    {}
+func (*CreateDatasetResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{1}
 }
 
-type Parameter struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+func (m *CreateDatasetResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateDatasetResponse.Unmarshal(m, b)
+}
+func (m *CreateDatasetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateDatasetResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateDatasetResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateDatasetResponse.Merge(m, src)
+}
+func (m *CreateDatasetResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateDatasetResponse.Size(m)
+}
+func (m *CreateDatasetResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateDatasetResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateDatasetResponse proto.InternalMessageInfo
+
+type GetDatasetRequest struct {
+	Dataset              *DatasetID `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *GetDatasetRequest) Reset()         { *m = GetDatasetRequest{} }
+func (m *GetDatasetRequest) String() string { return proto.CompactTextString(m) }
+func (*GetDatasetRequest) ProtoMessage()    {}
+func (*GetDatasetRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{2}
+}
+
+func (m *GetDatasetRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDatasetRequest.Unmarshal(m, b)
+}
+func (m *GetDatasetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDatasetRequest.Marshal(b, m, deterministic)
+}
+func (m *GetDatasetRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDatasetRequest.Merge(m, src)
+}
+func (m *GetDatasetRequest) XXX_Size() int {
+	return xxx_messageInfo_GetDatasetRequest.Size(m)
+}
+func (m *GetDatasetRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDatasetRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDatasetRequest proto.InternalMessageInfo
+
+func (m *GetDatasetRequest) GetDataset() *DatasetID {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
+}
+
+type GetDatasetResponse struct {
+	Dataset              *Dataset `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetDatasetResponse) Reset()         { *m = GetDatasetResponse{} }
+func (m *GetDatasetResponse) String() string { return proto.CompactTextString(m) }
+func (*GetDatasetResponse) ProtoMessage()    {}
+func (*GetDatasetResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{3}
+}
+
+func (m *GetDatasetResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDatasetResponse.Unmarshal(m, b)
+}
+func (m *GetDatasetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDatasetResponse.Marshal(b, m, deterministic)
+}
+func (m *GetDatasetResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDatasetResponse.Merge(m, src)
+}
+func (m *GetDatasetResponse) XXX_Size() int {
+	return xxx_messageInfo_GetDatasetResponse.Size(m)
+}
+func (m *GetDatasetResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDatasetResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDatasetResponse proto.InternalMessageInfo
+
+func (m *GetDatasetResponse) GetDataset() *Dataset {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
+}
+
+type GetArtifactRequest struct {
+	Dataset *DatasetID `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	// Types that are valid to be assigned to QueryHandle:
+	//	*GetArtifactRequest_ArtifactId
+	//	*GetArtifactRequest_TagName
+	QueryHandle          isGetArtifactRequest_QueryHandle `protobuf_oneof:"query_handle"`
+	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
+	XXX_unrecognized     []byte                           `json:"-"`
+	XXX_sizecache        int32                            `json:"-"`
+}
+
+func (m *GetArtifactRequest) Reset()         { *m = GetArtifactRequest{} }
+func (m *GetArtifactRequest) String() string { return proto.CompactTextString(m) }
+func (*GetArtifactRequest) ProtoMessage()    {}
+func (*GetArtifactRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{4}
+}
+
+func (m *GetArtifactRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetArtifactRequest.Unmarshal(m, b)
+}
+func (m *GetArtifactRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetArtifactRequest.Marshal(b, m, deterministic)
+}
+func (m *GetArtifactRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetArtifactRequest.Merge(m, src)
+}
+func (m *GetArtifactRequest) XXX_Size() int {
+	return xxx_messageInfo_GetArtifactRequest.Size(m)
+}
+func (m *GetArtifactRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetArtifactRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetArtifactRequest proto.InternalMessageInfo
+
+func (m *GetArtifactRequest) GetDataset() *DatasetID {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
+}
+
+type isGetArtifactRequest_QueryHandle interface {
+	isGetArtifactRequest_QueryHandle()
+}
+
+type GetArtifactRequest_ArtifactId struct {
+	ArtifactId string `protobuf:"bytes,2,opt,name=artifact_id,json=artifactId,proto3,oneof"`
+}
+
+type GetArtifactRequest_TagName struct {
+	TagName string `protobuf:"bytes,3,opt,name=tag_name,json=tagName,proto3,oneof"`
+}
+
+func (*GetArtifactRequest_ArtifactId) isGetArtifactRequest_QueryHandle() {}
+
+func (*GetArtifactRequest_TagName) isGetArtifactRequest_QueryHandle() {}
+
+func (m *GetArtifactRequest) GetQueryHandle() isGetArtifactRequest_QueryHandle {
+	if m != nil {
+		return m.QueryHandle
+	}
+	return nil
+}
+
+func (m *GetArtifactRequest) GetArtifactId() string {
+	if x, ok := m.GetQueryHandle().(*GetArtifactRequest_ArtifactId); ok {
+		return x.ArtifactId
+	}
+	return ""
+}
+
+func (m *GetArtifactRequest) GetTagName() string {
+	if x, ok := m.GetQueryHandle().(*GetArtifactRequest_TagName); ok {
+		return x.TagName
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*GetArtifactRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*GetArtifactRequest_ArtifactId)(nil),
+		(*GetArtifactRequest_TagName)(nil),
+	}
+}
+
+type GetArtifactResponse struct {
+	Artifact             *Artifact `protobuf:"bytes,1,opt,name=artifact,proto3" json:"artifact,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *GetArtifactResponse) Reset()         { *m = GetArtifactResponse{} }
+func (m *GetArtifactResponse) String() string { return proto.CompactTextString(m) }
+func (*GetArtifactResponse) ProtoMessage()    {}
+func (*GetArtifactResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{5}
+}
+
+func (m *GetArtifactResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetArtifactResponse.Unmarshal(m, b)
+}
+func (m *GetArtifactResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetArtifactResponse.Marshal(b, m, deterministic)
+}
+func (m *GetArtifactResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetArtifactResponse.Merge(m, src)
+}
+func (m *GetArtifactResponse) XXX_Size() int {
+	return xxx_messageInfo_GetArtifactResponse.Size(m)
+}
+func (m *GetArtifactResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetArtifactResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetArtifactResponse proto.InternalMessageInfo
+
+func (m *GetArtifactResponse) GetArtifact() *Artifact {
+	if m != nil {
+		return m.Artifact
+	}
+	return nil
+}
+
+type CreateArtifactRequest struct {
+	Artifact             *Artifact `protobuf:"bytes,1,opt,name=artifact,proto3" json:"artifact,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *CreateArtifactRequest) Reset()         { *m = CreateArtifactRequest{} }
+func (m *CreateArtifactRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateArtifactRequest) ProtoMessage()    {}
+func (*CreateArtifactRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{6}
+}
+
+func (m *CreateArtifactRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateArtifactRequest.Unmarshal(m, b)
+}
+func (m *CreateArtifactRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateArtifactRequest.Marshal(b, m, deterministic)
+}
+func (m *CreateArtifactRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateArtifactRequest.Merge(m, src)
+}
+func (m *CreateArtifactRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateArtifactRequest.Size(m)
+}
+func (m *CreateArtifactRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateArtifactRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateArtifactRequest proto.InternalMessageInfo
+
+func (m *CreateArtifactRequest) GetArtifact() *Artifact {
+	if m != nil {
+		return m.Artifact
+	}
+	return nil
+}
+
+type CreateArtifactResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateArtifactResponse) Reset()         { *m = CreateArtifactResponse{} }
+func (m *CreateArtifactResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateArtifactResponse) ProtoMessage()    {}
+func (*CreateArtifactResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{7}
+}
+
+func (m *CreateArtifactResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateArtifactResponse.Unmarshal(m, b)
+}
+func (m *CreateArtifactResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateArtifactResponse.Marshal(b, m, deterministic)
+}
+func (m *CreateArtifactResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateArtifactResponse.Merge(m, src)
+}
+func (m *CreateArtifactResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateArtifactResponse.Size(m)
+}
+func (m *CreateArtifactResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateArtifactResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateArtifactResponse proto.InternalMessageInfo
+
+type AddTagRequest struct {
+	Tag                  *Tag     `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddTagRequest) Reset()         { *m = AddTagRequest{} }
+func (m *AddTagRequest) String() string { return proto.CompactTextString(m) }
+func (*AddTagRequest) ProtoMessage()    {}
+func (*AddTagRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{8}
+}
+
+func (m *AddTagRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddTagRequest.Unmarshal(m, b)
+}
+func (m *AddTagRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddTagRequest.Marshal(b, m, deterministic)
+}
+func (m *AddTagRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddTagRequest.Merge(m, src)
+}
+func (m *AddTagRequest) XXX_Size() int {
+	return xxx_messageInfo_AddTagRequest.Size(m)
+}
+func (m *AddTagRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddTagRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddTagRequest proto.InternalMessageInfo
+
+func (m *AddTagRequest) GetTag() *Tag {
+	if m != nil {
+		return m.Tag
+	}
+	return nil
+}
+
+type AddTagResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddTagResponse) Reset()         { *m = AddTagResponse{} }
+func (m *AddTagResponse) String() string { return proto.CompactTextString(m) }
+func (*AddTagResponse) ProtoMessage()    {}
+func (*AddTagResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{9}
+}
+
+func (m *AddTagResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddTagResponse.Unmarshal(m, b)
+}
+func (m *AddTagResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddTagResponse.Marshal(b, m, deterministic)
+}
+func (m *AddTagResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddTagResponse.Merge(m, src)
+}
+func (m *AddTagResponse) XXX_Size() int {
+	return xxx_messageInfo_AddTagResponse.Size(m)
+}
+func (m *AddTagResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddTagResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddTagResponse proto.InternalMessageInfo
+
+// List the artifacts that belong to the Dataset
+type ListArtifactsRequest struct {
+	Dataset *DatasetID `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	// Apply the filter expression to this query
+	Filter *FilterExpression `protobuf:"bytes,2,opt,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination options to get a page of artifacts
+	Pagination           *PaginationOptions `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *ListArtifactsRequest) Reset()         { *m = ListArtifactsRequest{} }
+func (m *ListArtifactsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListArtifactsRequest) ProtoMessage()    {}
+func (*ListArtifactsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{10}
+}
+
+func (m *ListArtifactsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListArtifactsRequest.Unmarshal(m, b)
+}
+func (m *ListArtifactsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListArtifactsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListArtifactsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListArtifactsRequest.Merge(m, src)
+}
+func (m *ListArtifactsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListArtifactsRequest.Size(m)
+}
+func (m *ListArtifactsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListArtifactsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListArtifactsRequest proto.InternalMessageInfo
+
+func (m *ListArtifactsRequest) GetDataset() *DatasetID {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
+}
+
+func (m *ListArtifactsRequest) GetFilter() *FilterExpression {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (m *ListArtifactsRequest) GetPagination() *PaginationOptions {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// Response to list artifacts
+type ListArtifactsResponse struct {
+	// The list of artifacts
+	Artifacts []*Artifact `protobuf:"bytes,1,rep,name=artifacts,proto3" json:"artifacts,omitempty"`
+	// Token to use to request the next page, pass this into the next requests PaginationOptions
+	NextToken            string   `protobuf:"bytes,2,opt,name=next_token,json=nextToken,proto3" json:"next_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListArtifactsResponse) Reset()         { *m = ListArtifactsResponse{} }
+func (m *ListArtifactsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListArtifactsResponse) ProtoMessage()    {}
+func (*ListArtifactsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{11}
+}
+
+func (m *ListArtifactsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListArtifactsResponse.Unmarshal(m, b)
+}
+func (m *ListArtifactsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListArtifactsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListArtifactsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListArtifactsResponse.Merge(m, src)
+}
+func (m *ListArtifactsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListArtifactsResponse.Size(m)
+}
+func (m *ListArtifactsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListArtifactsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListArtifactsResponse proto.InternalMessageInfo
+
+func (m *ListArtifactsResponse) GetArtifacts() []*Artifact {
+	if m != nil {
+		return m.Artifacts
+	}
+	return nil
+}
+
+func (m *ListArtifactsResponse) GetNextToken() string {
+	if m != nil {
+		return m.NextToken
+	}
+	return ""
+}
+
+// List the datasets for the given query
+type ListDatasetsRequest struct {
+	// Apply the filter expression to this query
+	Filter *FilterExpression `protobuf:"bytes,1,opt,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination options to get a page of datasets
+	Pagination           *PaginationOptions `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
+	XXX_unrecognized     []byte             `json:"-"`
+	XXX_sizecache        int32              `json:"-"`
+}
+
+func (m *ListDatasetsRequest) Reset()         { *m = ListDatasetsRequest{} }
+func (m *ListDatasetsRequest) String() string { return proto.CompactTextString(m) }
+func (*ListDatasetsRequest) ProtoMessage()    {}
+func (*ListDatasetsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{12}
+}
+
+func (m *ListDatasetsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListDatasetsRequest.Unmarshal(m, b)
+}
+func (m *ListDatasetsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListDatasetsRequest.Marshal(b, m, deterministic)
+}
+func (m *ListDatasetsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListDatasetsRequest.Merge(m, src)
+}
+func (m *ListDatasetsRequest) XXX_Size() int {
+	return xxx_messageInfo_ListDatasetsRequest.Size(m)
+}
+func (m *ListDatasetsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListDatasetsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListDatasetsRequest proto.InternalMessageInfo
+
+func (m *ListDatasetsRequest) GetFilter() *FilterExpression {
+	if m != nil {
+		return m.Filter
+	}
+	return nil
+}
+
+func (m *ListDatasetsRequest) GetPagination() *PaginationOptions {
+	if m != nil {
+		return m.Pagination
+	}
+	return nil
+}
+
+// List the datasets response with token for next pagination
+type ListDatasetsResponse struct {
+	// The list of datasets
+	Datasets []*Dataset `protobuf:"bytes,1,rep,name=datasets,proto3" json:"datasets,omitempty"`
+	// Token to use to request the next page, pass this into the next requests PaginationOptions
+	NextToken            string   `protobuf:"bytes,2,opt,name=next_token,json=nextToken,proto3" json:"next_token,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListDatasetsResponse) Reset()         { *m = ListDatasetsResponse{} }
+func (m *ListDatasetsResponse) String() string { return proto.CompactTextString(m) }
+func (*ListDatasetsResponse) ProtoMessage()    {}
+func (*ListDatasetsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{13}
+}
+
+func (m *ListDatasetsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListDatasetsResponse.Unmarshal(m, b)
+}
+func (m *ListDatasetsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListDatasetsResponse.Marshal(b, m, deterministic)
+}
+func (m *ListDatasetsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListDatasetsResponse.Merge(m, src)
+}
+func (m *ListDatasetsResponse) XXX_Size() int {
+	return xxx_messageInfo_ListDatasetsResponse.Size(m)
+}
+func (m *ListDatasetsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListDatasetsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListDatasetsResponse proto.InternalMessageInfo
+
+func (m *ListDatasetsResponse) GetDatasets() []*Dataset {
+	if m != nil {
+		return m.Datasets
+	}
+	return nil
+}
+
+func (m *ListDatasetsResponse) GetNextToken() string {
+	if m != nil {
+		return m.NextToken
+	}
+	return ""
+}
+
+type Dataset struct {
+	Id                   *DatasetID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Metadata             *Metadata  `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	PartitionKeys        []string   `protobuf:"bytes,3,rep,name=partitionKeys,proto3" json:"partitionKeys,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *Dataset) Reset()         { *m = Dataset{} }
+func (m *Dataset) String() string { return proto.CompactTextString(m) }
+func (*Dataset) ProtoMessage()    {}
+func (*Dataset) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{14}
+}
+
+func (m *Dataset) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Dataset.Unmarshal(m, b)
+}
+func (m *Dataset) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Dataset.Marshal(b, m, deterministic)
+}
+func (m *Dataset) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Dataset.Merge(m, src)
+}
+func (m *Dataset) XXX_Size() int {
+	return xxx_messageInfo_Dataset.Size(m)
+}
+func (m *Dataset) XXX_DiscardUnknown() {
+	xxx_messageInfo_Dataset.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Dataset proto.InternalMessageInfo
+
+func (m *Dataset) GetId() *DatasetID {
+	if m != nil {
+		return m.Id
+	}
+	return nil
+}
+
+func (m *Dataset) GetMetadata() *Metadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+func (m *Dataset) GetPartitionKeys() []string {
+	if m != nil {
+		return m.PartitionKeys
+	}
+	return nil
+}
+
+type Partition struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Value                string   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *Parameter) Reset()         { *m = Parameter{} }
-func (m *Parameter) String() string { return proto.CompactTextString(m) }
-func (*Parameter) ProtoMessage()    {}
-func (*Parameter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{0}
+func (m *Partition) Reset()         { *m = Partition{} }
+func (m *Partition) String() string { return proto.CompactTextString(m) }
+func (*Partition) ProtoMessage()    {}
+func (*Partition) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{15}
 }
 
-func (m *Parameter) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_Parameter.Unmarshal(m, b)
+func (m *Partition) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Partition.Unmarshal(m, b)
 }
-func (m *Parameter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_Parameter.Marshal(b, m, deterministic)
+func (m *Partition) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Partition.Marshal(b, m, deterministic)
 }
-func (m *Parameter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Parameter.Merge(m, src)
+func (m *Partition) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Partition.Merge(m, src)
 }
-func (m *Parameter) XXX_Size() int {
-	return xxx_messageInfo_Parameter.Size(m)
+func (m *Partition) XXX_Size() int {
+	return xxx_messageInfo_Partition.Size(m)
 }
-func (m *Parameter) XXX_DiscardUnknown() {
-	xxx_messageInfo_Parameter.DiscardUnknown(m)
+func (m *Partition) XXX_DiscardUnknown() {
+	xxx_messageInfo_Partition.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_Parameter proto.InternalMessageInfo
+var xxx_messageInfo_Partition proto.InternalMessageInfo
 
-func (m *Parameter) GetName() string {
+func (m *Partition) GetKey() string {
 	if m != nil {
-		return m.Name
+		return m.Key
 	}
 	return ""
 }
 
-func (m *Parameter) GetValue() string {
+func (m *Partition) GetValue() string {
 	if m != nil {
 		return m.Value
 	}
 	return ""
 }
 
-// Before jumping to message definition, lets go over the expected flow-
-//   An Artifact represents an unit-of-work identified by (task, version, inputs). This is
-//   encoded as unique hash for faster queries(called provenance). An artifact is persisted with some other
-//   attributes (revision, createdAt, reference_id, outputs).
-//   Only Discovery service knows about the hashing algorithm; one can use the closure (task, version, inputs)
-//   to query an artifact if it doesnt have the provenance value.
-//
-//   Before starting the work on a task, programming-model first checks if the task has been done.
-//     Request:   GET (task, version, inputs)
-//     Response:  (Exists, Artifact) or (NotFound, nil)
-//   if not found, Task executor goes ahead with the execution and at the end of execution creates a new entry in
-//   the discovery service
-//     Request:  CREATE (task, version, inputs) + (revision, reference_id, outputs)
-//     Response: (Exists, Artifact) or (Created, Artifact)
-//
-//   One can also Query all the artifacts by querying any subset of properties.
-// Message Artifact represents the complete information of an artifact- field that unique define the artifact +
-// properties.
-// Message ArtifactInternal is our storage model where we create an additional derived column for faster queries.
-// Message ArtifactId only represents field that uniquely define the artifact.
+type DatasetID struct {
+	Project              string   `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
+	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Domain               string   `protobuf:"bytes,3,opt,name=domain,proto3" json:"domain,omitempty"`
+	Version              string   `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
+	UUID                 string   `protobuf:"bytes,5,opt,name=UUID,proto3" json:"UUID,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DatasetID) Reset()         { *m = DatasetID{} }
+func (m *DatasetID) String() string { return proto.CompactTextString(m) }
+func (*DatasetID) ProtoMessage()    {}
+func (*DatasetID) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{16}
+}
+
+func (m *DatasetID) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DatasetID.Unmarshal(m, b)
+}
+func (m *DatasetID) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DatasetID.Marshal(b, m, deterministic)
+}
+func (m *DatasetID) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DatasetID.Merge(m, src)
+}
+func (m *DatasetID) XXX_Size() int {
+	return xxx_messageInfo_DatasetID.Size(m)
+}
+func (m *DatasetID) XXX_DiscardUnknown() {
+	xxx_messageInfo_DatasetID.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DatasetID proto.InternalMessageInfo
+
+func (m *DatasetID) GetProject() string {
+	if m != nil {
+		return m.Project
+	}
+	return ""
+}
+
+func (m *DatasetID) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *DatasetID) GetDomain() string {
+	if m != nil {
+		return m.Domain
+	}
+	return ""
+}
+
+func (m *DatasetID) GetVersion() string {
+	if m != nil {
+		return m.Version
+	}
+	return ""
+}
+
+func (m *DatasetID) GetUUID() string {
+	if m != nil {
+		return m.UUID
+	}
+	return ""
+}
+
 type Artifact struct {
-	Provenance           string       `protobuf:"bytes,1,opt,name=provenance,proto3" json:"provenance,omitempty"`
-	Name                 string       `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string       `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	Revision             int64        `protobuf:"varint,4,opt,name=revision,proto3" json:"revision,omitempty"`
-	CreatedAt            int64        `protobuf:"varint,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	ReferenceId          string       `protobuf:"bytes,6,opt,name=reference_id,json=referenceId,proto3" json:"reference_id,omitempty"`
-	Inputs               []*Parameter `protobuf:"bytes,7,rep,name=inputs,proto3" json:"inputs,omitempty"`
-	Outputs              []*Parameter `protobuf:"bytes,8,rep,name=outputs,proto3" json:"outputs,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Dataset              *DatasetID           `protobuf:"bytes,2,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	Data                 []*ArtifactData      `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Metadata             *Metadata            `protobuf:"bytes,4,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Partitions           []*Partition         `protobuf:"bytes,5,rep,name=partitions,proto3" json:"partitions,omitempty"`
+	Tags                 []*Tag               `protobuf:"bytes,6,rep,name=tags,proto3" json:"tags,omitempty"`
+	CreatedAt            *timestamp.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
+	XXX_unrecognized     []byte               `json:"-"`
+	XXX_sizecache        int32                `json:"-"`
 }
 
 func (m *Artifact) Reset()         { *m = Artifact{} }
 func (m *Artifact) String() string { return proto.CompactTextString(m) }
 func (*Artifact) ProtoMessage()    {}
 func (*Artifact) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{1}
+	return fileDescriptor_275951237ff4368a, []int{17}
 }
 
 func (m *Artifact) XXX_Unmarshal(b []byte) error {
@@ -183,727 +930,815 @@ func (m *Artifact) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Artifact proto.InternalMessageInfo
 
-func (m *Artifact) GetProvenance() string {
-	if m != nil {
-		return m.Provenance
-	}
-	return ""
-}
-
-func (m *Artifact) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *Artifact) GetVersion() string {
-	if m != nil {
-		return m.Version
-	}
-	return ""
-}
-
-func (m *Artifact) GetRevision() int64 {
-	if m != nil {
-		return m.Revision
-	}
-	return 0
-}
-
-func (m *Artifact) GetCreatedAt() int64 {
-	if m != nil {
-		return m.CreatedAt
-	}
-	return 0
-}
-
-func (m *Artifact) GetReferenceId() string {
-	if m != nil {
-		return m.ReferenceId
-	}
-	return ""
-}
-
-func (m *Artifact) GetInputs() []*Parameter {
-	if m != nil {
-		return m.Inputs
-	}
-	return nil
-}
-
-func (m *Artifact) GetOutputs() []*Parameter {
-	if m != nil {
-		return m.Outputs
-	}
-	return nil
-}
-
-type ArtifactId struct {
-	Name                 string       `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string       `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	Inputs               []*Parameter `protobuf:"bytes,3,rep,name=inputs,proto3" json:"inputs,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
-}
-
-func (m *ArtifactId) Reset()         { *m = ArtifactId{} }
-func (m *ArtifactId) String() string { return proto.CompactTextString(m) }
-func (*ArtifactId) ProtoMessage()    {}
-func (*ArtifactId) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{2}
-}
-
-func (m *ArtifactId) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ArtifactId.Unmarshal(m, b)
-}
-func (m *ArtifactId) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ArtifactId.Marshal(b, m, deterministic)
-}
-func (m *ArtifactId) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ArtifactId.Merge(m, src)
-}
-func (m *ArtifactId) XXX_Size() int {
-	return xxx_messageInfo_ArtifactId.Size(m)
-}
-func (m *ArtifactId) XXX_DiscardUnknown() {
-	xxx_messageInfo_ArtifactId.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ArtifactId proto.InternalMessageInfo
-
-func (m *ArtifactId) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *ArtifactId) GetVersion() string {
-	if m != nil {
-		return m.Version
-	}
-	return ""
-}
-
-func (m *ArtifactId) GetInputs() []*Parameter {
-	if m != nil {
-		return m.Inputs
-	}
-	return nil
-}
-
-type GetRequest struct {
-	// Types that are valid to be assigned to Id:
-	//	*GetRequest_Provenance
-	//	*GetRequest_ArtifactId
-	Id                   isGetRequest_Id `protobuf_oneof:"id"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
-}
-
-func (m *GetRequest) Reset()         { *m = GetRequest{} }
-func (m *GetRequest) String() string { return proto.CompactTextString(m) }
-func (*GetRequest) ProtoMessage()    {}
-func (*GetRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{3}
-}
-
-func (m *GetRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetRequest.Unmarshal(m, b)
-}
-func (m *GetRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetRequest.Marshal(b, m, deterministic)
-}
-func (m *GetRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetRequest.Merge(m, src)
-}
-func (m *GetRequest) XXX_Size() int {
-	return xxx_messageInfo_GetRequest.Size(m)
-}
-func (m *GetRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetRequest proto.InternalMessageInfo
-
-type isGetRequest_Id interface {
-	isGetRequest_Id()
-}
-
-type GetRequest_Provenance struct {
-	Provenance string `protobuf:"bytes,1,opt,name=provenance,proto3,oneof"`
-}
-
-type GetRequest_ArtifactId struct {
-	ArtifactId *ArtifactId `protobuf:"bytes,2,opt,name=artifact_id,json=artifactId,proto3,oneof"`
-}
-
-func (*GetRequest_Provenance) isGetRequest_Id() {}
-
-func (*GetRequest_ArtifactId) isGetRequest_Id() {}
-
-func (m *GetRequest) GetId() isGetRequest_Id {
+func (m *Artifact) GetId() string {
 	if m != nil {
 		return m.Id
 	}
-	return nil
-}
-
-func (m *GetRequest) GetProvenance() string {
-	if x, ok := m.GetId().(*GetRequest_Provenance); ok {
-		return x.Provenance
-	}
 	return ""
 }
 
-func (m *GetRequest) GetArtifactId() *ArtifactId {
-	if x, ok := m.GetId().(*GetRequest_ArtifactId); ok {
-		return x.ArtifactId
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*GetRequest) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*GetRequest_Provenance)(nil),
-		(*GetRequest_ArtifactId)(nil),
-	}
-}
-
-type GetResponse struct {
-	Artifact             *Artifact `protobuf:"bytes,1,opt,name=artifact,proto3" json:"artifact,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
-}
-
-func (m *GetResponse) Reset()         { *m = GetResponse{} }
-func (m *GetResponse) String() string { return proto.CompactTextString(m) }
-func (*GetResponse) ProtoMessage()    {}
-func (*GetResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{4}
-}
-
-func (m *GetResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetResponse.Unmarshal(m, b)
-}
-func (m *GetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetResponse.Marshal(b, m, deterministic)
-}
-func (m *GetResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetResponse.Merge(m, src)
-}
-func (m *GetResponse) XXX_Size() int {
-	return xxx_messageInfo_GetResponse.Size(m)
-}
-func (m *GetResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetResponse proto.InternalMessageInfo
-
-func (m *GetResponse) GetArtifact() *Artifact {
+func (m *Artifact) GetDataset() *DatasetID {
 	if m != nil {
-		return m.Artifact
+		return m.Dataset
 	}
 	return nil
 }
 
-type IntFilter struct {
-	Value                int64         `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
-	Operator             QueryOperator `protobuf:"varint,2,opt,name=operator,proto3,enum=pb.lyft.datacatalog.QueryOperator" json:"operator,omitempty"`
+func (m *Artifact) GetData() []*ArtifactData {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+func (m *Artifact) GetMetadata() *Metadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+func (m *Artifact) GetPartitions() []*Partition {
+	if m != nil {
+		return m.Partitions
+	}
+	return nil
+}
+
+func (m *Artifact) GetTags() []*Tag {
+	if m != nil {
+		return m.Tags
+	}
+	return nil
+}
+
+func (m *Artifact) GetCreatedAt() *timestamp.Timestamp {
+	if m != nil {
+		return m.CreatedAt
+	}
+	return nil
+}
+
+type ArtifactData struct {
+	Name                 string        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Value                *core.Literal `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
 }
 
-func (m *IntFilter) Reset()         { *m = IntFilter{} }
-func (m *IntFilter) String() string { return proto.CompactTextString(m) }
-func (*IntFilter) ProtoMessage()    {}
-func (*IntFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{5}
+func (m *ArtifactData) Reset()         { *m = ArtifactData{} }
+func (m *ArtifactData) String() string { return proto.CompactTextString(m) }
+func (*ArtifactData) ProtoMessage()    {}
+func (*ArtifactData) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{18}
 }
 
-func (m *IntFilter) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_IntFilter.Unmarshal(m, b)
+func (m *ArtifactData) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ArtifactData.Unmarshal(m, b)
 }
-func (m *IntFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_IntFilter.Marshal(b, m, deterministic)
+func (m *ArtifactData) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ArtifactData.Marshal(b, m, deterministic)
 }
-func (m *IntFilter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IntFilter.Merge(m, src)
+func (m *ArtifactData) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ArtifactData.Merge(m, src)
 }
-func (m *IntFilter) XXX_Size() int {
-	return xxx_messageInfo_IntFilter.Size(m)
+func (m *ArtifactData) XXX_Size() int {
+	return xxx_messageInfo_ArtifactData.Size(m)
 }
-func (m *IntFilter) XXX_DiscardUnknown() {
-	xxx_messageInfo_IntFilter.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_IntFilter proto.InternalMessageInfo
-
-func (m *IntFilter) GetValue() int64 {
-	if m != nil {
-		return m.Value
-	}
-	return 0
+func (m *ArtifactData) XXX_DiscardUnknown() {
+	xxx_messageInfo_ArtifactData.DiscardUnknown(m)
 }
 
-func (m *IntFilter) GetOperator() QueryOperator {
-	if m != nil {
-		return m.Operator
-	}
-	return QueryOperator_EQUAL
-}
+var xxx_messageInfo_ArtifactData proto.InternalMessageInfo
 
-type IntRangeFilter struct {
-	Min                  int64    `protobuf:"varint,1,opt,name=min,proto3" json:"min,omitempty"`
-	Max                  int64    `protobuf:"varint,2,opt,name=max,proto3" json:"max,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *IntRangeFilter) Reset()         { *m = IntRangeFilter{} }
-func (m *IntRangeFilter) String() string { return proto.CompactTextString(m) }
-func (*IntRangeFilter) ProtoMessage()    {}
-func (*IntRangeFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{6}
-}
-
-func (m *IntRangeFilter) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_IntRangeFilter.Unmarshal(m, b)
-}
-func (m *IntRangeFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_IntRangeFilter.Marshal(b, m, deterministic)
-}
-func (m *IntRangeFilter) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IntRangeFilter.Merge(m, src)
-}
-func (m *IntRangeFilter) XXX_Size() int {
-	return xxx_messageInfo_IntRangeFilter.Size(m)
-}
-func (m *IntRangeFilter) XXX_DiscardUnknown() {
-	xxx_messageInfo_IntRangeFilter.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_IntRangeFilter proto.InternalMessageInfo
-
-func (m *IntRangeFilter) GetMin() int64 {
-	if m != nil {
-		return m.Min
-	}
-	return 0
-}
-
-func (m *IntRangeFilter) GetMax() int64 {
-	if m != nil {
-		return m.Max
-	}
-	return 0
-}
-
-type IntQueryKey struct {
-	// Types that are valid to be assigned to Filter:
-	//	*IntQueryKey_Val
-	//	*IntQueryKey_Range
-	Filter               isIntQueryKey_Filter `protobuf_oneof:"filter"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
-}
-
-func (m *IntQueryKey) Reset()         { *m = IntQueryKey{} }
-func (m *IntQueryKey) String() string { return proto.CompactTextString(m) }
-func (*IntQueryKey) ProtoMessage()    {}
-func (*IntQueryKey) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{7}
-}
-
-func (m *IntQueryKey) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_IntQueryKey.Unmarshal(m, b)
-}
-func (m *IntQueryKey) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_IntQueryKey.Marshal(b, m, deterministic)
-}
-func (m *IntQueryKey) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_IntQueryKey.Merge(m, src)
-}
-func (m *IntQueryKey) XXX_Size() int {
-	return xxx_messageInfo_IntQueryKey.Size(m)
-}
-func (m *IntQueryKey) XXX_DiscardUnknown() {
-	xxx_messageInfo_IntQueryKey.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_IntQueryKey proto.InternalMessageInfo
-
-type isIntQueryKey_Filter interface {
-	isIntQueryKey_Filter()
-}
-
-type IntQueryKey_Val struct {
-	Val *IntFilter `protobuf:"bytes,1,opt,name=val,proto3,oneof"`
-}
-
-type IntQueryKey_Range struct {
-	Range *IntRangeFilter `protobuf:"bytes,2,opt,name=range,proto3,oneof"`
-}
-
-func (*IntQueryKey_Val) isIntQueryKey_Filter() {}
-
-func (*IntQueryKey_Range) isIntQueryKey_Filter() {}
-
-func (m *IntQueryKey) GetFilter() isIntQueryKey_Filter {
-	if m != nil {
-		return m.Filter
-	}
-	return nil
-}
-
-func (m *IntQueryKey) GetVal() *IntFilter {
-	if x, ok := m.GetFilter().(*IntQueryKey_Val); ok {
-		return x.Val
-	}
-	return nil
-}
-
-func (m *IntQueryKey) GetRange() *IntRangeFilter {
-	if x, ok := m.GetFilter().(*IntQueryKey_Range); ok {
-		return x.Range
-	}
-	return nil
-}
-
-// XXX_OneofWrappers is for the internal use of the proto package.
-func (*IntQueryKey) XXX_OneofWrappers() []interface{} {
-	return []interface{}{
-		(*IntQueryKey_Val)(nil),
-		(*IntQueryKey_Range)(nil),
-	}
-}
-
-// QueryRequest allows queries on a range of values for revision column and point queries on created_at
-// and reference_id
-type QueryRequest struct {
-	Name                 string       `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string       `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	Revision             *IntQueryKey `protobuf:"bytes,3,opt,name=revision,proto3" json:"revision,omitempty"`
-	CreatedAt            int64        `protobuf:"varint,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	ReferenceId          string       `protobuf:"bytes,5,opt,name=reference_id,json=referenceId,proto3" json:"reference_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
-}
-
-func (m *QueryRequest) Reset()         { *m = QueryRequest{} }
-func (m *QueryRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryRequest) ProtoMessage()    {}
-func (*QueryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{8}
-}
-
-func (m *QueryRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_QueryRequest.Unmarshal(m, b)
-}
-func (m *QueryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_QueryRequest.Marshal(b, m, deterministic)
-}
-func (m *QueryRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryRequest.Merge(m, src)
-}
-func (m *QueryRequest) XXX_Size() int {
-	return xxx_messageInfo_QueryRequest.Size(m)
-}
-func (m *QueryRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryRequest proto.InternalMessageInfo
-
-func (m *QueryRequest) GetName() string {
+func (m *ArtifactData) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *QueryRequest) GetVersion() string {
+func (m *ArtifactData) GetValue() *core.Literal {
 	if m != nil {
-		return m.Version
+		return m.Value
+	}
+	return nil
+}
+
+type Tag struct {
+	Name                 string     `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	ArtifactId           string     `protobuf:"bytes,2,opt,name=artifact_id,json=artifactId,proto3" json:"artifact_id,omitempty"`
+	Dataset              *DatasetID `protobuf:"bytes,3,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
+}
+
+func (m *Tag) Reset()         { *m = Tag{} }
+func (m *Tag) String() string { return proto.CompactTextString(m) }
+func (*Tag) ProtoMessage()    {}
+func (*Tag) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{19}
+}
+
+func (m *Tag) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Tag.Unmarshal(m, b)
+}
+func (m *Tag) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Tag.Marshal(b, m, deterministic)
+}
+func (m *Tag) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Tag.Merge(m, src)
+}
+func (m *Tag) XXX_Size() int {
+	return xxx_messageInfo_Tag.Size(m)
+}
+func (m *Tag) XXX_DiscardUnknown() {
+	xxx_messageInfo_Tag.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Tag proto.InternalMessageInfo
+
+func (m *Tag) GetName() string {
+	if m != nil {
+		return m.Name
 	}
 	return ""
 }
 
-func (m *QueryRequest) GetRevision() *IntQueryKey {
+func (m *Tag) GetArtifactId() string {
 	if m != nil {
-		return m.Revision
-	}
-	return nil
-}
-
-func (m *QueryRequest) GetCreatedAt() int64 {
-	if m != nil {
-		return m.CreatedAt
-	}
-	return 0
-}
-
-func (m *QueryRequest) GetReferenceId() string {
-	if m != nil {
-		return m.ReferenceId
+		return m.ArtifactId
 	}
 	return ""
 }
 
-type QueryResponse struct {
-	Artifact             []*Artifact `protobuf:"bytes,1,rep,name=artifact,proto3" json:"artifact,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
-}
-
-func (m *QueryResponse) Reset()         { *m = QueryResponse{} }
-func (m *QueryResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryResponse) ProtoMessage()    {}
-func (*QueryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{9}
-}
-
-func (m *QueryResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_QueryResponse.Unmarshal(m, b)
-}
-func (m *QueryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_QueryResponse.Marshal(b, m, deterministic)
-}
-func (m *QueryResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryResponse.Merge(m, src)
-}
-func (m *QueryResponse) XXX_Size() int {
-	return xxx_messageInfo_QueryResponse.Size(m)
-}
-func (m *QueryResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryResponse proto.InternalMessageInfo
-
-func (m *QueryResponse) GetArtifact() []*Artifact {
+func (m *Tag) GetDataset() *DatasetID {
 	if m != nil {
-		return m.Artifact
+		return m.Dataset
 	}
 	return nil
 }
 
-type CreateRequest struct {
-	Ref                  *ArtifactId  `protobuf:"bytes,1,opt,name=ref,proto3" json:"ref,omitempty"`
-	ReferenceId          string       `protobuf:"bytes,2,opt,name=reference_id,json=referenceId,proto3" json:"reference_id,omitempty"`
-	Revision             int64        `protobuf:"varint,3,opt,name=revision,proto3" json:"revision,omitempty"`
-	Outputs              []*Parameter `protobuf:"bytes,4,rep,name=outputs,proto3" json:"outputs,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+type Metadata struct {
+	KeyMap               map[string]string `protobuf:"bytes,1,rep,name=key_map,json=keyMap,proto3" json:"key_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *CreateRequest) Reset()         { *m = CreateRequest{} }
-func (m *CreateRequest) String() string { return proto.CompactTextString(m) }
-func (*CreateRequest) ProtoMessage()    {}
-func (*CreateRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{10}
+func (m *Metadata) Reset()         { *m = Metadata{} }
+func (m *Metadata) String() string { return proto.CompactTextString(m) }
+func (*Metadata) ProtoMessage()    {}
+func (*Metadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{20}
 }
 
-func (m *CreateRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateRequest.Unmarshal(m, b)
+func (m *Metadata) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Metadata.Unmarshal(m, b)
 }
-func (m *CreateRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateRequest.Marshal(b, m, deterministic)
+func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Metadata.Marshal(b, m, deterministic)
 }
-func (m *CreateRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateRequest.Merge(m, src)
+func (m *Metadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Metadata.Merge(m, src)
 }
-func (m *CreateRequest) XXX_Size() int {
-	return xxx_messageInfo_CreateRequest.Size(m)
+func (m *Metadata) XXX_Size() int {
+	return xxx_messageInfo_Metadata.Size(m)
 }
-func (m *CreateRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateRequest.DiscardUnknown(m)
+func (m *Metadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_Metadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_CreateRequest proto.InternalMessageInfo
+var xxx_messageInfo_Metadata proto.InternalMessageInfo
 
-func (m *CreateRequest) GetRef() *ArtifactId {
+func (m *Metadata) GetKeyMap() map[string]string {
 	if m != nil {
-		return m.Ref
+		return m.KeyMap
 	}
 	return nil
 }
 
-func (m *CreateRequest) GetReferenceId() string {
+// Filter expression that is composed of a combination of single filters
+type FilterExpression struct {
+	Filters              []*SinglePropertyFilter `protobuf:"bytes,1,rep,name=filters,proto3" json:"filters,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
+}
+
+func (m *FilterExpression) Reset()         { *m = FilterExpression{} }
+func (m *FilterExpression) String() string { return proto.CompactTextString(m) }
+func (*FilterExpression) ProtoMessage()    {}
+func (*FilterExpression) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{21}
+}
+
+func (m *FilterExpression) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_FilterExpression.Unmarshal(m, b)
+}
+func (m *FilterExpression) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_FilterExpression.Marshal(b, m, deterministic)
+}
+func (m *FilterExpression) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_FilterExpression.Merge(m, src)
+}
+func (m *FilterExpression) XXX_Size() int {
+	return xxx_messageInfo_FilterExpression.Size(m)
+}
+func (m *FilterExpression) XXX_DiscardUnknown() {
+	xxx_messageInfo_FilterExpression.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_FilterExpression proto.InternalMessageInfo
+
+func (m *FilterExpression) GetFilters() []*SinglePropertyFilter {
 	if m != nil {
-		return m.ReferenceId
+		return m.Filters
+	}
+	return nil
+}
+
+// A single property to filter on.
+type SinglePropertyFilter struct {
+	// Types that are valid to be assigned to PropertyFilter:
+	//	*SinglePropertyFilter_TagFilter
+	//	*SinglePropertyFilter_PartitionFilter
+	//	*SinglePropertyFilter_ArtifactFilter
+	//	*SinglePropertyFilter_DatasetFilter
+	PropertyFilter       isSinglePropertyFilter_PropertyFilter   `protobuf_oneof:"property_filter"`
+	Operator             SinglePropertyFilter_ComparisonOperator `protobuf:"varint,10,opt,name=operator,proto3,enum=datacatalog.SinglePropertyFilter_ComparisonOperator" json:"operator,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                `json:"-"`
+	XXX_unrecognized     []byte                                  `json:"-"`
+	XXX_sizecache        int32                                   `json:"-"`
+}
+
+func (m *SinglePropertyFilter) Reset()         { *m = SinglePropertyFilter{} }
+func (m *SinglePropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*SinglePropertyFilter) ProtoMessage()    {}
+func (*SinglePropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{22}
+}
+
+func (m *SinglePropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SinglePropertyFilter.Unmarshal(m, b)
+}
+func (m *SinglePropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SinglePropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *SinglePropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SinglePropertyFilter.Merge(m, src)
+}
+func (m *SinglePropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_SinglePropertyFilter.Size(m)
+}
+func (m *SinglePropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_SinglePropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SinglePropertyFilter proto.InternalMessageInfo
+
+type isSinglePropertyFilter_PropertyFilter interface {
+	isSinglePropertyFilter_PropertyFilter()
+}
+
+type SinglePropertyFilter_TagFilter struct {
+	TagFilter *TagPropertyFilter `protobuf:"bytes,1,opt,name=tag_filter,json=tagFilter,proto3,oneof"`
+}
+
+type SinglePropertyFilter_PartitionFilter struct {
+	PartitionFilter *PartitionPropertyFilter `protobuf:"bytes,2,opt,name=partition_filter,json=partitionFilter,proto3,oneof"`
+}
+
+type SinglePropertyFilter_ArtifactFilter struct {
+	ArtifactFilter *ArtifactPropertyFilter `protobuf:"bytes,3,opt,name=artifact_filter,json=artifactFilter,proto3,oneof"`
+}
+
+type SinglePropertyFilter_DatasetFilter struct {
+	DatasetFilter *DatasetPropertyFilter `protobuf:"bytes,4,opt,name=dataset_filter,json=datasetFilter,proto3,oneof"`
+}
+
+func (*SinglePropertyFilter_TagFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (*SinglePropertyFilter_PartitionFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (*SinglePropertyFilter_ArtifactFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (*SinglePropertyFilter_DatasetFilter) isSinglePropertyFilter_PropertyFilter() {}
+
+func (m *SinglePropertyFilter) GetPropertyFilter() isSinglePropertyFilter_PropertyFilter {
+	if m != nil {
+		return m.PropertyFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetTagFilter() *TagPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_TagFilter); ok {
+		return x.TagFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetPartitionFilter() *PartitionPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_PartitionFilter); ok {
+		return x.PartitionFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetArtifactFilter() *ArtifactPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_ArtifactFilter); ok {
+		return x.ArtifactFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetDatasetFilter() *DatasetPropertyFilter {
+	if x, ok := m.GetPropertyFilter().(*SinglePropertyFilter_DatasetFilter); ok {
+		return x.DatasetFilter
+	}
+	return nil
+}
+
+func (m *SinglePropertyFilter) GetOperator() SinglePropertyFilter_ComparisonOperator {
+	if m != nil {
+		return m.Operator
+	}
+	return SinglePropertyFilter_EQUALS
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*SinglePropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*SinglePropertyFilter_TagFilter)(nil),
+		(*SinglePropertyFilter_PartitionFilter)(nil),
+		(*SinglePropertyFilter_ArtifactFilter)(nil),
+		(*SinglePropertyFilter_DatasetFilter)(nil),
+	}
+}
+
+// Artifact properties we can filter by
+type ArtifactPropertyFilter struct {
+	// oneof because we can add more properties in the future
+	//
+	// Types that are valid to be assigned to Property:
+	//	*ArtifactPropertyFilter_ArtifactId
+	Property             isArtifactPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                          `json:"-"`
+	XXX_unrecognized     []byte                            `json:"-"`
+	XXX_sizecache        int32                             `json:"-"`
+}
+
+func (m *ArtifactPropertyFilter) Reset()         { *m = ArtifactPropertyFilter{} }
+func (m *ArtifactPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*ArtifactPropertyFilter) ProtoMessage()    {}
+func (*ArtifactPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{23}
+}
+
+func (m *ArtifactPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ArtifactPropertyFilter.Unmarshal(m, b)
+}
+func (m *ArtifactPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ArtifactPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *ArtifactPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ArtifactPropertyFilter.Merge(m, src)
+}
+func (m *ArtifactPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_ArtifactPropertyFilter.Size(m)
+}
+func (m *ArtifactPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_ArtifactPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ArtifactPropertyFilter proto.InternalMessageInfo
+
+type isArtifactPropertyFilter_Property interface {
+	isArtifactPropertyFilter_Property()
+}
+
+type ArtifactPropertyFilter_ArtifactId struct {
+	ArtifactId string `protobuf:"bytes,1,opt,name=artifact_id,json=artifactId,proto3,oneof"`
+}
+
+func (*ArtifactPropertyFilter_ArtifactId) isArtifactPropertyFilter_Property() {}
+
+func (m *ArtifactPropertyFilter) GetProperty() isArtifactPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *ArtifactPropertyFilter) GetArtifactId() string {
+	if x, ok := m.GetProperty().(*ArtifactPropertyFilter_ArtifactId); ok {
+		return x.ArtifactId
 	}
 	return ""
 }
 
-func (m *CreateRequest) GetRevision() int64 {
-	if m != nil {
-		return m.Revision
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*ArtifactPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*ArtifactPropertyFilter_ArtifactId)(nil),
 	}
-	return 0
 }
 
-func (m *CreateRequest) GetOutputs() []*Parameter {
+// Tag properties we can filter by
+type TagPropertyFilter struct {
+	// Types that are valid to be assigned to Property:
+	//	*TagPropertyFilter_TagName
+	Property             isTagPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *TagPropertyFilter) Reset()         { *m = TagPropertyFilter{} }
+func (m *TagPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*TagPropertyFilter) ProtoMessage()    {}
+func (*TagPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{24}
+}
+
+func (m *TagPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_TagPropertyFilter.Unmarshal(m, b)
+}
+func (m *TagPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_TagPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *TagPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TagPropertyFilter.Merge(m, src)
+}
+func (m *TagPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_TagPropertyFilter.Size(m)
+}
+func (m *TagPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_TagPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TagPropertyFilter proto.InternalMessageInfo
+
+type isTagPropertyFilter_Property interface {
+	isTagPropertyFilter_Property()
+}
+
+type TagPropertyFilter_TagName struct {
+	TagName string `protobuf:"bytes,1,opt,name=tag_name,json=tagName,proto3,oneof"`
+}
+
+func (*TagPropertyFilter_TagName) isTagPropertyFilter_Property() {}
+
+func (m *TagPropertyFilter) GetProperty() isTagPropertyFilter_Property {
 	if m != nil {
-		return m.Outputs
-	}
-	return nil
-}
-
-type CreateResponse struct {
-	Artifact             *Artifact             `protobuf:"bytes,1,opt,name=artifact,proto3" json:"artifact,omitempty"`
-	Status               CreateResponse_Status `protobuf:"varint,2,opt,name=status,proto3,enum=pb.lyft.datacatalog.CreateResponse_Status" json:"status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
-	XXX_unrecognized     []byte                `json:"-"`
-	XXX_sizecache        int32                 `json:"-"`
-}
-
-func (m *CreateResponse) Reset()         { *m = CreateResponse{} }
-func (m *CreateResponse) String() string { return proto.CompactTextString(m) }
-func (*CreateResponse) ProtoMessage()    {}
-func (*CreateResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{11}
-}
-
-func (m *CreateResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_CreateResponse.Unmarshal(m, b)
-}
-func (m *CreateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_CreateResponse.Marshal(b, m, deterministic)
-}
-func (m *CreateResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_CreateResponse.Merge(m, src)
-}
-func (m *CreateResponse) XXX_Size() int {
-	return xxx_messageInfo_CreateResponse.Size(m)
-}
-func (m *CreateResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_CreateResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_CreateResponse proto.InternalMessageInfo
-
-func (m *CreateResponse) GetArtifact() *Artifact {
-	if m != nil {
-		return m.Artifact
-	}
-	return nil
-}
-
-func (m *CreateResponse) GetStatus() CreateResponse_Status {
-	if m != nil {
-		return m.Status
-	}
-	return CreateResponse_ALREADY_EXISTS
-}
-
-type GenerateProvenanceRequest struct {
-	Id                   *ArtifactId `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
-	XXX_unrecognized     []byte      `json:"-"`
-	XXX_sizecache        int32       `json:"-"`
-}
-
-func (m *GenerateProvenanceRequest) Reset()         { *m = GenerateProvenanceRequest{} }
-func (m *GenerateProvenanceRequest) String() string { return proto.CompactTextString(m) }
-func (*GenerateProvenanceRequest) ProtoMessage()    {}
-func (*GenerateProvenanceRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{12}
-}
-
-func (m *GenerateProvenanceRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GenerateProvenanceRequest.Unmarshal(m, b)
-}
-func (m *GenerateProvenanceRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GenerateProvenanceRequest.Marshal(b, m, deterministic)
-}
-func (m *GenerateProvenanceRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GenerateProvenanceRequest.Merge(m, src)
-}
-func (m *GenerateProvenanceRequest) XXX_Size() int {
-	return xxx_messageInfo_GenerateProvenanceRequest.Size(m)
-}
-func (m *GenerateProvenanceRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GenerateProvenanceRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GenerateProvenanceRequest proto.InternalMessageInfo
-
-func (m *GenerateProvenanceRequest) GetId() *ArtifactId {
-	if m != nil {
-		return m.Id
+		return m.Property
 	}
 	return nil
 }
 
-type GenerateProvenanceResponse struct {
-	Provenance           string   `protobuf:"bytes,1,opt,name=provenance,proto3" json:"provenance,omitempty"`
+func (m *TagPropertyFilter) GetTagName() string {
+	if x, ok := m.GetProperty().(*TagPropertyFilter_TagName); ok {
+		return x.TagName
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*TagPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*TagPropertyFilter_TagName)(nil),
+	}
+}
+
+// Partition properties we can filter by
+type PartitionPropertyFilter struct {
+	// Types that are valid to be assigned to Property:
+	//	*PartitionPropertyFilter_KeyVal
+	Property             isPartitionPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                           `json:"-"`
+	XXX_unrecognized     []byte                             `json:"-"`
+	XXX_sizecache        int32                              `json:"-"`
+}
+
+func (m *PartitionPropertyFilter) Reset()         { *m = PartitionPropertyFilter{} }
+func (m *PartitionPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*PartitionPropertyFilter) ProtoMessage()    {}
+func (*PartitionPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{25}
+}
+
+func (m *PartitionPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PartitionPropertyFilter.Unmarshal(m, b)
+}
+func (m *PartitionPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PartitionPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *PartitionPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PartitionPropertyFilter.Merge(m, src)
+}
+func (m *PartitionPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_PartitionPropertyFilter.Size(m)
+}
+func (m *PartitionPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_PartitionPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PartitionPropertyFilter proto.InternalMessageInfo
+
+type isPartitionPropertyFilter_Property interface {
+	isPartitionPropertyFilter_Property()
+}
+
+type PartitionPropertyFilter_KeyVal struct {
+	KeyVal *KeyValuePair `protobuf:"bytes,1,opt,name=key_val,json=keyVal,proto3,oneof"`
+}
+
+func (*PartitionPropertyFilter_KeyVal) isPartitionPropertyFilter_Property() {}
+
+func (m *PartitionPropertyFilter) GetProperty() isPartitionPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *PartitionPropertyFilter) GetKeyVal() *KeyValuePair {
+	if x, ok := m.GetProperty().(*PartitionPropertyFilter_KeyVal); ok {
+		return x.KeyVal
+	}
+	return nil
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*PartitionPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*PartitionPropertyFilter_KeyVal)(nil),
+	}
+}
+
+type KeyValuePair struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Value                string   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *GenerateProvenanceResponse) Reset()         { *m = GenerateProvenanceResponse{} }
-func (m *GenerateProvenanceResponse) String() string { return proto.CompactTextString(m) }
-func (*GenerateProvenanceResponse) ProtoMessage()    {}
-func (*GenerateProvenanceResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{13}
+func (m *KeyValuePair) Reset()         { *m = KeyValuePair{} }
+func (m *KeyValuePair) String() string { return proto.CompactTextString(m) }
+func (*KeyValuePair) ProtoMessage()    {}
+func (*KeyValuePair) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{26}
 }
 
-func (m *GenerateProvenanceResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GenerateProvenanceResponse.Unmarshal(m, b)
+func (m *KeyValuePair) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_KeyValuePair.Unmarshal(m, b)
 }
-func (m *GenerateProvenanceResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GenerateProvenanceResponse.Marshal(b, m, deterministic)
+func (m *KeyValuePair) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_KeyValuePair.Marshal(b, m, deterministic)
 }
-func (m *GenerateProvenanceResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GenerateProvenanceResponse.Merge(m, src)
+func (m *KeyValuePair) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_KeyValuePair.Merge(m, src)
 }
-func (m *GenerateProvenanceResponse) XXX_Size() int {
-	return xxx_messageInfo_GenerateProvenanceResponse.Size(m)
+func (m *KeyValuePair) XXX_Size() int {
+	return xxx_messageInfo_KeyValuePair.Size(m)
 }
-func (m *GenerateProvenanceResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GenerateProvenanceResponse.DiscardUnknown(m)
+func (m *KeyValuePair) XXX_DiscardUnknown() {
+	xxx_messageInfo_KeyValuePair.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_GenerateProvenanceResponse proto.InternalMessageInfo
+var xxx_messageInfo_KeyValuePair proto.InternalMessageInfo
 
-func (m *GenerateProvenanceResponse) GetProvenance() string {
+func (m *KeyValuePair) GetKey() string {
 	if m != nil {
-		return m.Provenance
+		return m.Key
 	}
 	return ""
 }
 
+func (m *KeyValuePair) GetValue() string {
+	if m != nil {
+		return m.Value
+	}
+	return ""
+}
+
+// Dataset properties we can filter by
+type DatasetPropertyFilter struct {
+	// Types that are valid to be assigned to Property:
+	//	*DatasetPropertyFilter_Project
+	//	*DatasetPropertyFilter_Name
+	//	*DatasetPropertyFilter_Domain
+	//	*DatasetPropertyFilter_Version
+	Property             isDatasetPropertyFilter_Property `protobuf_oneof:"property"`
+	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
+	XXX_unrecognized     []byte                           `json:"-"`
+	XXX_sizecache        int32                            `json:"-"`
+}
+
+func (m *DatasetPropertyFilter) Reset()         { *m = DatasetPropertyFilter{} }
+func (m *DatasetPropertyFilter) String() string { return proto.CompactTextString(m) }
+func (*DatasetPropertyFilter) ProtoMessage()    {}
+func (*DatasetPropertyFilter) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{27}
+}
+
+func (m *DatasetPropertyFilter) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DatasetPropertyFilter.Unmarshal(m, b)
+}
+func (m *DatasetPropertyFilter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DatasetPropertyFilter.Marshal(b, m, deterministic)
+}
+func (m *DatasetPropertyFilter) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DatasetPropertyFilter.Merge(m, src)
+}
+func (m *DatasetPropertyFilter) XXX_Size() int {
+	return xxx_messageInfo_DatasetPropertyFilter.Size(m)
+}
+func (m *DatasetPropertyFilter) XXX_DiscardUnknown() {
+	xxx_messageInfo_DatasetPropertyFilter.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DatasetPropertyFilter proto.InternalMessageInfo
+
+type isDatasetPropertyFilter_Property interface {
+	isDatasetPropertyFilter_Property()
+}
+
+type DatasetPropertyFilter_Project struct {
+	Project string `protobuf:"bytes,1,opt,name=project,proto3,oneof"`
+}
+
+type DatasetPropertyFilter_Name struct {
+	Name string `protobuf:"bytes,2,opt,name=name,proto3,oneof"`
+}
+
+type DatasetPropertyFilter_Domain struct {
+	Domain string `protobuf:"bytes,3,opt,name=domain,proto3,oneof"`
+}
+
+type DatasetPropertyFilter_Version struct {
+	Version string `protobuf:"bytes,4,opt,name=version,proto3,oneof"`
+}
+
+func (*DatasetPropertyFilter_Project) isDatasetPropertyFilter_Property() {}
+
+func (*DatasetPropertyFilter_Name) isDatasetPropertyFilter_Property() {}
+
+func (*DatasetPropertyFilter_Domain) isDatasetPropertyFilter_Property() {}
+
+func (*DatasetPropertyFilter_Version) isDatasetPropertyFilter_Property() {}
+
+func (m *DatasetPropertyFilter) GetProperty() isDatasetPropertyFilter_Property {
+	if m != nil {
+		return m.Property
+	}
+	return nil
+}
+
+func (m *DatasetPropertyFilter) GetProject() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Project); ok {
+		return x.Project
+	}
+	return ""
+}
+
+func (m *DatasetPropertyFilter) GetName() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Name); ok {
+		return x.Name
+	}
+	return ""
+}
+
+func (m *DatasetPropertyFilter) GetDomain() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Domain); ok {
+		return x.Domain
+	}
+	return ""
+}
+
+func (m *DatasetPropertyFilter) GetVersion() string {
+	if x, ok := m.GetProperty().(*DatasetPropertyFilter_Version); ok {
+		return x.Version
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*DatasetPropertyFilter) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*DatasetPropertyFilter_Project)(nil),
+		(*DatasetPropertyFilter_Name)(nil),
+		(*DatasetPropertyFilter_Domain)(nil),
+		(*DatasetPropertyFilter_Version)(nil),
+	}
+}
+
+// Pagination options for making list requests
+type PaginationOptions struct {
+	// the max number of results to return
+	Limit uint32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	// the token to pass to fetch the next page
+	Token string `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
+	// the property that we want to sort the results by
+	SortKey PaginationOptions_SortKey `protobuf:"varint,3,opt,name=sortKey,proto3,enum=datacatalog.PaginationOptions_SortKey" json:"sortKey,omitempty"`
+	// the sort order of the results
+	SortOrder            PaginationOptions_SortOrder `protobuf:"varint,4,opt,name=sortOrder,proto3,enum=datacatalog.PaginationOptions_SortOrder" json:"sortOrder,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
+	XXX_unrecognized     []byte                      `json:"-"`
+	XXX_sizecache        int32                       `json:"-"`
+}
+
+func (m *PaginationOptions) Reset()         { *m = PaginationOptions{} }
+func (m *PaginationOptions) String() string { return proto.CompactTextString(m) }
+func (*PaginationOptions) ProtoMessage()    {}
+func (*PaginationOptions) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{28}
+}
+
+func (m *PaginationOptions) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PaginationOptions.Unmarshal(m, b)
+}
+func (m *PaginationOptions) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PaginationOptions.Marshal(b, m, deterministic)
+}
+func (m *PaginationOptions) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PaginationOptions.Merge(m, src)
+}
+func (m *PaginationOptions) XXX_Size() int {
+	return xxx_messageInfo_PaginationOptions.Size(m)
+}
+func (m *PaginationOptions) XXX_DiscardUnknown() {
+	xxx_messageInfo_PaginationOptions.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PaginationOptions proto.InternalMessageInfo
+
+func (m *PaginationOptions) GetLimit() uint32 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+func (m *PaginationOptions) GetToken() string {
+	if m != nil {
+		return m.Token
+	}
+	return ""
+}
+
+func (m *PaginationOptions) GetSortKey() PaginationOptions_SortKey {
+	if m != nil {
+		return m.SortKey
+	}
+	return PaginationOptions_CREATION_TIME
+}
+
+func (m *PaginationOptions) GetSortOrder() PaginationOptions_SortOrder {
+	if m != nil {
+		return m.SortOrder
+	}
+	return PaginationOptions_DESCENDING
+}
+
 func init() {
-	proto.RegisterEnum("pb.lyft.datacatalog.QueryOperator", QueryOperator_name, QueryOperator_value)
-	proto.RegisterEnum("pb.lyft.datacatalog.CreateResponse_Status", CreateResponse_Status_name, CreateResponse_Status_value)
-	proto.RegisterType((*Parameter)(nil), "pb.lyft.datacatalog.Parameter")
-	proto.RegisterType((*Artifact)(nil), "pb.lyft.datacatalog.Artifact")
-	proto.RegisterType((*ArtifactId)(nil), "pb.lyft.datacatalog.ArtifactId")
-	proto.RegisterType((*GetRequest)(nil), "pb.lyft.datacatalog.GetRequest")
-	proto.RegisterType((*GetResponse)(nil), "pb.lyft.datacatalog.GetResponse")
-	proto.RegisterType((*IntFilter)(nil), "pb.lyft.datacatalog.IntFilter")
-	proto.RegisterType((*IntRangeFilter)(nil), "pb.lyft.datacatalog.IntRangeFilter")
-	proto.RegisterType((*IntQueryKey)(nil), "pb.lyft.datacatalog.IntQueryKey")
-	proto.RegisterType((*QueryRequest)(nil), "pb.lyft.datacatalog.QueryRequest")
-	proto.RegisterType((*QueryResponse)(nil), "pb.lyft.datacatalog.QueryResponse")
-	proto.RegisterType((*CreateRequest)(nil), "pb.lyft.datacatalog.CreateRequest")
-	proto.RegisterType((*CreateResponse)(nil), "pb.lyft.datacatalog.CreateResponse")
-	proto.RegisterType((*GenerateProvenanceRequest)(nil), "pb.lyft.datacatalog.GenerateProvenanceRequest")
-	proto.RegisterType((*GenerateProvenanceResponse)(nil), "pb.lyft.datacatalog.GenerateProvenanceResponse")
+	proto.RegisterEnum("datacatalog.SinglePropertyFilter_ComparisonOperator", SinglePropertyFilter_ComparisonOperator_name, SinglePropertyFilter_ComparisonOperator_value)
+	proto.RegisterEnum("datacatalog.PaginationOptions_SortOrder", PaginationOptions_SortOrder_name, PaginationOptions_SortOrder_value)
+	proto.RegisterEnum("datacatalog.PaginationOptions_SortKey", PaginationOptions_SortKey_name, PaginationOptions_SortKey_value)
+	proto.RegisterType((*CreateDatasetRequest)(nil), "datacatalog.CreateDatasetRequest")
+	proto.RegisterType((*CreateDatasetResponse)(nil), "datacatalog.CreateDatasetResponse")
+	proto.RegisterType((*GetDatasetRequest)(nil), "datacatalog.GetDatasetRequest")
+	proto.RegisterType((*GetDatasetResponse)(nil), "datacatalog.GetDatasetResponse")
+	proto.RegisterType((*GetArtifactRequest)(nil), "datacatalog.GetArtifactRequest")
+	proto.RegisterType((*GetArtifactResponse)(nil), "datacatalog.GetArtifactResponse")
+	proto.RegisterType((*CreateArtifactRequest)(nil), "datacatalog.CreateArtifactRequest")
+	proto.RegisterType((*CreateArtifactResponse)(nil), "datacatalog.CreateArtifactResponse")
+	proto.RegisterType((*AddTagRequest)(nil), "datacatalog.AddTagRequest")
+	proto.RegisterType((*AddTagResponse)(nil), "datacatalog.AddTagResponse")
+	proto.RegisterType((*ListArtifactsRequest)(nil), "datacatalog.ListArtifactsRequest")
+	proto.RegisterType((*ListArtifactsResponse)(nil), "datacatalog.ListArtifactsResponse")
+	proto.RegisterType((*ListDatasetsRequest)(nil), "datacatalog.ListDatasetsRequest")
+	proto.RegisterType((*ListDatasetsResponse)(nil), "datacatalog.ListDatasetsResponse")
+	proto.RegisterType((*Dataset)(nil), "datacatalog.Dataset")
+	proto.RegisterType((*Partition)(nil), "datacatalog.Partition")
+	proto.RegisterType((*DatasetID)(nil), "datacatalog.DatasetID")
+	proto.RegisterType((*Artifact)(nil), "datacatalog.Artifact")
+	proto.RegisterType((*ArtifactData)(nil), "datacatalog.ArtifactData")
+	proto.RegisterType((*Tag)(nil), "datacatalog.Tag")
+	proto.RegisterType((*Metadata)(nil), "datacatalog.Metadata")
+	proto.RegisterMapType((map[string]string)(nil), "datacatalog.Metadata.KeyMapEntry")
+	proto.RegisterType((*FilterExpression)(nil), "datacatalog.FilterExpression")
+	proto.RegisterType((*SinglePropertyFilter)(nil), "datacatalog.SinglePropertyFilter")
+	proto.RegisterType((*ArtifactPropertyFilter)(nil), "datacatalog.ArtifactPropertyFilter")
+	proto.RegisterType((*TagPropertyFilter)(nil), "datacatalog.TagPropertyFilter")
+	proto.RegisterType((*PartitionPropertyFilter)(nil), "datacatalog.PartitionPropertyFilter")
+	proto.RegisterType((*KeyValuePair)(nil), "datacatalog.KeyValuePair")
+	proto.RegisterType((*DatasetPropertyFilter)(nil), "datacatalog.DatasetPropertyFilter")
+	proto.RegisterType((*PaginationOptions)(nil), "datacatalog.PaginationOptions")
 }
 
 func init() {
@@ -911,57 +1746,92 @@ func init() {
 }
 
 var fileDescriptor_275951237ff4368a = []byte{
-	// 790 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x56, 0xdd, 0x6e, 0xda, 0x48,
-	0x14, 0xc6, 0x36, 0xbf, 0xc7, 0x09, 0x8b, 0xce, 0xee, 0x05, 0x8b, 0x94, 0x2c, 0x99, 0x48, 0xab,
-	0x6c, 0x2e, 0x88, 0x96, 0xdd, 0x56, 0xad, 0x9a, 0x56, 0x82, 0x84, 0x02, 0x29, 0x6a, 0x13, 0x93,
-	0x4a, 0x6d, 0x6f, 0xd0, 0x04, 0x86, 0xc8, 0x12, 0xb1, 0xe9, 0x78, 0xa0, 0xe1, 0x0d, 0x7a, 0xd9,
-	0xc7, 0xe8, 0x33, 0xb4, 0x7d, 0xaf, 0xde, 0x56, 0x1e, 0x3c, 0x8e, 0x53, 0x4c, 0x02, 0xea, 0x9d,
-	0xe7, 0xcc, 0x39, 0xdf, 0xf9, 0xe6, 0x3b, 0x3f, 0x00, 0x7f, 0x0f, 0x47, 0x33, 0xc1, 0xec, 0xc1,
-	0xe8, 0x60, 0x40, 0x05, 0xed, 0x53, 0x41, 0x47, 0xee, 0x65, 0xf4, 0xbb, 0x32, 0xe6, 0xae, 0x70,
-	0xf1, 0xf7, 0xf1, 0x45, 0x65, 0x34, 0x1b, 0x8a, 0x4a, 0xe4, 0x8a, 0x3c, 0x80, 0xdc, 0x29, 0xe5,
-	0xf4, 0x8a, 0x09, 0xc6, 0x11, 0x21, 0xe9, 0xd0, 0x2b, 0x56, 0xd4, 0xca, 0xda, 0x5e, 0xce, 0x92,
-	0xdf, 0xf8, 0x07, 0xa4, 0xa6, 0x74, 0x34, 0x61, 0x45, 0x5d, 0x1a, 0xe7, 0x07, 0xf2, 0x59, 0x87,
-	0x6c, 0x8d, 0x0b, 0x7b, 0x48, 0xfb, 0x02, 0xb7, 0x01, 0xc6, 0xdc, 0x9d, 0x32, 0x87, 0x3a, 0x7d,
-	0x15, 0x1c, 0xb1, 0x84, 0xb0, 0x7a, 0x04, 0xb6, 0x08, 0x99, 0x29, 0xe3, 0x9e, 0xed, 0x3a, 0x45,
-	0x43, 0x9a, 0xd5, 0x11, 0x4b, 0x90, 0xe5, 0x6c, 0x6a, 0xcb, 0xab, 0x64, 0x59, 0xdb, 0x33, 0xac,
-	0xf0, 0x8c, 0x5b, 0x00, 0x7d, 0xce, 0xa8, 0x60, 0x83, 0x1e, 0x15, 0xc5, 0x94, 0xbc, 0xcd, 0x05,
-	0x96, 0x9a, 0xc0, 0x1d, 0xd8, 0xe0, 0x6c, 0xc8, 0x38, 0x73, 0xfa, 0xac, 0x67, 0x0f, 0x8a, 0x69,
-	0x89, 0x6c, 0x86, 0xb6, 0xf6, 0x00, 0x1f, 0x42, 0xda, 0x76, 0xc6, 0x13, 0xe1, 0x15, 0x33, 0x65,
-	0x63, 0xcf, 0xac, 0x6e, 0x57, 0x62, 0x54, 0xa9, 0x84, 0x92, 0x58, 0x81, 0x37, 0x3e, 0x82, 0x8c,
-	0x3b, 0x11, 0x32, 0x30, 0xbb, 0x52, 0xa0, 0x72, 0x27, 0x1c, 0x40, 0x29, 0xd5, 0x1e, 0xc4, 0x4a,
-	0x1c, 0xd1, 0x42, 0xbf, 0xad, 0xc5, 0x0d, 0x5b, 0x63, 0x1d, 0xb6, 0xe4, 0x1a, 0xa0, 0xc9, 0x84,
-	0xc5, 0xde, 0x4f, 0x98, 0x27, 0xb0, 0xbc, 0x58, 0x9f, 0x56, 0xe2, 0x56, 0x85, 0xea, 0x60, 0xd2,
-	0x80, 0xa3, 0xaf, 0x9b, 0xcf, 0xc2, 0xac, 0xfe, 0x15, 0x9b, 0xec, 0xe6, 0x2d, 0x3e, 0x06, 0x0d,
-	0x4f, 0xf5, 0x24, 0xe8, 0xf6, 0x80, 0xb4, 0xc0, 0x94, 0x99, 0xbd, 0xb1, 0xeb, 0x78, 0x0c, 0x1f,
-	0x43, 0x56, 0xb9, 0xc8, 0xc4, 0x66, 0x75, 0xeb, 0x4e, 0x54, 0x2b, 0x74, 0x27, 0x14, 0x72, 0x6d,
-	0x47, 0x3c, 0xb7, 0x47, 0x7e, 0x67, 0x86, 0x5d, 0xa8, 0xc9, 0x9a, 0xcf, 0x0f, 0xf8, 0x0c, 0xb2,
-	0xee, 0x98, 0x71, 0x2a, 0x5c, 0x2e, 0x39, 0xe7, 0xab, 0x24, 0x16, 0xfd, 0x6c, 0xc2, 0xf8, 0xec,
-	0x55, 0xe0, 0x69, 0x85, 0x31, 0xe4, 0x7f, 0xc8, 0xb7, 0x1d, 0x61, 0x51, 0xe7, 0x92, 0x05, 0x79,
-	0x0a, 0x60, 0x5c, 0xd9, 0x4e, 0x90, 0xc5, 0xff, 0x94, 0x16, 0x7a, 0x2d, 0xe1, 0x7d, 0x0b, 0xbd,
-	0x26, 0x1f, 0x35, 0x30, 0xdb, 0x8e, 0x90, 0xa0, 0x2f, 0xd8, 0x0c, 0xab, 0x60, 0x4c, 0xe9, 0x28,
-	0x78, 0x5e, 0x7c, 0x85, 0xc2, 0x87, 0xb4, 0x12, 0x96, 0xef, 0x8c, 0x4f, 0x20, 0xc5, 0xfd, 0xb4,
-	0x81, 0xd4, 0xbb, 0xcb, 0xa2, 0x22, 0xdc, 0x5a, 0x09, 0x6b, 0x1e, 0x53, 0xcf, 0x42, 0x7a, 0x28,
-	0x4d, 0xe4, 0x9b, 0x06, 0x1b, 0x92, 0x87, 0x2a, 0xf5, 0x7a, 0xed, 0x75, 0x18, 0x19, 0x35, 0x43,
-	0x12, 0x29, 0x2f, 0x23, 0xa2, 0x5e, 0xbb, 0x74, 0x18, 0x93, 0xf7, 0x0d, 0x63, 0x6a, 0x61, 0x18,
-	0xc9, 0x09, 0x6c, 0x06, 0xec, 0x63, 0xdb, 0xc5, 0x58, 0xa7, 0x5d, 0xbe, 0x6a, 0xb0, 0x79, 0x24,
-	0x93, 0x2b, 0x2d, 0xfe, 0x05, 0x83, 0xb3, 0x61, 0x50, 0x97, 0xfb, 0x9a, 0xd9, 0xf2, 0x7d, 0x17,
-	0x38, 0xeb, 0x8b, 0x0b, 0xa4, 0xf4, 0x93, 0x66, 0xd1, 0xf5, 0x14, 0x59, 0x12, 0xc9, 0xf5, 0x96,
-	0xc4, 0x17, 0x0d, 0xf2, 0x8a, 0xfd, 0x2f, 0x8f, 0x0e, 0xd6, 0x21, 0xed, 0x09, 0x2a, 0x26, 0x5e,
-	0x30, 0x15, 0xfb, 0xb1, 0x81, 0xb7, 0xf3, 0x55, 0xba, 0x32, 0xc2, 0x0a, 0x22, 0xc9, 0x3f, 0x90,
-	0x9e, 0x5b, 0x10, 0x21, 0x5f, 0xeb, 0x58, 0x8d, 0xda, 0xf1, 0xdb, 0x5e, 0xe3, 0x4d, 0xbb, 0x7b,
-	0xde, 0x2d, 0x24, 0xd0, 0x84, 0xcc, 0x91, 0xd5, 0xa8, 0x9d, 0x37, 0x8e, 0x0b, 0x1a, 0xe9, 0xc0,
-	0x9f, 0x4d, 0xe6, 0xf8, 0x33, 0xc5, 0x4e, 0xc3, 0x9d, 0xa2, 0xaa, 0x70, 0xe0, 0xaf, 0x85, 0x55,
-	0x8b, 0xe0, 0x6f, 0x90, 0x43, 0x28, 0xc5, 0xa1, 0x05, 0xaa, 0xdc, 0xf3, 0x5b, 0xb3, 0xff, 0x34,
-	0x68, 0x29, 0x35, 0xed, 0x98, 0x83, 0x54, 0xe3, 0xec, 0x75, 0xad, 0x53, 0x48, 0x60, 0x01, 0x36,
-	0x9a, 0x92, 0xb4, 0xd5, 0x3b, 0x6f, 0xd5, 0x5e, 0x16, 0x34, 0xfc, 0x0d, 0xcc, 0x4e, 0xa3, 0xdb,
-	0x55, 0x06, 0xbd, 0xfa, 0x5d, 0x87, 0x9c, 0xe2, 0xe3, 0xe1, 0x09, 0x18, 0x4d, 0x26, 0x30, 0x9e,
-	0xf6, 0xcd, 0x82, 0x2d, 0x95, 0x97, 0x3b, 0xcc, 0x69, 0x93, 0x04, 0x9e, 0x42, 0x4a, 0x12, 0xc3,
-	0x9d, 0xe5, 0x2b, 0x4a, 0xe1, 0x91, 0xbb, 0x5c, 0x42, 0xc4, 0x2e, 0xa4, 0xe7, 0x25, 0x44, 0x72,
-	0x67, 0x7d, 0xe7, 0x98, 0xbb, 0x2b, 0xf4, 0x00, 0x49, 0xe0, 0x07, 0xc0, 0x45, 0xf5, 0xb1, 0xb2,
-	0xe4, 0x81, 0x4b, 0x8a, 0x5e, 0x3a, 0x58, 0xd9, 0x5f, 0x25, 0xae, 0x17, 0xde, 0x99, 0x11, 0xdf,
-	0x4f, 0x9a, 0x76, 0x91, 0x96, 0x7f, 0x5b, 0xfe, 0xfb, 0x11, 0x00, 0x00, 0xff, 0xff, 0xea, 0x1f,
-	0xee, 0x85, 0xe0, 0x08, 0x00, 0x00,
+	// 1347 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x57, 0x5f, 0x6f, 0xdb, 0xb6,
+	0x17, 0xb5, 0x6c, 0xd7, 0xb6, 0xae, 0x63, 0xd7, 0x61, 0x9d, 0x54, 0x3f, 0xf5, 0x9f, 0xab, 0x16,
+	0x45, 0xf0, 0xc3, 0xe6, 0x74, 0x4e, 0x57, 0xac, 0xdd, 0xb0, 0xcd, 0x8d, 0xdd, 0xc6, 0x4b, 0x93,
+	0xb8, 0x8a, 0x1b, 0x60, 0xd8, 0x83, 0xc1, 0x46, 0x8c, 0xa6, 0x45, 0xb6, 0x54, 0x89, 0x29, 0xea,
+	0xa7, 0x61, 0xaf, 0xdb, 0xde, 0x06, 0xec, 0xeb, 0xec, 0x71, 0x6f, 0x03, 0xf6, 0x8d, 0x06, 0x8a,
+	0x94, 0x2c, 0xc9, 0x4a, 0xea, 0xe6, 0xc5, 0x10, 0xc9, 0x73, 0x8f, 0xef, 0xe5, 0xb9, 0xe4, 0xbd,
+	0x84, 0x07, 0x27, 0xf6, 0x8c, 0x12, 0xcb, 0xb0, 0x37, 0x0d, 0x4c, 0xf1, 0x31, 0xa6, 0xd8, 0x76,
+	0xcc, 0xf8, 0x77, 0xdb, 0xf5, 0x1c, 0xea, 0xa0, 0x6a, 0x6c, 0x4a, 0xbd, 0x19, 0x19, 0x1d, 0x3b,
+	0x1e, 0xd9, 0xb4, 0x2d, 0x4a, 0x3c, 0x6c, 0xfb, 0x1c, 0xaa, 0xde, 0x31, 0x1d, 0xc7, 0xb4, 0xc9,
+	0x66, 0x30, 0x7a, 0x73, 0x76, 0xb2, 0x49, 0xad, 0x09, 0xf1, 0x29, 0x9e, 0xb8, 0x1c, 0xa0, 0x3d,
+	0x87, 0xe6, 0xb6, 0x47, 0x30, 0x25, 0x3d, 0x4c, 0xb1, 0x4f, 0xa8, 0x4e, 0xde, 0x9e, 0x11, 0x9f,
+	0xa2, 0x36, 0x94, 0x0d, 0x3e, 0xa3, 0x48, 0x2d, 0x69, 0xa3, 0xda, 0x69, 0xb6, 0xe3, 0x8e, 0x84,
+	0xe8, 0x10, 0xa4, 0x5d, 0x87, 0xb5, 0x14, 0x8f, 0xef, 0x3a, 0x53, 0x9f, 0x68, 0x7d, 0x58, 0x7d,
+	0x41, 0x68, 0x8a, 0xfd, 0x61, 0x9a, 0x7d, 0x3d, 0x8b, 0x7d, 0xd0, 0x9b, 0xf3, 0xf7, 0x00, 0xc5,
+	0x69, 0x38, 0xf9, 0x47, 0x7b, 0xf9, 0xa7, 0x14, 0xd0, 0x74, 0x3d, 0x6a, 0x9d, 0xe0, 0xe3, 0xcb,
+	0xbb, 0x83, 0xee, 0x42, 0x15, 0x0b, 0x92, 0xb1, 0x65, 0x28, 0xf9, 0x96, 0xb4, 0x21, 0xef, 0xe4,
+	0x74, 0x08, 0x27, 0x07, 0x06, 0xba, 0x01, 0x15, 0x8a, 0xcd, 0xf1, 0x14, 0x4f, 0x88, 0x52, 0x10,
+	0xeb, 0x65, 0x8a, 0xcd, 0x7d, 0x3c, 0x21, 0xcf, 0xea, 0xb0, 0xf2, 0xf6, 0x8c, 0x78, 0xb3, 0xf1,
+	0x8f, 0x78, 0x6a, 0xd8, 0x44, 0xdb, 0x81, 0x6b, 0x09, 0xbf, 0x44, 0x7c, 0x9f, 0x41, 0x25, 0x64,
+	0x14, 0x9e, 0xad, 0x25, 0x3c, 0x8b, 0x0c, 0x22, 0x98, 0xf6, 0x5d, 0x28, 0x44, 0x3a, 0xc8, 0x4b,
+	0x70, 0x29, 0xb0, 0x9e, 0xe6, 0x12, 0xaa, 0x6e, 0x41, 0xad, 0x6b, 0x18, 0x23, 0x6c, 0x86, 0xec,
+	0x1a, 0x14, 0x28, 0x36, 0x05, 0x71, 0x23, 0x41, 0xcc, 0x50, 0x6c, 0x51, 0x6b, 0x40, 0x3d, 0x34,
+	0x12, 0x34, 0x7f, 0x49, 0xd0, 0x7c, 0x69, 0xf9, 0x51, 0xe0, 0xfe, 0xe5, 0x15, 0xf9, 0x1c, 0x4a,
+	0x27, 0x96, 0x4d, 0x89, 0x17, 0x88, 0x51, 0xed, 0xdc, 0x4a, 0x18, 0x3c, 0x0f, 0x96, 0xfa, 0xef,
+	0x5d, 0x8f, 0xf8, 0xbe, 0xe5, 0x4c, 0x75, 0x01, 0x46, 0x5f, 0x03, 0xb8, 0xd8, 0xb4, 0xa6, 0x98,
+	0x5a, 0xce, 0x34, 0xd0, 0xa9, 0xda, 0xb9, 0x9d, 0x30, 0x1d, 0x46, 0xcb, 0x07, 0x2e, 0xfb, 0xf5,
+	0xf5, 0x98, 0x85, 0x76, 0x0a, 0x6b, 0xa9, 0x00, 0x84, 0x74, 0x5b, 0x20, 0x87, 0xfb, 0xe8, 0x2b,
+	0x52, 0xab, 0x70, 0xfe, 0x7e, 0xcf, 0x71, 0xe8, 0x16, 0xc0, 0x94, 0xbc, 0xa7, 0x63, 0xea, 0x9c,
+	0x92, 0x29, 0xcf, 0x2a, 0x5d, 0x66, 0x33, 0x23, 0x36, 0xa1, 0xfd, 0x2e, 0xc1, 0x35, 0xf6, 0x6f,
+	0x22, 0xfc, 0x68, 0xb7, 0xe6, 0xb1, 0x4b, 0x97, 0x8f, 0x3d, 0xff, 0xd1, 0xb1, 0x9b, 0x5c, 0xbc,
+	0xb9, 0x37, 0x22, 0xf4, 0x87, 0x50, 0x11, 0xaa, 0x84, 0x91, 0x67, 0x1f, 0xcb, 0x08, 0xf5, 0xa1,
+	0xb8, 0x7f, 0x95, 0xa0, 0x2c, 0x8c, 0xd0, 0x03, 0xc8, 0x5b, 0xc6, 0x07, 0x92, 0x22, 0x6f, 0x19,
+	0x2c, 0xdd, 0x27, 0x84, 0x62, 0x06, 0x10, 0xa1, 0x25, 0xb7, 0x7f, 0x4f, 0x2c, 0xea, 0x11, 0x0c,
+	0xdd, 0x87, 0x9a, 0xcb, 0xb4, 0x60, 0xc1, 0xed, 0x92, 0x99, 0xaf, 0x14, 0x5a, 0x85, 0x0d, 0x59,
+	0x4f, 0x4e, 0x6a, 0x5b, 0x20, 0x0f, 0xc3, 0x09, 0xd4, 0x80, 0xc2, 0x29, 0x99, 0x05, 0xee, 0xc8,
+	0x3a, 0xfb, 0x44, 0x4d, 0xb8, 0xf2, 0x0e, 0xdb, 0x67, 0x44, 0x44, 0xc1, 0x07, 0xda, 0xcf, 0x20,
+	0x47, 0xee, 0x21, 0x05, 0xca, 0xae, 0xe7, 0xfc, 0x44, 0xc4, 0x41, 0x94, 0xf5, 0x70, 0x88, 0x10,
+	0x14, 0x83, 0xfb, 0x82, 0xdb, 0x06, 0xdf, 0x68, 0x1d, 0x4a, 0x86, 0x33, 0xc1, 0x16, 0xcf, 0x4e,
+	0x59, 0x17, 0x23, 0xc6, 0xf2, 0x8e, 0x78, 0x4c, 0x50, 0xa5, 0xc8, 0x59, 0xc4, 0x90, 0xb1, 0xbc,
+	0x7e, 0x3d, 0xe8, 0x29, 0x57, 0x38, 0x0b, 0xfb, 0xd6, 0xfe, 0xce, 0x43, 0x25, 0xcc, 0x38, 0x54,
+	0x8f, 0xf6, 0x50, 0x0e, 0xf6, 0x2a, 0x76, 0xda, 0xf2, 0xcb, 0x9d, 0xb6, 0x4f, 0xa1, 0x18, 0xec,
+	0x6c, 0x21, 0x90, 0xf7, 0x7f, 0x99, 0x89, 0xcd, 0xcc, 0xf4, 0x00, 0x96, 0x10, 0xa3, 0xb8, 0x9c,
+	0x18, 0x8f, 0x59, 0x72, 0x8a, 0x6d, 0xf6, 0x95, 0x2b, 0xc1, 0xff, 0xac, 0xa7, 0x92, 0x53, 0x2c,
+	0xeb, 0x31, 0x24, 0xba, 0x0f, 0x45, 0x8a, 0x4d, 0x5f, 0x29, 0x05, 0x16, 0x8b, 0x37, 0x51, 0xb0,
+	0x8a, 0x9e, 0x00, 0x1c, 0x07, 0x37, 0x9b, 0x31, 0xc6, 0x54, 0x29, 0x07, 0x2e, 0xa9, 0x6d, 0x5e,
+	0x2c, 0xdb, 0x61, 0xb1, 0x6c, 0x8f, 0xc2, 0x62, 0xa9, 0xcb, 0x02, 0xdd, 0xa5, 0xda, 0x10, 0x56,
+	0xe2, 0x11, 0x46, 0x9a, 0x49, 0x31, 0xcd, 0x3e, 0x89, 0x27, 0x01, 0xf3, 0x3b, 0x2c, 0xd2, 0x6d,
+	0x56, 0xa4, 0xdb, 0x2f, 0x79, 0x91, 0x0e, 0x93, 0xc3, 0x86, 0xc2, 0x08, 0x9b, 0x99, 0x44, 0x77,
+	0x32, 0xea, 0x4c, 0xa2, 0xca, 0xc4, 0xa4, 0x2b, 0x2c, 0x57, 0x49, 0x7f, 0x91, 0xa0, 0x12, 0xee,
+	0x37, 0x7a, 0x0a, 0xe5, 0x53, 0x32, 0x1b, 0x4f, 0xb0, 0x2b, 0x4e, 0xea, 0xdd, 0x4c, 0x5d, 0xda,
+	0xbb, 0x64, 0xb6, 0x87, 0xdd, 0xfe, 0x94, 0x7a, 0x33, 0xbd, 0x74, 0x1a, 0x0c, 0xd4, 0x27, 0x50,
+	0x8d, 0x4d, 0x2f, 0x7b, 0x14, 0x9e, 0xe6, 0xbf, 0x90, 0xb4, 0x03, 0x68, 0xa4, 0x6f, 0x25, 0xf4,
+	0x25, 0x94, 0xf9, 0xbd, 0xe4, 0x67, 0xba, 0x72, 0x68, 0x4d, 0x4d, 0x9b, 0x0c, 0x3d, 0xc7, 0x25,
+	0x1e, 0x9d, 0x71, 0x6b, 0x3d, 0xb4, 0xd0, 0xfe, 0x29, 0x40, 0x33, 0x0b, 0x81, 0xbe, 0x01, 0x60,
+	0x55, 0x38, 0x71, 0x3d, 0xde, 0x4e, 0x27, 0x45, 0xd2, 0x66, 0x27, 0xa7, 0xcb, 0x14, 0x9b, 0x82,
+	0xe0, 0x15, 0x34, 0xa2, 0xec, 0x1a, 0x27, 0x2a, 0xcc, 0xfd, 0xec, 0x6c, 0x5c, 0x20, 0xbb, 0x1a,
+	0xd9, 0x0b, 0xca, 0x7d, 0xb8, 0x1a, 0x89, 0x2a, 0x18, 0xb9, 0x76, 0xf7, 0x32, 0xcf, 0xd1, 0x02,
+	0x61, 0x3d, 0xb4, 0x16, 0x7c, 0xbb, 0x50, 0x17, 0xe2, 0x86, 0x74, 0xfc, 0x8c, 0x69, 0x59, 0xa9,
+	0xb0, 0xc0, 0x56, 0x13, 0xb6, 0x82, 0x6c, 0x08, 0x15, 0x06, 0xc0, 0xd4, 0xf1, 0x14, 0x68, 0x49,
+	0x1b, 0xf5, 0xce, 0xa3, 0x0f, 0xea, 0xd0, 0xde, 0x76, 0x26, 0x2e, 0xf6, 0x2c, 0x9f, 0xd5, 0x09,
+	0x6e, 0xab, 0x47, 0x2c, 0x5a, 0x0b, 0xd0, 0xe2, 0x3a, 0x02, 0x28, 0xf5, 0x5f, 0xbd, 0xee, 0xbe,
+	0x3c, 0x6c, 0xe4, 0x9e, 0xad, 0xc2, 0x55, 0x57, 0x10, 0x8a, 0x08, 0xb4, 0x17, 0xb0, 0x9e, 0x1d,
+	0x7f, 0xba, 0xf5, 0x92, 0x16, 0x5b, 0xaf, 0x67, 0x00, 0x95, 0x90, 0x4f, 0xfb, 0x0a, 0x56, 0x17,
+	0x14, 0x4e, 0xf4, 0x66, 0x52, 0xba, 0x37, 0x8b, 0x5b, 0xff, 0x00, 0xd7, 0xcf, 0x11, 0x16, 0x3d,
+	0xe2, 0x47, 0xe7, 0x1d, 0xb6, 0x45, 0x5a, 0x25, 0x6f, 0xc1, 0x5d, 0x32, 0x3b, 0x62, 0xf9, 0x3e,
+	0xc4, 0x16, 0xdb, 0x65, 0x76, 0x68, 0x8e, 0xb0, 0x9d, 0x20, 0x7f, 0x0c, 0x2b, 0x71, 0xd4, 0xd2,
+	0xc5, 0xe4, 0x37, 0x09, 0xd6, 0x32, 0xd5, 0x44, 0x6a, 0xaa, 0xb2, 0xb0, 0xb0, 0xc2, 0xda, 0xd2,
+	0x8c, 0xd7, 0x96, 0x9d, 0x9c, 0xb8, 0x60, 0x94, 0x64, 0x75, 0x61, 0x9e, 0x8a, 0xfa, 0xa2, 0xa6,
+	0xea, 0x0b, 0xe3, 0x12, 0x13, 0x89, 0x28, 0xfe, 0xc8, 0xc3, 0xea, 0x42, 0x9f, 0xc0, 0x3c, 0xb7,
+	0xad, 0x89, 0xc5, 0xfd, 0xa8, 0xe9, 0x7c, 0xc0, 0x66, 0xe3, 0x25, 0x9e, 0x0f, 0xd0, 0xb7, 0x50,
+	0xf6, 0x1d, 0x8f, 0xee, 0x92, 0x59, 0xe0, 0x44, 0xbd, 0xf3, 0xe0, 0xe2, 0x26, 0xa4, 0x7d, 0xc8,
+	0xd1, 0x7a, 0x68, 0x86, 0x9e, 0x83, 0xcc, 0x3e, 0x0f, 0x3c, 0x43, 0x24, 0x7f, 0xbd, 0xb3, 0xb1,
+	0x04, 0x47, 0x80, 0xd7, 0xe7, 0xa6, 0xda, 0xff, 0x41, 0x8e, 0xe6, 0x51, 0x1d, 0xa0, 0xd7, 0x3f,
+	0xdc, 0xee, 0xef, 0xf7, 0x06, 0xfb, 0x2f, 0x1a, 0x39, 0x54, 0x03, 0xb9, 0x1b, 0x0d, 0x25, 0xed,
+	0x26, 0x94, 0x85, 0x1f, 0x68, 0x15, 0x6a, 0xdb, 0x7a, 0xbf, 0x3b, 0x1a, 0x1c, 0xec, 0x8f, 0x47,
+	0x83, 0xbd, 0x7e, 0x23, 0xd7, 0xf9, 0xb7, 0x08, 0x55, 0xa6, 0xd1, 0x36, 0x77, 0x00, 0x1d, 0x41,
+	0x2d, 0xf1, 0x3e, 0x42, 0xc9, 0xdb, 0x2d, 0xeb, 0x0d, 0xa6, 0x6a, 0x17, 0x41, 0x44, 0xaf, 0xb5,
+	0x07, 0x30, 0x7f, 0x17, 0xa1, 0xe4, 0xcd, 0xb6, 0xf0, 0xee, 0x52, 0xef, 0x9c, 0xbb, 0x2e, 0xe8,
+	0xbe, 0x87, 0x7a, 0xb2, 0xe3, 0x47, 0x59, 0x4e, 0xa4, 0x9e, 0x16, 0xea, 0xbd, 0x0b, 0x31, 0x82,
+	0x7a, 0x08, 0xd5, 0xd8, 0x13, 0x07, 0x2d, 0xb8, 0x92, 0x26, 0x6d, 0x9d, 0x0f, 0x10, 0x8c, 0x5d,
+	0x28, 0xf1, 0xf7, 0x04, 0x52, 0x93, 0x17, 0x67, 0xfc, 0x65, 0xa2, 0xde, 0xc8, 0x5c, 0x13, 0x14,
+	0x47, 0x50, 0x4b, 0xb4, 0xef, 0x29, 0x59, 0xb2, 0xde, 0x26, 0x29, 0x59, 0xb2, 0xbb, 0xff, 0x43,
+	0x58, 0x89, 0xb7, 0xc6, 0xa8, 0xb5, 0x60, 0x93, 0xea, 0xe1, 0xd5, 0xbb, 0x17, 0x20, 0x38, 0xe9,
+	0x9b, 0x52, 0xd0, 0x98, 0x6c, 0xfd, 0x17, 0x00, 0x00, 0xff, 0xff, 0x93, 0xd2, 0x4d, 0xdb, 0x28,
+	0x10, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -972,180 +1842,288 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// ArtifactsClient is the client API for Artifacts service.
+// DataCatalogClient is the client API for DataCatalog service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ArtifactsClient interface {
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error)
-	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	GenerateProvenance(ctx context.Context, in *GenerateProvenanceRequest, opts ...grpc.CallOption) (*GenerateProvenanceResponse, error)
+type DataCatalogClient interface {
+	CreateDataset(ctx context.Context, in *CreateDatasetRequest, opts ...grpc.CallOption) (*CreateDatasetResponse, error)
+	GetDataset(ctx context.Context, in *GetDatasetRequest, opts ...grpc.CallOption) (*GetDatasetResponse, error)
+	CreateArtifact(ctx context.Context, in *CreateArtifactRequest, opts ...grpc.CallOption) (*CreateArtifactResponse, error)
+	GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error)
+	AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error)
+	ListArtifacts(ctx context.Context, in *ListArtifactsRequest, opts ...grpc.CallOption) (*ListArtifactsResponse, error)
+	ListDatasets(ctx context.Context, in *ListDatasetsRequest, opts ...grpc.CallOption) (*ListDatasetsResponse, error)
 }
 
-type artifactsClient struct {
+type dataCatalogClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewArtifactsClient(cc *grpc.ClientConn) ArtifactsClient {
-	return &artifactsClient{cc}
+func NewDataCatalogClient(cc *grpc.ClientConn) DataCatalogClient {
+	return &dataCatalogClient{cc}
 }
 
-func (c *artifactsClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
-	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, "/pb.lyft.datacatalog.Artifacts/Get", in, out, opts...)
+func (c *dataCatalogClient) CreateDataset(ctx context.Context, in *CreateDatasetRequest, opts ...grpc.CallOption) (*CreateDatasetResponse, error) {
+	out := new(CreateDatasetResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/CreateDataset", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *artifactsClient) Query(ctx context.Context, in *QueryRequest, opts ...grpc.CallOption) (*QueryResponse, error) {
-	out := new(QueryResponse)
-	err := c.cc.Invoke(ctx, "/pb.lyft.datacatalog.Artifacts/Query", in, out, opts...)
+func (c *dataCatalogClient) GetDataset(ctx context.Context, in *GetDatasetRequest, opts ...grpc.CallOption) (*GetDatasetResponse, error) {
+	out := new(GetDatasetResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/GetDataset", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *artifactsClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
-	out := new(CreateResponse)
-	err := c.cc.Invoke(ctx, "/pb.lyft.datacatalog.Artifacts/Create", in, out, opts...)
+func (c *dataCatalogClient) CreateArtifact(ctx context.Context, in *CreateArtifactRequest, opts ...grpc.CallOption) (*CreateArtifactResponse, error) {
+	out := new(CreateArtifactResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/CreateArtifact", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *artifactsClient) GenerateProvenance(ctx context.Context, in *GenerateProvenanceRequest, opts ...grpc.CallOption) (*GenerateProvenanceResponse, error) {
-	out := new(GenerateProvenanceResponse)
-	err := c.cc.Invoke(ctx, "/pb.lyft.datacatalog.Artifacts/GenerateProvenance", in, out, opts...)
+func (c *dataCatalogClient) GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error) {
+	out := new(GetArtifactResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/GetArtifact", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ArtifactsServer is the server API for Artifacts service.
-type ArtifactsServer interface {
-	Get(context.Context, *GetRequest) (*GetResponse, error)
-	Query(context.Context, *QueryRequest) (*QueryResponse, error)
-	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	GenerateProvenance(context.Context, *GenerateProvenanceRequest) (*GenerateProvenanceResponse, error)
+func (c *dataCatalogClient) AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error) {
+	out := new(AddTagResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/AddTag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedArtifactsServer can be embedded to have forward compatible implementations.
-type UnimplementedArtifactsServer struct {
+func (c *dataCatalogClient) ListArtifacts(ctx context.Context, in *ListArtifactsRequest, opts ...grpc.CallOption) (*ListArtifactsResponse, error) {
+	out := new(ListArtifactsResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/ListArtifacts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func (*UnimplementedArtifactsServer) Get(ctx context.Context, req *GetRequest) (*GetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
-}
-func (*UnimplementedArtifactsServer) Query(ctx context.Context, req *QueryRequest) (*QueryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Query not implemented")
-}
-func (*UnimplementedArtifactsServer) Create(ctx context.Context, req *CreateRequest) (*CreateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
-}
-func (*UnimplementedArtifactsServer) GenerateProvenance(ctx context.Context, req *GenerateProvenanceRequest) (*GenerateProvenanceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GenerateProvenance not implemented")
+func (c *dataCatalogClient) ListDatasets(ctx context.Context, in *ListDatasetsRequest, opts ...grpc.CallOption) (*ListDatasetsResponse, error) {
+	out := new(ListDatasetsResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/ListDatasets", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-func RegisterArtifactsServer(s *grpc.Server, srv ArtifactsServer) {
-	s.RegisterService(&_Artifacts_serviceDesc, srv)
+// DataCatalogServer is the server API for DataCatalog service.
+type DataCatalogServer interface {
+	CreateDataset(context.Context, *CreateDatasetRequest) (*CreateDatasetResponse, error)
+	GetDataset(context.Context, *GetDatasetRequest) (*GetDatasetResponse, error)
+	CreateArtifact(context.Context, *CreateArtifactRequest) (*CreateArtifactResponse, error)
+	GetArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error)
+	AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error)
+	ListArtifacts(context.Context, *ListArtifactsRequest) (*ListArtifactsResponse, error)
+	ListDatasets(context.Context, *ListDatasetsRequest) (*ListDatasetsResponse, error)
 }
 
-func _Artifacts_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
+// UnimplementedDataCatalogServer can be embedded to have forward compatible implementations.
+type UnimplementedDataCatalogServer struct {
+}
+
+func (*UnimplementedDataCatalogServer) CreateDataset(ctx context.Context, req *CreateDatasetRequest) (*CreateDatasetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateDataset not implemented")
+}
+func (*UnimplementedDataCatalogServer) GetDataset(ctx context.Context, req *GetDatasetRequest) (*GetDatasetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDataset not implemented")
+}
+func (*UnimplementedDataCatalogServer) CreateArtifact(ctx context.Context, req *CreateArtifactRequest) (*CreateArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateArtifact not implemented")
+}
+func (*UnimplementedDataCatalogServer) GetArtifact(ctx context.Context, req *GetArtifactRequest) (*GetArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArtifact not implemented")
+}
+func (*UnimplementedDataCatalogServer) AddTag(ctx context.Context, req *AddTagRequest) (*AddTagResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddTag not implemented")
+}
+func (*UnimplementedDataCatalogServer) ListArtifacts(ctx context.Context, req *ListArtifactsRequest) (*ListArtifactsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListArtifacts not implemented")
+}
+func (*UnimplementedDataCatalogServer) ListDatasets(ctx context.Context, req *ListDatasetsRequest) (*ListDatasetsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListDatasets not implemented")
+}
+
+func RegisterDataCatalogServer(s *grpc.Server, srv DataCatalogServer) {
+	s.RegisterService(&_DataCatalog_serviceDesc, srv)
+}
+
+func _DataCatalog_CreateDataset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDatasetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArtifactsServer).Get(ctx, in)
+		return srv.(DataCatalogServer).CreateDataset(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.lyft.datacatalog.Artifacts/Get",
+		FullMethod: "/datacatalog.DataCatalog/CreateDataset",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArtifactsServer).Get(ctx, req.(*GetRequest))
+		return srv.(DataCatalogServer).CreateDataset(ctx, req.(*CreateDatasetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Artifacts_Query_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryRequest)
+func _DataCatalog_GetDataset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDatasetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArtifactsServer).Query(ctx, in)
+		return srv.(DataCatalogServer).GetDataset(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.lyft.datacatalog.Artifacts/Query",
+		FullMethod: "/datacatalog.DataCatalog/GetDataset",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArtifactsServer).Query(ctx, req.(*QueryRequest))
+		return srv.(DataCatalogServer).GetDataset(ctx, req.(*GetDatasetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Artifacts_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateRequest)
+func _DataCatalog_CreateArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateArtifactRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArtifactsServer).Create(ctx, in)
+		return srv.(DataCatalogServer).CreateArtifact(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.lyft.datacatalog.Artifacts/Create",
+		FullMethod: "/datacatalog.DataCatalog/CreateArtifact",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArtifactsServer).Create(ctx, req.(*CreateRequest))
+		return srv.(DataCatalogServer).CreateArtifact(ctx, req.(*CreateArtifactRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Artifacts_GenerateProvenance_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GenerateProvenanceRequest)
+func _DataCatalog_GetArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArtifactRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArtifactsServer).GenerateProvenance(ctx, in)
+		return srv.(DataCatalogServer).GetArtifact(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.lyft.datacatalog.Artifacts/GenerateProvenance",
+		FullMethod: "/datacatalog.DataCatalog/GetArtifact",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArtifactsServer).GenerateProvenance(ctx, req.(*GenerateProvenanceRequest))
+		return srv.(DataCatalogServer).GetArtifact(ctx, req.(*GetArtifactRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Artifacts_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "pb.lyft.datacatalog.Artifacts",
-	HandlerType: (*ArtifactsServer)(nil),
+func _DataCatalog_AddTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).AddTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/AddTag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).AddTag(ctx, req.(*AddTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_ListArtifacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListArtifactsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).ListArtifacts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/ListArtifacts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).ListArtifacts(ctx, req.(*ListArtifactsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_ListDatasets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListDatasetsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).ListDatasets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/ListDatasets",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).ListDatasets(ctx, req.(*ListDatasetsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _DataCatalog_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "datacatalog.DataCatalog",
+	HandlerType: (*DataCatalogServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Get",
-			Handler:    _Artifacts_Get_Handler,
+			MethodName: "CreateDataset",
+			Handler:    _DataCatalog_CreateDataset_Handler,
 		},
 		{
-			MethodName: "Query",
-			Handler:    _Artifacts_Query_Handler,
+			MethodName: "GetDataset",
+			Handler:    _DataCatalog_GetDataset_Handler,
 		},
 		{
-			MethodName: "Create",
-			Handler:    _Artifacts_Create_Handler,
+			MethodName: "CreateArtifact",
+			Handler:    _DataCatalog_CreateArtifact_Handler,
 		},
 		{
-			MethodName: "GenerateProvenance",
-			Handler:    _Artifacts_GenerateProvenance_Handler,
+			MethodName: "GetArtifact",
+			Handler:    _DataCatalog_GetArtifact_Handler,
+		},
+		{
+			MethodName: "AddTag",
+			Handler:    _DataCatalog_AddTag_Handler,
+		},
+		{
+			MethodName: "ListArtifacts",
+			Handler:    _DataCatalog_ListArtifacts_Handler,
+		},
+		{
+			MethodName: "ListDatasets",
+			Handler:    _DataCatalog_ListDatasets_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

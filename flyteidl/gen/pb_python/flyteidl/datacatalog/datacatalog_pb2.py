@@ -4,296 +4,98 @@
 
 import sys
 _b=sys.version_info[0]<3 and (lambda x:x) or (lambda x:x.encode('latin1'))
-from google.protobuf.internal import enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
-from google.protobuf import service as _service
-from google.protobuf import service_reflection
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
+from flyteidl.core import literals_pb2 as flyteidl_dot_core_dot_literals__pb2
+from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='flyteidl/datacatalog/datacatalog.proto',
-  package='pb.lyft.datacatalog',
+  package='datacatalog',
   syntax='proto3',
-  serialized_options=_b('Z\013datacatalog\220\001\001'),
-  serialized_pb=_b('\n&flyteidl/datacatalog/datacatalog.proto\x12\x13pb.lyft.datacatalog\"(\n\tParameter\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"\xda\x01\n\x08\x41rtifact\x12\x12\n\nprovenance\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07version\x18\x03 \x01(\t\x12\x10\n\x08revision\x18\x04 \x01(\x03\x12\x12\n\ncreated_at\x18\x05 \x01(\x03\x12\x14\n\x0creference_id\x18\x06 \x01(\t\x12.\n\x06inputs\x18\x07 \x03(\x0b\x32\x1e.pb.lyft.datacatalog.Parameter\x12/\n\x07outputs\x18\x08 \x03(\x0b\x32\x1e.pb.lyft.datacatalog.Parameter\"[\n\nArtifactId\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\t\x12.\n\x06inputs\x18\x03 \x03(\x0b\x32\x1e.pb.lyft.datacatalog.Parameter\"`\n\nGetRequest\x12\x14\n\nprovenance\x18\x01 \x01(\tH\x00\x12\x36\n\x0b\x61rtifact_id\x18\x02 \x01(\x0b\x32\x1f.pb.lyft.datacatalog.ArtifactIdH\x00\x42\x04\n\x02id\">\n\x0bGetResponse\x12/\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x1d.pb.lyft.datacatalog.Artifact\"P\n\tIntFilter\x12\r\n\x05value\x18\x01 \x01(\x03\x12\x34\n\x08operator\x18\x02 \x01(\x0e\x32\".pb.lyft.datacatalog.QueryOperator\"*\n\x0eIntRangeFilter\x12\x0b\n\x03min\x18\x01 \x01(\x03\x12\x0b\n\x03max\x18\x02 \x01(\x03\"|\n\x0bIntQueryKey\x12-\n\x03val\x18\x01 \x01(\x0b\x32\x1e.pb.lyft.datacatalog.IntFilterH\x00\x12\x34\n\x05range\x18\x02 \x01(\x0b\x32#.pb.lyft.datacatalog.IntRangeFilterH\x00\x42\x08\n\x06\x66ilter\"\x8b\x01\n\x0cQueryRequest\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x0f\n\x07version\x18\x02 \x01(\t\x12\x32\n\x08revision\x18\x03 \x01(\x0b\x32 .pb.lyft.datacatalog.IntQueryKey\x12\x12\n\ncreated_at\x18\x04 \x01(\x03\x12\x14\n\x0creference_id\x18\x05 \x01(\t\"@\n\rQueryResponse\x12/\n\x08\x61rtifact\x18\x01 \x03(\x0b\x32\x1d.pb.lyft.datacatalog.Artifact\"\x96\x01\n\rCreateRequest\x12,\n\x03ref\x18\x01 \x01(\x0b\x32\x1f.pb.lyft.datacatalog.ArtifactId\x12\x14\n\x0creference_id\x18\x02 \x01(\t\x12\x10\n\x08revision\x18\x03 \x01(\x03\x12/\n\x07outputs\x18\x04 \x03(\x0b\x32\x1e.pb.lyft.datacatalog.Parameter\"\xa8\x01\n\x0e\x43reateResponse\x12/\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x1d.pb.lyft.datacatalog.Artifact\x12:\n\x06status\x18\x02 \x01(\x0e\x32*.pb.lyft.datacatalog.CreateResponse.Status\")\n\x06Status\x12\x12\n\x0e\x41LREADY_EXISTS\x10\x00\x12\x0b\n\x07\x43REATED\x10\x01\"H\n\x19GenerateProvenanceRequest\x12+\n\x02id\x18\x01 \x01(\x0b\x32\x1f.pb.lyft.datacatalog.ArtifactId\"0\n\x1aGenerateProvenanceResponse\x12\x12\n\nprovenance\x18\x01 \x01(\t*=\n\rQueryOperator\x12\t\n\x05\x45QUAL\x10\x00\x12\x10\n\x0cGREATER_THAN\x10\x01\x12\x0f\n\x0bLESSER_THAN\x10\x02\x32\xf7\x02\n\tArtifacts\x12J\n\x03Get\x12\x1f.pb.lyft.datacatalog.GetRequest\x1a .pb.lyft.datacatalog.GetResponse\"\x00\x12P\n\x05Query\x12!.pb.lyft.datacatalog.QueryRequest\x1a\".pb.lyft.datacatalog.QueryResponse\"\x00\x12S\n\x06\x43reate\x12\".pb.lyft.datacatalog.CreateRequest\x1a#.pb.lyft.datacatalog.CreateResponse\"\x00\x12w\n\x12GenerateProvenance\x12..pb.lyft.datacatalog.GenerateProvenanceRequest\x1a/.pb.lyft.datacatalog.GenerateProvenanceResponse\"\x00\x42\x10Z\x0b\x64\x61tacatalog\x90\x01\x01\x62\x06proto3')
-)
+  serialized_options=None,
+  serialized_pb=_b('\n&flyteidl/datacatalog/datacatalog.proto\x12\x0b\x64\x61tacatalog\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"=\n\x14\x43reateDatasetRequest\x12%\n\x07\x64\x61taset\x18\x01 \x01(\x0b\x32\x14.datacatalog.Dataset\"\x17\n\x15\x43reateDatasetResponse\"<\n\x11GetDatasetRequest\x12\'\n\x07\x64\x61taset\x18\x01 \x01(\x0b\x32\x16.datacatalog.DatasetID\";\n\x12GetDatasetResponse\x12%\n\x07\x64\x61taset\x18\x01 \x01(\x0b\x32\x14.datacatalog.Dataset\"x\n\x12GetArtifactRequest\x12\'\n\x07\x64\x61taset\x18\x01 \x01(\x0b\x32\x16.datacatalog.DatasetID\x12\x15\n\x0b\x61rtifact_id\x18\x02 \x01(\tH\x00\x12\x12\n\x08tag_name\x18\x03 \x01(\tH\x00\x42\x0e\n\x0cquery_handle\">\n\x13GetArtifactResponse\x12\'\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x15.datacatalog.Artifact\"@\n\x15\x43reateArtifactRequest\x12\'\n\x08\x61rtifact\x18\x01 \x01(\x0b\x32\x15.datacatalog.Artifact\"\x18\n\x16\x43reateArtifactResponse\".\n\rAddTagRequest\x12\x1d\n\x03tag\x18\x01 \x01(\x0b\x32\x10.datacatalog.Tag\"\x10\n\x0e\x41\x64\x64TagResponse\"\xa2\x01\n\x14ListArtifactsRequest\x12\'\n\x07\x64\x61taset\x18\x01 \x01(\x0b\x32\x16.datacatalog.DatasetID\x12-\n\x06\x66ilter\x18\x02 \x01(\x0b\x32\x1d.datacatalog.FilterExpression\x12\x32\n\npagination\x18\x03 \x01(\x0b\x32\x1e.datacatalog.PaginationOptions\"U\n\x15ListArtifactsResponse\x12(\n\tartifacts\x18\x01 \x03(\x0b\x32\x15.datacatalog.Artifact\x12\x12\n\nnext_token\x18\x02 \x01(\t\"x\n\x13ListDatasetsRequest\x12-\n\x06\x66ilter\x18\x01 \x01(\x0b\x32\x1d.datacatalog.FilterExpression\x12\x32\n\npagination\x18\x02 \x01(\x0b\x32\x1e.datacatalog.PaginationOptions\"R\n\x14ListDatasetsResponse\x12&\n\x08\x64\x61tasets\x18\x01 \x03(\x0b\x32\x14.datacatalog.Dataset\x12\x12\n\nnext_token\x18\x02 \x01(\t\"m\n\x07\x44\x61taset\x12\"\n\x02id\x18\x01 \x01(\x0b\x32\x16.datacatalog.DatasetID\x12\'\n\x08metadata\x18\x02 \x01(\x0b\x32\x15.datacatalog.Metadata\x12\x15\n\rpartitionKeys\x18\x03 \x03(\t\"\'\n\tPartition\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"Y\n\tDatasetID\x12\x0f\n\x07project\x18\x01 \x01(\t\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0e\n\x06\x64omain\x18\x03 \x01(\t\x12\x0f\n\x07version\x18\x04 \x01(\t\x12\x0c\n\x04UUID\x18\x05 \x01(\t\"\x8d\x02\n\x08\x41rtifact\x12\n\n\x02id\x18\x01 \x01(\t\x12\'\n\x07\x64\x61taset\x18\x02 \x01(\x0b\x32\x16.datacatalog.DatasetID\x12\'\n\x04\x64\x61ta\x18\x03 \x03(\x0b\x32\x19.datacatalog.ArtifactData\x12\'\n\x08metadata\x18\x04 \x01(\x0b\x32\x15.datacatalog.Metadata\x12*\n\npartitions\x18\x05 \x03(\x0b\x32\x16.datacatalog.Partition\x12\x1e\n\x04tags\x18\x06 \x03(\x0b\x32\x10.datacatalog.Tag\x12.\n\ncreated_at\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"C\n\x0c\x41rtifactData\x12\x0c\n\x04name\x18\x01 \x01(\t\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x16.flyteidl.core.Literal\"Q\n\x03Tag\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x13\n\x0b\x61rtifact_id\x18\x02 \x01(\t\x12\'\n\x07\x64\x61taset\x18\x03 \x01(\x0b\x32\x16.datacatalog.DatasetID\"m\n\x08Metadata\x12\x32\n\x07key_map\x18\x01 \x03(\x0b\x32!.datacatalog.Metadata.KeyMapEntry\x1a-\n\x0bKeyMapEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"F\n\x10\x46ilterExpression\x12\x32\n\x07\x66ilters\x18\x01 \x03(\x0b\x32!.datacatalog.SinglePropertyFilter\"\x89\x03\n\x14SinglePropertyFilter\x12\x34\n\ntag_filter\x18\x01 \x01(\x0b\x32\x1e.datacatalog.TagPropertyFilterH\x00\x12@\n\x10partition_filter\x18\x02 \x01(\x0b\x32$.datacatalog.PartitionPropertyFilterH\x00\x12>\n\x0f\x61rtifact_filter\x18\x03 \x01(\x0b\x32#.datacatalog.ArtifactPropertyFilterH\x00\x12<\n\x0e\x64\x61taset_filter\x18\x04 \x01(\x0b\x32\".datacatalog.DatasetPropertyFilterH\x00\x12\x46\n\x08operator\x18\n \x01(\x0e\x32\x34.datacatalog.SinglePropertyFilter.ComparisonOperator\" \n\x12\x43omparisonOperator\x12\n\n\x06\x45QUALS\x10\x00\x42\x11\n\x0fproperty_filter\";\n\x16\x41rtifactPropertyFilter\x12\x15\n\x0b\x61rtifact_id\x18\x01 \x01(\tH\x00\x42\n\n\x08property\"3\n\x11TagPropertyFilter\x12\x12\n\x08tag_name\x18\x01 \x01(\tH\x00\x42\n\n\x08property\"S\n\x17PartitionPropertyFilter\x12,\n\x07key_val\x18\x01 \x01(\x0b\x32\x19.datacatalog.KeyValuePairH\x00\x42\n\n\x08property\"*\n\x0cKeyValuePair\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"k\n\x15\x44\x61tasetPropertyFilter\x12\x11\n\x07project\x18\x01 \x01(\tH\x00\x12\x0e\n\x04name\x18\x02 \x01(\tH\x00\x12\x10\n\x06\x64omain\x18\x03 \x01(\tH\x00\x12\x11\n\x07version\x18\x04 \x01(\tH\x00\x42\n\n\x08property\"\xf1\x01\n\x11PaginationOptions\x12\r\n\x05limit\x18\x01 \x01(\r\x12\r\n\x05token\x18\x02 \x01(\t\x12\x37\n\x07sortKey\x18\x03 \x01(\x0e\x32&.datacatalog.PaginationOptions.SortKey\x12;\n\tsortOrder\x18\x04 \x01(\x0e\x32(.datacatalog.PaginationOptions.SortOrder\"*\n\tSortOrder\x12\x0e\n\nDESCENDING\x10\x00\x12\r\n\tASCENDING\x10\x01\"\x1c\n\x07SortKey\x12\x11\n\rCREATION_TIME\x10\x00\x32\xd1\x04\n\x0b\x44\x61taCatalog\x12V\n\rCreateDataset\x12!.datacatalog.CreateDatasetRequest\x1a\".datacatalog.CreateDatasetResponse\x12M\n\nGetDataset\x12\x1e.datacatalog.GetDatasetRequest\x1a\x1f.datacatalog.GetDatasetResponse\x12Y\n\x0e\x43reateArtifact\x12\".datacatalog.CreateArtifactRequest\x1a#.datacatalog.CreateArtifactResponse\x12P\n\x0bGetArtifact\x12\x1f.datacatalog.GetArtifactRequest\x1a .datacatalog.GetArtifactResponse\x12\x41\n\x06\x41\x64\x64Tag\x12\x1a.datacatalog.AddTagRequest\x1a\x1b.datacatalog.AddTagResponse\x12V\n\rListArtifacts\x12!.datacatalog.ListArtifactsRequest\x1a\".datacatalog.ListArtifactsResponse\x12S\n\x0cListDatasets\x12 .datacatalog.ListDatasetsRequest\x1a!.datacatalog.ListDatasetsResponseb\x06proto3')
+  ,
+  dependencies=[flyteidl_dot_core_dot_literals__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
-_QUERYOPERATOR = _descriptor.EnumDescriptor(
-  name='QueryOperator',
-  full_name='pb.lyft.datacatalog.QueryOperator',
+
+
+_SINGLEPROPERTYFILTER_COMPARISONOPERATOR = _descriptor.EnumDescriptor(
+  name='ComparisonOperator',
+  full_name='datacatalog.SinglePropertyFilter.ComparisonOperator',
   filename=None,
   file=DESCRIPTOR,
   values=[
     _descriptor.EnumValueDescriptor(
-      name='EQUAL', index=0, number=0,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='GREATER_THAN', index=1, number=1,
-      serialized_options=None,
-      type=None),
-    _descriptor.EnumValueDescriptor(
-      name='LESSER_THAN', index=2, number=2,
+      name='EQUALS', index=0, number=0,
       serialized_options=None,
       type=None),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1489,
-  serialized_end=1550,
+  serialized_start=2324,
+  serialized_end=2356,
 )
-_sym_db.RegisterEnumDescriptor(_QUERYOPERATOR)
+_sym_db.RegisterEnumDescriptor(_SINGLEPROPERTYFILTER_COMPARISONOPERATOR)
 
-QueryOperator = enum_type_wrapper.EnumTypeWrapper(_QUERYOPERATOR)
-EQUAL = 0
-GREATER_THAN = 1
-LESSER_THAN = 2
-
-
-_CREATERESPONSE_STATUS = _descriptor.EnumDescriptor(
-  name='Status',
-  full_name='pb.lyft.datacatalog.CreateResponse.Status',
+_PAGINATIONOPTIONS_SORTORDER = _descriptor.EnumDescriptor(
+  name='SortOrder',
+  full_name='datacatalog.PaginationOptions.SortOrder',
   filename=None,
   file=DESCRIPTOR,
   values=[
     _descriptor.EnumValueDescriptor(
-      name='ALREADY_EXISTS', index=0, number=0,
+      name='DESCENDING', index=0, number=0,
       serialized_options=None,
       type=None),
     _descriptor.EnumValueDescriptor(
-      name='CREATED', index=1, number=1,
+      name='ASCENDING', index=1, number=1,
       serialized_options=None,
       type=None),
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1322,
-  serialized_end=1363,
+  serialized_start=2899,
+  serialized_end=2941,
 )
-_sym_db.RegisterEnumDescriptor(_CREATERESPONSE_STATUS)
+_sym_db.RegisterEnumDescriptor(_PAGINATIONOPTIONS_SORTORDER)
 
-
-_PARAMETER = _descriptor.Descriptor(
-  name='Parameter',
-  full_name='pb.lyft.datacatalog.Parameter',
+_PAGINATIONOPTIONS_SORTKEY = _descriptor.EnumDescriptor(
+  name='SortKey',
+  full_name='datacatalog.PaginationOptions.SortKey',
   filename=None,
   file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='CREATION_TIME', index=0, number=0,
+      serialized_options=None,
+      type=None),
+  ],
   containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='pb.lyft.datacatalog.Parameter.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='value', full_name='pb.lyft.datacatalog.Parameter.value', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
   serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=63,
-  serialized_end=103,
+  serialized_start=2943,
+  serialized_end=2971,
 )
+_sym_db.RegisterEnumDescriptor(_PAGINATIONOPTIONS_SORTKEY)
 
 
-_ARTIFACT = _descriptor.Descriptor(
-  name='Artifact',
-  full_name='pb.lyft.datacatalog.Artifact',
+_CREATEDATASETREQUEST = _descriptor.Descriptor(
+  name='CreateDatasetRequest',
+  full_name='datacatalog.CreateDatasetRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='provenance', full_name='pb.lyft.datacatalog.Artifact.provenance', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='name', full_name='pb.lyft.datacatalog.Artifact.name', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='version', full_name='pb.lyft.datacatalog.Artifact.version', index=2,
-      number=3, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='revision', full_name='pb.lyft.datacatalog.Artifact.revision', index=3,
-      number=4, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='created_at', full_name='pb.lyft.datacatalog.Artifact.created_at', index=4,
-      number=5, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='reference_id', full_name='pb.lyft.datacatalog.Artifact.reference_id', index=5,
-      number=6, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='inputs', full_name='pb.lyft.datacatalog.Artifact.inputs', index=6,
-      number=7, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='outputs', full_name='pb.lyft.datacatalog.Artifact.outputs', index=7,
-      number=8, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=106,
-  serialized_end=324,
-)
-
-
-_ARTIFACTID = _descriptor.Descriptor(
-  name='ArtifactId',
-  full_name='pb.lyft.datacatalog.ArtifactId',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='name', full_name='pb.lyft.datacatalog.ArtifactId.name', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='version', full_name='pb.lyft.datacatalog.ArtifactId.version', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='inputs', full_name='pb.lyft.datacatalog.ArtifactId.inputs', index=2,
-      number=3, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=326,
-  serialized_end=417,
-)
-
-
-_GETREQUEST = _descriptor.Descriptor(
-  name='GetRequest',
-  full_name='pb.lyft.datacatalog.GetRequest',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='provenance', full_name='pb.lyft.datacatalog.GetRequest.provenance', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='artifact_id', full_name='pb.lyft.datacatalog.GetRequest.artifact_id', index=1,
-      number=2, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='id', full_name='pb.lyft.datacatalog.GetRequest.id',
-      index=0, containing_type=None, fields=[]),
-  ],
-  serialized_start=419,
-  serialized_end=515,
-)
-
-
-_GETRESPONSE = _descriptor.Descriptor(
-  name='GetResponse',
-  full_name='pb.lyft.datacatalog.GetResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='artifact', full_name='pb.lyft.datacatalog.GetResponse.artifact', index=0,
+      name='dataset', full_name='datacatalog.CreateDatasetRequest.dataset', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -311,32 +113,214 @@ _GETRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=517,
-  serialized_end=579,
+  serialized_start=118,
+  serialized_end=179,
 )
 
 
-_INTFILTER = _descriptor.Descriptor(
-  name='IntFilter',
-  full_name='pb.lyft.datacatalog.IntFilter',
+_CREATEDATASETRESPONSE = _descriptor.Descriptor(
+  name='CreateDatasetResponse',
+  full_name='datacatalog.CreateDatasetResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=181,
+  serialized_end=204,
+)
+
+
+_GETDATASETREQUEST = _descriptor.Descriptor(
+  name='GetDatasetRequest',
+  full_name='datacatalog.GetDatasetRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='value', full_name='pb.lyft.datacatalog.IntFilter.value', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      name='dataset', full_name='datacatalog.GetDatasetRequest.dataset', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=206,
+  serialized_end=266,
+)
+
+
+_GETDATASETRESPONSE = _descriptor.Descriptor(
+  name='GetDatasetResponse',
+  full_name='datacatalog.GetDatasetResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='dataset', full_name='datacatalog.GetDatasetResponse.dataset', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=268,
+  serialized_end=327,
+)
+
+
+_GETARTIFACTREQUEST = _descriptor.Descriptor(
+  name='GetArtifactRequest',
+  full_name='datacatalog.GetArtifactRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='dataset', full_name='datacatalog.GetArtifactRequest.dataset', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='operator', full_name='pb.lyft.datacatalog.IntFilter.operator', index=1,
-      number=2, type=14, cpp_type=8, label=1,
-      has_default_value=False, default_value=0,
+      name='artifact_id', full_name='datacatalog.GetArtifactRequest.artifact_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tag_name', full_name='datacatalog.GetArtifactRequest.tag_name', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='query_handle', full_name='datacatalog.GetArtifactRequest.query_handle',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=329,
+  serialized_end=449,
+)
+
+
+_GETARTIFACTRESPONSE = _descriptor.Descriptor(
+  name='GetArtifactResponse',
+  full_name='datacatalog.GetArtifactResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='artifact', full_name='datacatalog.GetArtifactResponse.artifact', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=451,
+  serialized_end=513,
+)
+
+
+_CREATEARTIFACTREQUEST = _descriptor.Descriptor(
+  name='CreateArtifactRequest',
+  full_name='datacatalog.CreateArtifactRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='artifact', full_name='datacatalog.CreateArtifactRequest.artifact', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=515,
+  serialized_end=579,
+)
+
+
+_CREATEARTIFACTRESPONSE = _descriptor.Descriptor(
+  name='CreateArtifactResponse',
+  full_name='datacatalog.CreateArtifactResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
   ],
   extensions=[
   ],
@@ -350,28 +334,21 @@ _INTFILTER = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=581,
-  serialized_end=661,
+  serialized_end=605,
 )
 
 
-_INTRANGEFILTER = _descriptor.Descriptor(
-  name='IntRangeFilter',
-  full_name='pb.lyft.datacatalog.IntRangeFilter',
+_ADDTAGREQUEST = _descriptor.Descriptor(
+  name='AddTagRequest',
+  full_name='datacatalog.AddTagRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='min', full_name='pb.lyft.datacatalog.IntRangeFilter.min', index=0,
-      number=1, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='max', full_name='pb.lyft.datacatalog.IntRangeFilter.max', index=1,
-      number=2, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      name='tag', full_name='datacatalog.AddTagRequest.tag', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -387,27 +364,134 @@ _INTRANGEFILTER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=663,
-  serialized_end=705,
+  serialized_start=607,
+  serialized_end=653,
 )
 
 
-_INTQUERYKEY = _descriptor.Descriptor(
-  name='IntQueryKey',
-  full_name='pb.lyft.datacatalog.IntQueryKey',
+_ADDTAGRESPONSE = _descriptor.Descriptor(
+  name='AddTagResponse',
+  full_name='datacatalog.AddTagResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=655,
+  serialized_end=671,
+)
+
+
+_LISTARTIFACTSREQUEST = _descriptor.Descriptor(
+  name='ListArtifactsRequest',
+  full_name='datacatalog.ListArtifactsRequest',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='val', full_name='pb.lyft.datacatalog.IntQueryKey.val', index=0,
+      name='dataset', full_name='datacatalog.ListArtifactsRequest.dataset', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='range', full_name='pb.lyft.datacatalog.IntQueryKey.range', index=1,
+      name='filter', full_name='datacatalog.ListArtifactsRequest.filter', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='pagination', full_name='datacatalog.ListArtifactsRequest.pagination', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=674,
+  serialized_end=836,
+)
+
+
+_LISTARTIFACTSRESPONSE = _descriptor.Descriptor(
+  name='ListArtifactsResponse',
+  full_name='datacatalog.ListArtifactsResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='artifacts', full_name='datacatalog.ListArtifactsResponse.artifacts', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='next_token', full_name='datacatalog.ListArtifactsResponse.next_token', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=838,
+  serialized_end=923,
+)
+
+
+_LISTDATASETSREQUEST = _descriptor.Descriptor(
+  name='ListDatasetsRequest',
+  full_name='datacatalog.ListDatasetsRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='filter', full_name='datacatalog.ListDatasetsRequest.filter', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='pagination', full_name='datacatalog.ListDatasetsRequest.pagination', index=1,
       number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -424,52 +508,170 @@ _INTQUERYKEY = _descriptor.Descriptor(
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
-    _descriptor.OneofDescriptor(
-      name='filter', full_name='pb.lyft.datacatalog.IntQueryKey.filter',
-      index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=707,
-  serialized_end=831,
+  serialized_start=925,
+  serialized_end=1045,
 )
 
 
-_QUERYREQUEST = _descriptor.Descriptor(
-  name='QueryRequest',
-  full_name='pb.lyft.datacatalog.QueryRequest',
+_LISTDATASETSRESPONSE = _descriptor.Descriptor(
+  name='ListDatasetsResponse',
+  full_name='datacatalog.ListDatasetsResponse',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='pb.lyft.datacatalog.QueryRequest.name', index=0,
+      name='datasets', full_name='datacatalog.ListDatasetsResponse.datasets', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='next_token', full_name='datacatalog.ListDatasetsResponse.next_token', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1047,
+  serialized_end=1129,
+)
+
+
+_DATASET = _descriptor.Descriptor(
+  name='Dataset',
+  full_name='datacatalog.Dataset',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='id', full_name='datacatalog.Dataset.id', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='metadata', full_name='datacatalog.Dataset.metadata', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='partitionKeys', full_name='datacatalog.Dataset.partitionKeys', index=2,
+      number=3, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1131,
+  serialized_end=1240,
+)
+
+
+_PARTITION = _descriptor.Descriptor(
+  name='Partition',
+  full_name='datacatalog.Partition',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='datacatalog.Partition.key', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='version', full_name='pb.lyft.datacatalog.QueryRequest.version', index=1,
+      name='value', full_name='datacatalog.Partition.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1242,
+  serialized_end=1281,
+)
+
+
+_DATASETID = _descriptor.Descriptor(
+  name='DatasetID',
+  full_name='datacatalog.DatasetID',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='project', full_name='datacatalog.DatasetID.project', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='datacatalog.DatasetID.name', index=1,
       number=2, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='revision', full_name='pb.lyft.datacatalog.QueryRequest.revision', index=2,
-      number=3, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
+      name='domain', full_name='datacatalog.DatasetID.domain', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='created_at', full_name='pb.lyft.datacatalog.QueryRequest.created_at', index=3,
-      number=4, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
+      name='version', full_name='datacatalog.DatasetID.version', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='reference_id', full_name='pb.lyft.datacatalog.QueryRequest.reference_id', index=4,
+      name='UUID', full_name='datacatalog.DatasetID.UUID', index=4,
       number=5, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -487,20 +689,244 @@ _QUERYREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=834,
-  serialized_end=973,
+  serialized_start=1283,
+  serialized_end=1372,
 )
 
 
-_QUERYRESPONSE = _descriptor.Descriptor(
-  name='QueryResponse',
-  full_name='pb.lyft.datacatalog.QueryResponse',
+_ARTIFACT = _descriptor.Descriptor(
+  name='Artifact',
+  full_name='datacatalog.Artifact',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='artifact', full_name='pb.lyft.datacatalog.QueryResponse.artifact', index=0,
+      name='id', full_name='datacatalog.Artifact.id', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dataset', full_name='datacatalog.Artifact.dataset', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='data', full_name='datacatalog.Artifact.data', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='metadata', full_name='datacatalog.Artifact.metadata', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='partitions', full_name='datacatalog.Artifact.partitions', index=4,
+      number=5, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='tags', full_name='datacatalog.Artifact.tags', index=5,
+      number=6, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='created_at', full_name='datacatalog.Artifact.created_at', index=6,
+      number=7, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1375,
+  serialized_end=1644,
+)
+
+
+_ARTIFACTDATA = _descriptor.Descriptor(
+  name='ArtifactData',
+  full_name='datacatalog.ArtifactData',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='datacatalog.ArtifactData.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='datacatalog.ArtifactData.value', index=1,
+      number=2, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1646,
+  serialized_end=1713,
+)
+
+
+_TAG = _descriptor.Descriptor(
+  name='Tag',
+  full_name='datacatalog.Tag',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='name', full_name='datacatalog.Tag.name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='artifact_id', full_name='datacatalog.Tag.artifact_id', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dataset', full_name='datacatalog.Tag.dataset', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1715,
+  serialized_end=1796,
+)
+
+
+_METADATA_KEYMAPENTRY = _descriptor.Descriptor(
+  name='KeyMapEntry',
+  full_name='datacatalog.Metadata.KeyMapEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='datacatalog.Metadata.KeyMapEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='datacatalog.Metadata.KeyMapEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=_b('8\001'),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1862,
+  serialized_end=1907,
+)
+
+_METADATA = _descriptor.Descriptor(
+  name='Metadata',
+  full_name='datacatalog.Metadata',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key_map', full_name='datacatalog.Metadata.key_map', index=0,
+      number=1, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[_METADATA_KEYMAPENTRY, ],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=1798,
+  serialized_end=1907,
+)
+
+
+_FILTEREXPRESSION = _descriptor.Descriptor(
+  name='FilterExpression',
+  full_name='datacatalog.FilterExpression',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='filters', full_name='datacatalog.FilterExpression.filters', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -518,80 +944,49 @@ _QUERYRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=975,
-  serialized_end=1039,
+  serialized_start=1909,
+  serialized_end=1979,
 )
 
 
-_CREATEREQUEST = _descriptor.Descriptor(
-  name='CreateRequest',
-  full_name='pb.lyft.datacatalog.CreateRequest',
+_SINGLEPROPERTYFILTER = _descriptor.Descriptor(
+  name='SinglePropertyFilter',
+  full_name='datacatalog.SinglePropertyFilter',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='ref', full_name='pb.lyft.datacatalog.CreateRequest.ref', index=0,
+      name='tag_filter', full_name='datacatalog.SinglePropertyFilter.tag_filter', index=0,
       number=1, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='reference_id', full_name='pb.lyft.datacatalog.CreateRequest.reference_id', index=1,
-      number=2, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='revision', full_name='pb.lyft.datacatalog.CreateRequest.revision', index=2,
-      number=3, type=3, cpp_type=2, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='outputs', full_name='pb.lyft.datacatalog.CreateRequest.outputs', index=3,
-      number=4, type=11, cpp_type=10, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1042,
-  serialized_end=1192,
-)
-
-
-_CREATERESPONSE = _descriptor.Descriptor(
-  name='CreateResponse',
-  full_name='pb.lyft.datacatalog.CreateResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='artifact', full_name='pb.lyft.datacatalog.CreateResponse.artifact', index=0,
-      number=1, type=11, cpp_type=10, label=1,
+      name='partition_filter', full_name='datacatalog.SinglePropertyFilter.partition_filter', index=1,
+      number=2, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='status', full_name='pb.lyft.datacatalog.CreateResponse.status', index=1,
-      number=2, type=14, cpp_type=8, label=1,
+      name='artifact_filter', full_name='datacatalog.SinglePropertyFilter.artifact_filter', index=2,
+      number=3, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='dataset_filter', full_name='datacatalog.SinglePropertyFilter.dataset_filter', index=3,
+      number=4, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='operator', full_name='datacatalog.SinglePropertyFilter.operator', index=4,
+      number=10, type=14, cpp_type=8, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -601,59 +996,31 @@ _CREATERESPONSE = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _CREATERESPONSE_STATUS,
+    _SINGLEPROPERTYFILTER_COMPARISONOPERATOR,
   ],
   serialized_options=None,
   is_extendable=False,
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
+    _descriptor.OneofDescriptor(
+      name='property_filter', full_name='datacatalog.SinglePropertyFilter.property_filter',
+      index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1195,
-  serialized_end=1363,
+  serialized_start=1982,
+  serialized_end=2375,
 )
 
 
-_GENERATEPROVENANCEREQUEST = _descriptor.Descriptor(
-  name='GenerateProvenanceRequest',
-  full_name='pb.lyft.datacatalog.GenerateProvenanceRequest',
+_ARTIFACTPROPERTYFILTER = _descriptor.Descriptor(
+  name='ArtifactPropertyFilter',
+  full_name='datacatalog.ArtifactPropertyFilter',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='id', full_name='pb.lyft.datacatalog.GenerateProvenanceRequest.id', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=1365,
-  serialized_end=1437,
-)
-
-
-_GENERATEPROVENANCERESPONSE = _descriptor.Descriptor(
-  name='GenerateProvenanceResponse',
-  full_name='pb.lyft.datacatalog.GenerateProvenanceResponse',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='provenance', full_name='pb.lyft.datacatalog.GenerateProvenanceResponse.provenance', index=0,
+      name='artifact_id', full_name='datacatalog.ArtifactPropertyFilter.artifact_id', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=_b("").decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
@@ -670,216 +1037,626 @@ _GENERATEPROVENANCERESPONSE = _descriptor.Descriptor(
   syntax='proto3',
   extension_ranges=[],
   oneofs=[
+    _descriptor.OneofDescriptor(
+      name='property', full_name='datacatalog.ArtifactPropertyFilter.property',
+      index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=1439,
-  serialized_end=1487,
+  serialized_start=2377,
+  serialized_end=2436,
 )
 
-_ARTIFACT.fields_by_name['inputs'].message_type = _PARAMETER
-_ARTIFACT.fields_by_name['outputs'].message_type = _PARAMETER
-_ARTIFACTID.fields_by_name['inputs'].message_type = _PARAMETER
-_GETREQUEST.fields_by_name['artifact_id'].message_type = _ARTIFACTID
-_GETREQUEST.oneofs_by_name['id'].fields.append(
-  _GETREQUEST.fields_by_name['provenance'])
-_GETREQUEST.fields_by_name['provenance'].containing_oneof = _GETREQUEST.oneofs_by_name['id']
-_GETREQUEST.oneofs_by_name['id'].fields.append(
-  _GETREQUEST.fields_by_name['artifact_id'])
-_GETREQUEST.fields_by_name['artifact_id'].containing_oneof = _GETREQUEST.oneofs_by_name['id']
-_GETRESPONSE.fields_by_name['artifact'].message_type = _ARTIFACT
-_INTFILTER.fields_by_name['operator'].enum_type = _QUERYOPERATOR
-_INTQUERYKEY.fields_by_name['val'].message_type = _INTFILTER
-_INTQUERYKEY.fields_by_name['range'].message_type = _INTRANGEFILTER
-_INTQUERYKEY.oneofs_by_name['filter'].fields.append(
-  _INTQUERYKEY.fields_by_name['val'])
-_INTQUERYKEY.fields_by_name['val'].containing_oneof = _INTQUERYKEY.oneofs_by_name['filter']
-_INTQUERYKEY.oneofs_by_name['filter'].fields.append(
-  _INTQUERYKEY.fields_by_name['range'])
-_INTQUERYKEY.fields_by_name['range'].containing_oneof = _INTQUERYKEY.oneofs_by_name['filter']
-_QUERYREQUEST.fields_by_name['revision'].message_type = _INTQUERYKEY
-_QUERYRESPONSE.fields_by_name['artifact'].message_type = _ARTIFACT
-_CREATEREQUEST.fields_by_name['ref'].message_type = _ARTIFACTID
-_CREATEREQUEST.fields_by_name['outputs'].message_type = _PARAMETER
-_CREATERESPONSE.fields_by_name['artifact'].message_type = _ARTIFACT
-_CREATERESPONSE.fields_by_name['status'].enum_type = _CREATERESPONSE_STATUS
-_CREATERESPONSE_STATUS.containing_type = _CREATERESPONSE
-_GENERATEPROVENANCEREQUEST.fields_by_name['id'].message_type = _ARTIFACTID
-DESCRIPTOR.message_types_by_name['Parameter'] = _PARAMETER
+
+_TAGPROPERTYFILTER = _descriptor.Descriptor(
+  name='TagPropertyFilter',
+  full_name='datacatalog.TagPropertyFilter',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='tag_name', full_name='datacatalog.TagPropertyFilter.tag_name', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='property', full_name='datacatalog.TagPropertyFilter.property',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=2438,
+  serialized_end=2489,
+)
+
+
+_PARTITIONPROPERTYFILTER = _descriptor.Descriptor(
+  name='PartitionPropertyFilter',
+  full_name='datacatalog.PartitionPropertyFilter',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key_val', full_name='datacatalog.PartitionPropertyFilter.key_val', index=0,
+      number=1, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='property', full_name='datacatalog.PartitionPropertyFilter.property',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=2491,
+  serialized_end=2574,
+)
+
+
+_KEYVALUEPAIR = _descriptor.Descriptor(
+  name='KeyValuePair',
+  full_name='datacatalog.KeyValuePair',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='datacatalog.KeyValuePair.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='datacatalog.KeyValuePair.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2576,
+  serialized_end=2618,
+)
+
+
+_DATASETPROPERTYFILTER = _descriptor.Descriptor(
+  name='DatasetPropertyFilter',
+  full_name='datacatalog.DatasetPropertyFilter',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='project', full_name='datacatalog.DatasetPropertyFilter.project', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='name', full_name='datacatalog.DatasetPropertyFilter.name', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='domain', full_name='datacatalog.DatasetPropertyFilter.domain', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='version', full_name='datacatalog.DatasetPropertyFilter.version', index=3,
+      number=4, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+    _descriptor.OneofDescriptor(
+      name='property', full_name='datacatalog.DatasetPropertyFilter.property',
+      index=0, containing_type=None, fields=[]),
+  ],
+  serialized_start=2620,
+  serialized_end=2727,
+)
+
+
+_PAGINATIONOPTIONS = _descriptor.Descriptor(
+  name='PaginationOptions',
+  full_name='datacatalog.PaginationOptions',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='limit', full_name='datacatalog.PaginationOptions.limit', index=0,
+      number=1, type=13, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='token', full_name='datacatalog.PaginationOptions.token', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sortKey', full_name='datacatalog.PaginationOptions.sortKey', index=2,
+      number=3, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='sortOrder', full_name='datacatalog.PaginationOptions.sortOrder', index=3,
+      number=4, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+    _PAGINATIONOPTIONS_SORTORDER,
+    _PAGINATIONOPTIONS_SORTKEY,
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=2730,
+  serialized_end=2971,
+)
+
+_CREATEDATASETREQUEST.fields_by_name['dataset'].message_type = _DATASET
+_GETDATASETREQUEST.fields_by_name['dataset'].message_type = _DATASETID
+_GETDATASETRESPONSE.fields_by_name['dataset'].message_type = _DATASET
+_GETARTIFACTREQUEST.fields_by_name['dataset'].message_type = _DATASETID
+_GETARTIFACTREQUEST.oneofs_by_name['query_handle'].fields.append(
+  _GETARTIFACTREQUEST.fields_by_name['artifact_id'])
+_GETARTIFACTREQUEST.fields_by_name['artifact_id'].containing_oneof = _GETARTIFACTREQUEST.oneofs_by_name['query_handle']
+_GETARTIFACTREQUEST.oneofs_by_name['query_handle'].fields.append(
+  _GETARTIFACTREQUEST.fields_by_name['tag_name'])
+_GETARTIFACTREQUEST.fields_by_name['tag_name'].containing_oneof = _GETARTIFACTREQUEST.oneofs_by_name['query_handle']
+_GETARTIFACTRESPONSE.fields_by_name['artifact'].message_type = _ARTIFACT
+_CREATEARTIFACTREQUEST.fields_by_name['artifact'].message_type = _ARTIFACT
+_ADDTAGREQUEST.fields_by_name['tag'].message_type = _TAG
+_LISTARTIFACTSREQUEST.fields_by_name['dataset'].message_type = _DATASETID
+_LISTARTIFACTSREQUEST.fields_by_name['filter'].message_type = _FILTEREXPRESSION
+_LISTARTIFACTSREQUEST.fields_by_name['pagination'].message_type = _PAGINATIONOPTIONS
+_LISTARTIFACTSRESPONSE.fields_by_name['artifacts'].message_type = _ARTIFACT
+_LISTDATASETSREQUEST.fields_by_name['filter'].message_type = _FILTEREXPRESSION
+_LISTDATASETSREQUEST.fields_by_name['pagination'].message_type = _PAGINATIONOPTIONS
+_LISTDATASETSRESPONSE.fields_by_name['datasets'].message_type = _DATASET
+_DATASET.fields_by_name['id'].message_type = _DATASETID
+_DATASET.fields_by_name['metadata'].message_type = _METADATA
+_ARTIFACT.fields_by_name['dataset'].message_type = _DATASETID
+_ARTIFACT.fields_by_name['data'].message_type = _ARTIFACTDATA
+_ARTIFACT.fields_by_name['metadata'].message_type = _METADATA
+_ARTIFACT.fields_by_name['partitions'].message_type = _PARTITION
+_ARTIFACT.fields_by_name['tags'].message_type = _TAG
+_ARTIFACT.fields_by_name['created_at'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_ARTIFACTDATA.fields_by_name['value'].message_type = flyteidl_dot_core_dot_literals__pb2._LITERAL
+_TAG.fields_by_name['dataset'].message_type = _DATASETID
+_METADATA_KEYMAPENTRY.containing_type = _METADATA
+_METADATA.fields_by_name['key_map'].message_type = _METADATA_KEYMAPENTRY
+_FILTEREXPRESSION.fields_by_name['filters'].message_type = _SINGLEPROPERTYFILTER
+_SINGLEPROPERTYFILTER.fields_by_name['tag_filter'].message_type = _TAGPROPERTYFILTER
+_SINGLEPROPERTYFILTER.fields_by_name['partition_filter'].message_type = _PARTITIONPROPERTYFILTER
+_SINGLEPROPERTYFILTER.fields_by_name['artifact_filter'].message_type = _ARTIFACTPROPERTYFILTER
+_SINGLEPROPERTYFILTER.fields_by_name['dataset_filter'].message_type = _DATASETPROPERTYFILTER
+_SINGLEPROPERTYFILTER.fields_by_name['operator'].enum_type = _SINGLEPROPERTYFILTER_COMPARISONOPERATOR
+_SINGLEPROPERTYFILTER_COMPARISONOPERATOR.containing_type = _SINGLEPROPERTYFILTER
+_SINGLEPROPERTYFILTER.oneofs_by_name['property_filter'].fields.append(
+  _SINGLEPROPERTYFILTER.fields_by_name['tag_filter'])
+_SINGLEPROPERTYFILTER.fields_by_name['tag_filter'].containing_oneof = _SINGLEPROPERTYFILTER.oneofs_by_name['property_filter']
+_SINGLEPROPERTYFILTER.oneofs_by_name['property_filter'].fields.append(
+  _SINGLEPROPERTYFILTER.fields_by_name['partition_filter'])
+_SINGLEPROPERTYFILTER.fields_by_name['partition_filter'].containing_oneof = _SINGLEPROPERTYFILTER.oneofs_by_name['property_filter']
+_SINGLEPROPERTYFILTER.oneofs_by_name['property_filter'].fields.append(
+  _SINGLEPROPERTYFILTER.fields_by_name['artifact_filter'])
+_SINGLEPROPERTYFILTER.fields_by_name['artifact_filter'].containing_oneof = _SINGLEPROPERTYFILTER.oneofs_by_name['property_filter']
+_SINGLEPROPERTYFILTER.oneofs_by_name['property_filter'].fields.append(
+  _SINGLEPROPERTYFILTER.fields_by_name['dataset_filter'])
+_SINGLEPROPERTYFILTER.fields_by_name['dataset_filter'].containing_oneof = _SINGLEPROPERTYFILTER.oneofs_by_name['property_filter']
+_ARTIFACTPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _ARTIFACTPROPERTYFILTER.fields_by_name['artifact_id'])
+_ARTIFACTPROPERTYFILTER.fields_by_name['artifact_id'].containing_oneof = _ARTIFACTPROPERTYFILTER.oneofs_by_name['property']
+_TAGPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _TAGPROPERTYFILTER.fields_by_name['tag_name'])
+_TAGPROPERTYFILTER.fields_by_name['tag_name'].containing_oneof = _TAGPROPERTYFILTER.oneofs_by_name['property']
+_PARTITIONPROPERTYFILTER.fields_by_name['key_val'].message_type = _KEYVALUEPAIR
+_PARTITIONPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _PARTITIONPROPERTYFILTER.fields_by_name['key_val'])
+_PARTITIONPROPERTYFILTER.fields_by_name['key_val'].containing_oneof = _PARTITIONPROPERTYFILTER.oneofs_by_name['property']
+_DATASETPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _DATASETPROPERTYFILTER.fields_by_name['project'])
+_DATASETPROPERTYFILTER.fields_by_name['project'].containing_oneof = _DATASETPROPERTYFILTER.oneofs_by_name['property']
+_DATASETPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _DATASETPROPERTYFILTER.fields_by_name['name'])
+_DATASETPROPERTYFILTER.fields_by_name['name'].containing_oneof = _DATASETPROPERTYFILTER.oneofs_by_name['property']
+_DATASETPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _DATASETPROPERTYFILTER.fields_by_name['domain'])
+_DATASETPROPERTYFILTER.fields_by_name['domain'].containing_oneof = _DATASETPROPERTYFILTER.oneofs_by_name['property']
+_DATASETPROPERTYFILTER.oneofs_by_name['property'].fields.append(
+  _DATASETPROPERTYFILTER.fields_by_name['version'])
+_DATASETPROPERTYFILTER.fields_by_name['version'].containing_oneof = _DATASETPROPERTYFILTER.oneofs_by_name['property']
+_PAGINATIONOPTIONS.fields_by_name['sortKey'].enum_type = _PAGINATIONOPTIONS_SORTKEY
+_PAGINATIONOPTIONS.fields_by_name['sortOrder'].enum_type = _PAGINATIONOPTIONS_SORTORDER
+_PAGINATIONOPTIONS_SORTORDER.containing_type = _PAGINATIONOPTIONS
+_PAGINATIONOPTIONS_SORTKEY.containing_type = _PAGINATIONOPTIONS
+DESCRIPTOR.message_types_by_name['CreateDatasetRequest'] = _CREATEDATASETREQUEST
+DESCRIPTOR.message_types_by_name['CreateDatasetResponse'] = _CREATEDATASETRESPONSE
+DESCRIPTOR.message_types_by_name['GetDatasetRequest'] = _GETDATASETREQUEST
+DESCRIPTOR.message_types_by_name['GetDatasetResponse'] = _GETDATASETRESPONSE
+DESCRIPTOR.message_types_by_name['GetArtifactRequest'] = _GETARTIFACTREQUEST
+DESCRIPTOR.message_types_by_name['GetArtifactResponse'] = _GETARTIFACTRESPONSE
+DESCRIPTOR.message_types_by_name['CreateArtifactRequest'] = _CREATEARTIFACTREQUEST
+DESCRIPTOR.message_types_by_name['CreateArtifactResponse'] = _CREATEARTIFACTRESPONSE
+DESCRIPTOR.message_types_by_name['AddTagRequest'] = _ADDTAGREQUEST
+DESCRIPTOR.message_types_by_name['AddTagResponse'] = _ADDTAGRESPONSE
+DESCRIPTOR.message_types_by_name['ListArtifactsRequest'] = _LISTARTIFACTSREQUEST
+DESCRIPTOR.message_types_by_name['ListArtifactsResponse'] = _LISTARTIFACTSRESPONSE
+DESCRIPTOR.message_types_by_name['ListDatasetsRequest'] = _LISTDATASETSREQUEST
+DESCRIPTOR.message_types_by_name['ListDatasetsResponse'] = _LISTDATASETSRESPONSE
+DESCRIPTOR.message_types_by_name['Dataset'] = _DATASET
+DESCRIPTOR.message_types_by_name['Partition'] = _PARTITION
+DESCRIPTOR.message_types_by_name['DatasetID'] = _DATASETID
 DESCRIPTOR.message_types_by_name['Artifact'] = _ARTIFACT
-DESCRIPTOR.message_types_by_name['ArtifactId'] = _ARTIFACTID
-DESCRIPTOR.message_types_by_name['GetRequest'] = _GETREQUEST
-DESCRIPTOR.message_types_by_name['GetResponse'] = _GETRESPONSE
-DESCRIPTOR.message_types_by_name['IntFilter'] = _INTFILTER
-DESCRIPTOR.message_types_by_name['IntRangeFilter'] = _INTRANGEFILTER
-DESCRIPTOR.message_types_by_name['IntQueryKey'] = _INTQUERYKEY
-DESCRIPTOR.message_types_by_name['QueryRequest'] = _QUERYREQUEST
-DESCRIPTOR.message_types_by_name['QueryResponse'] = _QUERYRESPONSE
-DESCRIPTOR.message_types_by_name['CreateRequest'] = _CREATEREQUEST
-DESCRIPTOR.message_types_by_name['CreateResponse'] = _CREATERESPONSE
-DESCRIPTOR.message_types_by_name['GenerateProvenanceRequest'] = _GENERATEPROVENANCEREQUEST
-DESCRIPTOR.message_types_by_name['GenerateProvenanceResponse'] = _GENERATEPROVENANCERESPONSE
-DESCRIPTOR.enum_types_by_name['QueryOperator'] = _QUERYOPERATOR
+DESCRIPTOR.message_types_by_name['ArtifactData'] = _ARTIFACTDATA
+DESCRIPTOR.message_types_by_name['Tag'] = _TAG
+DESCRIPTOR.message_types_by_name['Metadata'] = _METADATA
+DESCRIPTOR.message_types_by_name['FilterExpression'] = _FILTEREXPRESSION
+DESCRIPTOR.message_types_by_name['SinglePropertyFilter'] = _SINGLEPROPERTYFILTER
+DESCRIPTOR.message_types_by_name['ArtifactPropertyFilter'] = _ARTIFACTPROPERTYFILTER
+DESCRIPTOR.message_types_by_name['TagPropertyFilter'] = _TAGPROPERTYFILTER
+DESCRIPTOR.message_types_by_name['PartitionPropertyFilter'] = _PARTITIONPROPERTYFILTER
+DESCRIPTOR.message_types_by_name['KeyValuePair'] = _KEYVALUEPAIR
+DESCRIPTOR.message_types_by_name['DatasetPropertyFilter'] = _DATASETPROPERTYFILTER
+DESCRIPTOR.message_types_by_name['PaginationOptions'] = _PAGINATIONOPTIONS
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Parameter = _reflection.GeneratedProtocolMessageType('Parameter', (_message.Message,), dict(
-  DESCRIPTOR = _PARAMETER,
+CreateDatasetRequest = _reflection.GeneratedProtocolMessageType('CreateDatasetRequest', (_message.Message,), dict(
+  DESCRIPTOR = _CREATEDATASETREQUEST,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.Parameter)
+  # @@protoc_insertion_point(class_scope:datacatalog.CreateDatasetRequest)
   ))
-_sym_db.RegisterMessage(Parameter)
+_sym_db.RegisterMessage(CreateDatasetRequest)
+
+CreateDatasetResponse = _reflection.GeneratedProtocolMessageType('CreateDatasetResponse', (_message.Message,), dict(
+  DESCRIPTOR = _CREATEDATASETRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.CreateDatasetResponse)
+  ))
+_sym_db.RegisterMessage(CreateDatasetResponse)
+
+GetDatasetRequest = _reflection.GeneratedProtocolMessageType('GetDatasetRequest', (_message.Message,), dict(
+  DESCRIPTOR = _GETDATASETREQUEST,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.GetDatasetRequest)
+  ))
+_sym_db.RegisterMessage(GetDatasetRequest)
+
+GetDatasetResponse = _reflection.GeneratedProtocolMessageType('GetDatasetResponse', (_message.Message,), dict(
+  DESCRIPTOR = _GETDATASETRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.GetDatasetResponse)
+  ))
+_sym_db.RegisterMessage(GetDatasetResponse)
+
+GetArtifactRequest = _reflection.GeneratedProtocolMessageType('GetArtifactRequest', (_message.Message,), dict(
+  DESCRIPTOR = _GETARTIFACTREQUEST,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.GetArtifactRequest)
+  ))
+_sym_db.RegisterMessage(GetArtifactRequest)
+
+GetArtifactResponse = _reflection.GeneratedProtocolMessageType('GetArtifactResponse', (_message.Message,), dict(
+  DESCRIPTOR = _GETARTIFACTRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.GetArtifactResponse)
+  ))
+_sym_db.RegisterMessage(GetArtifactResponse)
+
+CreateArtifactRequest = _reflection.GeneratedProtocolMessageType('CreateArtifactRequest', (_message.Message,), dict(
+  DESCRIPTOR = _CREATEARTIFACTREQUEST,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.CreateArtifactRequest)
+  ))
+_sym_db.RegisterMessage(CreateArtifactRequest)
+
+CreateArtifactResponse = _reflection.GeneratedProtocolMessageType('CreateArtifactResponse', (_message.Message,), dict(
+  DESCRIPTOR = _CREATEARTIFACTRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.CreateArtifactResponse)
+  ))
+_sym_db.RegisterMessage(CreateArtifactResponse)
+
+AddTagRequest = _reflection.GeneratedProtocolMessageType('AddTagRequest', (_message.Message,), dict(
+  DESCRIPTOR = _ADDTAGREQUEST,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.AddTagRequest)
+  ))
+_sym_db.RegisterMessage(AddTagRequest)
+
+AddTagResponse = _reflection.GeneratedProtocolMessageType('AddTagResponse', (_message.Message,), dict(
+  DESCRIPTOR = _ADDTAGRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.AddTagResponse)
+  ))
+_sym_db.RegisterMessage(AddTagResponse)
+
+ListArtifactsRequest = _reflection.GeneratedProtocolMessageType('ListArtifactsRequest', (_message.Message,), dict(
+  DESCRIPTOR = _LISTARTIFACTSREQUEST,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.ListArtifactsRequest)
+  ))
+_sym_db.RegisterMessage(ListArtifactsRequest)
+
+ListArtifactsResponse = _reflection.GeneratedProtocolMessageType('ListArtifactsResponse', (_message.Message,), dict(
+  DESCRIPTOR = _LISTARTIFACTSRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.ListArtifactsResponse)
+  ))
+_sym_db.RegisterMessage(ListArtifactsResponse)
+
+ListDatasetsRequest = _reflection.GeneratedProtocolMessageType('ListDatasetsRequest', (_message.Message,), dict(
+  DESCRIPTOR = _LISTDATASETSREQUEST,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.ListDatasetsRequest)
+  ))
+_sym_db.RegisterMessage(ListDatasetsRequest)
+
+ListDatasetsResponse = _reflection.GeneratedProtocolMessageType('ListDatasetsResponse', (_message.Message,), dict(
+  DESCRIPTOR = _LISTDATASETSRESPONSE,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.ListDatasetsResponse)
+  ))
+_sym_db.RegisterMessage(ListDatasetsResponse)
+
+Dataset = _reflection.GeneratedProtocolMessageType('Dataset', (_message.Message,), dict(
+  DESCRIPTOR = _DATASET,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.Dataset)
+  ))
+_sym_db.RegisterMessage(Dataset)
+
+Partition = _reflection.GeneratedProtocolMessageType('Partition', (_message.Message,), dict(
+  DESCRIPTOR = _PARTITION,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.Partition)
+  ))
+_sym_db.RegisterMessage(Partition)
+
+DatasetID = _reflection.GeneratedProtocolMessageType('DatasetID', (_message.Message,), dict(
+  DESCRIPTOR = _DATASETID,
+  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+  # @@protoc_insertion_point(class_scope:datacatalog.DatasetID)
+  ))
+_sym_db.RegisterMessage(DatasetID)
 
 Artifact = _reflection.GeneratedProtocolMessageType('Artifact', (_message.Message,), dict(
   DESCRIPTOR = _ARTIFACT,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.Artifact)
+  # @@protoc_insertion_point(class_scope:datacatalog.Artifact)
   ))
 _sym_db.RegisterMessage(Artifact)
 
-ArtifactId = _reflection.GeneratedProtocolMessageType('ArtifactId', (_message.Message,), dict(
-  DESCRIPTOR = _ARTIFACTID,
+ArtifactData = _reflection.GeneratedProtocolMessageType('ArtifactData', (_message.Message,), dict(
+  DESCRIPTOR = _ARTIFACTDATA,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.ArtifactId)
+  # @@protoc_insertion_point(class_scope:datacatalog.ArtifactData)
   ))
-_sym_db.RegisterMessage(ArtifactId)
+_sym_db.RegisterMessage(ArtifactData)
 
-GetRequest = _reflection.GeneratedProtocolMessageType('GetRequest', (_message.Message,), dict(
-  DESCRIPTOR = _GETREQUEST,
+Tag = _reflection.GeneratedProtocolMessageType('Tag', (_message.Message,), dict(
+  DESCRIPTOR = _TAG,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.GetRequest)
+  # @@protoc_insertion_point(class_scope:datacatalog.Tag)
   ))
-_sym_db.RegisterMessage(GetRequest)
+_sym_db.RegisterMessage(Tag)
 
-GetResponse = _reflection.GeneratedProtocolMessageType('GetResponse', (_message.Message,), dict(
-  DESCRIPTOR = _GETRESPONSE,
+Metadata = _reflection.GeneratedProtocolMessageType('Metadata', (_message.Message,), dict(
+
+  KeyMapEntry = _reflection.GeneratedProtocolMessageType('KeyMapEntry', (_message.Message,), dict(
+    DESCRIPTOR = _METADATA_KEYMAPENTRY,
+    __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
+    # @@protoc_insertion_point(class_scope:datacatalog.Metadata.KeyMapEntry)
+    ))
+  ,
+  DESCRIPTOR = _METADATA,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.GetResponse)
+  # @@protoc_insertion_point(class_scope:datacatalog.Metadata)
   ))
-_sym_db.RegisterMessage(GetResponse)
+_sym_db.RegisterMessage(Metadata)
+_sym_db.RegisterMessage(Metadata.KeyMapEntry)
 
-IntFilter = _reflection.GeneratedProtocolMessageType('IntFilter', (_message.Message,), dict(
-  DESCRIPTOR = _INTFILTER,
+FilterExpression = _reflection.GeneratedProtocolMessageType('FilterExpression', (_message.Message,), dict(
+  DESCRIPTOR = _FILTEREXPRESSION,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.IntFilter)
+  # @@protoc_insertion_point(class_scope:datacatalog.FilterExpression)
   ))
-_sym_db.RegisterMessage(IntFilter)
+_sym_db.RegisterMessage(FilterExpression)
 
-IntRangeFilter = _reflection.GeneratedProtocolMessageType('IntRangeFilter', (_message.Message,), dict(
-  DESCRIPTOR = _INTRANGEFILTER,
+SinglePropertyFilter = _reflection.GeneratedProtocolMessageType('SinglePropertyFilter', (_message.Message,), dict(
+  DESCRIPTOR = _SINGLEPROPERTYFILTER,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.IntRangeFilter)
+  # @@protoc_insertion_point(class_scope:datacatalog.SinglePropertyFilter)
   ))
-_sym_db.RegisterMessage(IntRangeFilter)
+_sym_db.RegisterMessage(SinglePropertyFilter)
 
-IntQueryKey = _reflection.GeneratedProtocolMessageType('IntQueryKey', (_message.Message,), dict(
-  DESCRIPTOR = _INTQUERYKEY,
+ArtifactPropertyFilter = _reflection.GeneratedProtocolMessageType('ArtifactPropertyFilter', (_message.Message,), dict(
+  DESCRIPTOR = _ARTIFACTPROPERTYFILTER,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.IntQueryKey)
+  # @@protoc_insertion_point(class_scope:datacatalog.ArtifactPropertyFilter)
   ))
-_sym_db.RegisterMessage(IntQueryKey)
+_sym_db.RegisterMessage(ArtifactPropertyFilter)
 
-QueryRequest = _reflection.GeneratedProtocolMessageType('QueryRequest', (_message.Message,), dict(
-  DESCRIPTOR = _QUERYREQUEST,
+TagPropertyFilter = _reflection.GeneratedProtocolMessageType('TagPropertyFilter', (_message.Message,), dict(
+  DESCRIPTOR = _TAGPROPERTYFILTER,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.QueryRequest)
+  # @@protoc_insertion_point(class_scope:datacatalog.TagPropertyFilter)
   ))
-_sym_db.RegisterMessage(QueryRequest)
+_sym_db.RegisterMessage(TagPropertyFilter)
 
-QueryResponse = _reflection.GeneratedProtocolMessageType('QueryResponse', (_message.Message,), dict(
-  DESCRIPTOR = _QUERYRESPONSE,
+PartitionPropertyFilter = _reflection.GeneratedProtocolMessageType('PartitionPropertyFilter', (_message.Message,), dict(
+  DESCRIPTOR = _PARTITIONPROPERTYFILTER,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.QueryResponse)
+  # @@protoc_insertion_point(class_scope:datacatalog.PartitionPropertyFilter)
   ))
-_sym_db.RegisterMessage(QueryResponse)
+_sym_db.RegisterMessage(PartitionPropertyFilter)
 
-CreateRequest = _reflection.GeneratedProtocolMessageType('CreateRequest', (_message.Message,), dict(
-  DESCRIPTOR = _CREATEREQUEST,
+KeyValuePair = _reflection.GeneratedProtocolMessageType('KeyValuePair', (_message.Message,), dict(
+  DESCRIPTOR = _KEYVALUEPAIR,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.CreateRequest)
+  # @@protoc_insertion_point(class_scope:datacatalog.KeyValuePair)
   ))
-_sym_db.RegisterMessage(CreateRequest)
+_sym_db.RegisterMessage(KeyValuePair)
 
-CreateResponse = _reflection.GeneratedProtocolMessageType('CreateResponse', (_message.Message,), dict(
-  DESCRIPTOR = _CREATERESPONSE,
+DatasetPropertyFilter = _reflection.GeneratedProtocolMessageType('DatasetPropertyFilter', (_message.Message,), dict(
+  DESCRIPTOR = _DATASETPROPERTYFILTER,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.CreateResponse)
+  # @@protoc_insertion_point(class_scope:datacatalog.DatasetPropertyFilter)
   ))
-_sym_db.RegisterMessage(CreateResponse)
+_sym_db.RegisterMessage(DatasetPropertyFilter)
 
-GenerateProvenanceRequest = _reflection.GeneratedProtocolMessageType('GenerateProvenanceRequest', (_message.Message,), dict(
-  DESCRIPTOR = _GENERATEPROVENANCEREQUEST,
+PaginationOptions = _reflection.GeneratedProtocolMessageType('PaginationOptions', (_message.Message,), dict(
+  DESCRIPTOR = _PAGINATIONOPTIONS,
   __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.GenerateProvenanceRequest)
+  # @@protoc_insertion_point(class_scope:datacatalog.PaginationOptions)
   ))
-_sym_db.RegisterMessage(GenerateProvenanceRequest)
-
-GenerateProvenanceResponse = _reflection.GeneratedProtocolMessageType('GenerateProvenanceResponse', (_message.Message,), dict(
-  DESCRIPTOR = _GENERATEPROVENANCERESPONSE,
-  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  # @@protoc_insertion_point(class_scope:pb.lyft.datacatalog.GenerateProvenanceResponse)
-  ))
-_sym_db.RegisterMessage(GenerateProvenanceResponse)
+_sym_db.RegisterMessage(PaginationOptions)
 
 
-DESCRIPTOR._options = None
+_METADATA_KEYMAPENTRY._options = None
 
-_ARTIFACTS = _descriptor.ServiceDescriptor(
-  name='Artifacts',
-  full_name='pb.lyft.datacatalog.Artifacts',
+_DATACATALOG = _descriptor.ServiceDescriptor(
+  name='DataCatalog',
+  full_name='datacatalog.DataCatalog',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1553,
-  serialized_end=1928,
+  serialized_start=2974,
+  serialized_end=3567,
   methods=[
   _descriptor.MethodDescriptor(
-    name='Get',
-    full_name='pb.lyft.datacatalog.Artifacts.Get',
+    name='CreateDataset',
+    full_name='datacatalog.DataCatalog.CreateDataset',
     index=0,
     containing_service=None,
-    input_type=_GETREQUEST,
-    output_type=_GETRESPONSE,
+    input_type=_CREATEDATASETREQUEST,
+    output_type=_CREATEDATASETRESPONSE,
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
-    name='Query',
-    full_name='pb.lyft.datacatalog.Artifacts.Query',
+    name='GetDataset',
+    full_name='datacatalog.DataCatalog.GetDataset',
     index=1,
     containing_service=None,
-    input_type=_QUERYREQUEST,
-    output_type=_QUERYRESPONSE,
+    input_type=_GETDATASETREQUEST,
+    output_type=_GETDATASETRESPONSE,
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
-    name='Create',
-    full_name='pb.lyft.datacatalog.Artifacts.Create',
+    name='CreateArtifact',
+    full_name='datacatalog.DataCatalog.CreateArtifact',
     index=2,
     containing_service=None,
-    input_type=_CREATEREQUEST,
-    output_type=_CREATERESPONSE,
+    input_type=_CREATEARTIFACTREQUEST,
+    output_type=_CREATEARTIFACTRESPONSE,
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
-    name='GenerateProvenance',
-    full_name='pb.lyft.datacatalog.Artifacts.GenerateProvenance',
+    name='GetArtifact',
+    full_name='datacatalog.DataCatalog.GetArtifact',
     index=3,
     containing_service=None,
-    input_type=_GENERATEPROVENANCEREQUEST,
-    output_type=_GENERATEPROVENANCERESPONSE,
+    input_type=_GETARTIFACTREQUEST,
+    output_type=_GETARTIFACTRESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='AddTag',
+    full_name='datacatalog.DataCatalog.AddTag',
+    index=4,
+    containing_service=None,
+    input_type=_ADDTAGREQUEST,
+    output_type=_ADDTAGRESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='ListArtifacts',
+    full_name='datacatalog.DataCatalog.ListArtifacts',
+    index=5,
+    containing_service=None,
+    input_type=_LISTARTIFACTSREQUEST,
+    output_type=_LISTARTIFACTSRESPONSE,
+    serialized_options=None,
+  ),
+  _descriptor.MethodDescriptor(
+    name='ListDatasets',
+    full_name='datacatalog.DataCatalog.ListDatasets',
+    index=6,
+    containing_service=None,
+    input_type=_LISTDATASETSREQUEST,
+    output_type=_LISTDATASETSRESPONSE,
     serialized_options=None,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_ARTIFACTS)
+_sym_db.RegisterServiceDescriptor(_DATACATALOG)
 
-DESCRIPTOR.services_by_name['Artifacts'] = _ARTIFACTS
-
-Artifacts = service_reflection.GeneratedServiceType('Artifacts', (_service.Service,), dict(
-  DESCRIPTOR = _ARTIFACTS,
-  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  ))
-
-Artifacts_Stub = service_reflection.GeneratedServiceStubType('Artifacts_Stub', (Artifacts,), dict(
-  DESCRIPTOR = _ARTIFACTS,
-  __module__ = 'flyteidl.datacatalog.datacatalog_pb2'
-  ))
-
+DESCRIPTOR.services_by_name['DataCatalog'] = _DATACATALOG
 
 # @@protoc_insertion_point(module_scope)

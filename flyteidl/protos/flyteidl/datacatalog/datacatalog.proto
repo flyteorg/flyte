@@ -1,128 +1,223 @@
 syntax = "proto3";
 
-package pb.lyft.datacatalog;
+package datacatalog;
 
-option go_package = "datacatalog";
-option py_generic_services = true;
+import "flyteidl/core/literals.proto";
+import "google/protobuf/timestamp.proto";
 
-message Parameter {
+service DataCatalog {
+    rpc CreateDataset (CreateDatasetRequest) returns (CreateDatasetResponse);
+    rpc GetDataset (GetDatasetRequest) returns (GetDatasetResponse);
+    rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse);
+    rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
+    rpc AddTag (AddTagRequest) returns (AddTagResponse);
+    rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse);
+    rpc ListDatasets (ListDatasetsRequest) returns (ListDatasetsResponse);
+}
 
-    string name = 1;
+message CreateDatasetRequest {
+    Dataset dataset = 1;
+}
+
+message CreateDatasetResponse {
+
+}
+
+message GetDatasetRequest {
+    DatasetID dataset = 1;
+}
+
+message GetDatasetResponse {
+    Dataset dataset = 1;
+}
+
+message GetArtifactRequest {
+    DatasetID dataset = 1;
+
+    oneof query_handle {
+        string artifact_id = 2;
+        string tag_name = 3;
+    }
+}
+
+message GetArtifactResponse {
+    Artifact artifact = 1;
+}
+
+message CreateArtifactRequest {
+    Artifact artifact = 1;
+}
+
+message CreateArtifactResponse {
+
+}
+
+message AddTagRequest {
+    Tag tag = 1;
+}
+
+message AddTagResponse {
+
+}
+
+// List the artifacts that belong to the Dataset
+message ListArtifactsRequest {
+    DatasetID dataset = 1;
+    // Apply the filter expression to this query
+    FilterExpression filter = 2;
+    // Pagination options to get a page of artifacts
+    PaginationOptions pagination = 3;
+}
+
+// Response to list artifacts
+message ListArtifactsResponse {
+    // The list of artifacts
+    repeated Artifact artifacts = 1;
+    // Token to use to request the next page, pass this into the next requests PaginationOptions
+    string next_token = 2;
+}
+
+// List the datasets for the given query
+message ListDatasetsRequest {
+    // Apply the filter expression to this query
+    FilterExpression filter = 1;
+    // Pagination options to get a page of datasets
+    PaginationOptions pagination = 2;
+}
+
+// List the datasets response with token for next pagination
+message ListDatasetsResponse {
+    // The list of datasets
+    repeated Dataset datasets = 1;
+    // Token to use to request the next page, pass this into the next requests PaginationOptions
+    string next_token = 2;
+}
+
+message Dataset {
+    DatasetID id = 1;
+    Metadata metadata = 2;
+    repeated string partitionKeys = 3;
+}
+
+message Partition {
+    string key = 1;
     string value = 2;
 }
 
-// Before jumping to message definition, lets go over the expected flow-
-//   An Artifact represents an unit-of-work identified by (task, version, inputs). This is
-//   encoded as unique hash for faster queries(called provenance). An artifact is persisted with some other
-//   attributes (revision, createdAt, reference_id, outputs).
-//   Only Discovery service knows about the hashing algorithm; one can use the closure (task, version, inputs)
-//   to query an artifact if it doesnt have the provenance value.
-//
-//   Before starting the work on a task, programming-model first checks if the task has been done.
-//     Request:   GET (task, version, inputs)
-//     Response:  (Exists, Artifact) or (NotFound, nil)
-//   if not found, Task executor goes ahead with the execution and at the end of execution creates a new entry in
-//   the discovery service
-//     Request:  CREATE (task, version, inputs) + (revision, reference_id, outputs)
-//     Response: (Exists, Artifact) or (Created, Artifact)
-//
-//   One can also Query all the artifacts by querying any subset of properties.
-// Message Artifact represents the complete information of an artifact- field that unique define the artifact +
-// properties.
-// Message ArtifactInternal is our storage model where we create an additional derived column for faster queries.
-// Message ArtifactId only represents field that uniquely define the artifact.
+message DatasetID {
+    string project = 1;  // The name of the project
+    string name = 2;     // The name of the dataset
+    string domain = 3;   // The domain (eg. environment)
+    string version = 4;  // Version of the data schema
+    string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
+}
+
 message Artifact {
-    string provenance = 1;
-    string name = 2;
-    string version = 3;
-    int64 revision = 4;       // strictly increasing value set by users. users can do range query on this attribute.
-    int64 created_at = 5;     // the time when discovery service received the request.
-    string reference_id = 6;  // this could be a workflow runid or something that ties it data elsewhere
-    repeated Parameter inputs = 7;
-    repeated Parameter outputs = 8;
+    string id = 1;
+    DatasetID dataset = 2;
+    repeated ArtifactData data = 3;
+    Metadata metadata = 4;
+    repeated Partition partitions = 5;
+    repeated Tag tags = 6;
+    google.protobuf.Timestamp created_at = 7; // creation timestamp of artifact, autogenerated by service
 }
 
-message ArtifactId {
+message ArtifactData {
     string name = 1;
-    string version = 2;
-    repeated Parameter inputs = 3;
+    flyteidl.core.Literal value = 2;
 }
 
-message GetRequest {
-    oneof id {
-        string provenance = 1;
-        ArtifactId artifact_id = 2;
-    }
-}
-
-message GetResponse {
-    Artifact artifact = 1;
-}
-
-enum QueryOperator {
-    EQUAL = 0;
-    GREATER_THAN = 1;
-    LESSER_THAN = 2;
-}
-
-message IntFilter {
-    int64 value = 1;
-    QueryOperator operator = 2;
-}
-
-message IntRangeFilter {
-    int64 min = 1;
-    int64 max = 2;
-}
-
-message IntQueryKey {
-    oneof filter {
-        IntFilter val = 1;
-        IntRangeFilter range = 2;
-    }
-}
-
-// QueryRequest allows queries on a range of values for revision column and point queries on created_at
-// and reference_id
-message QueryRequest {
+message Tag {
     string name = 1;
-    string version = 2;
-    IntQueryKey revision = 3;
-    int64 created_at = 4;
-    string reference_id = 5;
+    string artifact_id = 2;
+    DatasetID dataset = 3;
 }
 
-message QueryResponse {
-    repeated Artifact artifact = 1;
+message Metadata {
+    map<string, string> key_map = 1; // key map is a dictionary of key/val strings that represent metadata
 }
 
-message CreateRequest {
-    ArtifactId ref = 1;
-    string reference_id = 2;
-    int64 revision = 3;
-    repeated Parameter outputs = 4;
+// Filter expression that is composed of a combination of single filters
+message FilterExpression {
+    repeated SinglePropertyFilter filters = 1;
 }
 
-message CreateResponse {
-    Artifact artifact = 1;
-    enum Status {
-        ALREADY_EXISTS = 0;
-        CREATED        = 1;
+// A single property to filter on.
+message SinglePropertyFilter {
+    oneof property_filter {
+        TagPropertyFilter tag_filter = 1;
+        PartitionPropertyFilter partition_filter = 2;
+        ArtifactPropertyFilter artifact_filter = 3;
+        DatasetPropertyFilter dataset_filter = 4;
     }
-    Status status = 2;
+
+    // as use-cases come up we can add more operators, ex: gte, like, not eq etc.
+    enum ComparisonOperator {
+        EQUALS = 0;
+    }
+
+    ComparisonOperator operator = 10; // field 10 in case we add more entities to query
+    // Next field number: 11
 }
 
-message GenerateProvenanceRequest {
-    ArtifactId id = 1;
+// Artifact properties we can filter by
+message ArtifactPropertyFilter {
+    // oneof because we can add more properties in the future
+    oneof property {
+        string artifact_id = 1;
+    }
 }
 
-message GenerateProvenanceResponse {
-    string provenance = 1;
+// Tag properties we can filter by
+message TagPropertyFilter {
+    oneof property {
+        string tag_name = 1;
+    }
 }
 
-service Artifacts {
-    rpc Get (GetRequest) returns (GetResponse) {}
-    rpc Query (QueryRequest) returns (QueryResponse) {}
-    rpc Create (CreateRequest) returns (CreateResponse) {}
-    rpc GenerateProvenance (GenerateProvenanceRequest) returns (GenerateProvenanceResponse) {}
+// Partition properties we can filter by
+message PartitionPropertyFilter {
+    oneof property {
+        KeyValuePair key_val = 1;
+    }
+}
+
+message KeyValuePair {
+    string key = 1;
+    string value = 2;
+}
+
+// Dataset properties we can filter by
+message DatasetPropertyFilter {
+    oneof property {
+        string project = 1;
+        string name = 2;
+        string domain = 3;
+        string version = 4;
+    }
+}
+
+// Pagination options for making list requests
+message PaginationOptions {
+
+    // the max number of results to return
+    uint32 limit = 1;
+
+    // the token to pass to fetch the next page
+    string token = 2;
+
+    // the property that we want to sort the results by
+    SortKey sortKey = 3;
+
+    // the sort order of the results
+    SortOrder sortOrder = 4;
+
+    enum SortOrder {
+        DESCENDING = 0;
+        ASCENDING = 1;
+    }
+
+    enum SortKey {
+        CREATION_TIME = 0;
+    }
 }
