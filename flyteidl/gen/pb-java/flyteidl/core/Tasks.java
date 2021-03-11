@@ -5230,6 +5230,70 @@ public final class Tasks {
      */
     flyteidl.core.Security.SecurityContextOrBuilder getSecurityContextOrBuilder();
 
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+    int getConfigCount();
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+    boolean containsConfig(
+        java.lang.String key);
+    /**
+     * Use {@link #getConfigMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getConfig();
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getConfigMap();
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+
+    java.lang.String getConfigOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+
+    java.lang.String getConfigOrThrow(
+        java.lang.String key);
+
     public flyteidl.core.Tasks.TaskTemplate.TargetCase getTargetCase();
   }
   /**
@@ -5367,6 +5431,19 @@ public final class Tasks {
 
               break;
             }
+            case 130: {
+              if (!((mutable_bitField0_ & 0x00000100) != 0)) {
+                config_ = com.google.protobuf.MapField.newMapField(
+                    ConfigDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000100;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              config__ = input.readMessage(
+                  ConfigDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              config_.getMutableMap().put(
+                  config__.getKey(), config__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -5391,6 +5468,18 @@ public final class Tasks {
       return flyteidl.core.Tasks.internal_static_flyteidl_core_TaskTemplate_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 16:
+          return internalGetConfig();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -5399,6 +5488,7 @@ public final class Tasks {
               flyteidl.core.Tasks.TaskTemplate.class, flyteidl.core.Tasks.TaskTemplate.Builder.class);
     }
 
+    private int bitField0_;
     private int targetCase_ = 0;
     private java.lang.Object target_;
     public enum TargetCase
@@ -5688,6 +5778,106 @@ public final class Tasks {
       return getSecurityContext();
     }
 
+    public static final int CONFIG_FIELD_NUMBER = 16;
+    private static final class ConfigDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.core.Tasks.internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> config_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetConfig() {
+      if (config_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            ConfigDefaultEntryHolder.defaultEntry);
+      }
+      return config_;
+    }
+
+    public int getConfigCount() {
+      return internalGetConfig().getMap().size();
+    }
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+
+    public boolean containsConfig(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetConfig().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getConfigMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getConfig() {
+      return getConfigMap();
+    }
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getConfigMap() {
+      return internalGetConfig().getMap();
+    }
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+
+    public java.lang.String getConfigOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetConfig().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+     * to use as required.
+     * reserve the field numbers 1 through 15 for very frequently occurring message elements
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; config = 16;</code>
+     */
+
+    public java.lang.String getConfigOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetConfig().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5726,6 +5916,12 @@ public final class Tasks {
       if (securityContext_ != null) {
         output.writeMessage(8, getSecurityContext());
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetConfig(),
+          ConfigDefaultEntryHolder.defaultEntry,
+          16);
       unknownFields.writeTo(output);
     }
 
@@ -5765,6 +5961,16 @@ public final class Tasks {
       if (securityContext_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, getSecurityContext());
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetConfig().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        config__ = ConfigDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(16, config__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5810,6 +6016,8 @@ public final class Tasks {
         if (!getSecurityContext()
             .equals(other.getSecurityContext())) return false;
       }
+      if (!internalGetConfig().equals(
+          other.internalGetConfig())) return false;
       if (!getTargetCase().equals(other.getTargetCase())) return false;
       switch (targetCase_) {
         case 6:
@@ -5853,6 +6061,10 @@ public final class Tasks {
       if (hasSecurityContext()) {
         hash = (37 * hash) + SECURITY_CONTEXT_FIELD_NUMBER;
         hash = (53 * hash) + getSecurityContext().hashCode();
+      }
+      if (!internalGetConfig().getMap().isEmpty()) {
+        hash = (37 * hash) + CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetConfig().hashCode();
       }
       switch (targetCase_) {
         case 6:
@@ -5974,6 +6186,28 @@ public final class Tasks {
         return flyteidl.core.Tasks.internal_static_flyteidl_core_TaskTemplate_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 16:
+            return internalGetConfig();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 16:
+            return internalGetMutableConfig();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -6034,6 +6268,7 @@ public final class Tasks {
           securityContext_ = null;
           securityContextBuilder_ = null;
         }
+        internalGetMutableConfig().clear();
         targetCase_ = 0;
         target_ = null;
         return this;
@@ -6062,6 +6297,8 @@ public final class Tasks {
       @java.lang.Override
       public flyteidl.core.Tasks.TaskTemplate buildPartial() {
         flyteidl.core.Tasks.TaskTemplate result = new flyteidl.core.Tasks.TaskTemplate(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (idBuilder_ == null) {
           result.id_ = id_;
         } else {
@@ -6096,6 +6333,9 @@ public final class Tasks {
         } else {
           result.securityContext_ = securityContextBuilder_.build();
         }
+        result.config_ = internalGetConfig();
+        result.config_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         result.targetCase_ = targetCase_;
         onBuilt();
         return result;
@@ -6167,6 +6407,8 @@ public final class Tasks {
         if (other.hasSecurityContext()) {
           mergeSecurityContext(other.getSecurityContext());
         }
+        internalGetMutableConfig().mergeFrom(
+            other.internalGetConfig());
         switch (other.getTargetCase()) {
           case CONTAINER: {
             mergeContainer(other.getContainer());
@@ -6219,6 +6461,7 @@ public final class Tasks {
         return this;
       }
 
+      private int bitField0_;
 
       private flyteidl.core.IdentifierOuterClass.Identifier id_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -7266,6 +7509,171 @@ public final class Tasks {
         }
         return securityContextBuilder_;
       }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> config_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetConfig() {
+        if (config_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              ConfigDefaultEntryHolder.defaultEntry);
+        }
+        return config_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableConfig() {
+        onChanged();;
+        if (config_ == null) {
+          config_ = com.google.protobuf.MapField.newMapField(
+              ConfigDefaultEntryHolder.defaultEntry);
+        }
+        if (!config_.isMutable()) {
+          config_ = config_.copy();
+        }
+        return config_;
+      }
+
+      public int getConfigCount() {
+        return internalGetConfig().getMap().size();
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+
+      public boolean containsConfig(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetConfig().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getConfigMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getConfig() {
+        return getConfigMap();
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getConfigMap() {
+        return internalGetConfig().getMap();
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+
+      public java.lang.String getConfigOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetConfig().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+
+      public java.lang.String getConfigOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetConfig().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearConfig() {
+        internalGetMutableConfig().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+
+      public Builder removeConfig(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableConfig().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableConfig() {
+        return internalGetMutableConfig().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+      public Builder putConfig(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableConfig().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
+       * to use as required.
+       * reserve the field numbers 1 through 15 for very frequently occurring message elements
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; config = 16;</code>
+       */
+
+      public Builder putAllConfig(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableConfig().getMutableMap()
+            .putAll(values);
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -7999,49 +8407,54 @@ public final class Tasks {
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    java.util.List<flyteidl.core.Literals.KeyValuePair> 
+    @java.lang.Deprecated java.util.List<flyteidl.core.Literals.KeyValuePair> 
         getConfigList();
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.KeyValuePair getConfig(int index);
+    @java.lang.Deprecated flyteidl.core.Literals.KeyValuePair getConfig(int index);
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    int getConfigCount();
+    @java.lang.Deprecated int getConfigCount();
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
+    @java.lang.Deprecated java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
         getConfigOrBuilderList();
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.KeyValuePairOrBuilder getConfigOrBuilder(
+    @java.lang.Deprecated flyteidl.core.Literals.KeyValuePairOrBuilder getConfigOrBuilder(
         int index);
 
     /**
@@ -8545,22 +8958,24 @@ public final class Tasks {
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    public java.util.List<flyteidl.core.Literals.KeyValuePair> getConfigList() {
+    @java.lang.Deprecated public java.util.List<flyteidl.core.Literals.KeyValuePair> getConfigList() {
       return config_;
     }
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    public java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
+    @java.lang.Deprecated public java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
         getConfigOrBuilderList() {
       return config_;
     }
@@ -8568,33 +8983,36 @@ public final class Tasks {
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    public int getConfigCount() {
+    @java.lang.Deprecated public int getConfigCount() {
       return config_.size();
     }
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.KeyValuePair getConfig(int index) {
+    @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePair getConfig(int index) {
       return config_.get(index);
     }
     /**
      * <pre>
      * Allows extra configs to be available for the container.
      * TODO: elaborate on how configs will become available.
+     * Deprecated, please use TaskTemplate.config instead.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+     * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.KeyValuePairOrBuilder getConfigOrBuilder(
+    @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePairOrBuilder getConfigOrBuilder(
         int index) {
       return config_.get(index);
     }
@@ -10162,11 +10580,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public java.util.List<flyteidl.core.Literals.KeyValuePair> getConfigList() {
+      @java.lang.Deprecated public java.util.List<flyteidl.core.Literals.KeyValuePair> getConfigList() {
         if (configBuilder_ == null) {
           return java.util.Collections.unmodifiableList(config_);
         } else {
@@ -10177,11 +10596,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public int getConfigCount() {
+      @java.lang.Deprecated public int getConfigCount() {
         if (configBuilder_ == null) {
           return config_.size();
         } else {
@@ -10192,11 +10612,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.KeyValuePair getConfig(int index) {
+      @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePair getConfig(int index) {
         if (configBuilder_ == null) {
           return config_.get(index);
         } else {
@@ -10207,11 +10628,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder setConfig(
+      @java.lang.Deprecated public Builder setConfig(
           int index, flyteidl.core.Literals.KeyValuePair value) {
         if (configBuilder_ == null) {
           if (value == null) {
@@ -10229,11 +10651,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder setConfig(
+      @java.lang.Deprecated public Builder setConfig(
           int index, flyteidl.core.Literals.KeyValuePair.Builder builderForValue) {
         if (configBuilder_ == null) {
           ensureConfigIsMutable();
@@ -10248,11 +10671,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder addConfig(flyteidl.core.Literals.KeyValuePair value) {
+      @java.lang.Deprecated public Builder addConfig(flyteidl.core.Literals.KeyValuePair value) {
         if (configBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -10269,11 +10693,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder addConfig(
+      @java.lang.Deprecated public Builder addConfig(
           int index, flyteidl.core.Literals.KeyValuePair value) {
         if (configBuilder_ == null) {
           if (value == null) {
@@ -10291,11 +10716,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder addConfig(
+      @java.lang.Deprecated public Builder addConfig(
           flyteidl.core.Literals.KeyValuePair.Builder builderForValue) {
         if (configBuilder_ == null) {
           ensureConfigIsMutable();
@@ -10310,11 +10736,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder addConfig(
+      @java.lang.Deprecated public Builder addConfig(
           int index, flyteidl.core.Literals.KeyValuePair.Builder builderForValue) {
         if (configBuilder_ == null) {
           ensureConfigIsMutable();
@@ -10329,11 +10756,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder addAllConfig(
+      @java.lang.Deprecated public Builder addAllConfig(
           java.lang.Iterable<? extends flyteidl.core.Literals.KeyValuePair> values) {
         if (configBuilder_ == null) {
           ensureConfigIsMutable();
@@ -10349,11 +10777,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder clearConfig() {
+      @java.lang.Deprecated public Builder clearConfig() {
         if (configBuilder_ == null) {
           config_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000020);
@@ -10367,11 +10796,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public Builder removeConfig(int index) {
+      @java.lang.Deprecated public Builder removeConfig(int index) {
         if (configBuilder_ == null) {
           ensureConfigIsMutable();
           config_.remove(index);
@@ -10385,11 +10815,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.KeyValuePair.Builder getConfigBuilder(
+      @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePair.Builder getConfigBuilder(
           int index) {
         return getConfigFieldBuilder().getBuilder(index);
       }
@@ -10397,11 +10828,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.KeyValuePairOrBuilder getConfigOrBuilder(
+      @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePairOrBuilder getConfigOrBuilder(
           int index) {
         if (configBuilder_ == null) {
           return config_.get(index);  } else {
@@ -10412,11 +10844,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
+      @java.lang.Deprecated public java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
            getConfigOrBuilderList() {
         if (configBuilder_ != null) {
           return configBuilder_.getMessageOrBuilderList();
@@ -10428,11 +10861,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.KeyValuePair.Builder addConfigBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePair.Builder addConfigBuilder() {
         return getConfigFieldBuilder().addBuilder(
             flyteidl.core.Literals.KeyValuePair.getDefaultInstance());
       }
@@ -10440,11 +10874,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.KeyValuePair.Builder addConfigBuilder(
+      @java.lang.Deprecated public flyteidl.core.Literals.KeyValuePair.Builder addConfigBuilder(
           int index) {
         return getConfigFieldBuilder().addBuilder(
             index, flyteidl.core.Literals.KeyValuePair.getDefaultInstance());
@@ -10453,11 +10888,12 @@ public final class Tasks {
        * <pre>
        * Allows extra configs to be available for the container.
        * TODO: elaborate on how configs will become available.
+       * Deprecated, please use TaskTemplate.config instead.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.KeyValuePair config = 6;</code>
+       * <code>repeated .flyteidl.core.KeyValuePair config = 6 [deprecated = true];</code>
        */
-      public java.util.List<flyteidl.core.Literals.KeyValuePair.Builder> 
+      @java.lang.Deprecated public java.util.List<flyteidl.core.Literals.KeyValuePair.Builder> 
            getConfigBuilderList() {
         return getConfigFieldBuilder().getBuilderList();
       }
@@ -13429,6 +13865,11 @@ public final class Tasks {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_TaskTemplate_ConfigEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_ContainerPort_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -13480,7 +13921,7 @@ public final class Tasks {
       "retries\030\005 \001(\0132\034.flyteidl.core.RetryStrat" +
       "egy\022\031\n\021discovery_version\030\006 \001(\t\022 \n\030deprec" +
       "ated_error_message\030\007 \001(\t\022\027\n\rinterruptibl" +
-      "e\030\010 \001(\010H\000B\025\n\023interruptible_value\"\333\002\n\014Tas" +
+      "e\030\010 \001(\010H\000B\025\n\023interruptible_value\"\303\003\n\014Tas" +
       "kTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Id" +
       "entifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001(\013" +
       "2\033.flyteidl.core.TaskMetadata\0220\n\tinterfa" +
@@ -13489,30 +13930,33 @@ public final class Tasks {
       "\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Cont" +
       "ainerH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020se" +
       "curity_context\030\010 \001(\0132\036.flyteidl.core.Sec" +
-      "urityContextB\010\n\006target\"\'\n\rContainerPort\022" +
-      "\026\n\016container_port\030\001 \001(\r\"\241\002\n\tContainer\022\r\n" +
-      "\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 " +
-      "\003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl.core.R" +
-      "esources\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.Ke" +
-      "yValuePair\022+\n\006config\030\006 \003(\0132\033.flyteidl.co" +
-      "re.KeyValuePair\022+\n\005ports\030\007 \003(\0132\034.flyteid" +
-      "l.core.ContainerPort\0225\n\013data_config\030\t \001(" +
-      "\0132 .flyteidl.core.DataLoadingConfig\"\233\002\n\n" +
-      "IOStrategy\022=\n\rdownload_mode\030\001 \001(\0162&.flyt" +
-      "eidl.core.IOStrategy.DownloadMode\0229\n\013upl" +
-      "oad_mode\030\002 \001(\0162$.flyteidl.core.IOStrateg" +
-      "y.UploadMode\"L\n\014DownloadMode\022\022\n\016DOWNLOAD" +
-      "_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_" +
-      "DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EX" +
-      "IT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020" +
-      "\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabled\030\001 \001(\010" +
-      "\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(" +
-      "\t\022A\n\006format\030\004 \001(\01621.flyteidl.core.DataLo" +
-      "adingConfig.LiteralMapFormat\022.\n\013io_strat" +
-      "egy\030\005 \001(\0132\031.flyteidl.core.IOStrategy\"1\n\020" +
-      "LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005" +
-      "PROTO\020\002B6Z4github.com/flyteorg/flyteidl/" +
-      "gen/pb-go/flyteidl/coreb\006proto3"
+      "urityContext\0227\n\006config\030\020 \003(\0132\'.flyteidl." +
+      "core.TaskTemplate.ConfigEntry\032-\n\013ConfigE" +
+      "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006" +
+      "target\"\'\n\rContainerPort\022\026\n\016container_por" +
+      "t\030\001 \001(\r\"\245\002\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007" +
+      "command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources" +
+      "\030\004 \001(\0132\030.flyteidl.core.Resources\022(\n\003env\030" +
+      "\005 \003(\0132\033.flyteidl.core.KeyValuePair\022/\n\006co" +
+      "nfig\030\006 \003(\0132\033.flyteidl.core.KeyValuePairB" +
+      "\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Conta" +
+      "inerPort\0225\n\013data_config\030\t \001(\0132 .flyteidl" +
+      ".core.DataLoadingConfig\"\233\002\n\nIOStrategy\022=" +
+      "\n\rdownload_mode\030\001 \001(\0162&.flyteidl.core.IO" +
+      "Strategy.DownloadMode\0229\n\013upload_mode\030\002 \001" +
+      "(\0162$.flyteidl.core.IOStrategy.UploadMode" +
+      "\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017" +
+      "DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E" +
+      "\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLO" +
+      "AD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021DataLo" +
+      "adingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninput_pa" +
+      "th\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006format\030" +
+      "\004 \001(\01621.flyteidl.core.DataLoadingConfig." +
+      "LiteralMapFormat\022.\n\013io_strategy\030\005 \001(\0132\031." +
+      "flyteidl.core.IOStrategy\"1\n\020LiteralMapFo" +
+      "rmat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002B6Z4g" +
+      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
+      "yteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13561,7 +14005,13 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskTemplate_descriptor,
-        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "TaskTypeVersion", "SecurityContext", "Target", });
+        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "TaskTypeVersion", "SecurityContext", "Config", "Target", });
+    internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor =
+      internal_static_flyteidl_core_TaskTemplate_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_core_TaskTemplate_ConfigEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_ContainerPort_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_ContainerPort_fieldAccessorTable = new

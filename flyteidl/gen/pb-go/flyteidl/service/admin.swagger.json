@@ -4906,7 +4906,7 @@
           "items": {
             "$ref": "#/definitions/coreKeyValuePair"
           },
-          "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available."
+          "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
         "ports": {
           "type": "array",
@@ -5711,6 +5711,13 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system\nto use as required.\nreserve the field numbers 1 through 15 for very frequently occurring message elements"
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
