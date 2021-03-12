@@ -31,3 +31,6 @@ propeller:
       type: bucket
       rate: 10
       capacity: 100
+  webhook:
+    certDir: /etc/webhook/certs
+    name: flyte-pod-webhook

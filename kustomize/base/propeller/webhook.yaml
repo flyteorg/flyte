@@ -1,0 +1,158 @@
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+  labels:
+    app: flyte-pod-webhook
+spec:
+  selector:
+    matchLabels:
+      app: flyte-pod-webhook
+  template:
+    metadata:
+      labels:
+        app: flyte-pod-webhook
+        app.kubernetes.io/name: flyte-pod-webhook
+        app.kubernetes.io/version: 0.5.13
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: flyte-pod-webhook
+      initContainers:
+        - image: ghcr.io/flyteorg/flytepropeller:0.1-h4
+          imagePullPolicy: Always # TODO: Change to IfNotPresent
+          command:
+            - flytepropeller
+          args:
+            - --config
+            - /etc/flyte/config/*.yaml
+            - webhook
+            - certs
+          name: webhook-init
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+            - mountPath: /etc/webhook/certs
+              name: webhook-certs
+          env:
+            - name: PROPELLER_WEBHOOK_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      containers:
+        - image: ghcr.io/flyteorg/flytepropeller:0.1-h4
+          imagePullPolicy: Always # TODO: Change to IfNotPresent
+          command:
+            - flytepropeller
+          args:
+            - --config
+            - /etc/flyte/config/*.yaml
+            - webhook
+            - secrets
+          name: webhook-server
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: flyte-propeller-config-5h6m9f27hc
+        - name: webhook-certs
+          emptyDir: {}
+# ---
+# apiVersion: admissionregistration.k8s.io/v1
+# kind: MutatingWebhookConfiguration
+# metadata:
+#   name: flyte-pod-webhook
+#   namespace: flyte
+# webhooks:
+#   - admissionReviewVersions:
+#       - v1beta1
+#     name: mapplication.kb.io
+#     clientConfig:
+#       caBundle: ${CA_BUNDLE}
+#       service:
+#         name: flyte-pod-webhook
+#         namespace: flyte
+#         path: /mutate
+#     rules:
+#       - apiGroups:
+#           - apps
+#       - apiVersions:
+#           - v1
+#         resources:
+#           - pods
+#     sideEffects: None
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+  annotations:
+    # This tells contour to use a H2 connection for the port associated
+    # with the name 'grpc' under spec/ports.
+    # For more information, refer to
+    # https://github.com/heptio/contour/blob/master/docs/annotations.md#contour-specific-service-annotations
+    # # Following this issue - the annotation was updated https://github.com/projectcontour/contour/issues/2092
+    projectcontour.io/upstream-protocol.h2c: "grpc"
+spec:
+  selector:
+    app: flyte-pod-webhook
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9443
+---
+# Create a ClusterRole for flytepropeller
+# https://kubernetes.io/docs/admin/authorization/rbac/
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+rules:
+  #Allow Access All plugin objects
+  - apiGroups:
+      - "*"
+    resources:
+      - "*"
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - patch
+---
+# Create a Service Account for Flytepropeller
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+---
+# Create a binding from Role -> ServiceAccount
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-pod-webhook
+subjects:
+  - kind: ServiceAccount
+    name: flyte-pod-webhook
+    namespace: flyte
