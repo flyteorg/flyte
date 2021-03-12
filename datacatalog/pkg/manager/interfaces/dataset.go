@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	idl_datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	idl_datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 type DatasetManager interface {

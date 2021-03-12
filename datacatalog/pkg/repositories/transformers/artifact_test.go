@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 )

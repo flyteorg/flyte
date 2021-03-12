@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/datacatalog/pkg/errors"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"google.golang.org/grpc/codes"
 )
 

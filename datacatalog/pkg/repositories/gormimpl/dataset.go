@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	idl_datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	idl_datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/jinzhu/gorm"

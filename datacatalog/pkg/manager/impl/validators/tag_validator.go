@@ -1,7 +1,7 @@
 package validators
 
 import (
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 const (

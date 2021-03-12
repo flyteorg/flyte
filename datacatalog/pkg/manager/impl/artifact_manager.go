@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
 	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
 	"github.com/flyteorg/datacatalog/pkg/repositories"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"

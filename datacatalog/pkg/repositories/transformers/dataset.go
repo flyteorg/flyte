@@ -2,7 +2,7 @@ package transformers
 
 import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 // Create a dataset model from the Dataset api object. This will serialize the metadata in the dataset as part of the transform
