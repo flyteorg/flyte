@@ -9021,9 +9021,6 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/tags: service_instance=production
-    kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
   name: flytesystem
   namespace: flyte
@@ -9059,3 +9056,178 @@ spec:
           serviceName: flyteadmin
           servicePort: 87
         path: /openapi
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:590375264460:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+    alb.ingress.kubernetes.io/group.name: flytesystem
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: service_instance=production
+    kubernetes.io/ingress.class: alb
+  labels:
+    app: flyteadmin
+  name: flytesystem
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: ssl-redirect
+            port:
+              name: use-annotation
+        path: /*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /api/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /healthcheck
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /v1/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /openapi/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /.well-known/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /me
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config/*
+        pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:590375264460:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+    alb.ingress.kubernetes.io/group.name: flytesystem
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: service_instance=production
+    kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  labels:
+    app: flyteadmin
+  name: flytesystem-grpc
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: ssl-redirect
+            port:
+              name: ssl-redirect
+        path: /*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.AdminService/*
+        pathType: ImplementationSpecific

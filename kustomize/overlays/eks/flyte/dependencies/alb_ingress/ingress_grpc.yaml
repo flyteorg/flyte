@@ -1,0 +1,36 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:590375264460:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: service_instance=production
+    kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    alb.ingress.kubernetes.io/group.name: flytesystem
+  labels:
+    app: flyteadmin
+  name: flytesystem-grpc
+  namespace: flyte
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: ssl-redirect
+                port:
+                  name: ssl-redirect
+            path: /*
+            pathType: ImplementationSpecific
+          - backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+            path: /flyteidl.service.AdminService/*
+            pathType: ImplementationSpecific
