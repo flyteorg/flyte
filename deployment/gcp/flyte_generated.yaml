@@ -8557,11 +8557,12 @@ spec:
       labels:
         app: datacatalog
         app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/version: 0.3.0
+        app.kubernetes.io/version: 0.2.2
     spec:
       containers:
       - command:
         - datacatalog
+        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
@@ -8584,6 +8585,7 @@ spec:
       initContainers:
       - command:
         - datacatalog
+        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - migrate
