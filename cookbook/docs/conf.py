@@ -28,7 +28,7 @@ author = "Flyte"
 
 # The full version, including alpha/beta/rc tags
 # The full version, including alpha/beta/rc tags.
-release = re.sub('^v', '', os.popen('git describe').read().strip())
+release = re.sub("^v", "", os.popen("git describe").read().strip())
 
 
 class CustomSorter(FileNameSortKey):
@@ -58,7 +58,7 @@ class CustomSorter(FileNameSortKey):
         "custom_objects.py",
         "run_conditions.py",
         "raw_container.py",
-        "pod.py",
+        "map_task.py"
         # Advanced
         "run_merge_sort.py",
         "custom_task_plugin.py",
@@ -151,7 +151,7 @@ html_theme_options = {
     "globaltoc_collapse": False,
     # If True, show hidden TOC entries
     "globaltoc_includehidden": False,
-    "heroes": {"": "Flyte", },
+    "heroes": {"": "Flyte",},
 }
 
 html_sidebars = {
