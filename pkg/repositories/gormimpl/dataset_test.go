@@ -17,7 +17,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/datacatalog/pkg/repositories/utils"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"

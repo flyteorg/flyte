@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
 	mock "github.com/stretchr/testify/mock"
 )

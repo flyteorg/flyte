@@ -10,7 +10,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories"
 	"github.com/flyteorg/datacatalog/pkg/repositories/config"
 	"github.com/flyteorg/datacatalog/pkg/runtime"
-	catalog "github.com/flyteorg/datacatalog/protos/gen"
+	catalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/profutils"

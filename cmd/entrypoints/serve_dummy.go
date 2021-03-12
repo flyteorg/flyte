@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/datacatalog/pkg/config"
 	"github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"

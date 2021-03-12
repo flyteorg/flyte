@@ -2,7 +2,7 @@ package transformers
 
 import (
 	"github.com/flyteorg/datacatalog/pkg/errors"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 )

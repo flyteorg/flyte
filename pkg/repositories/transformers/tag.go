@@ -2,7 +2,7 @@ package transformers
 
 import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 func ToTagKey(datasetID *datacatalog.DatasetID, tagName string) models.TagKey {

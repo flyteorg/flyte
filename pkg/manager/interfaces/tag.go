@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 type TagManager interface {

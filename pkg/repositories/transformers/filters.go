@@ -8,7 +8,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
 	"github.com/flyteorg/datacatalog/pkg/repositories/gormimpl"
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/logger"
 )
 
