@@ -26,6 +26,7 @@ class SecretMountType(object):
     """
     allowed enum values
     """
+    ANY = "ANY"
     ENV_VAR = "ENV_VAR"
     FILE = "FILE"
 

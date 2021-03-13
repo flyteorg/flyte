@@ -11,31 +11,41 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
 // are passed through file mounts.
 message Secret {
     enum MountType {
+        // Default case, indicates the client can tolerate either mounting options.
+        ANY = 0;
+
         // ENV_VAR indicates the secret needs to be mounted as an environment variable.
-        ENV_VAR = 0;
+        ENV_VAR = 1;
 
         // FILE indicates the secret needs to be mounted as a file.
-        FILE = 1;
+        FILE = 2;
     }
 
     // The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
     // of the secret management system to require case sensitivity.
-    string name = 1;
+    // +required
+    string key = 1;
+
+    // The name of the secret group where to find the key referenced above.
+    // +optional
+    string group = 2;
 
     // mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail
     // if the underlying key management system cannot satisfy that requirement. If not provided, the default location
     // will depend on the key management system.
     // +optional
-    MountType mount_requirement = 2;
+    MountType mount_requirement = 3;
 }
 
 // OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
 message OAuth2Client {
     // client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
     // secret requested matches the client_id indicated here.
+    // +required
     string client_id = 1;
 
     // client_secret is a reference to the secret used to authenticate the OAuth2 client.
+    // +required
     Secret client_secret = 2;
 }
 
@@ -67,12 +77,15 @@ message OAuth2TokenRequest {
 
     // name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
     // environment variables and as a filename for mounting tokens as files.
+    // +required
     string name = 1;
 
     // type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+    // +required
     Type type = 2;
 
     // client references the client_id/secret to use to request the OAuth2 token.
+    // +required
     OAuth2Client client = 3;
 
     // idp_discovery_endpoint references the discovery endpoint used to retrieve token endpoint and other related
