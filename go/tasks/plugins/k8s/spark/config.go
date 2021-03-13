@@ -10,7 +10,7 @@ import (
 var (
 	defaultConfig = &Config{
 		LogConfig: LogConfig{
-			User: logs.LogConfig{
+			Mixed: logs.LogConfig{
 				IsKubernetesEnabled:   true,
 				KubernetesTemplateURI: "http://localhost:30084/#!/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}",
 			},

@@ -186,7 +186,6 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 		Spec: sparkOp.SparkApplicationSpec{
 			ServiceAccount: &sparkTaskType,
 			Type:           getApplicationType(sparkJob.GetApplicationType()),
-			Mode:           sparkOp.ClusterMode,
 			Image:          &container.Image,
 			Arguments:      modifiedArgs,
 			Driver:         driverSpec,
@@ -286,7 +285,7 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 				o, err := p.GetTaskLogs(tasklog.Input{
 					PodName:   sj.Status.DriverInfo.PodName,
 					Namespace: sj.Namespace,
-					LogName:   "Driver Logs",
+					LogName:   "(Driver Logs)",
 				})
 
 				if err != nil {
@@ -306,7 +305,7 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 			o, err := p.GetTaskLogs(tasklog.Input{
 				PodName:   sj.Status.DriverInfo.PodName,
 				Namespace: sj.Namespace,
-				LogName:   "User Logs",
+				LogName:   "(User Logs)",
 			})
 
 			if err != nil {
@@ -325,7 +324,7 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 			o, err := p.GetTaskLogs(tasklog.Input{
 				PodName:   sj.Name,
 				Namespace: sj.Namespace,
-				LogName:   "System Logs",
+				LogName:   "(System Logs)",
 			})
 
 			if err != nil {
@@ -345,7 +344,7 @@ func getEventInfoForSpark(sj *sparkOp.SparkApplication) (*pluginsCore.TaskInfo, 
 		o, err := p.GetTaskLogs(tasklog.Input{
 			PodName:   sj.Name,
 			Namespace: sj.Namespace,
-			LogName:   "Spark-Submit/All User Logs",
+			LogName:   "(Spark-Submit/All User Logs)",
 		})
 
 		if err != nil {
