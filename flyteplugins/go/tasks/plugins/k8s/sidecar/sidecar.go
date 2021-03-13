@@ -2,10 +2,10 @@ package sidecar
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
-	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
@@ -22,7 +22,7 @@ import (
 
 const (
 	sidecarTaskType     = "sidecar"
-	primaryContainerKey = "primary"
+	primaryContainerKey = "primary_container_name"
 )
 
 type sidecarResourceHandler struct{}
@@ -73,45 +73,55 @@ type sidecarJob struct {
 	PrimaryContainerName string
 }
 
-func unmarshalSidecarCustom(structObj *structpb.Struct, sidecarJob *sidecarJob) error {
-	if structObj == nil {
-		return fmt.Errorf("nil Struct Object passed")
-	}
-
-	jsonObj, err := json.Marshal(structObj)
-	if err != nil {
-		return err
-	}
-
-	if err = json.Unmarshal(jsonObj, sidecarJob); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (sidecarResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
-	sidecarJob := sidecarJob{}
+	var podSpec k8sv1.PodSpec
+	var primaryContainerName string
+
 	task, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification,
 			"TaskSpecification cannot be read, Err: [%v]", err.Error())
 	}
-	err = unmarshalSidecarCustom(task.GetCustom(), &sidecarJob)
-	if err != nil {
-		return nil, errors.Errorf(errors.BadTaskSpecification,
-			"invalid TaskSpecification [%v], Err: [%v]", task.GetCustom(), err.Error())
+	if task.TaskTypeVersion == 0 {
+		sidecarJob := sidecarJob{}
+		err := utils.UnmarshalStructToObj(task.GetCustom(), &sidecarJob)
+		if err != nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"invalid TaskSpecification [%v], Err: [%v]", task.GetCustom(), err.Error())
+		}
+		if sidecarJob.PodSpec == nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"invalid TaskSpecification, nil PodSpec [%v]", task.GetCustom())
+		}
+		podSpec = *sidecarJob.PodSpec
+		primaryContainerName = sidecarJob.PrimaryContainerName
+	} else {
+		err := utils.UnmarshalStructToObj(task.GetCustom(), &podSpec)
+		if err != nil {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"Unable to unmarshal task custom [%v], Err: [%v]", task.GetCustom(), err.Error())
+		}
+		if len(task.GetConfig()) == 0 {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"invalid TaskSpecification, config needs to be non-empty and include missing [%s] key", primaryContainerKey)
+		}
+		var ok bool
+		primaryContainerName, ok = task.GetConfig()[primaryContainerKey]
+		if !ok {
+			return nil, errors.Errorf(errors.BadTaskSpecification,
+				"invalid TaskSpecification, config missing [%s] key in [%v]", primaryContainerKey, task.GetConfig())
+		}
 	}
 
-	pod := flytek8s.BuildPodWithSpec(sidecarJob.PodSpec)
+	pod := flytek8s.BuildPodWithSpec(&podSpec)
 	// Set the restart policy to *not* inherit from the default so that a completed pod doesn't get caught in a
 	// CrashLoopBackoff after the initial job completion.
 	pod.Spec.RestartPolicy = k8sv1.RestartPolicyNever
 
-	// We want to Also update the serviceAccount to the serviceaccount of the workflow
+	// We want to also update the serviceAccount to the serviceaccount of the workflow
 	pod.Spec.ServiceAccountName = taskCtx.TaskExecutionMetadata().GetK8sServiceAccount()
 
-	pod, err = validateAndFinalizePod(ctx, taskCtx, sidecarJob.PrimaryContainerName, *pod)
+	pod, err = validateAndFinalizePod(ctx, taskCtx, primaryContainerName, *pod)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +130,7 @@ func (sidecarResourceHandler) BuildResource(ctx context.Context, taskCtx plugins
 		pod.Annotations = make(map[string]string, 1)
 	}
 
-	pod.Annotations[primaryContainerKey] = sidecarJob.PrimaryContainerName
+	pod.Annotations[primaryContainerKey] = primaryContainerName
 
 	return pod, nil
 }
