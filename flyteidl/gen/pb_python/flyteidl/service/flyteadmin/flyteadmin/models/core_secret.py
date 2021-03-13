@@ -33,49 +33,73 @@ class CoreSecret(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'name': 'str',
+        'key': 'str',
+        'group': 'str',
         'mount_requirement': 'SecretMountType'
     }
 
     attribute_map = {
-        'name': 'name',
+        'key': 'key',
+        'group': 'group',
         'mount_requirement': 'mount_requirement'
     }
 
-    def __init__(self, name=None, mount_requirement=None):  # noqa: E501
+    def __init__(self, key=None, group=None, mount_requirement=None):  # noqa: E501
         """CoreSecret - a model defined in Swagger"""  # noqa: E501
 
-        self._name = None
+        self._key = None
+        self._group = None
         self._mount_requirement = None
         self.discriminator = None
 
-        if name is not None:
-            self.name = name
+        if key is not None:
+            self.key = key
+        if group is not None:
+            self.group = group
         if mount_requirement is not None:
             self.mount_requirement = mount_requirement
 
     @property
-    def name(self):
-        """Gets the name of this CoreSecret.  # noqa: E501
+    def key(self):
+        """Gets the key of this CoreSecret.  # noqa: E501
 
-        The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation of the secret management system to require case sensitivity.  # noqa: E501
 
-        :return: The name of this CoreSecret.  # noqa: E501
+        :return: The key of this CoreSecret.  # noqa: E501
         :rtype: str
         """
-        return self._name
+        return self._key
 
-    @name.setter
-    def name(self, name):
-        """Sets the name of this CoreSecret.
+    @key.setter
+    def key(self, key):
+        """Sets the key of this CoreSecret.
 
-        The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation of the secret management system to require case sensitivity.  # noqa: E501
 
-        :param name: The name of this CoreSecret.  # noqa: E501
+        :param key: The key of this CoreSecret.  # noqa: E501
         :type: str
         """
 
-        self._name = name
+        self._key = key
+
+    @property
+    def group(self):
+        """Gets the group of this CoreSecret.  # noqa: E501
+
+
+        :return: The group of this CoreSecret.  # noqa: E501
+        :rtype: str
+        """
+        return self._group
+
+    @group.setter
+    def group(self, group):
+        """Sets the group of this CoreSecret.
+
+
+        :param group: The group of this CoreSecret.  # noqa: E501
+        :type: str
+        """
+
+        self._group = group
 
     @property
     def mount_requirement(self):

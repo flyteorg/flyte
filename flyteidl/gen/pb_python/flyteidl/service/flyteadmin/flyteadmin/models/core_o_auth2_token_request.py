@@ -74,7 +74,6 @@ class CoreOAuth2TokenRequest(object):
     def name(self):
         """Gets the name of this CoreOAuth2TokenRequest.  # noqa: E501
 
-        name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for environment variables and as a filename for mounting tokens as files.  # noqa: E501
 
         :return: The name of this CoreOAuth2TokenRequest.  # noqa: E501
         :rtype: str
@@ -85,7 +84,6 @@ class CoreOAuth2TokenRequest(object):
     def name(self, name):
         """Sets the name of this CoreOAuth2TokenRequest.
 
-        name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for environment variables and as a filename for mounting tokens as files.  # noqa: E501
 
         :param name: The name of this CoreOAuth2TokenRequest.  # noqa: E501
         :type: str
@@ -97,7 +95,6 @@ class CoreOAuth2TokenRequest(object):
     def type(self):
         """Gets the type of this CoreOAuth2TokenRequest.  # noqa: E501
 
-        type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.  # noqa: E501
 
         :return: The type of this CoreOAuth2TokenRequest.  # noqa: E501
         :rtype: CoreOAuth2TokenRequestType
@@ -108,7 +105,6 @@ class CoreOAuth2TokenRequest(object):
     def type(self, type):
         """Sets the type of this CoreOAuth2TokenRequest.
 
-        type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.  # noqa: E501
 
         :param type: The type of this CoreOAuth2TokenRequest.  # noqa: E501
         :type: CoreOAuth2TokenRequestType
@@ -120,7 +116,6 @@ class CoreOAuth2TokenRequest(object):
     def client(self):
         """Gets the client of this CoreOAuth2TokenRequest.  # noqa: E501
 
-        client references the client_id/secret to use to request the OAuth2 token.  # noqa: E501
 
         :return: The client of this CoreOAuth2TokenRequest.  # noqa: E501
         :rtype: CoreOAuth2Client
@@ -131,7 +126,6 @@ class CoreOAuth2TokenRequest(object):
     def client(self, client):
         """Sets the client of this CoreOAuth2TokenRequest.
 
-        client references the client_id/secret to use to request the OAuth2 token.  # noqa: E501
 
         :param client: The client of this CoreOAuth2TokenRequest.  # noqa: E501
         :type: CoreOAuth2Client

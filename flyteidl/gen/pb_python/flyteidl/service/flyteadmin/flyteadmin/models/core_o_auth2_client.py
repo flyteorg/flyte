@@ -58,7 +58,6 @@ class CoreOAuth2Client(object):
     def client_id(self):
         """Gets the client_id of this CoreOAuth2Client.  # noqa: E501
 
-        client_id is the public id for the client to use. The system will not perform any pre-auth validation that the secret requested matches the client_id indicated here.  # noqa: E501
 
         :return: The client_id of this CoreOAuth2Client.  # noqa: E501
         :rtype: str
@@ -69,7 +68,6 @@ class CoreOAuth2Client(object):
     def client_id(self, client_id):
         """Sets the client_id of this CoreOAuth2Client.
 
-        client_id is the public id for the client to use. The system will not perform any pre-auth validation that the secret requested matches the client_id indicated here.  # noqa: E501
 
         :param client_id: The client_id of this CoreOAuth2Client.  # noqa: E501
         :type: str
@@ -81,7 +79,6 @@ class CoreOAuth2Client(object):
     def client_secret(self):
         """Gets the client_secret of this CoreOAuth2Client.  # noqa: E501
 
-        client_secret is a reference to the secret used to authenticate the OAuth2 client.  # noqa: E501
 
         :return: The client_secret of this CoreOAuth2Client.  # noqa: E501
         :rtype: CoreSecret
@@ -92,7 +89,6 @@ class CoreOAuth2Client(object):
     def client_secret(self, client_secret):
         """Sets the client_secret of this CoreOAuth2Client.
 
-        client_secret is a reference to the secret used to authenticate the OAuth2 client.  # noqa: E501
 
         :param client_secret: The client_secret of this CoreOAuth2Client.  # noqa: E501
         :type: CoreSecret
