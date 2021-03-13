@@ -22,21 +22,43 @@ public final class Security {
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
      * of the secret management system to require case sensitivity.
+     * +required
      * </pre>
      *
-     * <code>string name = 1;</code>
+     * <code>string key = 1;</code>
      */
-    java.lang.String getName();
+    java.lang.String getKey();
     /**
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
      * of the secret management system to require case sensitivity.
+     * +required
      * </pre>
      *
-     * <code>string name = 1;</code>
+     * <code>string key = 1;</code>
      */
     com.google.protobuf.ByteString
-        getNameBytes();
+        getKeyBytes();
+
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced above.
+     * +optional
+     * </pre>
+     *
+     * <code>string group = 2;</code>
+     */
+    java.lang.String getGroup();
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced above.
+     * +optional
+     * </pre>
+     *
+     * <code>string group = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getGroupBytes();
 
     /**
      * <pre>
@@ -46,7 +68,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
      */
     int getMountRequirementValue();
     /**
@@ -57,7 +79,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
      */
     flyteidl.core.Security.Secret.MountType getMountRequirement();
   }
@@ -82,7 +104,8 @@ public final class Security {
       super(builder);
     }
     private Secret() {
-      name_ = "";
+      key_ = "";
+      group_ = "";
       mountRequirement_ = 0;
     }
 
@@ -113,10 +136,16 @@ public final class Security {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              name_ = s;
+              key_ = s;
               break;
             }
-            case 16: {
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              group_ = s;
+              break;
+            }
+            case 24: {
               int rawValue = input.readEnum();
 
               mountRequirement_ = rawValue;
@@ -161,39 +190,55 @@ public final class Security {
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
        * <pre>
+       * Default case, indicates the client can tolerate either mounting options.
+       * </pre>
+       *
+       * <code>ANY = 0;</code>
+       */
+      ANY(0),
+      /**
+       * <pre>
        * ENV_VAR indicates the secret needs to be mounted as an environment variable.
        * </pre>
        *
-       * <code>ENV_VAR = 0;</code>
+       * <code>ENV_VAR = 1;</code>
        */
-      ENV_VAR(0),
+      ENV_VAR(1),
       /**
        * <pre>
        * FILE indicates the secret needs to be mounted as a file.
        * </pre>
        *
-       * <code>FILE = 1;</code>
+       * <code>FILE = 2;</code>
        */
-      FILE(1),
+      FILE(2),
       UNRECOGNIZED(-1),
       ;
 
       /**
        * <pre>
+       * Default case, indicates the client can tolerate either mounting options.
+       * </pre>
+       *
+       * <code>ANY = 0;</code>
+       */
+      public static final int ANY_VALUE = 0;
+      /**
+       * <pre>
        * ENV_VAR indicates the secret needs to be mounted as an environment variable.
        * </pre>
        *
-       * <code>ENV_VAR = 0;</code>
+       * <code>ENV_VAR = 1;</code>
        */
-      public static final int ENV_VAR_VALUE = 0;
+      public static final int ENV_VAR_VALUE = 1;
       /**
        * <pre>
        * FILE indicates the secret needs to be mounted as a file.
        * </pre>
        *
-       * <code>FILE = 1;</code>
+       * <code>FILE = 2;</code>
        */
-      public static final int FILE_VALUE = 1;
+      public static final int FILE_VALUE = 2;
 
 
       public final int getNumber() {
@@ -214,8 +259,9 @@ public final class Security {
 
       public static MountType forNumber(int value) {
         switch (value) {
-          case 0: return ENV_VAR;
-          case 1: return FILE;
+          case 0: return ANY;
+          case 1: return ENV_VAR;
+          case 2: return FILE;
           default: return null;
         }
       }
@@ -268,25 +314,26 @@ public final class Security {
       // @@protoc_insertion_point(enum_scope:flyteidl.core.Secret.MountType)
     }
 
-    public static final int NAME_FIELD_NUMBER = 1;
-    private volatile java.lang.Object name_;
+    public static final int KEY_FIELD_NUMBER = 1;
+    private volatile java.lang.Object key_;
     /**
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
      * of the secret management system to require case sensitivity.
+     * +required
      * </pre>
      *
-     * <code>string name = 1;</code>
+     * <code>string key = 1;</code>
      */
-    public java.lang.String getName() {
-      java.lang.Object ref = name_;
+    public java.lang.String getKey() {
+      java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        name_ = s;
+        key_ = s;
         return s;
       }
     }
@@ -294,25 +341,70 @@ public final class Security {
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
      * of the secret management system to require case sensitivity.
+     * +required
      * </pre>
      *
-     * <code>string name = 1;</code>
+     * <code>string key = 1;</code>
      */
     public com.google.protobuf.ByteString
-        getNameBytes() {
-      java.lang.Object ref = name_;
+        getKeyBytes() {
+      java.lang.Object ref = key_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        name_ = b;
+        key_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int MOUNT_REQUIREMENT_FIELD_NUMBER = 2;
+    public static final int GROUP_FIELD_NUMBER = 2;
+    private volatile java.lang.Object group_;
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced above.
+     * +optional
+     * </pre>
+     *
+     * <code>string group = 2;</code>
+     */
+    public java.lang.String getGroup() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        group_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced above.
+     * +optional
+     * </pre>
+     *
+     * <code>string group = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGroupBytes() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        group_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int MOUNT_REQUIREMENT_FIELD_NUMBER = 3;
     private int mountRequirement_;
     /**
      * <pre>
@@ -322,7 +414,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
      */
     public int getMountRequirementValue() {
       return mountRequirement_;
@@ -335,7 +427,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
      */
     public flyteidl.core.Security.Secret.MountType getMountRequirement() {
       @SuppressWarnings("deprecation")
@@ -357,11 +449,14 @@ public final class Security {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
+      if (!getKeyBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, key_);
       }
-      if (mountRequirement_ != flyteidl.core.Security.Secret.MountType.ENV_VAR.getNumber()) {
-        output.writeEnum(2, mountRequirement_);
+      if (!getGroupBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, group_);
+      }
+      if (mountRequirement_ != flyteidl.core.Security.Secret.MountType.ANY.getNumber()) {
+        output.writeEnum(3, mountRequirement_);
       }
       unknownFields.writeTo(output);
     }
@@ -372,12 +467,15 @@ public final class Security {
       if (size != -1) return size;
 
       size = 0;
-      if (!getNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
+      if (!getKeyBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, key_);
       }
-      if (mountRequirement_ != flyteidl.core.Security.Secret.MountType.ENV_VAR.getNumber()) {
+      if (!getGroupBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, group_);
+      }
+      if (mountRequirement_ != flyteidl.core.Security.Secret.MountType.ANY.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(2, mountRequirement_);
+          .computeEnumSize(3, mountRequirement_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -394,8 +492,10 @@ public final class Security {
       }
       flyteidl.core.Security.Secret other = (flyteidl.core.Security.Secret) obj;
 
-      if (!getName()
-          .equals(other.getName())) return false;
+      if (!getKey()
+          .equals(other.getKey())) return false;
+      if (!getGroup()
+          .equals(other.getGroup())) return false;
       if (mountRequirement_ != other.mountRequirement_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -408,8 +508,10 @@ public final class Security {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getName().hashCode();
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
+      hash = (37 * hash) + GROUP_FIELD_NUMBER;
+      hash = (53 * hash) + getGroup().hashCode();
       hash = (37 * hash) + MOUNT_REQUIREMENT_FIELD_NUMBER;
       hash = (53 * hash) + mountRequirement_;
       hash = (29 * hash) + unknownFields.hashCode();
@@ -553,7 +655,9 @@ public final class Security {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        name_ = "";
+        key_ = "";
+
+        group_ = "";
 
         mountRequirement_ = 0;
 
@@ -583,7 +687,8 @@ public final class Security {
       @java.lang.Override
       public flyteidl.core.Security.Secret buildPartial() {
         flyteidl.core.Security.Secret result = new flyteidl.core.Security.Secret(this);
-        result.name_ = name_;
+        result.key_ = key_;
+        result.group_ = group_;
         result.mountRequirement_ = mountRequirement_;
         onBuilt();
         return result;
@@ -633,8 +738,12 @@ public final class Security {
 
       public Builder mergeFrom(flyteidl.core.Security.Secret other) {
         if (other == flyteidl.core.Security.Secret.getDefaultInstance()) return this;
-        if (!other.getName().isEmpty()) {
-          name_ = other.name_;
+        if (!other.getKey().isEmpty()) {
+          key_ = other.key_;
+          onChanged();
+        }
+        if (!other.getGroup().isEmpty()) {
+          group_ = other.group_;
           onChanged();
         }
         if (other.mountRequirement_ != 0) {
@@ -669,22 +778,23 @@ public final class Security {
         return this;
       }
 
-      private java.lang.Object name_ = "";
+      private java.lang.Object key_ = "";
       /**
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
        * of the secret management system to require case sensitivity.
+       * +required
        * </pre>
        *
-       * <code>string name = 1;</code>
+       * <code>string key = 1;</code>
        */
-      public java.lang.String getName() {
-        java.lang.Object ref = name_;
+      public java.lang.String getKey() {
+        java.lang.Object ref = key_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          name_ = s;
+          key_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -694,18 +804,19 @@ public final class Security {
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
        * of the secret management system to require case sensitivity.
+       * +required
        * </pre>
        *
-       * <code>string name = 1;</code>
+       * <code>string key = 1;</code>
        */
       public com.google.protobuf.ByteString
-          getNameBytes() {
-        java.lang.Object ref = name_;
+          getKeyBytes() {
+        java.lang.Object ref = key_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          name_ = b;
+          key_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -715,17 +826,18 @@ public final class Security {
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
        * of the secret management system to require case sensitivity.
+       * +required
        * </pre>
        *
-       * <code>string name = 1;</code>
+       * <code>string key = 1;</code>
        */
-      public Builder setName(
+      public Builder setKey(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        name_ = value;
+        key_ = value;
         onChanged();
         return this;
       }
@@ -733,13 +845,14 @@ public final class Security {
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
        * of the secret management system to require case sensitivity.
+       * +required
        * </pre>
        *
-       * <code>string name = 1;</code>
+       * <code>string key = 1;</code>
        */
-      public Builder clearName() {
+      public Builder clearKey() {
         
-        name_ = getDefaultInstance().getName();
+        key_ = getDefaultInstance().getKey();
         onChanged();
         return this;
       }
@@ -747,18 +860,113 @@ public final class Security {
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
        * of the secret management system to require case sensitivity.
+       * +required
        * </pre>
        *
-       * <code>string name = 1;</code>
+       * <code>string key = 1;</code>
        */
-      public Builder setNameBytes(
+      public Builder setKeyBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        name_ = value;
+        key_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object group_ = "";
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced above.
+       * +optional
+       * </pre>
+       *
+       * <code>string group = 2;</code>
+       */
+      public java.lang.String getGroup() {
+        java.lang.Object ref = group_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          group_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced above.
+       * +optional
+       * </pre>
+       *
+       * <code>string group = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGroupBytes() {
+        java.lang.Object ref = group_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          group_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced above.
+       * +optional
+       * </pre>
+       *
+       * <code>string group = 2;</code>
+       */
+      public Builder setGroup(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        group_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced above.
+       * +optional
+       * </pre>
+       *
+       * <code>string group = 2;</code>
+       */
+      public Builder clearGroup() {
+        
+        group_ = getDefaultInstance().getGroup();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced above.
+       * +optional
+       * </pre>
+       *
+       * <code>string group = 2;</code>
+       */
+      public Builder setGroupBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        group_ = value;
         onChanged();
         return this;
       }
@@ -772,7 +980,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
        */
       public int getMountRequirementValue() {
         return mountRequirement_;
@@ -785,7 +993,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
        */
       public Builder setMountRequirementValue(int value) {
         mountRequirement_ = value;
@@ -800,7 +1008,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
        */
       public flyteidl.core.Security.Secret.MountType getMountRequirement() {
         @SuppressWarnings("deprecation")
@@ -815,7 +1023,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
        */
       public Builder setMountRequirement(flyteidl.core.Security.Secret.MountType value) {
         if (value == null) {
@@ -834,7 +1042,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 2;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
        */
       public Builder clearMountRequirement() {
         
@@ -903,6 +1111,7 @@ public final class Security {
      * <pre>
      * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
      * secret requested matches the client_id indicated here.
+     * +required
      * </pre>
      *
      * <code>string client_id = 1;</code>
@@ -912,6 +1121,7 @@ public final class Security {
      * <pre>
      * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
      * secret requested matches the client_id indicated here.
+     * +required
      * </pre>
      *
      * <code>string client_id = 1;</code>
@@ -922,6 +1132,7 @@ public final class Security {
     /**
      * <pre>
      * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -930,6 +1141,7 @@ public final class Security {
     /**
      * <pre>
      * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -938,6 +1150,7 @@ public final class Security {
     /**
      * <pre>
      * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1045,6 +1258,7 @@ public final class Security {
      * <pre>
      * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
      * secret requested matches the client_id indicated here.
+     * +required
      * </pre>
      *
      * <code>string client_id = 1;</code>
@@ -1065,6 +1279,7 @@ public final class Security {
      * <pre>
      * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
      * secret requested matches the client_id indicated here.
+     * +required
      * </pre>
      *
      * <code>string client_id = 1;</code>
@@ -1088,6 +1303,7 @@ public final class Security {
     /**
      * <pre>
      * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1098,6 +1314,7 @@ public final class Security {
     /**
      * <pre>
      * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1108,6 +1325,7 @@ public final class Security {
     /**
      * <pre>
      * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1457,6 +1675,7 @@ public final class Security {
        * <pre>
        * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
        * secret requested matches the client_id indicated here.
+       * +required
        * </pre>
        *
        * <code>string client_id = 1;</code>
@@ -1477,6 +1696,7 @@ public final class Security {
        * <pre>
        * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
        * secret requested matches the client_id indicated here.
+       * +required
        * </pre>
        *
        * <code>string client_id = 1;</code>
@@ -1498,6 +1718,7 @@ public final class Security {
        * <pre>
        * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
        * secret requested matches the client_id indicated here.
+       * +required
        * </pre>
        *
        * <code>string client_id = 1;</code>
@@ -1516,6 +1737,7 @@ public final class Security {
        * <pre>
        * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
        * secret requested matches the client_id indicated here.
+       * +required
        * </pre>
        *
        * <code>string client_id = 1;</code>
@@ -1530,6 +1752,7 @@ public final class Security {
        * <pre>
        * client_id is the public id for the client to use. The system will not perform any pre-auth validation that the
        * secret requested matches the client_id indicated here.
+       * +required
        * </pre>
        *
        * <code>string client_id = 1;</code>
@@ -1552,6 +1775,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1562,6 +1786,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1576,6 +1801,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1596,6 +1822,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1614,6 +1841,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1636,6 +1864,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1654,6 +1883,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1666,6 +1896,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -1681,6 +1912,7 @@ public final class Security {
       /**
        * <pre>
        * client_secret is a reference to the secret used to authenticate the OAuth2 client.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Secret client_secret = 2;</code>
@@ -2796,6 +3028,7 @@ public final class Security {
      * <pre>
      * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
      * environment variables and as a filename for mounting tokens as files.
+     * +required
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -2805,6 +3038,7 @@ public final class Security {
      * <pre>
      * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
      * environment variables and as a filename for mounting tokens as files.
+     * +required
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -2815,6 +3049,7 @@ public final class Security {
     /**
      * <pre>
      * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -2823,6 +3058,7 @@ public final class Security {
     /**
      * <pre>
      * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -2832,6 +3068,7 @@ public final class Security {
     /**
      * <pre>
      * client references the client_id/secret to use to request the OAuth2 token.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -2840,6 +3077,7 @@ public final class Security {
     /**
      * <pre>
      * client references the client_id/secret to use to request the OAuth2 token.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -2848,6 +3086,7 @@ public final class Security {
     /**
      * <pre>
      * client references the client_id/secret to use to request the OAuth2 token.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3125,6 +3364,7 @@ public final class Security {
      * <pre>
      * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
      * environment variables and as a filename for mounting tokens as files.
+     * +required
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -3145,6 +3385,7 @@ public final class Security {
      * <pre>
      * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
      * environment variables and as a filename for mounting tokens as files.
+     * +required
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -3168,6 +3409,7 @@ public final class Security {
     /**
      * <pre>
      * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3178,6 +3420,7 @@ public final class Security {
     /**
      * <pre>
      * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3193,6 +3436,7 @@ public final class Security {
     /**
      * <pre>
      * client references the client_id/secret to use to request the OAuth2 token.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3203,6 +3447,7 @@ public final class Security {
     /**
      * <pre>
      * client references the client_id/secret to use to request the OAuth2 token.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3213,6 +3458,7 @@ public final class Security {
     /**
      * <pre>
      * client references the client_id/secret to use to request the OAuth2 token.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3708,6 +3954,7 @@ public final class Security {
        * <pre>
        * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
        * environment variables and as a filename for mounting tokens as files.
+       * +required
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -3728,6 +3975,7 @@ public final class Security {
        * <pre>
        * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
        * environment variables and as a filename for mounting tokens as files.
+       * +required
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -3749,6 +3997,7 @@ public final class Security {
        * <pre>
        * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
        * environment variables and as a filename for mounting tokens as files.
+       * +required
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -3767,6 +4016,7 @@ public final class Security {
        * <pre>
        * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
        * environment variables and as a filename for mounting tokens as files.
+       * +required
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -3781,6 +4031,7 @@ public final class Security {
        * <pre>
        * name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for
        * environment variables and as a filename for mounting tokens as files.
+       * +required
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -3801,6 +4052,7 @@ public final class Security {
       /**
        * <pre>
        * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3811,6 +4063,7 @@ public final class Security {
       /**
        * <pre>
        * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3823,6 +4076,7 @@ public final class Security {
       /**
        * <pre>
        * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3835,6 +4089,7 @@ public final class Security {
       /**
        * <pre>
        * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3851,6 +4106,7 @@ public final class Security {
       /**
        * <pre>
        * type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2TokenRequest.Type type = 2;</code>
@@ -3868,6 +4124,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3878,6 +4135,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3892,6 +4150,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3912,6 +4171,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3930,6 +4190,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3952,6 +4213,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3970,6 +4232,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3982,6 +4245,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -3997,6 +4261,7 @@ public final class Security {
       /**
        * <pre>
        * client references the client_id/secret to use to request the OAuth2 token.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.OAuth2Client client = 3;</code>
@@ -6120,25 +6385,26 @@ public final class Security {
   static {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/core/security.proto\022\rflyteidl" +
-      ".core\"v\n\006Secret\022\014\n\004name\030\001 \001(\t\022:\n\021mount_r" +
-      "equirement\030\002 \001(\0162\037.flyteidl.core.Secret." +
-      "MountType\"\"\n\tMountType\022\013\n\007ENV_VAR\020\000\022\010\n\004F" +
-      "ILE\020\001\"O\n\014OAuth2Client\022\021\n\tclient_id\030\001 \001(\t" +
-      "\022,\n\rclient_secret\030\002 \001(\0132\025.flyteidl.core." +
-      "Secret\"m\n\010Identity\022\020\n\010iam_role\030\001 \001(\t\022\033\n\023" +
-      "k8s_service_account\030\002 \001(\t\0222\n\roauth2_clie" +
-      "nt\030\003 \001(\0132\033.flyteidl.core.OAuth2Client\"\335\001" +
-      "\n\022OAuth2TokenRequest\022\014\n\004name\030\001 \001(\t\0224\n\004ty" +
-      "pe\030\002 \001(\0162&.flyteidl.core.OAuth2TokenRequ" +
-      "est.Type\022+\n\006client\030\003 \001(\0132\033.flyteidl.core" +
-      ".OAuth2Client\022\036\n\026idp_discovery_endpoint\030" +
-      "\004 \001(\t\022\026\n\016token_endpoint\030\005 \001(\t\"\036\n\004Type\022\026\n" +
-      "\022CLIENT_CREDENTIALS\020\000\"\225\001\n\017SecurityContex" +
-      "t\022\'\n\006run_as\030\001 \001(\0132\027.flyteidl.core.Identi" +
-      "ty\022&\n\007secrets\030\002 \003(\0132\025.flyteidl.core.Secr" +
-      "et\0221\n\006tokens\030\003 \003(\0132!.flyteidl.core.OAuth" +
-      "2TokenRequestB6Z4github.com/flyteorg/fly" +
-      "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+      ".core\"\215\001\n\006Secret\022\013\n\003key\030\001 \001(\t\022\r\n\005group\030\002" +
+      " \001(\t\022:\n\021mount_requirement\030\003 \001(\0162\037.flytei" +
+      "dl.core.Secret.MountType\"+\n\tMountType\022\007\n" +
+      "\003ANY\020\000\022\013\n\007ENV_VAR\020\001\022\010\n\004FILE\020\002\"O\n\014OAuth2C" +
+      "lient\022\021\n\tclient_id\030\001 \001(\t\022,\n\rclient_secre" +
+      "t\030\002 \001(\0132\025.flyteidl.core.Secret\"m\n\010Identi" +
+      "ty\022\020\n\010iam_role\030\001 \001(\t\022\033\n\023k8s_service_acco" +
+      "unt\030\002 \001(\t\0222\n\roauth2_client\030\003 \001(\0132\033.flyte" +
+      "idl.core.OAuth2Client\"\335\001\n\022OAuth2TokenReq" +
+      "uest\022\014\n\004name\030\001 \001(\t\0224\n\004type\030\002 \001(\0162&.flyte" +
+      "idl.core.OAuth2TokenRequest.Type\022+\n\006clie" +
+      "nt\030\003 \001(\0132\033.flyteidl.core.OAuth2Client\022\036\n" +
+      "\026idp_discovery_endpoint\030\004 \001(\t\022\026\n\016token_e" +
+      "ndpoint\030\005 \001(\t\"\036\n\004Type\022\026\n\022CLIENT_CREDENTI" +
+      "ALS\020\000\"\225\001\n\017SecurityContext\022\'\n\006run_as\030\001 \001(" +
+      "\0132\027.flyteidl.core.Identity\022&\n\007secrets\030\002 " +
+      "\003(\0132\025.flyteidl.core.Secret\0221\n\006tokens\030\003 \003" +
+      "(\0132!.flyteidl.core.OAuth2TokenRequestB6Z" +
+      "4github.com/flyteorg/flyteidl/gen/pb-go/" +
+      "flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6157,7 +6423,7 @@ public final class Security {
     internal_static_flyteidl_core_Secret_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Secret_descriptor,
-        new java.lang.String[] { "Name", "MountRequirement", });
+        new java.lang.String[] { "Key", "Group", "MountRequirement", });
     internal_static_flyteidl_core_OAuth2Client_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_core_OAuth2Client_fieldAccessorTable = new

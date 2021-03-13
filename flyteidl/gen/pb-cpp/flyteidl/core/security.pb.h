@@ -81,13 +81,14 @@ namespace flyteidl {
 namespace core {
 
 enum Secret_MountType {
-  Secret_MountType_ENV_VAR = 0,
-  Secret_MountType_FILE = 1,
+  Secret_MountType_ANY = 0,
+  Secret_MountType_ENV_VAR = 1,
+  Secret_MountType_FILE = 2,
   Secret_MountType_Secret_MountType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   Secret_MountType_Secret_MountType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool Secret_MountType_IsValid(int value);
-const Secret_MountType Secret_MountType_MountType_MIN = Secret_MountType_ENV_VAR;
+const Secret_MountType Secret_MountType_MountType_MIN = Secret_MountType_ANY;
 const Secret_MountType Secret_MountType_MountType_MAX = Secret_MountType_FILE;
 const int Secret_MountType_MountType_ARRAYSIZE = Secret_MountType_MountType_MAX + 1;
 
@@ -217,6 +218,8 @@ class Secret final :
   // nested types ----------------------------------------------------
 
   typedef Secret_MountType MountType;
+  static const MountType ANY =
+    Secret_MountType_ANY;
   static const MountType ENV_VAR =
     Secret_MountType_ENV_VAR;
   static const MountType FILE =
@@ -244,23 +247,37 @@ class Secret final :
 
   // accessors -------------------------------------------------------
 
-  // string name = 1;
-  void clear_name();
-  static const int kNameFieldNumber = 1;
-  const ::std::string& name() const;
-  void set_name(const ::std::string& value);
+  // string key = 1;
+  void clear_key();
+  static const int kKeyFieldNumber = 1;
+  const ::std::string& key() const;
+  void set_key(const ::std::string& value);
   #if LANG_CXX11
-  void set_name(::std::string&& value);
+  void set_key(::std::string&& value);
   #endif
-  void set_name(const char* value);
-  void set_name(const char* value, size_t size);
-  ::std::string* mutable_name();
-  ::std::string* release_name();
-  void set_allocated_name(::std::string* name);
+  void set_key(const char* value);
+  void set_key(const char* value, size_t size);
+  ::std::string* mutable_key();
+  ::std::string* release_key();
+  void set_allocated_key(::std::string* key);
 
-  // .flyteidl.core.Secret.MountType mount_requirement = 2;
+  // string group = 2;
+  void clear_group();
+  static const int kGroupFieldNumber = 2;
+  const ::std::string& group() const;
+  void set_group(const ::std::string& value);
+  #if LANG_CXX11
+  void set_group(::std::string&& value);
+  #endif
+  void set_group(const char* value);
+  void set_group(const char* value, size_t size);
+  ::std::string* mutable_group();
+  ::std::string* release_group();
+  void set_allocated_group(::std::string* group);
+
+  // .flyteidl.core.Secret.MountType mount_requirement = 3;
   void clear_mount_requirement();
-  static const int kMountRequirementFieldNumber = 2;
+  static const int kMountRequirementFieldNumber = 3;
   ::flyteidl::core::Secret_MountType mount_requirement() const;
   void set_mount_requirement(::flyteidl::core::Secret_MountType value);
 
@@ -269,7 +286,8 @@ class Secret final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr key_;
+  ::google::protobuf::internal::ArenaStringPtr group_;
   int mount_requirement_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fsecurity_2eproto;
@@ -892,60 +910,113 @@ class SecurityContext final :
 #endif  // __GNUC__
 // Secret
 
-// string name = 1;
-inline void Secret::clear_name() {
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string key = 1;
+inline void Secret::clear_key() {
+  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Secret::name() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.Secret.name)
-  return name_.GetNoArena();
+inline const ::std::string& Secret::key() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Secret.key)
+  return key_.GetNoArena();
 }
-inline void Secret::set_name(const ::std::string& value) {
+inline void Secret::set_key(const ::std::string& value) {
   
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.core.Secret.name)
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Secret.key)
 }
 #if LANG_CXX11
-inline void Secret::set_name(::std::string&& value) {
+inline void Secret::set_key(::std::string&& value) {
   
-  name_.SetNoArena(
+  key_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Secret.name)
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Secret.key)
 }
 #endif
-inline void Secret::set_name(const char* value) {
+inline void Secret::set_key(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.core.Secret.name)
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Secret.key)
 }
-inline void Secret::set_name(const char* value, size_t size) {
+inline void Secret::set_key(const char* value, size_t size) {
   
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Secret.name)
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Secret.key)
 }
-inline ::std::string* Secret::mutable_name() {
+inline ::std::string* Secret::mutable_key() {
   
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.Secret.name)
-  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Secret.key)
+  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Secret::release_name() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.Secret.name)
+inline ::std::string* Secret::release_key() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Secret.key)
   
-  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Secret::set_allocated_name(::std::string* name) {
-  if (name != nullptr) {
+inline void Secret::set_allocated_key(::std::string* key) {
+  if (key != nullptr) {
     
   } else {
     
   }
-  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.name)
+  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.key)
 }
 
-// .flyteidl.core.Secret.MountType mount_requirement = 2;
+// string group = 2;
+inline void Secret::clear_group() {
+  group_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Secret::group() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Secret.group)
+  return group_.GetNoArena();
+}
+inline void Secret::set_group(const ::std::string& value) {
+  
+  group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Secret.group)
+}
+#if LANG_CXX11
+inline void Secret::set_group(::std::string&& value) {
+  
+  group_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Secret.group)
+}
+#endif
+inline void Secret::set_group(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Secret.group)
+}
+inline void Secret::set_group(const char* value, size_t size) {
+  
+  group_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Secret.group)
+}
+inline ::std::string* Secret::mutable_group() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Secret.group)
+  return group_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Secret::release_group() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Secret.group)
+  
+  return group_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Secret::set_allocated_group(::std::string* group) {
+  if (group != nullptr) {
+    
+  } else {
+    
+  }
+  group_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), group);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.group)
+}
+
+// .flyteidl.core.Secret.MountType mount_requirement = 3;
 inline void Secret::clear_mount_requirement() {
   mount_requirement_ = 0;
 }

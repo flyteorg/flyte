@@ -11,8 +11,6 @@ package flyteadmin
 
 // OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.
 type CoreOAuth2Client struct {
-	// client_id is the public id for the client to use. The system will not perform any pre-auth validation that the secret requested matches the client_id indicated here.
 	ClientId string `json:"client_id,omitempty"`
-	// client_secret is a reference to the secret used to authenticate the OAuth2 client.
 	ClientSecret *CoreSecret `json:"client_secret,omitempty"`
 }

@@ -10893,7 +10893,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * Properties of a Secret.
              * @memberof flyteidl.core
              * @interface ISecret
-             * @property {string|null} [name] Secret name
+             * @property {string|null} [key] Secret key
+             * @property {string|null} [group] Secret group
              * @property {flyteidl.core.Secret.MountType|null} [mountRequirement] Secret mountRequirement
              */
 
@@ -10913,12 +10914,20 @@ export const flyteidl = $root.flyteidl = (() => {
             }
 
             /**
-             * Secret name.
-             * @member {string} name
+             * Secret key.
+             * @member {string} key
              * @memberof flyteidl.core.Secret
              * @instance
              */
-            Secret.prototype.name = "";
+            Secret.prototype.key = "";
+
+            /**
+             * Secret group.
+             * @member {string} group
+             * @memberof flyteidl.core.Secret
+             * @instance
+             */
+            Secret.prototype.group = "";
 
             /**
              * Secret mountRequirement.
@@ -10952,10 +10961,12 @@ export const flyteidl = $root.flyteidl = (() => {
             Secret.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.name != null && message.hasOwnProperty("name"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+                if (message.key != null && message.hasOwnProperty("key"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.key);
+                if (message.group != null && message.hasOwnProperty("group"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.group);
                 if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
-                    writer.uint32(/* id 2, wireType 0 =*/16).int32(message.mountRequirement);
+                    writer.uint32(/* id 3, wireType 0 =*/24).int32(message.mountRequirement);
                 return writer;
             };
 
@@ -10978,9 +10989,12 @@ export const flyteidl = $root.flyteidl = (() => {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.name = reader.string();
+                        message.key = reader.string();
                         break;
                     case 2:
+                        message.group = reader.string();
+                        break;
+                    case 3:
                         message.mountRequirement = reader.int32();
                         break;
                     default:
@@ -11002,15 +11016,19 @@ export const flyteidl = $root.flyteidl = (() => {
             Secret.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (message.name != null && message.hasOwnProperty("name"))
-                    if (!$util.isString(message.name))
-                        return "name: string expected";
+                if (message.key != null && message.hasOwnProperty("key"))
+                    if (!$util.isString(message.key))
+                        return "key: string expected";
+                if (message.group != null && message.hasOwnProperty("group"))
+                    if (!$util.isString(message.group))
+                        return "group: string expected";
                 if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
                     switch (message.mountRequirement) {
                     default:
                         return "mountRequirement: enum value expected";
                     case 0:
                     case 1:
+                    case 2:
                         break;
                     }
                 return null;
@@ -11020,13 +11038,15 @@ export const flyteidl = $root.flyteidl = (() => {
              * MountType enum.
              * @name flyteidl.core.Secret.MountType
              * @enum {string}
-             * @property {number} ENV_VAR=0 ENV_VAR value
-             * @property {number} FILE=1 FILE value
+             * @property {number} ANY=0 ANY value
+             * @property {number} ENV_VAR=1 ENV_VAR value
+             * @property {number} FILE=2 FILE value
              */
             Secret.MountType = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "ENV_VAR"] = 0;
-                values[valuesById[1] = "FILE"] = 1;
+                values[valuesById[0] = "ANY"] = 0;
+                values[valuesById[1] = "ENV_VAR"] = 1;
+                values[valuesById[2] = "FILE"] = 2;
                 return values;
             })();
 
