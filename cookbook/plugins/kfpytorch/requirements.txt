@@ -12,7 +12,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.6
+croniter==1.0.8
     # via flytekit
 cycler==0.10.0
     # via matplotlib
@@ -24,9 +24,11 @@ deprecated==1.2.11
     # via flytekit
 dirhash==0.2.1
     # via flytekit
-flyteidl==0.18.12
+docker-image-py==0.1.10
     # via flytekit
-flytekit==0.16.0b13
+flyteidl==0.18.17
+    # via flytekit
+flytekit==0.16.0b17
     # via
     #   -r ../../common/requirements-common.in
     #   flytekitplugins-kfpytorch
@@ -34,11 +36,13 @@ flytekitplugins-kfpytorch==0.1.1
     # via -r requirements.in
 future==0.18.2
     # via croniter
-grpcio==1.35.0
+grpcio==1.36.1
     # via flytekit
 idna==2.10
     # via requests
-keyring==22.0.1
+importlib-metadata==3.7.2
+    # via keyring
+keyring==23.0.0
     # via flytekit
 kiwisolver==1.3.1
     # via matplotlib
@@ -64,15 +68,15 @@ numpy==1.20.1
     #   tensorboardx
     #   torch
     #   torchvision
-pandas==1.2.2
+pandas==1.2.3
     # via flytekit
 pathspec==0.8.1
     # via scantree
-pillow==8.1.0
+pillow==8.1.2
     # via
     #   matplotlib
     #   torchvision
-protobuf==3.15.0
+protobuf==3.15.6
     # via
     #   flyteidl
     #   flytekit
@@ -95,6 +99,8 @@ pytz==2018.4
     # via
     #   flytekit
     #   pandas
+regex==2020.11.13
+    # via docker-image-py
 requests==2.25.1
     # via
     #   flytekit
@@ -123,11 +129,11 @@ stringcase==1.2.0
     # via dataclasses-json
 tensorboardx==2.1
     # via -r requirements.in
-torch==1.7.1
+torch==1.8.0
     # via
     #   -r requirements.in
     #   torchvision
-torchvision==0.8.2
+torchvision==0.9.0
     # via -r requirements.in
 typing-extensions==3.7.4.3
     # via
@@ -148,3 +154,5 @@ wrapt==1.12.1
     # via
     #   deprecated
     #   flytekit
+zipp==3.4.1
+    # via importlib-metadata

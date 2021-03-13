@@ -28,7 +28,7 @@ docker-image-py==0.1.10
     # via flytekit
 flyteidl==0.18.17
     # via flytekit
-flytekit==0.16.0b16
+flytekit==0.16.0b17
     # via -r ../common/requirements-common.in
 future==0.18.2
     # via croniter

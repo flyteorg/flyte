@@ -15,7 +15,10 @@ The primary container is the driver for the flyte task execution for example, pr
 # %%
 # Pod tasks accept all the same arguments that ordinary container tasks accept, such as resource specifications.
 # However, these are only applied to the primary container. To customize other containers brought up during execution
-# we define a fully-fledged pod spec.
+# we define a fully-fledged pod spec. This is done using the
+# `kubernetes python client library <https://github.com/kubernetes-client/python>`__
+# specifically with the
+# `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/client/models/v1_pod_spec.py>`__.
 #
 # In this example, we define a simple pod spec in which a shared volume is mounted in both the primary and secondary
 # containers. The secondary writes a file that the primary waits on before completing.
@@ -24,50 +27,49 @@ import time
 
 from flytekit import task, workflow
 from flytekitplugins.pod import Pod
-from k8s.io.api.core.v1 import generated_pb2
-from k8s.io.apimachinery.pkg.api.resource.generated_pb2 import Quantity
+from kubernetes.client.models import (
+    V1Container,
+    V1PodSpec,
+    V1VolumeMount,
+    V1ResourceRequirements,
+    V1Volume,
+    V1EmptyDirVolumeSource,
+)
 
 _SHARED_DATA_PATH = "/data/message.txt"
 
 
 def generate_pod_spec_for_task():
-    pod_spec = generated_pb2.PodSpec()
 
     # Primary containers do not require us to specify an image, the default image built for flyte tasks will get used.
-    primary_container = generated_pb2.Container(name="primary")
+    primary_container = V1Container(name="primary")
 
     # Note: for non-primary containers we must specify an image.
-    secondary_container = generated_pb2.Container(name="secondary", image="alpine",)
+    secondary_container = V1Container(name="secondary", image="alpine",)
     secondary_container.command.extend(["/bin/sh"])
     secondary_container.args.extend(
         ["-c", "echo hi pod world > {}".format(_SHARED_DATA_PATH)]
     )
 
-    resources = generated_pb2.ResourceRequirements()
-    resources.limits["cpu"].CopyFrom(Quantity(string="1"))
-    resources.requests["cpu"].CopyFrom(Quantity(string="1"))
-    resources.limits["memory"].CopyFrom(Quantity(string="100Mi"))
-    resources.requests["memory"].CopyFrom(Quantity(string="100Mi"))
-    primary_container.resources.CopyFrom(resources)
-    secondary_container.resources.CopyFrom(resources)
-
-    shared_volume_mount = generated_pb2.VolumeMount(
-        name="shared-data", mountPath="/data",
+    resources = V1ResourceRequirements(
+        requests={"cpu": "1", "memory": "100Mi"}, limits={"cpu": "1", "memory": "100Mi"}
     )
-    secondary_container.volumeMounts.extend([shared_volume_mount])
-    primary_container.volumeMounts.extend([shared_volume_mount])
+    primary_container.resources = resources
+    secondary_container = resources
 
-    pod_spec.volumes.extend(
-        [
-            generated_pb2.Volume(
-                name="shared-data",
-                volumeSource=generated_pb2.VolumeSource(
-                    emptyDir=generated_pb2.EmptyDirVolumeSource(medium="Memory",)
-                ),
+    shared_volume_mount = V1VolumeMount(name="shared-data", mount_path="/data",)
+    secondary_container.volumeMounts = [shared_volume_mount]
+    primary_container.volumeMounts = [shared_volume_mount]
+
+    pod_spec = V1PodSpec(
+        containers=[primary_container, secondary_container],
+        volumes=[
+            V1Volume(
+                name="shared-data", empty_dir=V1EmptyDirVolumeSource(medium="Memory")
             )
-        ]
+        ],
     )
-    pod_spec.containers.extend([primary_container, secondary_container])
+
     return pod_spec
 
 
