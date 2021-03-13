@@ -112,6 +112,160 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	return taskCtx
 }
 
+func TestBuildSidecarResource_TaskType1(t *testing.T) {
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary container",
+				Args: []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
+				Resources: v1.ResourceRequirements{
+					Limits: v1.ResourceList{
+						"cpu":    resource.MustParse("2"),
+						"memory": resource.MustParse("200Mi"),
+					},
+					Requests: v1.ResourceList{
+						"cpu":    resource.MustParse("1"),
+						"memory": resource.MustParse("100Mi"),
+					},
+				},
+				VolumeMounts: []v1.VolumeMount{
+					{
+						Name: "volume mount",
+					},
+				},
+			},
+			{
+				Name: "secondary container",
+			},
+		},
+		Volumes: []v1.Volume{
+			{
+				Name: "dshm",
+			},
+		},
+		Tolerations: []v1.Toleration{
+			{
+				Key:   "my toleration key",
+				Value: "my toleration value",
+			},
+		},
+	}
+
+	b, err := json.Marshal(podSpec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	structObj := &structpb.Struct{}
+	if err := json.Unmarshal(b, structObj); err != nil {
+		t.Fatal(err)
+	}
+
+	task := core.TaskTemplate{
+		Custom:          structObj,
+		TaskTypeVersion: 1,
+		Config: map[string]string{
+			primaryContainerKey: "primary container",
+		},
+	}
+
+	tolGPU := v1.Toleration{
+		Key:      "flyte/gpu",
+		Value:    "dedicated",
+		Operator: v1.TolerationOpEqual,
+		Effect:   v1.TaintEffectNoSchedule,
+	}
+
+	tolStorage := v1.Toleration{
+		Key:      "storage",
+		Value:    "dedicated",
+		Operator: v1.TolerationOpExists,
+		Effect:   v1.TaintEffectNoSchedule,
+	}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
+			v1.ResourceStorage: {tolStorage},
+			ResourceNvidiaGPU:  {tolGPU},
+		},
+		DefaultCPURequest:    "1024m",
+		DefaultMemoryRequest: "1024Mi",
+	}))
+	handler := &sidecarResourceHandler{}
+	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
+	res, err := handler.BuildResource(context.TODO(), taskCtx)
+	assert.Nil(t, err)
+	assert.EqualValues(t, map[string]string{
+		primaryContainerKey: "primary container",
+	}, res.GetAnnotations())
+
+	// Assert volumes & volume mounts are preserved
+	assert.Len(t, res.(*v1.Pod).Spec.Volumes, 1)
+	assert.Equal(t, "dshm", res.(*v1.Pod).Spec.Volumes[0].Name)
+
+	assert.Len(t, res.(*v1.Pod).Spec.Containers[0].VolumeMounts, 1)
+	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
+
+	// Assert user-specified tolerations don't get overridden
+	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 1)
+	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
+		if tol.Key == "my toleration key" {
+			assert.Equal(t, tol.Value, "my toleration value")
+		} else {
+			t.Fatalf("unexpected toleration [%+v]", tol)
+		}
+	}
+
+}
+
+func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary container",
+			},
+			{
+				Name: "secondary container",
+			},
+		},
+	}
+
+	b, err := json.Marshal(podSpec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	structObj := &structpb.Struct{}
+	if err := json.Unmarshal(b, structObj); err != nil {
+		t.Fatal(err)
+	}
+
+	task := core.TaskTemplate{
+		Custom:          structObj,
+		TaskTypeVersion: 1,
+	}
+
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
+			v1.ResourceStorage: {},
+			ResourceNvidiaGPU:  {},
+		},
+		DefaultCPURequest:    "1024m",
+		DefaultMemoryRequest: "1024Mi",
+	}))
+	handler := &sidecarResourceHandler{}
+	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
+	_, err = handler.BuildResource(context.TODO(), taskCtx)
+	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config needs to be non-empty and include missing [primary_container_name] key")
+
+	task.Config = map[string]string{
+		"foo": "bar",
+	}
+	taskCtx = getDummySidecarTaskContext(&task, resourceRequirements)
+	_, err = handler.BuildResource(context.TODO(), taskCtx)
+	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config missing [primary_container_name] key in [map[foo:bar]]")
+
+}
+
 func TestBuildSidecarResource(t *testing.T) {
 	dir, err := os.Getwd()
 	if err != nil {
