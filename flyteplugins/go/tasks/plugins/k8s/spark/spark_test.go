@@ -81,11 +81,15 @@ func TestGetEventInfo(t *testing.T) {
 				IsCloudwatchEnabled:   true,
 				CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
 			},
+			Mixed: logs.LogConfig{
+				IsKubernetesEnabled: true,
+				KubernetesURL:       "k8s.com",
+			},
 		},
 	}))
 	info, err := getEventInfoForSpark(dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
-	assert.Len(t, info.Logs, 5)
+	assert.Len(t, info.Logs, 6)
 	assert.Equal(t, fmt.Sprintf("https://%s", sparkUIAddress), info.CustomInfo.Fields[sparkDriverUI].GetStringValue())
 	generatedLinks := make([]string, 0, len(info.Logs))
 	for _, l := range info.Logs {
@@ -93,6 +97,7 @@ func TestGetEventInfo(t *testing.T) {
 	}
 
 	expectedLinks := []string{
+		"k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace",
 		"k8s.com/#!/log/spark-namespace/spark-pod/pod?namespace=spark-namespace",
 		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.spark-pod;streamFilter=typeLogStreamPrefix",
 		"https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=system_log.var.log.containers.spark-app-name;streamFilter=typeLogStreamPrefix",
