@@ -8,7 +8,7 @@ require (
 	github.com/fatih/color v1.10.0
 	github.com/flyteorg/datacatalog v0.3.0
 	github.com/flyteorg/flyteidl v0.18.15
-	github.com/flyteorg/flyteplugins v0.5.30
+	github.com/flyteorg/flyteplugins v0.5.32
 	github.com/flyteorg/flytestdlib v0.3.13
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
@@ -32,7 +32,4 @@ require (
 	sigs.k8s.io/controller-runtime v0.8.2
 )
 
-replace (
-	github.com/GoogleCloudPlatform/spark-on-k8s-operator => github.com/lyft/spark-on-k8s-operator v0.1.4-0.20201027003055-c76b67e3b6d0
-	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
-)
+replace github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
