@@ -19,7 +19,7 @@
 # -- Project information -----------------------------------------------------
 
 project = u'Flyte'
-copyright = u'2020, Flyte Authors'
+copyright = u'2021, Flyte Authors'
 author = u'Flyte'
 
 # The short X.Y version
