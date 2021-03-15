@@ -4,6 +4,7 @@ on:
     branches:
     - master
   pull_request:
+    types: [edited, review_requested, opened, synchronize, reopened]
 jobs:
   end-to-end:
     runs-on: ubuntu-latest
