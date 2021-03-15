@@ -3,7 +3,7 @@
 .. _flyte-tutorials-firstrun:
 
 ############################################
-Getting Started with Flyte
+Getting Started With Flyte
 ############################################
 
 .. rubric:: Estimated time to complete: 2 minutes.
