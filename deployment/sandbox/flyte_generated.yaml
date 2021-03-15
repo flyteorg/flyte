@@ -3401,7 +3401,7 @@ spec:
       serviceAccountName: contour-certgen
   ttlSecondsAfterFinished: 0
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -3413,35 +3413,147 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: flyteconsole
-          servicePort: 80
-        path: /console
-      - backend:
-          serviceName: flyteconsole
-          servicePort: 80
+          service:
+            name: flyteconsole
+            port:
+              number: 80
         path: /__webpack_hmr
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /api
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /healthcheck
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /v1
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 81
+          service:
+            name: flyteadmin
+            port:
+              number: 81
         path: /flyteidl.service.AdminService
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 87
+          service:
+            name: flyteadmin
+            port:
+              number: 87
         path: /openapi
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /api
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /api/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /healthcheck
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /v1/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /openapi/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /.well-known/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /me
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config/*
+        pathType: ImplementationSpecific
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -3453,6 +3565,9 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: minio
-          servicePort: 9000
+          service:
+            name: minio
+            port:
+              number: 9000
         path: /minio
+        pathType: ImplementationSpecific

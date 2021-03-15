@@ -814,47 +814,7 @@ spec:
       - emptyDir: {}
         name: postgres-storage
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: flytesystem
-  namespace: flyte
-spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          serviceName: flyteconsole
-          servicePort: 80
-        path: /console
-      - backend:
-          serviceName: flyteconsole
-          servicePort: 80
-        path: /__webpack_hmr
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /api
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /healthcheck
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /v1
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 81
-        path: /flyteidl.service.AdminService
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 87
-        path: /openapi
----
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -866,6 +826,9 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: minio
-          servicePort: 9000
+          service:
+            name: minio
+            port:
+              number: 9000
         path: /minio
+        pathType: ImplementationSpecific

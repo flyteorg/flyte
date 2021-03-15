@@ -3,3 +3,4 @@ kind: Kustomization
 
 resources:
   - ingress.yaml
+  - ingress_grpc.yaml
