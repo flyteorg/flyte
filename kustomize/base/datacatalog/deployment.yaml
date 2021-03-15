@@ -15,7 +15,7 @@ spec:
       labels:
         app: datacatalog
         app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/version: 0.2.2
+        app.kubernetes.io/version: 0.3.0
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"
@@ -33,9 +33,9 @@ spec:
           secretName: db-pass
       initContainers:
       - name: run-migrations
-        image: datacatalog:v0.2.2
+        image: datacatalog:v0.3.0
         imagePullPolicy: IfNotPresent
-        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/*.yaml", "migrate", "run"]
+        command: ["datacatalog", "--config", "/etc/datacatalog/config/*.yaml", "migrate", "run"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/datacatalog/config
@@ -43,9 +43,9 @@ spec:
           mountPath: /etc/db
       containers:
       - name: datacatalog
-        image: datacatalog:v0.2.2
+        image: datacatalog:v0.3.0
         imagePullPolicy: IfNotPresent
-        command: ["datacatalog", "--logtostderr", "--config", "/etc/datacatalog/config/*.yaml", "serve"]
+        command: ["datacatalog", "--config", "/etc/datacatalog/config/*.yaml", "serve"]
         ports:
         - containerPort: 8088
         - containerPort: 8089

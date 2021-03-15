@@ -16,7 +16,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.29
+        app.kubernetes.io/version: 0.3.38
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"
@@ -37,9 +37,9 @@ spec:
           secretName: db-pass
       initContainers:
       - name: run-migrations
-        image: flyteadmin:v0.3.29
+        image: flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "migrate", "run"]
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "migrate", "run"]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
@@ -47,9 +47,9 @@ spec:
           mountPath: /etc/db
       # Optional, These just seed the project - TODO move them to only
       - name: seed-projects
-        image: flyteadmin:v0.3.29
+        image: flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml",
                   "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples"]
         volumeMounts:
         - name: config-volume
@@ -57,9 +57,9 @@ spec:
         - name: db-pass
           mountPath: /etc/db
       - name: sync-cluster-resources
-        image: flyteadmin:v0.3.29
+        image: flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
         volumeMounts:
         - name: resource-templates 
           mountPath: /etc/flyte/clusterresource/templates
@@ -69,9 +69,9 @@ spec:
           mountPath: /etc/db
       containers:
       - name: flyteadmin
-        image: flyteadmin:v0.3.29
+        image: flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "serve"]
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "serve"]
         ports:
         - containerPort: 8088
         - containerPort: 8089
