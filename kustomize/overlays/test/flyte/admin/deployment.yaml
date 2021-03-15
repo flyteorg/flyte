@@ -19,7 +19,7 @@ spec:
       - name: run-migrations
         image: flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml",
                   "migrate", "run"]
         volumeMounts:
         - name: config-volume
@@ -27,7 +27,7 @@ spec:
       - name: seed-projects
         image: flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml",
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml",
                   "migrate", "seed-projects", "flytetester", "flytesnacks"]
         volumeMounts:
         - name: config-volume
@@ -35,7 +35,7 @@ spec:
       - name: sync-cluster-resources
         image: flyteadmin:v0.3.5
         imagePullPolicy: IfNotPresent
-        command: ["flyteadmin", "--logtostderr", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
+        command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
         volumeMounts:
         - name: resource-templates 
           mountPath: /etc/flyte/clusterresource/templates

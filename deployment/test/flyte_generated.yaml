@@ -638,7 +638,6 @@ spec:
         name: check-db-ready
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
@@ -653,7 +652,6 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
@@ -670,7 +668,6 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - clusterresource
