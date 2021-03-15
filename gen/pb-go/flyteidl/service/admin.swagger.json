@@ -2262,6 +2262,23 @@
         ]
       }
     },
+    "/api/v1/version": {
+      "get": {
+        "description": "Retrieve the Version (including the Build  information) for FlyteAdmin service",
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetVersionResponse"
+            }
+          }
+        },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}": {
       "put": {
         "description": "Update the customized resource attributes associated with a project, domain and workflow combination",
@@ -2738,33 +2755,6 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/version": {
-      "put": {
-        "description": "Retrieve the Version (including the Build  information) for FlyteAdmin service",
-        "operationId": "GetVersion",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminGetVersionResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminGetVersionRequest"
-            }
           }
         ],
         "tags": [
@@ -3392,10 +3382,6 @@
       ],
       "default": "MINUTE",
       "description": "Represents a frequency at which to run a schedule."
-    },
-    "adminGetVersionRequest": {
-      "type": "object",
-      "title": "Empty request for GetVersion"
     },
     "adminGetVersionResponse": {
       "type": "object",

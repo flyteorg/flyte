@@ -346,7 +346,7 @@ public final class Admin {
       "ds associated with a NamedEntity\022\277\001\n\nGet" +
       "Version\022!.flyteidl.admin.GetVersionReque" +
       "st\032\".flyteidl.admin.GetVersionResponse\"j" +
-      "\202\323\344\223\002\021\032\014/api/version:\001*\222AP\032NRetrieve the" +
+      "\202\323\344\223\002\021\022\017/api/v1/version\222AP\032NRetrieve the" +
       " Version (including the Build  informati" +
       "on) for FlyteAdmin serviceB9Z7github.com" +
       "/flyteorg/flyteidl/gen/pb-go/flyteidl/se" +

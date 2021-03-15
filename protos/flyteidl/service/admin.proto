@@ -491,8 +491,7 @@ service AdminService {
 
   rpc GetVersion (flyteidl.admin.GetVersionRequest) returns (flyteidl.admin.GetVersionResponse) {
       option (google.api.http) = {
-        put: "/api/version"
-        body: "*"
+        get: "/api/v1/version"
       };
       option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
         description: "Retrieve the Version (including the Build  information) for FlyteAdmin service"
