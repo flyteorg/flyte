@@ -517,16 +517,15 @@ spec:
       labels:
         app: datacatalog
         app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/version: 0.2.2
+        app.kubernetes.io/version: 0.3.0
     spec:
       containers:
       - command:
         - datacatalog
-        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/lyft/datacatalog:v0.2.130
+        image: ghcr.io/flyteorg/datacatalog:v0.3.0
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -540,12 +539,11 @@ spec:
       initContainers:
       - command:
         - datacatalog
-        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/datacatalog:v0.2.130
+        image: ghcr.io/flyteorg/datacatalog:v0.3.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -585,16 +583,15 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.29
+        app.kubernetes.io/version: 0.3.38
     spec:
       containers:
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -641,12 +638,11 @@ spec:
         name: check-db-ready
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -656,14 +652,13 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
         - seed-projects
         - flytetester
         - flytesnacks
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -673,12 +668,11 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.37
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -722,7 +716,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.5.13
+        app.kubernetes.io/version: 0.7.1
     spec:
       containers:
       - args:
@@ -735,7 +729,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.6.2
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.1
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
