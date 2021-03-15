@@ -12,6 +12,7 @@ bases:
   # This is used for Resource pooling. On cloud you can use hosted redis (e.g. AWS elasticache)
   # Contour is used to create ingress. On cloud service use the default provided ingress controllers or cloud LB's
   # Add node ports for ease of use locally
+  - ../../base/ingress
   - ../../base/operators/spark
   - ../../base/operators/kfoperators/pytorch
   - ../../base/addons/cloudsqlproxy

@@ -10,8 +10,6 @@ bases:
 resources:
   - datacatalog/service.yaml
   - propeller/service.yaml
-  - ./dependencies/alb_ingress/ingress_grpc.yaml
-  - ./dependencies/alb_ingress/ingress.yaml
 
 patchesStrategicMerge:
   - admin/deployment.yaml
