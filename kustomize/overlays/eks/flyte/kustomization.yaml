@@ -6,6 +6,7 @@ namespace: flyte
 
 bases:
   - ../../../base/single_cluster/complete
+  - ingress
 
 resources:
   - datacatalog/service.yaml

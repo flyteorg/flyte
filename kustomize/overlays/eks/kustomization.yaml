@@ -14,7 +14,6 @@ bases:
   # Add node ports for ease of use locally
   - ../../base/operators/spark
   - ../../base/operators/kfoperators/pytorch
-  - ../../base/addons/alb_ingress
   # Optional dependency
   - ../../base/addons/redis
 
