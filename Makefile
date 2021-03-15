@@ -44,7 +44,6 @@ doc-requirements.txt: doc-requirements.in install-piptools
 
 PLACEHOLDER := "__version__\ =\ \"develop\""
 PLACEHOLDER_NPM := \"version\": \"develop\"
-VERSION := "v1.0.0"
 
 .PHONY: update_pyversion
 update_pyversion:
