@@ -9,7 +9,6 @@ jobs:
   bump-version:
     name: Bump Version
     runs-on: ubuntu-latest
-    needs: build-docker # Only to ensure it can successfully build
     outputs:
       version: ${{ steps.bump-version.outputs.tag }}
     steps:
