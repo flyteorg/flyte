@@ -1984,6 +1984,19 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminTask"
+  /api/v1/version:
+    get:
+      tags:
+      - "AdminService"
+      description: "Retrieve the Version (including the Build  information) for FlyteAdmin\
+        \ service"
+      operationId: "GetVersion"
+      parameters: []
+      responses:
+        200:
+          description: "A successful response."
+          schema:
+            $ref: "#/definitions/adminGetVersionResponse"
   /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}:
     put:
       tags:
@@ -2415,25 +2428,6 @@ paths:
           description: "A successful response."
           schema:
             $ref: "#/definitions/adminWorkflow"
-  /api/version:
-    put:
-      tags:
-      - "AdminService"
-      description: "Retrieve the Version (including the Build  information) for FlyteAdmin\
-        \ service"
-      operationId: "GetVersion"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: true
-        schema:
-          $ref: "#/definitions/adminGetVersionRequest"
-        x-exportParamName: "Body"
-      responses:
-        200:
-          description: "A successful response."
-          schema:
-            $ref: "#/definitions/adminGetVersionResponse"
 definitions:
   BlobTypeBlobDimensionality:
     type: "string"
@@ -3741,9 +3735,6 @@ definitions:
     - "HOUR"
     - "DAY"
     default: "MINUTE"
-  adminGetVersionRequest:
-    type: "object"
-    title: "Empty request for GetVersion"
   adminGetVersionResponse:
     type: "object"
     properties:

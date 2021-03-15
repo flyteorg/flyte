@@ -2021,13 +2021,12 @@ func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNod
 AdminServiceApiService
 Retrieve the Version (including the Build  information) for FlyteAdmin service
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
 
 @return AdminGetVersionResponse
 */
-func (a *AdminServiceApiService) GetVersion(ctx context.Context, body AdminGetVersionRequest) (AdminGetVersionResponse, *http.Response, error) {
+func (a *AdminServiceApiService) GetVersion(ctx context.Context) (AdminGetVersionResponse, *http.Response, error) {
 	var (
-		localVarHttpMethod = strings.ToUpper("Put")
+		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
 		localVarFileName   string
 		localVarFileBytes  []byte
@@ -2035,7 +2034,7 @@ func (a *AdminServiceApiService) GetVersion(ctx context.Context, body AdminGetVe
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/version"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/version"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -2058,8 +2057,6 @@ func (a *AdminServiceApiService) GetVersion(ctx context.Context, body AdminGetVe
 	if localVarHttpHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
 	}
-	// body params
-	localVarPostBody = &body
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
