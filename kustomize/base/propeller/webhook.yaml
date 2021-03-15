@@ -23,15 +23,15 @@ spec:
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
-        - image: ghcr.io/flyteorg/flytepropeller:0.1-h4
+        - image: ghcr.io/flyteorg/flytepropeller:0.1-h6
           imagePullPolicy: Always # TODO: Change to IfNotPresent
           command:
             - flytepropeller
           args:
+            - webhook
+            - init-certs
             - --config
             - /etc/flyte/config/*.yaml
-            - webhook
-            - certs
           name: webhook-init
           volumeMounts:
             - name: config-volume
@@ -39,20 +39,24 @@ spec:
             - mountPath: /etc/webhook/certs
               name: webhook-certs
           env:
-            - name: PROPELLER_WEBHOOK_NAMESPACE
+            - name: PROPELLER.WEBHOOK.NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
       containers:
-        - image: ghcr.io/flyteorg/flytepropeller:0.1-h4
+        - image: ghcr.io/flyteorg/flytepropeller:0.1-h6
           imagePullPolicy: Always # TODO: Change to IfNotPresent
+          # command:
+          #   - sleep
+          #   - "10000"
           command:
             - flytepropeller
           args:
+            - webhook
             - --config
             - /etc/flyte/config/*.yaml
-            - webhook
-            - secrets
+            - --propeller.webhook.namespace
+            - flyte
           name: webhook-server
           volumeMounts:
             - name: config-volume
@@ -63,7 +67,7 @@ spec:
       volumes:
         - name: config-volume
           configMap:
-            name: flyte-propeller-config-5h6m9f27hc
+            name: flyte-propeller-config-685g22kg5m
         - name: webhook-certs
           emptyDir: {}
 # ---
