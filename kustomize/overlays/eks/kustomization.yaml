@@ -14,8 +14,6 @@ bases:
   # Add node ports for ease of use locally
   - ../../base/operators/spark
   - ../../base/operators/kfoperators/pytorch
-  # TODO Fix deployment of alb_ingress controller
-  #- ../../base/addons/alb_ingress
   # Optional dependency
   - ../../base/addons/redis
 
