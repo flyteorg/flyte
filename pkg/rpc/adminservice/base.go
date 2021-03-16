@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
 
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
@@ -25,6 +27,7 @@ import (
 )
 
 type AdminService struct {
+	service.UnimplementedAdminServiceServer
 	TaskManager          interfaces.TaskInterface
 	WorkflowManager      interfaces.WorkflowInterface
 	LaunchPlanManager    interfaces.LaunchPlanInterface
