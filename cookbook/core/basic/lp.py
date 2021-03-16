@@ -60,9 +60,9 @@ square_2 = my_fixed_lp()
 
 @task
 def greet(day_of_week: str, number: int, am: bool) -> str:
-    greeting = "Have a great " + day_of_week
+    greeting = "Have a great " + day_of_week + " "
     greeting += "morning" if am else "evening"
-    return " " + greeting + "!" * number
+    return greeting + "!" * number
 
 
 @workflow
