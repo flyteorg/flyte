@@ -1378,6 +1378,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@flyteorg/flyteidl@^0.18.20":
+  version "0.18.20"
+  resolved "https://registry.yarnpkg.com/@flyteorg/flyteidl/-/flyteidl-0.18.20.tgz#4c65b53ea232101937aedbf02646be4e49680aed"
+  integrity sha512-ck0SE3VHyhFahYW6D7Iij8pE6dWSCH9rdii+YzTRA8tCeZ4EUeP8ccz9HVdZU4yovifViRG+5RyBhZQGirPqRA==
+
 "@iarna/cli@^1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@iarna/cli/-/cli-1.2.0.tgz#0f7af5e851afe895104583c4ca07377a8094d641"
@@ -1830,11 +1835,6 @@
   integrity sha512-7H9RFVU+Li2XmEko0GGyzy7m7JjSc7qa+m8l3fUzYg2GtwASApjKF/LSG2AUQCUmDKFLdfIEVjxvKvZUJFEmpw==
   dependencies:
     core-js "^2.5.7"
-
-"@lyft/flyteidl@^0.18.9":
-  version "0.18.9"
-  resolved "https://registry.yarnpkg.com/@lyft/flyteidl/-/flyteidl-0.18.9.tgz#e8c06a598329de052ca5b539c382749379a93ad7"
-  integrity sha512-BZCAiHpq+JMsd5u2m8UuedlL1E/CQZjDywXnOO27QmNzJv1zdcZ4QDkBU6ClCQQr/KOBszolyfRVY3N//3AG2Q==
 
 "@marionebl/sander@^0.6.0":
   version "0.6.1"

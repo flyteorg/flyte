@@ -20,7 +20,7 @@ import { InputValueMap, LaunchRoleInputRef, RoleType } from './types';
 
 const roleHeader = 'Role';
 const roleDocLinkUrl =
-    'https://github.com/lyft/flyteidl/blob/3789005a1372221eba28fa20d8386e44b32388f5/protos/flyteidl/admin/common.proto#L241';
+    'https://github.com/flyteorg/flyteidl/blob/3789005a1372221eba28fa20d8386e44b32388f5/protos/flyteidl/admin/common.proto#L241';
 const roleTypeLabel = 'type';
 const roleInputId = 'launch-auth-role';
 const defaultRoleTypeValue = roleTypes.iamRole;
