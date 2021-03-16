@@ -463,6 +463,40 @@ func TestDemystifyPending(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 	})
+
+	t.Run("CreateContainerConfigError", func(t *testing.T) {
+		s.ContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "CreateContainerConfigError",
+						Message: "this an error",
+					},
+				},
+			},
+		}
+		taskStatus, err := DemystifyPending(s)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+	})
+
+	t.Run("CreateContainerError", func(t *testing.T) {
+		s.ContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "CreateContainerError",
+						Message: "this an error",
+					},
+				},
+			},
+		}
+		taskStatus, err := DemystifyPending(s)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+	})
 }
 
 func TestDemystifySuccess(t *testing.T) {
