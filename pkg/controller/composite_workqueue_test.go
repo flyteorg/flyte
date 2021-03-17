@@ -124,13 +124,18 @@ func TestBatchingQueue(t *testing.T) {
 	})
 
 	t.Run("AddRateLimitedSubQueue", func(t *testing.T) {
-		q.AddToSubQueueRateLimited("z")
-		assert.Equal(t, 0, q.Len())
+		q1, err := NewCompositeWorkQueue(ctx, cfg, promutils.NewScope("test_batch_inner"))
+		assert.NoError(t, err)
+		assert.NotNil(t, q1)
+
+		batchQueue := q1.(*BatchingWorkQueue)
+		q1.AddToSubQueueRateLimited("z")
+		assert.Equal(t, 0, q1.Len())
 		batchQueue.Start(ctx)
-		i, s := q.Get()
+		i, s := q1.Get()
 		assert.False(t, s)
 		assert.Equal(t, "z", i.(string))
-		q.Done(i)
+		q1.Done(i)
 	})
 
 	t.Run("shutdown", func(t *testing.T) {
