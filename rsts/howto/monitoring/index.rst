@@ -4,7 +4,7 @@
 How do I monitor my Flyte deployment?
 ######################################
 
-.. tip:: The flyte core team publishes a maintains Grafana dashboards built using prometheus data source and can be found `here <https://grafana.com/grafana/dashboards?search=flyte>`_.
+.. tip:: The flyte core team publishes a maintains Grafana dashboards built using prometheus data source and can be found `here <https://grafana.com/grafana/dashboards?search=flyte>`__.
 
 Flyte Backend is  written in Golang and exposes stats using Prometheus. The Stats themselves are labeled with the Workflow, Task, Project & Domain whereever appropriate.
 
@@ -17,4 +17,4 @@ The dashboards are divided into primarily 2 types
         - DataPlane/FlytePropeller dashboards published @ `13979 <https://grafana.com/grafana/dashboards/13979>`_
         - ControlPlane/Flyteadmin dashboards published @ `13981 <https://grafana.com/grafana/dashboards/13981>`_
 
-These are basic dashboards and do no include all the metrics that are exposed by Flyte. You can contribute to the dashboards and help us improve them - by referring to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`_.
+These are basic dashboards and do no include all the metrics that are exposed by Flyte. You can contribute to the dashboards and help us improve them - by referring to the build scripts `here <https://github.com/flyteorg/flyte/tree/master/stats>`__.

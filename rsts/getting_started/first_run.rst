@@ -1,10 +1,10 @@
 .. currentmodule:: firstrun
 
-.. _flyte-tutorials-firstrun:
+.. _getting-started-firstrun:
 
-############################################
-Getting Started With Flyte
-############################################
+###########################
+Start a Local Flyte Backend
+###########################
 
 .. rubric:: Estimated time to complete: 2 minutes.
 
