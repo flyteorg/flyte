@@ -1,8 +1,8 @@
-.. _tutorials-getting-started-run-on-flyte:
+.. _getting-started-run-on-flyte:
 
-######################################
+#####################################
 Run Your Workflow on a Flyte Backend
-######################################
+#####################################
 
 ************************
 Installing Flyte Locally
@@ -16,13 +16,13 @@ workflows against this deployment. (The tabs below have an option to install Fly
 Prerequisites
 =============
 
-Make Sure you have followed :ref:`flyte-tutorials-firstrun` and have a running docker container and can access FlyteConsole on http://localhost:30081/console.
+Make Sure you have followed :ref:`getting-started-firstrun` and have a running docker container and can access FlyteConsole on http://localhost:30081/console.
 
-.. tip:: To check if your flyte-sandbox container is running you can run ``docker ps`` and it should show image ``ghcr.io/flyteorg/flyte-sandbox `` running
+.. tip:: To check if your flyte-sandbox container is running you can run ``docker ps`` and it should show image ``ghcr.io/flyteorg/flyte-sandbox`` running
 
 .. tip:: If you prefer using k3d, Minikube, docker for mac, or a hosted Kubernetes cluster like AWS-EKS, GCP-GKE, Azure Kubernetes refer to :ref:`howto-sandbox`. It is recommended that you use a simple Docker based approach when you are first getting started with Flyte.
 
-.. _tutorials-run-flyte-laptop:
+.. _getting-started-run-flyte-laptop:
 
 ****************************
 Running your Flyte Workflows
@@ -35,7 +35,7 @@ Registration is the process of shipping your code to Flyte backend. This creates
 Register your workflows
 -----------------------
 
-From within root directory of ``flyteexamples`` you created :ref:`previously <tutorials-getting-started-first-example>`
+From within root directory of ``flyteexamples`` you created :ref:`previously <getting-started-first-example>`
 feel free to make any changes and then register ::
 
   FLYTE_AWS_ENDPOINT=http://localhost:30084/ FLYTE_AWS_ACCESS_KEY_ID=minio \

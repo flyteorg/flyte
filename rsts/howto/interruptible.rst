@@ -49,4 +49,6 @@ Most Flyte workloads should be good candidates for spot instances. If your task 
 How to recover from interruptions?
 ===================================
 
-.. todo: Intra-task checkpointing coming soon
+.. CAUTION::
+
+    Coming soon 🛠
