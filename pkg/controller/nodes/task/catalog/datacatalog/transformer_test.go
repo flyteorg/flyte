@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"testing"
 
-	datacatalog "github.com/flyteorg/datacatalog/protos/gen"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/stretchr/testify/assert"
 
