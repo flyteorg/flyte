@@ -137,8 +137,9 @@ func (m awsSagemakerPlugin) buildResourceForHyperparameterTuningJob(
 	tuningObjectiveTypeString := strings.Title(strings.ToLower(hpoJobConfig.GetTuningObjective().GetObjectiveType().String()))
 	trainingJobEarlyStoppingTypeString := strings.Title(strings.ToLower(hpoJobConfig.TrainingJobEarlyStoppingType.String()))
 
-	role := awsUtils.GetRole(ctx, cfg.RoleAnnotationKey, taskCtx.TaskExecutionMetadata().GetAnnotations())
-	if role == "" {
+	role := awsUtils.GetRoleFromSecurityContext(cfg.RoleAnnotationKey, taskCtx.TaskExecutionMetadata())
+
+	if len(role) == 0 {
 		role = cfg.RoleArn
 	}
 

@@ -1,10 +1,26 @@
 package awsutils
 
-import "context"
+import (
+	core2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+)
 
-func GetRole(_ context.Context, roleAnnotationKey string, annotations map[string]string) string {
-	if len(roleAnnotationKey) > 0 {
-		return annotations[roleAnnotationKey]
+func GetRoleFromSecurityContext(roleKey string, taskExecutionMetadata core2.TaskExecutionMetadata) string {
+	var role string
+	securityContext := taskExecutionMetadata.GetSecurityContext()
+	if securityContext.GetRunAs() != nil {
+		role = securityContext.GetRunAs().GetIamRole()
+	}
+
+	// Continue this for backward compatibility
+	if len(role) == 0 {
+		role = getRole(roleKey, taskExecutionMetadata.GetAnnotations())
+	}
+	return role
+}
+
+func getRole(roleKey string, keyValueMap map[string]string) string {
+	if len(roleKey) > 0 {
+		return keyValueMap[roleKey]
 	}
 
 	return ""

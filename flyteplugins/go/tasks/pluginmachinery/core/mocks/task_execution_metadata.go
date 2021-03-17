@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	flyteidlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	core "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+
 	mock "github.com/stretchr/testify/mock"
 
 	types "k8s.io/apimachinery/pkg/types"
@@ -273,6 +275,38 @@ func (_m *TaskExecutionMetadata) GetOwnerReference() v1.OwnerReference {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1.OwnerReference)
+	}
+
+	return r0
+}
+
+type TaskExecutionMetadata_GetSecurityContext struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionMetadata_GetSecurityContext) Return(_a0 flyteidlcore.SecurityContext) *TaskExecutionMetadata_GetSecurityContext {
+	return &TaskExecutionMetadata_GetSecurityContext{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionMetadata) OnGetSecurityContext() *TaskExecutionMetadata_GetSecurityContext {
+	c := _m.On("GetSecurityContext")
+	return &TaskExecutionMetadata_GetSecurityContext{Call: c}
+}
+
+func (_m *TaskExecutionMetadata) OnGetSecurityContextMatch(matchers ...interface{}) *TaskExecutionMetadata_GetSecurityContext {
+	c := _m.On("GetSecurityContext", matchers...)
+	return &TaskExecutionMetadata_GetSecurityContext{Call: c}
+}
+
+// GetSecurityContext provides a mock function with given fields:
+func (_m *TaskExecutionMetadata) GetSecurityContext() flyteidlcore.SecurityContext {
+	ret := _m.Called()
+
+	var r0 flyteidlcore.SecurityContext
+	if rf, ok := ret.Get(0).(func() flyteidlcore.SecurityContext); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(flyteidlcore.SecurityContext)
 	}
 
 	return r0

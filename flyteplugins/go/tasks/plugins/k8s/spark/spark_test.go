@@ -317,6 +317,9 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 		Kind: "node",
 		Name: "blah",
 	})
+	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{
+		RunAs: &core.Identity{K8SServiceAccount: "new-val"},
+	})
 	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
 	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
@@ -374,6 +377,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	execCores, _ := strconv.ParseInt(dummySparkConf["spark.executor.cores"], 10, 32)
 	execInstances, _ := strconv.ParseInt(dummySparkConf["spark.executor.instances"], 10, 32)
 
+	assert.Equal(t, "new-val", *sparkApp.Spec.ServiceAccount)
 	assert.Equal(t, int32(driverCores), *sparkApp.Spec.Driver.Cores)
 	assert.Equal(t, int32(execCores), *sparkApp.Spec.Executor.Cores)
 	assert.Equal(t, int32(execInstances), *sparkApp.Spec.Executor.Instances)

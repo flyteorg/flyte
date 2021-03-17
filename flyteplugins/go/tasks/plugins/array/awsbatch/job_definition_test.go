@@ -64,7 +64,7 @@ func TestEnsureJobDefinition(t *testing.T) {
 	tMeta.OnGetTaskExecutionID().Return(tID)
 	tMeta.OnGetOverrides().Return(overrides)
 	tMeta.OnGetAnnotations().Return(map[string]string{})
-
+	tMeta.OnGetSecurityContext().Return(core.SecurityContext{})
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskReader().Return(tReader)
 	tCtx.OnTaskExecutionMetadata().Return(tMeta)
@@ -92,6 +92,73 @@ func TestEnsureJobDefinition(t *testing.T) {
 	t.Run("Found", func(t *testing.T) {
 		dCache := definition.NewCache(10)
 		assert.NoError(t, dCache.Put(definition.NewCacheKey("", "img1"), "their-arn"))
+
+		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
+			State: &arrayCore.State{},
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, nextState)
+		assert.Equal(t, "their-arn", nextState.JobDefinitionArn)
+	})
+}
+
+func TestEnsureJobDefinitionWithSecurityContext(t *testing.T) {
+	ctx := context.Background()
+
+	tReader := &mocks.TaskReader{}
+	tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{
+		Interface: &core.TypedInterface{
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{"var1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}}},
+			},
+		},
+		Target: &core.TaskTemplate_Container{
+			Container: createSampleContainerTask(),
+		},
+	}, nil)
+
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
+		DynamicTaskQueueKey: "queue1",
+	}})
+
+	tID := &mocks.TaskExecutionID{}
+	tID.OnGetGeneratedName().Return("found")
+
+	tMeta := &mocks.TaskExecutionMetadata{}
+	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.OnGetOverrides().Return(overrides)
+	tMeta.OnGetAnnotations().Return(map[string]string{})
+	tMeta.OnGetSecurityContext().Return(core.SecurityContext{
+		RunAs: &core.Identity{IamRole: "new-role"},
+	})
+	tCtx := &mocks.TaskExecutionContext{}
+	tCtx.OnTaskReader().Return(tReader)
+	tCtx.OnTaskExecutionMetadata().Return(tMeta)
+
+	cfg := &config.Config{}
+	batchClient := NewCustomBatchClient(batchMocks.NewMockAwsBatchClient(), "", "",
+		utils.NewRateLimiter("", 10, 20),
+		utils.NewRateLimiter("", 10, 20))
+
+	t.Run("Not Found", func(t *testing.T) {
+		dCache := definition.NewCache(10)
+
+		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
+			State: &arrayCore.State{},
+		})
+
+		assert.NoError(t, err)
+		assert.NotNil(t, nextState)
+		assert.Equal(t, "my-arn", nextState.JobDefinitionArn)
+		p, v := nextState.GetPhase()
+		assert.Equal(t, arrayCore.PhaseLaunch, p)
+		assert.Zero(t, v)
+	})
+
+	t.Run("Found", func(t *testing.T) {
+		dCache := definition.NewCache(10)
+		assert.NoError(t, dCache.Put(definition.NewCacheKey("new-role", "img1"), "their-arn"))
 
 		nextState, err := EnsureJobDefinition(ctx, tCtx, cfg, batchClient, dCache, &State{
 			State: &arrayCore.State{},
