@@ -45,13 +45,3 @@ jobs:
           context: ./
           dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: ${{ github.event_name == 'release' }}
-  release-flyte-defination:
-    name: Publish flyte defination file
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: "0"
-      - name: Build kustomize
-        run: |
-          make kustomize
