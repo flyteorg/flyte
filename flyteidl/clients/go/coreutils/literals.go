@@ -437,3 +437,60 @@ func MakeLiteralForBlob(path storage.DataReference, isDir bool, format string) *
 		},
 	}
 }
+
+func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, error) {
+	l := &core.Literal{}
+	switch t.Type.(type) {
+	case *core.LiteralType_MapValueType:
+		newT := t.Type.(*core.LiteralType_MapValueType)
+		newV, ok := v.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("map value types can only be of type map[string]interface{}, but found %v", reflect.TypeOf(v))
+		}
+
+		literals := make(map[string]*core.Literal, len(newV))
+		for key, val := range newV {
+			lv, err := MakeLiteralForType(newT.MapValueType, val)
+			if err != nil {
+				return nil, err
+			}
+			literals[key] = lv
+		}
+		l.Value = &core.Literal_Map{
+			Map: &core.LiteralMap{
+				Literals: literals,
+			},
+		}
+	case *core.LiteralType_CollectionType:
+		newT := t.Type.(*core.LiteralType_CollectionType)
+		newV, ok := v.([]interface{})
+		if !ok {
+			return nil, fmt.Errorf("collection type expected but found %v", reflect.TypeOf(v))
+		}
+
+		literals := make([]*core.Literal, 0, len(newV))
+		for _, val := range newV {
+			lv, err := MakeLiteralForType(newT.CollectionType, val)
+			if err != nil {
+				return nil, err
+			}
+			literals = append(literals, lv)
+		}
+		l.Value = &core.Literal_Collection{
+			Collection: &core.LiteralCollection{
+				Literals: literals,
+			},
+		}
+	case *core.LiteralType_Simple:
+		newT := t.Type.(*core.LiteralType_Simple)
+		lv, err := MakeLiteralForSimpleType(newT.Simple, fmt.Sprintf("%v", v))
+		if err != nil {
+			return nil, err
+		}
+		return lv, nil
+	default:
+		return nil, fmt.Errorf("unsupported type %s", t.String())
+	}
+
+	return l, nil
+}
