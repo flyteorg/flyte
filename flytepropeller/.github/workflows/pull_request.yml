@@ -45,6 +45,8 @@ jobs:
       - name: Prime docker cache
         run: docker load -i /tmp/tmp/docker-images/snapshot.tar || true
       - uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.10.0"
       - name: End2End
         run: |
           kubectl cluster-info
