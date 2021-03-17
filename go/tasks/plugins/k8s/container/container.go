@@ -64,8 +64,7 @@ func (Plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecuti
 
 	pod := flytek8s.BuildPodWithSpec(podSpec)
 
-	// We want to Also update the serviceAccount to the serviceaccount of the workflow
-	pod.Spec.ServiceAccountName = taskCtx.TaskExecutionMetadata().GetK8sServiceAccount()
+	pod.Spec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
 	return pod, nil
 }

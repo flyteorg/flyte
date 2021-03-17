@@ -195,6 +195,10 @@ func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTem
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
 	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"iam.amazonaws.com/role": "metadata_role"})
+	taskExecutionMetadata.OnGetSecurityContext().Return(flyteIdlCore.SecurityContext{
+		RunAs: &flyteIdlCore.Identity{IamRole: "new-role"},
+	})
+
 	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
 	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
@@ -270,6 +274,7 @@ func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate,
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
 	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"iam.amazonaws.com/role": "metadata_role"})
+	taskExecutionMetadata.OnGetSecurityContext().Return(flyteIdlCore.SecurityContext{})
 	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
 	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
@@ -353,6 +358,7 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	outputReader.OnGetOutputPath().Return(storage.DataReference("/data/outputs.pb"))
 	outputReader.OnGetOutputPrefixPath().Return(storage.DataReference("/data/"))
 	outputReader.OnGetRawOutputPrefix().Return(storage.DataReference("/raw/"))
+
 	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &mocks.TaskReader{}
@@ -384,6 +390,9 @@ func genMockTaskExecutionMetadata() *mocks.TaskExecutionMetadata {
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
 	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"iam.amazonaws.com/role": "metadata_role"})
+	taskExecutionMetadata.OnGetSecurityContext().Return(flyteIdlCore.SecurityContext{
+		RunAs: &flyteIdlCore.Identity{IamRole: "default_role"},
+	})
 	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
 	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",

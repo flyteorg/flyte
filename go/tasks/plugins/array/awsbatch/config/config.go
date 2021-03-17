@@ -22,9 +22,10 @@ type Config struct {
 	// Provide additional environment variable pairs that plugin authors will provide to containers
 	DefaultEnvVars       map[string]string `json:"defaultEnvVars" pflag:"-,Additional environment variable that should be injected into every resource"`
 	MaxErrorStringLength int               `json:"maxErrLength" pflag:",Determines the maximum length of the error string returned for the array."`
-	RoleAnnotationKey    string            `json:"roleAnnotationKey" pflag:",Map key to use to lookup role from task annotations."`
-	OutputAssembler      workqueue.Config  `json:"outputAssembler"`
-	ErrorAssembler       workqueue.Config  `json:"errorAssembler"`
+	// This can be deprecated. Just having it for backward compatibility
+	RoleAnnotationKey string           `json:"roleAnnotationKey" pflag:",Map key to use to lookup role from task annotations."`
+	OutputAssembler   workqueue.Config `json:"outputAssembler"`
+	ErrorAssembler    workqueue.Config `json:"errorAssembler"`
 }
 
 type JobStoreConfig struct {

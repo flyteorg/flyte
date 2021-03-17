@@ -33,5 +33,6 @@ type TaskExecutionMetadata interface {
 	GetMaxAttempts() uint32
 	GetAnnotations() map[string]string
 	GetK8sServiceAccount() string
+	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 }

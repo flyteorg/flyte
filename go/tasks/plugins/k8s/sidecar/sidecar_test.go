@@ -56,12 +56,14 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
+
 	taskMetadata.On("GetLabels").Return(map[string]string{"label-1": "val1"})
 	taskMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
 	})
 	taskMetadata.On("IsInterruptible").Return(true)
+	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{})
 	taskMetadata.On("GetK8sServiceAccount").Return("service-account")
 	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
 		Namespace: "test-namespace",
@@ -319,6 +321,7 @@ func TestBuildSidecarResource(t *testing.T) {
 	assert.Len(t, res.(*v1.Pod).Spec.Containers[0].VolumeMounts, 1)
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 
+	assert.Equal(t, "service-account", res.(*v1.Pod).Spec.ServiceAccountName)
 	// Assert user-specified tolerations don't get overridden
 	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 1)
 	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
