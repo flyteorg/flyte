@@ -4,6 +4,7 @@
 package coreutils
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
@@ -365,4 +366,163 @@ func TestMakeLiteralForBlob(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestMakeLiteralForType(t *testing.T) {
+	t.Run("SimpleInteger", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}
+		val, err := MakeLiteralForType(literalType, 1)
+		assert.NoError(t, err)
+		literalVal := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_Integer{Integer: 1}}}}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("SimpleFloat", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}}
+		val, err := MakeLiteralForType(literalType, 1)
+		assert.NoError(t, err)
+		literalVal := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_FloatValue{FloatValue: 1.0}}}}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("ArrayStrings", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_CollectionType{
+			CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}
+		strArray := []interface{}{"hello", "world"}
+		val, err := MakeLiteralForType(literalType, strArray)
+		assert.NoError(t, err)
+		literalVal1 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello"}}}}}}
+		literalVal2 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world"}}}}}}
+		literalCollection := []*core.Literal{literalVal1, literalVal2}
+		literalVal := &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: literalCollection}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("ArrayOfArrayStringsNotSupported", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_CollectionType{
+			CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}
+		strArrayOfArray := [][]interface{}{{"hello1", "world1"}, {"hello2", "world2"}}
+		_, err := MakeLiteralForType(literalType, strArrayOfArray)
+		expectedErrorf := fmt.Errorf("collection type expected but found [][]interface {}")
+		assert.Equal(t, expectedErrorf, err)
+	})
+
+	t.Run("ArrayOfArrayStringsTypeErasure", func(t *testing.T) {
+		var collectionType = &core.LiteralType{Type: &core.LiteralType_CollectionType{
+			CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}
+		var literalType = &core.LiteralType{Type: &core.LiteralType_CollectionType{
+			CollectionType: collectionType}}
+
+		createList1 := func() interface{} {
+			return []interface{}{"hello1", "world1"}
+		}
+		createList2 := func() interface{} {
+			return []interface{}{"hello2", "world2"}
+		}
+		createNestedList := func() interface{} {
+			return []interface{}{createList1(), createList2()}
+		}
+		var strArrayOfArray = createNestedList()
+		val, err := MakeLiteralForType(literalType, strArrayOfArray)
+		assert.NoError(t, err)
+		literalVal11 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello1"}}}}}}
+		literalVal12 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world1"}}}}}}
+		literalCollection1Val := []*core.Literal{literalVal11, literalVal12}
+
+		literalCollection1 := &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: literalCollection1Val}}}
+
+		literalVal21 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "hello2"}}}}}}
+		literalVal22 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world2"}}}}}}
+		literalCollection2Val := []*core.Literal{literalVal21, literalVal22}
+		literalCollection2 := &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: literalCollection2Val}}}
+		literalCollection := []*core.Literal{literalCollection1, literalCollection2}
+
+		literalVal := &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: literalCollection}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("MapStrings", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_MapValueType{
+			MapValueType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}
+		mapVal := map[string]interface{}{"hello1": "world1", "hello2": "world2"}
+		val, err := MakeLiteralForType(literalType, mapVal)
+		assert.NoError(t, err)
+		literalVal1 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world1"}}}}}}
+		literalVal2 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world2"}}}}}}
+		literalMapVal := map[string]*core.Literal{"hello1": literalVal1, "hello2": literalVal2}
+		literalVal := &core.Literal{Value: &core.Literal_Map{Map: &core.LiteralMap{Literals: literalMapVal}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("MapArrayOfStringsFail", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_MapValueType{
+			MapValueType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}
+		strArray := map[string][]interface{}{"hello1": {"world11", "world12"}, "hello2": {"world21", "world22"}}
+		_, err := MakeLiteralForType(literalType, strArray)
+		expectedErrorf := fmt.Errorf("map value types can only be of type map[string]interface{}, but found map[string][]interface {}")
+		assert.Equal(t, expectedErrorf, err)
+	})
+
+	t.Run("MapArrayOfStringsTypeErasure", func(t *testing.T) {
+		var collectionType = &core.LiteralType{Type: &core.LiteralType_CollectionType{
+			CollectionType: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}}}
+		var literalType = &core.LiteralType{Type: &core.LiteralType_MapValueType{
+			MapValueType: collectionType}}
+		createList1 := func() interface{} {
+			return []interface{}{"world11", "world12"}
+		}
+		createList2 := func() interface{} {
+			return []interface{}{"world21", "world22"}
+		}
+		strArray := map[string]interface{}{"hello1": createList1(), "hello2": createList2()}
+		val, err := MakeLiteralForType(literalType, strArray)
+		assert.NoError(t, err)
+		literalVal11 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world11"}}}}}}
+		literalVal12 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world12"}}}}}}
+		literalCollection1 := []*core.Literal{literalVal11, literalVal12}
+		literalVal1 := &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: literalCollection1}}}
+		literalVal21 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world21"}}}}}}
+		literalVal22 := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "world22"}}}}}}
+		literalCollection2 := []*core.Literal{literalVal21, literalVal22}
+		literalVal2 := &core.Literal{Value: &core.Literal_Collection{Collection: &core.LiteralCollection{Literals: literalCollection2}}}
+		literalMapVal := map[string]*core.Literal{"hello1": literalVal1, "hello2": literalVal2}
+		literalVal := &core.Literal{Value: &core.Literal_Map{Map: &core.LiteralMap{Literals: literalMapVal}}}
+		expectedVal, _ := ExtractFromLiteral(literalVal)
+		actualVal, _ := ExtractFromLiteral(val)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("UnsupportedType", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Schema{
+			Schema: &core.SchemaType{}}}
+		var schema interface{}
+		_, err := MakeLiteralForType(literalType, schema)
+		expectedErrorf := fmt.Errorf("unsupported type schema:<> ")
+		assert.Equal(t, expectedErrorf, err)
+
+	})
 }
