@@ -17,7 +17,7 @@ deploy_sandbox:
 
 # launch dockernetes and execute tests
 .PHONY: end2end
-end2end:
+end2end: release_automation
 	@end2end/launch_dockernetes.sh
 
 # execute tests in the current kubernetes context
