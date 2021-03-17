@@ -30,14 +30,14 @@ This makes it possible to extend a task-template beyond the default supported ta
 The motivation of the Custom field, is to marshal a JSON structure that specifies information beyond what a regular TaskTemplate can capture. The actual structure of the JSON is known only to the implemented backend-plugin and the SDK components. The core Flyte platform, does not understand of look into the specifics of this structure.
 It is highly recommended to use an interface definition lanugage like Protobuf, OpenAPISpec etc to declare specify the structure of the JSON. From here, on we refer to this as the ``Plugin Specification``.
 
-For Spark we decided to use Protobuf to specify the plugin as can be seen `here <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/plugins/spark.proto>`_. Note it is not necessary to have the Plugin structure specified in FlyteIDL, we do it for simplicity, ease of maintenance alongwith the core platform and because of existing tooling to generate code for protobuf.
+For Spark we decided to use Protobuf to specify the plugin as can be seen `here <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/plugins/spark.proto>`__. Note it is not necessary to have the Plugin structure specified in FlyteIDL, we do it for simplicity, ease of maintenance alongwith the core platform and because of existing tooling to generate code for protobuf.
 
 Flytekit Plugin implementation
 --------------------------------
 Now that you have a specification, we have to implement a method to generate this new TaskTemplate, with the special custom field. Also, this is where the UX design comes into play. You want to write the best possible interface in the SDK that users are delighted to use. The end goal is to create the TaskTemplate with the Custom field populated with the actual JSON structure.
 We will currently refer to Flytekit - python as an example for extending and implementing the SDK. (For java refer to other docs).
 The SDK task should be implemented as an extension of :py:class:`flytekit.extend.PythonTask`, or more commonly :py:class:`flytekit.PythonFunctionTask`.
-In the case of Spark, we extend the :py:class:`flytekit.PythonFunctionTask`, as shown `here <https://github.com/flyteorg/flytekit/blob/master/plugins/spark/flytekitplugins/spark/task.py#L64>`_.
+In the case of Spark, we extend the :py:class:`flytekit.PythonFunctionTask`, as shown `here <https://github.com/flyteorg/flytekit/blob/master/plugins/spark/flytekitplugins/spark/task.py#L64>`__.
 
 The SparkTask is implemented as a regular flytekit plugin, with one exception, the ``Custom`` field is now actually the ``SparkJob`` protocol buffer. Flytekit base classes when serializing a task, will automatically invoke the `get_custom method <https://github.com/flyteorg/flytekit/blob/c02075d472b5587d199630bcfc7f9937673c6a0e/flytekit/core/base_task.py#L255>`_.
 
@@ -52,12 +52,24 @@ The backend plugin is where the actual logic of the execution is implemented. Th
 
 Kubernetes operator Plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-.. todo: fill in
+
+.. CAUTION::
+
+      Coming soon 🛠
+  
 
 Web API plugin
 ^^^^^^^^^^^^^^^
-.. todo: fill in
+
+.. CAUTION::
+
+      Coming soon 🛠
+  
 
 Catch-all - Core Plugin
 ^^^^^^^^^^^^^^^^^^^^^^^^
-.. todo: fill in
+
+.. CAUTION::
+
+      Coming soon 🛠
+  

@@ -119,12 +119,16 @@ html_theme_options = {
     "globaltoc_collapse": False,
     # If True, show hidden TOC entries
     "globaltoc_includehidden": False,
+    # don't include home link in breadcrumb bar, since it's included
+    # in the nav_links key below.
+    "master_doc": False,
+    # custom nav in breadcrumb bar
     "nav_links": [
         {"href": "index", "internal": True, "title": "Flyte Docs"},
         {
             "href": "https://flytecookbook.readthedocs.io",
             "internal": False,
-            "title": "Flyte Tutorials",
+            "title": "Flytekit Tutorials",
         },
     ],
 }
