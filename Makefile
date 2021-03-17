@@ -3,8 +3,12 @@ pip-compile $(1) --upgrade --verbose
 endef
 
 .PHONY: kustomize
-kustomize:
+kustomize: release_automation
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
+
+.PHONY: release_automation
+release_automation:
+	bash script/release.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox:
