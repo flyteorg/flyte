@@ -119,7 +119,7 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	logger.Infof(ctx, "Setting the MetadataDir for StartNode [%v]", dataDir)
 	nodeStatus.SetDataDir(dataDir)
 	nodeStatus.SetOutputDir(outputDir)
-	execcontext := executors.NewExecutionContext(w, w, w, nil)
+	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	s, err := c.nodeExecutor.SetInputsForStartNode(ctx, execcontext, w, executors.NewNodeLookup(w, w.GetExecutionStatus()), inputs)
 	if err != nil {
 		return StatusReady, err
@@ -139,7 +139,7 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 			Code:    errors.IllegalStateError.String(),
 			Message: "Start node not found"}), nil
 	}
-	execcontext := executors.NewExecutionContext(w, w, w, nil)
+	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
 	if err != nil {
 		return StatusRunning, err
@@ -166,7 +166,7 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	execErr := executionErrorOrDefault(w.GetExecutionStatus().GetExecutionError(), w.GetExecutionStatus().GetMessage())
 	errorNode := w.GetOnFailureNode()
-	execcontext := executors.NewExecutionContext(w, w, w, nil)
+	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, errorNode)
 	if err != nil {
 		return StatusFailureNode(execErr), err
@@ -468,7 +468,7 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 		return errors.Errorf(errors.IllegalStateError, w.GetID(), "StartNode not found in running workflow?")
 	}
 
-	execcontext := executors.NewExecutionContext(w, w, w, nil)
+	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	if err := c.nodeExecutor.AbortHandler(ctx, execcontext, w, w, startNode, reason); err != nil {
 		return errors.Errorf(errors.CausedByError, w.GetID(), "Failed to propagate Abort for workflow. Error: %v", err)
 	}

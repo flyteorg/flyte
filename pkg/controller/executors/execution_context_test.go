@@ -28,7 +28,7 @@ func TestExecutionContext(t *testing.T) {
 	subWfGetter := subWfGetter{}
 	immutableParentInfo := immutableParentInfo{}
 
-	ec := NewExecutionContext(eCtx, taskGetter, subWfGetter, immutableParentInfo)
+	ec := NewExecutionContext(eCtx, taskGetter, subWfGetter, immutableParentInfo, InitializeControlFlow())
 	assert.NotNil(t, ec)
 	typed := ec.(execContext)
 	assert.Equal(t, typed.ImmutableExecutionContext, eCtx)

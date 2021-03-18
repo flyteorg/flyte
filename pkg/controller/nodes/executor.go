@@ -1,3 +1,19 @@
+// Core Nodes Executor implementation
+// This module implements the core Nodes executor.
+// This executor is the starting point for executing any node in the workflow. Since Nodes in a workflow are composable,
+// i.e., one node may contain other nodes, the Node Handler is recursive in nature.
+// This executor handles the core logic for all nodes, but specific logic for handling different kinds of nodes is delegated
+// to the respective node handlers
+//
+// Available node handlers are
+// - Task: Arguably the most important handler as it handles all tasks. These include all plugins. The goal of the workflow is
+//         is to run tasks, thus every workflow will contain atleast one TaskNode (except for the case, where the workflow
+//          is purely a meta-workflow and can run other workflows
+// - SubWorkflow: This is one of the most important handlers. It can executes Workflows that are nested inside a workflow
+// - DynamicTask Handler: This is just a decorator on the Task Handler. It handles cases, in which the Task returns a futures
+//                        file. Every Task is actually executed through the DynamicTaskHandler
+// - Branch Handler: This handler is used to execute branches
+// - Start & End Node handler: these are nominal handlers for the start and end node and do no really carry a lot of logic
 package nodes
 
 import (
@@ -62,6 +78,7 @@ type nodeMetrics struct {
 	NodeInputGatherLatency labeled.StopWatch
 }
 
+// Implements the executors.Node interface
 type nodeExecutor struct {
 	nodeHandlerFactory              HandlerFactory
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
@@ -137,7 +154,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 
 	if predicatePhase == PredicatePhaseReady {
 		// TODO: Performance problem, we maybe in a retry loop and do not need to resolve the inputs again.
-		// For now we will do this.
+		// For now we will do this
 		node := nCtx.Node()
 		nodeStatus := nCtx.NodeStatus()
 		dataDir := nodeStatus.GetDataDir()
@@ -182,7 +199,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 	return handler.PhaseInfoNotReady("predecessor node not yet complete"), nil
 }
 
-func (c *nodeExecutor) isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
+func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 	if !queuedAt.IsZero() && timeout != 0 {
 		deadline := queuedAt.Add(timeout)
 		if deadline.Before(time.Now()) {
@@ -224,7 +241,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *nodeEx
 		if nCtx.Node().GetActiveDeadline() != nil && *nCtx.Node().GetActiveDeadline() > 0 {
 			activeDeadline = *nCtx.Node().GetActiveDeadline()
 		}
-		if c.isTimeoutExpired(nodeStatus.GetQueuedAt(), activeDeadline) {
+		if isTimeoutExpired(nodeStatus.GetQueuedAt(), activeDeadline) {
 			logger.Errorf(ctx, "Node has timed out; timeout configured: %v", activeDeadline)
 			return handler.PhaseInfoTimedOut(nil, fmt.Sprintf("task active timeout [%s] expired", activeDeadline.String())), nil
 		}
@@ -234,7 +251,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h handler.Node, nCtx *nodeEx
 		if nCtx.Node().GetExecutionDeadline() != nil && *nCtx.Node().GetExecutionDeadline() > 0 {
 			executionDeadline = *nCtx.Node().GetExecutionDeadline()
 		}
-		if c.isTimeoutExpired(nodeStatus.GetLastAttemptStartedAt(), executionDeadline) {
+		if isTimeoutExpired(nodeStatus.GetLastAttemptStartedAt(), executionDeadline) {
 			logger.Errorf(ctx, "Current execution for the node timed out; timeout configured: %v", executionDeadline)
 			executionErr := &core.ExecutionError{Code: "TimeoutExpired", Message: fmt.Sprintf("task execution timeout [%s] expired", executionDeadline.String()), Kind: core.ExecutionError_USER}
 			phase = handler.PhaseInfoRetryableFailureErr(executionErr, nil)
@@ -659,9 +676,30 @@ func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext exe
 
 		// This is an optimization to avoid creating the nodeContext object in case the node has already been looked at.
 		// If the overhead was zero, we would just do the isDirtyCheck after the nodeContext is created
-		nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 		if nodeStatus.IsDirty() {
 			return executors.NodeStatusRunning, nil
+		}
+
+		// Now if the node is of type task, then let us check if we are within the parallelism limit, only if the node
+		// has been queued already
+		if currentNode.GetKind() == v1alpha1.NodeKindTask && nodeStatus.GetPhase() == v1alpha1.NodePhaseQueued {
+			maxParallelism := execContext.GetExecutionConfig().MaxParallelism
+			if maxParallelism > 0 {
+				// If we are queued, let us see if we can proceed within the node parallelism bounds
+				if execContext.CurrentParallelism() >= maxParallelism {
+					logger.Infof(ctx, "Maximum Parallelism for task nodes achieved [%d] >= Max [%d], Round will be short-circuited.", execContext.CurrentParallelism(), maxParallelism)
+					return executors.NodeStatusRunning, nil
+				}
+				// We know that Propeller goes through each workflow in a single thread, thus every node is really processed
+				// sequentially. So, we can continue - now that we know we are under the parallelism limits and increment the
+				// parallelism if the node, enters a running state
+				logger.Debugf(ctx, "Parallelism criteria not met, Current [%d], Max [%d]", execContext.CurrentParallelism(), maxParallelism)
+			} else {
+				logger.Debugf(ctx, "Parallelism control disabled")
+			}
+		} else {
+			logger.Debugf(ctx, "NodeKind: %s in status [%s]. Parallelism control is not applicable. Current Parallelism [%d]",
+				currentNode.GetKind().String(), nodeStatus.GetPhase().String(), execContext.CurrentParallelism())
 		}
 
 		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)

@@ -151,6 +151,7 @@ func (in *ExecutionConfig) DeepCopyInto(out *ExecutionConfig) {
 			(*out)[key] = *val.DeepCopy()
 		}
 	}
+	out.MaxParallelism = in.MaxParallelism
 	return
 }
 

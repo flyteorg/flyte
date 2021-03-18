@@ -9,7 +9,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
@@ -305,15 +304,4 @@ type FlyteWorkflowList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata"`
 	Items           []FlyteWorkflow `json:"items"`
-}
-
-// This contains workflow-execution specifications and overrides.
-type ExecutionConfig struct {
-	// Maps individual task types to their alternate (non-default) plugin handlers by name.
-	TaskPluginImpls map[string]TaskPluginOverride
-}
-
-type TaskPluginOverride struct {
-	PluginIDs             []string
-	MissingPluginBehavior admin.PluginOverride_MissingPluginBehavior
 }

@@ -56,7 +56,7 @@ func Test_NodeContext(t *testing.T) {
 	}
 	s, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 	p := parentInfo{}
-	execContext := executors.NewExecutionContext(w1, nil, nil, p)
+	execContext := executors.NewExecutionContext(w1, nil, nil, p, nil)
 	nCtx := newNodeExecContext(context.TODO(), s, execContext, w1, n, nil, nil, false, 0, nil, TaskReader{}, nil, nil, "s3://bucket", ioutils.NewConstantShardSelector([]string{"x"}))
 	assert.Equal(t, "id", nCtx.NodeExecutionMetadata().GetLabels()["node-id"])
 	assert.Equal(t, "false", nCtx.NodeExecutionMetadata().GetLabels()["interruptible"])
@@ -111,7 +111,7 @@ func Test_NodeContextDefault(t *testing.T) {
 		enqueueWorkflow:               func(workflowID v1alpha1.WorkflowID) {},
 	}
 	p := parentInfo{}
-	execContext := executors.NewExecutionContext(w1, w1, w1, p)
+	execContext := executors.NewExecutionContext(w1, w1, w1, p, nil)
 	nodeExecContext, err := nodeExecutor.newNodeExecContextDefault(context.Background(), "node-a", execContext, nodeLookup)
 	assert.NoError(t, err)
 	assert.Equal(t, "s3://bucket-a", nodeExecContext.rawOutputPrefix.String())
