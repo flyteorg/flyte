@@ -1,4 +1,4 @@
 -r ../../common/requirements-common.in
 pyspark
 
-flytekitplugins-spark>=0.1.1
+flytekitplugins-spark>=0.16.0

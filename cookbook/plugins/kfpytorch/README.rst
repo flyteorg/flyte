@@ -9,7 +9,7 @@ To use the flytekit distributed pytorch plugin simply run the following:
 
 .. prompt:: bash
 
-   pip install flytekitplugins-kfpytorch==0.1.0
+   pip install flytekitplugins-kfpytorch==0.16.0
 
 
 How to build your Dockerfile for Pytorch on K8s

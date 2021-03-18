@@ -11,7 +11,7 @@ To use the flytekit aws sagemaker plugin simply run the following:
 
 .. prompt:: bash
 
-   pip install flytekitplugins-awssagemaker==0.1.0
+   pip install flytekitplugins-awssagemaker==0.16.0
 
 
 Builtin Algorithms

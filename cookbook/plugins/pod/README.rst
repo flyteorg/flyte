@@ -21,4 +21,4 @@ To use the flytekit pod plugin simply run the following:
 
 .. prompt:: bash
 
-   pip install flytekitplugins-pod==0.1.0
+   pip install flytekitplugins-pod==0.16.0
