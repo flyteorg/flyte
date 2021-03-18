@@ -128,7 +128,7 @@ html_theme_options = {
         {
             "href": "https://flytecookbook.readthedocs.io",
             "internal": False,
-            "title": "Tutorials 1",
+            "title": "Tutorials",
         },
         {
             "href": "https://flytekit.readthedocs.io",
