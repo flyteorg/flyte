@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/lyft/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyteidl/clients/go/admin"
 	"github.com/spf13/cobra"
 
-	"github.com/lyft/flytectl/cmd/config"
+	"github.com/flyteorg/flytectl/cmd/config"
 )
 
 type PFlagProvider interface {

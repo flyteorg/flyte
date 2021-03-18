@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/kataras/tablewriter"
 	"github.com/landoop/tableprinter"
-	"github.com/lyft/flytestdlib/errors"
 	"github.com/yalp/jsonpath"
 )
 

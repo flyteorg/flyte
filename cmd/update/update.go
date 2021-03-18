@@ -1,7 +1,7 @@
 package update
 
 import (
-	cmdcore "github.com/lyft/flytectl/cmd/core"
+	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
 )

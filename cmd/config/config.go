@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lyft/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/config"
 
-	"github.com/lyft/flytectl/pkg/printer"
+	"github.com/flyteorg/flytectl/pkg/printer"
 )
 
 //go:generate pflags Config
