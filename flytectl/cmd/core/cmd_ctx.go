@@ -3,7 +3,7 @@ package cmdcore
 import (
 	"io"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 type CommandContext struct {

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/lyft/flytectl/cmd"
+	"github.com/flyteorg/flytectl/cmd"
 )
 
 func main() {

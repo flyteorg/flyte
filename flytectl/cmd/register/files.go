@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"os"
 
-	cmdCore "github.com/lyft/flytectl/cmd/core"
-	"github.com/lyft/flytectl/pkg/printer"
-	"github.com/lyft/flytestdlib/logger"
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 //go:generate pflags FilesConfig

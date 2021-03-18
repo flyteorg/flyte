@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"gopkg.in/yaml.v2"
 
-	cmdCore "github.com/lyft/flytectl/cmd/core"
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
 
 const (

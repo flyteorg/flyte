@@ -11,6 +11,6 @@ FLYTECTL_GRPC_PORT=`kubectl get service -n flyte flyteadmin -o json | jq '.spec.
 
 #2) Setup Port forwarding: kubectl port-forward -n flyte service/flyteadmin 8081:$FLYTECTL_GRPC_PORT
 
-#3) Update config line in https://github.com/lyft/flytectl/blob/master/config.yaml to dns:///localhost:8081
+#3) Update config line in https://github.com/flyteorg/flytectl/blob/master/config.yaml to dns:///localhost:8081
 
 #4) All new flags introduced for flytectl commands and subcommands should be camelcased. eg: bin/flytectl update project -p flytesnacks --activateProject

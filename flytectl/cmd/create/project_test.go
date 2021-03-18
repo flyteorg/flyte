@@ -8,9 +8,9 @@ import (
 	"os"
 	"testing"
 
-	cmdCore "github.com/lyft/flytectl/cmd/core"
-	"github.com/lyft/flyteidl/clients/go/admin/mocks"
-	"github.com/lyft/flyteidl/gen/pb-go/flyteidl/admin"
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -1,6 +1,6 @@
 package adminutils
 
-import "github.com/lyft/flytestdlib/config"
+import "github.com/flyteorg/flytestdlib/config"
 
 //go:generate pflags Config
 

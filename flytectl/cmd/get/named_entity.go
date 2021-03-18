@@ -1,7 +1,7 @@
 package get
 
 import (
-	"github.com/lyft/flytectl/pkg/printer"
+	"github.com/flyteorg/flytectl/pkg/printer"
 )
 
 var entityColumns = []printer.Column{

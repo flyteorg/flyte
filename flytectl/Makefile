@@ -6,7 +6,7 @@ pip-compile $(1) --upgrade --verbose
 endef
 
 generate:
-	go test github.com/lyft/flytectl/cmd --update
+	go test github.com/flyteorg/flytectl/cmd --update
 
 compile:
 	go build -o bin/flytectl main.go
