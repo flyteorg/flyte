@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
+
 	types "k8s.io/apimachinery/pkg/types"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -403,6 +405,38 @@ func (_m *MetaExtended) GetRawOutputDataConfig() v1alpha1.RawOutputDataConfig {
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1alpha1.RawOutputDataConfig)
+	}
+
+	return r0
+}
+
+type MetaExtended_GetSecurityContext struct {
+	*mock.Call
+}
+
+func (_m MetaExtended_GetSecurityContext) Return(_a0 core.SecurityContext) *MetaExtended_GetSecurityContext {
+	return &MetaExtended_GetSecurityContext{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MetaExtended) OnGetSecurityContext() *MetaExtended_GetSecurityContext {
+	c := _m.On("GetSecurityContext")
+	return &MetaExtended_GetSecurityContext{Call: c}
+}
+
+func (_m *MetaExtended) OnGetSecurityContextMatch(matchers ...interface{}) *MetaExtended_GetSecurityContext {
+	c := _m.On("GetSecurityContext", matchers...)
+	return &MetaExtended_GetSecurityContext{Call: c}
+}
+
+// GetSecurityContext provides a mock function with given fields:
+func (_m *MetaExtended) GetSecurityContext() core.SecurityContext {
+	ret := _m.Called()
+
+	var r0 core.SecurityContext
+	if rf, ok := ret.Get(0).(func() core.SecurityContext); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(core.SecurityContext)
 	}
 
 	return r0

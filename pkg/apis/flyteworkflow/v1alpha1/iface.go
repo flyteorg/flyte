@@ -434,6 +434,7 @@ type Meta interface {
 	GetLabels() map[string]string
 	GetName() string
 	GetServiceAccountName() string
+	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetEventVersion() EventVersion
 	GetRawOutputDataConfig() RawOutputDataConfig

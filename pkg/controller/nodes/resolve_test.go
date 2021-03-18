@@ -119,6 +119,10 @@ func (d *dummyBaseWorkflow) GetServiceAccountName() string {
 	return ""
 }
 
+func (d *dummyBaseWorkflow) GetSecurityContext() core.SecurityContext {
+	return core.SecurityContext{}
+}
+
 func (d *dummyBaseWorkflow) GetTask(id v1alpha1.TaskID) (v1alpha1.ExecutableTask, error) {
 	return nil, nil
 }

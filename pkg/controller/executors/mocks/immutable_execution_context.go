@@ -3,7 +3,10 @@
 package mocks
 
 import (
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	mock "github.com/stretchr/testify/mock"
+
 	types "k8s.io/apimachinery/pkg/types"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -431,6 +434,38 @@ func (_m *ImmutableExecutionContext) GetRawOutputDataConfig() v1alpha1.RawOutput
 		r0 = rf()
 	} else {
 		r0 = ret.Get(0).(v1alpha1.RawOutputDataConfig)
+	}
+
+	return r0
+}
+
+type ImmutableExecutionContext_GetSecurityContext struct {
+	*mock.Call
+}
+
+func (_m ImmutableExecutionContext_GetSecurityContext) Return(_a0 core.SecurityContext) *ImmutableExecutionContext_GetSecurityContext {
+	return &ImmutableExecutionContext_GetSecurityContext{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ImmutableExecutionContext) OnGetSecurityContext() *ImmutableExecutionContext_GetSecurityContext {
+	c := _m.On("GetSecurityContext")
+	return &ImmutableExecutionContext_GetSecurityContext{Call: c}
+}
+
+func (_m *ImmutableExecutionContext) OnGetSecurityContextMatch(matchers ...interface{}) *ImmutableExecutionContext_GetSecurityContext {
+	c := _m.On("GetSecurityContext", matchers...)
+	return &ImmutableExecutionContext_GetSecurityContext{Call: c}
+}
+
+// GetSecurityContext provides a mock function with given fields:
+func (_m *ImmutableExecutionContext) GetSecurityContext() core.SecurityContext {
+	ret := _m.Called()
+
+	var r0 core.SecurityContext
+	if rf, ok := ret.Get(0).(func() core.SecurityContext); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(core.SecurityContext)
 	}
 
 	return r0

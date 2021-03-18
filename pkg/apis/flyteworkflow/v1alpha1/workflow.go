@@ -39,10 +39,13 @@ type FlyteWorkflow struct {
 	NodeDefaults NodeDefaults `json:"node-defaults,omitempty"`
 	// Specifies the time when the workflow has been accepted into the system.
 	AcceptedAt *metav1.Time `json:"acceptedAt,omitempty"`
-	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
-	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-	// +optional
+	// [DEPRECATED] ServiceAccountName is the name of the ServiceAccount to use to run this pod.
+	// [DEPRECATED] More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+	// [DEPRECATED] +optional
 	ServiceAccountName string `json:"serviceAccountName,omitempty" protobuf:"bytes,8,opt,name=serviceAccountName"`
+	// Security context fields to define privilege and access control settings
+	// +optional
+	SecurityContext core.SecurityContext `json:"securityContext,omitempty" protobuf:"bytes,12,rep,name=securityContext"`
 	// Status is the only mutable section in the workflow. It holds all the execution information
 	Status WorkflowStatus `json:"status,omitempty"`
 	// RawOutputDataConfig defines the configurations to use for generating raw outputs (e.g. blobs, schemas).
@@ -56,6 +59,10 @@ type FlyteWorkflow struct {
 	// so that it can be used downstream without any confusion.
 	// This field is here because it's easier to put it here than pipe through a new object through all of propeller.
 	DataReferenceConstructor storage.ReferenceConstructor `json:"-"`
+}
+
+func (in *FlyteWorkflow) GetSecurityContext() core.SecurityContext {
+	return in.SecurityContext
 }
 
 func (in *FlyteWorkflow) GetEventVersion() EventVersion {
