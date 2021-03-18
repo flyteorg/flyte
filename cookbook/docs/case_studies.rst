@@ -1,7 +1,7 @@
 .. currentmodule:: case_studies
 
 ####################################################
-Case Studies: Real world examples of using flytekit
+Real world examples of using Flytekit
 ####################################################
 
 

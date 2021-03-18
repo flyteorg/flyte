@@ -2,7 +2,7 @@
 .. currentmodule:: flyte_tutorial
 
 ############################################
-Tutorial: Hello World!
+Hello World Example
 ############################################
 
 .. rubric:: Estimated time to complete: 3 minutes.

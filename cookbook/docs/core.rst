@@ -3,7 +3,7 @@
 .. currentmodule:: core
 
 ############################################
-Getting Started with Flytekit [python]
+Getting Started with Flytekit Python
 ############################################
 The first three chapters of this part of the cookbook is organized into increasing levels of complexity. The last chapter shows the reader the optimal way to use flytekit with a live Flyte deployment.
 

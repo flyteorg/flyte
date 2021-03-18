@@ -1,10 +1,10 @@
-Flyte Cookbook
+Flyte Tutorials
 ==============================================
-Flytesnacks is intended to be a ``learn by example`` style cookbook.  We cover all the various concepts in Flyte along with most of the maintained
-plugins. This cookbook is designed to get you running both locally, and on a Flyte cluster using `Flyte Python SDK (flytekit) <https://github.com/lyft/flytekit>`__
+These tutorials are intended to help the user learn by example. We start with various concepts in flyte and flytekit with examples and
+then introduce some of the core plugins. This cookbook is designed to get you running both locally, and on a Flyte cluster using
+`Flytekit Python <https://github.com/lyft/flytekit>`__
 
-All the examples in this book are executable locally and we recommend the best way to try out Flyte is to run these examples in your terminal or IDE.
-If you have access to a whole Flyte platform deployment, this cookbook can also be used as a fully functional workflow repo.
+All the examples are authored using `Flytekit Python <https://github.com/lyft/flytekit>`__ and are designed to be run-locally (this may not be possible for some plugins) or on a Flyte cluster.
 
 The tutorial is divided into 3 sections:
 
@@ -22,7 +22,7 @@ Please join our Slack channel as well through this `form <https://docs.google.co
 
 .. toctree::
    :maxdepth: 4
-   :caption: Getting Started
+   :caption: Examples
 
    tutorial
    core
@@ -49,13 +49,6 @@ Please join our Slack channel as well through this `form <https://docs.google.co
    auto_plugins_sagemaker_training/index
    auto_plugins_kfpytorch/index
    auto_plugins_sagemaker_pytorch/index
-
-.. toctree::
-   :maxdepth: 4
-   :caption: Additional Flyte Documentation
-
-   Flyte Project <https://flyte.readthedocs.io/en/latest/>
-   Flytekit Python <https://flytekit.readthedocs.io/en/latest/">
 
 
 Indices and tables
