@@ -111,8 +111,26 @@ Following dependencies need to be met
 Making changes to CRD
 =====================
 *Remember* changes to CRD should be carefully done, they should be backwards compatible or else you should use proper
-operator versioning system. Once you do the changes, remember to execute
+operator versioning system. Once you do the changes, you have to follow the
+following steps.
 
+- ensure the propeller code is checked out in $GOPATH/github.com/flyteorg/flytepropeller
+- Uncomment https://github.com/flyteorg/flytepropeller/blob/master/hack/tools.go#L5
+-
+ ```bash
+  go mod vendor
 ```
+- Now generate the code
+```bash
+make op_code_generate
     $make op_code_generate
 ```
+
+**Why do we have to do this?** 
+Flytepropeller uses old way of writing Custom controllers for K8s. The k8s.io/code-generator only works in the GOPATH relative code path (sadly). So you have checkout the code in the right place.
+Also, `go mod vendor` is needed to get code-generator in a discoverable path. 
+
+**TODO**
+1. We may be able to avoid needing the old style go-path
+2. Migrate to using controller runtime
+
