@@ -6,7 +6,7 @@
 Start a Local Flyte Backend
 ###########################
 
-.. rubric:: Estimated time to complete: 2 minutes.
+.. rubric:: Estimated time: 2 minutes
 
 Flyte enables scalable, reproducible and reliable orchestration of massively large workflows. To get a sense of the product, a minimalist version of the Flyte system is packaged into a Docker image.
 
