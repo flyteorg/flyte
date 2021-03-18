@@ -247,6 +247,38 @@ func (_m *NodeExecutionMetadata) GetOwnerReference() v1.OwnerReference {
 	return r0
 }
 
+type NodeExecutionMetadata_GetSecurityContext struct {
+	*mock.Call
+}
+
+func (_m NodeExecutionMetadata_GetSecurityContext) Return(_a0 core.SecurityContext) *NodeExecutionMetadata_GetSecurityContext {
+	return &NodeExecutionMetadata_GetSecurityContext{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutionMetadata) OnGetSecurityContext() *NodeExecutionMetadata_GetSecurityContext {
+	c := _m.On("GetSecurityContext")
+	return &NodeExecutionMetadata_GetSecurityContext{Call: c}
+}
+
+func (_m *NodeExecutionMetadata) OnGetSecurityContextMatch(matchers ...interface{}) *NodeExecutionMetadata_GetSecurityContext {
+	c := _m.On("GetSecurityContext", matchers...)
+	return &NodeExecutionMetadata_GetSecurityContext{Call: c}
+}
+
+// GetSecurityContext provides a mock function with given fields:
+func (_m *NodeExecutionMetadata) GetSecurityContext() core.SecurityContext {
+	ret := _m.Called()
+
+	var r0 core.SecurityContext
+	if rf, ok := ret.Get(0).(func() core.SecurityContext); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(core.SecurityContext)
+	}
+
+	return r0
+}
+
 type NodeExecutionMetadata_IsInterruptible struct {
 	*mock.Call
 }
