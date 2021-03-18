@@ -34,12 +34,12 @@ type PluginEntry struct {
 	DefaultForTaskTypes []pluginsCore.TaskType
 	// Returns a new KubeClient to be used instead of the internal controller-runtime client.
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
-	// Boolean that indicates if kubernetes resources that this plugin is responsible for should include OwnerReferences.
-	// Ingoring is only useful if resources will be created in a remote cluster.
-	OverrideInjectOwnerReferences *bool
-	// Boolean flag that indicates if a finalizer should be injected.
-	// This will override the `inject-finalizer` set under k8s config.
-	OverrideInjectFinalizer *bool
+	// Disables the inclusion of OwnerReferences in kubernetes resources that this plugin is responsible for.
+	// Disabling is only useful if resources will be created in a remote cluster.
+	DisableInjectOwnerReferences bool
+	// Boolean that indicates if finalizer injection should be disabled for resources that this plugin is
+	// responsible for.
+	DisableInjectFinalizer bool
 }
 
 // Special context passed in to plugins when checking task phase
