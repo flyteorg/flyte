@@ -151,13 +151,56 @@ message TaskExecutionEvent {
     // The version field should be incremented when metadata changes across the duration of an individual phase.
     uint32 phase_version                  = 12;    
 
+    // An optional explanation for the phase transition.
+    string reason                         = 13;
+
+
+    // A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin
+    // this type will be identical, but not all task executions necessarily use pre-registered definitions and this
+    // type is useful to render the task in the UI, filter task executions, etc.
+    string task_type                      = 14;
+
     // Metadata around how a task was executed.
     TaskExecutionMetadata metadata        = 16;
 }
 
+// This message contains metadata about external resources produced or used by a specific task execution.
+message ExternalResourceInfo {
+
+    // Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
+    string external_ids = 1;
+}
+
+
+// This message holds task execution metadata specific to resource allocation used to manage concurrent
+// executions for a project namespace.
+message ResourcePoolInfo {
+    // Unique resource ID used to identify this execution when allocating a token.
+    string allocation_token               = 1;
+
+    // Namespace under which this task execution requested an allocation token.
+    string namespace                      = 2;
+}
+
 // Holds metadata around how a task was executed.
-// TODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325).
+// As a task transitions across event phases during execution some attributes, such its generated name, generated external resources,
+// and more may grow in size but not change necessarily based on the phase transition that sparked the event update.
+// Metadata is a container for these attributes across the task execution lifecycle.
 message TaskExecutionMetadata {
+
+    // Unique, generated name for this task execution used by the backend.
+    string generated_name = 1;
+
+    // Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution.
+    repeated ExternalResourceInfo external_resources = 2;
+
+    // Includes additional data on concurrent resource management used during execution..
+    // This is a repeated field because a plugin can request multiple resource allocations during execution.
+    repeated ResourcePoolInfo resource_pool_info = 3;
+
+    // The identifier of the plugin used to execute this task.
+    string plugin_identifier = 4;
+
     // Includes the broad cateogry of machine used for this specific task execution. 
     enum InstanceClass {
         // The default instance class configured for the flyte application platform.

@@ -19,6 +19,7 @@ import six
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
+from flyteadmin.models.event_task_execution_metadata import EventTaskExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -44,7 +45,10 @@ class AdminTaskExecutionClosure(object):
         'duration': 'str',
         'created_at': 'datetime',
         'updated_at': 'datetime',
-        'custom_info': 'ProtobufStruct'
+        'custom_info': 'ProtobufStruct',
+        'reason': 'str',
+        'task_type': 'str',
+        'metadata': 'EventTaskExecutionMetadata'
     }
 
     attribute_map = {
@@ -56,10 +60,13 @@ class AdminTaskExecutionClosure(object):
         'duration': 'duration',
         'created_at': 'created_at',
         'updated_at': 'updated_at',
-        'custom_info': 'custom_info'
+        'custom_info': 'custom_info',
+        'reason': 'reason',
+        'task_type': 'task_type',
+        'metadata': 'metadata'
     }
 
-    def __init__(self, output_uri=None, error=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None):  # noqa: E501
         """AdminTaskExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
@@ -71,6 +78,9 @@ class AdminTaskExecutionClosure(object):
         self._created_at = None
         self._updated_at = None
         self._custom_info = None
+        self._reason = None
+        self._task_type = None
+        self._metadata = None
         self.discriminator = None
 
         if output_uri is not None:
@@ -91,6 +101,12 @@ class AdminTaskExecutionClosure(object):
             self.updated_at = updated_at
         if custom_info is not None:
             self.custom_info = custom_info
+        if reason is not None:
+            self.reason = reason
+        if task_type is not None:
+            self.task_type = task_type
+        if metadata is not None:
+            self.metadata = metadata
 
     @property
     def output_uri(self):
@@ -298,6 +314,75 @@ class AdminTaskExecutionClosure(object):
         """
 
         self._custom_info = custom_info
+
+    @property
+    def reason(self):
+        """Gets the reason of this AdminTaskExecutionClosure.  # noqa: E501
+
+        If there is an explanation for the most recent phase transition, the reason will capture it.  # noqa: E501
+
+        :return: The reason of this AdminTaskExecutionClosure.  # noqa: E501
+        :rtype: str
+        """
+        return self._reason
+
+    @reason.setter
+    def reason(self, reason):
+        """Sets the reason of this AdminTaskExecutionClosure.
+
+        If there is an explanation for the most recent phase transition, the reason will capture it.  # noqa: E501
+
+        :param reason: The reason of this AdminTaskExecutionClosure.  # noqa: E501
+        :type: str
+        """
+
+        self._reason = reason
+
+    @property
+    def task_type(self):
+        """Gets the task_type of this AdminTaskExecutionClosure.  # noqa: E501
+
+        A predefined yet extensible Task type identifier.  # noqa: E501
+
+        :return: The task_type of this AdminTaskExecutionClosure.  # noqa: E501
+        :rtype: str
+        """
+        return self._task_type
+
+    @task_type.setter
+    def task_type(self, task_type):
+        """Sets the task_type of this AdminTaskExecutionClosure.
+
+        A predefined yet extensible Task type identifier.  # noqa: E501
+
+        :param task_type: The task_type of this AdminTaskExecutionClosure.  # noqa: E501
+        :type: str
+        """
+
+        self._task_type = task_type
+
+    @property
+    def metadata(self):
+        """Gets the metadata of this AdminTaskExecutionClosure.  # noqa: E501
+
+        Metadata around how a task was executed.  # noqa: E501
+
+        :return: The metadata of this AdminTaskExecutionClosure.  # noqa: E501
+        :rtype: EventTaskExecutionMetadata
+        """
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, metadata):
+        """Sets the metadata of this AdminTaskExecutionClosure.
+
+        Metadata around how a task was executed.  # noqa: E501
+
+        :param metadata: The metadata of this AdminTaskExecutionClosure.  # noqa: E501
+        :type: EventTaskExecutionMetadata
+        """
+
+        self._metadata = metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""

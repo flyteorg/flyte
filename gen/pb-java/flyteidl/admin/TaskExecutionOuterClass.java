@@ -4490,6 +4490,67 @@ public final class TaskExecutionOuterClass {
      */
     com.google.protobuf.StructOrBuilder getCustomInfoOrBuilder();
 
+    /**
+     * <pre>
+     * If there is an explanation for the most recent phase transition, the reason will capture it.
+     * </pre>
+     *
+     * <code>string reason = 10;</code>
+     */
+    java.lang.String getReason();
+    /**
+     * <pre>
+     * If there is an explanation for the most recent phase transition, the reason will capture it.
+     * </pre>
+     *
+     * <code>string reason = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getReasonBytes();
+
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 11;</code>
+     */
+    java.lang.String getTaskType();
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getTaskTypeBytes();
+
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    boolean hasMetadata();
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    flyteidl.event.Event.TaskExecutionMetadata getMetadata();
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder();
+
     public flyteidl.admin.TaskExecutionOuterClass.TaskExecutionClosure.OutputResultCase getOutputResultCase();
   }
   /**
@@ -4511,6 +4572,8 @@ public final class TaskExecutionOuterClass {
     private TaskExecutionClosure() {
       phase_ = 0;
       logs_ = java.util.Collections.emptyList();
+      reason_ = "";
+      taskType_ = "";
     }
 
     @java.lang.Override
@@ -4633,6 +4696,31 @@ public final class TaskExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(customInfo_);
                 customInfo_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 82: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              reason_ = s;
+              break;
+            }
+            case 90: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              taskType_ = s;
+              break;
+            }
+            case 130: {
+              flyteidl.event.Event.TaskExecutionMetadata.Builder subBuilder = null;
+              if (metadata_ != null) {
+                subBuilder = metadata_.toBuilder();
+              }
+              metadata_ = input.readMessage(flyteidl.event.Event.TaskExecutionMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(metadata_);
+                metadata_ = subBuilder.buildPartial();
               }
 
               break;
@@ -5045,6 +5133,123 @@ public final class TaskExecutionOuterClass {
       return getCustomInfo();
     }
 
+    public static final int REASON_FIELD_NUMBER = 10;
+    private volatile java.lang.Object reason_;
+    /**
+     * <pre>
+     * If there is an explanation for the most recent phase transition, the reason will capture it.
+     * </pre>
+     *
+     * <code>string reason = 10;</code>
+     */
+    public java.lang.String getReason() {
+      java.lang.Object ref = reason_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        reason_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * If there is an explanation for the most recent phase transition, the reason will capture it.
+     * </pre>
+     *
+     * <code>string reason = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getReasonBytes() {
+      java.lang.Object ref = reason_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        reason_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TASK_TYPE_FIELD_NUMBER = 11;
+    private volatile java.lang.Object taskType_;
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 11;</code>
+     */
+    public java.lang.String getTaskType() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        taskType_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTaskTypeBytes() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        taskType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int METADATA_FIELD_NUMBER = 16;
+    private flyteidl.event.Event.TaskExecutionMetadata metadata_;
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    public boolean hasMetadata() {
+      return metadata_ != null;
+    }
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    public flyteidl.event.Event.TaskExecutionMetadata getMetadata() {
+      return metadata_ == null ? flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance() : metadata_;
+    }
+    /**
+     * <pre>
+     * Metadata around how a task was executed.
+     * </pre>
+     *
+     * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+     */
+    public flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder() {
+      return getMetadata();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5085,6 +5290,15 @@ public final class TaskExecutionOuterClass {
       }
       if (customInfo_ != null) {
         output.writeMessage(9, getCustomInfo());
+      }
+      if (!getReasonBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 10, reason_);
+      }
+      if (!getTaskTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 11, taskType_);
+      }
+      if (metadata_ != null) {
+        output.writeMessage(16, getMetadata());
       }
       unknownFields.writeTo(output);
     }
@@ -5130,6 +5344,16 @@ public final class TaskExecutionOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, getCustomInfo());
       }
+      if (!getReasonBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(10, reason_);
+      }
+      if (!getTaskTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, taskType_);
+      }
+      if (metadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, getMetadata());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5172,6 +5396,15 @@ public final class TaskExecutionOuterClass {
       if (hasCustomInfo()) {
         if (!getCustomInfo()
             .equals(other.getCustomInfo())) return false;
+      }
+      if (!getReason()
+          .equals(other.getReason())) return false;
+      if (!getTaskType()
+          .equals(other.getTaskType())) return false;
+      if (hasMetadata() != other.hasMetadata()) return false;
+      if (hasMetadata()) {
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
       }
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
@@ -5222,6 +5455,14 @@ public final class TaskExecutionOuterClass {
       if (hasCustomInfo()) {
         hash = (37 * hash) + CUSTOM_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getCustomInfo().hashCode();
+      }
+      hash = (37 * hash) + REASON_FIELD_NUMBER;
+      hash = (53 * hash) + getReason().hashCode();
+      hash = (37 * hash) + TASK_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getTaskType().hashCode();
+      if (hasMetadata()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadata().hashCode();
       }
       switch (outputResultCase_) {
         case 1:
@@ -5411,6 +5652,16 @@ public final class TaskExecutionOuterClass {
           customInfo_ = null;
           customInfoBuilder_ = null;
         }
+        reason_ = "";
+
+        taskType_ = "";
+
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
         outputResultCase_ = 0;
         outputResult_ = null;
         return this;
@@ -5485,6 +5736,13 @@ public final class TaskExecutionOuterClass {
           result.customInfo_ = customInfo_;
         } else {
           result.customInfo_ = customInfoBuilder_.build();
+        }
+        result.reason_ = reason_;
+        result.taskType_ = taskType_;
+        if (metadataBuilder_ == null) {
+          result.metadata_ = metadata_;
+        } else {
+          result.metadata_ = metadataBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         result.outputResultCase_ = outputResultCase_;
@@ -5579,6 +5837,17 @@ public final class TaskExecutionOuterClass {
         }
         if (other.hasCustomInfo()) {
           mergeCustomInfo(other.getCustomInfo());
+        }
+        if (!other.getReason().isEmpty()) {
+          reason_ = other.reason_;
+          onChanged();
+        }
+        if (!other.getTaskType().isEmpty()) {
+          taskType_ = other.taskType_;
+          onChanged();
+        }
+        if (other.hasMetadata()) {
+          mergeMetadata(other.getMetadata());
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -7052,6 +7321,337 @@ public final class TaskExecutionOuterClass {
           customInfo_ = null;
         }
         return customInfoBuilder_;
+      }
+
+      private java.lang.Object reason_ = "";
+      /**
+       * <pre>
+       * If there is an explanation for the most recent phase transition, the reason will capture it.
+       * </pre>
+       *
+       * <code>string reason = 10;</code>
+       */
+      public java.lang.String getReason() {
+        java.lang.Object ref = reason_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          reason_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * If there is an explanation for the most recent phase transition, the reason will capture it.
+       * </pre>
+       *
+       * <code>string reason = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getReasonBytes() {
+        java.lang.Object ref = reason_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          reason_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * If there is an explanation for the most recent phase transition, the reason will capture it.
+       * </pre>
+       *
+       * <code>string reason = 10;</code>
+       */
+      public Builder setReason(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        reason_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If there is an explanation for the most recent phase transition, the reason will capture it.
+       * </pre>
+       *
+       * <code>string reason = 10;</code>
+       */
+      public Builder clearReason() {
+        
+        reason_ = getDefaultInstance().getReason();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If there is an explanation for the most recent phase transition, the reason will capture it.
+       * </pre>
+       *
+       * <code>string reason = 10;</code>
+       */
+      public Builder setReasonBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        reason_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object taskType_ = "";
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 11;</code>
+       */
+      public java.lang.String getTaskType() {
+        java.lang.Object ref = taskType_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          taskType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTaskTypeBytes() {
+        java.lang.Object ref = taskType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          taskType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 11;</code>
+       */
+      public Builder setTaskType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 11;</code>
+       */
+      public Builder clearTaskType() {
+        
+        taskType_ = getDefaultInstance().getTaskType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 11;</code>
+       */
+      public Builder setTaskTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.event.Event.TaskExecutionMetadata metadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.event.Event.TaskExecutionMetadata, flyteidl.event.Event.TaskExecutionMetadata.Builder, flyteidl.event.Event.TaskExecutionMetadataOrBuilder> metadataBuilder_;
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public boolean hasMetadata() {
+        return metadataBuilder_ != null || metadata_ != null;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadata getMetadata() {
+        if (metadataBuilder_ == null) {
+          return metadata_ == null ? flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance() : metadata_;
+        } else {
+          return metadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder setMetadata(flyteidl.event.Event.TaskExecutionMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          metadata_ = value;
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder setMetadata(
+          flyteidl.event.Event.TaskExecutionMetadata.Builder builderForValue) {
+        if (metadataBuilder_ == null) {
+          metadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder mergeMetadata(flyteidl.event.Event.TaskExecutionMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (metadata_ != null) {
+            metadata_ =
+              flyteidl.event.Event.TaskExecutionMetadata.newBuilder(metadata_).mergeFrom(value).buildPartial();
+          } else {
+            metadata_ = value;
+          }
+          onChanged();
+        } else {
+          metadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public Builder clearMetadata() {
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+          onChanged();
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadata.Builder getMetadataBuilder() {
+        
+        onChanged();
+        return getMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      public flyteidl.event.Event.TaskExecutionMetadataOrBuilder getMetadataOrBuilder() {
+        if (metadataBuilder_ != null) {
+          return metadataBuilder_.getMessageOrBuilder();
+        } else {
+          return metadata_ == null ?
+              flyteidl.event.Event.TaskExecutionMetadata.getDefaultInstance() : metadata_;
+        }
+      }
+      /**
+       * <pre>
+       * Metadata around how a task was executed.
+       * </pre>
+       *
+       * <code>.flyteidl.event.TaskExecutionMetadata metadata = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.event.Event.TaskExecutionMetadata, flyteidl.event.Event.TaskExecutionMetadata.Builder, flyteidl.event.Event.TaskExecutionMetadataOrBuilder> 
+          getMetadataFieldBuilder() {
+        if (metadataBuilder_ == null) {
+          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.event.Event.TaskExecutionMetadata, flyteidl.event.Event.TaskExecutionMetadata.Builder, flyteidl.event.Event.TaskExecutionMetadataOrBuilder>(
+                  getMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          metadata_ = null;
+        }
+        return metadataBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -9264,33 +9864,36 @@ public final class TaskExecutionOuterClass {
       "lyteidl.admin\032\033flyteidl/admin/common.pro" +
       "to\032\035flyteidl/core/execution.proto\032\036flyte" +
       "idl/core/identifier.proto\032\034flyteidl/core" +
-      "/literals.proto\032\037google/protobuf/timesta" +
-      "mp.proto\032\036google/protobuf/duration.proto" +
-      "\032\034google/protobuf/struct.proto\"M\n\027TaskEx" +
-      "ecutionGetRequest\0222\n\002id\030\001 \001(\0132&.flyteidl" +
-      ".core.TaskExecutionIdentifier\"\263\001\n\030TaskEx" +
-      "ecutionListRequest\022A\n\021node_execution_id\030" +
-      "\001 \001(\0132&.flyteidl.core.NodeExecutionIdent" +
-      "ifier\022\r\n\005limit\030\002 \001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007f" +
-      "ilters\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl" +
-      ".admin.Sort\"\240\001\n\rTaskExecution\0222\n\002id\030\001 \001(" +
-      "\0132&.flyteidl.core.TaskExecutionIdentifie" +
-      "r\022\021\n\tinput_uri\030\002 \001(\t\0225\n\007closure\030\003 \001(\0132$." +
-      "flyteidl.admin.TaskExecutionClosure\022\021\n\ti" +
-      "s_parent\030\004 \001(\010\"Z\n\021TaskExecutionList\0226\n\017t" +
-      "ask_executions\030\001 \003(\0132\035.flyteidl.admin.Ta" +
-      "skExecution\022\r\n\005token\030\002 \001(\t\"\261\003\n\024TaskExecu" +
-      "tionClosure\022\024\n\noutput_uri\030\001 \001(\tH\000\022.\n\005err" +
-      "or\030\002 \001(\0132\035.flyteidl.core.ExecutionErrorH" +
-      "\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.TaskExe" +
-      "cution.Phase\022$\n\004logs\030\004 \003(\0132\026.flyteidl.co" +
-      "re.TaskLog\022.\n\nstarted_at\030\005 \001(\0132\032.google." +
-      "protobuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.g" +
-      "oogle.protobuf.Duration\022.\n\ncreated_at\030\007 " +
-      "\001(\0132\032.google.protobuf.Timestamp\022.\n\nupdat" +
-      "ed_at\030\010 \001(\0132\032.google.protobuf.Timestamp\022" +
-      ",\n\013custom_info\030\t \001(\0132\027.google.protobuf.S" +
-      "tructB\017\n\routput_result\"Q\n\033TaskExecutionG" +
+      "/literals.proto\032\032flyteidl/event/event.pr" +
+      "oto\032\037google/protobuf/timestamp.proto\032\036go" +
+      "ogle/protobuf/duration.proto\032\034google/pro" +
+      "tobuf/struct.proto\"M\n\027TaskExecutionGetRe" +
+      "quest\0222\n\002id\030\001 \001(\0132&.flyteidl.core.TaskEx" +
+      "ecutionIdentifier\"\263\001\n\030TaskExecutionListR" +
+      "equest\022A\n\021node_execution_id\030\001 \001(\0132&.flyt" +
+      "eidl.core.NodeExecutionIdentifier\022\r\n\005lim" +
+      "it\030\002 \001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t" +
+      "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort\"" +
+      "\240\001\n\rTaskExecution\0222\n\002id\030\001 \001(\0132&.flyteidl" +
+      ".core.TaskExecutionIdentifier\022\021\n\tinput_u" +
+      "ri\030\002 \001(\t\0225\n\007closure\030\003 \001(\0132$.flyteidl.adm" +
+      "in.TaskExecutionClosure\022\021\n\tis_parent\030\004 \001" +
+      "(\010\"Z\n\021TaskExecutionList\0226\n\017task_executio" +
+      "ns\030\001 \003(\0132\035.flyteidl.admin.TaskExecution\022" +
+      "\r\n\005token\030\002 \001(\t\"\215\004\n\024TaskExecutionClosure\022" +
+      "\024\n\noutput_uri\030\001 \001(\tH\000\022.\n\005error\030\002 \001(\0132\035.f" +
+      "lyteidl.core.ExecutionErrorH\000\0221\n\005phase\030\003" +
+      " \001(\0162\".flyteidl.core.TaskExecution.Phase" +
+      "\022$\n\004logs\030\004 \003(\0132\026.flyteidl.core.TaskLog\022." +
+      "\n\nstarted_at\030\005 \001(\0132\032.google.protobuf.Tim" +
+      "estamp\022+\n\010duration\030\006 \001(\0132\031.google.protob" +
+      "uf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032.google" +
+      ".protobuf.Timestamp\022.\n\nupdated_at\030\010 \001(\0132" +
+      "\032.google.protobuf.Timestamp\022,\n\013custom_in" +
+      "fo\030\t \001(\0132\027.google.protobuf.Struct\022\016\n\006rea" +
+      "son\030\n \001(\t\022\021\n\ttask_type\030\013 \001(\t\0227\n\010metadata" +
+      "\030\020 \001(\0132%.flyteidl.event.TaskExecutionMet" +
+      "adataB\017\n\routput_result\"Q\n\033TaskExecutionG" +
       "etDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.cor" +
       "e.TaskExecutionIdentifier\"\322\001\n\034TaskExecut" +
       "ionGetDataResponse\022\'\n\006inputs\030\001 \001(\0132\027.fly" +
@@ -9316,6 +9919,7 @@ public final class TaskExecutionOuterClass {
           flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
+          flyteidl.event.Event.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
           com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.StructProto.getDescriptor(),
@@ -9349,7 +9953,7 @@ public final class TaskExecutionOuterClass {
     internal_static_flyteidl_admin_TaskExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "OutputResult", });
+        new java.lang.String[] { "OutputUri", "Error", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "OutputResult", });
     internal_static_flyteidl_admin_TaskExecutionGetDataRequest_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_TaskExecutionGetDataRequest_fieldAccessorTable = new
@@ -9366,6 +9970,7 @@ public final class TaskExecutionOuterClass {
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
+    flyteidl.event.Event.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
     com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.StructProto.getDescriptor();

@@ -6582,10 +6582,33 @@ definitions:
       custom_info:
         description: "Custom data specific to the task plugin."
         $ref: "#/definitions/protobufStruct"
+      reason:
+        type: "string"
+        description: "If there is an explanation for the most recent phase transition,\
+          \ the reason will capture it."
+      task_type:
+        type: "string"
+        description: "A predefined yet extensible Task type identifier."
+      metadata:
+        description: "Metadata around how a task was executed."
+        $ref: "#/definitions/eventTaskExecutionMetadata"
     description: "Container for task execution details and results."
     example:
       phase: {}
       duration: "duration"
+      reason: "reason"
+      metadata:
+        external_resources:
+        - external_ids: "external_ids"
+        - external_ids: "external_ids"
+        instance_class: {}
+        resource_pool_info:
+        - allocation_token: "allocation_token"
+          namespace: "namespace"
+        - allocation_token: "allocation_token"
+          namespace: "namespace"
+        generated_name: "generated_name"
+        plugin_identifier: "plugin_identifier"
       updated_at: "2000-01-23T04:56:07.000+00:00"
       custom_info:
         fields:
@@ -6606,6 +6629,7 @@ definitions:
         kind: {}
         message: "message"
         error_uri: "error_uri"
+      task_type: "task_type"
       logs:
       - message_format: {}
         name: "name"
@@ -6691,6 +6715,19 @@ definitions:
         closure:
           phase: {}
           duration: "duration"
+          reason: "reason"
+          metadata:
+            external_resources:
+            - external_ids: "external_ids"
+            - external_ids: "external_ids"
+            instance_class: {}
+            resource_pool_info:
+            - allocation_token: "allocation_token"
+              namespace: "namespace"
+            - allocation_token: "allocation_token"
+              namespace: "namespace"
+            generated_name: "generated_name"
+            plugin_identifier: "plugin_identifier"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           custom_info:
             fields:
@@ -6711,6 +6748,7 @@ definitions:
             kind: {}
             message: "message"
             error_uri: "error_uri"
+          task_type: "task_type"
           logs:
           - message_format: {}
             name: "name"
@@ -6739,6 +6777,19 @@ definitions:
         closure:
           phase: {}
           duration: "duration"
+          reason: "reason"
+          metadata:
+            external_resources:
+            - external_ids: "external_ids"
+            - external_ids: "external_ids"
+            instance_class: {}
+            resource_pool_info:
+            - allocation_token: "allocation_token"
+              namespace: "namespace"
+            - allocation_token: "allocation_token"
+              namespace: "namespace"
+            generated_name: "generated_name"
+            plugin_identifier: "plugin_identifier"
           updated_at: "2000-01-23T04:56:07.000+00:00"
           custom_info:
             fields:
@@ -6759,6 +6810,7 @@ definitions:
             kind: {}
             message: "message"
             error_uri: "error_uri"
+          task_type: "task_type"
           logs:
           - message_format: {}
             name: "name"
@@ -25885,6 +25937,17 @@ definitions:
                   dimensionality: {}
                   format: "format"
                 simple: {}
+  eventExternalResourceInfo:
+    type: "object"
+    properties:
+      external_ids:
+        type: "string"
+        description: "Identifier for an external resource created by this task execution,\
+          \ for example Qubole query ID or presto query ids."
+    description: "This message contains metadata about external resources produced\
+      \ or used by a specific task execution."
+    example:
+      external_ids: "external_ids"
   eventNodeExecutionEvent:
     type: "object"
     properties:
@@ -25944,6 +26007,22 @@ definitions:
     properties:
       id:
         $ref: "#/definitions/coreTaskExecutionIdentifier"
+  eventResourcePoolInfo:
+    type: "object"
+    properties:
+      allocation_token:
+        type: "string"
+        description: "Unique resource ID used to identify this execution when allocating\
+          \ a token."
+      namespace:
+        type: "string"
+        description: "Namespace under which this task execution requested an allocation\
+          \ token."
+    description: "This message holds task execution metadata specific to resource\
+      \ allocation used to manage concurrent\nexecutions for a project namespace."
+    example:
+      allocation_token: "allocation_token"
+      namespace: "namespace"
   eventTaskExecutionEvent:
     type: "object"
     properties:
@@ -25998,6 +26077,16 @@ definitions:
           \ metadata (new logs, additional custom_info, etc)\nthat should be recorded\
           \ regardless of the lack of phase change.\nThe version field should be incremented\
           \ when metadata changes across the duration of an individual phase."
+      reason:
+        type: "string"
+        description: "An optional explanation for the phase transition."
+      task_type:
+        type: "string"
+        description: "A predefined yet extensible Task type identifier. If the task\
+          \ definition is already registered in flyte admin\nthis type will be identical,\
+          \ but not all task executions necessarily use pre-registered definitions\
+          \ and this\ntype is useful to render the task in the UI, filter task executions,\
+          \ etc."
       metadata:
         description: "Metadata around how a task was executed."
         $ref: "#/definitions/eventTaskExecutionMetadata"
@@ -26006,10 +26095,44 @@ definitions:
   eventTaskExecutionMetadata:
     type: "object"
     properties:
+      generated_name:
+        type: "string"
+        description: "Unique, generated name for this task execution used by the backend."
+      external_resources:
+        type: "array"
+        description: "Additional data on external resources on other back-ends or\
+          \ platforms (e.g. Hive, Qubole, etc) launched by this task execution."
+        items:
+          $ref: "#/definitions/eventExternalResourceInfo"
+      resource_pool_info:
+        type: "array"
+        description: "Includes additional data on concurrent resource management used\
+          \ during execution..\nThis is a repeated field because a plugin can request\
+          \ multiple resource allocations during execution."
+        items:
+          $ref: "#/definitions/eventResourcePoolInfo"
+      plugin_identifier:
+        type: "string"
+        description: "The identifier of the plugin used to execute this task."
       instance_class:
         $ref: "#/definitions/TaskExecutionMetadataInstanceClass"
-    description: "Holds metadata around how a task was executed.\nTODO(katrogan):\
-      \ Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325)."
+    description: "Holds metadata around how a task was executed.\nAs a task transitions\
+      \ across event phases during execution some attributes, such its generated name,\
+      \ generated external resources,\nand more may grow in size but not change necessarily\
+      \ based on the phase transition that sparked the event update.\nMetadata is\
+      \ a container for these attributes across the task execution lifecycle."
+    example:
+      external_resources:
+      - external_ids: "external_ids"
+      - external_ids: "external_ids"
+      instance_class: {}
+      resource_pool_info:
+      - allocation_token: "allocation_token"
+        namespace: "namespace"
+      - allocation_token: "allocation_token"
+        namespace: "namespace"
+      generated_name: "generated_name"
+      plugin_identifier: "plugin_identifier"
   eventWorkflowExecutionEvent:
     type: "object"
     properties:
@@ -26148,6 +26271,19 @@ definitions:
       closure:
         phase: {}
         duration: "duration"
+        reason: "reason"
+        metadata:
+          external_resources:
+          - external_ids: "external_ids"
+          - external_ids: "external_ids"
+          instance_class: {}
+          resource_pool_info:
+          - allocation_token: "allocation_token"
+            namespace: "namespace"
+          - allocation_token: "allocation_token"
+            namespace: "namespace"
+          generated_name: "generated_name"
+          plugin_identifier: "plugin_identifier"
         updated_at: "2000-01-23T04:56:07.000+00:00"
         custom_info:
           fields:
@@ -26168,6 +26304,7 @@ definitions:
           kind: {}
           message: "message"
           error_uri: "error_uri"
+        task_type: "task_type"
         logs:
         - message_format: {}
           name: "name"
