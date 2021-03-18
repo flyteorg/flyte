@@ -53,6 +53,7 @@ require (
 	google.golang.org/genproto v0.0.0-20210315173758-2651cd453018
 	google.golang.org/grpc v1.36.0
 	google.golang.org/grpc/examples v0.0.0-20210315211313-1e7119b13689 // indirect
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/gormigrate.v1 v1.6.0
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	k8s.io/api v0.20.4

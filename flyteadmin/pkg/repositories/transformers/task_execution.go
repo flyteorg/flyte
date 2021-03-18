@@ -3,6 +3,9 @@ package transformers
 import (
 	"context"
 
+	"google.golang.org/protobuf/encoding/protojson"
+
+	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
@@ -11,8 +14,13 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	_struct "github.com/golang/protobuf/ptypes/struct"
+
 	"google.golang.org/grpc/codes"
 )
+
+var empty _struct.Struct
+var jsonEmpty, _ = protojson.Marshal(&empty)
 
 type CreateTaskExecutionModelInput struct {
 	Request *admin.TaskExecutionEventRequest
@@ -152,6 +160,42 @@ func mergeLogs(existing, latest []*core.TaskLog) []*core.TaskLog {
 	return logs
 }
 
+func mergeCustom(existing, latest *_struct.Struct) (*_struct.Struct, error) {
+	if existing == nil {
+		return latest, nil
+	}
+	if latest == nil {
+		return existing, nil
+	}
+
+	// To merge latest into existing we first create a patch object that consists of applying changes from latest to
+	// an empty struct. Then we apply this patch to existing so that the values changed in latest take precedence but
+	// barring conflicts/overwrites the values in existing stay the same.
+	jsonExisting, err := protojson.Marshal(existing)
+	if err != nil {
+		return nil, err
+	}
+	jsonLatest, err := protojson.Marshal(latest)
+	if err != nil {
+		return nil, err
+	}
+	patch, err := jsonpatch.CreateMergePatch(jsonEmpty, jsonLatest)
+	if err != nil {
+		return nil, err
+	}
+	custom, err := jsonpatch.MergePatch(jsonExisting, patch)
+	if err != nil {
+		return nil, err
+	}
+	var response _struct.Struct
+
+	err = protojson.Unmarshal(custom, &response)
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
 func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution) error {
 	var taskExecutionClosure admin.TaskExecutionClosure
 	err := proto.Unmarshal(taskExecutionModel.Closure, &taskExecutionClosure)
@@ -178,7 +222,10 @@ func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExec
 			return err
 		}
 	}
-	taskExecutionClosure.CustomInfo = request.Event.CustomInfo
+	taskExecutionClosure.CustomInfo, err = mergeCustom(taskExecutionClosure.CustomInfo, request.Event.CustomInfo)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task even custom_info with error: %v", err)
+	}
 	marshaledClosure, err := proto.Marshal(&taskExecutionClosure)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(
