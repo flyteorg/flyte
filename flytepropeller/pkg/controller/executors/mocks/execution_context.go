@@ -18,6 +18,38 @@ type ExecutionContext struct {
 	mock.Mock
 }
 
+type ExecutionContext_CurrentParallelism struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_CurrentParallelism) Return(_a0 uint32) *ExecutionContext_CurrentParallelism {
+	return &ExecutionContext_CurrentParallelism{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnCurrentParallelism() *ExecutionContext_CurrentParallelism {
+	c := _m.On("CurrentParallelism")
+	return &ExecutionContext_CurrentParallelism{Call: c}
+}
+
+func (_m *ExecutionContext) OnCurrentParallelismMatch(matchers ...interface{}) *ExecutionContext_CurrentParallelism {
+	c := _m.On("CurrentParallelism", matchers...)
+	return &ExecutionContext_CurrentParallelism{Call: c}
+}
+
+// CurrentParallelism provides a mock function with given fields:
+func (_m *ExecutionContext) CurrentParallelism() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
+}
+
 type ExecutionContext_FindSubWorkflow struct {
 	*mock.Call
 }
@@ -577,6 +609,38 @@ func (_m *ExecutionContext) GetTask(id string) (v1alpha1.ExecutableTask, error) 
 	}
 
 	return r0, r1
+}
+
+type ExecutionContext_IncrementParallelism struct {
+	*mock.Call
+}
+
+func (_m ExecutionContext_IncrementParallelism) Return(_a0 uint32) *ExecutionContext_IncrementParallelism {
+	return &ExecutionContext_IncrementParallelism{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutionContext) OnIncrementParallelism() *ExecutionContext_IncrementParallelism {
+	c := _m.On("IncrementParallelism")
+	return &ExecutionContext_IncrementParallelism{Call: c}
+}
+
+func (_m *ExecutionContext) OnIncrementParallelismMatch(matchers ...interface{}) *ExecutionContext_IncrementParallelism {
+	c := _m.On("IncrementParallelism", matchers...)
+	return &ExecutionContext_IncrementParallelism{Call: c}
+}
+
+// IncrementParallelism provides a mock function with given fields:
+func (_m *ExecutionContext) IncrementParallelism() uint32 {
+	ret := _m.Called()
+
+	var r0 uint32
+	if rf, ok := ret.Get(0).(func() uint32); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(uint32)
+	}
+
+	return r0
 }
 
 type ExecutionContext_IsInterruptible struct {

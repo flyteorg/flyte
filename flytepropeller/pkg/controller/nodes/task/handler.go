@@ -623,6 +623,10 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		return handler.UnknownTransition, err
 	}
 
+	if !pluginTrns.pInfo.Phase().IsTerminal() {
+		eCtx := nCtx.ExecutionContext()
+		logger.Infof(ctx, "Parallelism now set to [%d].", eCtx.IncrementParallelism())
+	}
 	return pluginTrns.FinalTransition(ctx)
 }
 

@@ -2,12 +2,12 @@ Flyte Propeller
 ===============
 [![Current Release](https://img.shields.io/github/release/flyteorg/flytepropeller.svg)](https://github.com/flyteorg/flytepropeller/releases/latest)
 ![Master](https://github.com/flyteorg/flytepropeller/workflows/Master/badge.svg)
-[![GoDoc](https://godoc.org/github.com/lyft/flytepropeller?status.svg)](https://pkg.go.dev/mod/github.com/lyft/flytepropeller)
+[![GoDoc](https://godoc.org/github.com/flyteorg/flytepropeller?status.svg)](https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller)
 [![License](https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![CodeCoverage](https://img.shields.io/codecov/c/github/flyteorg/flytepropeller.svg)](https://codecov.io/gh/flyteorg/flytepropeller)
-[![Go Report Card](https://goreportcard.com/badge/github.com/lyft/flytepropeller)](https://goreportcard.com/report/github.com/lyft/flytepropeller)
-![Commit activity](https://img.shields.io/github/commit-activity/w/lyft/flytepropeller.svg?style=plastic)
-![Commit since last release](https://img.shields.io/github/commits-since/lyft/flytepropeller/latest.svg?style=plastic)
+[![Go Report Card](https://goreportcard.com/badge/github.com/flyteorg/flytepropeller)](https://goreportcard.com/report/github.com/flyteorg/flytepropeller)
+![Commit activity](https://img.shields.io/github/commit-activity/w/flyteorg/flytepropeller.svg?style=plastic)
+![Commit since last release](https://img.shields.io/github/commits-since/flyteorg/flytepropeller/latest.svg?style=plastic)
 
 Kubernetes operator to executes Flyte graphs natively on kubernetes
 
@@ -89,7 +89,7 @@ To delete a specific workflow
    $ kubectl-flyte delete --namespace flytekit-development flytekit-development-ff806e973581f4508bf1
 ```
 
-To delete all completed workflows - they have to be either success/failed with a special isCompleted label set on them. The Label is set `here <https://github.com/lyft/flytepropeller/blob/master/pkg/controller/controller.go#L247>`
+To delete all completed workflows - they have to be either success/failed with a special isCompleted label set on them. The Label is set `here <https://github.com/flyteorg/flytepropeller/blob/master/pkg/controller/controller.go#L247>`
 
 ```
    $ kubectl-flyte delete --namespace flytekit-development --all-completed
@@ -97,7 +97,7 @@ To delete all completed workflows - they have to be either success/failed with a
 
 Running propeller locally
 -------------------------
-use the config.yaml in root found `here <https://github.com/lyft/flytepropeller/blob/master/config.yaml>`. Cd into this folder and then run
+use the config.yaml in root found `here <https://github.com/flyteorg/flytepropeller/blob/master/config.yaml>`. Cd into this folder and then run
 
 ```
    $ flytepropeller --logtostderr

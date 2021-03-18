@@ -358,7 +358,7 @@ func CreateNoopResourceManager(ctx context.Context, scope promutils.Scope) resou
 
 func Test_task_Handle_NoCatalog(t *testing.T) {
 
-	createNodeContext := func(pluginPhase pluginCore.Phase, pluginVer uint32, pluginResp fakeplugins.NextPhaseState, recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder) *nodeMocks.NodeExecutionContext {
+	createNodeContext := func(pluginPhase pluginCore.Phase, pluginVer uint32, pluginResp fakeplugins.NextPhaseState, recorder events.TaskEventRecorder, ttype string, s *taskNodeStateHolder, allowIncrementParallelism bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
 			Domain:  "domain",
@@ -448,6 +448,9 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		executionContext.OnGetParentInfo().Return(nil)
+		if allowIncrementParallelism {
+			executionContext.OnIncrementParallelism().Return(1)
+		}
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		st := bytes.NewBuffer([]byte{})
@@ -477,6 +480,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		event           bool
 		eventPhase      core.TaskExecution_Phase
 		skipStateUpdate bool
+		incrParallel    bool
 	}
 	tests := []struct {
 		name string
@@ -583,6 +587,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase: handler.EPhaseRunning,
 				event:        true,
 				eventPhase:   core.TaskExecution_RUNNING,
+				incrParallel: true,
 			},
 		},
 		{
@@ -604,6 +609,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase:    handler.EPhaseRunning,
 				event:           false,
 				skipStateUpdate: true,
+				incrParallel:    true,
 			},
 		},
 		{
@@ -619,6 +625,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				handlerPhase: handler.EPhaseUndefined,
 				event:        false,
 				wantErr:      true,
+				incrParallel: true,
 			},
 		},
 	}
@@ -626,7 +633,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			state := &taskNodeStateHolder{}
 			ev := &fakeBufferedTaskEventRecorder{}
-			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state)
+			nCtx := createNodeContext(tt.args.startingPluginPhase, uint32(tt.args.startingPluginPhaseVersion), tt.args.expectedState, ev, "test", state, tt.want.incrParallel)
 			c := &pluginCatalogMocks.Client{}
 			tk := Handler{
 				cfg: &config.Config{MaxErrorMessageLength: 100},
@@ -998,6 +1005,7 @@ func Test_task_Handle_Barrier(t *testing.T) {
 		executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
 		executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
 		executionContext.OnGetParentInfo().Return(nil)
+		executionContext.OnIncrementParallelism().Return(1)
 		nCtx.OnExecutionContext().Return(executionContext)
 
 		nCtx.OnRawOutputPrefix().Return("s3://sandbox/")

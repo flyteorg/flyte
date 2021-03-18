@@ -22,6 +22,7 @@ import (
 var testScope = promutils.NewScope("test")
 
 type dummyBaseWorkflow struct {
+	executors.ControlFlow
 	DummyStartNode v1alpha1.ExecutableNode
 	ID             v1alpha1.WorkflowID
 	ToNodeCb       func(name v1alpha1.NodeID) ([]v1alpha1.NodeID, error)
