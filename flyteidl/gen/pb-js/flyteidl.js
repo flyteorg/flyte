@@ -13480,6 +13480,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.IExecutionError|null} [error] TaskExecutionEvent error
              * @property {google.protobuf.IStruct|null} [customInfo] TaskExecutionEvent customInfo
              * @property {number|null} [phaseVersion] TaskExecutionEvent phaseVersion
+             * @property {string|null} [reason] TaskExecutionEvent reason
+             * @property {string|null} [taskType] TaskExecutionEvent taskType
              * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionEvent metadata
              */
 
@@ -13596,6 +13598,22 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskExecutionEvent.prototype.phaseVersion = 0;
 
             /**
+             * TaskExecutionEvent reason.
+             * @member {string} reason
+             * @memberof flyteidl.event.TaskExecutionEvent
+             * @instance
+             */
+            TaskExecutionEvent.prototype.reason = "";
+
+            /**
+             * TaskExecutionEvent taskType.
+             * @member {string} taskType
+             * @memberof flyteidl.event.TaskExecutionEvent
+             * @instance
+             */
+            TaskExecutionEvent.prototype.taskType = "";
+
+            /**
              * TaskExecutionEvent metadata.
              * @member {flyteidl.event.ITaskExecutionMetadata|null|undefined} metadata
              * @memberof flyteidl.event.TaskExecutionEvent
@@ -13666,6 +13684,10 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 11, wireType 2 =*/90).fork()).ldelim();
                 if (message.phaseVersion != null && message.hasOwnProperty("phaseVersion"))
                     writer.uint32(/* id 12, wireType 0 =*/96).uint32(message.phaseVersion);
+                if (message.reason != null && message.hasOwnProperty("reason"))
+                    writer.uint32(/* id 13, wireType 2 =*/106).string(message.reason);
+                if (message.taskType != null && message.hasOwnProperty("taskType"))
+                    writer.uint32(/* id 14, wireType 2 =*/114).string(message.taskType);
                 if (message.metadata != null && message.hasOwnProperty("metadata"))
                     $root.flyteidl.event.TaskExecutionMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
@@ -13726,6 +13748,12 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 12:
                         message.phaseVersion = reader.uint32();
+                        break;
+                    case 13:
+                        message.reason = reader.string();
+                        break;
+                    case 14:
+                        message.taskType = reader.string();
                         break;
                     case 16:
                         message.metadata = $root.flyteidl.event.TaskExecutionMetadata.decode(reader, reader.uint32());
@@ -13820,6 +13848,12 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.phaseVersion != null && message.hasOwnProperty("phaseVersion"))
                     if (!$util.isInteger(message.phaseVersion))
                         return "phaseVersion: integer expected";
+                if (message.reason != null && message.hasOwnProperty("reason"))
+                    if (!$util.isString(message.reason))
+                        return "reason: string expected";
+                if (message.taskType != null && message.hasOwnProperty("taskType"))
+                    if (!$util.isString(message.taskType))
+                        return "taskType: string expected";
                 if (message.metadata != null && message.hasOwnProperty("metadata")) {
                     let error = $root.flyteidl.event.TaskExecutionMetadata.verify(message.metadata);
                     if (error)
@@ -13831,12 +13865,253 @@ export const flyteidl = $root.flyteidl = (() => {
             return TaskExecutionEvent;
         })();
 
+        event.ExternalResourceInfo = (function() {
+
+            /**
+             * Properties of an ExternalResourceInfo.
+             * @memberof flyteidl.event
+             * @interface IExternalResourceInfo
+             * @property {string|null} [externalIds] ExternalResourceInfo externalIds
+             */
+
+            /**
+             * Constructs a new ExternalResourceInfo.
+             * @memberof flyteidl.event
+             * @classdesc Represents an ExternalResourceInfo.
+             * @implements IExternalResourceInfo
+             * @constructor
+             * @param {flyteidl.event.IExternalResourceInfo=} [properties] Properties to set
+             */
+            function ExternalResourceInfo(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ExternalResourceInfo externalIds.
+             * @member {string} externalIds
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @instance
+             */
+            ExternalResourceInfo.prototype.externalIds = "";
+
+            /**
+             * Creates a new ExternalResourceInfo instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @static
+             * @param {flyteidl.event.IExternalResourceInfo=} [properties] Properties to set
+             * @returns {flyteidl.event.ExternalResourceInfo} ExternalResourceInfo instance
+             */
+            ExternalResourceInfo.create = function create(properties) {
+                return new ExternalResourceInfo(properties);
+            };
+
+            /**
+             * Encodes the specified ExternalResourceInfo message. Does not implicitly {@link flyteidl.event.ExternalResourceInfo.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @static
+             * @param {flyteidl.event.IExternalResourceInfo} message ExternalResourceInfo message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ExternalResourceInfo.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.externalIds != null && message.hasOwnProperty("externalIds"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.externalIds);
+                return writer;
+            };
+
+            /**
+             * Decodes an ExternalResourceInfo message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.event.ExternalResourceInfo} ExternalResourceInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ExternalResourceInfo.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.ExternalResourceInfo();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.externalIds = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an ExternalResourceInfo message.
+             * @function verify
+             * @memberof flyteidl.event.ExternalResourceInfo
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ExternalResourceInfo.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.externalIds != null && message.hasOwnProperty("externalIds"))
+                    if (!$util.isString(message.externalIds))
+                        return "externalIds: string expected";
+                return null;
+            };
+
+            return ExternalResourceInfo;
+        })();
+
+        event.ResourcePoolInfo = (function() {
+
+            /**
+             * Properties of a ResourcePoolInfo.
+             * @memberof flyteidl.event
+             * @interface IResourcePoolInfo
+             * @property {string|null} [allocationToken] ResourcePoolInfo allocationToken
+             * @property {string|null} [namespace] ResourcePoolInfo namespace
+             */
+
+            /**
+             * Constructs a new ResourcePoolInfo.
+             * @memberof flyteidl.event
+             * @classdesc Represents a ResourcePoolInfo.
+             * @implements IResourcePoolInfo
+             * @constructor
+             * @param {flyteidl.event.IResourcePoolInfo=} [properties] Properties to set
+             */
+            function ResourcePoolInfo(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * ResourcePoolInfo allocationToken.
+             * @member {string} allocationToken
+             * @memberof flyteidl.event.ResourcePoolInfo
+             * @instance
+             */
+            ResourcePoolInfo.prototype.allocationToken = "";
+
+            /**
+             * ResourcePoolInfo namespace.
+             * @member {string} namespace
+             * @memberof flyteidl.event.ResourcePoolInfo
+             * @instance
+             */
+            ResourcePoolInfo.prototype.namespace = "";
+
+            /**
+             * Creates a new ResourcePoolInfo instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.event.ResourcePoolInfo
+             * @static
+             * @param {flyteidl.event.IResourcePoolInfo=} [properties] Properties to set
+             * @returns {flyteidl.event.ResourcePoolInfo} ResourcePoolInfo instance
+             */
+            ResourcePoolInfo.create = function create(properties) {
+                return new ResourcePoolInfo(properties);
+            };
+
+            /**
+             * Encodes the specified ResourcePoolInfo message. Does not implicitly {@link flyteidl.event.ResourcePoolInfo.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.event.ResourcePoolInfo
+             * @static
+             * @param {flyteidl.event.IResourcePoolInfo} message ResourcePoolInfo message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            ResourcePoolInfo.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.allocationToken != null && message.hasOwnProperty("allocationToken"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.allocationToken);
+                if (message.namespace != null && message.hasOwnProperty("namespace"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.namespace);
+                return writer;
+            };
+
+            /**
+             * Decodes a ResourcePoolInfo message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.event.ResourcePoolInfo
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.event.ResourcePoolInfo} ResourcePoolInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            ResourcePoolInfo.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.ResourcePoolInfo();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.allocationToken = reader.string();
+                        break;
+                    case 2:
+                        message.namespace = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a ResourcePoolInfo message.
+             * @function verify
+             * @memberof flyteidl.event.ResourcePoolInfo
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            ResourcePoolInfo.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.allocationToken != null && message.hasOwnProperty("allocationToken"))
+                    if (!$util.isString(message.allocationToken))
+                        return "allocationToken: string expected";
+                if (message.namespace != null && message.hasOwnProperty("namespace"))
+                    if (!$util.isString(message.namespace))
+                        return "namespace: string expected";
+                return null;
+            };
+
+            return ResourcePoolInfo;
+        })();
+
         event.TaskExecutionMetadata = (function() {
 
             /**
              * Properties of a TaskExecutionMetadata.
              * @memberof flyteidl.event
              * @interface ITaskExecutionMetadata
+             * @property {string|null} [generatedName] TaskExecutionMetadata generatedName
+             * @property {Array.<flyteidl.event.IExternalResourceInfo>|null} [externalResources] TaskExecutionMetadata externalResources
+             * @property {Array.<flyteidl.event.IResourcePoolInfo>|null} [resourcePoolInfo] TaskExecutionMetadata resourcePoolInfo
+             * @property {string|null} [pluginIdentifier] TaskExecutionMetadata pluginIdentifier
              * @property {flyteidl.event.TaskExecutionMetadata.InstanceClass|null} [instanceClass] TaskExecutionMetadata instanceClass
              */
 
@@ -13849,11 +14124,45 @@ export const flyteidl = $root.flyteidl = (() => {
              * @param {flyteidl.event.ITaskExecutionMetadata=} [properties] Properties to set
              */
             function TaskExecutionMetadata(properties) {
+                this.externalResources = [];
+                this.resourcePoolInfo = [];
                 if (properties)
                     for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null)
                             this[keys[i]] = properties[keys[i]];
             }
+
+            /**
+             * TaskExecutionMetadata generatedName.
+             * @member {string} generatedName
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @instance
+             */
+            TaskExecutionMetadata.prototype.generatedName = "";
+
+            /**
+             * TaskExecutionMetadata externalResources.
+             * @member {Array.<flyteidl.event.IExternalResourceInfo>} externalResources
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @instance
+             */
+            TaskExecutionMetadata.prototype.externalResources = $util.emptyArray;
+
+            /**
+             * TaskExecutionMetadata resourcePoolInfo.
+             * @member {Array.<flyteidl.event.IResourcePoolInfo>} resourcePoolInfo
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @instance
+             */
+            TaskExecutionMetadata.prototype.resourcePoolInfo = $util.emptyArray;
+
+            /**
+             * TaskExecutionMetadata pluginIdentifier.
+             * @member {string} pluginIdentifier
+             * @memberof flyteidl.event.TaskExecutionMetadata
+             * @instance
+             */
+            TaskExecutionMetadata.prototype.pluginIdentifier = "";
 
             /**
              * TaskExecutionMetadata instanceClass.
@@ -13887,6 +14196,16 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskExecutionMetadata.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
+                if (message.generatedName != null && message.hasOwnProperty("generatedName"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.generatedName);
+                if (message.externalResources != null && message.externalResources.length)
+                    for (let i = 0; i < message.externalResources.length; ++i)
+                        $root.flyteidl.event.ExternalResourceInfo.encode(message.externalResources[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.resourcePoolInfo != null && message.resourcePoolInfo.length)
+                    for (let i = 0; i < message.resourcePoolInfo.length; ++i)
+                        $root.flyteidl.event.ResourcePoolInfo.encode(message.resourcePoolInfo[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                if (message.pluginIdentifier != null && message.hasOwnProperty("pluginIdentifier"))
+                    writer.uint32(/* id 4, wireType 2 =*/34).string(message.pluginIdentifier);
                 if (message.instanceClass != null && message.hasOwnProperty("instanceClass"))
                     writer.uint32(/* id 16, wireType 0 =*/128).int32(message.instanceClass);
                 return writer;
@@ -13910,6 +14229,22 @@ export const flyteidl = $root.flyteidl = (() => {
                 while (reader.pos < end) {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
+                    case 1:
+                        message.generatedName = reader.string();
+                        break;
+                    case 2:
+                        if (!(message.externalResources && message.externalResources.length))
+                            message.externalResources = [];
+                        message.externalResources.push($root.flyteidl.event.ExternalResourceInfo.decode(reader, reader.uint32()));
+                        break;
+                    case 3:
+                        if (!(message.resourcePoolInfo && message.resourcePoolInfo.length))
+                            message.resourcePoolInfo = [];
+                        message.resourcePoolInfo.push($root.flyteidl.event.ResourcePoolInfo.decode(reader, reader.uint32()));
+                        break;
+                    case 4:
+                        message.pluginIdentifier = reader.string();
+                        break;
                     case 16:
                         message.instanceClass = reader.int32();
                         break;
@@ -13932,6 +14267,30 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskExecutionMetadata.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
+                if (message.generatedName != null && message.hasOwnProperty("generatedName"))
+                    if (!$util.isString(message.generatedName))
+                        return "generatedName: string expected";
+                if (message.externalResources != null && message.hasOwnProperty("externalResources")) {
+                    if (!Array.isArray(message.externalResources))
+                        return "externalResources: array expected";
+                    for (let i = 0; i < message.externalResources.length; ++i) {
+                        let error = $root.flyteidl.event.ExternalResourceInfo.verify(message.externalResources[i]);
+                        if (error)
+                            return "externalResources." + error;
+                    }
+                }
+                if (message.resourcePoolInfo != null && message.hasOwnProperty("resourcePoolInfo")) {
+                    if (!Array.isArray(message.resourcePoolInfo))
+                        return "resourcePoolInfo: array expected";
+                    for (let i = 0; i < message.resourcePoolInfo.length; ++i) {
+                        let error = $root.flyteidl.event.ResourcePoolInfo.verify(message.resourcePoolInfo[i]);
+                        if (error)
+                            return "resourcePoolInfo." + error;
+                    }
+                }
+                if (message.pluginIdentifier != null && message.hasOwnProperty("pluginIdentifier"))
+                    if (!$util.isString(message.pluginIdentifier))
+                        return "pluginIdentifier: string expected";
                 if (message.instanceClass != null && message.hasOwnProperty("instanceClass"))
                     switch (message.instanceClass) {
                     default:
@@ -29854,6 +30213,9 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {google.protobuf.ITimestamp|null} [createdAt] TaskExecutionClosure createdAt
              * @property {google.protobuf.ITimestamp|null} [updatedAt] TaskExecutionClosure updatedAt
              * @property {google.protobuf.IStruct|null} [customInfo] TaskExecutionClosure customInfo
+             * @property {string|null} [reason] TaskExecutionClosure reason
+             * @property {string|null} [taskType] TaskExecutionClosure taskType
+             * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionClosure metadata
              */
 
             /**
@@ -29944,6 +30306,30 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             TaskExecutionClosure.prototype.customInfo = null;
 
+            /**
+             * TaskExecutionClosure reason.
+             * @member {string} reason
+             * @memberof flyteidl.admin.TaskExecutionClosure
+             * @instance
+             */
+            TaskExecutionClosure.prototype.reason = "";
+
+            /**
+             * TaskExecutionClosure taskType.
+             * @member {string} taskType
+             * @memberof flyteidl.admin.TaskExecutionClosure
+             * @instance
+             */
+            TaskExecutionClosure.prototype.taskType = "";
+
+            /**
+             * TaskExecutionClosure metadata.
+             * @member {flyteidl.event.ITaskExecutionMetadata|null|undefined} metadata
+             * @memberof flyteidl.admin.TaskExecutionClosure
+             * @instance
+             */
+            TaskExecutionClosure.prototype.metadata = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -30001,6 +30387,12 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.google.protobuf.Timestamp.encode(message.updatedAt, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                 if (message.customInfo != null && message.hasOwnProperty("customInfo"))
                     $root.google.protobuf.Struct.encode(message.customInfo, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                if (message.reason != null && message.hasOwnProperty("reason"))
+                    writer.uint32(/* id 10, wireType 2 =*/82).string(message.reason);
+                if (message.taskType != null && message.hasOwnProperty("taskType"))
+                    writer.uint32(/* id 11, wireType 2 =*/90).string(message.taskType);
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.event.TaskExecutionMetadata.encode(message.metadata, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -30050,6 +30442,15 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 9:
                         message.customInfo = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                        break;
+                    case 10:
+                        message.reason = reader.string();
+                        break;
+                    case 11:
+                        message.taskType = reader.string();
+                        break;
+                    case 16:
+                        message.metadata = $root.flyteidl.event.TaskExecutionMetadata.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -30133,6 +30534,17 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.google.protobuf.Struct.verify(message.customInfo);
                     if (error)
                         return "customInfo." + error;
+                }
+                if (message.reason != null && message.hasOwnProperty("reason"))
+                    if (!$util.isString(message.reason))
+                        return "reason: string expected";
+                if (message.taskType != null && message.hasOwnProperty("taskType"))
+                    if (!$util.isString(message.taskType))
+                        return "taskType: string expected";
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.event.TaskExecutionMetadata.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
                 }
                 return null;
             };

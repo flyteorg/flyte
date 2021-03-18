@@ -4240,6 +4240,18 @@
         "custom_info": {
           "$ref": "#/definitions/protobufStruct",
           "description": "Custom data specific to the task plugin."
+        },
+        "reason": {
+          "type": "string",
+          "description": "If there is an explanation for the most recent phase transition, the reason will capture it."
+        },
+        "task_type": {
+          "type": "string",
+          "description": "A predefined yet extensible Task type identifier."
+        },
+        "metadata": {
+          "$ref": "#/definitions/eventTaskExecutionMetadata",
+          "description": "Metadata around how a task was executed."
         }
       },
       "description": "Container for task execution details and results."
@@ -5868,6 +5880,16 @@
       },
       "description": "Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,\ndirected acyclic graph."
     },
+    "eventExternalResourceInfo": {
+      "type": "object",
+      "properties": {
+        "external_ids": {
+          "type": "string",
+          "description": "Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids."
+        }
+      },
+      "description": "This message contains metadata about external resources produced or used by a specific task execution."
+    },
     "eventNodeExecutionEvent": {
       "type": "object",
       "properties": {
@@ -5943,6 +5965,20 @@
         }
       }
     },
+    "eventResourcePoolInfo": {
+      "type": "object",
+      "properties": {
+        "allocation_token": {
+          "type": "string",
+          "description": "Unique resource ID used to identify this execution when allocating a token."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Namespace under which this task execution requested an allocation token."
+        }
+      },
+      "description": "This message holds task execution metadata specific to resource allocation used to manage concurrent\nexecutions for a project namespace."
+    },
     "eventTaskExecutionEvent": {
       "type": "object",
       "properties": {
@@ -6000,6 +6036,14 @@
           "format": "int64",
           "description": "Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc)\nthat should be recorded regardless of the lack of phase change.\nThe version field should be incremented when metadata changes across the duration of an individual phase."
         },
+        "reason": {
+          "type": "string",
+          "description": "An optional explanation for the phase transition."
+        },
+        "task_type": {
+          "type": "string",
+          "description": "A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin\nthis type will be identical, but not all task executions necessarily use pre-registered definitions and this\ntype is useful to render the task in the UI, filter task executions, etc."
+        },
         "metadata": {
           "$ref": "#/definitions/eventTaskExecutionMetadata",
           "description": "Metadata around how a task was executed."
@@ -6010,11 +6054,33 @@
     "eventTaskExecutionMetadata": {
       "type": "object",
       "properties": {
+        "generated_name": {
+          "type": "string",
+          "description": "Unique, generated name for this task execution used by the backend."
+        },
+        "external_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventExternalResourceInfo"
+          },
+          "description": "Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution."
+        },
+        "resource_pool_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventResourcePoolInfo"
+          },
+          "description": "Includes additional data on concurrent resource management used during execution..\nThis is a repeated field because a plugin can request multiple resource allocations during execution."
+        },
+        "plugin_identifier": {
+          "type": "string",
+          "description": "The identifier of the plugin used to execute this task."
+        },
         "instance_class": {
           "$ref": "#/definitions/TaskExecutionMetadataInstanceClass"
         }
       },
-      "description": "Holds metadata around how a task was executed.\nTODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325)."
+      "description": "Holds metadata around how a task was executed.\nAs a task transitions across event phases during execution some attributes, such its generated name, generated external resources,\nand more may grow in size but not change necessarily based on the phase transition that sparked the event update.\nMetadata is a container for these attributes across the task execution lifecycle."
     },
     "eventWorkflowExecutionEvent": {
       "type": "object",

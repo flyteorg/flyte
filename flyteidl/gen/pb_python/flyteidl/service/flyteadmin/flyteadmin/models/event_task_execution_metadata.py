@@ -16,6 +16,8 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.event_external_resource_info import EventExternalResourceInfo  # noqa: F401,E501
+from flyteadmin.models.event_resource_pool_info import EventResourcePoolInfo  # noqa: F401,E501
 from flyteadmin.models.task_execution_metadata_instance_class import TaskExecutionMetadataInstanceClass  # noqa: F401,E501
 
 
@@ -33,21 +35,133 @@ class EventTaskExecutionMetadata(object):
                             and the value is json key in definition.
     """
     swagger_types = {
+        'generated_name': 'str',
+        'external_resources': 'list[EventExternalResourceInfo]',
+        'resource_pool_info': 'list[EventResourcePoolInfo]',
+        'plugin_identifier': 'str',
         'instance_class': 'TaskExecutionMetadataInstanceClass'
     }
 
     attribute_map = {
+        'generated_name': 'generated_name',
+        'external_resources': 'external_resources',
+        'resource_pool_info': 'resource_pool_info',
+        'plugin_identifier': 'plugin_identifier',
         'instance_class': 'instance_class'
     }
 
-    def __init__(self, instance_class=None):  # noqa: E501
+    def __init__(self, generated_name=None, external_resources=None, resource_pool_info=None, plugin_identifier=None, instance_class=None):  # noqa: E501
         """EventTaskExecutionMetadata - a model defined in Swagger"""  # noqa: E501
 
+        self._generated_name = None
+        self._external_resources = None
+        self._resource_pool_info = None
+        self._plugin_identifier = None
         self._instance_class = None
         self.discriminator = None
 
+        if generated_name is not None:
+            self.generated_name = generated_name
+        if external_resources is not None:
+            self.external_resources = external_resources
+        if resource_pool_info is not None:
+            self.resource_pool_info = resource_pool_info
+        if plugin_identifier is not None:
+            self.plugin_identifier = plugin_identifier
         if instance_class is not None:
             self.instance_class = instance_class
+
+    @property
+    def generated_name(self):
+        """Gets the generated_name of this EventTaskExecutionMetadata.  # noqa: E501
+
+        Unique, generated name for this task execution used by the backend.  # noqa: E501
+
+        :return: The generated_name of this EventTaskExecutionMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._generated_name
+
+    @generated_name.setter
+    def generated_name(self, generated_name):
+        """Sets the generated_name of this EventTaskExecutionMetadata.
+
+        Unique, generated name for this task execution used by the backend.  # noqa: E501
+
+        :param generated_name: The generated_name of this EventTaskExecutionMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._generated_name = generated_name
+
+    @property
+    def external_resources(self):
+        """Gets the external_resources of this EventTaskExecutionMetadata.  # noqa: E501
+
+        Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution.  # noqa: E501
+
+        :return: The external_resources of this EventTaskExecutionMetadata.  # noqa: E501
+        :rtype: list[EventExternalResourceInfo]
+        """
+        return self._external_resources
+
+    @external_resources.setter
+    def external_resources(self, external_resources):
+        """Sets the external_resources of this EventTaskExecutionMetadata.
+
+        Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution.  # noqa: E501
+
+        :param external_resources: The external_resources of this EventTaskExecutionMetadata.  # noqa: E501
+        :type: list[EventExternalResourceInfo]
+        """
+
+        self._external_resources = external_resources
+
+    @property
+    def resource_pool_info(self):
+        """Gets the resource_pool_info of this EventTaskExecutionMetadata.  # noqa: E501
+
+        Includes additional data on concurrent resource management used during execution.. This is a repeated field because a plugin can request multiple resource allocations during execution.  # noqa: E501
+
+        :return: The resource_pool_info of this EventTaskExecutionMetadata.  # noqa: E501
+        :rtype: list[EventResourcePoolInfo]
+        """
+        return self._resource_pool_info
+
+    @resource_pool_info.setter
+    def resource_pool_info(self, resource_pool_info):
+        """Sets the resource_pool_info of this EventTaskExecutionMetadata.
+
+        Includes additional data on concurrent resource management used during execution.. This is a repeated field because a plugin can request multiple resource allocations during execution.  # noqa: E501
+
+        :param resource_pool_info: The resource_pool_info of this EventTaskExecutionMetadata.  # noqa: E501
+        :type: list[EventResourcePoolInfo]
+        """
+
+        self._resource_pool_info = resource_pool_info
+
+    @property
+    def plugin_identifier(self):
+        """Gets the plugin_identifier of this EventTaskExecutionMetadata.  # noqa: E501
+
+        The identifier of the plugin used to execute this task.  # noqa: E501
+
+        :return: The plugin_identifier of this EventTaskExecutionMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._plugin_identifier
+
+    @plugin_identifier.setter
+    def plugin_identifier(self, plugin_identifier):
+        """Sets the plugin_identifier of this EventTaskExecutionMetadata.
+
+        The identifier of the plugin used to execute this task.  # noqa: E501
+
+        :param plugin_identifier: The plugin_identifier of this EventTaskExecutionMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._plugin_identifier = plugin_identifier
 
     @property
     def instance_class(self):
