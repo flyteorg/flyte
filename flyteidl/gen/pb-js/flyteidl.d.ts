@@ -5621,6 +5621,12 @@ export namespace flyteidl {
             /** TaskExecutionEvent phaseVersion */
             phaseVersion?: (number|null);
 
+            /** TaskExecutionEvent reason */
+            reason?: (string|null);
+
+            /** TaskExecutionEvent taskType */
+            taskType?: (string|null);
+
             /** TaskExecutionEvent metadata */
             metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
         }
@@ -5670,6 +5676,12 @@ export namespace flyteidl {
             /** TaskExecutionEvent phaseVersion. */
             public phaseVersion: number;
 
+            /** TaskExecutionEvent reason. */
+            public reason: string;
+
+            /** TaskExecutionEvent taskType. */
+            public taskType: string;
+
             /** TaskExecutionEvent metadata. */
             public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
 
@@ -5709,8 +5721,130 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExternalResourceInfo. */
+        interface IExternalResourceInfo {
+
+            /** ExternalResourceInfo externalIds */
+            externalIds?: (string|null);
+        }
+
+        /** Represents an ExternalResourceInfo. */
+        class ExternalResourceInfo implements IExternalResourceInfo {
+
+            /**
+             * Constructs a new ExternalResourceInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IExternalResourceInfo);
+
+            /** ExternalResourceInfo externalIds. */
+            public externalIds: string;
+
+            /**
+             * Creates a new ExternalResourceInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExternalResourceInfo instance
+             */
+            public static create(properties?: flyteidl.event.IExternalResourceInfo): flyteidl.event.ExternalResourceInfo;
+
+            /**
+             * Encodes the specified ExternalResourceInfo message. Does not implicitly {@link flyteidl.event.ExternalResourceInfo.verify|verify} messages.
+             * @param message ExternalResourceInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IExternalResourceInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExternalResourceInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExternalResourceInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ExternalResourceInfo;
+
+            /**
+             * Verifies an ExternalResourceInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ResourcePoolInfo. */
+        interface IResourcePoolInfo {
+
+            /** ResourcePoolInfo allocationToken */
+            allocationToken?: (string|null);
+
+            /** ResourcePoolInfo namespace */
+            namespace?: (string|null);
+        }
+
+        /** Represents a ResourcePoolInfo. */
+        class ResourcePoolInfo implements IResourcePoolInfo {
+
+            /**
+             * Constructs a new ResourcePoolInfo.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IResourcePoolInfo);
+
+            /** ResourcePoolInfo allocationToken. */
+            public allocationToken: string;
+
+            /** ResourcePoolInfo namespace. */
+            public namespace: string;
+
+            /**
+             * Creates a new ResourcePoolInfo instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ResourcePoolInfo instance
+             */
+            public static create(properties?: flyteidl.event.IResourcePoolInfo): flyteidl.event.ResourcePoolInfo;
+
+            /**
+             * Encodes the specified ResourcePoolInfo message. Does not implicitly {@link flyteidl.event.ResourcePoolInfo.verify|verify} messages.
+             * @param message ResourcePoolInfo message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IResourcePoolInfo, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ResourcePoolInfo message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ResourcePoolInfo
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.ResourcePoolInfo;
+
+            /**
+             * Verifies a ResourcePoolInfo message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TaskExecutionMetadata. */
         interface ITaskExecutionMetadata {
+
+            /** TaskExecutionMetadata generatedName */
+            generatedName?: (string|null);
+
+            /** TaskExecutionMetadata externalResources */
+            externalResources?: (flyteidl.event.IExternalResourceInfo[]|null);
+
+            /** TaskExecutionMetadata resourcePoolInfo */
+            resourcePoolInfo?: (flyteidl.event.IResourcePoolInfo[]|null);
+
+            /** TaskExecutionMetadata pluginIdentifier */
+            pluginIdentifier?: (string|null);
 
             /** TaskExecutionMetadata instanceClass */
             instanceClass?: (flyteidl.event.TaskExecutionMetadata.InstanceClass|null);
@@ -5724,6 +5858,18 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.event.ITaskExecutionMetadata);
+
+            /** TaskExecutionMetadata generatedName. */
+            public generatedName: string;
+
+            /** TaskExecutionMetadata externalResources. */
+            public externalResources: flyteidl.event.IExternalResourceInfo[];
+
+            /** TaskExecutionMetadata resourcePoolInfo. */
+            public resourcePoolInfo: flyteidl.event.IResourcePoolInfo[];
+
+            /** TaskExecutionMetadata pluginIdentifier. */
+            public pluginIdentifier: string;
 
             /** TaskExecutionMetadata instanceClass. */
             public instanceClass: flyteidl.event.TaskExecutionMetadata.InstanceClass;
@@ -12570,6 +12716,15 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure customInfo */
             customInfo?: (google.protobuf.IStruct|null);
+
+            /** TaskExecutionClosure reason */
+            reason?: (string|null);
+
+            /** TaskExecutionClosure taskType */
+            taskType?: (string|null);
+
+            /** TaskExecutionClosure metadata */
+            metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
         }
 
         /** Represents a TaskExecutionClosure. */
@@ -12607,6 +12762,15 @@ export namespace flyteidl {
 
             /** TaskExecutionClosure customInfo. */
             public customInfo?: (google.protobuf.IStruct|null);
+
+            /** TaskExecutionClosure reason. */
+            public reason: string;
+
+            /** TaskExecutionClosure taskType. */
+            public taskType: string;
+
+            /** TaskExecutionClosure metadata. */
+            public metadata?: (flyteidl.event.ITaskExecutionMetadata|null);
 
             /** TaskExecutionClosure outputResult. */
             public outputResult?: ("outputUri"|"error");

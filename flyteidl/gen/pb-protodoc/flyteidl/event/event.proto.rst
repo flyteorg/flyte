@@ -314,6 +314,8 @@ Plugin specific execution event information. For tasks like Python, Hive, Spark,
     "error": "{...}",
     "custom_info": "{...}",
     "phase_version": "...",
+    "reason": "...",
+    "task_type": "...",
     "metadata": "{...}"
   }
 
@@ -402,10 +404,78 @@ phase_version
   The version field should be incremented when metadata changes across the duration of an individual phase.
   
   
+.. _api_field_flyteidl.event.TaskExecutionEvent.reason:
+
+reason
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) An optional explanation for the phase transition.
+  
+  
+.. _api_field_flyteidl.event.TaskExecutionEvent.task_type:
+
+task_type
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin
+  this type will be identical, but not all task executions necessarily use pre-registered definitions and this
+  type is useful to render the task in the UI, filter task executions, etc.
+  
+  
 .. _api_field_flyteidl.event.TaskExecutionEvent.metadata:
 
 metadata
   (:ref:`flyteidl.event.TaskExecutionMetadata <api_msg_flyteidl.event.TaskExecutionMetadata>`) Metadata around how a task was executed.
+  
+  
+
+
+.. _api_msg_flyteidl.event.ExternalResourceInfo:
+
+flyteidl.event.ExternalResourceInfo
+-----------------------------------
+
+`[flyteidl.event.ExternalResourceInfo proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L167>`_
+
+This message contains metadata about external resources produced or used by a specific task execution.
+
+.. code-block:: json
+
+  {
+    "external_ids": "..."
+  }
+
+.. _api_field_flyteidl.event.ExternalResourceInfo.external_ids:
+
+external_ids
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
+  
+  
+
+
+.. _api_msg_flyteidl.event.ResourcePoolInfo:
+
+flyteidl.event.ResourcePoolInfo
+-------------------------------
+
+`[flyteidl.event.ResourcePoolInfo proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L176>`_
+
+This message holds task execution metadata specific to resource allocation used to manage concurrent
+executions for a project namespace.
+
+.. code-block:: json
+
+  {
+    "allocation_token": "...",
+    "namespace": "..."
+  }
+
+.. _api_field_flyteidl.event.ResourcePoolInfo.allocation_token:
+
+allocation_token
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Unique resource ID used to identify this execution when allocating a token.
+  
+  
+.. _api_field_flyteidl.event.ResourcePoolInfo.namespace:
+
+namespace
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Namespace under which this task execution requested an allocation token.
   
   
 
@@ -415,17 +485,48 @@ metadata
 flyteidl.event.TaskExecutionMetadata
 ------------------------------------
 
-`[flyteidl.event.TaskExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L159>`_
+`[flyteidl.event.TaskExecutionMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L188>`_
 
 Holds metadata around how a task was executed.
-TODO(katrogan): Extend to include freeform fields (https://github.com/flyteorg/flyte/issues/325).
+As a task transitions across event phases during execution some attributes, such its generated name, generated external resources,
+and more may grow in size but not change necessarily based on the phase transition that sparked the event update.
+Metadata is a container for these attributes across the task execution lifecycle.
 
 .. code-block:: json
 
   {
+    "generated_name": "...",
+    "external_resources": [],
+    "resource_pool_info": [],
+    "plugin_identifier": "...",
     "instance_class": "..."
   }
 
+.. _api_field_flyteidl.event.TaskExecutionMetadata.generated_name:
+
+generated_name
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Unique, generated name for this task execution used by the backend.
+  
+  
+.. _api_field_flyteidl.event.TaskExecutionMetadata.external_resources:
+
+external_resources
+  (:ref:`flyteidl.event.ExternalResourceInfo <api_msg_flyteidl.event.ExternalResourceInfo>`) Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution.
+  
+  
+.. _api_field_flyteidl.event.TaskExecutionMetadata.resource_pool_info:
+
+resource_pool_info
+  (:ref:`flyteidl.event.ResourcePoolInfo <api_msg_flyteidl.event.ResourcePoolInfo>`) Includes additional data on concurrent resource management used during execution..
+  This is a repeated field because a plugin can request multiple resource allocations during execution.
+  
+  
+.. _api_field_flyteidl.event.TaskExecutionMetadata.plugin_identifier:
+
+plugin_identifier
+  (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) The identifier of the plugin used to execute this task.
+  
+  
 .. _api_field_flyteidl.event.TaskExecutionMetadata.instance_class:
 
 instance_class
@@ -437,7 +538,7 @@ instance_class
 Enum flyteidl.event.TaskExecutionMetadata.InstanceClass
 -------------------------------------------------------
 
-`[flyteidl.event.TaskExecutionMetadata.InstanceClass proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L161>`_
+`[flyteidl.event.TaskExecutionMetadata.InstanceClass proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/event/event.proto#L204>`_
 
 Includes the broad cateogry of machine used for this specific task execution. 
 
