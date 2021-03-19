@@ -504,6 +504,10 @@ configmap:
     plugins:
       spark:
         spark-config-default:
+          - # We override the default credentials chain provider for Hadoop so that
+            # it can use the serviceAccount based IAM role or ec2 metadata based.
+            # This is more in line with how AWS works
+          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
           - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
           - spark.kubernetes.allocation.batch.size: "50"
           - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
