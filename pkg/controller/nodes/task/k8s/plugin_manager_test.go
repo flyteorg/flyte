@@ -160,6 +160,25 @@ func getMockTaskExecutionMetadata() pluginsCore.TaskExecutionMetadata {
 	return taskExecutionMetadata
 }
 
+func getMockTaskExecutionMetadataCustom(
+	tid string,
+	ns string,
+	annotations map[string]string,
+	labels map[string]string,
+	ownerRef v12.OwnerReference) pluginsCore.TaskExecutionMetadata {
+	taskExecutionMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
+	taskExecutionMetadata.On("GetNamespace").Return(ns)
+	taskExecutionMetadata.On("GetAnnotations").Return(annotations)
+	taskExecutionMetadata.On("GetLabels").Return(labels)
+	taskExecutionMetadata.On("GetOwnerReference").Return(ownerRef)
+
+	id := &pluginsCoreMock.TaskExecutionID{}
+	id.On("GetGeneratedName").Return(tid)
+	id.On("GetID").Return(core.TaskExecutionIdentifier{})
+	taskExecutionMetadata.On("GetTaskExecutionID").Return(id)
+	return taskExecutionMetadata
+}
+
 func dummySetupContext(fakeClient client.Client) pluginsCore.SetupContext {
 	setupContext := &pluginsCoreMock.SetupContext{}
 	var enqueueOwnerFunc = pluginsCore.EnqueueOwner(func(ownerId k8stypes.NamespacedName) error { return nil })
@@ -202,7 +221,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseQueued, transitionInfo.Phase())
 		createdPod := &v1.Pod{}
 
-		AddObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
+		pluginManager.AddObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
 		assert.NoError(t, fakeClient.Get(ctx, k8stypes.NamespacedName{Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
 			Name: tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()}, createdPod))
 		assert.Equal(t, tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), createdPod.Name)
@@ -223,7 +242,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.NoError(t, err)
 
 		createdPod := &v1.Pod{}
-		AddObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
+		pluginManager.AddObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
 		assert.NoError(t, fakeClient.Create(ctx, createdPod))
 
 		transition, err := pluginManager.Handle(ctx, tctx)
@@ -349,7 +368,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		// Build a reference resource that is supposed to be identical to the resource built by pluginManager
 		referenceResource, err := mockResourceHandler.BuildResource(ctx, tctx)
 		assert.NoError(t, err)
-		AddObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
+		pluginManager.AddObjectMetadata(tctx.TaskExecutionMetadata(), referenceResource, config.GetK8sPluginConfig())
 		refKey := backoff.ComposeResourceKey(referenceResource)
 		podBackOffHandler, found := backOffController.GetBackOffHandler(refKey)
 		assert.True(t, found)
@@ -545,34 +564,104 @@ func TestPluginManager_Handle_CheckResourceStatus(t *testing.T) {
 	}
 }
 
-func TestAddObjectMetadata(t *testing.T) {
+func TestPluginManager_CustomKubeClient(t *testing.T) {
+	ctx := context.TODO()
+	tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
+	// common setup code
+	mockResourceHandler := &pluginsk8sMock.Plugin{}
+	mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
+	fakeClient := fake.NewClientBuilder().Build()
+	newFakeClient := &pluginsCoreMock.KubeClient{}
+	pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
+		ID:              "x",
+		ResourceToWatch: &v1.Pod{},
+		Plugin:          mockResourceHandler,
+		CustomKubeClient: func(ctx context.Context) (pluginsCore.KubeClient, error) {
+			return newFakeClient, nil
+		},
+	}, NewResourceMonitorIndex())
+	assert.NoError(t, err)
+
+	assert.Equal(t, newFakeClient, pluginManager.kubeClient)
+}
+
+func TestPluginManager_AddObjectMetadata(t *testing.T) {
 	genName := "genName"
-	execID := &pluginsCoreMock.TaskExecutionID{}
-	execID.On("GetGeneratedName").Return(genName)
-	tm := &pluginsCoreMock.TaskExecutionMetadata{}
-	tm.On("GetTaskExecutionID").Return(execID)
-	or := v12.OwnerReference{}
-	tm.On("GetOwnerReference").Return(or)
 	ns := "ns"
-	tm.On("GetNamespace").Return(ns)
-	tm.On("GetAnnotations").Return(map[string]string{"aKey": "aVal"})
+	or := v12.OwnerReference{}
+	l := map[string]string{"l1": "lv1"}
+	a := map[string]string{"aKey": "aVal"}
+	tm := getMockTaskExecutionMetadataCustom(genName, ns, a, l, or)
 
-	l := map[string]string{
-		"l1": "lv1",
-	}
-	tm.On("GetLabels").Return(l)
-
-	o := &v1.Pod{}
 	cfg := config.GetK8sPluginConfig()
-	AddObjectMetadata(tm, o, cfg)
-	assert.Equal(t, genName, o.GetName())
-	assert.Equal(t, []v12.OwnerReference{or}, o.GetOwnerReferences())
-	assert.Equal(t, ns, o.GetNamespace())
-	assert.Equal(t, map[string]string{
-		"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
-		"aKey": "aVal",
-	}, o.GetAnnotations())
-	assert.Equal(t, l, o.GetLabels())
+
+	t.Run("default", func(t *testing.T) {
+		o := &v1.Pod{}
+		pluginManager := PluginManager{}
+		pluginManager.AddObjectMetadata(tm, o, cfg)
+		assert.Equal(t, genName, o.GetName())
+		assert.Equal(t, []v12.OwnerReference{or}, o.GetOwnerReferences())
+		assert.Equal(t, ns, o.GetNamespace())
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "aVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, l, o.GetLabels())
+		assert.Equal(t, 0, len(o.GetFinalizers()))
+	})
+
+	t.Run("Disable OwnerReferences injection", func(t *testing.T) {
+		pluginManager := PluginManager{disableInjectOwnerReferences: true}
+		o := &v1.Pod{}
+		pluginManager.AddObjectMetadata(tm, o, cfg)
+		assert.Equal(t, genName, o.GetName())
+		// empty OwnerReference since we are ignoring
+		assert.Equal(t, 0, len(o.GetOwnerReferences()))
+		assert.Equal(t, ns, o.GetNamespace())
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "aVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, l, o.GetLabels())
+		assert.Equal(t, 0, len(o.GetFinalizers()))
+	})
+
+	t.Run("Disable enabled InjectFinalizer", func(t *testing.T) {
+		pluginManager := PluginManager{disableInjectFinalizer: true}
+		// enable finalizer injection
+		cfg.InjectFinalizer = true
+		o := &v1.Pod{}
+		pluginManager.AddObjectMetadata(tm, o, cfg)
+		assert.Equal(t, genName, o.GetName())
+		// empty OwnerReference since we are ignoring
+		assert.Equal(t, 1, len(o.GetOwnerReferences()))
+		assert.Equal(t, ns, o.GetNamespace())
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "aVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, l, o.GetLabels())
+		assert.Equal(t, 0, len(o.GetFinalizers()))
+	})
+
+	t.Run("Disable disabled InjectFinalizer", func(t *testing.T) {
+		pluginManager := PluginManager{disableInjectFinalizer: true}
+		// disable finalizer injection
+		cfg.InjectFinalizer = false
+		o := &v1.Pod{}
+		pluginManager.AddObjectMetadata(tm, o, cfg)
+		assert.Equal(t, genName, o.GetName())
+		// empty OwnerReference since we are ignoring
+		assert.Equal(t, 1, len(o.GetOwnerReferences()))
+		assert.Equal(t, ns, o.GetNamespace())
+		assert.Equal(t, map[string]string{
+			"cluster-autoscaler.kubernetes.io/safe-to-evict": "false",
+			"aKey": "aVal",
+		}, o.GetAnnotations())
+		assert.Equal(t, l, o.GetLabels())
+		assert.Equal(t, 0, len(o.GetFinalizers()))
+	})
+
 }
 
 func TestResourceManagerConstruction(t *testing.T) {

@@ -84,18 +84,6 @@ func newPluginMetrics(s promutils.Scope) PluginMetrics {
 	}
 }
 
-func AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
-	o.SetNamespace(taskCtx.GetNamespace())
-	o.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), utils.CopyMap(taskCtx.GetAnnotations())))
-	o.SetLabels(utils.UnionMaps(o.GetLabels(), utils.CopyMap(taskCtx.GetLabels()), cfg.DefaultLabels))
-	o.SetOwnerReferences([]metav1.OwnerReference{taskCtx.GetOwnerReference()})
-	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
-	if cfg.InjectFinalizer {
-		f := append(o.GetFinalizers(), finalizer)
-		o.SetFinalizers(f)
-	}
-}
-
 func IsK8sObjectNotExists(err error) bool {
 	return k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || k8serrors.IsResourceExpired(err)
 }
@@ -109,8 +97,26 @@ type PluginManager struct {
 	kubeClient      pluginsCore.KubeClient
 	metrics         PluginMetrics
 	// Per namespace-resource
-	backOffController    *backoff.Controller
-	resourceLevelMonitor *ResourceLevelMonitor
+	backOffController            *backoff.Controller
+	resourceLevelMonitor         *ResourceLevelMonitor
+	disableInjectOwnerReferences bool
+	disableInjectFinalizer       bool
+}
+
+func (e *PluginManager) AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
+	o.SetNamespace(taskCtx.GetNamespace())
+	o.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), utils.CopyMap(taskCtx.GetAnnotations())))
+	o.SetLabels(utils.UnionMaps(o.GetLabels(), utils.CopyMap(taskCtx.GetLabels()), cfg.DefaultLabels))
+	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
+
+	if !e.disableInjectOwnerReferences {
+		o.SetOwnerReferences([]metav1.OwnerReference{taskCtx.GetOwnerReference()})
+	}
+
+	if cfg.InjectFinalizer && !e.disableInjectFinalizer {
+		f := append(o.GetFinalizers(), finalizer)
+		o.SetFinalizers(f)
+	}
 }
 
 func (e *PluginManager) GetProperties() pluginsCore.PluginProperties {
@@ -175,7 +181,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 		return pluginsCore.UnknownTransition, err
 	}
 
-	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	key := backoff.ComposeResourceKey(o)
@@ -227,7 +233,7 @@ func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore
 		return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskDefinition", fmt.Sprintf("Failed to build resource, caused by: %s", err.Error()), nil)), nil
 	}
 
-	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 	nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 	// Attempt to get resource from informer cache, if not found, retrieve it from API server.
 	if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
@@ -314,7 +320,7 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 		return nil
 	}
 
-	AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 
 	err = e.kubeClient.GetClient().Delete(ctx, o)
 	if err != nil && !IsK8sObjectNotExists(err) {
@@ -352,7 +358,7 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 			return nil
 		}
 
-		AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+		e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 		nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 		// Attempt to get resource from informer cache, if not found, retrieve it from API server.
 		if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
@@ -392,7 +398,19 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize plugin, enqueue Owner cannot be nil or empty.")
 	}
 
-	if iCtx.KubeClient() == nil {
+	kubeClient := iCtx.KubeClient()
+	if entry.CustomKubeClient != nil {
+		kc, err := entry.CustomKubeClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		if kc != nil {
+			kubeClient = kc
+		}
+	}
+
+	if kubeClient == nil {
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize K8sResource Plugin, Kubeclient cannot be nil!")
 	}
 
@@ -401,14 +419,18 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		Type: entry.ResourceToWatch,
 	}
 
-	ownerKind := iCtx.OwnerKind()
 	workflowParentPredicate := func(o metav1.Object) bool {
+		if entry.DisableInjectOwnerReferences {
+			return true
+		}
+
 		ownerReference := metav1.GetControllerOf(o)
 		if ownerReference != nil {
-			if ownerReference.Kind == ownerKind {
+			if ownerReference.Kind == iCtx.OwnerKind() {
 				return true
 			}
 		}
+
 		return false
 	}
 
@@ -492,12 +514,14 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	rm.RunCollectorOnce(ctx)
 
 	return &PluginManager{
-		id:                   entry.ID,
-		plugin:               entry.Plugin,
-		resourceToWatch:      entry.ResourceToWatch,
-		metrics:              newPluginMetrics(metricsScope),
-		kubeClient:           iCtx.KubeClient(),
-		resourceLevelMonitor: rm,
+		id:                           entry.ID,
+		plugin:                       entry.Plugin,
+		resourceToWatch:              entry.ResourceToWatch,
+		metrics:                      newPluginMetrics(metricsScope),
+		kubeClient:                   kubeClient,
+		resourceLevelMonitor:         rm,
+		disableInjectOwnerReferences: entry.DisableInjectOwnerReferences,
+		disableInjectFinalizer:       entry.DisableInjectFinalizer,
 	}, nil
 }
 
