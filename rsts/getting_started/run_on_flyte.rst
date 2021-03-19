@@ -23,9 +23,7 @@ Prerequisites
 
 1. Follow :ref:`getting-started-firstrun` 
 
-2. Prepare a running docker container
-
-3. Access FlyteConsole on http://localhost:30081/console
+2. Access FlyteConsole on http://localhost:30081/console
 
 .. tip:: To check if your flyte-sandbox container is running you can run ``docker ps`` and it should show image ``ghcr.io/flyteorg/flyte-sandbox`` running
 
@@ -48,26 +46,15 @@ feel free to make any changes and then register: ::
   FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage make fast_register
 
 
-.. tip:: Flyte sandbox uses minio as a substitue for S3/GCS etc. It is port-forwarded in the first command to 30084. If you use S3/GCS or a different port-forward you can drop or change the ``FLYTE_AWS_ENDPOINT`` accordingly.
+.. tip:: Flyte sandbox uses minio as a substitute for S3/GCS etc. It is port-forwarded in the first command to 30084. If you use S3/GCS or a different port-forward you can drop or change the ``FLYTE_AWS_ENDPOINT`` accordingly.
 
 .. rubric:: It's that simple!
 
 Run Your Workflows
 ==================
 
-K3d
----
-
 Visit the page housing workflows registered to your project at:
 `http://localhost:30081/console/projects/flyteexamples/workflows <http://localhost:30081/console/projects/flyteexamples/workflows>`__
-
-Docker-desktop or other
------------------------
-
-Copy and paste this URL into the browser and fill in the ``<host:port>``::
-
-    http://<host:port>/console/projects/flyteexamples/workflows
-
 
 Once you have accessed your workflows, 
 
