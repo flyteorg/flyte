@@ -348,7 +348,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fevent_2eproto::o
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::event::ExternalResourceInfo, external_ids_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::event::ExternalResourceInfo, external_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::ResourcePoolInfo, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -452,25 +452,25 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto[] =
   ".google.protobuf.Struct\022\025\n\rphase_version"
   "\030\014 \001(\r\022\016\n\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001("
   "\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.event.Tas"
-  "kExecutionMetadataB\017\n\routput_result\",\n\024E"
-  "xternalResourceInfo\022\024\n\014external_ids\030\001 \001("
-  "\t\"\?\n\020ResourcePoolInfo\022\030\n\020allocation_toke"
-  "n\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecu"
-  "tionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022"
-  "external_resources\030\002 \003(\0132$.flyteidl.even"
-  "t.ExternalResourceInfo\022<\n\022resource_pool_"
-  "info\030\003 \003(\0132 .flyteidl.event.ResourcePool"
-  "Info\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016insta"
-  "nce_class\030\020 \001(\01623.flyteidl.event.TaskExe"
-  "cutionMetadata.InstanceClass\"/\n\rInstance"
-  "Class\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z"
-  "5github.com/flyteorg/flyteidl/gen/pb-go/"
-  "flyteidl/eventb\006proto3"
+  "kExecutionMetadataB\017\n\routput_result\"+\n\024E"
+  "xternalResourceInfo\022\023\n\013external_id\030\001 \001(\t"
+  "\"\?\n\020ResourcePoolInfo\022\030\n\020allocation_token"
+  "\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecut"
+  "ionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022e"
+  "xternal_resources\030\002 \003(\0132$.flyteidl.event"
+  ".ExternalResourceInfo\022<\n\022resource_pool_i"
+  "nfo\030\003 \003(\0132 .flyteidl.event.ResourcePoolI"
+  "nfo\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016instan"
+  "ce_class\030\020 \001(\01623.flyteidl.event.TaskExec"
+  "utionMetadata.InstanceClass\"/\n\rInstanceC"
+  "lass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5"
+  "github.com/flyteorg/flyteidl/gen/pb-go/f"
+  "lyteidl/eventb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fevent_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fevent_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fevent_2fevent_2eproto,
-  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 2622,
+  "flyteidl/event/event.proto", &assign_descriptors_table_flyteidl_2fevent_2fevent_2eproto, 2621,
 };
 
 void AddDescriptors_flyteidl_2fevent_2fevent_2eproto() {
@@ -4987,7 +4987,7 @@ class ExternalResourceInfo::HasBitSetters {
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int ExternalResourceInfo::kExternalIdsFieldNumber;
+const int ExternalResourceInfo::kExternalIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ExternalResourceInfo::ExternalResourceInfo()
@@ -4999,9 +4999,9 @@ ExternalResourceInfo::ExternalResourceInfo(const ExternalResourceInfo& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  external_ids_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.external_ids().size() > 0) {
-    external_ids_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.external_ids_);
+  external_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.external_id().size() > 0) {
+    external_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.external_id_);
   }
   // @@protoc_insertion_point(copy_constructor:flyteidl.event.ExternalResourceInfo)
 }
@@ -5009,7 +5009,7 @@ ExternalResourceInfo::ExternalResourceInfo(const ExternalResourceInfo& from)
 void ExternalResourceInfo::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_ExternalResourceInfo_flyteidl_2fevent_2fevent_2eproto.base);
-  external_ids_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  external_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 ExternalResourceInfo::~ExternalResourceInfo() {
@@ -5018,7 +5018,7 @@ ExternalResourceInfo::~ExternalResourceInfo() {
 }
 
 void ExternalResourceInfo::SharedDtor() {
-  external_ids_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  external_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void ExternalResourceInfo::SetCachedSize(int size) const {
@@ -5036,7 +5036,7 @@ void ExternalResourceInfo::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  external_ids_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  external_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   _internal_metadata_.Clear();
 }
 
@@ -5053,13 +5053,13 @@ const char* ExternalResourceInfo::_InternalParse(const char* begin, const char* 
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // string external_ids = 1;
+      // string external_id = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("flyteidl.event.ExternalResourceInfo.external_ids");
-        object = msg->mutable_external_ids();
+        ctx->extra_parse_data().SetFieldName("flyteidl.event.ExternalResourceInfo.external_id");
+        object = msg->mutable_external_id();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -5103,15 +5103,15 @@ bool ExternalResourceInfo::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // string external_ids = 1;
+      // string external_id = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_external_ids()));
+                input, this->mutable_external_id()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->external_ids().data(), static_cast<int>(this->external_ids().length()),
+            this->external_id().data(), static_cast<int>(this->external_id().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.event.ExternalResourceInfo.external_ids"));
+            "flyteidl.event.ExternalResourceInfo.external_id"));
         } else {
           goto handle_unusual;
         }
@@ -5145,14 +5145,14 @@ void ExternalResourceInfo::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string external_ids = 1;
-  if (this->external_ids().size() > 0) {
+  // string external_id = 1;
+  if (this->external_id().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->external_ids().data(), static_cast<int>(this->external_ids().length()),
+      this->external_id().data(), static_cast<int>(this->external_id().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.event.ExternalResourceInfo.external_ids");
+      "flyteidl.event.ExternalResourceInfo.external_id");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      1, this->external_ids(), output);
+      1, this->external_id(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -5168,15 +5168,15 @@ void ExternalResourceInfo::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string external_ids = 1;
-  if (this->external_ids().size() > 0) {
+  // string external_id = 1;
+  if (this->external_id().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->external_ids().data(), static_cast<int>(this->external_ids().length()),
+      this->external_id().data(), static_cast<int>(this->external_id().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.event.ExternalResourceInfo.external_ids");
+      "flyteidl.event.ExternalResourceInfo.external_id");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        1, this->external_ids(), target);
+        1, this->external_id(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -5200,11 +5200,11 @@ size_t ExternalResourceInfo::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string external_ids = 1;
-  if (this->external_ids().size() > 0) {
+  // string external_id = 1;
+  if (this->external_id().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->external_ids());
+        this->external_id());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -5234,9 +5234,9 @@ void ExternalResourceInfo::MergeFrom(const ExternalResourceInfo& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.external_ids().size() > 0) {
+  if (from.external_id().size() > 0) {
 
-    external_ids_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.external_ids_);
+    external_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.external_id_);
   }
 }
 
@@ -5265,7 +5265,7 @@ void ExternalResourceInfo::Swap(ExternalResourceInfo* other) {
 void ExternalResourceInfo::InternalSwap(ExternalResourceInfo* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  external_ids_.Swap(&other->external_ids_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  external_id_.Swap(&other->external_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
 }
 

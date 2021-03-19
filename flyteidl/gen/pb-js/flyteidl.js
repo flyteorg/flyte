@@ -13888,7 +13888,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * Properties of an ExternalResourceInfo.
              * @memberof flyteidl.event
              * @interface IExternalResourceInfo
-             * @property {string|null} [externalIds] ExternalResourceInfo externalIds
+             * @property {string|null} [externalId] ExternalResourceInfo externalId
              */
 
             /**
@@ -13907,12 +13907,12 @@ export const flyteidl = $root.flyteidl = (() => {
             }
 
             /**
-             * ExternalResourceInfo externalIds.
-             * @member {string} externalIds
+             * ExternalResourceInfo externalId.
+             * @member {string} externalId
              * @memberof flyteidl.event.ExternalResourceInfo
              * @instance
              */
-            ExternalResourceInfo.prototype.externalIds = "";
+            ExternalResourceInfo.prototype.externalId = "";
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.
@@ -13938,8 +13938,8 @@ export const flyteidl = $root.flyteidl = (() => {
             ExternalResourceInfo.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.externalIds != null && message.hasOwnProperty("externalIds"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.externalIds);
+                if (message.externalId != null && message.hasOwnProperty("externalId"))
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.externalId);
                 return writer;
             };
 
@@ -13962,7 +13962,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.externalIds = reader.string();
+                        message.externalId = reader.string();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -13983,9 +13983,9 @@ export const flyteidl = $root.flyteidl = (() => {
             ExternalResourceInfo.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (message.externalIds != null && message.hasOwnProperty("externalIds"))
-                    if (!$util.isString(message.externalIds))
-                        return "externalIds: string expected";
+                if (message.externalId != null && message.hasOwnProperty("externalId"))
+                    if (!$util.isString(message.externalId))
+                        return "externalId: string expected";
                 return null;
             };
 

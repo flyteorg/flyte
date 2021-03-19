@@ -5730,8 +5730,8 @@ export namespace flyteidl {
         /** Properties of an ExternalResourceInfo. */
         interface IExternalResourceInfo {
 
-            /** ExternalResourceInfo externalIds */
-            externalIds?: (string|null);
+            /** ExternalResourceInfo externalId */
+            externalId?: (string|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -5743,8 +5743,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.event.IExternalResourceInfo);
 
-            /** ExternalResourceInfo externalIds. */
-            public externalIds: string;
+            /** ExternalResourceInfo externalId. */
+            public externalId: string;
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.

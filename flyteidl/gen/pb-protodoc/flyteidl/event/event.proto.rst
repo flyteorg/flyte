@@ -438,12 +438,12 @@ This message contains metadata about external resources produced or used by a sp
 .. code-block:: json
 
   {
-    "external_ids": "..."
+    "external_id": "..."
   }
 
-.. _api_field_flyteidl.event.ExternalResourceInfo.external_ids:
+.. _api_field_flyteidl.event.ExternalResourceInfo.external_id:
 
-external_ids
+external_id
   (`string <https://developers.google.com/protocol-buffers/docs/proto#scalar>`_) Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
   
   

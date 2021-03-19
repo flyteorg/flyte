@@ -5887,7 +5887,7 @@
     "eventExternalResourceInfo": {
       "type": "object",
       "properties": {
-        "external_ids": {
+        "external_id": {
           "type": "string",
           "description": "Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids."
         }
