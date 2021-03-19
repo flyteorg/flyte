@@ -11616,18 +11616,18 @@ public final class Event {
      * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
      * </pre>
      *
-     * <code>string external_ids = 1;</code>
+     * <code>string external_id = 1;</code>
      */
-    java.lang.String getExternalIds();
+    java.lang.String getExternalId();
     /**
      * <pre>
      * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
      * </pre>
      *
-     * <code>string external_ids = 1;</code>
+     * <code>string external_id = 1;</code>
      */
     com.google.protobuf.ByteString
-        getExternalIdsBytes();
+        getExternalIdBytes();
   }
   /**
    * <pre>
@@ -11646,7 +11646,7 @@ public final class Event {
       super(builder);
     }
     private ExternalResourceInfo() {
-      externalIds_ = "";
+      externalId_ = "";
     }
 
     @java.lang.Override
@@ -11676,7 +11676,7 @@ public final class Event {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              externalIds_ = s;
+              externalId_ = s;
               break;
             }
             default: {
@@ -11711,24 +11711,24 @@ public final class Event {
               flyteidl.event.Event.ExternalResourceInfo.class, flyteidl.event.Event.ExternalResourceInfo.Builder.class);
     }
 
-    public static final int EXTERNAL_IDS_FIELD_NUMBER = 1;
-    private volatile java.lang.Object externalIds_;
+    public static final int EXTERNAL_ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object externalId_;
     /**
      * <pre>
      * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
      * </pre>
      *
-     * <code>string external_ids = 1;</code>
+     * <code>string external_id = 1;</code>
      */
-    public java.lang.String getExternalIds() {
-      java.lang.Object ref = externalIds_;
+    public java.lang.String getExternalId() {
+      java.lang.Object ref = externalId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        externalIds_ = s;
+        externalId_ = s;
         return s;
       }
     }
@@ -11737,16 +11737,16 @@ public final class Event {
      * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
      * </pre>
      *
-     * <code>string external_ids = 1;</code>
+     * <code>string external_id = 1;</code>
      */
     public com.google.protobuf.ByteString
-        getExternalIdsBytes() {
-      java.lang.Object ref = externalIds_;
+        getExternalIdBytes() {
+      java.lang.Object ref = externalId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        externalIds_ = b;
+        externalId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -11767,8 +11767,8 @@ public final class Event {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getExternalIdsBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, externalIds_);
+      if (!getExternalIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, externalId_);
       }
       unknownFields.writeTo(output);
     }
@@ -11779,8 +11779,8 @@ public final class Event {
       if (size != -1) return size;
 
       size = 0;
-      if (!getExternalIdsBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, externalIds_);
+      if (!getExternalIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, externalId_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11797,8 +11797,8 @@ public final class Event {
       }
       flyteidl.event.Event.ExternalResourceInfo other = (flyteidl.event.Event.ExternalResourceInfo) obj;
 
-      if (!getExternalIds()
-          .equals(other.getExternalIds())) return false;
+      if (!getExternalId()
+          .equals(other.getExternalId())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -11810,8 +11810,8 @@ public final class Event {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + EXTERNAL_IDS_FIELD_NUMBER;
-      hash = (53 * hash) + getExternalIds().hashCode();
+      hash = (37 * hash) + EXTERNAL_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getExternalId().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11949,7 +11949,7 @@ public final class Event {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        externalIds_ = "";
+        externalId_ = "";
 
         return this;
       }
@@ -11977,7 +11977,7 @@ public final class Event {
       @java.lang.Override
       public flyteidl.event.Event.ExternalResourceInfo buildPartial() {
         flyteidl.event.Event.ExternalResourceInfo result = new flyteidl.event.Event.ExternalResourceInfo(this);
-        result.externalIds_ = externalIds_;
+        result.externalId_ = externalId_;
         onBuilt();
         return result;
       }
@@ -12026,8 +12026,8 @@ public final class Event {
 
       public Builder mergeFrom(flyteidl.event.Event.ExternalResourceInfo other) {
         if (other == flyteidl.event.Event.ExternalResourceInfo.getDefaultInstance()) return this;
-        if (!other.getExternalIds().isEmpty()) {
-          externalIds_ = other.externalIds_;
+        if (!other.getExternalId().isEmpty()) {
+          externalId_ = other.externalId_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -12059,21 +12059,21 @@ public final class Event {
         return this;
       }
 
-      private java.lang.Object externalIds_ = "";
+      private java.lang.Object externalId_ = "";
       /**
        * <pre>
        * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
        * </pre>
        *
-       * <code>string external_ids = 1;</code>
+       * <code>string external_id = 1;</code>
        */
-      public java.lang.String getExternalIds() {
-        java.lang.Object ref = externalIds_;
+      public java.lang.String getExternalId() {
+        java.lang.Object ref = externalId_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          externalIds_ = s;
+          externalId_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -12084,16 +12084,16 @@ public final class Event {
        * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
        * </pre>
        *
-       * <code>string external_ids = 1;</code>
+       * <code>string external_id = 1;</code>
        */
       public com.google.protobuf.ByteString
-          getExternalIdsBytes() {
-        java.lang.Object ref = externalIds_;
+          getExternalIdBytes() {
+        java.lang.Object ref = externalId_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          externalIds_ = b;
+          externalId_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -12104,15 +12104,15 @@ public final class Event {
        * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
        * </pre>
        *
-       * <code>string external_ids = 1;</code>
+       * <code>string external_id = 1;</code>
        */
-      public Builder setExternalIds(
+      public Builder setExternalId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        externalIds_ = value;
+        externalId_ = value;
         onChanged();
         return this;
       }
@@ -12121,11 +12121,11 @@ public final class Event {
        * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
        * </pre>
        *
-       * <code>string external_ids = 1;</code>
+       * <code>string external_id = 1;</code>
        */
-      public Builder clearExternalIds() {
+      public Builder clearExternalId() {
         
-        externalIds_ = getDefaultInstance().getExternalIds();
+        externalId_ = getDefaultInstance().getExternalId();
         onChanged();
         return this;
       }
@@ -12134,16 +12134,16 @@ public final class Event {
        * Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.
        * </pre>
        *
-       * <code>string external_ids = 1;</code>
+       * <code>string external_id = 1;</code>
        */
-      public Builder setExternalIdsBytes(
+      public Builder setExternalIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        externalIds_ = value;
+        externalId_ = value;
         onChanged();
         return this;
       }
@@ -15054,20 +15054,20 @@ public final class Event {
       ".google.protobuf.Struct\022\025\n\rphase_version" +
       "\030\014 \001(\r\022\016\n\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(" +
       "\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.event.Tas" +
-      "kExecutionMetadataB\017\n\routput_result\",\n\024E" +
-      "xternalResourceInfo\022\024\n\014external_ids\030\001 \001(" +
-      "\t\"?\n\020ResourcePoolInfo\022\030\n\020allocation_toke" +
-      "n\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecu" +
-      "tionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022" +
-      "external_resources\030\002 \003(\0132$.flyteidl.even" +
-      "t.ExternalResourceInfo\022<\n\022resource_pool_" +
-      "info\030\003 \003(\0132 .flyteidl.event.ResourcePool" +
-      "Info\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016insta" +
-      "nce_class\030\020 \001(\01623.flyteidl.event.TaskExe" +
-      "cutionMetadata.InstanceClass\"/\n\rInstance" +
-      "Class\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z" +
-      "5github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/eventb\006proto3"
+      "kExecutionMetadataB\017\n\routput_result\"+\n\024E" +
+      "xternalResourceInfo\022\023\n\013external_id\030\001 \001(\t" +
+      "\"?\n\020ResourcePoolInfo\022\030\n\020allocation_token" +
+      "\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecut" +
+      "ionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022e" +
+      "xternal_resources\030\002 \003(\0132$.flyteidl.event" +
+      ".ExternalResourceInfo\022<\n\022resource_pool_i" +
+      "nfo\030\003 \003(\0132 .flyteidl.event.ResourcePoolI" +
+      "nfo\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016instan" +
+      "ce_class\030\020 \001(\01623.flyteidl.event.TaskExec" +
+      "utionMetadata.InstanceClass\"/\n\rInstanceC" +
+      "lass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5" +
+      "github.com/flyteorg/flyteidl/gen/pb-go/f" +
+      "lyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -15133,7 +15133,7 @@ public final class Event {
     internal_static_flyteidl_event_ExternalResourceInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ExternalResourceInfo_descriptor,
-        new java.lang.String[] { "ExternalIds", });
+        new java.lang.String[] { "ExternalId", });
     internal_static_flyteidl_event_ResourcePoolInfo_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_event_ResourcePoolInfo_fieldAccessorTable = new

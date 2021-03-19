@@ -6649,8 +6649,8 @@ definitions:
       reason: "reason"
       metadata:
         external_resources:
-        - external_ids: "external_ids"
-        - external_ids: "external_ids"
+        - external_id: "external_id"
+        - external_id: "external_id"
         instance_class: {}
         resource_pool_info:
         - allocation_token: "allocation_token"
@@ -6768,8 +6768,8 @@ definitions:
           reason: "reason"
           metadata:
             external_resources:
-            - external_ids: "external_ids"
-            - external_ids: "external_ids"
+            - external_id: "external_id"
+            - external_id: "external_id"
             instance_class: {}
             resource_pool_info:
             - allocation_token: "allocation_token"
@@ -6830,8 +6830,8 @@ definitions:
           reason: "reason"
           metadata:
             external_resources:
-            - external_ids: "external_ids"
-            - external_ids: "external_ids"
+            - external_id: "external_id"
+            - external_id: "external_id"
             instance_class: {}
             resource_pool_info:
             - allocation_token: "allocation_token"
@@ -26078,14 +26078,14 @@ definitions:
   eventExternalResourceInfo:
     type: "object"
     properties:
-      external_ids:
+      external_id:
         type: "string"
         description: "Identifier for an external resource created by this task execution,\
           \ for example Qubole query ID or presto query ids."
     description: "This message contains metadata about external resources produced\
       \ or used by a specific task execution."
     example:
-      external_ids: "external_ids"
+      external_id: "external_id"
   eventNodeExecutionEvent:
     type: "object"
     properties:
@@ -26261,8 +26261,8 @@ definitions:
       \ a container for these attributes across the task execution lifecycle."
     example:
       external_resources:
-      - external_ids: "external_ids"
-      - external_ids: "external_ids"
+      - external_id: "external_id"
+      - external_id: "external_id"
       instance_class: {}
       resource_pool_info:
       - allocation_token: "allocation_token"
@@ -26412,8 +26412,8 @@ definitions:
         reason: "reason"
         metadata:
           external_resources:
-          - external_ids: "external_ids"
-          - external_ids: "external_ids"
+          - external_id: "external_id"
+          - external_id: "external_id"
           instance_class: {}
           resource_pool_info:
           - allocation_token: "allocation_token"
