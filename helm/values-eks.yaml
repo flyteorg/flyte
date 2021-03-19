@@ -468,6 +468,12 @@ configmap:
           - spark
           - k8s-array
           - pytorch
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          spark: spark
+          container_array: k8s-array
+          pytorch: pytorch
 
   k8s:
     plugins:

@@ -103,14 +103,15 @@ configmap:
 
   enabled_plugins:
     tasks:
-      max-plugin-phase-versions: 1000000
       task-plugins:
         enabled-plugins:
-        - container
-        - sidecar
-        - spark
-        - k8s-array
-        - pytorch
+          - container
+          - sidecar
+          - k8s-array
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          container_array: k8s-array
 
   k8s:
     plugins:
