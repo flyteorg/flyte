@@ -20,45 +20,73 @@ public final class Security {
 
     /**
      * <pre>
-     * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-     * of the secret management system to require case sensitivity.
+     * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+     * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+     * For AWS Secret Manager, this should be the name of the secret.
      * +required
      * </pre>
      *
-     * <code>string key = 1;</code>
+     * <code>string group = 1;</code>
+     */
+    java.lang.String getGroup();
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+     * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+     * For AWS Secret Manager, this should be the name of the secret.
+     * +required
+     * </pre>
+     *
+     * <code>string group = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getGroupBytes();
+
+    /**
+     * <pre>
+     * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+     * that do not support it.
+     * +optional
+     * </pre>
+     *
+     * <code>string group_version = 2;</code>
+     */
+    java.lang.String getGroupVersion();
+    /**
+     * <pre>
+     * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+     * that do not support it.
+     * +optional
+     * </pre>
+     *
+     * <code>string group_version = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getGroupVersionBytes();
+
+    /**
+     * <pre>
+     * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
+     * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+     * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+     * +optional
+     * </pre>
+     *
+     * <code>string key = 3;</code>
      */
     java.lang.String getKey();
     /**
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-     * of the secret management system to require case sensitivity.
-     * +required
+     * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+     * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+     * +optional
      * </pre>
      *
-     * <code>string key = 1;</code>
+     * <code>string key = 3;</code>
      */
     com.google.protobuf.ByteString
         getKeyBytes();
-
-    /**
-     * <pre>
-     * The name of the secret group where to find the key referenced above.
-     * +optional
-     * </pre>
-     *
-     * <code>string group = 2;</code>
-     */
-    java.lang.String getGroup();
-    /**
-     * <pre>
-     * The name of the secret group where to find the key referenced above.
-     * +optional
-     * </pre>
-     *
-     * <code>string group = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getGroupBytes();
 
     /**
      * <pre>
@@ -68,7 +96,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
      */
     int getMountRequirementValue();
     /**
@@ -79,7 +107,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
      */
     flyteidl.core.Security.Secret.MountType getMountRequirement();
   }
@@ -104,8 +132,9 @@ public final class Security {
       super(builder);
     }
     private Secret() {
-      key_ = "";
       group_ = "";
+      groupVersion_ = "";
+      key_ = "";
       mountRequirement_ = 0;
     }
 
@@ -136,16 +165,22 @@ public final class Security {
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              key_ = s;
+              group_ = s;
               break;
             }
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              group_ = s;
+              groupVersion_ = s;
               break;
             }
-            case 24: {
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              key_ = s;
+              break;
+            }
+            case 32: {
               int rawValue = input.readEnum();
 
               mountRequirement_ = rawValue;
@@ -314,16 +349,111 @@ public final class Security {
       // @@protoc_insertion_point(enum_scope:flyteidl.core.Secret.MountType)
     }
 
-    public static final int KEY_FIELD_NUMBER = 1;
+    public static final int GROUP_FIELD_NUMBER = 1;
+    private volatile java.lang.Object group_;
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+     * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+     * For AWS Secret Manager, this should be the name of the secret.
+     * +required
+     * </pre>
+     *
+     * <code>string group = 1;</code>
+     */
+    public java.lang.String getGroup() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        group_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+     * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+     * For AWS Secret Manager, this should be the name of the secret.
+     * +required
+     * </pre>
+     *
+     * <code>string group = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGroupBytes() {
+      java.lang.Object ref = group_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        group_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int GROUP_VERSION_FIELD_NUMBER = 2;
+    private volatile java.lang.Object groupVersion_;
+    /**
+     * <pre>
+     * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+     * that do not support it.
+     * +optional
+     * </pre>
+     *
+     * <code>string group_version = 2;</code>
+     */
+    public java.lang.String getGroupVersion() {
+      java.lang.Object ref = groupVersion_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        groupVersion_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+     * that do not support it.
+     * +optional
+     * </pre>
+     *
+     * <code>string group_version = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGroupVersionBytes() {
+      java.lang.Object ref = groupVersion_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        groupVersion_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int KEY_FIELD_NUMBER = 3;
     private volatile java.lang.Object key_;
     /**
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-     * of the secret management system to require case sensitivity.
-     * +required
+     * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+     * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+     * +optional
      * </pre>
      *
-     * <code>string key = 1;</code>
+     * <code>string key = 3;</code>
      */
     public java.lang.String getKey() {
       java.lang.Object ref = key_;
@@ -340,11 +470,12 @@ public final class Security {
     /**
      * <pre>
      * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-     * of the secret management system to require case sensitivity.
-     * +required
+     * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+     * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+     * +optional
      * </pre>
      *
-     * <code>string key = 1;</code>
+     * <code>string key = 3;</code>
      */
     public com.google.protobuf.ByteString
         getKeyBytes() {
@@ -360,51 +491,7 @@ public final class Security {
       }
     }
 
-    public static final int GROUP_FIELD_NUMBER = 2;
-    private volatile java.lang.Object group_;
-    /**
-     * <pre>
-     * The name of the secret group where to find the key referenced above.
-     * +optional
-     * </pre>
-     *
-     * <code>string group = 2;</code>
-     */
-    public java.lang.String getGroup() {
-      java.lang.Object ref = group_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        group_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     * The name of the secret group where to find the key referenced above.
-     * +optional
-     * </pre>
-     *
-     * <code>string group = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getGroupBytes() {
-      java.lang.Object ref = group_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        group_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int MOUNT_REQUIREMENT_FIELD_NUMBER = 3;
+    public static final int MOUNT_REQUIREMENT_FIELD_NUMBER = 4;
     private int mountRequirement_;
     /**
      * <pre>
@@ -414,7 +501,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
      */
     public int getMountRequirementValue() {
       return mountRequirement_;
@@ -427,7 +514,7 @@ public final class Security {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+     * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
      */
     public flyteidl.core.Security.Secret.MountType getMountRequirement() {
       @SuppressWarnings("deprecation")
@@ -449,14 +536,17 @@ public final class Security {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!getKeyBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, key_);
-      }
       if (!getGroupBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, group_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, group_);
+      }
+      if (!getGroupVersionBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, groupVersion_);
+      }
+      if (!getKeyBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, key_);
       }
       if (mountRequirement_ != flyteidl.core.Security.Secret.MountType.ANY.getNumber()) {
-        output.writeEnum(3, mountRequirement_);
+        output.writeEnum(4, mountRequirement_);
       }
       unknownFields.writeTo(output);
     }
@@ -467,15 +557,18 @@ public final class Security {
       if (size != -1) return size;
 
       size = 0;
-      if (!getKeyBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, key_);
-      }
       if (!getGroupBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, group_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, group_);
+      }
+      if (!getGroupVersionBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, groupVersion_);
+      }
+      if (!getKeyBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, key_);
       }
       if (mountRequirement_ != flyteidl.core.Security.Secret.MountType.ANY.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(3, mountRequirement_);
+          .computeEnumSize(4, mountRequirement_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -492,10 +585,12 @@ public final class Security {
       }
       flyteidl.core.Security.Secret other = (flyteidl.core.Security.Secret) obj;
 
-      if (!getKey()
-          .equals(other.getKey())) return false;
       if (!getGroup()
           .equals(other.getGroup())) return false;
+      if (!getGroupVersion()
+          .equals(other.getGroupVersion())) return false;
+      if (!getKey()
+          .equals(other.getKey())) return false;
       if (mountRequirement_ != other.mountRequirement_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -508,10 +603,12 @@ public final class Security {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + KEY_FIELD_NUMBER;
-      hash = (53 * hash) + getKey().hashCode();
       hash = (37 * hash) + GROUP_FIELD_NUMBER;
       hash = (53 * hash) + getGroup().hashCode();
+      hash = (37 * hash) + GROUP_VERSION_FIELD_NUMBER;
+      hash = (53 * hash) + getGroupVersion().hashCode();
+      hash = (37 * hash) + KEY_FIELD_NUMBER;
+      hash = (53 * hash) + getKey().hashCode();
       hash = (37 * hash) + MOUNT_REQUIREMENT_FIELD_NUMBER;
       hash = (53 * hash) + mountRequirement_;
       hash = (29 * hash) + unknownFields.hashCode();
@@ -655,9 +752,11 @@ public final class Security {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        key_ = "";
-
         group_ = "";
+
+        groupVersion_ = "";
+
+        key_ = "";
 
         mountRequirement_ = 0;
 
@@ -687,8 +786,9 @@ public final class Security {
       @java.lang.Override
       public flyteidl.core.Security.Secret buildPartial() {
         flyteidl.core.Security.Secret result = new flyteidl.core.Security.Secret(this);
-        result.key_ = key_;
         result.group_ = group_;
+        result.groupVersion_ = groupVersion_;
+        result.key_ = key_;
         result.mountRequirement_ = mountRequirement_;
         onBuilt();
         return result;
@@ -738,12 +838,16 @@ public final class Security {
 
       public Builder mergeFrom(flyteidl.core.Security.Secret other) {
         if (other == flyteidl.core.Security.Secret.getDefaultInstance()) return this;
-        if (!other.getKey().isEmpty()) {
-          key_ = other.key_;
-          onChanged();
-        }
         if (!other.getGroup().isEmpty()) {
           group_ = other.group_;
+          onChanged();
+        }
+        if (!other.getGroupVersion().isEmpty()) {
+          groupVersion_ = other.groupVersion_;
+          onChanged();
+        }
+        if (!other.getKey().isEmpty()) {
+          key_ = other.key_;
           onChanged();
         }
         if (other.mountRequirement_ != 0) {
@@ -778,15 +882,219 @@ public final class Security {
         return this;
       }
 
+      private java.lang.Object group_ = "";
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+       * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+       * For AWS Secret Manager, this should be the name of the secret.
+       * +required
+       * </pre>
+       *
+       * <code>string group = 1;</code>
+       */
+      public java.lang.String getGroup() {
+        java.lang.Object ref = group_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          group_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+       * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+       * For AWS Secret Manager, this should be the name of the secret.
+       * +required
+       * </pre>
+       *
+       * <code>string group = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGroupBytes() {
+        java.lang.Object ref = group_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          group_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+       * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+       * For AWS Secret Manager, this should be the name of the secret.
+       * +required
+       * </pre>
+       *
+       * <code>string group = 1;</code>
+       */
+      public Builder setGroup(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        group_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+       * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+       * For AWS Secret Manager, this should be the name of the secret.
+       * +required
+       * </pre>
+       *
+       * <code>string group = 1;</code>
+       */
+      public Builder clearGroup() {
+        
+        group_ = getDefaultInstance().getGroup();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+       * the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+       * For AWS Secret Manager, this should be the name of the secret.
+       * +required
+       * </pre>
+       *
+       * <code>string group = 1;</code>
+       */
+      public Builder setGroupBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        group_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object groupVersion_ = "";
+      /**
+       * <pre>
+       * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+       * that do not support it.
+       * +optional
+       * </pre>
+       *
+       * <code>string group_version = 2;</code>
+       */
+      public java.lang.String getGroupVersion() {
+        java.lang.Object ref = groupVersion_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          groupVersion_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+       * that do not support it.
+       * +optional
+       * </pre>
+       *
+       * <code>string group_version = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGroupVersionBytes() {
+        java.lang.Object ref = groupVersion_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          groupVersion_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+       * that do not support it.
+       * +optional
+       * </pre>
+       *
+       * <code>string group_version = 2;</code>
+       */
+      public Builder setGroupVersion(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        groupVersion_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+       * that do not support it.
+       * +optional
+       * </pre>
+       *
+       * <code>string group_version = 2;</code>
+       */
+      public Builder clearGroupVersion() {
+        
+        groupVersion_ = getDefaultInstance().getGroupVersion();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+       * that do not support it.
+       * +optional
+       * </pre>
+       *
+       * <code>string group_version = 2;</code>
+       */
+      public Builder setGroupVersionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        groupVersion_ = value;
+        onChanged();
+        return this;
+      }
+
       private java.lang.Object key_ = "";
       /**
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-       * of the secret management system to require case sensitivity.
-       * +required
+       * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+       * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+       * +optional
        * </pre>
        *
-       * <code>string key = 1;</code>
+       * <code>string key = 3;</code>
        */
       public java.lang.String getKey() {
         java.lang.Object ref = key_;
@@ -803,11 +1111,12 @@ public final class Security {
       /**
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-       * of the secret management system to require case sensitivity.
-       * +required
+       * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+       * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+       * +optional
        * </pre>
        *
-       * <code>string key = 1;</code>
+       * <code>string key = 3;</code>
        */
       public com.google.protobuf.ByteString
           getKeyBytes() {
@@ -825,11 +1134,12 @@ public final class Security {
       /**
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-       * of the secret management system to require case sensitivity.
-       * +required
+       * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+       * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+       * +optional
        * </pre>
        *
-       * <code>string key = 1;</code>
+       * <code>string key = 3;</code>
        */
       public Builder setKey(
           java.lang.String value) {
@@ -844,11 +1154,12 @@ public final class Security {
       /**
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-       * of the secret management system to require case sensitivity.
-       * +required
+       * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+       * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+       * +optional
        * </pre>
        *
-       * <code>string key = 1;</code>
+       * <code>string key = 3;</code>
        */
       public Builder clearKey() {
         
@@ -859,11 +1170,12 @@ public final class Security {
       /**
        * <pre>
        * The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-       * of the secret management system to require case sensitivity.
-       * +required
+       * of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+       * match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+       * +optional
        * </pre>
        *
-       * <code>string key = 1;</code>
+       * <code>string key = 3;</code>
        */
       public Builder setKeyBytes(
           com.google.protobuf.ByteString value) {
@@ -877,100 +1189,6 @@ public final class Security {
         return this;
       }
 
-      private java.lang.Object group_ = "";
-      /**
-       * <pre>
-       * The name of the secret group where to find the key referenced above.
-       * +optional
-       * </pre>
-       *
-       * <code>string group = 2;</code>
-       */
-      public java.lang.String getGroup() {
-        java.lang.Object ref = group_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          group_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * The name of the secret group where to find the key referenced above.
-       * +optional
-       * </pre>
-       *
-       * <code>string group = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getGroupBytes() {
-        java.lang.Object ref = group_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          group_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * The name of the secret group where to find the key referenced above.
-       * +optional
-       * </pre>
-       *
-       * <code>string group = 2;</code>
-       */
-      public Builder setGroup(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        group_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * The name of the secret group where to find the key referenced above.
-       * +optional
-       * </pre>
-       *
-       * <code>string group = 2;</code>
-       */
-      public Builder clearGroup() {
-        
-        group_ = getDefaultInstance().getGroup();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * The name of the secret group where to find the key referenced above.
-       * +optional
-       * </pre>
-       *
-       * <code>string group = 2;</code>
-       */
-      public Builder setGroupBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        group_ = value;
-        onChanged();
-        return this;
-      }
-
       private int mountRequirement_ = 0;
       /**
        * <pre>
@@ -980,7 +1198,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
        */
       public int getMountRequirementValue() {
         return mountRequirement_;
@@ -993,7 +1211,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
        */
       public Builder setMountRequirementValue(int value) {
         mountRequirement_ = value;
@@ -1008,7 +1226,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
        */
       public flyteidl.core.Security.Secret.MountType getMountRequirement() {
         @SuppressWarnings("deprecation")
@@ -1023,7 +1241,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
        */
       public Builder setMountRequirement(flyteidl.core.Security.Secret.MountType value) {
         if (value == null) {
@@ -1042,7 +1260,7 @@ public final class Security {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.Secret.MountType mount_requirement = 3;</code>
+       * <code>.flyteidl.core.Secret.MountType mount_requirement = 4;</code>
        */
       public Builder clearMountRequirement() {
         
@@ -6385,26 +6603,27 @@ public final class Security {
   static {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/core/security.proto\022\rflyteidl" +
-      ".core\"\215\001\n\006Secret\022\013\n\003key\030\001 \001(\t\022\r\n\005group\030\002" +
-      " \001(\t\022:\n\021mount_requirement\030\003 \001(\0162\037.flytei" +
-      "dl.core.Secret.MountType\"+\n\tMountType\022\007\n" +
-      "\003ANY\020\000\022\013\n\007ENV_VAR\020\001\022\010\n\004FILE\020\002\"O\n\014OAuth2C" +
-      "lient\022\021\n\tclient_id\030\001 \001(\t\022,\n\rclient_secre" +
-      "t\030\002 \001(\0132\025.flyteidl.core.Secret\"m\n\010Identi" +
-      "ty\022\020\n\010iam_role\030\001 \001(\t\022\033\n\023k8s_service_acco" +
-      "unt\030\002 \001(\t\0222\n\roauth2_client\030\003 \001(\0132\033.flyte" +
-      "idl.core.OAuth2Client\"\335\001\n\022OAuth2TokenReq" +
-      "uest\022\014\n\004name\030\001 \001(\t\0224\n\004type\030\002 \001(\0162&.flyte" +
-      "idl.core.OAuth2TokenRequest.Type\022+\n\006clie" +
-      "nt\030\003 \001(\0132\033.flyteidl.core.OAuth2Client\022\036\n" +
-      "\026idp_discovery_endpoint\030\004 \001(\t\022\026\n\016token_e" +
-      "ndpoint\030\005 \001(\t\"\036\n\004Type\022\026\n\022CLIENT_CREDENTI" +
-      "ALS\020\000\"\225\001\n\017SecurityContext\022\'\n\006run_as\030\001 \001(" +
-      "\0132\027.flyteidl.core.Identity\022&\n\007secrets\030\002 " +
-      "\003(\0132\025.flyteidl.core.Secret\0221\n\006tokens\030\003 \003" +
-      "(\0132!.flyteidl.core.OAuth2TokenRequestB6Z" +
-      "4github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/coreb\006proto3"
+      ".core\"\244\001\n\006Secret\022\r\n\005group\030\001 \001(\t\022\025\n\rgroup" +
+      "_version\030\002 \001(\t\022\013\n\003key\030\003 \001(\t\022:\n\021mount_req" +
+      "uirement\030\004 \001(\0162\037.flyteidl.core.Secret.Mo" +
+      "untType\"+\n\tMountType\022\007\n\003ANY\020\000\022\013\n\007ENV_VAR" +
+      "\020\001\022\010\n\004FILE\020\002\"O\n\014OAuth2Client\022\021\n\tclient_i" +
+      "d\030\001 \001(\t\022,\n\rclient_secret\030\002 \001(\0132\025.flyteid" +
+      "l.core.Secret\"m\n\010Identity\022\020\n\010iam_role\030\001 " +
+      "\001(\t\022\033\n\023k8s_service_account\030\002 \001(\t\0222\n\roaut" +
+      "h2_client\030\003 \001(\0132\033.flyteidl.core.OAuth2Cl" +
+      "ient\"\335\001\n\022OAuth2TokenRequest\022\014\n\004name\030\001 \001(" +
+      "\t\0224\n\004type\030\002 \001(\0162&.flyteidl.core.OAuth2To" +
+      "kenRequest.Type\022+\n\006client\030\003 \001(\0132\033.flytei" +
+      "dl.core.OAuth2Client\022\036\n\026idp_discovery_en" +
+      "dpoint\030\004 \001(\t\022\026\n\016token_endpoint\030\005 \001(\t\"\036\n\004" +
+      "Type\022\026\n\022CLIENT_CREDENTIALS\020\000\"\225\001\n\017Securit" +
+      "yContext\022\'\n\006run_as\030\001 \001(\0132\027.flyteidl.core" +
+      ".Identity\022&\n\007secrets\030\002 \003(\0132\025.flyteidl.co" +
+      "re.Secret\0221\n\006tokens\030\003 \003(\0132!.flyteidl.cor" +
+      "e.OAuth2TokenRequestB6Z4github.com/flyte" +
+      "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6423,7 +6642,7 @@ public final class Security {
     internal_static_flyteidl_core_Secret_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Secret_descriptor,
-        new java.lang.String[] { "Key", "Group", "MountRequirement", });
+        new java.lang.String[] { "Group", "GroupVersion", "Key", "MountRequirement", });
     internal_static_flyteidl_core_OAuth2Client_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_core_OAuth2Client_fieldAccessorTable = new
