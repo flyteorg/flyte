@@ -2917,6 +2917,7 @@ definitions:
             oauth2_client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -2927,6 +2928,7 @@ definitions:
             client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -2937,6 +2939,7 @@ definitions:
             client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -2944,9 +2947,11 @@ definitions:
             token_endpoint: "token_endpoint"
           secrets:
           - mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
           - mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
         labels:
@@ -3258,6 +3263,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -3268,6 +3274,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -3278,6 +3285,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -3285,9 +3293,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
           labels:
@@ -3430,6 +3440,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -3440,6 +3451,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -3450,6 +3462,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -3457,9 +3470,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
           labels:
@@ -3660,6 +3675,7 @@ definitions:
           oauth2_client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -3670,6 +3686,7 @@ definitions:
           client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -3680,6 +3697,7 @@ definitions:
           client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -3687,9 +3705,11 @@ definitions:
           token_endpoint: "token_endpoint"
         secrets:
         - mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
         - mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
       labels:
@@ -4032,6 +4052,7 @@ definitions:
             oauth2_client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -4042,6 +4063,7 @@ definitions:
             client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -4052,6 +4074,7 @@ definitions:
             client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -4059,9 +4082,11 @@ definitions:
             token_endpoint: "token_endpoint"
           secrets:
           - mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
           - mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
         labels:
@@ -4486,6 +4511,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -4496,6 +4522,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -4506,6 +4533,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -4513,9 +4541,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
           labels:
@@ -4779,6 +4809,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -4789,6 +4820,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -4799,6 +4831,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -4806,9 +4839,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
           labels:
@@ -5056,6 +5091,7 @@ definitions:
           oauth2_client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -5066,6 +5102,7 @@ definitions:
           client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -5076,6 +5113,7 @@ definitions:
           client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -5083,9 +5121,11 @@ definitions:
           token_endpoint: "token_endpoint"
         secrets:
         - mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
         - mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
       labels:
@@ -6319,6 +6359,7 @@ definitions:
                 oauth2_client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -6329,6 +6370,7 @@ definitions:
                 client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -6339,6 +6381,7 @@ definitions:
                 client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -6346,9 +6389,11 @@ definitions:
                 token_endpoint: "token_endpoint"
               secrets:
               - mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               - mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
   adminTaskClosure:
@@ -6500,6 +6545,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -6510,6 +6556,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -6520,6 +6567,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -6527,9 +6575,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
   adminTaskCreateRequest:
@@ -6979,6 +7029,7 @@ definitions:
                   oauth2_client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -6989,6 +7040,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -6999,6 +7051,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -7006,9 +7059,11 @@ definitions:
                   token_endpoint: "token_endpoint"
                 secrets:
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
       - id:
@@ -7153,6 +7208,7 @@ definitions:
                   oauth2_client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -7163,6 +7219,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -7173,6 +7230,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -7180,9 +7238,11 @@ definitions:
                   token_endpoint: "token_endpoint"
                 secrets:
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
       token: "token"
@@ -9070,6 +9130,7 @@ definitions:
                   oauth2_client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -9080,6 +9141,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -9090,6 +9152,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -9097,9 +9160,11 @@ definitions:
                   token_endpoint: "token_endpoint"
                 secrets:
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
           - template:
@@ -9235,6 +9300,7 @@ definitions:
                   oauth2_client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -9245,6 +9311,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -9255,6 +9322,7 @@ definitions:
                   client:
                     client_secret:
                       mount_requirement: {}
+                      group_version: "group_version"
                       key: "key"
                       group: "group"
                     client_id: "client_id"
@@ -9262,9 +9330,11 @@ definitions:
                   token_endpoint: "token_endpoint"
                 secrets:
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 - mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
           primary:
@@ -12025,6 +12095,7 @@ definitions:
                 oauth2_client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -12035,6 +12106,7 @@ definitions:
                 client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -12045,6 +12117,7 @@ definitions:
                 client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -12052,9 +12125,11 @@ definitions:
                 token_endpoint: "token_endpoint"
               secrets:
               - mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               - mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
         - template:
@@ -12190,6 +12265,7 @@ definitions:
                 oauth2_client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -12200,6 +12276,7 @@ definitions:
                 client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -12210,6 +12287,7 @@ definitions:
                 client:
                   client_secret:
                     mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   client_id: "client_id"
@@ -12217,9 +12295,11 @@ definitions:
                 token_endpoint: "token_endpoint"
               secrets:
               - mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               - mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
         primary:
@@ -14916,6 +14996,7 @@ definitions:
                     oauth2_client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -14926,6 +15007,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -14936,6 +15018,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -14943,9 +15026,11 @@ definitions:
                     token_endpoint: "token_endpoint"
                   secrets:
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
             - template:
@@ -15081,6 +15166,7 @@ definitions:
                     oauth2_client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -15091,6 +15177,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -15101,6 +15188,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -15108,9 +15196,11 @@ definitions:
                     token_endpoint: "token_endpoint"
                   secrets:
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
             primary:
@@ -17736,6 +17826,7 @@ definitions:
                     oauth2_client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -17746,6 +17837,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -17756,6 +17848,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -17763,9 +17856,11 @@ definitions:
                     token_endpoint: "token_endpoint"
                   secrets:
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
             - template:
@@ -17901,6 +17996,7 @@ definitions:
                     oauth2_client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -17911,6 +18007,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -17921,6 +18018,7 @@ definitions:
                     client:
                       client_secret:
                         mount_requirement: {}
+                        group_version: "group_version"
                         key: "key"
                         group: "group"
                       client_id: "client_id"
@@ -17928,9 +18026,11 @@ definitions:
                     token_endpoint: "token_endpoint"
                   secrets:
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
                   - mount_requirement: {}
+                    group_version: "group_version"
                     key: "key"
                     group: "group"
             primary:
@@ -19363,6 +19463,7 @@ definitions:
             oauth2_client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -19373,6 +19474,7 @@ definitions:
             client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -19383,6 +19485,7 @@ definitions:
             client:
               client_secret:
                 mount_requirement: {}
+                group_version: "group_version"
                 key: "key"
                 group: "group"
               client_id: "client_id"
@@ -19390,9 +19493,11 @@ definitions:
             token_endpoint: "token_endpoint"
           secrets:
           - mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
           - mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
   coreCompiledWorkflow:
@@ -22047,6 +22152,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -22057,6 +22163,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -22067,6 +22174,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -22074,9 +22182,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
       - template:
@@ -22212,6 +22322,7 @@ definitions:
               oauth2_client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -22222,6 +22333,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -22232,6 +22344,7 @@ definitions:
               client:
                 client_secret:
                   mount_requirement: {}
+                  group_version: "group_version"
                   key: "key"
                   group: "group"
                 client_id: "client_id"
@@ -22239,9 +22352,11 @@ definitions:
               token_endpoint: "token_endpoint"
             secrets:
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             - mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
       primary:
@@ -23358,6 +23473,7 @@ definitions:
       oauth2_client:
         client_secret:
           mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
         client_id: "client_id"
@@ -23963,6 +24079,7 @@ definitions:
     example:
       client_secret:
         mount_requirement: {}
+        group_version: "group_version"
         key: "key"
         group: "group"
       client_id: "client_id"
@@ -24002,6 +24119,7 @@ definitions:
       client:
         client_secret:
           mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
         client_id: "client_id"
@@ -24420,15 +24538,24 @@ definitions:
   coreSecret:
     type: "object"
     properties:
+      group:
+        type: "string"
+        title: "The name of the secret group where to find the key referenced below.\
+          \ For K8s secrets, this should be the name of\nthe v1/secret object. For\
+          \ Confidant, this should be the Credential name. For Vault, this should\
+          \ be the secret name.\nFor AWS Secret Manager, this should be the name of\
+          \ the secret.\n+required"
+      group_version:
+        type: "string"
+        title: "The group version to fetch. This is not supported in all secret management\
+          \ systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
       key:
         type: "string"
         title: "The name of the secret to mount. This has to match an existing secret\
           \ in the system. It's up to the implementation\nof the secret management\
-          \ system to require case sensitivity.\n+required"
-      group:
-        type: "string"
-        title: "The name of the secret group where to find the key referenced above.\n\
-          +optional"
+          \ system to require case sensitivity. For K8s secrets, Confidant and Vault,\
+          \ this should\nmatch one of the keys inside the secret. For AWS Secret Manager,\
+          \ it's ignored.\n+optional"
       mount_requirement:
         title: "mount_requirement is optional. Indicates where the secret has to be\
           \ mounted. If provided, the execution will fail\nif the underlying key management\
@@ -24443,6 +24570,7 @@ definitions:
       \ if secrets\nare passed through file mounts."
     example:
       mount_requirement: {}
+      group_version: "group_version"
       key: "key"
       group: "group"
   coreSecurityContext:
@@ -24481,6 +24609,7 @@ definitions:
         oauth2_client:
           client_secret:
             mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
           client_id: "client_id"
@@ -24491,6 +24620,7 @@ definitions:
         client:
           client_secret:
             mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
           client_id: "client_id"
@@ -24501,6 +24631,7 @@ definitions:
         client:
           client_secret:
             mount_requirement: {}
+            group_version: "group_version"
             key: "key"
             group: "group"
           client_id: "client_id"
@@ -24508,9 +24639,11 @@ definitions:
         token_endpoint: "token_endpoint"
       secrets:
       - mount_requirement: {}
+        group_version: "group_version"
         key: "key"
         group: "group"
       - mount_requirement: {}
+        group_version: "group_version"
         key: "key"
         group: "group"
   coreSimpleType:
@@ -24821,6 +24954,7 @@ definitions:
           oauth2_client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -24831,6 +24965,7 @@ definitions:
           client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -24841,6 +24976,7 @@ definitions:
           client:
             client_secret:
               mount_requirement: {}
+              group_version: "group_version"
               key: "key"
               group: "group"
             client_id: "client_id"
@@ -24848,9 +24984,11 @@ definitions:
           token_endpoint: "token_endpoint"
         secrets:
         - mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
         - mount_requirement: {}
+          group_version: "group_version"
           key: "key"
           group: "group"
   coreTypedInterface:

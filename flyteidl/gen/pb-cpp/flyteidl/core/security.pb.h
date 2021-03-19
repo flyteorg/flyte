@@ -247,23 +247,9 @@ class Secret final :
 
   // accessors -------------------------------------------------------
 
-  // string key = 1;
-  void clear_key();
-  static const int kKeyFieldNumber = 1;
-  const ::std::string& key() const;
-  void set_key(const ::std::string& value);
-  #if LANG_CXX11
-  void set_key(::std::string&& value);
-  #endif
-  void set_key(const char* value);
-  void set_key(const char* value, size_t size);
-  ::std::string* mutable_key();
-  ::std::string* release_key();
-  void set_allocated_key(::std::string* key);
-
-  // string group = 2;
+  // string group = 1;
   void clear_group();
-  static const int kGroupFieldNumber = 2;
+  static const int kGroupFieldNumber = 1;
   const ::std::string& group() const;
   void set_group(const ::std::string& value);
   #if LANG_CXX11
@@ -275,9 +261,37 @@ class Secret final :
   ::std::string* release_group();
   void set_allocated_group(::std::string* group);
 
-  // .flyteidl.core.Secret.MountType mount_requirement = 3;
+  // string group_version = 2;
+  void clear_group_version();
+  static const int kGroupVersionFieldNumber = 2;
+  const ::std::string& group_version() const;
+  void set_group_version(const ::std::string& value);
+  #if LANG_CXX11
+  void set_group_version(::std::string&& value);
+  #endif
+  void set_group_version(const char* value);
+  void set_group_version(const char* value, size_t size);
+  ::std::string* mutable_group_version();
+  ::std::string* release_group_version();
+  void set_allocated_group_version(::std::string* group_version);
+
+  // string key = 3;
+  void clear_key();
+  static const int kKeyFieldNumber = 3;
+  const ::std::string& key() const;
+  void set_key(const ::std::string& value);
+  #if LANG_CXX11
+  void set_key(::std::string&& value);
+  #endif
+  void set_key(const char* value);
+  void set_key(const char* value, size_t size);
+  ::std::string* mutable_key();
+  ::std::string* release_key();
+  void set_allocated_key(::std::string* key);
+
+  // .flyteidl.core.Secret.MountType mount_requirement = 4;
   void clear_mount_requirement();
-  static const int kMountRequirementFieldNumber = 3;
+  static const int kMountRequirementFieldNumber = 4;
   ::flyteidl::core::Secret_MountType mount_requirement() const;
   void set_mount_requirement(::flyteidl::core::Secret_MountType value);
 
@@ -286,8 +300,9 @@ class Secret final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr key_;
   ::google::protobuf::internal::ArenaStringPtr group_;
+  ::google::protobuf::internal::ArenaStringPtr group_version_;
+  ::google::protobuf::internal::ArenaStringPtr key_;
   int mount_requirement_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fsecurity_2eproto;
@@ -910,60 +925,7 @@ class SecurityContext final :
 #endif  // __GNUC__
 // Secret
 
-// string key = 1;
-inline void Secret::clear_key() {
-  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Secret::key() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.Secret.key)
-  return key_.GetNoArena();
-}
-inline void Secret::set_key(const ::std::string& value) {
-  
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.core.Secret.key)
-}
-#if LANG_CXX11
-inline void Secret::set_key(::std::string&& value) {
-  
-  key_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Secret.key)
-}
-#endif
-inline void Secret::set_key(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.core.Secret.key)
-}
-inline void Secret::set_key(const char* value, size_t size) {
-  
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Secret.key)
-}
-inline ::std::string* Secret::mutable_key() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.Secret.key)
-  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* Secret::release_key() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.Secret.key)
-  
-  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void Secret::set_allocated_key(::std::string* key) {
-  if (key != nullptr) {
-    
-  } else {
-    
-  }
-  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.key)
-}
-
-// string group = 2;
+// string group = 1;
 inline void Secret::clear_group() {
   group_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1016,7 +978,113 @@ inline void Secret::set_allocated_group(::std::string* group) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.group)
 }
 
-// .flyteidl.core.Secret.MountType mount_requirement = 3;
+// string group_version = 2;
+inline void Secret::clear_group_version() {
+  group_version_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Secret::group_version() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Secret.group_version)
+  return group_version_.GetNoArena();
+}
+inline void Secret::set_group_version(const ::std::string& value) {
+  
+  group_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Secret.group_version)
+}
+#if LANG_CXX11
+inline void Secret::set_group_version(::std::string&& value) {
+  
+  group_version_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Secret.group_version)
+}
+#endif
+inline void Secret::set_group_version(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  group_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Secret.group_version)
+}
+inline void Secret::set_group_version(const char* value, size_t size) {
+  
+  group_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Secret.group_version)
+}
+inline ::std::string* Secret::mutable_group_version() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Secret.group_version)
+  return group_version_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Secret::release_group_version() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Secret.group_version)
+  
+  return group_version_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Secret::set_allocated_group_version(::std::string* group_version) {
+  if (group_version != nullptr) {
+    
+  } else {
+    
+  }
+  group_version_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), group_version);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.group_version)
+}
+
+// string key = 3;
+inline void Secret::clear_key() {
+  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Secret::key() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Secret.key)
+  return key_.GetNoArena();
+}
+inline void Secret::set_key(const ::std::string& value) {
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Secret.key)
+}
+#if LANG_CXX11
+inline void Secret::set_key(::std::string&& value) {
+  
+  key_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Secret.key)
+}
+#endif
+inline void Secret::set_key(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Secret.key)
+}
+inline void Secret::set_key(const char* value, size_t size) {
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Secret.key)
+}
+inline ::std::string* Secret::mutable_key() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Secret.key)
+  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Secret::release_key() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Secret.key)
+  
+  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Secret::set_allocated_key(::std::string* key) {
+  if (key != nullptr) {
+    
+  } else {
+    
+  }
+  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Secret.key)
+}
+
+// .flyteidl.core.Secret.MountType mount_requirement = 4;
 inline void Secret::clear_mount_requirement() {
   mount_requirement_ = 0;
 }

@@ -33,52 +33,36 @@ class CoreSecret(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'key': 'str',
         'group': 'str',
+        'group_version': 'str',
+        'key': 'str',
         'mount_requirement': 'SecretMountType'
     }
 
     attribute_map = {
-        'key': 'key',
         'group': 'group',
+        'group_version': 'group_version',
+        'key': 'key',
         'mount_requirement': 'mount_requirement'
     }
 
-    def __init__(self, key=None, group=None, mount_requirement=None):  # noqa: E501
+    def __init__(self, group=None, group_version=None, key=None, mount_requirement=None):  # noqa: E501
         """CoreSecret - a model defined in Swagger"""  # noqa: E501
 
-        self._key = None
         self._group = None
+        self._group_version = None
+        self._key = None
         self._mount_requirement = None
         self.discriminator = None
 
-        if key is not None:
-            self.key = key
         if group is not None:
             self.group = group
+        if group_version is not None:
+            self.group_version = group_version
+        if key is not None:
+            self.key = key
         if mount_requirement is not None:
             self.mount_requirement = mount_requirement
-
-    @property
-    def key(self):
-        """Gets the key of this CoreSecret.  # noqa: E501
-
-
-        :return: The key of this CoreSecret.  # noqa: E501
-        :rtype: str
-        """
-        return self._key
-
-    @key.setter
-    def key(self, key):
-        """Sets the key of this CoreSecret.
-
-
-        :param key: The key of this CoreSecret.  # noqa: E501
-        :type: str
-        """
-
-        self._key = key
 
     @property
     def group(self):
@@ -100,6 +84,48 @@ class CoreSecret(object):
         """
 
         self._group = group
+
+    @property
+    def group_version(self):
+        """Gets the group_version of this CoreSecret.  # noqa: E501
+
+
+        :return: The group_version of this CoreSecret.  # noqa: E501
+        :rtype: str
+        """
+        return self._group_version
+
+    @group_version.setter
+    def group_version(self, group_version):
+        """Sets the group_version of this CoreSecret.
+
+
+        :param group_version: The group_version of this CoreSecret.  # noqa: E501
+        :type: str
+        """
+
+        self._group_version = group_version
+
+    @property
+    def key(self):
+        """Gets the key of this CoreSecret.  # noqa: E501
+
+
+        :return: The key of this CoreSecret.  # noqa: E501
+        :rtype: str
+        """
+        return self._key
+
+    @key.setter
+    def key(self, key):
+        """Sets the key of this CoreSecret.
+
+
+        :param key: The key of this CoreSecret.  # noqa: E501
+        :type: str
+        """
+
+        self._key = key
 
     @property
     def mount_requirement(self):
