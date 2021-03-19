@@ -542,9 +542,11 @@ configmap:
         batching-interval: 2s
         batch-size: -1
         queue:
-          type: bucket
-          rate: 10
-          capacity: 100
+          type: maxof
+          rate: 100
+          capacity: 1000
+          base-delay: 5s
+          max-delay: 120s
         sub-queue:
           type: bucket
           rate: 10
