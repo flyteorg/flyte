@@ -66,7 +66,7 @@ datacatalog:
   # -- Service settings for Datacatalog
   service:
     annotations:
-      contour.heptio.com/upstream-protocol.h2c: grpc
+      projectcontour.io/upstream-protocol.h2c: grpc
     type: NodePort
   # -- Annotations for ServiceAccount attached to Datacatalog pods
   serviceAccountAnnotations: {}

@@ -27,8 +27,8 @@ flyteadmin:
   configPath: /etc/flyte/config/*.yaml
   service:
     annotations:
-      contour.heptio.com/upstream-protocol.h2c: grpc
-  
+      projectcontour.io/upstream-protocol.h2c: grpc
+
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
