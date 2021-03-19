@@ -378,13 +378,14 @@ configmap:
   task_resource_defaults:
     task_resources:
       defaults:
-        cpu: 100m
+        cpu: 1000m
         memory: 1000Mi
-        storage: 5Mi
+        storage: 1000Mi
       limits:
-        cpu: 15000m
-        memory: 100Gi
-        storage: 400Gi
+        cpu: 2
+        memory: 8Gi
+        storage: 2000Mi
+        gpu: 1
 
   admin:
     event:
