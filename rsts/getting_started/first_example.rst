@@ -4,30 +4,9 @@
 Write Your First Flyte Workflow
 ###############################
 
-By the end of this guide you will become familiar with how easy it is to author a Flyte workflow and run it locally.
+By the end of this guide you will learn how to author a Flyte workflow and run it locally.
 
 .. rubric:: Estimated time: <3 minutes
-
-
-Prerequisites
-*************
-
-#. Ensure that you have `git <https://git-scm.com/>`__ installed.
-
-#. Let us make a virutal environment **(recommended)** - and then install flytekit using
-    ``--pre`` is used because we are currently using the beta version of flytekit 0.16.0, this introduces a completely new SDK for authoring workflows
-    ::
-
-        pip install --pre flytekit
-
-
-#. Now we will use the ``flytekit-python-template`` repo to create our own git repository called ``flyteexamples`` ::
-
-      git clone git@github.com:flyteorg/flytekit-python-template.git flyteexamples
-      cd flyteexamples
-      rm -rf .git
-      git init
-
 
 Flyte Tasks and Workflows
 *************************
