@@ -4,27 +4,6 @@
 Run Your Workflow on a Flyte Backend
 #####################################
 
-************************
-Installing Flyte Locally
-************************
-
-This guide will walk you through:
-
-* A quick installation of Flyte on your device
-
-* How to register and execute your workflows against this deployment. 
-
-(The tips below have an option to install Flyte on a cloud provider as well)
-
-.. rubric:: Estimated time: 1 minute
-
-Prerequisites
-=============
-
-1. Follow :ref:`getting-started-firstrun` 
-
-2. Access FlyteConsole on http://localhost:30081/console
-
 .. tip:: To check if your flyte-sandbox container is running you can run ``docker ps`` and it should show image ``ghcr.io/flyteorg/flyte-sandbox`` running
 
 .. tip:: If you prefer using k3d, Minikube, docker for mac, or a hosted Kubernetes cluster like AWS-EKS, GCP-GKE, Azure Kubernetes refer to :ref:`howto-sandbox`. It is recommended that you use a simple Docker based approach when you are first getting started with Flyte.
