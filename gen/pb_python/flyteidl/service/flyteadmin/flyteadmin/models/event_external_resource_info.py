@@ -31,44 +31,44 @@ class EventExternalResourceInfo(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'external_ids': 'str'
+        'external_id': 'str'
     }
 
     attribute_map = {
-        'external_ids': 'external_ids'
+        'external_id': 'external_id'
     }
 
-    def __init__(self, external_ids=None):  # noqa: E501
+    def __init__(self, external_id=None):  # noqa: E501
         """EventExternalResourceInfo - a model defined in Swagger"""  # noqa: E501
 
-        self._external_ids = None
+        self._external_id = None
         self.discriminator = None
 
-        if external_ids is not None:
-            self.external_ids = external_ids
+        if external_id is not None:
+            self.external_id = external_id
 
     @property
-    def external_ids(self):
-        """Gets the external_ids of this EventExternalResourceInfo.  # noqa: E501
+    def external_id(self):
+        """Gets the external_id of this EventExternalResourceInfo.  # noqa: E501
 
         Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.  # noqa: E501
 
-        :return: The external_ids of this EventExternalResourceInfo.  # noqa: E501
+        :return: The external_id of this EventExternalResourceInfo.  # noqa: E501
         :rtype: str
         """
-        return self._external_ids
+        return self._external_id
 
-    @external_ids.setter
-    def external_ids(self, external_ids):
-        """Sets the external_ids of this EventExternalResourceInfo.
+    @external_id.setter
+    def external_id(self, external_id):
+        """Sets the external_id of this EventExternalResourceInfo.
 
         Identifier for an external resource created by this task execution, for example Qubole query ID or presto query ids.  # noqa: E501
 
-        :param external_ids: The external_ids of this EventExternalResourceInfo.  # noqa: E501
+        :param external_id: The external_id of this EventExternalResourceInfo.  # noqa: E501
         :type: str
         """
 
-        self._external_ids = external_ids
+        self._external_id = external_id
 
     def to_dict(self):
         """Returns the model properties as a dict"""

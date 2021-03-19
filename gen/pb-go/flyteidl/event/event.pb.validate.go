@@ -797,7 +797,7 @@ func (m *ExternalResourceInfo) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ExternalIds
+	// no validation rules for ExternalId
 
 	return nil
 }
