@@ -10,7 +10,9 @@ a provisioned services that can scale to great sizes.
 """
 
 import typing
-from flytekit import task, workflow, map_task, TaskMetadata
+
+from flytekit import TaskMetadata, map_task, task, workflow
+
 
 # %%
 # Note that this is the single task that we'll use in our map task. It can only accept one input and produce one output

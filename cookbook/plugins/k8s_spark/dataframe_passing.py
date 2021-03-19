@@ -47,7 +47,7 @@ def create_spark_df() -> my_schema:
     """
     sess = flytekit.current_context().spark_session
     return sess.createDataFrame(
-        [("Alice", 5), ("Bob", 10), ("Charlie", 15), ], my_schema.column_names(),
+        [("Alice", 5), ("Bob", 10), ("Charlie", 15),], my_schema.column_names(),
     )
 
 

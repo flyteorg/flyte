@@ -10,7 +10,7 @@ from dataclasses import dataclass
 import joblib
 import pandas as pd
 from dataclasses_json import dataclass_json
-from flytekit import task, workflow
+from flytekit import Resources, task, workflow
 from flytekit.types.file import FlyteFile
 from flytekit.types.schema import FlyteSchema
 from sklearn.metrics import accuracy_score
@@ -63,7 +63,7 @@ CLASSES_COLUMNS = OrderedDict({"class": int})
 # columns and converts it to a typed schema.
 # An example CSV file is available at
 # `https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv<https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv>`
-@task(cache_version="1.0", cache=True, memory_limit="200Mi")
+@task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def split_traintest_dataset(
     dataset: FlyteFile[typing.TypeVar("csv")], seed: int, test_split_ratio: float
 ) -> (
@@ -121,7 +121,7 @@ workflow_outputs = typing.NamedTuple(
 )
 
 
-@task(cache_version="1.0", cache=True, memory_limit="200Mi")
+@task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def fit(
     x: FlyteSchema[FEATURE_COLUMNS],
     y: FlyteSchema[CLASSES_COLUMNS],
@@ -151,7 +151,7 @@ def fit(
     return (fname,)
 
 
-@task(cache_version="1.0", cache=True, memory_limit="200Mi")
+@task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def predict(
     x: FlyteSchema[FEATURE_COLUMNS], model_ser: FlyteFile[MODELSER_JOBLIB],
 ) -> FlyteSchema[CLASSES_COLUMNS]:
@@ -170,7 +170,7 @@ def predict(
     return y_pred_df
 
 
-@task(cache_version="1.0", cache=True, memory_limit="200Mi")
+@task(cache_version="1.0", cache=True, limits=Resources(mem="200Mi"))
 def score(
     predictions: FlyteSchema[CLASSES_COLUMNS], y: FlyteSchema[CLASSES_COLUMNS]
 ) -> float:

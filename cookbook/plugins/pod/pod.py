@@ -29,11 +29,11 @@ from flytekit import task, workflow
 from flytekitplugins.pod import Pod
 from kubernetes.client.models import (
     V1Container,
+    V1EmptyDirVolumeSource,
     V1PodSpec,
-    V1VolumeMount,
     V1ResourceRequirements,
     V1Volume,
-    V1EmptyDirVolumeSource,
+    V1VolumeMount,
 )
 
 _SHARED_DATA_PATH = "/data/message.txt"

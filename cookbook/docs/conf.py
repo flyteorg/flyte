@@ -6,7 +6,6 @@
 
 # -- Path setup --------------------------------------------------------------
 
-import re
 import logging
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -14,6 +13,7 @@ import logging
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import re
 import sys
 
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
@@ -157,7 +157,11 @@ html_theme_options = {
     "nav_links": [
         {"href": "https://flyte.readthedocs.io/", "internal": False, "title": "Flyte"},
         {"href": "index", "internal": True, "title": "Tutorials"},
-        {"href": "https://flytekit.readthedocs.io/en/latest/", "internal": False, "title": "Flytekit Python Reference"},
+        {
+            "href": "https://flytekit.readthedocs.io/en/latest/",
+            "internal": False,
+            "title": "Flytekit Python Reference",
+        },
     ],
 }
 
