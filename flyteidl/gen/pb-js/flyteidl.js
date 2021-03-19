@@ -10893,8 +10893,9 @@ export const flyteidl = $root.flyteidl = (() => {
              * Properties of a Secret.
              * @memberof flyteidl.core
              * @interface ISecret
-             * @property {string|null} [key] Secret key
              * @property {string|null} [group] Secret group
+             * @property {string|null} [groupVersion] Secret groupVersion
+             * @property {string|null} [key] Secret key
              * @property {flyteidl.core.Secret.MountType|null} [mountRequirement] Secret mountRequirement
              */
 
@@ -10914,20 +10915,28 @@ export const flyteidl = $root.flyteidl = (() => {
             }
 
             /**
-             * Secret key.
-             * @member {string} key
-             * @memberof flyteidl.core.Secret
-             * @instance
-             */
-            Secret.prototype.key = "";
-
-            /**
              * Secret group.
              * @member {string} group
              * @memberof flyteidl.core.Secret
              * @instance
              */
             Secret.prototype.group = "";
+
+            /**
+             * Secret groupVersion.
+             * @member {string} groupVersion
+             * @memberof flyteidl.core.Secret
+             * @instance
+             */
+            Secret.prototype.groupVersion = "";
+
+            /**
+             * Secret key.
+             * @member {string} key
+             * @memberof flyteidl.core.Secret
+             * @instance
+             */
+            Secret.prototype.key = "";
 
             /**
              * Secret mountRequirement.
@@ -10961,12 +10970,14 @@ export const flyteidl = $root.flyteidl = (() => {
             Secret.encode = function encode(message, writer) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.key != null && message.hasOwnProperty("key"))
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.key);
                 if (message.group != null && message.hasOwnProperty("group"))
-                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.group);
+                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.group);
+                if (message.groupVersion != null && message.hasOwnProperty("groupVersion"))
+                    writer.uint32(/* id 2, wireType 2 =*/18).string(message.groupVersion);
+                if (message.key != null && message.hasOwnProperty("key"))
+                    writer.uint32(/* id 3, wireType 2 =*/26).string(message.key);
                 if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
-                    writer.uint32(/* id 3, wireType 0 =*/24).int32(message.mountRequirement);
+                    writer.uint32(/* id 4, wireType 0 =*/32).int32(message.mountRequirement);
                 return writer;
             };
 
@@ -10989,12 +11000,15 @@ export const flyteidl = $root.flyteidl = (() => {
                     let tag = reader.uint32();
                     switch (tag >>> 3) {
                     case 1:
-                        message.key = reader.string();
-                        break;
-                    case 2:
                         message.group = reader.string();
                         break;
+                    case 2:
+                        message.groupVersion = reader.string();
+                        break;
                     case 3:
+                        message.key = reader.string();
+                        break;
+                    case 4:
                         message.mountRequirement = reader.int32();
                         break;
                     default:
@@ -11016,12 +11030,15 @@ export const flyteidl = $root.flyteidl = (() => {
             Secret.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (message.key != null && message.hasOwnProperty("key"))
-                    if (!$util.isString(message.key))
-                        return "key: string expected";
                 if (message.group != null && message.hasOwnProperty("group"))
                     if (!$util.isString(message.group))
                         return "group: string expected";
+                if (message.groupVersion != null && message.hasOwnProperty("groupVersion"))
+                    if (!$util.isString(message.groupVersion))
+                        return "groupVersion: string expected";
+                if (message.key != null && message.hasOwnProperty("key"))
+                    if (!$util.isString(message.key))
+                        return "key: string expected";
                 if (message.mountRequirement != null && message.hasOwnProperty("mountRequirement"))
                     switch (message.mountRequirement) {
                     default:

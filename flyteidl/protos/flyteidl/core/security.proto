@@ -21,20 +21,28 @@ message Secret {
         FILE = 2;
     }
 
-    // The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
-    // of the secret management system to require case sensitivity.
+    // The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of
+    // the v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.
+    // For AWS Secret Manager, this should be the name of the secret.
     // +required
-    string key = 1;
+    string group = 1;
 
-    // The name of the secret group where to find the key referenced above.
+    // The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones
+    // that do not support it.
     // +optional
-    string group = 2;
+    string group_version = 2;
+
+    // The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation
+    // of the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should
+    // match one of the keys inside the secret. For AWS Secret Manager, it's ignored.
+    // +optional
+    string key = 3;
 
     // mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail
     // if the underlying key management system cannot satisfy that requirement. If not provided, the default location
     // will depend on the key management system.
     // +optional
-    MountType mount_requirement = 3;
+    MountType mount_requirement = 4;
 }
 
 // OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task.

@@ -4537,11 +4537,14 @@ export namespace flyteidl {
         /** Properties of a Secret. */
         interface ISecret {
 
-            /** Secret key */
-            key?: (string|null);
-
             /** Secret group */
             group?: (string|null);
+
+            /** Secret groupVersion */
+            groupVersion?: (string|null);
+
+            /** Secret key */
+            key?: (string|null);
 
             /** Secret mountRequirement */
             mountRequirement?: (flyteidl.core.Secret.MountType|null);
@@ -4556,11 +4559,14 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.core.ISecret);
 
-            /** Secret key. */
-            public key: string;
-
             /** Secret group. */
             public group: string;
+
+            /** Secret groupVersion. */
+            public groupVersion: string;
+
+            /** Secret key. */
+            public key: string;
 
             /** Secret mountRequirement. */
             public mountRequirement: flyteidl.core.Secret.MountType;
