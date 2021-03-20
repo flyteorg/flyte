@@ -8,8 +8,8 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: ghcr.io/lyft/flyteadmin
-    tag: v0.3.29
+    repository: ghcr.io/flyteorg/flyteadmin
+    tag: v0.3.38
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -48,8 +48,8 @@ datacatalog:
   replicaCount: 1
   image:
     # -- Docker image for Datacatalog deployment
-    repository: ghcr.io/lyft/datacatalog
-    tag: v0.2.130
+    repository: ghcr.io/flyteorg/datacatalog
+    tag: v0.3.0
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -89,7 +89,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.5.13
+    tag: v0.7.1
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -123,8 +123,8 @@ flyteconsole:
   replicaCount: 1
   image:
     # -- Docker image for Flyteconsole deployment
-    repository: ghcr.io/lyft/flyteconsole
-    tag: v0.19.1
+    repository: ghcr.io/flyteorg/flyteconsole
+    tag: v0.19.6
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -361,7 +361,8 @@ common:
   ingress:
     # --- enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
-    annotations: {}
+    annotations:
+      nginx.ingress.kubernetes.io/ssl-redirect: "false"
   flyteNamespaceTemplate:
     # --- enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false

@@ -15,3 +15,4 @@ docs/flytekit/flytekit.interfaces.html
 docs/searchindex.js
 docs/
 __pycache__/
+/helm/charts/
