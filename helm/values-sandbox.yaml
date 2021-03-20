@@ -107,6 +107,12 @@ configmap:
         endpoint: http://minio.flyte.svc.cluster.local:9000
         region: us-east-1
 
+  # Task default resources configuration
+  task_resource_defaults:
+    task_resources:
+      defaults:
+        memory: 200Mi
+
   enabled_plugins:
     tasks:
       task-plugins:
