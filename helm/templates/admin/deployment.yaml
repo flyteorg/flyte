@@ -20,7 +20,7 @@ spec:
       initContainers:
       {{- if .Values.postgres.enabled }}
       - name: check-db-ready
-        image: postgres:10.1
+        image: postgres:10.16-alpine
         command:
         - sh
         - -c

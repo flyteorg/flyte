@@ -35,8 +35,10 @@ data:
 {{- with .Values.configmap.resource_manager }}
   resource_manager.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
+{{- if .Values.sparkoperator.enabled }}
 {{- with .Values.configmap.spark }}
   spark.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
 {{- end }}
 {{- with .Values.configmap.storage }}
   storage.yaml: | {{ toYaml . | nindent 4 }}
