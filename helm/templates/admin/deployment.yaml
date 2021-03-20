@@ -28,7 +28,6 @@ spec:
       {{- end }}
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - {{ .Values.flyteadmin.configPath }}
         - migrate
@@ -41,7 +40,6 @@ spec:
           name: config-volume
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - {{ .Values.flyteadmin.configPath }}
         - migrate
@@ -57,7 +55,6 @@ spec:
           name: config-volume
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - {{ .Values.flyteadmin.configPath }}
         - clusterresource
@@ -73,7 +70,6 @@ spec:
       containers:
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - {{ .Values.flyteadmin.configPath }}
         {{- with .Values.flyteadmin.extraArgs }}
