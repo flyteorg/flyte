@@ -20,6 +20,9 @@ spec:
       - image: "{{ .Values.postgres.image.repository }}:{{ .Values.postgres.image.tag }}"
         imagePullPolicy: "{{ .Values.postgres.image.pullPolicy }}"
         name: postgres
+        env:
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
         ports:
         - containerPort: 5432
           name: postgres

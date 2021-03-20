@@ -27,13 +27,17 @@ flyteconsole: {}
 # REDIS
 #
 
-redis: {}
+redis:
+  enabled: false
 
 #
 # POSTGRES
 #
 
-postgres: {}
+postgres:
+  image:
+    # Override postgres image to use alpine based (rather smaller) docker image
+    tag: "10.16-alpine"
 
 #
 # MINIO
@@ -59,13 +63,15 @@ contour:
 # SPARKOPERATOR
 #
 
-sparkoperator: {}
+sparkoperator:
+  enabled: false
 
 #
 # PYTORCHOPERATOR
 #
 
-pytorchoperator: {}
+pytorchoperator:
+  enabled: false
 
 #
 # COMMON
@@ -131,6 +137,16 @@ configmap:
     logger:
       show-source: true
       level: 5
+
+  # Disable Qubole
+  qubole: null
+
+  # Use noop resource-manager
+  resource_manager:
+    propeller:
+      resourcemanager:
+        type: noop
+        redis: null
 
   ab_project_resource_quota: |
     apiVersion: v1
