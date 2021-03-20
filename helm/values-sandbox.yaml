@@ -74,6 +74,19 @@ pytorchoperator:
   enabled: false
 
 #
+# KUBERNETES DASHBOARD
+#
+kubernetes-dashboard:
+  extraArgs:
+   - --enable-skip-login
+   - --enable-insecure-login
+   - --disable-settings-authorizer
+  protocolHttp: true
+  service:
+    type: NodePort
+    externalPort: 30082
+
+#
 # COMMON
 #
 
@@ -138,7 +151,7 @@ configmap:
     plugins:
       logs:
         kubernetes-enabled: true
-        kubernetes-url: http://localhost:30082
+        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 
   logger:
     logger:

@@ -17,7 +17,6 @@ spec:
           containers:
           - command:
             - flyteadmin
-            - --logtostderr
             - --config
             - {{ .Values.flyteadmin.configPath }}
             - clusterresource
