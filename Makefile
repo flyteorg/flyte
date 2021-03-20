@@ -3,7 +3,7 @@ pip-compile $(1) --upgrade --verbose
 endef
 
 .PHONY: kustomize
-kustomize: release_automation
+kustomize: 
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 	git stash push -- kustomize/
 
