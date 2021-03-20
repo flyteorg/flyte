@@ -18,7 +18,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.FLYTEBOT_PAT }}
+          token: ${{ secrets.FLYTE_BOT_PAT }}
           commit-message: Updated flyte defination
           committer: GitHub <flytebot@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>

@@ -2654,7 +2654,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.0
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -2672,7 +2672,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.0
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2848,7 +2848,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: ghcr.io/flyteorg/flyteconsole:v0.19.6
+        image: ghcr.io/flyteorg/flyteconsole:v0.19.7
         name: flyteconsole
         ports:
         - containerPort: 8080
