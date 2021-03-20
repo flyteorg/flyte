@@ -126,6 +126,7 @@ configmap:
         - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        default-memory: 200Mi
   
   task_logs:
     plugins:
