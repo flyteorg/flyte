@@ -194,7 +194,7 @@ postgres:
   image:
     # -- Docker image for Postgres deployment
     repository: postgres
-    tag: "10.1"
+    tag: "10.16"
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Postgres deployment
   resources:
