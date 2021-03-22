@@ -1,3 +1,4 @@
+// Commands for FlytePropeller controller.
 package cmd
 
 import (
@@ -58,7 +59,7 @@ var rootCmd = &cobra.Command{
 	Short: "Operator for running Flyte Workflows",
 	Long: `Flyte Propeller runs a workflow to completion by recursing through the nodes, 
 			handling their tasks to completion and propagating their status upstream.`,
-	PreRunE: initConfig,
+	PersistentPreRunE: initConfig,
 	Run: func(cmd *cobra.Command, args []string) {
 		executeRootCmd(config2.GetConfig())
 	},
@@ -93,11 +94,13 @@ func init() {
 	rootCmd.AddCommand(viper.GetConfigCommand())
 }
 
-func initConfig(_ *cobra.Command, _ []string) error {
+func initConfig(cmd *cobra.Command, _ []string) error {
 	configAccessor = viper.NewAccessor(config.Options{
-		StrictMode:  true,
+		StrictMode:  false,
 		SearchPaths: []string{cfgFile},
 	})
+
+	configAccessor.InitializePflags(cmd.PersistentFlags())
 
 	err := configAccessor.UpdateConfig(context.TODO())
 	if err != nil {

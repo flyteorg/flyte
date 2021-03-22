@@ -38,6 +38,8 @@ import (
 	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	v "github.com/flyteorg/flytepropeller/pkg/compiler/validators"
+
+	// #noSA1019
 	"github.com/golang/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
