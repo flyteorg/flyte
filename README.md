@@ -64,8 +64,8 @@ producer-consumer order create a workflow.
 
 `Workflows` and `Tasks` can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
 
-<html id="quickstart">
-<h2> 
+<html>
+<h2 id="quickstart"> 
   🚀 Quick Start
 </h2>
 </html>
