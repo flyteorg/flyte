@@ -60,6 +60,7 @@ Basic Configuration
    :caption: Flytectl nouns
 
    gen/flytectl_create_project
+   gen/flytectl_create_execution
    gen/flytectl_get_execution
    gen/flytectl_get_project
    gen/flytectl_get_workflow

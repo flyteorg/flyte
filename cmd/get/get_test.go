@@ -1,12 +1,36 @@
 package get
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"testing"
 
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+
 	"github.com/stretchr/testify/assert"
 )
+
+const projectValue = "dummyProject"
+const domainValue = "dummyDomain"
+const output = "json"
+const executionNameValue = "e124"
+const launchPlanNameValue = "lp_name"
+const launchPlanVersionValue = "lp_version"
+const workflowNameValue = "wf_name"
+const workflowVersionValue = "wf_version"
+const testDataFolder = "../testdata/"
+
+var (
+	err        error
+	ctx        context.Context
+	mockClient *mocks.AdminServiceClient
+	cmdCtx     cmdCore.CommandContext
+)
+var setup = testutils.Setup
+var tearDownAndVerify = testutils.TearDownAndVerify
 
 func TestCreateGetCommand(t *testing.T) {
 	getCommand := CreateGetCommand()

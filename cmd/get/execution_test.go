@@ -14,15 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const projectValue = "dummyProject"
-const domainValue = "dummyDomain"
-const executionNameValue = "e124"
-const launchPlanNameValue = "lp_name"
-const launchPlanVersionValue = "lp_version"
-const workflowNameValue = "wf_name"
-const workflowVersionValue = "wf_version"
-const output = "json"
-
 func TestListExecutionFunc(t *testing.T) {
 	ctx := context.Background()
 	config.GetConfig().Project = projectValue

@@ -50,8 +50,8 @@ Usage
 
 var executionColumns = []printer.Column{
 	{Header: "Name", JSONPath: "$.id.name"},
-	{Header: "Workflow Name", JSONPath: "$.closure.workflowId.name"},
-	{Header: "Type", JSONPath: "$.closure.workflowId.resourceType"},
+	{Header: "Launch Plan Name", JSONPath: "$.spec.launchPlan.name"},
+	{Header: "Type", JSONPath: "$.spec.launchPlan.resourceType"},
 	{Header: "Phase", JSONPath: "$.closure.phase"},
 	{Header: "Started", JSONPath: "$.closure.startedAt"},
 	{Header: "Elapsed Time", JSONPath: "$.closure.duration"},
