@@ -9,7 +9,7 @@ import (
 
 const specialEncoderKey = "abcdefghijklmnopqrstuvwxyz123456"
 
-var base32Encoder = base32.NewEncoding(specialEncoderKey).WithPadding(base32.NoPadding)
+var Base32Encoder = base32.NewEncoding(specialEncoderKey).WithPadding(base32.NoPadding)
 
 // Creates a new UniqueID that is based on the inputID and of a specified length, if the given id is longer than the
 // maxLength.
@@ -22,8 +22,8 @@ func FixedLengthUniqueID(inputID string, maxLength int) (string, error) {
 	// Using 32a an error can never happen, so this will always remain not covered by a unit test
 	_, _ = hasher.Write([]byte(inputID)) // #nosec
 	b := hasher.Sum(nil)
-	// expected length after this step is 8 chars (1 + 7 chars from base32Encoder.EncodeToString(b))
-	finalStr := "f" + base32Encoder.EncodeToString(b)
+	// expected length after this step is 8 chars (1 + 7 chars from Base32Encoder.EncodeToString(b))
+	finalStr := "f" + Base32Encoder.EncodeToString(b)
 	if len(finalStr) > maxLength {
 		return finalStr, fmt.Errorf("max Length is too small, cannot create an encoded string that is so small")
 	}

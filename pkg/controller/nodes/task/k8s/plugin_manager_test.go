@@ -120,10 +120,14 @@ func (d *dummyOutputWriter) Put(ctx context.Context, reader io.OutputReader) err
 
 func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCore.TaskExecutionContext {
 	taskExecutionContext := &pluginsCoreMock.TaskExecutionContext{}
-	taskExecutionContext.On("TaskExecutionMetadata").Return(getMockTaskExecutionMetadata())
+	taskExecutionContext.OnTaskExecutionMetadata().Return(getMockTaskExecutionMetadata())
+
+	tReader := &pluginsCoreMock.TaskReader{}
+	tReader.OnReadMatch(mock.Anything).Return(&core.TaskTemplate{}, nil)
+	taskExecutionContext.OnTaskReader().Return(tReader)
 
 	customStateReader := &pluginsCoreMock.PluginStateReader{}
-	customStateReader.On("Get", mock.MatchedBy(func(i interface{}) bool {
+	customStateReader.OnGetMatch(mock.MatchedBy(func(i interface{}) bool {
 		ps, ok := i.(*PluginState)
 		if ok {
 			ps.Phase = initPhase
@@ -131,18 +135,18 @@ func getMockTaskContext(initPhase PluginPhase, wantPhase PluginPhase) pluginsCor
 		}
 		return false
 	})).Return(uint8(0), nil)
-	taskExecutionContext.On("PluginStateReader").Return(customStateReader)
+	taskExecutionContext.OnPluginStateReader().Return(customStateReader)
 
 	customStateWriter := &pluginsCoreMock.PluginStateWriter{}
-	customStateWriter.On("Put", mock.Anything, mock.MatchedBy(func(i interface{}) bool {
+	customStateWriter.OnPutMatch(mock.Anything, mock.MatchedBy(func(i interface{}) bool {
 		ps, ok := i.(*PluginState)
 		return ok && ps.Phase == wantPhase
 	})).Return(nil)
-	taskExecutionContext.On("PluginStateWriter").Return(customStateWriter)
-	taskExecutionContext.On("OutputWriter").Return(&dummyOutputWriter{})
+	taskExecutionContext.OnPluginStateWriter().Return(customStateWriter)
+	taskExecutionContext.OnOutputWriter().Return(&dummyOutputWriter{})
 
-	taskExecutionContext.On("DataStore").Return(nil)
-	taskExecutionContext.On("MaxDatasetSizeBytes").Return(int64(0))
+	taskExecutionContext.OnDataStore().Return(nil)
+	taskExecutionContext.OnMaxDatasetSizeBytes().Return(int64(0))
 	return taskExecutionContext
 }
 
@@ -201,11 +205,11 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 	var inputs *core.LiteralMap*/
 
 	t.Run("jobQueued", func(t *testing.T) {
-		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
+		tCtx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
-		fakeClient := fake.NewFakeClient()
+		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		fakeClient := fake.NewClientBuilder().WithRuntimeObjects().Build()
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
@@ -213,7 +217,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		}, NewResourceMonitorIndex())
 		assert.NoError(t, err)
 
-		transition, err := pluginManager.Handle(ctx, tctx)
+		transition, err := pluginManager.Handle(ctx, tCtx)
 		assert.NoError(t, err)
 		assert.NotNil(t, transition)
 		transitionInfo := transition.Info()
@@ -221,10 +225,10 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseQueued, transitionInfo.Phase())
 		createdPod := &v1.Pod{}
 
-		pluginManager.AddObjectMetadata(tctx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
-		assert.NoError(t, fakeClient.Get(ctx, k8stypes.NamespacedName{Namespace: tctx.TaskExecutionMetadata().GetNamespace(),
-			Name: tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()}, createdPod))
-		assert.Equal(t, tctx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), createdPod.Name)
+		pluginManager.AddObjectMetadata(tCtx.TaskExecutionMetadata(), createdPod, &config.K8sPluginConfig{})
+		assert.NoError(t, fakeClient.Get(ctx, k8stypes.NamespacedName{Namespace: tCtx.TaskExecutionMetadata().GetNamespace(),
+			Name: tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()}, createdPod))
+		assert.Equal(t, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), createdPod.Name)
 		assert.NoError(t, fakeClient.Delete(ctx, createdPod))
 	})
 
@@ -232,8 +236,8 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
-		fakeClient := fake.NewFakeClient()
+		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
+		fakeClient := fake.NewClientBuilder().WithRuntimeObjects().Build()
 		pluginManager, err := NewPluginManager(ctx, dummySetupContext(fakeClient), k8s.PluginEntry{
 			ID:              "x",
 			ResourceToWatch: &v1.Pod{},
@@ -262,9 +266,9 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
+		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 		fakeClient := extendedFakeClient{
-			Client:      fake.NewFakeClient(),
+			Client:      fake.NewClientBuilder().WithRuntimeObjects().Build(),
 			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("exceeded quota")),
 		}
 
@@ -295,9 +299,9 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{}, nil)
+		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{}, nil)
 		fakeClient := extendedFakeClient{
-			Client:      fake.NewFakeClient(),
+			Client:      fake.NewClientBuilder().WithRuntimeObjects().Build(),
 			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("auth error")),
 		}
 
@@ -326,7 +330,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 		tctx := getMockTaskContext(PluginPhaseNotStarted, PluginPhaseNotStarted)
 		// Creating a mock k8s plugin
 		mockResourceHandler := &pluginsk8sMock.Plugin{}
-		mockResourceHandler.On("BuildResource", mock.Anything, tctx).Return(&v1.Pod{
+		mockResourceHandler.OnBuildResourceMatch(mock.Anything, mock.Anything).Return(&v1.Pod{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       flytek8s.PodKind,
 				APIVersion: v1.SchemeGroupVersion.String(),
@@ -346,7 +350,7 @@ func TestK8sTaskExecutor_Handle_LaunchResource(t *testing.T) {
 			},
 		}, nil)
 		fakeClient := extendedFakeClient{
-			Client: fake.NewFakeClient(),
+			Client: fake.NewClientBuilder().WithRuntimeObjects().Build(),
 			CreateError: k8serrors.NewForbidden(schema.GroupResource{}, "", errors.New("is forbidden: "+
 				"exceeded quota: project-quota, requested: limits.memory=3Gi, "+
 				"used: limits.memory=7976Gi, limited: limits.memory=8000Gi")),
