@@ -110,17 +110,17 @@ Here are the resources that would help you get a better understanding of Flyte.
 ### Podcasts
 - TWIML&AI -  [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
-- MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible , and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
+- MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 
 ## 🔥 Features
  - Used at *Scale* in production by **500+** users at Lyft with more than **900k** workflows executed per month and more than **30+** million container executions per month
- - **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- from local to remote in a mere second
+ - **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- from local to remote in mere seconds
  - **Centralized Inventory** constituting Tasks, Workflows and Executions
  - **gRPC / REST** interface to define and execute tasks and workflows
- - **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and outputs; thus, illegal construction of pipelines fails during declaration rather than at runtime
+ - **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output; thus, illegal construction of pipelines fails during declaration rather than at runtime
  - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html#flyte-type-system)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
  - Memoization and Lineage tracking
- - Workflow features
+ - Workflow features:
      * Multiple **[schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_remote_flyte/lp_schedules.html)** for every workflow
      * Parallel step execution
      * Extensible backend to add [customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_advanced/custom_task_plugin.html#sphx-glr-auto-core-advanced-custom-task-plugin-py) experience (with simplified user experience)
