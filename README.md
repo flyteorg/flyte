@@ -69,6 +69,7 @@ producer-consumer order create a workflow.
   🚀 Quick Start
 </h2>
 </html>
+
 With [docker installed](https://docs.docker.com/get-docker/), run the following command:
 
 ```bash
@@ -85,7 +86,12 @@ Here's a quick visual tour of the console.
 
 To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en/latest/index.html).
 
-## ❄️ Community & Resources
+<html>
+<h2 id="community--resources"> 
+  ❄️ Community & Resources
+</h2>
+</html>
+
 Here are the resources that would help you get a better understanding of Flyte.
 
 ### Communication Channels
@@ -116,7 +122,12 @@ Here are the resources that would help you get a better understanding of Flyte.
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 
-## 🔥 Features
+<html>
+<h2 id="features"> 
+  🔥 Features
+</h2>
+</html>
+
  - Used at *Scale* in production by **500+** users at Lyft with more than **900k** workflows executed per month and more than **30+** million container executions per month
  - **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- from local to remote in mere seconds
  - **Centralized Inventory** constituting Tasks, Workflows and Executions
@@ -177,7 +188,12 @@ Here are the resources that would help you get a better understanding of Flyte.
 - [Spotify](https://www.spotify.com/)
 - [USU Group](https://www.usu.com/)
 
-## 📦 Component Repos 
+<html>
+<h2 id="component-repos"> 
+  📦 Component Repos 
+</h2>
+</html>
+
 Repo | Language | Purpose | Status
 --- | --- | --- | ---
 [flyte](https://github.com/lyft/flyte) | Kustomize,RST | deployment, documentation, issues | Production-grade
