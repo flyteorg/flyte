@@ -133,20 +133,20 @@ Here are the resources that would help you get a better understanding of Flyte.
  - **Centralized Inventory** constituting Tasks, Workflows and Executions
  - **gRPC / REST** interface to define and execute tasks and workflows
  - **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output; thus, illegal construction of pipelines fails during declaration rather than at runtime
- - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html#flyte-type-system)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
+ - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
  - Memoization and Lineage tracking
  - Workflow features:
      * Multiple **[schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_remote_flyte/lp_schedules.html)** for every workflow
      * Parallel step execution
-     * Extensible backend to add [customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_advanced/custom_task_plugin.html#sphx-glr-auto-core-advanced-custom-task-plugin-py) experience (with simplified user experience)
+     * Extensible backend to add [customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_advanced/custom_task_plugin.html) experience (with simplified user experience)
      * **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/run_conditions.html)**
-     * Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/subworkflows.html#sphx-glr-auto-core-intermediate-subworkflows-py)** (a workflow can be embeded within one node of the top level workflow)
+     * Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/subworkflows.html)** (a workflow can be embeded within one node of the top level workflow)
      * Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
-     * **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/map_task.html#sphx-glr-auto-core-intermediate-map-task-py)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
-     * **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/dynamics.html#sphx-glr-auto-core-intermediate-dynamics-py)** creation and execution with runtime type safety
+     * **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
+     * **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/dynamics.html)** creation and execution with runtime type safety
      * Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first class support in Python
-     * *PreAlpha*: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/raw_container.html#sphx-glr-auto-core-intermediate-raw-container-py))
- - Records [history of all executions](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_basic/task_cache.html#sphx-glr-auto-core-basic-task-cache-py) and they are completely repeatable (as long as they follow convention)
+     * *PreAlpha*: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/raw_container.html))
+ - Records [history of all executions](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_basic/task_cache.html) and they are completely repeatable (as long as they follow convention)
  - **Multi cloud support** (AWS, GCP and others)
  - Extensible core, modularized, and deep observability
  - Automated notifications to Slack, Email, and Pagerduty
@@ -172,7 +172,7 @@ Here are the resources that would help you get a better understanding of Flyte.
  - [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_hive/index.html)
  - Presto Queries
  - Distributed Pytorch (K8s Native) -- [Pytorch Operator](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_kfpytorch/index.html)
- - Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_builtin_algo_training.html#sphx-glr-auto-plugins-sagemaker-training-sagemaker-builtin-algo-training-py) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_custom_training.html#sphx-glr-auto-plugins-sagemaker-training-sagemaker-custom-training-py))
+ - Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_custom_training.html))
  - Distributed Tensorflow (K8s Native) - TFOperator
  - Papermill notebook execution ([Python](https://github.com/lyft/flytekit/tree/master/plugins/papermill) and Spark)
  - Type safe and data checking for Pandas dataframe using Pandera
