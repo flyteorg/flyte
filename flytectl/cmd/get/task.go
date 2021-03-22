@@ -3,16 +3,14 @@ package get
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flytectl/pkg/adminutils"
-	"github.com/flyteorg/flytectl/pkg/printer"
-
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-
+	"github.com/flyteorg/flytectl/pkg/adminutils"
+	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytestdlib/logger"
+
+	"github.com/golang/protobuf/proto"
 )
 
 const (
@@ -46,9 +44,45 @@ Retrieves all the tasks within project and domain in json format.
 
  bin/flytectl get task -p flytesnacks -d development -o json
 
+Retrieves a tasks within project and domain for a version and generate the execution spec file for it to be used for launching the execution using create execution.
+
+::
+
+ bin/flytectl get tasks -d development -p flytesnacks core.advanced.run_merge_sort.merge --execFile execution_spec.yaml --version v2
+
+The generated file would look similar to this
+
+.. code-block:: yaml
+
+	 iamRoleARN: ""
+	 inputs:
+	   sorted_list1:
+	   - 0
+	   sorted_list2:
+	   - 0
+	 kubeServiceAcct: ""
+	 targetDomain: ""
+	 targetProject: ""
+	 task: core.advanced.run_merge_sort.merge
+	 version: v2
+
+Check the create execution section on how to launch one using the generated file.
+
 Usage
 `
 )
+
+//go:generate pflags TaskConfig --default-var taskConfig
+var (
+	taskConfig = &TaskConfig{}
+)
+
+// FilesConfig
+type TaskConfig struct {
+	ExecFile string `json:"execFile" pflag:",execution file name to be used for generating execution spec of a single task."`
+	Version  string `json:"version" pflag:",version of the task to be fetched."`
+	Latest   bool   `json:"latest" pflag:", flag to indicate to fetch the latest version, version flag will be ignored in this case"`
+}
 
 var taskColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
@@ -68,31 +102,20 @@ func TaskToProtoMessages(l []*admin.Task) []proto.Message {
 }
 
 func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-
 	taskPrinter := printer.Printer{}
-
+	project := config.GetConfig().Project
+	domain := config.GetConfig().Domain
 	if len(args) == 1 {
-		task, err := cmdCtx.AdminClient().ListTasks(ctx, &admin.ResourceListRequest{
-			Id: &admin.NamedEntityIdentifier{
-				Project: config.GetConfig().Project,
-				Domain:  config.GetConfig().Domain,
-				Name:    args[0],
-			},
-			// TODO Sorting and limits should be parameters
-			SortBy: &admin.Sort{
-				Key:       "created_at",
-				Direction: admin.Sort_DESCENDING,
-			},
-			Limit: 100,
-		})
-		if err != nil {
+		name := args[0]
+		var tasks []*admin.Task
+		var err error
+		if tasks, err = FetchTaskForName(ctx, name, project, domain, cmdCtx); err != nil {
 			return err
 		}
-		logger.Debugf(ctx, "Retrieved Task", task.Tasks)
-
-		return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(task.Tasks)...)
+		logger.Debugf(ctx, "Retrieved Task", tasks)
+		return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(tasks)...)
 	}
-	tasks, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListTaskIds, adminutils.ListRequest{Project: config.GetConfig().Project, Domain: config.GetConfig().Domain})
+	tasks, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListTaskIds, adminutils.ListRequest{Project: project, Domain: domain})
 	if err != nil {
 		return err
 	}

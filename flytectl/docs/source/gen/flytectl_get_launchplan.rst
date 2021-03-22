@@ -13,13 +13,13 @@ Synopsis
 Retrieves all the launch plans within project and domain.(launchplan,launchplans can be used interchangeably in these commands)
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development
+ flytectl get launchplan -p flytesnacks -d development
 
 Retrieves launch plan by name within project and domain.
 
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
+ flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
 
 Retrieves launchplan by filters.
 ::
@@ -30,13 +30,37 @@ Retrieves all the launchplan within project and domain in yaml format.
 
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development -o yaml
+ flytectl get launchplan -p flytesnacks -d development -o yaml
 
 Retrieves all the launchplan within project and domain in json format
 
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development -o json
+ flytectl get launchplan -p flytesnacks -d development -o json
+
+Retrieves a launch plans within project and domain for a version and generate the execution spec file for it to be used for launching the execution using create execution.
+
+::
+
+ flytectl get launchplan -d development -p flytectldemo core.advanced.run_merge_sort.merge_sort --execFile execution_spec.yam
+
+The generated file would look similar to this
+
+.. code-block:: yaml
+
+	 iamRoleARN: ""
+	 inputs:
+		numbers:
+		- 0
+   		numbers_count: 0
+   		run_local_at_count: 10
+	 kubeServiceAcct: ""
+	 targetDomain: ""
+	 targetProject: ""
+	 workflow: core.advanced.run_merge_sort.merge
+	 version: "v3"
+
+Check the create execution section on how to launch one using the generated file.
 
 Usage
 
@@ -50,7 +74,10 @@ Options
 
 ::
 
-  -h, --help   help for launchplan
+      --execFile string   execution file name to be used for generating execution spec of a single launchplan.
+  -h, --help              help for launchplan
+      --latest            flag to indicate to fetch the latest version, version flag will be ignored in this case
+      --version string    version of the launchplan to be fetched.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

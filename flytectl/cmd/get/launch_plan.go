@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
+
 	"github.com/golang/protobuf/proto"
 )
 
@@ -18,13 +19,13 @@ const (
 Retrieves all the launch plans within project and domain.(launchplan,launchplans can be used interchangeably in these commands)
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development
+ flytectl get launchplan -p flytesnacks -d development
 
 Retrieves launch plan by name within project and domain.
 
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
+ flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
 
 Retrieves launchplan by filters.
 ::
@@ -35,17 +36,53 @@ Retrieves all the launchplan within project and domain in yaml format.
 
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development -o yaml
+ flytectl get launchplan -p flytesnacks -d development -o yaml
 
 Retrieves all the launchplan within project and domain in json format
 
 ::
 
- bin/flytectl get launchplan -p flytesnacks -d development -o json
+ flytectl get launchplan -p flytesnacks -d development -o json
+
+Retrieves a launch plans within project and domain for a version and generate the execution spec file for it to be used for launching the execution using create execution.
+
+::
+
+ flytectl get launchplan -d development -p flytectldemo core.advanced.run_merge_sort.merge_sort --execFile execution_spec.yam
+
+The generated file would look similar to this
+
+.. code-block:: yaml
+
+	 iamRoleARN: ""
+	 inputs:
+	   numbers:
+	   - 0
+	   numbers_count: 0
+	   run_local_at_count: 10
+	 kubeServiceAcct: ""
+	 targetDomain: ""
+	 targetProject: ""
+	 version: v3
+	 workflow: core.advanced.run_merge_sort.merge_sort
+
+Check the create execution section on how to launch one using the generated file.
 
 Usage
 `
 )
+
+//go:generate pflags LaunchPlanConfig --default-var launchPlanConfig
+var (
+	launchPlanConfig = &LaunchPlanConfig{}
+)
+
+// LaunchPlanConfig
+type LaunchPlanConfig struct {
+	ExecFile string `json:"execFile" pflag:",execution file name to be used for generating execution spec of a single launchplan."`
+	Version  string `json:"version" pflag:",version of the launchplan to be fetched."`
+	Latest   bool   `json:"latest" pflag:", flag to indicate to fetch the latest version, version flag will be ignored in this case"`
+}
 
 var launchplanColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
@@ -65,29 +102,24 @@ func LaunchplanToProtoMessages(l []*admin.LaunchPlan) []proto.Message {
 
 func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	launchPlanPrinter := printer.Printer{}
-
+	project := config.GetConfig().Project
+	domain := config.GetConfig().Domain
 	if len(args) == 1 {
 		name := args[0]
-		launchPlan, err := cmdCtx.AdminClient().ListLaunchPlans(ctx, &admin.ResourceListRequest{
-			Limit: 10,
-			Id: &admin.NamedEntityIdentifier{
-				Project: config.GetConfig().Project,
-				Domain:  config.GetConfig().Domain,
-				Name:    name,
-			},
-		})
-		if err != nil {
+		var launchPlans []*admin.LaunchPlan
+		var err error
+		if launchPlans, err = FetchLPForName(ctx, name, project, domain, cmdCtx); err != nil {
 			return err
 		}
-		logger.Debugf(ctx, "Retrieved %v excutions", len(launchPlan.LaunchPlans))
-		err = launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplanColumns, LaunchplanToProtoMessages(launchPlan.LaunchPlans)...)
+		logger.Debugf(ctx, "Retrieved %v launch plans", len(launchPlans))
+		err = launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplanColumns, LaunchplanToProtoMessages(launchPlans)...)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
 
-	launchPlans, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListLaunchPlanIds, adminutils.ListRequest{Project: config.GetConfig().Project, Domain: config.GetConfig().Domain})
+	launchPlans, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListLaunchPlanIds, adminutils.ListRequest{Project: project, Domain: domain})
 	if err != nil {
 		return err
 	}
