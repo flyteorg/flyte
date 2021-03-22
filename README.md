@@ -101,7 +101,7 @@ Here are the resources that would help you get a better understanding of Flyte.
 ### Biweekly Community Sync
 - 📣 **Flyte OSS Community Sync** happens every alternate Tuesday, 9am-10am PDT ([Checkout the events calendar & subscribe](https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles)). Here's the [zoom link]( https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
 - Meeting notes and backlog of topics are captured in [doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
-- If you'd like to revisit any community sync that has happened, you can access the [video recordings](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
+- If you'd like to revisit any community sync meeting that has happened, you can access the [video recordings](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
 ### Conference Talks
 - Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) | [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft)
