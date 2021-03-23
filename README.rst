@@ -27,6 +27,37 @@ Running flyteconsole locally requires `NodeJS <https://nodejs.org>`_ and
 `yarn <https://yarnpkg.com>`_. Once these are installed, all of the dependencies
 can be installed by running ``yarn`` in the project directory.
 
+=====================
+Quickstart
+====================
+
+#. Follow `Start a Local flyte backend <https://docs.flyte.org/en/latest/getting_started/first_run.html>`_, like
+
+  .. code:: bash
+
+     docker run --rm --privileged -p 30081:30081 -p 30082:30082 -p 30084:30084 ghcr.io/flyteorg/flyte-sandbox
+
+#. Now Export 2 env variables
+
+   .. code:: bash
+
+       export ADMIN_API_URL=http://localhost:30081
+       export DISABLE_AUTH=1
+
+  .. note::
+
+     You can persist these environment variables in a ``.env`` file at the root
+     of the repository. This will persist the settings across multiple terminal
+     sessions
+
+#. Start the server (uses localhost:3000)
+
+   .. code:: bash
+
+      yarn start
+
+#. Explore your local copy: `http://localhost:3000`_
+
 ======================
 Environment variables
 ======================
