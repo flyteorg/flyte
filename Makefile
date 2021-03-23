@@ -3,7 +3,7 @@ pip-compile $(1) --upgrade --verbose
 endef
 
 .PHONY: kustomize
-kustomize: 
+kustomize: release_automation
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 	git stash push -- kustomize/
 
@@ -17,7 +17,7 @@ deploy_sandbox:
 
 # launch dockernetes and execute tests
 .PHONY: end2end
-end2end: release_automation
+end2end:
 	@end2end/launch_dockernetes.sh
 
 # execute tests in the current kubernetes context
