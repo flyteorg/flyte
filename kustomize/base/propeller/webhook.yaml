@@ -1,4 +1,43 @@
-# Create the actual deployment
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyte-pod-webhook-secret
+  namespace: flyte
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 0
+  template:
+    spec:
+      serviceAccountName: flyte-pod-webhook
+      restartPolicy: Never
+      containers:
+        - name: webhook
+          image: flytepropeller:v0.5.13
+          imagePullPolicy: IfNotPresent
+          command:
+            - flytepropeller
+          args:
+            - webhook
+            - init-certs
+            - --config
+            - /etc/flyte/config/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: flyte-propeller-config
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,78 +61,39 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: flyte-pod-webhook
-      initContainers:
-        - image: ghcr.io/flyteorg/flytepropeller:0.1-h6
-          imagePullPolicy: Always # TODO: Change to IfNotPresent
+      containers:
+        - name: webhook
+          image: flytepropeller:v0.5.13
+          imagePullPolicy: IfNotPresent
           command:
             - flytepropeller
           args:
             - webhook
-            - init-certs
             - --config
             - /etc/flyte/config/*.yaml
-          name: webhook-init
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-            - mountPath: /etc/webhook/certs
-              name: webhook-certs
           env:
-            - name: PROPELLER.WEBHOOK.NAMESPACE
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-      containers:
-        - image: ghcr.io/flyteorg/flytepropeller:0.1-h6
-          imagePullPolicy: Always # TODO: Change to IfNotPresent
-          # command:
-          #   - sleep
-          #   - "10000"
-          command:
-            - flytepropeller
-          args:
-            - webhook
-            - --config
-            - /etc/flyte/config/*.yaml
-            - --propeller.webhook.namespace
-            - flyte
-          name: webhook-server
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
+              readOnly: true
             - name: webhook-certs
               mountPath: /etc/webhook/certs
               readOnly: true
       volumes:
         - name: config-volume
           configMap:
-            name: flyte-propeller-config-685g22kg5m
+            name: flyte-propeller-config
         - name: webhook-certs
-          emptyDir: {}
-# ---
-# apiVersion: admissionregistration.k8s.io/v1
-# kind: MutatingWebhookConfiguration
-# metadata:
-#   name: flyte-pod-webhook
-#   namespace: flyte
-# webhooks:
-#   - admissionReviewVersions:
-#       - v1beta1
-#     name: mapplication.kb.io
-#     clientConfig:
-#       caBundle: ${CA_BUNDLE}
-#       service:
-#         name: flyte-pod-webhook
-#         namespace: flyte
-#         path: /mutate
-#     rules:
-#       - apiGroups:
-#           - apps
-#       - apiVersions:
-#           - v1
-#         resources:
-#           - pods
-#     sideEffects: None
+          secret:
+            secretName: flyte-pod-webhook
 ---
 # Service
 apiVersion: v1
@@ -117,7 +117,7 @@ spec:
       port: 443
       targetPort: 9443
 ---
-# Create a ClusterRole for flytepropeller
+# Create a ClusterRole for the webhook
 # https://kubernetes.io/docs/admin/authorization/rbac/
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -125,7 +125,6 @@ metadata:
   name: flyte-pod-webhook
   namespace: flyte
 rules:
-  #Allow Access All plugin objects
   - apiGroups:
       - "*"
     resources:
@@ -139,7 +138,7 @@ rules:
       - delete
       - patch
 ---
-# Create a Service Account for Flytepropeller
+# Create a Service Account for webhook
 apiVersion: v1
 kind: ServiceAccount
 metadata:

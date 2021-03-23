@@ -27,6 +27,12 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   name: flyteadmin
   namespace: flyte
 ---
@@ -35,6 +41,25 @@ kind: ServiceAccount
 metadata:
   name: flytepropeller
   namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - delete
+  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -120,6 +145,20 @@ rules:
   - patch
   - post
   - deletecollection
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-pod-webhook
+subjects:
+- kind: ServiceAccount
+  name: flyte-pod-webhook
+  namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -375,6 +414,9 @@ data:
           type: bucket
           rate: 10
           capacity: 100
+    webhook:
+      certDir: /etc/webhook/certs
+      serviceName: flyte-pod-webhook
   enabled_plugins.yaml: |
     tasks:
       task-plugins:
@@ -417,7 +459,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-ttk5h2hkmg
+  name: flyte-propeller-config-cbbhf652h4
   namespace: flyte
 ---
 apiVersion: v1
@@ -448,6 +490,22 @@ spec:
     targetPort: 8089
   selector:
     app: datacatalog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    projectcontour.io/upstream-protocol.h2c: grpc
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app: flyte-pod-webhook
 ---
 apiVersion: v1
 kind: Service
@@ -561,6 +619,63 @@ spec:
       - name: db-pass
         secret:
           secretName: db-pass-9dgchhk2bm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: flyte-pod-webhook
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: flyte-pod-webhook
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flyte-pod-webhook
+        app.kubernetes.io/name: flyte-pod-webhook
+        app.kubernetes.io/version: 0.5.13
+    spec:
+      containers:
+      - args:
+        - webhook
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flytepropeller:v0.6.2
+        imagePullPolicy: IfNotPresent
+        name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+          readOnly: true
+        - mountPath: /etc/webhook/certs
+          name: webhook-certs
+          readOnly: true
+      serviceAccountName: flyte-pod-webhook
+      volumes:
+      - configMap:
+          name: flyte-propeller-config-cbbhf652h4
+        name: config-volume
+      - name: webhook-certs
+        secret:
+          secretName: flyte-pod-webhook
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -740,7 +855,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-ttk5h2hkmg
+          name: flyte-propeller-config-cbbhf652h4
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -808,7 +923,91 @@ spec:
       - emptyDir: {}
         name: postgres-storage
 ---
+<<<<<<< HEAD
 apiVersion: networking.k8s.io/v1
+=======
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flyte-pod-webhook-secret
+  namespace: flyte
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flytepropeller:v0.6.2
+        imagePullPolicy: IfNotPresent
+        name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      restartPolicy: Never
+      serviceAccountName: flyte-pod-webhook
+      volumes:
+      - configMap:
+          name: flyte-propeller-config-cbbhf652h4
+        name: config-volume
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: flytesystem
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /console
+      - backend:
+          serviceName: flyteconsole
+          servicePort: 80
+        path: /__webpack_hmr
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /api
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /healthcheck
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 80
+        path: /v1
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 81
+        path: /flyteidl.service.AdminService
+      - backend:
+          serviceName: flyteadmin
+          servicePort: 87
+        path: /openapi
+---
+apiVersion: extensions/v1beta1
+>>>>>>> e7e1625 (add webhook deployment)
 kind: Ingress
 metadata:
   annotations:
