@@ -37,11 +37,11 @@ The make target is a handy wrapper around the following:
 
    pyflyte -c sandbox.config --pkgs core serialize --in-container-config-path /root/sandbox.config --local-source-root ${CURDIR} --image ${FULL_IMAGE_NAME}:${VERSION} workflows -f _pb_output/
 
-- the `-c` is the path to the config definition on your machine. This config specifies SDK default attributes.
-- the `--pkgs` arg points to the packages within the
-- `--local-source-root` which contains the code copied over into your Docker container image that will be serialized (and later, executed)
-- `--in-container-config-path` maps to the location within your Docker container image where the above config file will be copied over too
-- `--image` is the non-optional fully qualified name of the container image housing your code
+- the :code:`-c` is the path to the config definition on your machine. This config specifies SDK default attributes.
+- the :code:`--pkgs` arg points to the packages within the
+- :code:`--local-source-root` which contains the code copied over into your Docker container image that will be serialized (and later, executed)
+- :code:`--in-container-config-path` maps to the location within your Docker container image where the above config file will be copied over too
+- :code:`--image` is the non-optional fully qualified name of the container image housing your code
 
 In-container serialization
 """"""""""""""""""""""""""
@@ -77,10 +77,10 @@ Under the hood this recipe again supplies some defaults you may find yourself wi
 
 Of interest are the following args:
 
-- `-p` specifies the project to register your entities. This project itself must already be registered on your Flyte deployment.
-- `-d` specifies the domain to register your entities. This domain must already be configured in your Flyte deployment
-- `-v` is a unique string used to identify this version of entities registered under a project and domain.
-- If required, you can specify a `kubernetes-service-account` or `assumable_iam_role` which your tasks will run with.
+- :code:`-p` specifies the project to register your entities. This project itself must already be registered on your Flyte deployment.
+- :code:`-d` specifies the domain to register your entities. This domain must already be configured in your Flyte deployment
+- :code:`-v` is a unique string used to identify this version of entities registered under a project and domain.
+- If required, you can specify a :code:`kubernetes-service-account` or :code:`assumable_iam_role` which your tasks will run with.
 
 
 Fast(er) iteration
@@ -88,7 +88,7 @@ Fast(er) iteration
 Re-building a new Docker container image for every code change you make can become cumbersome and slow.
 If you're making purely code changes that **do not** require updating your container definition, you can make use of
 fast serialization and registration to speed up your iteration process and reduce the time it takes to upload new entity
-versions to your hosted Flyte deployment.
+versions and development code to your hosted Flyte deployment. 
 
 First, run the fast serialization target:
 
@@ -103,6 +103,11 @@ And then the fast register target:
    OUTPUT_DATA_PREFIX=s3://my-s3-bucket/raw_data FLYTE_HOST=flyte.example.com ADDL_DISTRIBUTION_DIR=s3://my-s3-bucket/archives make register
 
 and just like that you can update your code without requiring a rebuild of your container!
+
+As fast registration serializes code from your local workstation and uploads it to the hosted flyte deployment, make sure to specify the following arguments correctly to ensure that the changes are picked up when the workflow is run.
+
+- :code:`pyflyte serialize` has a :code:`--local-source-root` option which specifies which code is uploaded during the fast registration step. This ensures that the files you want to modify are serialized. This is optional and should be used when your code lies outside of your current working directory.
+- :code:`flyte-cli fast-register-files` has a :code:`--dest-dir` option which specifies which folder (in the container) the fast serialization will dump the code in at execution time. This ensures that the running workflow loads the code changes that were uploaded via :code:`fast registration`.
 
 
 Building Images
