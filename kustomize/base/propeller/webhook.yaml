@@ -129,14 +129,13 @@ rules:
   - apiGroups:
       - "*"
     resources:
-      - "*"
+      - mutatingwebhookconfiguration
+      - secrets
+      - pods
     verbs:
       - get
-      - list
-      - watch
       - create
       - update
-      - delete
       - patch
 ---
 # Create a Service Account for webhook

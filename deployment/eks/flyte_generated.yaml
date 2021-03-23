@@ -7654,14 +7654,13 @@ rules:
 - apiGroups:
   - '*'
   resources:
-  - '*'
+  - mutatingwebhookconfiguration
+  - secrets
+  - pods
   verbs:
   - get
-  - list
-  - watch
   - create
   - update
-  - delete
   - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
