@@ -1,8 +1,8 @@
 .. _howto:
 
-########################
-How Do I...?
-########################
+###########################
+Frequently Asked Questions
+###########################
 
 .. toctree::
    :maxdepth: 1
@@ -31,12 +31,7 @@ How Do I...?
    labels_annotations
    notifications
    serviceaccount
+   gcp
 
 
 .. _howto_extend:
-
-=======================
-How do I Extend flyte?
-=======================
-
-Flyte was designed to be extensible. The section - :ref:`plugins`- dives into more details on extending Flyte and also provides available examples.

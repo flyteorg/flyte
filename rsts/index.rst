@@ -8,25 +8,24 @@ Welcome to the documentation hub for Flyte.
 
 .. toctree::
    :maxdepth: 1
-   :caption: Tutorials
-   :name: tutorialstoc
+   :caption: Getting Started
+   :name: gettingstartedtoc
 
-   tutorials/first_run
-   tutorials/first_example
-   tutorials/run_on_flyte
-   tutorials/learn
+   getting_started/first_run
+   getting_started/first_example
+   getting_started/run_on_flyte
+   getting_started/learn
 
 .. toctree::
-   :caption: Get Answers
+   :caption: How-Tos
    :maxdepth: 1
    :name: howtotoc
 
    plugins/index
    howto/index
-   faq/index
 
 .. toctree::
-   :caption: Diving Deep: Architecture, Concepts & References
+   :caption: Deep Dive
    :maxdepth: 1
    :name: divedeeptoc
 
@@ -34,7 +33,7 @@ Welcome to the documentation hub for Flyte.
    reference/index
 
 .. toctree::
-   :caption: Project Plan & Contributor Guide
+   :caption: Contributor Guide
    :maxdepth: 1
    :name: roadmaptoc
 
@@ -42,4 +41,3 @@ Welcome to the documentation hub for Flyte.
    community/docs
    community/roadmap
    community/compare
-

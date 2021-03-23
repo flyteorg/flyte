@@ -35,7 +35,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. tab:: Docker Image
 
-        Refer to :ref:`flyte-tutorials-firstrun`
+        Refer to :ref:`getting-started-firstrun`
 
     .. tab:: k3d
 
@@ -130,7 +130,7 @@ If you can access your cluster with ``kubectl cluster-info``, you're ready to de
 Deployment
 ==========
 
-We'll proceed like with :ref:`locally hosted flyte <tutorials-getting-started-run-on-flyte>` with deploying the sandbox
+We'll proceed like with :ref:`locally hosted flyte <getting-started-run-on-flyte>` with deploying the sandbox
 Flyte configuration on your remote cluster.
 
 .. warning::
