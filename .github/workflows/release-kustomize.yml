@@ -13,6 +13,7 @@ jobs:
           fetch-depth: "0"
       - name: Build kustomize
         run: |
+          make release_automation
           make kustomize
       - name: Create Pull Request
         id: cpr
