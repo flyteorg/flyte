@@ -2033,7 +2033,9 @@ data:
           enable-multicontainer: true
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-dtg8ff28mt
+  annotations: {}
+  labels: {}
+  name: clusterresource-template-9mbg4b2fhc
   namespace: flyte
 ---
 apiVersion: v1
@@ -2070,7 +2072,9 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-64k8dg9gck
+  annotations: {}
+  labels: {}
+  name: datacatalog-config-dcg96ktb98
   namespace: flyte
 ---
 apiVersion: v1
@@ -2168,7 +2172,9 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-5b5g7785h8
+  annotations: {}
+  labels: {}
+  name: flyte-admin-config-25gd9fg4cd
   namespace: flyte
 ---
 apiVersion: v1
@@ -2283,7 +2289,9 @@ data:
         kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-492gkfhbgk
+  annotations: {}
+  labels: {}
+  name: flyte-propeller-config-g6484k29h9
   namespace: flyte
 ---
 apiVersion: v1
@@ -2421,7 +2429,7 @@ data:
   pass.txt: YXdlc29tZXNhdWNl
 kind: Secret
 metadata:
-  name: db-pass-9dgchhk2bm
+  name: db-pass-8mb4h2b9hf
   namespace: flyte
 type: Opaque
 ---
@@ -2474,10 +2482,6 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
   - name: http
     port: 80
     protocol: TCP
@@ -2486,6 +2490,10 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
   selector:
     app: flyteadmin
 ---
@@ -2654,7 +2662,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.1
+        image: ghcr.io/flyteorg/datacatalog:v0.19.7
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -2672,7 +2680,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.1
+        image: ghcr.io/flyteorg/datacatalog:v0.19.7
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2685,11 +2693,11 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-64k8dg9gck
+          name: datacatalog-config-dcg96ktb98
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-9dgchhk2bm
+          secretName: db-pass-8mb4h2b9hf
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -2720,7 +2728,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2760,18 +2768,12 @@ spec:
             memory: 200Mi
       initContainers:
       - command:
-        - sh
-        - -c
-        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.16-alpine
-        name: check-db-ready
-      - command:
         - flyteadmin
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2787,7 +2789,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2801,7 +2803,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2811,19 +2813,24 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+      - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+        image: postgres:10.16-alpine
+        name: check-db-ready
       serviceAccountName: flyteadmin
       volumes:
+      - name: shared-data
       - configMap:
-          name: clusterresource-template-dtg8ff28mt
-        name: resource-templates
-      - emptyDir: {}
-        name: shared-data
-      - configMap:
-          name: flyte-admin-config-5b5g7785h8
+          name: flyte-admin-config-25gd9fg4cd
         name: config-volume
+      - configMap:
+          name: clusterresource-template-9mbg4b2fhc
+        name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-9dgchhk2bm
+          secretName: db-pass-8mb4h2b9hf
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -2848,7 +2855,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: ghcr.io/flyteorg/flyteconsole:v0.19.7
+        image: ghcr.io/flyteorg/flyteconsole:v0.3.1
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -2892,7 +2899,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.1
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.7
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -2903,7 +2910,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-492gkfhbgk
+          name: flyte-propeller-config-g6484k29h9
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -3072,8 +3079,7 @@ spec:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
       volumes:
-      - emptyDir: {}
-        name: tmp-volume
+      - name: tmp-volume
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -3197,7 +3203,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+            image: ghcr.io/flyteorg/flyteadmin:v0.3.43
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3211,14 +3217,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-dtg8ff28mt
+              name: clusterresource-template-9mbg4b2fhc
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-5b5g7785h8
+              name: flyte-admin-config-25gd9fg4cd
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-9dgchhk2bm
+              secretName: db-pass-8mb4h2b9hf
   schedule: '*/1 * * * *'
 ---
 apiVersion: apps/v1

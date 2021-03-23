@@ -8009,7 +8009,9 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  name: clusterresource-template-tkdkkt4cb5
+  annotations: {}
+  labels: {}
+  name: clusterresource-template-kf62ttf64k
   namespace: flyte
 ---
 apiVersion: v1
@@ -8056,7 +8058,9 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-d56hkd9229
+  annotations: {}
+  labels: {}
+  name: datacatalog-config-f58d6c6kmf
   namespace: flyte
 ---
 apiVersion: v1
@@ -8160,7 +8164,9 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-7k2dmcb4tg
+  annotations: {}
+  labels: {}
+  name: flyte-admin-config-g2bbmh8t7d
   namespace: flyte
 ---
 apiVersion: v1
@@ -8328,7 +8334,9 @@ data:
         stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-7288ccf2f8
+  annotations: {}
+  labels: {}
+  name: flyte-propeller-config-b8f6c7hkh9
   namespace: flyte
 ---
 apiVersion: v1
@@ -8336,7 +8344,9 @@ data:
   pass.txt: eW91cnBhc3N3b3Jk
 kind: Secret
 metadata:
-  name: db-pass-bthd2588cc
+  annotations: {}
+  labels: {}
+  name: db-pass-kdm4d5fcfb
   namespace: flyte
 type: Opaque
 ---
@@ -8399,13 +8409,6 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
-  - name: http-metrics
-    port: 10254
-    protocol: TCP
   - name: http
     port: 80
     protocol: TCP
@@ -8414,6 +8417,13 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
   selector:
     app: flyteadmin
   type: LoadBalancer
@@ -8427,6 +8437,9 @@ metadata:
   namespace: flyte
 spec:
   ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
   - name: redoc
     port: 87
     protocol: TCP
@@ -8434,9 +8447,6 @@ spec:
   - name: http-metrics
     port: 10254
     protocol: TCP
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
   selector:
     app: flyteconsole
   type: LoadBalancer
@@ -8565,7 +8575,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.0
+        image: ghcr.io/flyteorg/datacatalog:v0.19.7
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -8588,7 +8598,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.0
+        image: ghcr.io/flyteorg/datacatalog:v0.19.7
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8598,14 +8608,13 @@ spec:
           name: db-pass
       serviceAccountName: datacatalog
       volumes:
-      - emptyDir: {}
-        name: shared-data
+      - name: shared-data
       - configMap:
-          name: datacatalog-config-d56hkd9229
+          name: datacatalog-config-f58d6c6kmf
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-kdm4d5fcfb
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8636,7 +8645,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8681,7 +8690,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8698,7 +8707,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8712,7 +8721,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8724,17 +8733,16 @@ spec:
           name: db-pass
       serviceAccountName: flyteadmin
       volumes:
-      - emptyDir: {}
-        name: shared-data
+      - name: shared-data
       - configMap:
-          name: flyte-admin-config-7k2dmcb4tg
+          name: flyte-admin-config-g2bbmh8t7d
         name: config-volume
       - configMap:
-          name: clusterresource-template-tkdkkt4cb5
+          name: clusterresource-template-kf62ttf64k
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-bthd2588cc
+          secretName: db-pass-kdm4d5fcfb
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8759,7 +8767,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: ghcr.io/flyteorg/flyteconsole:v0.19.6
+        image: ghcr.io/flyteorg/flyteconsole:v0.3.1
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -8803,7 +8811,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.1
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.7
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -8819,7 +8827,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-7288ccf2f8
+          name: flyte-propeller-config-b8f6c7hkh9
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -8990,7 +8998,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+            image: ghcr.io/flyteorg/flyteadmin:v0.3.43
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -9004,14 +9012,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-tkdkkt4cb5
+              name: clusterresource-template-kf62ttf64k
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-7k2dmcb4tg
+              name: flyte-admin-config-g2bbmh8t7d
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-bthd2588cc
+              secretName: db-pass-kdm4d5fcfb
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1
