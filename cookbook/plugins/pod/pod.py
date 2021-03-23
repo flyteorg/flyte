@@ -46,16 +46,14 @@ def generate_pod_spec_for_task():
 
     # Note: for non-primary containers we must specify an image.
     secondary_container = V1Container(name="secondary", image="alpine",)
-    secondary_container.command.extend(["/bin/sh"])
-    secondary_container.args.extend(
-        ["-c", "echo hi pod world > {}".format(_SHARED_DATA_PATH)]
-    )
+    secondary_container.command = ["/bin/sh"]
+    secondary_container.args = ["-c", "echo hi pod world > {}".format(_SHARED_DATA_PATH)]
 
     resources = V1ResourceRequirements(
         requests={"cpu": "1", "memory": "100Mi"}, limits={"cpu": "1", "memory": "100Mi"}
     )
     primary_container.resources = resources
-    secondary_container = resources
+    secondary_container.resources = resources
 
     shared_volume_mount = V1VolumeMount(name="shared-data", mount_path="/data",)
     secondary_container.volumeMounts = [shared_volume_mount]
