@@ -658,7 +658,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.1
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -706,7 +706,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -757,7 +757,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -773,7 +773,7 @@ spec:
         - seed-projects
         - flytetester
         - flytesnacks
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -787,7 +787,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.38
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -844,7 +844,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.1
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -949,7 +949,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.1
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
