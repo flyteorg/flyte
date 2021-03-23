@@ -8613,7 +8613,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8658,7 +8658,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8675,7 +8675,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8689,7 +8689,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.3.43
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8779,7 +8779,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.7
+        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -8966,7 +8966,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:v0.3.43
+            image: ghcr.io/flyteorg/flyteadmin:v0.4.0
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
