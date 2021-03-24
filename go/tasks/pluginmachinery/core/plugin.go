@@ -2,9 +2,13 @@ package core
 
 import (
 	"context"
+	"fmt"
 )
 
 //go:generate mockery -all -case=underscore
+
+// https://github.com/flyteorg/flytepropeller/blob/979fabe1d1b22b01645259a03b8096f227681d08/pkg/utils/encoder.go#L25-L26
+const minGeneratedNameLength = 8
 
 type TaskType = string
 
@@ -34,6 +38,8 @@ type PluginEntry struct {
 type PluginProperties struct {
 	// Instructs the execution engine to not attempt to cache lookup or write for the node.
 	DisableNodeLevelCaching bool
+	// Specifies the length of TaskExecutionID generated name. default: 50
+	GeneratedNameMaxLength *int
 }
 
 // Interface for the core Flyte plugin
@@ -51,4 +57,19 @@ type Plugin interface {
 	Abort(ctx context.Context, tCtx TaskExecutionContext) error
 	// Finalize is always called, after Handle or Abort. Finalize should be an idempotent operation
 	Finalize(ctx context.Context, tCtx TaskExecutionContext) error
+}
+
+// Loads and validates a plugin.
+func LoadPlugin(ctx context.Context, iCtx SetupContext, entry PluginEntry) (Plugin, error) {
+	plugin, err := entry.LoadPlugin(ctx, iCtx)
+	if err != nil {
+		return nil, err
+	}
+
+	length := plugin.GetProperties().GeneratedNameMaxLength
+	if length != nil && *length < minGeneratedNameLength {
+		return nil, fmt.Errorf("GeneratedNameMaxLength needs to be greater then %d", minGeneratedNameLength)
+	}
+
+	return plugin, err
 }

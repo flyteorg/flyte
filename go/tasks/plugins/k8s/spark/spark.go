@@ -45,10 +45,6 @@ var sparkTaskType = "spark"
 type sparkResourceHandler struct {
 }
 
-func (sparkResourceHandler) GetProperties() pluginsCore.PluginProperties {
-	return pluginsCore.PluginProperties{}
-}
-
 func validateSparkJob(sparkJob *plugins.SparkJob) error {
 	if sparkJob == nil {
 		return fmt.Errorf("empty sparkJob")
@@ -59,6 +55,10 @@ func validateSparkJob(sparkJob *plugins.SparkJob) error {
 	}
 
 	return nil
+}
+
+func (sparkResourceHandler) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
 }
 
 // Creates a new Job that will execute the main container as well as any generated types the result from the execution.

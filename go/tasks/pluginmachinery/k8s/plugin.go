@@ -34,12 +34,18 @@ type PluginEntry struct {
 	DefaultForTaskTypes []pluginsCore.TaskType
 	// Returns a new KubeClient to be used instead of the internal controller-runtime client.
 	CustomKubeClient func(ctx context.Context) (pluginsCore.KubeClient, error)
+}
+
+// System level properties that this Plugin supports
+type PluginProperties struct {
 	// Disables the inclusion of OwnerReferences in kubernetes resources that this plugin is responsible for.
 	// Disabling is only useful if resources will be created in a remote cluster.
 	DisableInjectOwnerReferences bool
 	// Boolean that indicates if finalizer injection should be disabled for resources that this plugin is
 	// responsible for.
 	DisableInjectFinalizer bool
+	// Specifies the length of TaskExecutionID generated name. default: 50
+	GeneratedNameMaxLength *int
 }
 
 // Special context passed in to plugins when checking task phase
@@ -76,4 +82,7 @@ type Plugin interface {
 	// any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 	// background.
 	GetTaskPhase(ctx context.Context, pluginContext PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error)
+
+	// Properties desired by the plugin
+	GetProperties() PluginProperties
 }

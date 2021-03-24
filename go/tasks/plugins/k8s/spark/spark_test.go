@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 
 	"github.com/stretchr/testify/mock"
 
@@ -469,4 +470,10 @@ func TestBuildResourceSpark(t *testing.T) {
 	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.NotNil(t, err)
 	assert.Nil(t, resource)
+}
+
+func TestGetPropertiesSpark(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+	expected := k8s.PluginProperties{}
+	assert.Equal(t, expected, sparkResourceHandler.GetProperties())
 }

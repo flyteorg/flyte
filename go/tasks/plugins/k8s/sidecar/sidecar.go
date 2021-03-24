@@ -73,6 +73,10 @@ type sidecarJob struct {
 	PrimaryContainerName string
 }
 
+func (sidecarResourceHandler) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
+}
+
 func (sidecarResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	var podSpec k8sv1.PodSpec
 	var primaryContainerName string

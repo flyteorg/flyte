@@ -25,6 +25,10 @@ type awsSagemakerPlugin struct {
 	TaskType pluginsCore.TaskType
 }
 
+func (awsSagemakerPlugin) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
+}
+
 func (m awsSagemakerPlugin) BuildIdentityResource(_ context.Context, _ pluginsCore.TaskExecutionMetadata) (client.Object, error) {
 	if m.TaskType == trainingJobTaskType || m.TaskType == customTrainingJobTaskType {
 		return &trainingjobv1.TrainingJob{}, nil
