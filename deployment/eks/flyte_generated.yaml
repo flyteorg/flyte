@@ -8051,9 +8051,7 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: clusterresource-template-kf62ttf64k
+  name: clusterresource-template-tkdkkt4cb5
   namespace: flyte
 ---
 apiVersion: v1
@@ -8100,9 +8098,7 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: datacatalog-config-2tbm82k5t8
+  name: datacatalog-config-2bb94tc5b5
   namespace: flyte
 ---
 apiVersion: v1
@@ -8211,9 +8207,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-admin-config-g6662g42cf
+  name: flyte-admin-config-t2f9g68k65
   namespace: flyte
 ---
 apiVersion: v1
@@ -8385,9 +8379,7 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-propeller-config-ch84t45m6t
+  name: flyte-propeller-config-ct29cf4cch
   namespace: flyte
 ---
 apiVersion: v1
@@ -8395,9 +8387,7 @@ data:
   pass.txt: eW91cnBhc3N3b3Jk
 kind: Secret
 metadata:
-  annotations: {}
-  labels: {}
-  name: db-pass-kdm4d5fcfb
+  name: db-pass-bthd2588cc
   namespace: flyte
 type: Opaque
 ---
@@ -8630,13 +8620,14 @@ spec:
           name: db-pass
       serviceAccountName: datacatalog
       volumes:
-      - name: shared-data
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: datacatalog-config-2tbm82k5t8
+          name: datacatalog-config-2bb94tc5b5
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-kdm4d5fcfb
+          secretName: db-pass-bthd2588cc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8689,7 +8680,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-ch84t45m6t
+          name: flyte-propeller-config-ct29cf4cch
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8812,16 +8803,17 @@ spec:
           name: db-pass
       serviceAccountName: flyteadmin
       volumes:
-      - name: shared-data
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: flyte-admin-config-g6662g42cf
+          name: flyte-admin-config-t2f9g68k65
         name: config-volume
       - configMap:
-          name: clusterresource-template-kf62ttf64k
+          name: clusterresource-template-tkdkkt4cb5
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-kdm4d5fcfb
+          secretName: db-pass-bthd2588cc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8906,7 +8898,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-ch84t45m6t
+          name: flyte-propeller-config-ct29cf4cch
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -9091,14 +9083,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-kf62ttf64k
+              name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-g6662g42cf
+              name: flyte-admin-config-t2f9g68k65
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-kdm4d5fcfb
+              secretName: db-pass-bthd2588cc
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1
@@ -9137,7 +9129,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-ch84t45m6t
+          name: flyte-propeller-config-ct29cf4cch
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---

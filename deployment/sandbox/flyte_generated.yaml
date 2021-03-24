@@ -2071,9 +2071,7 @@ data:
           enable-multicontainer: true
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: clusterresource-template-9mbg4b2fhc
+  name: clusterresource-template-dtg8ff28mt
   namespace: flyte
 ---
 apiVersion: v1
@@ -2110,9 +2108,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: datacatalog-config-dcg96ktb98
+  name: datacatalog-config-64k8dg9gck
   namespace: flyte
 ---
 apiVersion: v1
@@ -2210,9 +2206,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-admin-config-25gd9fg4cd
+  name: flyte-admin-config-5b5g7785h8
   namespace: flyte
 ---
 apiVersion: v1
@@ -2330,9 +2324,7 @@ data:
         kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-propeller-config-m7g9mthmfc
+  name: flyte-propeller-config-c8kkg4fth7
   namespace: flyte
 ---
 apiVersion: v1
@@ -2470,7 +2462,7 @@ data:
   pass.txt: YXdlc29tZXNhdWNl
 kind: Secret
 metadata:
-  name: db-pass-8mb4h2b9hf
+  name: db-pass-9dgchhk2bm
   namespace: flyte
 type: Opaque
 ---
@@ -2550,6 +2542,10 @@ metadata:
   namespace: flyte
 spec:
   ports:
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
   - name: http
     port: 80
     protocol: TCP
@@ -2558,10 +2554,6 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
   selector:
     app: flyteadmin
 ---
@@ -2761,11 +2753,11 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-dcg96ktb98
+          name: datacatalog-config-64k8dg9gck
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-8mb4h2b9hf
+          secretName: db-pass-9dgchhk2bm
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -2809,26 +2801,26 @@ spec:
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
+        - mountPath: /etc/secrets/user-info
+          name: sample-secrets
+          readOnly: true
         - mountPath: /etc/flyte/config
           name: config-volume
           readOnly: true
         - mountPath: /etc/webhook/certs
           name: webhook-certs
           readOnly: true
-        - mountPath: /etc/secrets/user-info
-          name: sample-secrets
-          readOnly: true
       serviceAccountName: flyte-pod-webhook
       volumes:
+      - name: sample-secrets
+        secret:
+          secretName: user-info
       - configMap:
-          name: flyte-propeller-config-m7g9mthmfc
+          name: flyte-propeller-config-c8kkg4fth7
         name: config-volume
       - name: webhook-certs
         secret:
           secretName: flyte-pod-webhook
-      - name: sample-secrets
-        secret:
-          secretName: user-info
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -2899,6 +2891,12 @@ spec:
             memory: 200Mi
       initContainers:
       - command:
+        - sh
+        - -c
+        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+        image: postgres:10.16-alpine
+        name: check-db-ready
+      - command:
         - flyteadmin
         - --config
         - /etc/flyte/config/*.yaml
@@ -2944,24 +2942,19 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
-      - command:
-        - sh
-        - -c
-        - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
-        image: postgres:10.16-alpine
-        name: check-db-ready
       serviceAccountName: flyteadmin
       volumes:
-      - name: shared-data
       - configMap:
-          name: flyte-admin-config-25gd9fg4cd
-        name: config-volume
-      - configMap:
-          name: clusterresource-template-9mbg4b2fhc
+          name: clusterresource-template-dtg8ff28mt
         name: resource-templates
+      - emptyDir: {}
+        name: shared-data
+      - configMap:
+          name: flyte-admin-config-5b5g7785h8
+        name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-8mb4h2b9hf
+          secretName: db-pass-9dgchhk2bm
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -3041,7 +3034,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-m7g9mthmfc
+          name: flyte-propeller-config-c8kkg4fth7
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -3210,7 +3203,8 @@ spec:
       - effect: NoSchedule
         key: node-role.kubernetes.io/master
       volumes:
-      - name: tmp-volume
+      - emptyDir: {}
+        name: tmp-volume
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -3348,14 +3342,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-9mbg4b2fhc
+              name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-25gd9fg4cd
+              name: flyte-admin-config-5b5g7785h8
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-8mb4h2b9hf
+              secretName: db-pass-9dgchhk2bm
   schedule: '*/1 * * * *'
 ---
 apiVersion: apps/v1
@@ -3528,7 +3522,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-m7g9mthmfc
+          name: flyte-propeller-config-c8kkg4fth7
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---

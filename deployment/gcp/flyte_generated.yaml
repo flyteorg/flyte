@@ -8047,9 +8047,7 @@ data:
   af_spark-role-binding.yaml: "apiVersion: rbac.authorization.k8s.io/v1beta1\nkind: RoleBinding\nmetadata:\n  name: spark-role-binding\n  namespace: {{ namespace }} \nroleRef:\n  apiGroup: rbac.authorization.k8s.io\n  kind: Role\n  name: spark-role\nsubjects:\n- kind: ServiceAccount\n  name: spark\n  namespace: {{ namespace }}\n\n"
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: clusterresource-template-kf62ttf64k
+  name: clusterresource-template-tkdkkt4cb5
   namespace: flyte
 ---
 apiVersion: v1
@@ -8096,9 +8094,7 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: datacatalog-config-f58d6c6kmf
+  name: datacatalog-config-d56hkd9229
   namespace: flyte
 ---
 apiVersion: v1
@@ -8202,9 +8198,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-admin-config-g2bbmh8t7d
+  name: flyte-admin-config-7k2dmcb4tg
   namespace: flyte
 ---
 apiVersion: v1
@@ -8372,9 +8366,7 @@ data:
         stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
-  annotations: {}
-  labels: {}
-  name: flyte-propeller-config-b8f6c7hkh9
+  name: flyte-propeller-config-7288ccf2f8
   namespace: flyte
 ---
 apiVersion: v1
@@ -8382,9 +8374,7 @@ data:
   pass.txt: eW91cnBhc3N3b3Jk
 kind: Secret
 metadata:
-  annotations: {}
-  labels: {}
-  name: db-pass-kdm4d5fcfb
+  name: db-pass-bthd2588cc
   namespace: flyte
 type: Opaque
 ---
@@ -8463,6 +8453,13 @@ metadata:
   namespace: flyte
 spec:
   ports:
+  - name: redoc
+    port: 87
+    protocol: TCP
+    targetPort: 8087
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
   - name: http
     port: 80
     protocol: TCP
@@ -8471,13 +8468,6 @@ spec:
     port: 81
     protocol: TCP
     targetPort: 8089
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
-  - name: http-metrics
-    port: 10254
-    protocol: TCP
   selector:
     app: flyteadmin
   type: LoadBalancer
@@ -8491,9 +8481,6 @@ metadata:
   namespace: flyte
 spec:
   ports:
-  - port: 80
-    protocol: TCP
-    targetPort: 8080
   - name: redoc
     port: 87
     protocol: TCP
@@ -8501,6 +8488,9 @@ spec:
   - name: http-metrics
     port: 10254
     protocol: TCP
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
   selector:
     app: flyteconsole
   type: LoadBalancer
@@ -8662,13 +8652,14 @@ spec:
           name: db-pass
       serviceAccountName: datacatalog
       volumes:
-      - name: shared-data
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: datacatalog-config-f58d6c6kmf
+          name: datacatalog-config-d56hkd9229
         name: config-volume
       - name: db-pass
         secret:
-          secretName: db-pass-kdm4d5fcfb
+          secretName: db-pass-bthd2588cc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8721,7 +8712,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-b8f6c7hkh9
+          name: flyte-propeller-config-7288ccf2f8
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8844,16 +8835,17 @@ spec:
           name: db-pass
       serviceAccountName: flyteadmin
       volumes:
-      - name: shared-data
+      - emptyDir: {}
+        name: shared-data
       - configMap:
-          name: flyte-admin-config-g2bbmh8t7d
+          name: flyte-admin-config-7k2dmcb4tg
         name: config-volume
       - configMap:
-          name: clusterresource-template-kf62ttf64k
+          name: clusterresource-template-tkdkkt4cb5
         name: resource-templates
       - name: db-pass
         secret:
-          secretName: db-pass-kdm4d5fcfb
+          secretName: db-pass-bthd2588cc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -8938,7 +8930,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-b8f6c7hkh9
+          name: flyte-propeller-config-7288ccf2f8
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -9123,14 +9115,14 @@ spec:
           serviceAccountName: flyteadmin
           volumes:
           - configMap:
-              name: clusterresource-template-kf62ttf64k
+              name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-g2bbmh8t7d
+              name: flyte-admin-config-7k2dmcb4tg
             name: config-volume
           - name: db-pass
             secret:
-              secretName: db-pass-kdm4d5fcfb
+              secretName: db-pass-bthd2588cc
   schedule: '*/1 * * * *'
 ---
 apiVersion: batch/v1
@@ -9169,7 +9161,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-b8f6c7hkh9
+          name: flyte-propeller-config-7288ccf2f8
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---
