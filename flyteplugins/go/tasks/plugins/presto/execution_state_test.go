@@ -106,6 +106,8 @@ func TestConstructTaskInfo(t *testing.T) {
 
 	taskInfo := ConstructTaskInfo(e)
 	assert.Equal(t, "https://prestoproxy-internal.flyteorg.net:443", taskInfo.Logs[0].Uri)
+	assert.Len(t, taskInfo.Metadata.ExternalResources, 1)
+	assert.Equal(t, taskInfo.Metadata.ExternalResources[0].ExternalId, "123")
 }
 
 func TestMapExecutionStateToPhaseInfo(t *testing.T) {

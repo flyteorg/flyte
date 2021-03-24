@@ -2,7 +2,10 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"testing"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/golang/protobuf/proto"
@@ -48,14 +51,32 @@ func assertBitSetsEqual(t testing.TB, b1, b2 *bitarray.BitSet, len int) {
 	}
 }
 
+func assertTaskExecutionMetadata(t *testing.T, subTaskIDs []*string, metadata *event.TaskExecutionMetadata) {
+	assert.NotNil(t, metadata)
+	var externalResources = make([]*event.ExternalResourceInfo, len(subTaskIDs))
+	for i, subTaskID := range subTaskIDs {
+		externalResources[i] = &event.ExternalResourceInfo{
+			ExternalId: *subTaskID,
+		}
+	}
+	assert.True(t, proto.Equal(&event.TaskExecutionMetadata{
+		ExternalResources: externalResources,
+	}, metadata))
+}
+
 func TestMapArrayStateToPluginPhase(t *testing.T) {
 	ctx := context.Background()
+	var subTaskIDs = make([]*string, 3)
+	for i := 0; i < 3; i++ {
+		subTaskID := fmt.Sprintf("sub_task_%d", i)
+		subTaskIDs[i] = &subTaskID
+	}
 
 	t.Run("start", func(t *testing.T) {
 		s := State{
 			CurrentPhase: PhaseStart,
 		}
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseInitializing, phaseInfo.Phase())
 	})
@@ -66,7 +87,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			PhaseVersion: 0,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 	})
@@ -79,10 +100,11 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			ExecutionArraySize: 5,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 		assert.Equal(t, uint32(368), phaseInfo.Version())
+		assertTaskExecutionMetadata(t, subTaskIDs, phaseInfo.Info().Metadata)
 	})
 
 	t.Run("write to discovery", func(t *testing.T) {
@@ -93,10 +115,11 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			ExecutionArraySize: 5,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRunning, phaseInfo.Phase())
 		assert.Equal(t, uint32(548), phaseInfo.Version())
+		assertTaskExecutionMetadata(t, subTaskIDs, phaseInfo.Info().Metadata)
 	})
 
 	t.Run("success", func(t *testing.T) {
@@ -105,9 +128,10 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			PhaseVersion: 0,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseSuccess, phaseInfo.Phase())
+		assertTaskExecutionMetadata(t, subTaskIDs, phaseInfo.Info().Metadata)
 	})
 
 	t.Run("retryable failure", func(t *testing.T) {
@@ -116,9 +140,10 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			PhaseVersion: 0,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhaseRetryableFailure, phaseInfo.Phase())
+		assertTaskExecutionMetadata(t, subTaskIDs, phaseInfo.Info().Metadata)
 	})
 
 	t.Run("permanent failure", func(t *testing.T) {
@@ -127,9 +152,10 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 			PhaseVersion: 0,
 		}
 
-		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+		phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 		assert.NoError(t, err)
 		assert.Equal(t, core.PhasePermanentFailure, phaseInfo.Phase())
+		assertTaskExecutionMetadata(t, subTaskIDs, phaseInfo.Info().Metadata)
 	})
 
 	t.Run("All phases", func(t *testing.T) {
@@ -138,7 +164,7 @@ func TestMapArrayStateToPluginPhase(t *testing.T) {
 				CurrentPhase: p,
 			}
 
-			phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil)
+			phaseInfo, err := MapArrayStateToPluginPhase(ctx, &s, nil, subTaskIDs)
 			assert.NoError(t, err)
 			assert.NotEqual(t, core.PhaseUndefined, phaseInfo.Phase())
 		}

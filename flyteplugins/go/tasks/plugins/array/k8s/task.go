@@ -30,6 +30,7 @@ type Task struct {
 	Config           *Config
 	ChildIdx         int
 	MessageCollector *errorcollector.ErrorMessageCollector
+	SubTaskIDs       []*string
 }
 
 type LaunchResult int8
@@ -126,6 +127,7 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference) (MonitorResult, error) {
 	indexStr := strconv.Itoa(t.ChildIdx)
 	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
+	t.SubTaskIDs = append(t.SubTaskIDs, &podName)
 	phaseInfo, err := CheckPodStatus(ctx, kubeClient,
 		k8sTypes.NamespacedName{
 			Name:      podName,

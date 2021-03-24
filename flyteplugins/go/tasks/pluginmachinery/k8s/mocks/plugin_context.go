@@ -150,6 +150,40 @@ func (_m *PluginContext) OutputWriter() io.OutputWriter {
 	return r0
 }
 
+type PluginContext_TaskExecutionMetadata struct {
+	*mock.Call
+}
+
+func (_m PluginContext_TaskExecutionMetadata) Return(_a0 core.TaskExecutionMetadata) *PluginContext_TaskExecutionMetadata {
+	return &PluginContext_TaskExecutionMetadata{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *PluginContext) OnTaskExecutionMetadata() *PluginContext_TaskExecutionMetadata {
+	c := _m.On("TaskExecutionMetadata")
+	return &PluginContext_TaskExecutionMetadata{Call: c}
+}
+
+func (_m *PluginContext) OnTaskExecutionMetadataMatch(matchers ...interface{}) *PluginContext_TaskExecutionMetadata {
+	c := _m.On("TaskExecutionMetadata", matchers...)
+	return &PluginContext_TaskExecutionMetadata{Call: c}
+}
+
+// TaskExecutionMetadata provides a mock function with given fields:
+func (_m *PluginContext) TaskExecutionMetadata() core.TaskExecutionMetadata {
+	ret := _m.Called()
+
+	var r0 core.TaskExecutionMetadata
+	if rf, ok := ret.Get(0).(func() core.TaskExecutionMetadata); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(core.TaskExecutionMetadata)
+		}
+	}
+
+	return r0
+}
+
 type PluginContext_TaskReader struct {
 	*mock.Call
 }

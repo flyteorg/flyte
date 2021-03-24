@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
 	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
@@ -394,5 +395,12 @@ func createTaskInfo(_ context.Context, jobRegion string, jobName string, jobType
 	return &pluginsCore.TaskInfo{
 		Logs:       taskLogs,
 		CustomInfo: customInfo,
+		Metadata: &event.TaskExecutionMetadata{
+			ExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId: jobName,
+				},
+			},
+		},
 	}, nil
 }

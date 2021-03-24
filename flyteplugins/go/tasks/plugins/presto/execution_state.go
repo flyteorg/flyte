@@ -3,6 +3,8 @@ package presto
 import (
 	"context"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -499,6 +501,13 @@ func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 		return &core.TaskInfo{
 			Logs:       logs,
 			OccurredAt: &t,
+			Metadata: &event.TaskExecutionMetadata{
+				ExternalResources: []*event.ExternalResourceInfo{
+					{
+						ExternalId: e.CommandID,
+					},
+				},
+			},
 		}
 	}
 

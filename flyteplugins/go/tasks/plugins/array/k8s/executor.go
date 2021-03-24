@@ -86,6 +86,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	var nextState *arrayCore.State
 	var err error
 	var logLinks []*idlCore.TaskLog
+	var subTaskIDs []*string
 
 	switch p, _ := pluginState.GetPhase(); p {
 	case arrayCore.PhaseStart:
@@ -107,7 +108,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
 
-		nextState, logLinks, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
+		nextState, logLinks, subTaskIDs, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
 			tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), pluginState)
 
 	case arrayCore.PhaseAssembleFinalOutput:
@@ -135,7 +136,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	}
 
 	// Determine transition information from the state
-	phaseInfo, err := arrayCore.MapArrayStateToPluginPhase(ctx, nextState, logLinks)
+	phaseInfo, err := arrayCore.MapArrayStateToPluginPhase(ctx, nextState, logLinks, subTaskIDs)
 	if err != nil {
 		return core.UnknownTransition, err
 	}

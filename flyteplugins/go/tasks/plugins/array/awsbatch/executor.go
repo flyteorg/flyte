@@ -104,7 +104,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	}
 
 	// Always attempt to augment phase with task logs.
-	logLinks, err := GetTaskLinks(ctx, tCtx.TaskExecutionMetadata(), e.jobStore, pluginState)
+	subTaskDetails, err := GetTaskLinks(ctx, tCtx.TaskExecutionMetadata(), e.jobStore, pluginState)
 	if err != nil {
 		return core.UnknownTransition, err
 	}
@@ -112,7 +112,7 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	logger.Infof(ctx, "Exiting handle with phase [%v]", pluginState.State.CurrentPhase)
 
 	// Determine transition information from the state
-	phaseInfo, err := arrayCore.MapArrayStateToPluginPhase(ctx, pluginState.State, logLinks)
+	phaseInfo, err := arrayCore.MapArrayStateToPluginPhase(ctx, pluginState.State, subTaskDetails.LogLinks, subTaskDetails.SubTaskIDs)
 	if err != nil {
 		return core.UnknownTransition, err
 	}
