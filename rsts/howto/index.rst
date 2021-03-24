@@ -32,6 +32,7 @@ Frequently Asked Questions
    notifications
    serviceaccount
    gcp
+   secrets
 
 
 .. _howto_extend:

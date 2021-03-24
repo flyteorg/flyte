@@ -25,11 +25,11 @@ images:
     newName: ghcr.io/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
-    newTag: v0.3.1 # DATACATALOG_TAG override the tag
+    newTag: v0.19.7 # FLYTECONSOLE_TAG  the tag
     newName: ghcr.io/flyteorg/flyteconsole # override the namep
   # Flyte DataCatalog
   - name: datacatalog # match images with this name
-    newTag: v0.19.7 # FLYTECONSOLE_TAG override the tag
+    newTag: v0.3.1 # DATACATALOG_TAG override the tag
     newName: ghcr.io/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
