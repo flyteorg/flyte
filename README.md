@@ -150,6 +150,7 @@ Resources that would help you get a better understanding of Flyte.
 - [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
 - [Spotify](https://www.spotify.com/)
 - [USU Group](https://www.usu.com/)
+- [Striveworks](https://striveworks.us/)
 
 # Component Repos 
 Repo | Language | Purpose | Status
