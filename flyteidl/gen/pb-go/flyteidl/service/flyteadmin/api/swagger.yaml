@@ -3591,12 +3591,12 @@ definitions:
       annotations:
         description: "Annotations to apply to the execution resource."
         $ref: "#/definitions/adminAnnotations"
-      auth_role:
-        description: "Optional: auth override to apply this execution."
-        $ref: "#/definitions/adminAuthRole"
       security_context:
         description: "Optional: security context override to apply this execution."
         $ref: "#/definitions/coreSecurityContext"
+      auth_role:
+        description: "Optional: auth override to apply this execution."
+        $ref: "#/definitions/adminAuthRole"
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"

@@ -8519,11 +8519,11 @@ export namespace flyteidl {
             /** ExecutionSpec annotations */
             annotations?: (flyteidl.admin.IAnnotations|null);
 
-            /** ExecutionSpec authRole */
-            authRole?: (flyteidl.admin.IAuthRole|null);
-
             /** ExecutionSpec securityContext */
             securityContext?: (flyteidl.core.ISecurityContext|null);
+
+            /** ExecutionSpec authRole */
+            authRole?: (flyteidl.admin.IAuthRole|null);
 
             /** ExecutionSpec qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
@@ -8559,11 +8559,11 @@ export namespace flyteidl {
             /** ExecutionSpec annotations. */
             public annotations?: (flyteidl.admin.IAnnotations|null);
 
-            /** ExecutionSpec authRole. */
-            public authRole?: (flyteidl.admin.IAuthRole|null);
-
             /** ExecutionSpec securityContext. */
             public securityContext?: (flyteidl.core.ISecurityContext|null);
+
+            /** ExecutionSpec authRole. */
+            public authRole?: (flyteidl.admin.IAuthRole|null);
 
             /** ExecutionSpec qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);

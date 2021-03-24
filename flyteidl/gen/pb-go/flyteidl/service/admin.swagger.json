@@ -3328,13 +3328,13 @@
           "$ref": "#/definitions/adminAnnotations",
           "description": "Annotations to apply to the execution resource."
         },
-        "auth_role": {
-          "$ref": "#/definitions/adminAuthRole",
-          "description": "Optional: auth override to apply this execution."
-        },
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "description": "Optional: security context override to apply this execution."
+        },
+        "auth_role": {
+          "$ref": "#/definitions/adminAuthRole",
+          "description": "Optional: auth override to apply this execution."
         },
         "quality_of_service": {
           "$ref": "#/definitions/coreQualityOfService",
