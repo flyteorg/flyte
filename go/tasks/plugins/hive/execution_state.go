@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -146,11 +148,21 @@ func ConstructTaskLog(e ExecutionState) *idlCore.TaskLog {
 func ConstructTaskInfo(e ExecutionState) *core.TaskInfo {
 	logs := make([]*idlCore.TaskLog, 0, 1)
 	t := time.Now()
+
+	metadata := &event.TaskExecutionMetadata{
+		ExternalResources: []*event.ExternalResourceInfo{
+			{
+				ExternalId: e.CommandID,
+			},
+		},
+	}
+
 	if e.CommandID != "" {
 		logs = append(logs, ConstructTaskLog(e))
 		return &core.TaskInfo{
 			Logs:       logs,
 			OccurredAt: &t,
+			Metadata:   metadata,
 		}
 	}
 

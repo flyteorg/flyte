@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
@@ -72,6 +74,8 @@ type TaskInfo struct {
 	OccurredAt *time.Time
 	// Custom Event information that the plugin would like to expose to the front-end
 	CustomInfo *structpb.Struct
+	// Metadata around how a task was executed
+	Metadata *event.TaskExecutionMetadata
 }
 
 func (t *TaskInfo) String() string {

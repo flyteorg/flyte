@@ -36,13 +36,22 @@ func GetJobTaskLog(jobSize int, accountID, region, queue, jobID string) *idlCore
 	}
 }
 
+type SubTaskDetails struct {
+	LogLinks   []*idlCore.TaskLog
+	SubTaskIDs []*string
+}
+
 func GetTaskLinks(ctx context.Context, taskMeta pluginCore.TaskExecutionMetadata, jobStore *JobStore, state *State) (
-	[]*idlCore.TaskLog, error) {
+	SubTaskDetails, error) {
 
 	logLinks := make([]*idlCore.TaskLog, 0, 4)
+	subTaskIDs := make([]*string, 0)
 
 	if state.GetExternalJobID() == nil {
-		return logLinks, nil
+		return SubTaskDetails{
+			LogLinks:   logLinks,
+			SubTaskIDs: subTaskIDs,
+		}, nil
 	}
 
 	// TODO: Add tasktemplate container config to job config
@@ -58,14 +67,20 @@ func GetTaskLinks(ctx context.Context, taskMeta pluginCore.TaskExecutionMetadata
 	})
 
 	if err != nil {
-		return nil, errors.Wrapf(errors2.DownstreamSystemError, err, "Failed to retrieve a job from job store.")
+		return SubTaskDetails{
+			LogLinks:   logLinks,
+			SubTaskIDs: subTaskIDs,
+		}, errors.Wrapf(errors2.DownstreamSystemError, err, "Failed to retrieve a job from job store.")
 	}
 
 	if job == nil {
 		logger.Debugf(ctx, "Job [%v] not found in jobs store. It might have been evicted. If reasonable, bump the max "+
 			"size of the LRU cache.", *state.GetExternalJobID())
 
-		return logLinks, nil
+		return SubTaskDetails{
+			LogLinks:   logLinks,
+			SubTaskIDs: subTaskIDs,
+		}, nil
 	}
 
 	detailedArrayStatus := state.GetArrayStatus().Detailed
@@ -83,7 +98,11 @@ func GetTaskLinks(ctx context.Context, taskMeta pluginCore.TaskExecutionMetadata
 				})
 			}
 		}
+		subTaskIDs = append(subTaskIDs, &subJob.ID)
 	}
 
-	return logLinks, nil
+	return SubTaskDetails{
+		LogLinks:   logLinks,
+		SubTaskIDs: subTaskIDs,
+	}, nil
 }

@@ -36,12 +36,12 @@ const (
 
 func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient,
 	config *Config, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference, currentState *arrayCore.State) (
-	newState *arrayCore.State, logLinks []*idlCore.TaskLog, err error) {
+	newState *arrayCore.State, logLinks []*idlCore.TaskLog, subTaskIDs []*string, err error) {
 	if int64(currentState.GetExecutionArraySize()) > config.MaxArrayJobSize {
 		ee := fmt.Errorf("array size > max allowed. Requested [%v]. Allowed [%v]", currentState.GetExecutionArraySize(), config.MaxArrayJobSize)
 		logger.Info(ctx, ee)
 		currentState = currentState.SetPhase(arrayCore.PhasePermanentFailure, 0).SetReason(ee.Error())
-		return currentState, logLinks, nil
+		return currentState, logLinks, subTaskIDs, nil
 	}
 
 	logLinks = make([]*idlCore.TaskLog, 0, 4)
@@ -51,6 +51,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		Summary:  arraystatus.ArraySummary{},
 		Detailed: arrayCore.NewPhasesCompactArray(uint(currentState.GetExecutionArraySize())),
 	}
+	subTaskIDs = make([]*string, 0, len(currentState.GetArrayStatus().Detailed.GetItems()))
 
 	// If we have arrived at this state for the first time then currentState has not been
 	// initialized with number of sub tasks.
@@ -70,7 +71,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			err = deallocateResource(ctx, tCtx, config, childIdx)
 			if err != nil {
 				logger.Errorf(ctx, "Error releasing allocation token [%s] in LaunchAndCheckSubTasks [%s]", podName, err)
-				return currentState, logLinks, errors2.Wrapf(ErrCheckPodStatus, err, "Error releasing allocation token.")
+				return currentState, logLinks, subTaskIDs, errors2.Wrapf(ErrCheckPodStatus, err, "Error releasing allocation token.")
 			}
 			newArrayStatus.Summary.Inc(existingPhase)
 			newArrayStatus.Detailed.SetItem(childIdx, bitarray.Item(existingPhase))
@@ -86,6 +87,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			Config:           config,
 			ChildIdx:         childIdx,
 			MessageCollector: &msg,
+			SubTaskIDs:       subTaskIDs,
 		}
 
 		// The first time we enter this state we will launch every subtask. On subsequent rounds, the pod
@@ -94,31 +96,32 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		launchResult, err = task.Launch(ctx, tCtx, kubeClient)
 		if err != nil {
 			logger.Errorf(ctx, "K8s array - Launch error %v", err)
-			return currentState, logLinks, err
+			return currentState, logLinks, subTaskIDs, err
 		}
 
 		switch launchResult {
 		case LaunchSuccess:
 			// Continue with execution if successful
 		case LaunchError:
-			return currentState, logLinks, err
+			return currentState, logLinks, subTaskIDs, err
 		// If Resource manager is enabled and there are currently not enough resources we can skip this round
 		// for a subtask and wait until there are enough resources.
 		case LaunchWaiting:
 			continue
 		case LaunchReturnState:
-			return currentState, logLinks, nil
+			return currentState, logLinks, subTaskIDs, nil
 		}
 
 		var monitorResult MonitorResult
 		monitorResult, err = task.Monitor(ctx, tCtx, kubeClient, dataStore, outputPrefix, baseOutputDataSandbox)
 		logLinks = task.LogLinks
+		subTaskIDs = task.SubTaskIDs
 
 		if monitorResult != MonitorSuccess {
 			if err != nil {
 				logger.Errorf(ctx, "K8s array - Monitor error %v", err)
 			}
-			return currentState, logLinks, err
+			return currentState, logLinks, subTaskIDs, err
 		}
 	}
 
@@ -127,9 +130,9 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	// Check that the taskTemplate is valid
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return currentState, logLinks, err
+		return currentState, logLinks, subTaskIDs, err
 	} else if taskTemplate == nil {
-		return currentState, logLinks, fmt.Errorf("required value not set, taskTemplate is nil")
+		return currentState, logLinks, subTaskIDs, fmt.Errorf("required value not set, taskTemplate is nil")
 	}
 
 	phase := arrayCore.SummaryToPhase(ctx, currentState.GetOriginalMinSuccesses()-currentState.GetOriginalArraySize()+int64(currentState.GetExecutionArraySize()), newArrayStatus.Summary)
@@ -151,7 +154,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		newState = newState.SetPhase(phase, core.DefaultPhaseVersion)
 	}
 
-	return newState, logLinks, nil
+	return newState, logLinks, subTaskIDs, nil
 }
 
 func CheckPodStatus(ctx context.Context, client core.KubeClient, name k8sTypes.NamespacedName) (

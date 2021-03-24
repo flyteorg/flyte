@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flytestdlib/errors"
@@ -94,6 +96,13 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 			},
 		},
 		OccurredAt: &tNow,
+		Metadata: &event.TaskExecutionMetadata{
+			ExternalResources: []*event.ExternalResourceInfo{
+				{
+					ExternalId: "abc",
+				},
+			},
+		},
 	}), nil
 }
 

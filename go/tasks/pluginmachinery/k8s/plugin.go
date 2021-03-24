@@ -58,6 +58,9 @@ type PluginContext interface {
 
 	// Returns the max allowed dataset size that the outputwriter will accept
 	MaxDatasetSizeBytes() int64
+
+	// Returns a handle to the Task's execution metadata.
+	TaskExecutionMetadata() pluginsCore.TaskExecutionMetadata
 }
 
 // Defines a simplified interface to author plugins for k8s resources.
