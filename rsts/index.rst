@@ -8,7 +8,7 @@ Meet Flyte
 
 Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-Created at Lyft, Flyte provides first class support for Python, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
+Created at Lyft, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
 
 Flyte provides a single unit of execution (task) as a top-level concept. Multiple tasks arranged in a data producer-consumer order create the workflow, which is pure specification created in any language.
 
