@@ -41,4 +41,4 @@ Beginners: see Getting Started
 
 Intermediate Users: see Extend Flyte and Available Extensions
 
-Advanced USers: see Architecture and Concepts
+Advanced Users: see Architecture and Concepts
