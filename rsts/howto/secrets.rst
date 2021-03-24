@@ -47,6 +47,15 @@ The webhook is included in all overlays in this repo. The deployment file create
 Scaling the Webhook
 *******************
 
+Vertical Scaling
+=================
+
+To scale the Webhook to be able to process the number/rate of pods you need, you may need to configure a vertical `pod
+autoscaler <https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler>`_.
+
+Horizontal Scaling
+==================
+
 The Webhook does not make any external API Requests in response to Pod mutation requests. It should be able to handle traffic
 quickly, but a benchmark is needed. For horizontal scaling, adding additional replicas for the Pod in the
 deployment should be sufficient. A single MutatingWebhookConfiguration object will be used, the same TLS certificate
