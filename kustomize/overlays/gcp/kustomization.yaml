@@ -23,7 +23,7 @@ bases:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.3.38 # override the tag
+    newTag: v0.4.0 # override the tag
     newName: ghcr.io/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
@@ -35,5 +35,9 @@ images:
     newName: ghcr.io/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.7.1 # override the tag
+    newTag: v0.7.8 # override the tag
+    newName: ghcr.io/flyteorg/flytepropeller # override the name
+  # Webhook
+  - name: webhook # match images with this name
+    newTag: v0.7.8 # override the tag
     newName: ghcr.io/flyteorg/flytepropeller # override the name
