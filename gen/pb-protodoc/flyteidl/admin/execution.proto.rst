@@ -569,8 +569,8 @@ of an execution as it progresses across phase changes..
     "disable_all": "...",
     "labels": "{...}",
     "annotations": "{...}",
-    "auth_role": "{...}",
     "security_context": "{...}",
+    "auth_role": "{...}",
     "quality_of_service": "{...}"
   }
 
@@ -624,16 +624,16 @@ annotations
   (:ref:`flyteidl.admin.Annotations <api_msg_flyteidl.admin.Annotations>`) Annotations to apply to the execution resource.
   
   
-.. _api_field_flyteidl.admin.ExecutionSpec.auth_role:
-
-auth_role
-  (:ref:`flyteidl.admin.AuthRole <api_msg_flyteidl.admin.AuthRole>`) Optional: auth override to apply this execution.
-  
-  
 .. _api_field_flyteidl.admin.ExecutionSpec.security_context:
 
 security_context
   (:ref:`flyteidl.core.SecurityContext <api_msg_flyteidl.core.SecurityContext>`) Optional: security context override to apply this execution.
+  
+  
+.. _api_field_flyteidl.admin.ExecutionSpec.auth_role:
+
+auth_role
+  (:ref:`flyteidl.admin.AuthRole <api_msg_flyteidl.admin.AuthRole>`) Optional: auth override to apply this execution.
   
   
 .. _api_field_flyteidl.admin.ExecutionSpec.quality_of_service:

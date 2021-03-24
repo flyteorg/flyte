@@ -1199,20 +1199,20 @@ func (m *ExecutionSpec) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetAuthRole()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetSecurityContext()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExecutionSpecValidationError{
-				field:  "AuthRole",
+				field:  "SecurityContext",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetSecurityContext()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetAuthRole()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ExecutionSpecValidationError{
-				field:  "SecurityContext",
+				field:  "AuthRole",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

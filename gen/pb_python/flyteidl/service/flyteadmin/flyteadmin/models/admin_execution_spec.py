@@ -48,8 +48,8 @@ class AdminExecutionSpec(object):
         'disable_all': 'bool',
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
-        'auth_role': 'AdminAuthRole',
         'security_context': 'CoreSecurityContext',
+        'auth_role': 'AdminAuthRole',
         'quality_of_service': 'CoreQualityOfService'
     }
 
@@ -61,12 +61,12 @@ class AdminExecutionSpec(object):
         'disable_all': 'disable_all',
         'labels': 'labels',
         'annotations': 'annotations',
-        'auth_role': 'auth_role',
         'security_context': 'security_context',
+        'auth_role': 'auth_role',
         'quality_of_service': 'quality_of_service'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, auth_role=None, security_context=None, quality_of_service=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -76,8 +76,8 @@ class AdminExecutionSpec(object):
         self._disable_all = None
         self._labels = None
         self._annotations = None
-        self._auth_role = None
         self._security_context = None
+        self._auth_role = None
         self._quality_of_service = None
         self.discriminator = None
 
@@ -95,10 +95,10 @@ class AdminExecutionSpec(object):
             self.labels = labels
         if annotations is not None:
             self.annotations = annotations
-        if auth_role is not None:
-            self.auth_role = auth_role
         if security_context is not None:
             self.security_context = security_context
+        if auth_role is not None:
+            self.auth_role = auth_role
         if quality_of_service is not None:
             self.quality_of_service = quality_of_service
 
@@ -258,29 +258,6 @@ class AdminExecutionSpec(object):
         self._annotations = annotations
 
     @property
-    def auth_role(self):
-        """Gets the auth_role of this AdminExecutionSpec.  # noqa: E501
-
-        Optional: auth override to apply this execution.  # noqa: E501
-
-        :return: The auth_role of this AdminExecutionSpec.  # noqa: E501
-        :rtype: AdminAuthRole
-        """
-        return self._auth_role
-
-    @auth_role.setter
-    def auth_role(self, auth_role):
-        """Sets the auth_role of this AdminExecutionSpec.
-
-        Optional: auth override to apply this execution.  # noqa: E501
-
-        :param auth_role: The auth_role of this AdminExecutionSpec.  # noqa: E501
-        :type: AdminAuthRole
-        """
-
-        self._auth_role = auth_role
-
-    @property
     def security_context(self):
         """Gets the security_context of this AdminExecutionSpec.  # noqa: E501
 
@@ -302,6 +279,29 @@ class AdminExecutionSpec(object):
         """
 
         self._security_context = security_context
+
+    @property
+    def auth_role(self):
+        """Gets the auth_role of this AdminExecutionSpec.  # noqa: E501
+
+        Optional: auth override to apply this execution.  # noqa: E501
+
+        :return: The auth_role of this AdminExecutionSpec.  # noqa: E501
+        :rtype: AdminAuthRole
+        """
+        return self._auth_role
+
+    @auth_role.setter
+    def auth_role(self, auth_role):
+        """Sets the auth_role of this AdminExecutionSpec.
+
+        Optional: auth override to apply this execution.  # noqa: E501
+
+        :param auth_role: The auth_role of this AdminExecutionSpec.  # noqa: E501
+        :type: AdminAuthRole
+        """
+
+        self._auth_role = auth_role
 
     @property
     def quality_of_service(self):

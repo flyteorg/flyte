@@ -2090,15 +2090,6 @@ class ExecutionSpec final :
   ::flyteidl::admin::Annotations* mutable_annotations();
   void set_allocated_annotations(::flyteidl::admin::Annotations* annotations);
 
-  // .flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];
-  PROTOBUF_DEPRECATED bool has_auth_role() const;
-  PROTOBUF_DEPRECATED void clear_auth_role();
-  PROTOBUF_DEPRECATED static const int kAuthRoleFieldNumber = 9;
-  PROTOBUF_DEPRECATED const ::flyteidl::admin::AuthRole& auth_role() const;
-  PROTOBUF_DEPRECATED ::flyteidl::admin::AuthRole* release_auth_role();
-  PROTOBUF_DEPRECATED ::flyteidl::admin::AuthRole* mutable_auth_role();
-  PROTOBUF_DEPRECATED void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
-
   // .flyteidl.core.SecurityContext security_context = 10;
   bool has_security_context() const;
   void clear_security_context();
@@ -2107,6 +2098,15 @@ class ExecutionSpec final :
   ::flyteidl::core::SecurityContext* release_security_context();
   ::flyteidl::core::SecurityContext* mutable_security_context();
   void set_allocated_security_context(::flyteidl::core::SecurityContext* security_context);
+
+  // .flyteidl.admin.AuthRole auth_role = 16 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_auth_role() const;
+  PROTOBUF_DEPRECATED void clear_auth_role();
+  PROTOBUF_DEPRECATED static const int kAuthRoleFieldNumber = 16;
+  PROTOBUF_DEPRECATED const ::flyteidl::admin::AuthRole& auth_role() const;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::AuthRole* release_auth_role();
+  PROTOBUF_DEPRECATED ::flyteidl::admin::AuthRole* mutable_auth_role();
+  PROTOBUF_DEPRECATED void set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role);
 
   // .flyteidl.core.QualityOfService quality_of_service = 17;
   bool has_quality_of_service() const;
@@ -2152,8 +2152,8 @@ class ExecutionSpec final :
   ::flyteidl::admin::ExecutionMetadata* metadata_;
   ::flyteidl::admin::Labels* labels_;
   ::flyteidl::admin::Annotations* annotations_;
-  ::flyteidl::admin::AuthRole* auth_role_;
   ::flyteidl::core::SecurityContext* security_context_;
+  ::flyteidl::admin::AuthRole* auth_role_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
   union NotificationOverridesUnion {
     NotificationOverridesUnion() {}
@@ -4816,51 +4816,6 @@ inline void ExecutionSpec::set_allocated_annotations(::flyteidl::admin::Annotati
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.annotations)
 }
 
-// .flyteidl.admin.AuthRole auth_role = 9 [deprecated = true];
-inline bool ExecutionSpec::has_auth_role() const {
-  return this != internal_default_instance() && auth_role_ != nullptr;
-}
-inline const ::flyteidl::admin::AuthRole& ExecutionSpec::auth_role() const {
-  const ::flyteidl::admin::AuthRole* p = auth_role_;
-  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.auth_role)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::AuthRole*>(
-      &::flyteidl::admin::_AuthRole_default_instance_);
-}
-inline ::flyteidl::admin::AuthRole* ExecutionSpec::release_auth_role() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionSpec.auth_role)
-  
-  ::flyteidl::admin::AuthRole* temp = auth_role_;
-  auth_role_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::admin::AuthRole* ExecutionSpec::mutable_auth_role() {
-  
-  if (auth_role_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::admin::AuthRole>(GetArenaNoVirtual());
-    auth_role_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.auth_role)
-  return auth_role_;
-}
-inline void ExecutionSpec::set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(auth_role_);
-  }
-  if (auth_role) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      auth_role = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, auth_role, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  auth_role_ = auth_role;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.auth_role)
-}
-
 // .flyteidl.core.SecurityContext security_context = 10;
 inline bool ExecutionSpec::has_security_context() const {
   return this != internal_default_instance() && security_context_ != nullptr;
@@ -4904,6 +4859,51 @@ inline void ExecutionSpec::set_allocated_security_context(::flyteidl::core::Secu
   }
   security_context_ = security_context;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.security_context)
+}
+
+// .flyteidl.admin.AuthRole auth_role = 16 [deprecated = true];
+inline bool ExecutionSpec::has_auth_role() const {
+  return this != internal_default_instance() && auth_role_ != nullptr;
+}
+inline const ::flyteidl::admin::AuthRole& ExecutionSpec::auth_role() const {
+  const ::flyteidl::admin::AuthRole* p = auth_role_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.auth_role)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::AuthRole*>(
+      &::flyteidl::admin::_AuthRole_default_instance_);
+}
+inline ::flyteidl::admin::AuthRole* ExecutionSpec::release_auth_role() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionSpec.auth_role)
+  
+  ::flyteidl::admin::AuthRole* temp = auth_role_;
+  auth_role_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::AuthRole* ExecutionSpec::mutable_auth_role() {
+  
+  if (auth_role_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::AuthRole>(GetArenaNoVirtual());
+    auth_role_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.auth_role)
+  return auth_role_;
+}
+inline void ExecutionSpec::set_allocated_auth_role(::flyteidl::admin::AuthRole* auth_role) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(auth_role_);
+  }
+  if (auth_role) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      auth_role = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, auth_role, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  auth_role_ = auth_role;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.auth_role)
 }
 
 // .flyteidl.core.QualityOfService quality_of_service = 17;
