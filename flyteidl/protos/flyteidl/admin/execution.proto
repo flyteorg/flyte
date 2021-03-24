@@ -235,11 +235,11 @@ message ExecutionSpec {
     // Annotations to apply to the execution resource.
     Annotations annotations = 8;
 
-    // Optional: auth override to apply this execution.
-    AuthRole auth_role = 9 [deprecated = true];
-
     // Optional: security context override to apply this execution.
     core.SecurityContext security_context = 10;
+
+    // Optional: auth override to apply this execution.
+    AuthRole auth_role = 16 [deprecated = true];
 
     // Indicates the runtime priority of the execution.
     core.QualityOfService quality_of_service = 17;

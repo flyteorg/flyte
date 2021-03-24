@@ -20388,8 +20388,8 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {boolean|null} [disableAll] ExecutionSpec disableAll
              * @property {flyteidl.admin.ILabels|null} [labels] ExecutionSpec labels
              * @property {flyteidl.admin.IAnnotations|null} [annotations] ExecutionSpec annotations
-             * @property {flyteidl.admin.IAuthRole|null} [authRole] ExecutionSpec authRole
              * @property {flyteidl.core.ISecurityContext|null} [securityContext] ExecutionSpec securityContext
+             * @property {flyteidl.admin.IAuthRole|null} [authRole] ExecutionSpec authRole
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] ExecutionSpec qualityOfService
              */
 
@@ -20465,20 +20465,20 @@ export const flyteidl = $root.flyteidl = (() => {
             ExecutionSpec.prototype.annotations = null;
 
             /**
-             * ExecutionSpec authRole.
-             * @member {flyteidl.admin.IAuthRole|null|undefined} authRole
-             * @memberof flyteidl.admin.ExecutionSpec
-             * @instance
-             */
-            ExecutionSpec.prototype.authRole = null;
-
-            /**
              * ExecutionSpec securityContext.
              * @member {flyteidl.core.ISecurityContext|null|undefined} securityContext
              * @memberof flyteidl.admin.ExecutionSpec
              * @instance
              */
             ExecutionSpec.prototype.securityContext = null;
+
+            /**
+             * ExecutionSpec authRole.
+             * @member {flyteidl.admin.IAuthRole|null|undefined} authRole
+             * @memberof flyteidl.admin.ExecutionSpec
+             * @instance
+             */
+            ExecutionSpec.prototype.authRole = null;
 
             /**
              * ExecutionSpec qualityOfService.
@@ -20540,10 +20540,10 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 if (message.annotations != null && message.hasOwnProperty("annotations"))
                     $root.flyteidl.admin.Annotations.encode(message.annotations, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
-                if (message.authRole != null && message.hasOwnProperty("authRole"))
-                    $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                 if (message.securityContext != null && message.hasOwnProperty("securityContext"))
                     $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
+                if (message.authRole != null && message.hasOwnProperty("authRole"))
+                    $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                 return writer;
@@ -20588,11 +20588,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 8:
                         message.annotations = $root.flyteidl.admin.Annotations.decode(reader, reader.uint32());
                         break;
-                    case 9:
-                        message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
-                        break;
                     case 10:
                         message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
+                        break;
+                    case 16:
+                        message.authRole = $root.flyteidl.admin.AuthRole.decode(reader, reader.uint32());
                         break;
                     case 17:
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
@@ -20657,15 +20657,15 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "annotations." + error;
                 }
-                if (message.authRole != null && message.hasOwnProperty("authRole")) {
-                    let error = $root.flyteidl.admin.AuthRole.verify(message.authRole);
-                    if (error)
-                        return "authRole." + error;
-                }
                 if (message.securityContext != null && message.hasOwnProperty("securityContext")) {
                     let error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
                     if (error)
                         return "securityContext." + error;
+                }
+                if (message.authRole != null && message.hasOwnProperty("authRole")) {
+                    let error = $root.flyteidl.admin.AuthRole.verify(message.authRole);
+                    if (error)
+                        return "authRole." + error;
                 }
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService")) {
                     let error = $root.flyteidl.core.QualityOfService.verify(message.qualityOfService);
