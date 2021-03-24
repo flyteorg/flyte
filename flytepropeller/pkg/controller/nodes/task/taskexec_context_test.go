@@ -5,6 +5,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+
 	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -148,8 +153,19 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), nodeID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId(), wfExecID)
 
+	assert.EqualValues(t, got.ResourceManager().(resourcemanager.TaskResourceManager).GetResourcePoolInfo(), make([]*event.ResourcePoolInfo, 0))
+
 	// TODO @kumare fix this test
-	assert.NotNil(t, got.ResourceManager())
+	assert.NotNil(t, got.rm)
+
+	_, err = got.rm.AllocateResource(context.TODO(), "foo", "token", pluginCore.ResourceConstraintsSpec{})
+	assert.NoError(t, err)
+	assert.EqualValues(t, []*event.ResourcePoolInfo{
+		{
+			Namespace:       "foo",
+			AllocationToken: "token",
+		},
+	}, got.ResourceManager().(resourcemanager.TaskResourceManager).GetResourcePoolInfo())
 	assert.Nil(t, got.Catalog())
 	// assert.Equal(t, got.InputReader(), ir)
 }

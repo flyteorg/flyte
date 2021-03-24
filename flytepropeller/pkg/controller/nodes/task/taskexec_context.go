@@ -67,7 +67,7 @@ func (t taskExecutionMetadata) GetMaxAttempts() uint32 {
 type taskExecutionContext struct {
 	handler.NodeExecutionContext
 	tm  taskExecutionMetadata
-	rm  pluginCore.ResourceManager
+	rm  resourcemanager.TaskResourceManager
 	psm *pluginStateManager
 	tr  handler.TaskReader
 	ow  *ioutils.BufferedOutputWriter

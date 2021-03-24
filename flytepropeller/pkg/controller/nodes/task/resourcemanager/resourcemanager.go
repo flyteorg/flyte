@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -72,6 +74,12 @@ type Proxy struct {
 	BaseResourceManager
 	ResourceNamespacePrefix pluginCore.ResourceNamespace
 	ExecutionIdentifier     *core.TaskExecutionIdentifier
+	ResourcePoolInfo        map[string]*event.ResourcePoolInfo
+}
+
+type TaskResourceManager interface {
+	pluginCore.ResourceManager
+	GetResourcePoolInfo() []*event.ResourcePoolInfo
 }
 
 func (p Proxy) ComposeResourceConstraint(spec pluginCore.ResourceConstraintsSpec) []FullyQualifiedResourceConstraint {
@@ -92,6 +100,13 @@ func (p Proxy) AllocateResource(ctx context.Context, namespace pluginCore.Resour
 		p.ResourceNamespacePrefix.CreateSubNamespace(namespace),
 		Token(allocationToken).prepend(ComposeTokenPrefix(p.ExecutionIdentifier)),
 		composedResourceConstraintList)
+	if err != nil {
+		return status, err
+	}
+	p.ResourcePoolInfo[allocationToken] = &event.ResourcePoolInfo{
+		AllocationToken: allocationToken,
+		Namespace:       string(namespace),
+	}
 	return status, err
 }
 
@@ -103,12 +118,21 @@ func (p Proxy) ReleaseResource(ctx context.Context, namespace pluginCore.Resourc
 	return err
 }
 
+func (p Proxy) GetResourcePoolInfo() []*event.ResourcePoolInfo {
+	response := make([]*event.ResourcePoolInfo, 0, len(p.ResourcePoolInfo))
+	for _, resourcePoolInfo := range p.ResourcePoolInfo {
+		response = append(response, resourcePoolInfo)
+	}
+	return response
+}
+
 func GetTaskResourceManager(r BaseResourceManager, resourceNamespacePrefix pluginCore.ResourceNamespace,
-	id *core.TaskExecutionIdentifier) pluginCore.ResourceManager {
+	id *core.TaskExecutionIdentifier) TaskResourceManager {
 	return Proxy{
 		BaseResourceManager:     r,
 		ResourceNamespacePrefix: resourceNamespacePrefix,
 		ExecutionIdentifier:     id,
+		ResourcePoolInfo:        make(map[string]*event.ResourcePoolInfo),
 	}
 }
 

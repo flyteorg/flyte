@@ -69,55 +69,77 @@ func getParentNodeExecIDForTask(taskExecID *core.TaskExecutionIdentifier, execCo
 	return nodeExecutionID, nil
 }
 
-func ToTaskExecutionEvent(taskExecID *core.TaskExecutionIdentifier, in io.InputFilePaths, out io.OutputFilePaths, info pluginCore.PhaseInfo,
-	nodeExecutionMetadata handler.NodeExecutionMetadata, execContext executors.ExecutionContext) (*event.TaskExecutionEvent, error) {
+type ToTaskExecutionEventInputs struct {
+	TaskExecContext       pluginCore.TaskExecutionContext
+	InputReader           io.InputFilePaths
+	OutputWriter          io.OutputFilePaths
+	Info                  pluginCore.PhaseInfo
+	NodeExecutionMetadata handler.NodeExecutionMetadata
+	ExecContext           executors.ExecutionContext
+	TaskType              string
+	PluginID              string
+	ResourcePoolInfo      []*event.ResourcePoolInfo
+}
+
+func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutionEvent, error) {
 	// Transitions to a new phase
 
 	tm := ptypes.TimestampNow()
 	var err error
-	if i := info.Info(); i != nil && i.OccurredAt != nil {
+	if i := input.Info.Info(); i != nil && i.OccurredAt != nil {
 		tm, err = ptypes.TimestampProto(*i.OccurredAt)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	nodeExecutionID, err := getParentNodeExecIDForTask(taskExecID, execContext)
+	taskExecID := input.TaskExecContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, input.ExecContext)
 	if err != nil {
 		return nil, err
 	}
+	metadata := input.Info.Info().Metadata
+	if metadata == nil {
+		metadata = &event.TaskExecutionMetadata{}
+	}
+	metadata.PluginIdentifier = input.PluginID
+	metadata.GeneratedName = input.TaskExecContext.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	metadata.ResourcePoolInfo = input.ResourcePoolInfo
 	tev := &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
 		ParentNodeExecutionId: nodeExecutionID,
 		RetryAttempt:          taskExecID.RetryAttempt,
-		Phase:                 ToTaskEventPhase(info.Phase()),
-		PhaseVersion:          info.Version(),
+		Phase:                 ToTaskEventPhase(input.Info.Phase()),
+		PhaseVersion:          input.Info.Version(),
 		ProducerId:            "propeller",
 		OccurredAt:            tm,
-		InputUri:              in.GetInputPath().String(),
+		InputUri:              input.InputReader.GetInputPath().String(),
+		TaskType:              input.TaskType,
+		Reason:                input.Info.Reason(),
+		Metadata:              metadata,
 	}
 
-	if info.Phase().IsSuccess() && out != nil {
-		if out.GetOutputPath() != "" {
-			tev.OutputResult = &event.TaskExecutionEvent_OutputUri{OutputUri: out.GetOutputPath().String()}
+	if input.Info.Phase().IsSuccess() && input.OutputWriter != nil {
+		if input.OutputWriter.GetOutputPath() != "" {
+			tev.OutputResult = &event.TaskExecutionEvent_OutputUri{OutputUri: input.OutputWriter.GetOutputPath().String()}
 		}
 	}
 
-	if info.Phase().IsFailure() && info.Err() != nil {
+	if input.Info.Phase().IsFailure() && input.Info.Err() != nil {
 		tev.OutputResult = &event.TaskExecutionEvent_Error{
-			Error: info.Err(),
+			Error: input.Info.Err(),
 		}
 	}
 
-	if info.Info() != nil {
-		tev.Logs = info.Info().Logs
-		tev.CustomInfo = info.Info().CustomInfo
+	if input.Info.Info() != nil {
+		tev.Logs = input.Info.Info().Logs
+		tev.CustomInfo = input.Info.Info().CustomInfo
 	}
 
-	if nodeExecutionMetadata.IsInterruptible() {
-		tev.Metadata = &event.TaskExecutionMetadata{InstanceClass: event.TaskExecutionMetadata_INTERRUPTIBLE}
+	if input.NodeExecutionMetadata.IsInterruptible() {
+		tev.Metadata.InstanceClass = event.TaskExecutionMetadata_INTERRUPTIBLE
 	} else {
-		tev.Metadata = &event.TaskExecutionMetadata{InstanceClass: event.TaskExecutionMetadata_DEFAULT}
+		tev.Metadata.InstanceClass = event.TaskExecutionMetadata_DEFAULT
 	}
 
 	return tev, nil
