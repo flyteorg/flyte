@@ -1,12 +1,14 @@
 # flytesnacks: Deep Dive into Flyte
 
 ## Goal
-A single repository that will provide useful snippets, examples and demo for using Flyte. 
+Create a single repository that will provide useful snippets, examples and demos for using Flyte. 
 
 ## Pre-Requiste
-It is recommended that users refer to [flyte.org](https://flyte.org) to orient themselves with Flyte.
-Also refer to the [Getting started guide](https://flyte.readthedocs.io/en/latest/tutorials/first_example.html) to start with Flyte. Once you have gone through the getting started, you can use this repository
-to start diving deeper.
+First time users: refer to [flyte.org](https://flyte.org) for a Flyte orientation (highly recommended).
+
+To start using Flyte, go to the [Getting started guide](https://flyte.readthedocs.io/en/latest/tutorials/first_example.html). 
+
+After Getting Started, use this repository for a deeper dive.
 
 # Index
 1. [Simple Examples using Flytekit Python](./python)
