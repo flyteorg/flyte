@@ -214,7 +214,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 		sCtxFinal := newNameSpacedSetupCtx(
 			tSCtx, newResourceManagerBuilder.GetResourceRegistrar(pluginResourceNamespacePrefix))
 		logger.Infof(ctx, "Loading Plugin [%s] ENABLED", p.ID)
-		cp, err := p.LoadPlugin(ctx, sCtxFinal)
+		cp, err := pluginCore.LoadPlugin(ctx, sCtxFinal, p)
 		if err != nil {
 			return regErrors.Wrapf(err, "failed to load plugin - %s", p.ID)
 		}
@@ -476,7 +476,7 @@ func (t Handler) Handle(ctx context.Context, nCtx handler.NodeExecutionContext) 
 		logger.Infof(ctx, "Node level caching is disabled. Skipping catalog read.")
 	}
 
-	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p.GetID())
+	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p)
 	if err != nil {
 		return handler.UnknownTransition, errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "unable to create Handler execution context")
 	}
@@ -662,7 +662,7 @@ func (t Handler) Abort(ctx context.Context, nCtx handler.NodeExecutionContext, r
 		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
 
-	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p.GetID())
+	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p)
 	if err != nil {
 		return errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "unable to create Handler execution context")
 	}
@@ -718,7 +718,7 @@ func (t Handler) Finalize(ctx context.Context, nCtx handler.NodeExecutionContext
 		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
 
-	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p.GetID())
+	tCtx, err := t.newTaskExecutionContext(ctx, nCtx, p)
 	if err != nil {
 		return errors.Wrapf(errors.IllegalStateError, nCtx.NodeID(), err, "unable to create Handler execution context")
 	}
