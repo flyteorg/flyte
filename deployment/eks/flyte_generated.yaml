@@ -7654,7 +7654,7 @@ rules:
 - apiGroups:
   - '*'
   resources:
-  - mutatingwebhookconfiguration
+  - mutatingwebhookconfigurations
   - secrets
   - pods
   verbs:
