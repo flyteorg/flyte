@@ -101,6 +101,38 @@ func (_m *Plugin) BuildResource(ctx context.Context, taskCtx core.TaskExecutionC
 	return r0, r1
 }
 
+type Plugin_GetProperties struct {
+	*mock.Call
+}
+
+func (_m Plugin_GetProperties) Return(_a0 k8s.PluginProperties) *Plugin_GetProperties {
+	return &Plugin_GetProperties{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *Plugin) OnGetProperties() *Plugin_GetProperties {
+	c := _m.On("GetProperties")
+	return &Plugin_GetProperties{Call: c}
+}
+
+func (_m *Plugin) OnGetPropertiesMatch(matchers ...interface{}) *Plugin_GetProperties {
+	c := _m.On("GetProperties", matchers...)
+	return &Plugin_GetProperties{Call: c}
+}
+
+// GetProperties provides a mock function with given fields:
+func (_m *Plugin) GetProperties() k8s.PluginProperties {
+	ret := _m.Called()
+
+	var r0 k8s.PluginProperties
+	if rf, ok := ret.Get(0).(func() k8s.PluginProperties); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(k8s.PluginProperties)
+	}
+
+	return r0
+}
+
 type Plugin_GetTaskPhase struct {
 	*mock.Call
 }

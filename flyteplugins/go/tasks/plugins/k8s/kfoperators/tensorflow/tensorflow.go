@@ -31,6 +31,10 @@ type tensorflowOperatorResourceHandler struct {
 // Sanity test that the plugin implements method of k8s.Plugin
 var _ k8s.Plugin = tensorflowOperatorResourceHandler{}
 
+func (tensorflowOperatorResourceHandler) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
+}
+
 // Defines a func to create a query object (typically just object and type meta portions) that's used to query k8s
 // resources.
 func (tensorflowOperatorResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionMetadata) (client.Object, error) {

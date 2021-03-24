@@ -22,6 +22,10 @@ const (
 type Plugin struct {
 }
 
+func (Plugin) GetProperties() k8s.PluginProperties {
+	return k8s.PluginProperties{}
+}
+
 func (Plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r client.Object) (pluginsCore.PhaseInfo, error) {
 
 	pod := r.(*v1.Pod)

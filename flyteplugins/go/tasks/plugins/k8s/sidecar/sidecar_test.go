@@ -26,6 +26,7 @@ import (
 	pluginsCoreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
@@ -493,4 +494,10 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	phaseInfo, err := handler.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+}
+
+func TestGetProperties(t *testing.T) {
+	handler := &sidecarResourceHandler{}
+	expected := k8s.PluginProperties{}
+	assert.Equal(t, expected, handler.GetProperties())
 }
