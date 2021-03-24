@@ -1,7 +1,14 @@
 package resourcemanager
 
 import (
+	"context"
 	"testing"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	core2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	rmConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -52,4 +59,19 @@ func TestToken_prepend(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTaskResourceManager(t *testing.T) {
+	rmBuilder, _ := GetResourceManagerBuilderByType(context.TODO(), rmConfig.TypeNoop, promutils.NewTestScope())
+	rm, _ := rmBuilder.BuildResourceManager(context.TODO())
+	taskResourceManager := GetTaskResourceManager(rm, "namespace", &core.TaskExecutionIdentifier{})
+	_, err := taskResourceManager.AllocateResource(context.TODO(), "namespace", "allocation token", core2.ResourceConstraintsSpec{})
+	assert.NoError(t, err)
+	resourcePoolInfo := taskResourceManager.GetResourcePoolInfo()
+	assert.EqualValues(t, []*event.ResourcePoolInfo{
+		{
+			Namespace:       "namespace",
+			AllocationToken: "allocation token",
+		},
+	}, resourcePoolInfo)
 }
