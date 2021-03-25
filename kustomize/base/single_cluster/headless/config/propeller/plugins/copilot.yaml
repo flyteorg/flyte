@@ -2,5 +2,5 @@ plugins:
   k8s:
     co-pilot:
       name: "flyte-copilot-"
-      image: "ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2"
+      image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
       start-timeout: "30s"
