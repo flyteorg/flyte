@@ -118,7 +118,7 @@ html_theme_options = {
     # If False, expand all TOC entries
     "globaltoc_collapse": False,
     # If True, show hidden TOC entries
-    "globaltoc_includehidden": False,
+    "globaltoc_includehidden": True,
     # don't include home link in breadcrumb bar, since it's included
     # in the nav_links key below.
     "master_doc": False,
