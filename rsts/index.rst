@@ -20,7 +20,7 @@ Flyte's main purpose is to increase the development velocity for data processing
 What makes Flyte different?
 ---------------------------
 
-* Fully Containerized
+* Container Native
 * Extensible Backend & SDK’s
 * Ergonomic SDK’s in Python and Java/Scala
 * Versioned & Auditable - all actions are recorded
