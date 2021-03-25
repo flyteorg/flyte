@@ -12,6 +12,7 @@ import (
 const (
 	namespaceMappingKey   = "namespace_mapping"
 	domainVariable        = "domain"
+	projectVariable       = "project"
 	projectDomainVariable = "project-domain"
 )
 
@@ -27,12 +28,14 @@ func (p *NamespaceMappingConfigurationProvider) GetNamespaceMappingConfig() comm
 
 	switch mapping {
 	case domainVariable:
-		return common.Domain
+		return common.NamespaceMappingDomain
+	case projectVariable:
+		return common.NamespaceMappingProject
 	case projectDomainVariable:
-		return common.ProjectDomain
+		return common.NamespaceMappingProjectDomain
 	default:
 		logger.Warningf(context.Background(), "Unsupported value for namespace_mapping in config, defaulting to <project>-<domain>")
-		return common.ProjectDomain
+		return common.NamespaceMappingProjectDomain
 	}
 }
 
