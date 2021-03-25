@@ -3,6 +3,46 @@ Flyte
 
 .. image:: images/flyte_lockup_gradient_on_light.png
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Getting Started
+   :name: gettingstartedtoc
+   :hidden:
+
+   getting_started/first_run
+   getting_started/first_example
+   getting_started/run_on_flyte
+   getting_started/learn
+
+.. toctree::
+   :caption: How-Tos
+   :maxdepth: 1
+   :name: howtotoc
+   :hidden:
+
+   plugins/index
+   howto/index
+
+.. toctree::
+   :caption: Deep Dive
+   :maxdepth: 1
+   :name: divedeeptoc
+   :hidden:
+
+   dive_deep/index
+   reference/index
+
+.. toctree::
+   :caption: Contributor Guide
+   :maxdepth: 1
+   :name: roadmaptoc
+   :hidden:
+
+   community/index
+   community/docs
+   community/roadmap
+   community/compare
+
 Meet Flyte
 ==========
 
