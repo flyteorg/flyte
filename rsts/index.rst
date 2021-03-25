@@ -39,6 +39,6 @@ Welcome to the documentation hub for Flyte!
 
 Beginners: see :ref:`getting-started-firstrun`
 
-Intermediate Users: see Extend Flyte and Available Extensions
+Intermediate Users: see :ref:`plugins`
 
-Advanced Users: see Architecture and Concepts
+Advanced Users: see :ref:`divedeep`
