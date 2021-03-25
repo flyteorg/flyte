@@ -5,7 +5,7 @@ on:
 
 jobs:
   update-flyte-releases:
-    name: Update Flyte components' versions to latest
+    name: Update Flyte components
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,13 +20,13 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.FLYTE_BOT_PAT }}
-          commit-message: Update Flyte Components' Versions
+          commit-message: Update Flyte Components
           committer: Flyte-Bot <admin@flyte.org>
           author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
           signoff: true
           branch: flyte-bot-update-releases
           delete-branch: true
-          title: 'Update Flyte components' releases'
+          title: 'Update Flyte components'
           body: |
             Updated flyte deployment
             - Updated GCP Flyte deployment
