@@ -8231,7 +8231,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2"
+          image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -8366,7 +8366,7 @@ data:
         stackdriver-logresourcename: k8s_container
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-7288ccf2f8
+  name: flyte-propeller-config-k8km2mmdgf
   namespace: flyte
 ---
 apiVersion: v1
@@ -8712,7 +8712,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-7288ccf2f8
+          name: flyte-propeller-config-k8km2mmdgf
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8930,7 +8930,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-7288ccf2f8
+          name: flyte-propeller-config-k8km2mmdgf
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -9161,7 +9161,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-7288ccf2f8
+          name: flyte-propeller-config-k8km2mmdgf
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---
