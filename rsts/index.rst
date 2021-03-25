@@ -24,7 +24,7 @@ What makes Flyte different?
 * Extensible Backend & SDK’s
 * Ergonomic SDK’s in Python and Java/Scala
 * Versioned & Auditable - all actions are recorded
-* Horizontally Scalable - execute a single task or a workflow, attach multiple schedules to a workflow
+* Matches your workflow - Start with one task, convert to a pipeline, attach multiple schedules or trigger using a programmatic API or on-demand
 * Battle-tested - millions of pipelines executed per month
 * Vertically-Integrated Compute - serverless experience
 * Deep understanding of data-lineage & provenance
