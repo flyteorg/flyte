@@ -7,6 +7,7 @@ Flyte
    :maxdepth: 1
    :caption: Getting Started
    :name: gettingstartedtoc
+   :hidden:
 
    getting_started/first_run
    getting_started/first_example
@@ -17,6 +18,7 @@ Flyte
    :caption: How-Tos
    :maxdepth: 1
    :name: howtotoc
+   :hidden:
 
    plugins/index
    howto/index
@@ -25,6 +27,7 @@ Flyte
    :caption: Deep Dive
    :maxdepth: 1
    :name: divedeeptoc
+   :hidden:
 
    dive_deep/index
    reference/index
@@ -33,6 +36,7 @@ Flyte
    :caption: Contributor Guide
    :maxdepth: 1
    :name: roadmaptoc
+   :hidden:
 
    community/index
    community/docs
