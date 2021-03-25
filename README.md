@@ -102,14 +102,14 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </h2>
 </html>
 
-- Used at _Scale_ in production by **500+** users at Lyft with more than **900k** workflows executed per month and more than **30+** million container executions per month
+- Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
 - Enables **collaboration across your organization**, as in:
   - Execute distributed data pipelines/workflows
   - Reuse tasks across projects, users, and workflows
   - Backtrace to a specified workflow
   - Compare results of training workflows over time and across pipelines
   - Share workflows and tasks across your teams
-- **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- from local to remote in mere seconds
+- **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- start locally and scale to the cloud instantly
 - **Centralized Inventory** constituting Tasks, Workflows and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
 - **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output; thus, illegal construction of pipelines fails during declaration rather than at runtime
