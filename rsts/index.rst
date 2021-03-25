@@ -31,7 +31,7 @@ What makes Flyte different?
 * Operation Visibility - cost, performance, etc.
 * Cross-Cloud Portable Pipelines
 
-At Lyft, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA and Mapping teams.
+At Lyft, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA, Mapping teams, Growth, Autonomous and other teams
 
 Whether you will be writing Flyte workflows, deploying the Flyte platform to your k8 cluster, or would like to extend and contribute to the architecture and design of Flyte, we have what you need.
 
