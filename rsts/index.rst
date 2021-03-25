@@ -22,7 +22,7 @@ What makes Flyte different?
 
 * Container Native
 * Extensible Backend & SDK’s
-* Ergonomic SDK’s in Python and Java/Scala
+* Ergonomic SDK’s in Python, Java & Scala
 * Versioned & Auditable - all actions are recorded
 * Matches your workflow - Start with one task, convert to a pipeline, attach multiple schedules or trigger using a programmatic API or on-demand
 * Battle-tested - millions of pipelines executed per month
