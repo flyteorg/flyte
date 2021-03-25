@@ -103,6 +103,12 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </html>
 
 - Used at _Scale_ in production by **500+** users at Lyft with more than **900k** workflows executed per month and more than **30+** million container executions per month
+- Enables **collaboration across your organization**, as in:
+  - Execute distributed data pipelines/workflows
+  - Reuse tasks across projects, users, and workflows
+  - Backtrace to a specified workflow
+  - Compare results of training workflows over time and across pipelines
+  - Share workflows and tasks across your teams
 - **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- from local to remote in mere seconds
 - **Centralized Inventory** constituting Tasks, Workflows and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
@@ -110,7 +116,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
 - Memoization and Lineage tracking
 - Workflow features:
-  - Multiple **[schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_remote_flyte/lp_schedules.html)** for every workflow
+  - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_remote_flyte/lp_schedules.html)**, trigger using a programmatic API, or on-demand
   - Parallel step execution
   - Extensible backend to add [customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_advanced/custom_task_plugin.html) experience (with simplified user experience)
   - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/run_conditions.html)**
@@ -120,7 +126,10 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
   - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/dynamics.html)** creation and execution with runtime type safety
   - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first class support in Python
   - _PreAlpha_: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/raw_container.html))
-- Records [history of all executions](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_basic/task_cache.html) and they are completely repeatable (as long as they follow convention)
+- Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_basic/task_cache.html)** of pipelines via:
+  - Versioned data, code and models
+  - Automatically tracked executions
+  - Declarative pipelines
 - **Multi cloud support** (AWS, GCP and others)
 - Extensible core, modularized, and deep observability
 - Automated notifications to Slack, Email, and Pagerduty
@@ -228,79 +237,6 @@ Here are the resources that would help you get a better understanding of Flyte.
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 
 ## 💖 Top Contributors
-=======
-- MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible , and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
-
-
-# Features
- - Used at Scale in production by 500+ users at Lyft with more than *900k* workflow executed a month and more than *30+* million container executions per month
- - Fast registration - from local to remote in one second.
- - Centralized Inventory of Tasks, Workflows and Executions
- - Single Task Execution support - Start executing a task and then convert it to a workflow
- - gRPC / REST interface to define and executes tasks and workflows
- - Type safe construction of pipelines, each task has an interface which is characterized by its input and outputs. Thus illegal construction of pipelines fails during declaration rather than at
-   runtime
- - Types that help in creating machine learning and data processing pipelines like - Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc
- - Memoization and Lineage tracking
- - Workflows features
-  * Multiple Schedules for every workflow
-  * Parallel step execution
-  * Extensible Backend to add customized plugin experiences (with simplified User experiences)
-  * Arbitrary container execution
-  * Branching
-  * Inline Subworkflows (a workflow can be embeded within one node of the top level workflow)
-  * Distributed Remote Child workflows (a remote workflow can be triggered and statically verified at compile time)
-  * Array Tasks (map some function over a large dataset, controlled execution of 1000's of containers)
-  * Dynamic Workflow creation and execution - with runtime type safety
-  * Container side plugins with first class support in python
-  * PreAlpha: Arbitrary flytekit less containers supported (RawContainer)
- - Maintain an inventory of tasks and workflows
- - Record history of all executions and executions (as long as they follow convention) are completely repeatable
- - Multi Cloud support (AWS, GCP and others)
- - Extensible core
- - Modularized
- - Automated notifications to Slack, Email, Pagerduty
- - Deep observability
- - Multi K8s cluster support
- - Comes with many system supported out of the box on K8s like Spark etc.
- - Snappy Console
- - Python CLI
- - Written in Golang and optimized for performance of large running jobs
- - Golang CLI - flytectl
-
-## Inprogress
- - Grafana templates (user/system observability)
- - helm chart for Flyte
- - Performance optimization
- - Flink-K8s
- 
-# Available Plugins
- - Containers
- - K8s Pods
- - AWS Batch Arrays
- - K8s Pod arrays
- - K8s Spark (native pyspark and java/scala)
- - AWS Athena
- - Qubole Hive
- - Presto Queries
- - Distributed Pytorch (K8s Native) - Pytorch Operator
- - Sagemaker (builtin algorithms & custom models)
- - Distributed Tensorflow (K8s Native) - TFOperator
- - Papermill Notebook execution (python and spark)
- - Type safe and data checking for Pandas dataframe using Pandera
- 
-## Coming Soon
- - Reactive pipelines
- - More integrations
-
-
-# Current Usage 
-- [Freenome](https://www.freenome.com/)
-- [Lyft Rideshare, Mapping](https://www.lyft.com/)
-- [Lyft L5 autonomous](https://self-driving.lyft.com/level5/)
-- [Spotify](https://www.spotify.com/)
-- [USU Group](https://www.usu.com/)
-- [Striveworks](https://striveworks.us/)
 
 A big thank you to the community for making Flyte possible!
 
