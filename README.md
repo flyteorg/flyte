@@ -225,7 +225,6 @@ Here are the resources that would help you get a better understanding of Flyte.
 
 - TWIML&AI - [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)
 - Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)
-<<<<<<< HEAD
 - MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)
 
 ## 💖 Top Contributors
@@ -302,7 +301,6 @@ Here are the resources that would help you get a better understanding of Flyte.
 - [Spotify](https://www.spotify.com/)
 - [USU Group](https://www.usu.com/)
 - [Striveworks](https://striveworks.us/)
->>>>>>> master
 
 A big thank you to the community for making Flyte possible!
 
