@@ -37,7 +37,7 @@ Whether you will be writing Flyte workflows, deploying the Flyte platform to you
 
 Welcome to the documentation hub for Flyte!
 
-Beginners: see Getting Started
+Beginners: see :ref:`getting-started-firstrun`
 
 Intermediate Users: see Extend Flyte and Available Extensions
 
