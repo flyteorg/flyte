@@ -1,0 +1,16 @@
+# Comment to be posted on PRs from first time contributors in your repository
+newPRWelcomeComment: >
+  Thanks for opening this pull request! 💖
+
+  Things that will help get your PR across the finish line:
+  - Refer to the [issue template](https://github.com/flyteorg/flyte/tree/master/.github/ISSUE_TEMPLATE).
+  - Sign off your commits (Reference: [DCO Guide](https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md)).
+  - A concise explanation about what your PR is all about.
+
+# Comment to be posted to on pull requests merged by a first time user
+firstPRMergeComment: >
+  Congrats on merging your first pull request! 🎉
+
+# Comment to be posted to on first time issues
+newIssueWelcomeComment: >
+  Thanks for opening your first issue here! 🛠
