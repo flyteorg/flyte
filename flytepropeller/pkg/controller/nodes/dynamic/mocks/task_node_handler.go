@@ -7,11 +7,11 @@ import (
 
 	catalog "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	core "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-
 	handler "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 
 	io "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+
+	ioutils "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -198,7 +198,7 @@ func (_m TaskNodeHandler_ValidateOutputAndCacheAdd) Return(_a0 catalog.Status, _
 	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: _m.Call.Return(_a0, _a1, _a2)}
 }
 
-func (_m *TaskNodeHandler) OnValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig, tr core.TaskReader, m catalog.Metadata) *TaskNodeHandler_ValidateOutputAndCacheAdd {
+func (_m *TaskNodeHandler) OnValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig, tr ioutils.SimpleTaskReader, m catalog.Metadata) *TaskNodeHandler_ValidateOutputAndCacheAdd {
 	c := _m.On("ValidateOutputAndCacheAdd", ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
 	return &TaskNodeHandler_ValidateOutputAndCacheAdd{Call: c}
 }
@@ -209,18 +209,18 @@ func (_m *TaskNodeHandler) OnValidateOutputAndCacheAddMatch(matchers ...interfac
 }
 
 // ValidateOutputAndCacheAdd provides a mock function with given fields: ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m
-func (_m *TaskNodeHandler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig, tr core.TaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error) {
+func (_m *TaskNodeHandler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID string, i io.InputReader, r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig, tr ioutils.SimpleTaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error) {
 	ret := _m.Called(ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
 
 	var r0 catalog.Status
-	if rf, ok := ret.Get(0).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, v1alpha1.ExecutionConfig, core.TaskReader, catalog.Metadata) catalog.Status); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, v1alpha1.ExecutionConfig, ioutils.SimpleTaskReader, catalog.Metadata) catalog.Status); ok {
 		r0 = rf(ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
 	} else {
 		r0 = ret.Get(0).(catalog.Status)
 	}
 
 	var r1 *io.ExecutionError
-	if rf, ok := ret.Get(1).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, v1alpha1.ExecutionConfig, core.TaskReader, catalog.Metadata) *io.ExecutionError); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, v1alpha1.ExecutionConfig, ioutils.SimpleTaskReader, catalog.Metadata) *io.ExecutionError); ok {
 		r1 = rf(ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
 	} else {
 		if ret.Get(1) != nil {
@@ -229,7 +229,7 @@ func (_m *TaskNodeHandler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, v1alpha1.ExecutionConfig, core.TaskReader, catalog.Metadata) error); ok {
+	if rf, ok := ret.Get(2).(func(context.Context, string, io.InputReader, io.OutputReader, io.OutputWriter, v1alpha1.ExecutionConfig, ioutils.SimpleTaskReader, catalog.Metadata) error); ok {
 		r2 = rf(ctx, nodeID, i, r, outputCommitter, executionConfig, tr, m)
 	} else {
 		r2 = ret.Error(2)

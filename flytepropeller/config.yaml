@@ -22,7 +22,8 @@ propeller:
       type: bucket
       rate: 100
       capacity: 1000
-  kube-config: "$HOME/.kube/config"
+  # This config assumes using `make start` in flytesnacks repo to startup a DinD k3s container
+  kube-config: "$HOME/kubeconfig/k3s/k3s.yaml"
   publish-k8s-events: true
   workflowStore:
     policy: "ResourceVersionCache"
@@ -61,7 +62,7 @@ plugins:
       - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
     co-pilot:
       name: "flyte-copilot-"
-      image: "flyteplugins:24c62d97452ce83ad6b4fd24e0eea2b4c44ff0c6"
+      image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
       start-timeout: "5s"
   sagemaker:
     roleArn: "arn:aws:iam::123456789012:role/test-development"
@@ -94,7 +95,7 @@ event:
   rate: 500
   capacity: 1000
 admin:
-  endpoint: localhost:80
+  endpoint: localhost:30081
   insecure: true
 catalog-cache:
   type: noop

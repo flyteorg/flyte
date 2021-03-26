@@ -107,7 +107,6 @@ func initConfig(cmd *cobra.Command, _ []string) error {
 		return err
 	}
 
-	fmt.Printf("Started in-cluster mode\n")
 	return nil
 }
 
