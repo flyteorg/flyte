@@ -116,7 +116,12 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 		},
 	}
 
-	modifiedArgs, err := template.ReplaceTemplateCommandArgs(ctx, taskCtx.TaskExecutionMetadata(), container.GetArgs(), taskCtx.InputReader(), taskCtx.OutputWriter())
+	modifiedArgs, err := template.Render(ctx, container.GetArgs(), template.Parameters{
+		TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+		Inputs:           taskCtx.InputReader(),
+		OutputPath:       taskCtx.OutputWriter(),
+		Task:             taskCtx.TaskReader(),
+	})
 	if err != nil {
 		return nil, err
 	}

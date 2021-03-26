@@ -13,9 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 )
 
 const resourceGPU = "gpu"
@@ -84,35 +82,34 @@ func ApplyResourceOverrides(ctx context.Context, resources v1.ResourceRequiremen
 }
 
 // Returns a K8s Container for the execution
-func ToK8sContainer(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExecutionMetadata, taskContainer *core.Container, iFace *core.TypedInterface,
-	inputReader io.InputReader, outputPaths io.OutputFilePaths) (*v1.Container, error) {
-	modifiedCommand, err := template.ReplaceTemplateCommandArgs(ctx, taskExecutionMetadata, taskContainer.GetCommand(), inputReader, outputPaths)
+func ToK8sContainer(ctx context.Context, taskContainer *core.Container, iFace *core.TypedInterface, parameters template.Parameters) (*v1.Container, error) {
+	modifiedCommand, err := template.Render(ctx, taskContainer.GetCommand(), parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	modifiedArgs, err := template.ReplaceTemplateCommandArgs(ctx, taskExecutionMetadata, taskContainer.GetArgs(), inputReader, outputPaths)
+	modifiedArgs, err := template.Render(ctx, taskContainer.GetArgs(), parameters)
 	if err != nil {
 		return nil, err
 	}
 
-	envVars := DecorateEnvVars(ctx, ToK8sEnvVar(taskContainer.GetEnv()), taskExecutionMetadata.GetTaskExecutionID())
+	envVars := DecorateEnvVars(ctx, ToK8sEnvVar(taskContainer.GetEnv()), parameters.TaskExecMetadata.GetTaskExecutionID())
 
-	if taskExecutionMetadata.GetOverrides() == nil {
+	if parameters.TaskExecMetadata.GetOverrides() == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "platform/compiler error, overrides not set for task")
 	}
-	if taskExecutionMetadata.GetOverrides() == nil || taskExecutionMetadata.GetOverrides().GetResources() == nil {
+	if parameters.TaskExecMetadata.GetOverrides() == nil || parameters.TaskExecMetadata.GetOverrides().GetResources() == nil {
 		return nil, errors.Errorf(errors.BadTaskSpecification, "resource requirements not found for container task, required!")
 	}
 
-	res := taskExecutionMetadata.GetOverrides().GetResources()
+	res := parameters.TaskExecMetadata.GetOverrides().GetResources()
 	if res != nil {
 		res = ApplyResourceOverrides(ctx, *res)
 	}
 
 	// Make the container name the same as the pod name, unless it violates K8s naming conventions
 	// Container names are subject to the DNS-1123 standard
-	containerName := taskExecutionMetadata.GetTaskExecutionID().GetGeneratedName()
+	containerName := parameters.TaskExecMetadata.GetTaskExecutionID().GetGeneratedName()
 	if errs := validation.IsDNS1123Label(containerName); len(errs) > 0 {
 		containerName = rand.String(4)
 	}

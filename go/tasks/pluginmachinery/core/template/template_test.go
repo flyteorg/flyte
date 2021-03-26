@@ -66,8 +66,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
 
 	t.Run("empty cmd", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata,
-			[]string{}, nil, nil)
+		actual, err := Render(context.TODO(), []string{}, Parameters{})
 		assert.NoError(t, err)
 		assert.Equal(t, []string{}, actual)
 	})
@@ -78,11 +77,17 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 		rawOutputDataPrefix: "s3://custom-bucket",
 	}
 
+	params := Parameters{
+		TaskExecMetadata: taskMetadata,
+		Inputs:           in,
+		OutputPath:       out,
+		Task:             nil,
+	}
 	t.Run("nothing to substitute", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 
 		assert.Equal(t, []string{
@@ -92,11 +97,11 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Sub InputFile", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			"{{ .Input }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 
 		assert.Equal(t, []string{
@@ -108,11 +113,17 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 
 	t.Run("Sub Input Prefix", func(t *testing.T) {
 		in := dummyInputReader{inputPath: "input/prefix"}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			"{{ .Input }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 
 		assert.Equal(t, []string{
@@ -123,11 +134,11 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Sub Output Prefix", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			"{{ .OutputPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -137,12 +148,12 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Sub Input Output prefix", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			"{{ .Input }}",
 			"{{ .OutputPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -153,13 +164,13 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("Bad input template", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			"${{input}}",
 			"{{ .OutputPrefix }}",
 			"--switch {{ .rawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -182,13 +193,19 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				},
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.arr }}`,
 			"{{ .OutputPrefix }}",
 			"{{ $RawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -205,13 +222,19 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"date": coreutils.MustMakeLiteral(time.Date(1900, 01, 01, 01, 01, 01, 000000001, time.UTC)),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.date }}`,
 			"{{ .OutputPrefix }}",
 			"{{ .rawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -228,13 +251,19 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.arr }}`,
 			"{{ .OutputPrefix }}",
 			"{{ .wrongOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -247,14 +276,20 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 
 	t.Run("nil input", func(t *testing.T) {
 		in := dummyInputReader{inputs: &core.LiteralMap{}}
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
 
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.arr }}`,
 			"{{ .OutputPrefix }}",
 			"--raw-data-output-prefix {{ .rawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -274,14 +309,20 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"min":   coreutils.MustMakeLiteral(15),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		actual, err := Render(context.TODO(), []string{
 			`SELECT
         	COUNT(*) as total_count
     	FROM
         	hive.events.{{ .Inputs.table }}
     	WHERE
         	ds = '{{ .Inputs.ds }}' AND hr = '{{ .Inputs.hr }}' AND min = {{ .Inputs.min }}
-	    `}, in, out)
+	    `}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			`SELECT
@@ -299,12 +340,18 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 			},
 		}}
-		_, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		_, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.blah }}`,
 			"{{ .OutputPrefix }}",
-		}, in, out)
+		}, params)
 		assert.Error(t, err)
 	})
 
@@ -314,12 +361,18 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
 			},
 		}}
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             nil,
+		}
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"world",
 			`--someArg {{ .Inputs.blah blah }} {{ .PerretryuNIqueKey }}`,
 			"{{ .OutputPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -330,12 +383,12 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	})
 
 	t.Run("sub raw output data prefix", func(t *testing.T) {
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"{{ .perRetryUniqueKey }}",
 			"world",
 			"{{ .rawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -343,6 +396,52 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			"world",
 			"s3://custom-bucket",
 		}, actual)
+	})
+
+	t.Run("sub task template happy", func(t *testing.T) {
+		ctx := context.TODO()
+		tMock := &pluginsCoreMocks.TaskTemplatePath{}
+		tMock.OnPath(ctx).Return("s3://task-path", nil)
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             tMock,
+		}
+
+		actual, err := Render(ctx, []string{
+			"hello",
+			"{{ .perRetryUniqueKey }}",
+			"world",
+			"{{ .taskTemplatePath }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"per_retry_unique_key",
+			"world",
+			"s3://task-path",
+		}, actual)
+	})
+
+	t.Run("sub task template error", func(t *testing.T) {
+		ctx := context.TODO()
+		tMock := &pluginsCoreMocks.TaskTemplatePath{}
+		tMock.OnPath(ctx).Return("", fmt.Errorf("error"))
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath:       out,
+			Task:             tMock,
+		}
+
+		_, err := Render(ctx, []string{
+			"hello",
+			"{{ .perRetryUniqueKey }}",
+			"world",
+			"{{ .taskTemplatePath }}",
+		}, params)
+		assert.Error(t, err)
 	})
 }
 
@@ -353,18 +452,21 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		rawOutputDataPrefix: "s3://custom-bucket",
 	}
 
+	params := Parameters{Inputs: in, OutputPath: out}
+
 	t.Run("dashes are replaced", func(t *testing.T) {
 		taskExecutionID := &pluginsCoreMocks.TaskExecutionID{}
 		taskExecutionID.On("GetGeneratedName").Return("per-retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
 
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		params.TaskExecMetadata = taskMetadata
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"{{ .perRetryUniqueKey }}",
 			"world",
 			"{{ .rawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",
@@ -381,6 +483,7 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
 
+		params.TaskExecMetadata = taskMetadata
 		testString := "doesn't start with a number"
 		testString2 := "1 does start with a number"
 		testString3 := "  1 3 nd spaces "
@@ -388,12 +491,12 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		assert.Equal(t, "adoes start with a number", startsWithAlpha.ReplaceAllString(testString2, "a"))
 		assert.Equal(t, "and spaces ", startsWithAlpha.ReplaceAllString(testString3, "a"))
 
-		actual, err := ReplaceTemplateCommandArgs(context.TODO(), taskMetadata, []string{
+		actual, err := Render(context.TODO(), []string{
 			"hello",
 			"{{ .perRetryUniqueKey }}",
 			"world",
 			"{{ .rawOutputDataPrefix }}",
-		}, in, out)
+		}, params)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{
 			"hello",

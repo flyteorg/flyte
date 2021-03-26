@@ -223,12 +223,17 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (string, 
 		return "", "", "", "", err
 	}
 
-	outputs, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), []string{
+	outputs, err := template.Render(ctx, []string{
 		prestoQuery.RoutingGroup,
 		prestoQuery.Catalog,
 		prestoQuery.Schema,
 		prestoQuery.Statement,
-	}, tCtx.InputReader(), tCtx.OutputWriter())
+	}, template.Parameters{
+		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+		Inputs:           tCtx.InputReader(),
+		OutputPath:       tCtx.OutputWriter(),
+		Task:             tCtx.TaskReader(),
+	})
 	if err != nil {
 		return "", "", "", "", err
 	}

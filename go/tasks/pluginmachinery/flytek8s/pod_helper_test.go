@@ -80,6 +80,19 @@ func dummyInputReader() io.InputReader {
 	return inputReader
 }
 
+func dummyExecContext(r *v1.ResourceRequirements) pluginsCore.TaskExecutionContext {
+	ow := &pluginsIOMock.OutputWriter{}
+	ow.OnGetOutputPrefixPath().Return("")
+	ow.OnGetRawOutputPrefix().Return("")
+
+	tCtx := &pluginsCoreMock.TaskExecutionContext{}
+	tCtx.OnTaskExecutionMetadata().Return(dummyTaskExecutionMetadata(r))
+	tCtx.OnInputReader().Return(dummyInputReader())
+	tCtx.OnTaskReader().Return(dummyTaskReader())
+	tCtx.OnOutputWriter().Return(ow)
+	return tCtx
+}
+
 func TestPodSetup(t *testing.T) {
 	configAccessor := viper.NewAccessor(config1.Options{
 		StrictMode:  true,
@@ -142,11 +155,7 @@ func updatePod(t *testing.T) {
 func toK8sPodInterruptible(t *testing.T) {
 	ctx := context.TODO()
 
-	op := &pluginsIOMock.OutputFilePaths{}
-	op.On("GetOutputPrefixPath").Return(storage.DataReference(""))
-	op.On("GetRawOutputPrefix").Return(storage.DataReference(""))
-
-	x := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
+	x := dummyExecContext(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
 			v1.ResourceCPU:     resource.MustParse("1024m"),
 			v1.ResourceStorage: resource.MustParse("100M"),
@@ -158,7 +167,7 @@ func toK8sPodInterruptible(t *testing.T) {
 		},
 	})
 
-	p, err := ToK8sPodSpec(ctx, x, dummyTaskReader(), dummyInputReader(), op)
+	p, err := ToK8sPodSpec(ctx, x)
 	assert.NoError(t, err)
 	assert.Len(t, p.Tolerations, 2)
 	assert.Equal(t, "x/flyte", p.Tolerations[1].Key)
@@ -196,7 +205,7 @@ func TestToK8sPod(t *testing.T) {
 	op.On("GetRawOutputPrefix").Return(storage.DataReference(""))
 
 	t.Run("WithGPU", func(t *testing.T) {
-		x := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
+		x := dummyExecContext(&v1.ResourceRequirements{
 			Limits: v1.ResourceList{
 				v1.ResourceCPU:     resource.MustParse("1024m"),
 				v1.ResourceStorage: resource.MustParse("100M"),
@@ -208,13 +217,13 @@ func TestToK8sPod(t *testing.T) {
 			},
 		})
 
-		p, err := ToK8sPodSpec(ctx, x, dummyTaskReader(), dummyInputReader(), op)
+		p, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 1)
 	})
 
 	t.Run("NoGPU", func(t *testing.T) {
-		x := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
+		x := dummyExecContext(&v1.ResourceRequirements{
 			Limits: v1.ResourceList{
 				v1.ResourceCPU:     resource.MustParse("1024m"),
 				v1.ResourceStorage: resource.MustParse("100M"),
@@ -225,14 +234,14 @@ func TestToK8sPod(t *testing.T) {
 			},
 		})
 
-		p, err := ToK8sPodSpec(ctx, x, dummyTaskReader(), dummyInputReader(), op)
+		p, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 0)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
 	})
 
 	t.Run("Default toleration, selector, scheduler", func(t *testing.T) {
-		x := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
+		x := dummyExecContext(&v1.ResourceRequirements{
 			Limits: v1.ResourceList{
 				v1.ResourceCPU:     resource.MustParse("1024m"),
 				v1.ResourceStorage: resource.MustParse("100M"),
@@ -256,7 +265,7 @@ func TestToK8sPod(t *testing.T) {
 			SchedulerName: "myScheduler",
 		}))
 
-		p, err := ToK8sPodSpec(ctx, x, dummyTaskReader(), dummyInputReader(), op)
+		p, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, len(p.Tolerations))
 		assert.Equal(t, 1, len(p.NodeSelector))

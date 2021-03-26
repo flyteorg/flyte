@@ -39,13 +39,23 @@ func validateAndFinalizePod(
 		if container.Name == primaryContainerName {
 			hasPrimaryContainer = true
 		}
-		modifiedCommand, err := template.ReplaceTemplateCommandArgs(ctx, taskCtx.TaskExecutionMetadata(), container.Command, taskCtx.InputReader(), taskCtx.OutputWriter())
+		modifiedCommand, err := template.Render(ctx, container.Command, template.Parameters{
+			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+			Inputs:           taskCtx.InputReader(),
+			OutputPath:       taskCtx.OutputWriter(),
+			Task:             taskCtx.TaskReader(),
+		})
 		if err != nil {
 			return nil, err
 		}
 		container.Command = modifiedCommand
 
-		modifiedArgs, err := template.ReplaceTemplateCommandArgs(ctx, taskCtx.TaskExecutionMetadata(), container.Args, taskCtx.InputReader(), taskCtx.OutputWriter())
+		modifiedArgs, err := template.Render(ctx, container.Args, template.Parameters{
+			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+			Inputs:           taskCtx.InputReader(),
+			OutputPath:       taskCtx.OutputWriter(),
+			Task:             taskCtx.TaskReader(),
+		})
 		if err != nil {
 			return nil, err
 		}

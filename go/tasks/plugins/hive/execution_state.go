@@ -274,7 +274,13 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 
 	query := hiveJob.Query.GetQuery()
 
-	outputs, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), []string{query}, tCtx.InputReader(), tCtx.OutputWriter())
+	outputs, err := template.Render(ctx, []string{query},
+		template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           tCtx.InputReader(),
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		})
 	if err != nil {
 		return "", "", []string{}, 0, "", err
 	}

@@ -50,13 +50,26 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 		return nil, errors.Errorf(errors.BadTaskSpecification, "config[%v] is missing", DynamicTaskQueueKey)
 	}
 
-	cmd, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), taskTemplate.GetContainer().GetCommand(), tCtx.InputReader(), tCtx.OutputWriter())
+	inputReader := array.GetInputReader(tCtx, taskTemplate)
+	cmd, err := template.Render(
+		ctx,
+		taskTemplate.GetContainer().GetCommand(),
+		template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           inputReader,
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		})
 	if err != nil {
 		return nil, err
 	}
-	inputReader := array.GetInputReader(tCtx, taskTemplate)
-	args, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), taskTemplate.GetContainer().GetArgs(),
-		inputReader, tCtx.OutputWriter())
+	args, err := template.Render(ctx, taskTemplate.GetContainer().GetArgs(),
+		template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           inputReader,
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		})
 	taskTemplate.GetContainer().GetEnv()
 	if err != nil {
 		return nil, err
