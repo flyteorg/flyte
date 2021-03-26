@@ -83,8 +83,13 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 		return LaunchError, errors2.Wrapf(ErrGetTaskTypeVersion, err, "Missing task template")
 	}
 	inputReader := array.GetInputReader(tCtx, taskTemplate)
-	pod.Spec.Containers[0].Args, err = template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), args,
-		inputReader, tCtx.OutputWriter())
+	pod.Spec.Containers[0].Args, err = template.Render(ctx, args,
+		template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           inputReader,
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		})
 	if err != nil {
 		return LaunchError, errors2.Wrapf(ErrReplaceCmdTemplate, err, "Failed to replace cmd args")
 	}

@@ -9,8 +9,15 @@ import (
 	"github.com/flyteorg/flytestdlib/storage"
 )
 
+// An interface to access a remote/sharable location that contains the serialized TaskTemplate
+type TaskTemplatePath interface {
+	// Returns the path
+	Path(ctx context.Context) (storage.DataReference, error)
+}
+
 // An interface to access the TaskInformation
 type TaskReader interface {
+	TaskTemplatePath
 	// Returns the core TaskTemplate
 	Read(ctx context.Context) (*core.TaskTemplate, error)
 }

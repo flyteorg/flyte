@@ -6,6 +6,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	"github.com/flyteorg/flytestdlib/logger"
@@ -14,7 +16,6 @@ import (
 
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 )
 
 const PodKind = "pod"
@@ -45,9 +46,8 @@ func UpdatePod(taskExecutionMetadata pluginsCore.TaskExecutionMetadata,
 	}
 }
 
-func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExecutionMetadata, taskReader pluginsCore.TaskReader,
-	inputs io.InputReader, outputPaths io.OutputFilePaths) (*v1.PodSpec, error) {
-	task, err := taskReader.Read(ctx)
+func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v1.PodSpec, error) {
+	task, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		logger.Warnf(ctx, "failed to read task information when trying to construct Pod, err: %s", err.Error())
 		return nil, err
@@ -56,7 +56,12 @@ func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExe
 		logger.Errorf(ctx, "Default Pod creation logic works for default container in the task template only.")
 		return nil, fmt.Errorf("container not specified in task template")
 	}
-	c, err := ToK8sContainer(ctx, taskExecutionMetadata, task.GetContainer(), task.Interface, inputs, outputPaths)
+	c, err := ToK8sContainer(ctx, task.GetContainer(), task.Interface, template.Parameters{
+		Task:             tCtx.TaskReader(),
+		Inputs:           tCtx.InputReader(),
+		OutputPath:       tCtx.OutputWriter(),
+		TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +72,9 @@ func ToK8sPodSpec(ctx context.Context, taskExecutionMetadata pluginsCore.TaskExe
 	pod := &v1.PodSpec{
 		Containers: containers,
 	}
-	UpdatePod(taskExecutionMetadata, []v1.ResourceRequirements{c.Resources}, pod)
+	UpdatePod(tCtx.TaskExecutionMetadata(), []v1.ResourceRequirements{c.Resources}, pod)
 
-	if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, pod, task.GetInterface(), taskExecutionMetadata, inputs, outputPaths, task.GetContainer().GetDataConfig()); err != nil {
+	if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, pod, task.GetInterface(), tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), task.GetContainer().GetDataConfig()); err != nil {
 		return nil, err
 	}
 

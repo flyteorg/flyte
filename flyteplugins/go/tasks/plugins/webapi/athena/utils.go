@@ -97,10 +97,15 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 			return QueryInfo{}, errors.Wrapf(ErrUser, err, "Expects a valid QubleHiveJob proto in custom field.")
 		}
 
-		outputs, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), []string{
+		outputs, err := template.Render(ctx, []string{
 			hiveQuery.Query.Query,
 			hiveQuery.ClusterLabel,
-		}, tCtx.InputReader(), tCtx.OutputWriter())
+		}, template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           tCtx.InputReader(),
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		})
 		if err != nil {
 			return QueryInfo{}, err
 		}
@@ -121,12 +126,17 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 			return QueryInfo{}, errors.Wrapf(ErrUser, err, "Expects a valid PrestoQuery proto in custom field.")
 		}
 
-		outputs, err := template.ReplaceTemplateCommandArgs(ctx, tCtx.TaskExecutionMetadata(), []string{
+		outputs, err := template.Render(ctx, []string{
 			prestoQuery.RoutingGroup,
 			prestoQuery.Catalog,
 			prestoQuery.Schema,
 			prestoQuery.Statement,
-		}, tCtx.InputReader(), tCtx.OutputWriter())
+		}, template.Parameters{
+			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
+			Inputs:           tCtx.InputReader(),
+			OutputPath:       tCtx.OutputWriter(),
+			Task:             tCtx.TaskReader(),
+		})
 		if err != nil {
 			return QueryInfo{}, err
 		}

@@ -3,6 +3,8 @@ package k8s
 import (
 	"context"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 
 	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -16,6 +18,16 @@ import (
 )
 
 const PodKind = "pod"
+
+type arrayTaskContext struct {
+	core.TaskExecutionContext
+	arrayInputReader io.InputReader
+}
+
+// Overrides the TaskExecutionContext from base and returns a specialized context for Array
+func (a *arrayTaskContext) InputReader() io.InputReader {
+	return a.arrayInputReader
+}
 
 // Note that Name is not set on the result object.
 // It's up to the caller to set the Name before creating the object in K8s.
@@ -35,7 +47,10 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 			"Required value not set, taskTemplate Container")
 	}
 
-	inputReader := array.GetInputReader(tCtx, taskTemplate)
+	arrTCtx := &arrayTaskContext{
+		TaskExecutionContext: tCtx,
+		arrayInputReader:     array.GetInputReader(tCtx, taskTemplate),
+	}
 	var arrayJob *idlPlugins.ArrayJob
 	if taskTemplate.GetCustom() != nil {
 		arrayJob, err = core2.ToArrayJob(taskTemplate.GetCustom(), taskTemplate.TaskTypeVersion)
@@ -44,8 +59,7 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		}
 	}
 
-	podSpec, err := flytek8s.ToK8sPodSpec(ctx, tCtx.TaskExecutionMetadata(), tCtx.TaskReader(), inputReader,
-		tCtx.OutputWriter())
+	podSpec, err := flytek8s.ToK8sPodSpec(ctx, arrTCtx)
 	if err != nil {
 		return v1.Pod{}, nil, err
 	}

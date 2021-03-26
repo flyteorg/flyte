@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	InputsSuffix      = "inputs.pb"
-	FuturesSuffix     = "futures.pb"
-	OutputsSuffix     = "outputs.pb"
-	ErrorsSuffix      = "error.pb"
-	IndexLookupSuffix = "indexlookup.pb"
+	InputsSuffix       = "inputs.pb"
+	TaskTemplateSuffix = "task.pb"
+	FuturesSuffix      = "futures.pb"
+	OutputsSuffix      = "outputs.pb"
+	ErrorsSuffix       = "error.pb"
+	IndexLookupSuffix  = "indexlookup.pb"
 )
 
 func constructPath(store storage.ReferenceConstructor, base storage.DataReference, suffix string) storage.DataReference {
@@ -25,30 +26,12 @@ func constructPath(store storage.ReferenceConstructor, base storage.DataReferenc
 	return res
 }
 
-func GetPath(ctx context.Context, store storage.ReferenceConstructor, root storage.DataReference, subNames ...string) (res storage.DataReference, err error) {
-	return store.ConstructReference(ctx, root, subNames...)
+// GetTaskTemplatePath returns a protobuf file path where TaskTemplate is stored
+func GetTaskTemplatePath(ctx context.Context, store storage.ReferenceConstructor, base storage.DataReference) (storage.DataReference, error) {
+	return store.ConstructReference(ctx, base, TaskTemplateSuffix)
 }
 
-func GetMasterOutputsPath(ctx context.Context, store storage.ReferenceConstructor, output storage.DataReference) (res storage.DataReference, err error) {
-	return store.ConstructReference(ctx, output, OutputsSuffix)
-}
-
-func GetInputsPath(ctx context.Context, store storage.ReferenceConstructor, prefix storage.DataReference) (res storage.DataReference, err error) {
-	return store.ConstructReference(ctx, prefix, InputsSuffix)
-}
-
-func GetOutputsPath(ctx context.Context, store storage.ReferenceConstructor, prefix storage.DataReference) (res storage.DataReference, err error) {
-	return store.ConstructReference(ctx, prefix, OutputsSuffix)
-}
-
-func GetFuturesPath(ctx context.Context, store storage.ReferenceConstructor, prefix storage.DataReference) (res storage.DataReference, err error) {
-	return store.ConstructReference(ctx, prefix, FuturesSuffix)
-}
-
-func GetErrorsPath(ctx context.Context, store storage.ReferenceConstructor, prefix storage.DataReference) (res storage.DataReference, err error) {
-	return store.ConstructReference(ctx, prefix, ErrorsSuffix)
-}
-
+// GetIndexLookupPath returns the indexpath suffixed to IndexLookupSuffix
 func GetIndexLookupPath(ctx context.Context, store storage.ReferenceConstructor, prefix storage.DataReference) (res storage.DataReference, err error) {
 	return store.ConstructReference(ctx, prefix, IndexLookupSuffix)
 }

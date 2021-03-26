@@ -334,7 +334,12 @@ func injectTaskTemplateEnvVarToHyperparameters(ctx context.Context, taskTemplate
 
 func injectArgsAndEnvVars(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, taskTemplate *flyteIdlCore.TaskTemplate) ([]*commonv1.KeyValuePair, error) {
 	templateArgs := taskTemplate.GetContainer().GetArgs()
-	templateArgs, err := template.ReplaceTemplateCommandArgs(ctx, taskCtx.TaskExecutionMetadata(), templateArgs, taskCtx.InputReader(), taskCtx.OutputWriter())
+	templateArgs, err := template.Render(ctx, templateArgs, template.Parameters{
+		TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+		Inputs:           taskCtx.InputReader(),
+		OutputPath:       taskCtx.OutputWriter(),
+		Task:             taskCtx.TaskReader(),
+	})
 	if err != nil {
 		return nil, errors.Wrapf(ErrSagemaker, err, "Failed to de-template the hyperparameter values")
 	}
