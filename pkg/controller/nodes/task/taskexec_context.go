@@ -69,7 +69,7 @@ type taskExecutionContext struct {
 	tm  taskExecutionMetadata
 	rm  resourcemanager.TaskResourceManager
 	psm *pluginStateManager
-	tr  handler.TaskReader
+	tr  pluginCore.TaskReader
 	ow  *ioutils.BufferedOutputWriter
 	ber *bufferedEventRecorder
 	sm  pluginCore.SecretManager
@@ -168,6 +168,11 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
 	}
 
+	taskTemplatePath, err := ioutils.GetTaskTemplatePath(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetDataDir())
+	if err != nil {
+		return nil, err
+	}
+
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
@@ -179,7 +184,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx handler.Node
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),
 		psm: psm,
-		tr:  nCtx.TaskReader(),
+		tr:  ioutils.NewLazyUploadingTaskReader(nCtx.TaskReader(), taskTemplatePath, nCtx.DataStore()),
 		ow:  ow,
 		ber: newBufferedEventRecorder(),
 		c:   t.asyncCatalog,

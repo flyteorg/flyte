@@ -3,6 +3,8 @@ package task
 import (
 	"context"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
@@ -71,7 +73,7 @@ func (t *Handler) CheckCatalogCache(ctx context.Context, tr pluginCore.TaskReade
 
 func (t *Handler) ValidateOutputAndCacheAdd(ctx context.Context, nodeID v1alpha1.NodeID, i io.InputReader,
 	r io.OutputReader, outputCommitter io.OutputWriter, executionConfig v1alpha1.ExecutionConfig,
-	tr pluginCore.TaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error) {
+	tr ioutils.SimpleTaskReader, m catalog.Metadata) (catalog.Status, *io.ExecutionError, error) {
 
 	tk, err := tr.Read(ctx)
 	if err != nil {
