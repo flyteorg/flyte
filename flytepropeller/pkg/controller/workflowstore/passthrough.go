@@ -20,6 +20,7 @@ type workflowstoreMetrics struct {
 	workflowUpdateFailedCount   prometheus.Counter
 	workflowUpdateSuccessCount  prometheus.Counter
 	workflowUpdateConflictCount prometheus.Counter
+	workflowTooLarge            prometheus.Counter
 	workflowUpdateLatency       promutils.StopWatch
 }
 
@@ -36,7 +37,7 @@ func (p *passthroughWorkflowStore) Get(ctx context.Context, namespace, name stri
 		// processing.
 		if kubeerrors.IsNotFound(err) {
 			logger.Warningf(ctx, "Workflow not found in cache.")
-			return nil, errWorkflowNotFound
+			return nil, ErrWorkflowNotFound
 		}
 		return nil, err
 	}
@@ -57,6 +58,10 @@ func (p *passthroughWorkflowStore) UpdateStatus(ctx context.Context, workflow *v
 
 		if kubeerrors.IsConflict(err) {
 			p.metrics.workflowUpdateConflictCount.Inc()
+		}
+		if kubeerrors.IsRequestEntityTooLargeError(err) {
+			p.metrics.workflowTooLarge.Inc()
+			return nil, ErrWorkflowToLarge
 		}
 		p.metrics.workflowUpdateFailedCount.Inc()
 		logger.Errorf(ctx, "Failed to update workflow status. Error [%v]", err)
@@ -82,6 +87,10 @@ func (p *passthroughWorkflowStore) Update(ctx context.Context, workflow *v1alpha
 		if kubeerrors.IsConflict(err) {
 			p.metrics.workflowUpdateConflictCount.Inc()
 		}
+		if kubeerrors.IsRequestEntityTooLargeError(err) {
+			p.metrics.workflowTooLarge.Inc()
+			return nil, ErrWorkflowToLarge
+		}
 		p.metrics.workflowUpdateFailedCount.Inc()
 		logger.Errorf(ctx, "Failed to update workflow. Error [%v]", err)
 		return nil, err
@@ -101,6 +110,7 @@ func NewPassthroughWorkflowStore(_ context.Context, scope promutils.Scope, wfCli
 		workflowUpdateConflictCount: scope.MustNewCounter("wf_update_conflict", "Failure to update ETCd because of conflict"),
 		workflowUpdateSuccessCount:  scope.MustNewCounter("wf_update_success", "Success in updating ETCd"),
 		workflowUpdateLatency:       scope.MustNewStopWatch("wf_update_latency", "Time taken to complete update/updatestatus", time.Millisecond),
+		workflowTooLarge:            scope.MustNewCounter("wf_too_large", "Failure to update ETCd because of size of the workflow is too large."),
 	}
 
 	return &passthroughWorkflowStore{

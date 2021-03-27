@@ -6,6 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore/mocks"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
@@ -49,6 +53,15 @@ func TestPropeller_Handle(t *testing.T) {
 	const namespace = "test"
 	const name = "123"
 	t.Run("notPresent", func(t *testing.T) {
+		assert.NoError(t, p.Handle(ctx, namespace, name))
+	})
+
+	t.Run("stale", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+		s := &mocks.FlyteWorkflow{}
+		exec := &mockExecutor{}
+		p := NewPropellerHandler(ctx, cfg, s, exec, scope)
+		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrStaleWorkflowError, "stale")).Once()
 		assert.NoError(t, p.Handle(ctx, namespace, name))
 	})
 
@@ -450,7 +463,6 @@ func TestPropeller_Handle(t *testing.T) {
 }
 
 func TestPropeller_Handle_TurboMode(t *testing.T) {
-	// TODO unit tests need to fixed
 	scope := promutils.NewTestScope()
 	ctx := context.TODO()
 	s := workflowstore.NewInMemoryWorkflowStore()
@@ -668,4 +680,82 @@ func TestPropellerHandler_Initialize(t *testing.T) {
 	p := NewPropellerHandler(ctx, cfg, s, exec, scope)
 
 	assert.NoError(t, p.Initialize(ctx))
+}
+
+func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
+	ctx := context.TODO()
+	cfg := &config.Config{
+		MaxWorkflowRetries: 0,
+	}
+
+	const namespace = "test"
+	const name = "123"
+
+	t.Run("unknown error", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+		s := &mocks.FlyteWorkflow{}
+		exec := &mockExecutor{}
+		p := NewPropellerHandler(ctx, cfg, s, exec, scope)
+		wf := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+		}
+		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, fmt.Errorf("unknown error")).Once()
+
+		err := p.Handle(ctx, namespace, name)
+		assert.Error(t, err)
+	})
+
+	t.Run("too-large-fail-repeat", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+		s := &mocks.FlyteWorkflow{}
+		exec := &mockExecutor{}
+		p := NewPropellerHandler(ctx, cfg, s, exec, scope)
+		wf := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+		}
+		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.OnUpdateMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Twice()
+
+		err := p.Handle(ctx, namespace, name)
+		assert.Error(t, err)
+	})
+
+	t.Run("too-large-success", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+		s := &mocks.FlyteWorkflow{}
+		exec := &mockExecutor{}
+		p := NewPropellerHandler(ctx, cfg, s, exec, scope)
+		wf := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+		}
+		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseRunning, "done", nil)
+			return nil
+		}
+		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
+		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, nil).Once()
+
+		err := p.Handle(ctx, namespace, name)
+		assert.NoError(t, err)
+	})
 }

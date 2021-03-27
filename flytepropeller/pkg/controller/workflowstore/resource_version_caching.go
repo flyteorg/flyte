@@ -61,7 +61,7 @@ func (r *resourceVersionCaching) Get(ctx context.Context, namespace, name string
 
 	if w != nil {
 		if r.isResourceVersionSameAsPrevious(ctx, namespace, name, w.ResourceVersion) {
-			return nil, errStaleWorkflowError
+			return nil, ErrStaleWorkflowError
 		}
 	}
 
