@@ -6,6 +6,8 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
+//go:generate mockery -all
+
 type PriorityClass int
 
 const (

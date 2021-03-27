@@ -41,7 +41,7 @@ func (i *InmemoryWorkflowStore) Get(ctx context.Context, namespace, name string)
 			return v, nil
 		}
 	}
-	return nil, errWorkflowNotFound
+	return nil, ErrWorkflowNotFound
 }
 
 func (i *InmemoryWorkflowStore) UpdateStatus(ctx context.Context, w *v1alpha1.FlyteWorkflow, priorityClass PriorityClass) (

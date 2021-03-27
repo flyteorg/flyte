@@ -7,6 +7,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
@@ -52,6 +54,7 @@ func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 	}
 }
 
+// Helper method to record system error in the workflow.
 func RecordSystemError(w *v1alpha1.FlyteWorkflow, err error) *v1alpha1.FlyteWorkflow {
 	// Let's mark these as system errors.
 	// We only want to increase failed attempts and discard any other partial changes to the CRD.
@@ -61,6 +64,7 @@ func RecordSystemError(w *v1alpha1.FlyteWorkflow, err error) *v1alpha1.FlyteWork
 	return wfDeepCopy
 }
 
+// Core Propeller structure that houses the Reconciliation loop for Flytepropeller
 type Propeller struct {
 	wfStore          workflowstore.FlyteWorkflow
 	workflowExecutor executors.Workflow
@@ -68,10 +72,13 @@ type Propeller struct {
 	cfg              *config.Config
 }
 
+// Initializes all downstream executors
 func (p *Propeller) Initialize(ctx context.Context) error {
 	return p.workflowExecutor.Initialize(ctx)
 }
 
+// TryMutateWorkflow will try to mutate the workflow by traversing it and reconciling the desired and actual state.
+// The desired state here is the entire workflow is completed, actual state is each nodes current execution state.
 func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.FlyteWorkflow) (*v1alpha1.FlyteWorkflow, error) {
 
 	t := p.metrics.DeepCopyTime.Start()
@@ -134,7 +141,8 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 	return mutableW, nil
 }
 
-// reconciler compares the actual state with the desired, and attempts to
+// Handle method is the entry point for the reconciler.
+// It compares the actual state with the desired, and attempts to
 // converge the two. It then updates the GetExecutionStatus block of the FlyteWorkflow resource
 // with the current status of the resource.
 // Every FlyteWorkflow transitions through the following
@@ -227,6 +235,24 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 		newWf, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
 		if updateErr != nil {
 			t.Stop()
+			// The update has failed, lets check if this is because the size is too large. If so
+			if workflowstore.IsWorkflowTooLarge(updateErr) {
+				logger.Errorf(ctx, "Failed storing workflow to the store, reason: %s", updateErr)
+				p.metrics.SystemError.Inc(ctx)
+				// Workflow is too large, we will mark the workflow as failing and record it. This will automatically
+				// propagate the failure in the next round.
+				mutableW := w.DeepCopy()
+				mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow size has breached threshold, aborting", &core.ExecutionError{
+					Kind:    core.ExecutionError_SYSTEM,
+					Code:    "WorkflowTooLarge",
+					Message: "Workflow execution state is too large for Flyte to handle.",
+				})
+				if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+					logger.Errorf(ctx, "Failed recording a large workflow as failed, reason: %s. Retrying...", e)
+					return e
+				}
+				return nil
+			}
 			return updateErr
 		}
 		if err != nil {
@@ -249,6 +275,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	return nil
 }
 
+// NewPropellerHandler creates a new Propeller and initializes metrics
 func NewPropellerHandler(_ context.Context, cfg *config.Config, wfStore workflowstore.FlyteWorkflow, executor executors.Workflow, scope promutils.Scope) *Propeller {
 
 	metrics := newPropellerMetrics(scope)

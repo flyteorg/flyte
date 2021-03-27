@@ -1,3 +1,5 @@
+// Package controller contains the K8s controller logic. This does not contain the actual workflow re-conciliation.
+// It is then entrypoint into the K8s based Flyte controller.
 package controller
 
 import (
