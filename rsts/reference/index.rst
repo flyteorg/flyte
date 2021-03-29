@@ -1,8 +1,8 @@
 .. _reference:
 
-#################################
-API, CLI and Component Reference
-#################################
+#############
+API Reference
+#############
 
 
 .. toctree::
@@ -10,10 +10,10 @@ API, CLI and Component Reference
    :caption: API Reference
    :name: apitoc
 
-   Flyte Core Language Specification (FlyteIDL) <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>
    Flytekit Python <https://flyte.readthedocs.io/projects/flytekit/en/master/>
    Flytekit JAVA  <https://github.com/spotify/flytekit-java>
-   Flytectl CLI reference <https://flytectl.readthedocs.io/en/latest/>
+   Flyte Core Language Specification (FlyteIDL) <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>
+   Flytectl <https://flytectl.readthedocs.io/en/latest/>
 
 
 .. toctree::
