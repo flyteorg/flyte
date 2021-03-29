@@ -42,7 +42,6 @@ release = u'0.11.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    "sphinx.ext.autosummary",
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
@@ -60,7 +59,6 @@ extensions = [
     "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
-    "sphinxcontrib.googleanalytics",
 ]
 
 extlinks = {
@@ -127,8 +125,6 @@ html_theme_options = {
     },
 }
 
-googleanalytics_id = "G-YQL24L5CKY"
-
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
@@ -149,7 +145,6 @@ googleanalytics_id = "G-YQL24L5CKY"
 # 'searchbox.html']``.
 #
 # html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
-# html_sidebars = {"**": ["searchbox.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
