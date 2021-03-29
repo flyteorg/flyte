@@ -25,4 +25,3 @@ API Reference
    FlyteAdmin <https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin>
    FlytePlugins <https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins>
    DataCatalog <https://pkg.go.dev/mod/github.com/flyteorg/datacatalog>
-   Flytectl <https://pkg.go.dev/mod/github.com/flyteorg/flytectl>
