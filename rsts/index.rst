@@ -63,7 +63,7 @@ You can compose one or more tasks to create a ``workflow``:
    @workflow
    def welcome(name: str) -> str:
        greeting = greet(name=name)
-       return add_question(greeting)
+       return add_question(greeting=greeting)
 
    welcome("Traveler")
    # Output: "Welcome, Traveler! How are you?"
