@@ -6,12 +6,13 @@
 #
 alabaster==0.7.12
     # via sphinx
-astroid==2.5.1
+astroid==2.5.2
     # via sphinx-autoapi
 babel==2.9.0
     # via sphinx
 beautifulsoup4==4.9.3
     # via
+    #   furo
     #   sphinx-code-include
     #   sphinx-material
 certifi==2020.12.5
@@ -22,6 +23,8 @@ css-html-js-minify==2.5.5
     # via sphinx-material
 docutils==0.16
     # via sphinx
+furo==2021.3.20b30
+    # via -r doc-requirements.in
 idna==2.10
     # via requests
 imagesize==1.2.0
@@ -78,6 +81,7 @@ sphinx-tabs==2.1.0
 sphinx==3.5.3
     # via
     #   -r doc-requirements.in
+    #   furo
     #   sphinx-autoapi
     #   sphinx-code-include
     #   sphinx-copybutton
