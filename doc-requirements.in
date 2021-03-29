@@ -1,4 +1,5 @@
 furo
+readthedocs-sphinx-search
 sphinx
 sphinx-prompt
 sphinx-material
@@ -8,4 +9,3 @@ sphinx-copybutton
 sphinx-tabs
 sphinxext-remoteliteralinclude
 sphinx-issues
-sphinxcontrib-googleanalytics

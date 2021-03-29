@@ -54,6 +54,8 @@ pytz==2021.1
     # via babel
 pyyaml==5.4.1
     # via sphinx-autoapi
+readthedocs-sphinx-search==0.1.0
+    # via -r doc-requirements.in
 requests==2.25.1
     # via sphinx
 six==1.15.0
@@ -89,14 +91,11 @@ sphinx==3.5.3
     #   sphinx-material
     #   sphinx-prompt
     #   sphinx-tabs
-    #   sphinxcontrib-googleanalytics
     #   sphinxext-remoteliteralinclude
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-googleanalytics==0.1
-    # via -r doc-requirements.in
 sphinxcontrib-htmlhelp==1.0.3
     # via sphinx
 sphinxcontrib-jsmath==1.0.1

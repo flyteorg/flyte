@@ -59,6 +59,7 @@ extensions = [
     "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
+    "sphinx_search.extension",
 ]
 
 extlinks = {

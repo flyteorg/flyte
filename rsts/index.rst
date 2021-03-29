@@ -50,16 +50,23 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
    
    @task
    def greet(name: str) -> str:
-       return f"Welcome, {name}"
+       return f"Welcome, {name}!"
 
 You can compose one or more tasks to create a ``workflow``:
 
 .. code:: python
+
+   @task
+   def add_question(greeting: str) -> str:
+       return f"{greeting} How are you?"
    
    @workflow
    def welcome(name: str) -> str:
        greeting = greet(name=name)
-       return greeting
+       return add_question(greeting)
+
+   welcome("Traveler")
+   # Output: "Welcome, Traveler! How are you?"
 
 
 Why Flyte?
