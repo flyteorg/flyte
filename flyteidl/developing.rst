@@ -1,5 +1,5 @@
-How to contribute to and develop Flyte IDL
-===========================================
+Contributing to Flyte IDL
+=========================
 
 Generate Code from protobuf
 ----------------------------
