@@ -16,6 +16,10 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sphinx.application
+import sphinx.errors
+sphinx.application.ExtensionError = sphinx.errors.ExtensionError
+
 # -- Project information -----------------------------------------------------
 
 project = u'Flyte'
@@ -55,6 +59,7 @@ extensions = [
     "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
+    "sphinx_search.extension",
 ]
 
 extlinks = {
@@ -67,7 +72,7 @@ extlinks = {
 }
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+# templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -100,13 +105,16 @@ html_logo = "images/flyte_circle_gradient_1_4x4.png"
 html_theme = "furo"
 html_title = "Flyte Docs"
 
+html_static_path = ["_static"]
+templates_path = ["_templates"]
+
 pygments_style = "tango"
 pygments_dark_style = "paraiso-dark"
 
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#
+html_css_files = [
+    "custom.css",
+]
+
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#4300c9",
@@ -118,13 +126,16 @@ html_theme_options = {
     },
 }
 
+# Theme options are theme-specific and customize the look and feel of a theme
+# further.  For a list of options available for each theme, see the
+# documentation.
+#
+# html_theme_options = {}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
-html_css_files = [
-    "custom.css",
-]
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

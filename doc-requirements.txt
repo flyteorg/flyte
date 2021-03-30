@@ -47,6 +47,8 @@ pytz==2021.1
     # via babel
 pyyaml==5.4.1
     # via sphinx-autoapi
+readthedocs-sphinx-search==0.1.0
+    # via -r doc-requirements.in
 requests==2.25.1
     # via sphinx
 six==1.15.0
