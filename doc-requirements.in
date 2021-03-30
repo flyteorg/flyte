@@ -1,6 +1,7 @@
+furo
+readthedocs-sphinx-search
 sphinx
 sphinx-prompt
-sphinx-material
 sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
