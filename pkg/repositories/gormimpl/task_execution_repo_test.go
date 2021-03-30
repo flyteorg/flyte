@@ -107,8 +107,8 @@ func TestGetTaskExecution(t *testing.T) {
 			`"project" = project) AND ("task_executions"."domain" = domain) AND ("task_executions"."name" = task-id) ` +
 			`AND ("task_executions"."version" = task-version) AND ("task_executions"."execution_project" = project) ` +
 			`AND ("task_executions"."execution_domain" = domain) AND ("task_executions"."execution_name" = name) AND` +
-			` ("task_executions"."node_id" = node-id) AND ("task_executions"."retry_attempt" = 0)) ` +
-			`ORDER BY "task_executions"."id" ASC LIMIT 1`).WithReply(taskExecutions)
+			` ("task_executions"."node_id" = node-id) AND ("task_executions"."retry_attempt" = 0)) LIMIT 1`).
+		WithReply(taskExecutions)
 
 	output, err := taskExecutionRepo.Get(context.Background(), interfaces.GetTaskExecutionInput{
 		TaskExecutionID: core.TaskExecutionIdentifier{

@@ -77,8 +77,7 @@ func TestGetLaunchPlan(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "launch_plans"  WHERE "launch_plans"."deleted_at" IS NULL AND ` +
 			`(("launch_plans"."project" = project) AND ("launch_plans"."domain" = domain) AND ` +
-			`("launch_plans"."name" = name) AND ("launch_plans"."version" = XYZ)) ORDER BY "launch_plans"."id" ` +
-			`ASC LIMIT 1`).WithReply(launchPlans)
+			`("launch_plans"."name" = name) AND ("launch_plans"."version" = XYZ)) LIMIT 1`).WithReply(launchPlans)
 	output, err := launchPlanRepo.Get(context.Background(), interfaces.GetResourceInput{
 		Project: project,
 		Domain:  domain,

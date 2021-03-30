@@ -186,7 +186,7 @@ func TestGetNodeExecution(t *testing.T) {
 		`SELECT * FROM "node_executions"  WHERE "node_executions"."deleted_at" IS NULL AND ` +
 			`(("node_executions"."execution_project" = execution_project) AND ("node_executions"."execution_domain" ` +
 			`= execution_domain) AND ("node_executions"."execution_name" = execution_name) AND ("node_executions".` +
-			`"node_id" = 1)) ORDER BY "node_executions"."id" ASC LIMIT 1`).WithReply(nodeExecutions)
+			`"node_id" = 1)) LIMIT 1`).WithReply(nodeExecutions)
 	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.GetNodeExecutionInput{
 		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
 			NodeId: "1",

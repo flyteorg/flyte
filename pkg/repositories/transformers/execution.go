@@ -227,19 +227,6 @@ func FromExecutionModel(executionModel models.Execution) (*admin.Execution, erro
 	}, nil
 }
 
-func FromExecutionModelWithReferenceExecution(executionModel models.Execution, referenceExecutionID *core.WorkflowExecutionIdentifier) (
-	*admin.Execution, error) {
-	execution, err := FromExecutionModel(executionModel)
-	if err != nil {
-		return nil, err
-	}
-	if referenceExecutionID != nil && execution.Spec.Metadata != nil &&
-		execution.Spec.Metadata.Mode == admin.ExecutionMetadata_RELAUNCH {
-		execution.Spec.Metadata.ReferenceExecution = referenceExecutionID
-	}
-	return execution, nil
-}
-
 func FromExecutionModels(executionModels []models.Execution) ([]*admin.Execution, error) {
 	executions := make([]*admin.Execution, len(executionModels))
 	for idx, executionModel := range executionModels {

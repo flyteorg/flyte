@@ -41,7 +41,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.GetResourceInp
 			Domain:  input.Domain,
 			Name:    input.Name,
 		},
-	}).First(&execution)
+	}).Take(&execution)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -52,24 +52,6 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.GetResourceInp
 			Domain:  input.Domain,
 			Name:    input.Name,
 		})
-	}
-	return execution, nil
-}
-
-func (r *ExecutionRepo) GetByID(ctx context.Context, id uint) (models.Execution, error) {
-	var execution models.Execution
-	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Execution{
-		BaseModel: models.BaseModel{
-			ID: id,
-		},
-	}).First(&execution)
-	timer.Stop()
-	if tx.Error != nil {
-		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
-	}
-	if tx.RecordNotFound() {
-		return models.Execution{}, errors.GetMissingEntityByIDError("execution")
 	}
 	return execution, nil
 }

@@ -11,7 +11,6 @@ type CreateExecutionFunc func(ctx context.Context, input models.Execution) error
 type UpdateFunc func(ctx context.Context, event models.ExecutionEvent, execution models.Execution) error
 type UpdateExecutionFunc func(ctx context.Context, execution models.Execution) error
 type GetExecutionFunc func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error)
-type GetExecutionByIDFunc func(ctx context.Context, id uint) (models.Execution, error)
 type ListExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error)
 
@@ -20,7 +19,6 @@ type MockExecutionRepo struct {
 	updateFunction      UpdateFunc
 	updateExecutionFunc UpdateExecutionFunc
 	getFunction         GetExecutionFunc
-	getByIDFunction     GetExecutionByIDFunc
 	listFunction        ListExecutionFunc
 }
 
@@ -66,17 +64,6 @@ func (r *MockExecutionRepo) Get(ctx context.Context, input interfaces.GetResourc
 
 func (r *MockExecutionRepo) SetGetCallback(getFunction GetExecutionFunc) {
 	r.getFunction = getFunction
-}
-
-func (r *MockExecutionRepo) GetByID(ctx context.Context, id uint) (models.Execution, error) {
-	if r.getByIDFunction != nil {
-		return r.getByIDFunction(ctx, id)
-	}
-	return models.Execution{}, nil
-}
-
-func (r *MockExecutionRepo) SetGetByIDCallback(getByIDFunction GetExecutionByIDFunc) {
-	r.getByIDFunction = getByIDFunction
 }
 
 func (r *MockExecutionRepo) List(ctx context.Context, input interfaces.ListResourceInput) (

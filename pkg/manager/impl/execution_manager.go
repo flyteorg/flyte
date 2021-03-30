@@ -45,7 +45,6 @@ import (
 )
 
 const childContainerQueueKey = "child_queue"
-const noSourceExecutionID = 0
 const principalContextKeyFormat = "%v"
 
 // Map of [project] -> map of [domain] -> stop watch
@@ -785,6 +784,7 @@ func (m *ExecutionManager) RelaunchExecution(
 		inputs = spec.Inputs
 	}
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RELAUNCH
+	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
 	var executionModel *models.Execution
 	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
 		Project: request.Id.Project,
@@ -1027,21 +1027,7 @@ func (m *ExecutionManager) GetExecution(
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-	var execution *admin.Execution
-	var transformerErr error
-	if executionModel.SourceExecutionID != noSourceExecutionID {
-		// Fetch parent execution to reconstruct its WorkflowExecutionIdentifier
-		referenceExecutionModel, err := m.db.ExecutionRepo().GetByID(ctx, executionModel.SourceExecutionID)
-		if err != nil {
-			logger.Debugf(ctx, "Failed to get reference execution source execution id [%s] for descendant execution [%v]",
-				executionModel.SourceExecutionID)
-			return nil, err
-		}
-		referenceExecutionID := transformers.GetExecutionIdentifier(&referenceExecutionModel)
-		execution, transformerErr = transformers.FromExecutionModelWithReferenceExecution(*executionModel, &referenceExecutionID)
-	} else {
-		execution, transformerErr = transformers.FromExecutionModel(*executionModel)
-	}
+	execution, transformerErr := transformers.FromExecutionModel(*executionModel)
 	if transformerErr != nil {
 		logger.Debugf(ctx, "Failed to transform execution model [%+v] to proto object with err: %v", request.Id,
 			transformerErr)
