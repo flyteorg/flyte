@@ -8,6 +8,7 @@
    getting_started
    Tutorials <https://flytecookbook.readthedocs.io>
    reference/index
+   community/index
 
 .. toctree::
    :caption: How-Tos
@@ -27,12 +28,12 @@
    dive_deep/index
 
 .. toctree::
-   :caption: Contributor Guide
+   :caption: Developers
    :maxdepth: 1
    :name: roadmaptoc
    :hidden:
 
-   community/index
+   Join the Community <community/index>
    community/docs
    community/roadmap
    community/compare

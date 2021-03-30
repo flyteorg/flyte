@@ -10,13 +10,13 @@ Prerequisites
 
 Make sure you have `docker installed <https://docs.docker.com/get-docker/>`__ and `git <https://git-scm.com/>`__ installed, then install flytekit:
 
-.. code:: console
+.. prompt:: bash
 
    pip install flytekit
 
 Clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo to create our own git repository called ``flyteexamples``:
 
-.. code:: console
+.. prompt:: bash
 
    git clone git@github.com:flyteorg/flytekit-python-template.git flyteexamples
    cd flyteexamples
@@ -40,7 +40,7 @@ Start a Local Flyte Backend
 
 Once you're happy with the ``example.py`` script, run the following command in your terminal:
 
-.. code:: console
+.. prompt:: bash
 
    docker run --rm --privileged -p 30081:30081 -p 30082:30082 -p 30084:30084 ghcr.io/flyteorg/flyte-sandbox
 
@@ -51,7 +51,7 @@ Register Your Workflows
 
 Now we're ready to ship your code to the Flyte backend by running the following command:
 
-.. code:: console
+.. prompt:: bash
 
    FLYTE_AWS_ENDPOINT=http://localhost:30084/ FLYTE_AWS_ACCESS_KEY_ID=minio FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage make fast_register
 

@@ -10,10 +10,10 @@ API Reference
    :caption: API Reference
    :name: apitoc
 
-   Flytekit Python <https://flytekit.readthedocs.io/en/latest/>
-   Flytekit JAVA  <https://github.com/spotify/flytekit-java>
-   Flyte Core Language Specification (FlyteIDL) <https://flyte.readthedocs.io/projects/flyteidl/en/latest/>
-   Flytectl <https://flytectl.readthedocs.io/en/latest/>
+   Flytekit Python <https://flytekit.readthedocs.io>
+   Flytekit Java <https://github.com/spotify/flytekit-java>
+   FlyteIDL <https://flyteidl.readthedocs.io>
+   Flytectl <https://flytectl.readthedocs.io>
 
 
 .. toctree::
