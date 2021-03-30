@@ -40,7 +40,7 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.GetResourceInpu
 			Name:    input.Name,
 			Version: input.Version,
 		},
-	}).First(&workflow)
+	}).Take(&workflow)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

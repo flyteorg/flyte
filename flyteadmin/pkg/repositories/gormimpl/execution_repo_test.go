@@ -163,46 +163,12 @@ func TestGetExecution(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions"  WHERE "executions"."deleted_at" IS NULL AND ` +
 		`(("executions"."execution_project" = project) AND ("executions"."execution_domain" = domain) AND ` +
-		`("executions"."execution_name" = 1)) ORDER BY "executions"."id" ASC LIMIT 1`).WithReply(executions)
+		`("executions"."execution_name" = 1)) LIMIT 1`).WithReply(executions)
 	output, err := executionRepo.Get(context.Background(), interfaces.GetResourceInput{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "1",
 	})
-	assert.NoError(t, err)
-	assert.EqualValues(t, expectedExecution, output)
-}
-
-func TestGetByIDExecution(t *testing.T) {
-	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	expectedExecution := models.Execution{
-		BaseModel: models.BaseModel{
-			ID: uint(20),
-		},
-		ExecutionKey: models.ExecutionKey{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "1",
-		},
-		LaunchPlanID:       uint(2),
-		Phase:              core.WorkflowExecution_SUCCEEDED.String(),
-		Closure:            []byte{1, 2},
-		WorkflowID:         uint(3),
-		Spec:               []byte{3, 4},
-		StartedAt:          &executionStartedAt,
-		ExecutionCreatedAt: &createdAt,
-		ExecutionUpdatedAt: &executionUpdatedAt,
-	}
-
-	executions := make([]map[string]interface{}, 0)
-	execution := getMockExecutionResponseFromDb(expectedExecution)
-	executions = append(executions, execution)
-
-	GlobalMock := mocket.Catcher.Reset()
-	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions"  WHERE "executions"."deleted_at" IS NULL AND ` +
-		`(("executions"."id" = 20)) ORDER BY "executions"."id" ASC LIMIT 1`).WithReply(executions)
-	output, err := executionRepo.GetByID(context.Background(), uint(20))
 	assert.NoError(t, err)
 	assert.EqualValues(t, expectedExecution, output)
 }

@@ -56,8 +56,8 @@ func TestGetTask(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tasks"  WHERE "tasks"."deleted_at" IS NULL AND (("tasks"."project" = project) ` +
-			`AND ("tasks"."domain" = domain) AND ("tasks"."name" = name) AND ("tasks"."version" = XYZ)) ` +
-			`ORDER BY "tasks"."id" ASC LIMIT 1`).WithReply(tasks)
+			`AND ("tasks"."domain" = domain) AND ("tasks"."name" = name) AND ("tasks"."version" = XYZ)) LIMIT 1`).
+		WithReply(tasks)
 	output, err := taskRepo.Get(context.Background(), interfaces.GetResourceInput{
 		Project: project,
 		Domain:  domain,

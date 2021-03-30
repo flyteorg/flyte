@@ -37,7 +37,7 @@ func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.Project{
 		Identifier: projectID,
-	}).First(&project)
+	}).Take(&project)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.Project{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

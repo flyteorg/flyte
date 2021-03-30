@@ -152,7 +152,7 @@ func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEnti
 	}
 
 	timer := r.metrics.GetDuration.Start()
-	tx = tx.Select(getSelectForNamedEntity(tableName, input.ResourceType)).First(&namedEntity)
+	tx = tx.Select(getSelectForNamedEntity(tableName, input.ResourceType)).Take(&namedEntity)
 	timer.Stop()
 
 	if tx.Error != nil {

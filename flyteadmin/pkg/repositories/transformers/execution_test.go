@@ -420,57 +420,6 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 	assert.Empty(t, execution.Closure.GetAbortCause())
 }
 
-func TestFromExecutionModelWithReferenceExecution(t *testing.T) {
-	spec := testutils.GetExecutionRequest().Spec
-	spec.Metadata = &admin.ExecutionMetadata{
-		Mode: admin.ExecutionMetadata_RELAUNCH,
-	}
-	specBytes, _ := proto.Marshal(spec)
-	phase := core.WorkflowExecution_RUNNING.String()
-	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	startedAtProto, _ := ptypes.TimestampProto(startedAt)
-	closure := admin.ExecutionClosure{
-		ComputedInputs: spec.Inputs,
-		Phase:          core.WorkflowExecution_RUNNING,
-		StartedAt:      startedAtProto,
-	}
-	closureBytes, _ := proto.Marshal(&closure)
-
-	executionModel := models.Execution{
-		ExecutionKey: models.ExecutionKey{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-		},
-		Spec:         specBytes,
-		Phase:        phase,
-		Closure:      closureBytes,
-		LaunchPlanID: uint(1),
-		WorkflowID:   uint(2),
-		StartedAt:    &startedAt,
-	}
-	execution, err := FromExecutionModelWithReferenceExecution(executionModel, nil)
-	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&admin.Execution{
-		Id: &core.WorkflowExecutionIdentifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-		},
-		Spec:    spec,
-		Closure: &closure,
-	}, execution))
-
-	referenceExecutionID := &core.WorkflowExecutionIdentifier{
-		Project: "ref_project",
-		Domain:  "ref_domain",
-		Name:    "ref_name",
-	}
-	execution, err = FromExecutionModelWithReferenceExecution(executionModel, referenceExecutionID)
-	assert.Nil(t, err)
-	assert.True(t, proto.Equal(referenceExecutionID, execution.Spec.Metadata.ReferenceExecution))
-}
-
 func TestFromExecutionModels(t *testing.T) {
 	spec := testutils.GetExecutionRequest().Spec
 	specBytes, _ := proto.Marshal(spec)

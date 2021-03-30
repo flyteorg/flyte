@@ -56,7 +56,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.GetNodeExe
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
 			},
 		},
-	}).Preload("ChildNodeExecutions").First(&nodeExecution)
+	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

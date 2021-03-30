@@ -40,7 +40,7 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.GetResourceInput) (
 			Name:    input.Name,
 			Version: input.Version,
 		},
-	}).First(&task)
+	}).Take(&task)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.Task{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

@@ -58,7 +58,7 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.GetResourceIn
 			Name:    input.Name,
 			Version: input.Version,
 		},
-	}).First(&launchPlan)
+	}).Take(&launchPlan)
 	timer.Stop()
 	if tx.Error != nil {
 		return models.LaunchPlan{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

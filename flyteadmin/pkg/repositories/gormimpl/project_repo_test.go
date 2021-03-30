@@ -50,7 +50,7 @@ func TestGetProject(t *testing.T) {
 
 	query := GlobalMock.NewMock()
 	query.WithQuery(`SELECT * FROM "projects"  WHERE "projects"."deleted_at" IS NULL AND ` +
-		`(("projects"."identifier" = project_id)) ORDER BY "projects"."identifier" ASC LIMIT 1`).WithReply(
+		`(("projects"."identifier" = project_id)) LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})

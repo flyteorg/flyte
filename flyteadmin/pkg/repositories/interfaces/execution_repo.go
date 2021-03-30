@@ -17,8 +17,6 @@ type ExecutionRepoInterface interface {
 	UpdateExecution(ctx context.Context, execution models.Execution) error
 	// Returns a matching execution if it exists.
 	Get(ctx context.Context, input GetResourceInput) (models.Execution, error)
-	// Return a matching execution if it exists
-	GetByID(ctx context.Context, id uint) (models.Execution, error)
 	// Returns executions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (ExecutionCollectionOutput, error)
 }
