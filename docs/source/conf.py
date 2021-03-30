@@ -41,6 +41,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx-prompt",
     "sphinx_copybutton",
+    "sphinx_search.extension",
 ]
 
 # build the templated autosummary files
@@ -73,48 +74,50 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = []
+exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
+
+# The name of the Pygments (syntax highlighting) style to use.
+pygments_style = "tango"
+pygments_dark_style = "paraiso-dark"
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_material"
+html_theme = "furo"
+html_title = "Flyte Docs"
 html_logo = "flyte_circle_gradient_1_4x4.png"
+
 html_theme_options = {
-    # Set the name of the project to appear in the navigation.
-    "nav_title": "Flyte",
-    # Set you GA account ID to enable tracking
-    "google_analytics_account": "G-YQL24L5CKY",
-    # Specify a base_url used to generate sitemap.xml. If not
-    # specified, then no sitemap will be built.
-    "base_url": "https://github.com/flyteorg/flytectl",
-    # Set the color and the accent color
-    "color_primary": "deep-purple",
-    "color_accent": "blue",
-    # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/flyteorg/flyte/",
-    "repo_name": "flyte",
-    # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": 1,
-    # If False, expand all TOC entries
-    "globaltoc_collapse": False,
-    # If True, show hidden TOC entries
-    "globaltoc_includehidden": False,
+    "light_css_variables": {
+        "color-brand-primary": "#4300c9",
+        "color-brand-content": "#4300c9",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#9D68E4",
+        "color-brand-content": "#9D68E4",
+    },
+}
+
+html_context = {
+    "home_page": "https://docs.flyte.org",
 }
 
 # The default sidebars (for documents that don't match any pattern) are
 # defined by theme itself.  Builtin themes are using these templates by
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
-html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
+# html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ["_static"]
+html_css_files = [
+    "custom.css",
+]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

@@ -1,22 +1,22 @@
 .. flytectl doc
 
 ##########################################
-Welcome to ``Flytectl``'s documentation!
+``Flytectl`` Reference
 ##########################################
 
 
-Installation
-=============
+Install
+=======
 Flytectl is a Golang binary and can be installed on any platform supported by
-golang. To install simply copy paste the following into the command-line
+golang. To install simply copy paste the following into the command-line:
 
 .. prompt:: bash
 
    curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
 
-Configuration
-==============
+Configure
+=========
 Flytectl allows configuring using a YAML file or pass every configuration value
 on command-line. The follow configuration is useful to setup.
 
@@ -30,23 +30,32 @@ Basic Configuration
     endpoint: dns:///flyte.lyft.net
     # Change insecure flag to ensure that you use the right setting for your environment
     insecure: true
-  # Logger settings to control logger output. Useful to debug
-  #logger:
-    #show-source: true
-    #level: 1
+    # Logger settings to control logger output. Useful to debug logger:
+    show-source: true
+    level: 1
 
 
 
 .. toctree::
    :maxdepth: 1
-   :caption: Flyte Core docs
+   :hidden:
 
-   Flyte Documentation <https://flyte.readthedocs.io/en/latest/>
+   Getting Started <https://docs.flyte.org/en/latest/getting_started.html>
+   Tutorials <https://flytecookbook.readthedocs.io>
+   reference/index
+   Community <https://docs.flyte.org/en/latest/community/index.html>
 
-   gen/flytectl
 .. toctree::
    :maxdepth: 1
-   :caption: Flytectl verbs
+   :caption: Flytectl
+   :hidden:
+
+   Install and Configure <self>
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Verbs
+   :hidden:
 
    gen/flytectl_create
    gen/flytectl_get
@@ -57,7 +66,8 @@ Basic Configuration
 
 .. toctree::
    :maxdepth: 1
-   :caption: Flytectl nouns
+   :caption: Nouns
+   :hidden:
 
    gen/flytectl_create_project
    gen/flytectl_create_execution
@@ -74,13 +84,6 @@ Basic Configuration
 .. toctree::
    :maxdepth: 2
    :caption: Contribute
+   :hidden:
 
    contribute
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
