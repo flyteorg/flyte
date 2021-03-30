@@ -16,6 +16,10 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+import sphinx.application
+import sphinx.errors
+sphinx.application.ExtensionError = sphinx.errors.ExtensionError
+
 # -- Project information -----------------------------------------------------
 
 project = u'Flyte'
@@ -55,6 +59,7 @@ extensions = [
     "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
+    "sphinx_search.extension",
 ]
 
 extlinks = {
@@ -97,45 +102,28 @@ exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 #
 html_favicon = "images/flyte_circle_gradient_1_4x4.png"
 html_logo = "images/flyte_circle_gradient_1_4x4.png"
-html_static_path = []
-html_theme = "sphinx_material"
+html_theme = "furo"
+html_title = "Flyte Docs"
+
+html_static_path = ["_static"]
+templates_path = ["_templates"]
+
+pygments_style = "tango"
+pygments_dark_style = "paraiso-dark"
+
+html_css_files = [
+    "custom.css",
+]
+
 html_theme_options = {
-    # Set the name of the project to appear in the navigation.
-    "nav_title": "Flyte",
-    # Set you GA account ID to enable tracking
-    "google_analytics_account": "G-YQL24L5CKY",
-    # Specify a base_url used to generate sitemap.xml. If not
-    # specified, then no sitemap will be built.
-    "base_url": "https://github.com/flyteorg/flyte",
-    # Set the color and the accent color
-    "color_primary": "deep-purple",
-    "color_accent": "blue",
-    # Set the repo location to get a badge with stats
-    "repo_url": "https://github.com/flyteorg/flyte/",
-    "repo_name": "flyte",
-    # Visible levels of the global TOC; -1 means unlimited
-    "globaltoc_depth": 1,
-    # If False, expand all TOC entries
-    "globaltoc_collapse": False,
-    # If True, show hidden TOC entries
-    "globaltoc_includehidden": True,
-    # don't include home link in breadcrumb bar, since it's included
-    # in the nav_links key below.
-    "master_doc": False,
-    # custom nav in breadcrumb bar
-    "nav_links": [
-        {"href": "index", "internal": True, "title": "Flyte"},
-        {
-            "href": "https://flytecookbook.readthedocs.io",
-            "internal": False,
-            "title": "Tutorials",
-        },
-        {
-            "href": "https://flytekit.readthedocs.io",
-            "internal": False,
-            "title": "Flytekit Python Reference"
-        },
-    ],
+    "light_css_variables": {
+        "color-brand-primary": "#4300c9",
+        "color-brand-content": "#4300c9",
+    },
+    "dark_css_variables": {
+        "color-brand-primary": "#9D68E4",
+        "color-brand-content": "#9D68E4",
+    },
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -157,7 +145,7 @@ html_theme_options = {
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
 #
-html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
+# html_sidebars = {"**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
