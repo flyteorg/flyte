@@ -51,7 +51,12 @@ func ExtractFromLiteral(literal *core.Literal) (interface{}, error) {
 			case *core.Primitive_Duration:
 				scalarPrimitiveDuration := scalarPrimitive.Duration
 				return scalarPrimitiveDuration, nil
+			default:
+				return nil, fmt.Errorf("unsupported literal scalar primitive type %T", scalarValue)
 			}
+		case *core.Scalar_Blob:
+			return scalarValue.Blob.Uri, nil
+		default:
 			return nil, fmt.Errorf("unsupported literal scalar type %T", scalarValue)
 		}
 	case *core.Literal_Collection:
