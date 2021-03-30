@@ -488,6 +488,11 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 			return nil, err
 		}
 		return lv, nil
+	case *core.LiteralType_Blob:
+		newT := t.Type.(*core.LiteralType_Blob)
+		isDir := newT.Blob.Dimensionality == core.BlobType_MULTIPART
+		lv := MakeLiteralForBlob(storage.DataReference(fmt.Sprintf("%v", v)), isDir, newT.Blob.Format)
+		return lv, nil
 	default:
 		return nil, fmt.Errorf("unsupported type %s", t.String())
 	}

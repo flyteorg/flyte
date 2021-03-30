@@ -516,6 +516,62 @@ func TestMakeLiteralForType(t *testing.T) {
 		assert.Equal(t, expectedVal, actualVal)
 	})
 
+	t.Run("Blob", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{
+			Dimensionality: core.BlobType_SINGLE,
+		}}}
+		expectedLV := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Blob{
+				Blob: &core.Blob{
+					Uri: "s3://blah/blah/blah",
+					Metadata: &core.BlobMetadata{
+						Type: &core.BlobType{
+							Dimensionality: core.BlobType_SINGLE,
+						},
+					},
+				},
+			},
+		}}}
+		lv, err := MakeLiteralForType(literalType, "s3://blah/blah/blah")
+		assert.NoError(t, err)
+
+		assert.Equal(t, expectedLV, lv)
+
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("MultipartBlob", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Blob{Blob: &core.BlobType{
+			Dimensionality: core.BlobType_MULTIPART,
+		}}}
+		expectedLV := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Blob{
+				Blob: &core.Blob{
+					Uri: "s3://blah/blah/blah",
+					Metadata: &core.BlobMetadata{
+						Type: &core.BlobType{
+							Dimensionality: core.BlobType_MULTIPART,
+						},
+					},
+				},
+			},
+		}}}
+		lv, err := MakeLiteralForType(literalType, "s3://blah/blah/blah")
+		assert.NoError(t, err)
+
+		assert.Equal(t, expectedLV, lv)
+
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
 	t.Run("UnsupportedType", func(t *testing.T) {
 		var literalType = &core.LiteralType{Type: &core.LiteralType_Schema{
 			Schema: &core.SchemaType{}}}
