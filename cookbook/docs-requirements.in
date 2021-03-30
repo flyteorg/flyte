@@ -1,11 +1,12 @@
+furo
 pillow
+readthedocs-sphinx-search
 sphinx
 sphinx_rtd_theme
 sphinx-gallery
 sphinx-prompt
-sphinx-material
 sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
 docutils==0.16
-astroid==2.4.2 
+astroid==2.4.2

@@ -1,0 +1,41 @@
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+}
+
+.sidebar-logo {
+    max-width: 30%;
+}
+
+
+.sidebar-tree .reference.external:after {
+    content: none;
+}
+
+div.sphx-glr-download a {
+    color: #4300c9;
+    background-color: rgb(241, 241, 241);
+    background-image: none;
+    border: 1px solid rgb(202, 202, 202);
+}
+
+div.sphx-glr-download a:hover {
+    background-color: rgb(230, 230, 230);
+    box-shadow: none;
+}
+
+div.sphx-glr-thumbcontainer a.headerlink {
+    display: none;
+}
+
+div.sphx-glr-thumbcontainer:hover {
+    border-color: white;
+    box-shadow: none;
+}
+
+.sphx-glr-script-out .highlight pre {
+    background-color: #f8f8f8;
+}
+
+p.sphx-glr-script-out {
+    padding-top: 0em;
+}
