@@ -1034,25 +1034,6 @@ func (m *ExecutionManager) GetExecution(
 		return nil, transformerErr
 	}
 
-	// TO BE DELETED
-	// TODO: Remove the publishing to deprecated fields (Inputs) after a smooth migration has been completed of our existing users
-	// For now, publish to deprecated fields thus ensuring old clients don't break when calling GetExecution
-	if len(executionModel.InputsURI) > 0 {
-		var inputs core.LiteralMap
-		if err := m.storageClient.ReadProtobuf(ctx, executionModel.InputsURI, &inputs); err != nil {
-			return nil, err
-		}
-		execution.Closure.ComputedInputs = &inputs
-	}
-	if len(executionModel.UserInputsURI) > 0 {
-		var userInputs core.LiteralMap
-		if err := m.storageClient.ReadProtobuf(ctx, executionModel.UserInputsURI, &userInputs); err != nil {
-			return nil, err
-		}
-		execution.Spec.Inputs = &userInputs
-	}
-	// END TO BE DELETED
-
 	return execution, nil
 }
 
