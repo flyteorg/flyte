@@ -1,3 +1,33 @@
+// Package config contains the core configuration for FlytePropeller. This configuration can be added under the ``propeller`` section.
+//  Example config:
+// ----------------
+//  propeller:
+//     rawoutput-prefix: s3://my-container/test/
+//     metadata-prefix: metadata/propeller/sandbox
+//     workers: 4
+//     workflow-reeval-duration: 10s
+//     downstream-eval-duration: 5s
+//     limit-namespace: "all"
+//     prof-port: 11254
+//     metrics-prefix: flyte
+//     enable-admin-launcher: true
+//     max-ttl-hours: 1
+//     gc-interval: 500m
+//     queue:
+//       type: batch
+//       queue:
+//         type: bucket
+//         rate: 20
+//         capacity: 100
+//       sub-queue:
+//         type: bucket
+//         rate: 100
+//         capacity: 1000
+//     # This config assumes using `make start` in flytesnacks repo to startup a DinD k3s container
+//     kube-config: "$HOME/kubeconfig/k3s/k3s.yaml"
+//     publish-k8s-events: true
+//     workflowStore:
+//       policy: "ResourceVersionCache"
 package config
 
 import (
@@ -15,22 +45,38 @@ var (
 	configSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 
 	defaultConfig = &Config{
-		MaxWorkflowRetries:  5,
+		Workers: 20,
+		WorkflowReEval: config.Duration{
+			Duration: 10 * time.Second,
+		},
+		DownstreamEval: config.Duration{
+			Duration: 30 * time.Second,
+		},
+		MaxWorkflowRetries:  10,
 		MaxDatasetSizeBytes: 10 * 1024 * 1024,
 		Queue: CompositeQueueConfig{
-			Type: CompositeQueueSimple,
+			Type: CompositeQueueBatch,
+			BatchingInterval: config.Duration{
+				Duration: time.Second,
+			},
+			BatchSize: -1,
 			Queue: WorkqueueConfig{
-				Type:      WorkqueueTypeDefault,
-				BaseDelay: config.Duration{Duration: time.Second * 10},
-				MaxDelay:  config.Duration{Duration: time.Second * 10},
-				Rate:      10,
-				Capacity:  100,
+				Type:      WorkqueueTypeMaxOfRateLimiter,
+				BaseDelay: config.Duration{Duration: time.Second * 5},
+				MaxDelay:  config.Duration{Duration: time.Second * 60},
+				Rate:      100,
+				Capacity:  1000,
+			},
+			Sub: WorkqueueConfig{
+				Type:     WorkqueueTypeBucketRateLimiter,
+				Rate:     100,
+				Capacity: 1000,
 			},
 		},
 		KubeConfig: KubeClientConfig{
-			QPS:     5,
-			Burst:   10,
-			Timeout: config.Duration{Duration: 0},
+			QPS:     100,
+			Burst:   25,
+			Timeout: config.Duration{Duration: 30 * time.Second},
 		},
 		LeaderElection: LeaderElectionConfig{
 			Enabled:       false,
@@ -47,13 +93,20 @@ var (
 			MaxNodeRetriesOnSystemFailures: 3,
 			InterruptibleFailureThreshold:  1,
 		},
-		MaxStreakLength: 5, // Turbo mode is enabled by default
+		MaxStreakLength: 8, // Turbo mode is enabled by default
+		ProfilerPort: config.Port{
+			Port: 10254,
+		},
+		LimitNamespace:      "all",
+		MetadataPrefix:      "metadata/propeller",
+		EnableAdminLauncher: true,
+		MetricsPrefix:       "flyte",
 	}
 )
 
-// NOTE: when adding new fields, do not mark them as "omitempty" if it's desirable to read the value from env variables.
 // Config that uses the flytestdlib Config module to generate commandline and load config files. This configuration is
 // the base configuration to start propeller
+// NOTE: when adding new fields, do not mark them as "omitempty" if it's desirable to read the value from env variables.
 type Config struct {
 	KubeConfigPath         string               `json:"kube-config" pflag:",Path to kubernetes client config file."`
 	MasterURL              string               `json:"master"`
@@ -78,6 +131,7 @@ type Config struct {
 	MaxStreakLength        int                  `json:"max-streak-length" pflag:",Maximum number of consecutive rounds that one propeller worker can use for one workflow - >1 => turbo-mode is enabled."`
 }
 
+// KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
 type KubeClientConfig struct {
 	// QPS indicates the maximum QPS to the master from this client.
 	// If it's zero, the created RESTClient will use DefaultQPS: 5
@@ -96,6 +150,7 @@ const (
 	CompositeQueueBatch  CompositeQueueType = "batch"
 )
 
+// CompositeQueueConfig contains configuration for the controller queue and the downstream resource queue
 type CompositeQueueConfig struct {
 	Type             CompositeQueueType `json:"type" pflag:",Type of composite queue to use for the WorkQueue"`
 	Queue            WorkqueueConfig    `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
@@ -113,7 +168,7 @@ const (
 	WorkqueueTypeMaxOfRateLimiter              WorkqueueType = "maxof"
 )
 
-// prototypical configuration to configure a workqueue. We may want to generalize this in a package like k8sutils
+// WorkqueueConfig has the configuration to configure a workqueue. We may want to generalize this in a package like k8sutils
 type WorkqueueConfig struct {
 	// Refer to https://github.com/kubernetes/client-go/tree/master/util/workqueue
 	Type      WorkqueueType   `json:"type" pflag:",Type of RateLimiter to use for the WorkQueue"`
@@ -123,21 +178,21 @@ type WorkqueueConfig struct {
 	Capacity  int             `json:"capacity" pflag:",Bucket capacity as number of items"`
 }
 
-// configuration for a node
+// NodeConfig contains configuration that is useful for every node execution
 type NodeConfig struct {
 	DefaultDeadlines               DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
 	MaxNodeRetriesOnSystemFailures int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
 	InterruptibleFailureThreshold  int64            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible'"`
 }
 
-// Contains default values for timeouts
+// DefaultDeadlines contains default values for timeouts
 type DefaultDeadlines struct {
 	DefaultNodeExecutionDeadline  config.Duration `json:"node-execution-deadline" pflag:",Default value of node execution timeout"`
 	DefaultNodeActiveDeadline     config.Duration `json:"node-active-deadline" pflag:",Default value of node timeout"`
 	DefaultWorkflowActiveDeadline config.Duration `json:"workflow-active-deadline" pflag:",Default value of workflow timeout"`
 }
 
-// Contains leader election configuration.
+// LeaderElectionConfig Contains leader election configuration.
 type LeaderElectionConfig struct {
 	// Enable or disable leader election.
 	Enabled bool `json:"enabled" pflag:",Enables/Disables leader election."`
@@ -156,12 +211,12 @@ type LeaderElectionConfig struct {
 	RetryPeriod config.Duration `json:"retry-period" pflag:",Duration the LeaderElector clients should wait between tries of actions."`
 }
 
-// Extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.
-// TODO What if the type is incorrect?
+// GetConfig extracts the Configuration from the global config module in flytestdlib and returns the corresponding type-casted object.
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }
 
+// MustRegisterSubSection can be used to configure any subsections the the propeller configuration
 func MustRegisterSubSection(subSectionKey string, section config.Config) config.Section {
 	return configSection.MustRegisterSection(subSectionKey, section)
 }
