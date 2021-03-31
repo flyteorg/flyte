@@ -371,7 +371,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
 
-	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
+	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: request.Spec.LaunchPlan.Project,
 		Domain:  request.Spec.LaunchPlan.Domain,
 		Name:    request.Spec.LaunchPlan.Name,
@@ -1264,7 +1264,7 @@ func (m *ExecutionManager) TerminateExecution(
 	}
 	ctx = getExecutionContext(ctx, request.Id)
 	// Save the abort reason (best effort)
-	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
+	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Id.Name,

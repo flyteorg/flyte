@@ -164,7 +164,7 @@ func TestGetExecution(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions"  WHERE "executions"."deleted_at" IS NULL AND ` +
 		`(("executions"."execution_project" = project) AND ("executions"."execution_domain" = domain) AND ` +
 		`("executions"."execution_name" = 1)) LIMIT 1`).WithReply(executions)
-	output, err := executionRepo.Get(context.Background(), interfaces.GetResourceInput{
+	output, err := executionRepo.Get(context.Background(), interfaces.Identifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "1",
@@ -378,4 +378,40 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 		assert.Equal(t, executionStartedAt, *execution.StartedAt)
 		assert.Equal(t, time.Hour, execution.Duration)
 	}
+}
+
+func TestExecutionExists(t *testing.T) {
+	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	expectedExecution := models.Execution{
+		BaseModel: models.BaseModel{
+			ID: uint(20),
+		},
+		ExecutionKey: models.ExecutionKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "1",
+		},
+		LaunchPlanID: uint(2),
+		Phase:        core.WorkflowExecution_SUCCEEDED.String(),
+		Closure:      []byte{1, 2},
+		WorkflowID:   uint(3),
+		Spec:         []byte{3, 4},
+	}
+
+	executions := make([]map[string]interface{}, 0)
+	execution := getMockExecutionResponseFromDb(expectedExecution)
+	executions = append(executions, execution)
+
+	GlobalMock := mocket.Catcher.Reset()
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(`SELECT id FROM "executions"  WHERE "executions"."deleted_at" IS NULL AND ` +
+		`(("executions"."execution_project" = project) AND ("executions"."execution_domain" = domain) AND ` +
+		`("executions"."execution_name" = 1)) LIMIT 1`).WithReply(executions)
+	exists, err := executionRepo.Exists(context.Background(), interfaces.Identifier{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "1",
+	})
+	assert.NoError(t, err)
+	assert.True(t, exists)
 }

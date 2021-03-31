@@ -79,7 +79,7 @@ func getMockRepository(workflowOnGet bool) repositories.RepositoryInterface {
 	mockRepo := repositoryMocks.NewMockRepository()
 	if !workflowOnGet {
 		mockRepo.(*repositoryMocks.MockRepository).WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(
-			func(input interfaces.GetResourceInput) (models.Workflow, error) {
+			func(input interfaces.Identifier) (models.Workflow, error) {
 				return models.Workflow{}, adminErrors.NewFlyteAdminError(codes.NotFound, "not found")
 			})
 	}
@@ -261,7 +261,7 @@ func TestCreateWorkflow_DatabaseError(t *testing.T) {
 
 func TestGetWorkflow(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -308,7 +308,7 @@ func TestGetWorkflow(t *testing.T) {
 func TestGetWorkflow_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		return models.Workflow{}, expectedErr
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
@@ -324,7 +324,7 @@ func TestGetWorkflow_DatabaseError(t *testing.T) {
 
 func TestGetWorkflow_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)

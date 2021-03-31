@@ -58,7 +58,7 @@ func TestGetTask(t *testing.T) {
 		`SELECT * FROM "tasks"  WHERE "tasks"."deleted_at" IS NULL AND (("tasks"."project" = project) ` +
 			`AND ("tasks"."domain" = domain) AND ("tasks"."name" = name) AND ("tasks"."version" = XYZ)) LIMIT 1`).
 		WithReply(tasks)
-	output, err := taskRepo.Get(context.Background(), interfaces.GetResourceInput{
+	output, err := taskRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,

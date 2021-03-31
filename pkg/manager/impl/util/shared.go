@@ -44,7 +44,7 @@ func GetTask(ctx context.Context, repo repositories.RepositoryInterface, identif
 
 func GetWorkflowModel(
 	ctx context.Context, repo repositories.RepositoryInterface, identifier core.Identifier) (models.Workflow, error) {
-	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.GetResourceInput{
+	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
 		Name:    identifier.Name,
@@ -93,7 +93,7 @@ func GetWorkflow(
 
 func GetLaunchPlanModel(
 	ctx context.Context, repo repositories.RepositoryInterface, identifier core.Identifier) (models.LaunchPlan, error) {
-	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.GetResourceInput{
+	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
 		Name:    identifier.Name,
@@ -179,7 +179,7 @@ func ListActiveLaunchPlanVersionsFilters(project, domain string) ([]common.Inlin
 func GetExecutionModel(
 	ctx context.Context, repo repositories.RepositoryInterface, identifier core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
-	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.GetResourceInput{
+	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
 		Name:    identifier.Name,
@@ -192,7 +192,7 @@ func GetExecutionModel(
 
 func GetNodeExecutionModel(ctx context.Context, repo repositories.RepositoryInterface, nodeExecutionIdentifier *core.NodeExecutionIdentifier) (
 	*models.NodeExecution, error) {
-	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, repoInterfaces.GetNodeExecutionInput{
+	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
 		NodeExecutionIdentifier: *nodeExecutionIdentifier,
 	})
 
@@ -205,7 +205,7 @@ func GetNodeExecutionModel(ctx context.Context, repo repositories.RepositoryInte
 func GetTaskModel(ctx context.Context, repo repositories.RepositoryInterface, taskIdentifier *core.Identifier) (
 	*models.Task, error) {
 
-	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.GetResourceInput{
+	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: taskIdentifier.Project,
 		Domain:  taskIdentifier.Domain,
 		Name:    taskIdentifier.Name,

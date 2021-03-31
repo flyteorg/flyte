@@ -65,7 +65,7 @@ var mockNodeExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 
 func addGetExecutionCallback(t *testing.T, repository repositories.RepositoryInterface) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			assert.Equal(t, "project", input.Project)
 			assert.Equal(t, "domain", input.Domain)
 			assert.Equal(t, "name", input.Name)
@@ -86,7 +86,7 @@ func TestCreateNodeEvent(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
@@ -146,7 +146,7 @@ func TestCreateNodeEvent_Update(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
@@ -200,15 +200,29 @@ func TestCreateNodeEvent_Update(t *testing.T) {
 
 func TestCreateNodeEvent_MissingExecution(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	expectedErr := errors.New("expected error")
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
-			return models.Execution{}, expectedErr
+	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "expected error")
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).ExistsFunction =
+		func(ctx context.Context, input interfaces.Identifier) (bool, error) {
+			return false, expectedErr
+		}
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher)
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
-	assert.EqualError(t, err, "failed to get existing execution id: [project:\"project\""+
+	assert.EqualError(t, err, "Failed to get existing execution id: [project:\"project\""+
 		" domain:\"domain\" name:\"name\" ] with err: expected error")
+	assert.Nil(t, resp)
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).ExistsFunction =
+		func(ctx context.Context, input interfaces.Identifier) (bool, error) {
+			return false, nil
+		}
+	nodeExecManager = NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher)
+	resp, err = nodeExecManager.CreateNodeEvent(context.Background(), request)
+	assert.EqualError(t, err, "failed to get existing execution id: [project:\"project\""+
+		" domain:\"domain\" name:\"name\" ]")
 	assert.Nil(t, resp)
 }
 
@@ -216,7 +230,7 @@ func TestCreateNodeEvent_CreateDatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 
@@ -235,7 +249,7 @@ func TestCreateNodeEvent_UpdateDatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
@@ -270,7 +284,7 @@ func TestCreateNodeEvent_UpdateTerminalEventError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
@@ -305,7 +319,7 @@ func TestCreateNodeEvent_UpdateDuplicateEventError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
 				NodeId:      "node id",
 				ExecutionId: &workflowExecutionIdentifier,
@@ -334,7 +348,7 @@ func TestCreateNodeEvent_FirstEventIsTerminal(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetExecutionCallback(t, repository)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			return models.NodeExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher)
@@ -372,7 +386,7 @@ func TestGetNodeExecution(t *testing.T) {
 	metadataBytes, _ := proto.Marshal(&expectedMetadata)
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			workflowExecutionIdentifier := core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -423,7 +437,7 @@ func TestGetNodeExecutionParentNode(t *testing.T) {
 	metadataBytes, _ := proto.Marshal(&expectedMetadata)
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			workflowExecutionIdentifier := core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",
@@ -479,7 +493,7 @@ func TestGetNodeExecution_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			return models.NodeExecution{}, expectedErr
 		})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil)
@@ -493,7 +507,7 @@ func TestGetNodeExecution_DatabaseError(t *testing.T) {
 func TestGetNodeExecution_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
@@ -622,7 +636,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 	metadataBytes, _ := proto.Marshal(&expectedMetadata)
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	parentID := uint(12)
-	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.GetNodeExecutionInput) (execution models.NodeExecution, e error) {
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (execution models.NodeExecution, e error) {
 		assert.Equal(t, "parent_1", input.NodeExecutionIdentifier.NodeId)
 		return models.NodeExecution{
 			BaseModel: models.BaseModel{
@@ -959,7 +973,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 
 	closureBytes, _ := proto.Marshal(&expectedClosure)
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			workflowExecutionIdentifier := core.WorkflowExecutionIdentifier{
 				Project: "project",
 				Domain:  "domain",

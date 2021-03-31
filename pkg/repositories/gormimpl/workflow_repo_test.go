@@ -56,7 +56,7 @@ func TestGetWorkflow(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`(("workflows"."project" = project) AND ("workflows"."domain" = domain) AND ` +
 			`("workflows"."name" = name) AND ("workflows"."version" = XYZ))`).WithReply(workflows)
-	output, err := workflowRepo.Get(context.Background(), interfaces.GetResourceInput{
+	output, err := workflowRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,

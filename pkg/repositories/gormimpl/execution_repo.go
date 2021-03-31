@@ -32,7 +32,7 @@ func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) erro
 	return nil
 }
 
-func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 	var execution models.Execution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.Execution{
@@ -127,6 +127,24 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	return interfaces.ExecutionCollectionOutput{
 		Executions: executions,
 	}, nil
+}
+
+func (r *ExecutionRepo) Exists(ctx context.Context, input interfaces.Identifier) (bool, error) {
+	var execution models.Execution
+	timer := r.metrics.ExistsDuration.Start()
+	// Only select the id field (uint) to check for existence.
+	tx := r.db.Select(ID).Where(&models.Execution{
+		ExecutionKey: models.ExecutionKey{
+			Project: input.Project,
+			Domain:  input.Domain,
+			Name:    input.Name,
+		},
+	}).Take(&execution)
+	timer.Stop()
+	if tx.Error != nil {
+		return false, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return !tx.RecordNotFound(), nil
 }
 
 // Returns an instance of ExecutionRepoInterface

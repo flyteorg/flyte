@@ -11,7 +11,7 @@ type TaskRepoInterface interface {
 	// Inserts a task model into the database store.
 	Create(ctx context.Context, input models.Task) error
 	// Returns a matching task if it exists.
-	Get(ctx context.Context, input GetResourceInput) (models.Task, error)
+	Get(ctx context.Context, input Identifier) (models.Task, error)
 	// Returns task revisions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (TaskCollectionOutput, error)
 	// Returns tasks with only the project, name, and domain filled in.

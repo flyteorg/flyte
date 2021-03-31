@@ -78,7 +78,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowcreateFunc)
 
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		if getCalledCount == 0 {
 			getCalledCount++
 			return models.Workflow{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")
@@ -176,7 +176,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(launchPlanCreateFunc)
 
-	launchPlanGetFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	launchPlanGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		if getCalledCount == 0 {
 			getCalledCount++
 			return models.LaunchPlan{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")

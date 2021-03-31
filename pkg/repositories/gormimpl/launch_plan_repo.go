@@ -48,7 +48,7 @@ func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) er
 	return nil
 }
 
-func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (models.LaunchPlan, error) {
 	var launchPlan models.LaunchPlan
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.LaunchPlan{

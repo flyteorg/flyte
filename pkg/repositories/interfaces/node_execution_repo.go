@@ -15,14 +15,16 @@ type NodeExecutionRepoInterface interface {
 	// This execution and event correspond to entire graph (workflow) executions.
 	Update(ctx context.Context, event *models.NodeExecutionEvent, execution *models.NodeExecution) error
 	// Returns a matching execution if it exists.
-	Get(ctx context.Context, input GetNodeExecutionInput) (models.NodeExecution, error)
+	Get(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
 	// Returns node executions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (NodeExecutionCollectionOutput, error)
 	// Return node execution events matching query parameters. A limit must be provided for the results page size.
 	ListEvents(ctx context.Context, input ListResourceInput) (NodeExecutionEventCollectionOutput, error)
+	// Returns whether a matching execution  exists.
+	Exists(ctx context.Context, input NodeExecutionResource) (bool, error)
 }
 
-type GetNodeExecutionInput struct {
+type NodeExecutionResource struct {
 	NodeExecutionIdentifier core.NodeExecutionIdentifier
 }
 

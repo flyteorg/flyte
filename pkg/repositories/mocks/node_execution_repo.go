@@ -9,7 +9,7 @@ import (
 
 type CreateNodeExecutionFunc func(ctx context.Context, event *models.NodeExecutionEvent, input *models.NodeExecution) error
 type UpdateNodeExecutionFunc func(ctx context.Context, event *models.NodeExecutionEvent, nodeExecution *models.NodeExecution) error
-type GetNodeExecutionFunc func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error)
+type GetNodeExecutionFunc func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error)
 type ListNodeExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.NodeExecutionCollectionOutput, error)
 type ListNodeExecutionEventFunc func(ctx context.Context, input interfaces.ListResourceInput) (
@@ -21,6 +21,7 @@ type MockNodeExecutionRepo struct {
 	getFunction       GetNodeExecutionFunc
 	listFunction      ListNodeExecutionFunc
 	listEventFunction ListNodeExecutionEventFunc
+	ExistsFunction    func(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error)
 }
 
 func (r *MockNodeExecutionRepo) Create(ctx context.Context, event *models.NodeExecutionEvent, input *models.NodeExecution) error {
@@ -45,7 +46,7 @@ func (r *MockNodeExecutionRepo) SetUpdateCallback(updateFunction UpdateNodeExecu
 	r.updateFunction = updateFunction
 }
 
-func (r *MockNodeExecutionRepo) Get(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+func (r *MockNodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 	if r.getFunction != nil {
 		return r.getFunction(ctx, input)
 	}
@@ -78,6 +79,13 @@ func (r *MockNodeExecutionRepo) ListEvents(ctx context.Context, input interfaces
 
 func (r *MockNodeExecutionRepo) SetListEventCallback(listEventFunction ListNodeExecutionEventFunc) {
 	r.listEventFunction = listEventFunction
+}
+
+func (r *MockNodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+	if r.ExistsFunction != nil {
+		return r.ExistsFunction(ctx, input)
+	}
+	return true, nil
 }
 
 func NewMockNodeExecutionRepo() interfaces.NodeExecutionRepoInterface {

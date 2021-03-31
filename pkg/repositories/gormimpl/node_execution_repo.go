@@ -44,7 +44,7 @@ func (r *NodeExecutionRepo) Create(ctx context.Context, event *models.NodeExecut
 	return nil
 }
 
-func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.NodeExecution{
@@ -164,6 +164,26 @@ func (r *NodeExecutionRepo) ListEvents(
 	return interfaces.NodeExecutionEventCollectionOutput{
 		NodeExecutionEvents: nodeExecutionEvents,
 	}, nil
+}
+
+func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+	var nodeExecution models.NodeExecution
+	timer := r.metrics.ExistsDuration.Start()
+	tx := r.db.Select(ID).Where(&models.NodeExecution{
+		NodeExecutionKey: models.NodeExecutionKey{
+			NodeID: input.NodeExecutionIdentifier.NodeId,
+			ExecutionKey: models.ExecutionKey{
+				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
+				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
+				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+			},
+		},
+	}).Take(&nodeExecution)
+	timer.Stop()
+	if tx.Error != nil {
+		return false, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return !tx.RecordNotFound(), nil
 }
 
 // Returns an instance of NodeExecutionRepoInterface
