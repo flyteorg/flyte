@@ -349,6 +349,13 @@ pytorchoperator:
   affinity: {}
 
 #
+# KUBERNETES DASHBOARD
+#
+
+kubernetes-dashboard:
+  enabled: false
+
+#
 # COMMON SETTINGS
 #
 
@@ -359,12 +366,23 @@ common:
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
-    # --- enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
+    # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
+    # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
+    webpackHMR: false
+    # --- Ingress annotations applied to both HTTP and GRPC ingresses.
     annotations:
       nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # --- Extra Ingress annotations applied only to the HTTP ingress.
+    httpAnnotations: {}
+    # --- Extra Ingress annotations applied only to the GRPC ingress.
+    grpcAnnotations: {}
+    # --- Ingress hostname
+    # host:
+    # --- controllerType defines the ingress controller type. Currently supported values are "contour", "ALB" or "GKE"
+    # controllerType:
   flyteNamespaceTemplate:
-    # --- enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
+    # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
 
 #
