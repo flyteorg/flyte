@@ -77,6 +77,7 @@ pytorchoperator:
 # KUBERNETES DASHBOARD
 #
 kubernetes-dashboard:
+  enabled: true
   extraArgs:
    - --enable-skip-login
    - --enable-insecure-login
@@ -92,7 +93,10 @@ kubernetes-dashboard:
 
 common:
   databaseSecret: {}
-  ingress: {}
+  ingress:
+    # enable HMR route to flyteconsole for frontend development.
+    webpackHMR: true
+    controllerType: "contour"
   flyteNamespaceTemplate: {}
 
 #

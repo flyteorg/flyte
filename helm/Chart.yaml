@@ -17,3 +17,4 @@ dependencies:
   - name: kubernetes-dashboard
     version: 4.0.2
     repository: https://kubernetes.github.io/dashboard/
+    condition: kubernetes-dashboard.enabled
