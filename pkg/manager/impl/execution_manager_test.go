@@ -2149,43 +2149,6 @@ func TestGetExecution_Legacy(t *testing.T) {
 	assert.True(t, proto.Equal(getLegacyClosure(), execution.Closure))
 }
 
-func TestGetExecution_LegacyClient_OffloadedData(t *testing.T) {
-	repository := repositoryMocks.NewMockRepository()
-	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
-		assert.Equal(t, "project", input.Project)
-		assert.Equal(t, "domain", input.Domain)
-		assert.Equal(t, "name", input.Name)
-		return models.Execution{
-			ExecutionKey: models.ExecutionKey{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "name",
-			},
-			Spec:          specBytes,
-			Phase:         phase,
-			Closure:       closureBytes,
-			LaunchPlanID:  uint(1),
-			WorkflowID:    uint(2),
-			StartedAt:     &startedAt,
-			UserInputsURI: shared.UserInputs,
-			InputsURI:     shared.Inputs,
-		}, nil
-	}
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
-	storageClient := getMockStorageForExecTest(context.Background())
-	execManager := NewExecutionManager(repository, getMockExecutionsConfigProvider(), storageClient, workflowengineMocks.NewMockExecutor(), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil)
-	_ = storageClient.WriteProtobuf(context.Background(), storage.DataReference(shared.UserInputs), storage.Options{}, getLegacySpec().Inputs)
-	_ = storageClient.WriteProtobuf(context.Background(), storage.DataReference(shared.Inputs), storage.Options{}, getLegacyClosure().ComputedInputs)
-	execution, err := execManager.GetExecution(context.Background(), admin.WorkflowExecutionGetRequest{
-		Id: &executionIdentifier,
-	})
-	assert.NoError(t, err)
-	assert.True(t, proto.Equal(&executionIdentifier, execution.Id))
-	assert.True(t, proto.Equal(getLegacySpec(), execution.Spec))
-	assert.True(t, proto.Equal(getLegacyClosure(), execution.Closure))
-}
-
 func TestGetExecutionData_LegacyModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
