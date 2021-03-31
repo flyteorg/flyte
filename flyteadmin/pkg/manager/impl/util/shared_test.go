@@ -52,7 +52,7 @@ func TestPopulateExecutionID_ExistingName(t *testing.T) {
 
 func TestGetTask(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	taskGetFunc := func(input interfaces.GetResourceInput) (models.Task, error) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -85,7 +85,7 @@ func TestGetTask(t *testing.T) {
 
 func TestGetTask_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	taskGetFunc := func(input interfaces.GetResourceInput) (models.Task, error) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
 		return models.Task{}, errExpected
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
@@ -102,7 +102,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 
 func TestGetTask_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	taskGetFunc := func(input interfaces.GetResourceInput) (models.Task, error) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -131,7 +131,7 @@ func TestGetTask_TransformerError(t *testing.T) {
 
 func TestGetWorkflowModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -165,7 +165,7 @@ func TestGetWorkflowModel(t *testing.T) {
 
 func TestGetWorkflowModel_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		return models.Workflow{}, errExpected
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
@@ -208,7 +208,7 @@ func TestFetchAndGetWorkflowClosure_RemoteReadError(t *testing.T) {
 
 func TestGetWorkflow(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -249,7 +249,7 @@ func TestGetWorkflow(t *testing.T) {
 
 func TestGetLaunchPlanModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getLaunchPlanFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	getLaunchPlanFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -281,7 +281,7 @@ func TestGetLaunchPlanModel(t *testing.T) {
 
 func TestGetLaunchPlanModel_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getLaunchPlanFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	getLaunchPlanFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		return models.LaunchPlan{}, errExpected
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(getLaunchPlanFunc)
@@ -298,7 +298,7 @@ func TestGetLaunchPlanModel_DatabaseError(t *testing.T) {
 
 func TestGetLaunchPlan(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getLaunchPlanFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	getLaunchPlanFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -330,7 +330,7 @@ func TestGetLaunchPlan(t *testing.T) {
 
 func TestGetLaunchPlan_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	getLaunchPlanFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	getLaunchPlanFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)

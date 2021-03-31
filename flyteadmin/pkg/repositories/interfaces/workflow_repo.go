@@ -11,7 +11,7 @@ type WorkflowRepoInterface interface {
 	// Inserts a workflow model into the database store.
 	Create(ctx context.Context, input models.Workflow) error
 	// Returns a matching workflow if it exists.
-	Get(ctx context.Context, input GetResourceInput) (models.Workflow, error)
+	Get(ctx context.Context, input Identifier) (models.Workflow, error)
 	// Returns workflow revisions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (WorkflowCollectionOutput, error)
 	ListIdentifiers(ctx context.Context, input ListResourceInput) (WorkflowCollectionOutput, error)

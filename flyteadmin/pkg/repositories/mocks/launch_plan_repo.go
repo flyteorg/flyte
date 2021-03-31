@@ -11,7 +11,7 @@ import (
 type CreateLaunchPlanFunc func(input models.LaunchPlan) error
 type UpdateLaunchPlanFunc func(input models.LaunchPlan) error
 type SetActiveLaunchPlanFunc func(toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error
-type GetLaunchPlanFunc func(input interfaces.GetResourceInput) (models.LaunchPlan, error)
+type GetLaunchPlanFunc func(input interfaces.Identifier) (models.LaunchPlan, error)
 type ListLaunchPlanFunc func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error)
 type ListLaunchPlanIdentifiersFunc func(input interfaces.ListResourceInput) (
 	interfaces.LaunchPlanCollectionOutput, error)
@@ -60,7 +60,7 @@ func (r *MockLaunchPlanRepo) SetSetActiveCallback(setActiveFunction SetActiveLau
 }
 
 func (r *MockLaunchPlanRepo) Get(
-	ctx context.Context, input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	ctx context.Context, input interfaces.Identifier) (models.LaunchPlan, error) {
 	if r.getFunction != nil {
 		return r.getFunction(input)
 	}

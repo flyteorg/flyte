@@ -187,7 +187,7 @@ func TestGetNodeExecution(t *testing.T) {
 			`(("node_executions"."execution_project" = execution_project) AND ("node_executions"."execution_domain" ` +
 			`= execution_domain) AND ("node_executions"."execution_name" = execution_name) AND ("node_executions".` +
 			`"node_id" = 1)) LIMIT 1`).WithReply(nodeExecutions)
-	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.GetNodeExecutionInput{
+	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
 		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -431,4 +431,47 @@ func TestListNodeExecutionEvents_MissingParameters(t *testing.T) {
 		Limit: 20,
 	})
 	assert.EqualError(t, err, "missing and/or invalid parameters: filters")
+}
+
+func TestNodeExecutionExists(t *testing.T) {
+	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+	id := uint(10)
+	expectedNodeExecution := models.NodeExecution{
+		NodeExecutionKey: models.NodeExecutionKey{
+			NodeID: "1",
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "1",
+			},
+		},
+		BaseModel: models.BaseModel{
+			ID: id,
+		},
+		Phase:   nodePhase,
+		Closure: []byte("closure"),
+	}
+
+	nodeExecutions := make([]map[string]interface{}, 0)
+	nodeExecution := getMockNodeExecutionResponseFromDb(expectedNodeExecution)
+	nodeExecutions = append(nodeExecutions, nodeExecution)
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.NewMock().WithQuery(
+		`SELECT id FROM "node_executions"  WHERE "node_executions"."deleted_at" IS NULL AND ` +
+			`(("node_executions"."execution_project" = execution_project) AND ("node_executions"."execution_domain" = ` +
+			`execution_domain) AND ("node_executions"."execution_name" = execution_name) AND ` +
+			`("node_executions"."node_id" = 1)) LIMIT 1`).WithReply(nodeExecutions)
+	exists, err := nodeExecutionRepo.Exists(context.Background(), interfaces.NodeExecutionResource{
+		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+			NodeId: "1",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "execution_project",
+				Domain:  "execution_domain",
+				Name:    "execution_name",
+			},
+		},
+	})
+	assert.NoError(t, err)
+	assert.True(t, exists)
 }

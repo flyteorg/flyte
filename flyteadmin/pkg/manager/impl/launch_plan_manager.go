@@ -279,7 +279,7 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 
 func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
-	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.GetResourceInput{
+	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Id.Name,

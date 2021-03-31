@@ -131,7 +131,7 @@ func setDefaultLpCallbackForExecTest(repository repositories.RepositoryInterface
 	}
 	lpClosureBytes, _ := proto.Marshal(&lpClosure)
 
-	lpGetFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		lpModel := models.LaunchPlan{
 			LaunchPlanKey: models.LaunchPlanKey{
 				Project: input.Project,
@@ -179,7 +179,7 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 func getMockRepositoryForExecTest() repositories.RepositoryInterface {
 	repository := repositoryMocks.NewMockRepository()
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(
-		func(input interfaces.GetResourceInput) (models.Workflow, error) {
+		func(input interfaces.Identifier) (models.Workflow, error) {
 			return models.Workflow{
 				BaseModel: models.BaseModel{
 					CreatedAt: testutils.MockCreatedAtValue,
@@ -289,7 +289,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 
 	getNodeExecutionCalled := false
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetNodeExecutionInput) (models.NodeExecution, error) {
+		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 			assert.EqualValues(t, input.NodeExecutionIdentifier, parentNodeExecutionID)
 			getNodeExecutionCalled = true
 			return models.NodeExecution{
@@ -301,7 +301,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 	)
 	getExecutionCalled := false
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			assert.EqualValues(t, input.Project, parentNodeExecutionID.ExecutionId.Project)
 			assert.EqualValues(t, input.Domain, parentNodeExecutionID.ExecutionId.Domain)
 			assert.EqualValues(t, input.Name, parentNodeExecutionID.ExecutionId.Name)
@@ -666,7 +666,7 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 
 	// The LaunchPlan is retrieved within the CreateExecution call to ExecutionManager.
 	// Create a callback method used by the mock to retrieve a LaunchPlan.
-	lpGetFunc := func(input interfaces.GetResourceInput) (models.LaunchPlan, error) {
+	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
 		lpModel := models.LaunchPlan{
 			LaunchPlanKey: models.LaunchPlanKey{
 				Project: input.Project,
@@ -754,7 +754,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 
 func makeExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -780,7 +780,7 @@ func makeExecutionGetFunc(
 
 func makeLegacyExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -869,7 +869,7 @@ func TestRelaunchExecution_GetExistingFailure(t *testing.T) {
 
 	expectedErr := errors.New("expected error")
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			return models.Execution{}, expectedErr
 		})
 
@@ -1002,7 +1002,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 
 func TestCreateWorkflowEvent_TerminalState(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -1096,7 +1096,7 @@ func TestCreateWorkflowEvent_DuplicateRunning(t *testing.T) {
 	occurredAt := time.Now().UTC()
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: "project",
@@ -1137,7 +1137,7 @@ func TestCreateWorkflowEvent_InvalidPhaseChange(t *testing.T) {
 	occurredAt := time.Now().UTC()
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: "project",
@@ -1240,7 +1240,7 @@ func TestCreateWorkflowEvent_DatabaseGetError(t *testing.T) {
 	startTime := time.Now()
 
 	expectedErr := errors.New("expected error")
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{}, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
@@ -1304,7 +1304,7 @@ func TestCreateWorkflowEvent_DatabaseUpdateError(t *testing.T) {
 func TestGetExecution(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1338,7 +1338,7 @@ func TestGetExecution_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
 
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1356,7 +1356,7 @@ func TestGetExecution_DatabaseError(t *testing.T) {
 func TestGetExecution_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1927,7 +1927,7 @@ func TestGetExecutionData(t *testing.T) {
 	}
 	var closureBytes, _ = proto.Marshal(&closure)
 
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -2120,7 +2120,7 @@ func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
 func TestGetExecution_Legacy(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -2152,7 +2152,7 @@ func TestGetExecution_Legacy(t *testing.T) {
 func TestGetExecution_LegacyClient_OffloadedData(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -2199,7 +2199,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	}
 	var closureBytes, _ = proto.Marshal(closure)
 
-	executionGetFunc := func(ctx context.Context, input interfaces.GetResourceInput) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -2742,7 +2742,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowcreateFunc)
 
-	workflowGetFunc := func(input interfaces.GetResourceInput) (models.Workflow, error) {
+	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
 		if getCalledCount <= 1 {
 			getCalledCount++
 			return models.Workflow{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")
@@ -2752,7 +2752,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.GetResourceInput) (models.Task, error) {
+		func(input interfaces.Identifier) (models.Task, error) {
 			createdAt := time.Now()
 			createdAtProto, _ := ptypes.TimestampProto(createdAt)
 			taskClosure := &admin.TaskClosure{

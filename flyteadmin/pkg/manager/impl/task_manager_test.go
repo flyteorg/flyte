@@ -71,7 +71,7 @@ func getMockTaskRepository() repositories.RepositoryInterface {
 func TestCreateTask(t *testing.T) {
 	mockRepository := getMockTaskRepository()
 	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.GetResourceInput) (models.Task, error) {
+		func(input interfaces.Identifier) (models.Task, error) {
 			return models.Task{}, errors.New("foo")
 		})
 	var createCalled bool
@@ -123,7 +123,7 @@ func TestCreateTask_CompilerError(t *testing.T) {
 func TestCreateTask_DatabaseError(t *testing.T) {
 	repository := getMockTaskRepository()
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.GetResourceInput) (models.Task, error) {
+		func(input interfaces.Identifier) (models.Task, error) {
 			return models.Task{}, errors.New("foo")
 		})
 	expectedErr := errors.New("expected error")
@@ -141,7 +141,7 @@ func TestCreateTask_DatabaseError(t *testing.T) {
 
 func TestGetTask(t *testing.T) {
 	repository := getMockTaskRepository()
-	taskGetFunc := func(input interfaces.GetResourceInput) (models.Task, error) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -176,7 +176,7 @@ func TestGetTask(t *testing.T) {
 func TestGetTask_DatabaseError(t *testing.T) {
 	repository := getMockTaskRepository()
 	expectedErr := errors.New("expected error")
-	taskGetFunc := func(input interfaces.GetResourceInput) (models.Task, error) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
 		return models.Task{}, expectedErr
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
@@ -190,7 +190,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 
 func TestGetTask_TransformerError(t *testing.T) {
 	repository := getMockTaskRepository()
-	taskGetFunc := func(input interfaces.GetResourceInput) (models.Task, error) {
+	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)

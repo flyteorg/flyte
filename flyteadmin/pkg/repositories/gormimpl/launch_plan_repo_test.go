@@ -78,7 +78,7 @@ func TestGetLaunchPlan(t *testing.T) {
 		`SELECT * FROM "launch_plans"  WHERE "launch_plans"."deleted_at" IS NULL AND ` +
 			`(("launch_plans"."project" = project) AND ("launch_plans"."domain" = domain) AND ` +
 			`("launch_plans"."name" = name) AND ("launch_plans"."version" = XYZ)) LIMIT 1`).WithReply(launchPlans)
-	output, err := launchPlanRepo.Get(context.Background(), interfaces.GetResourceInput{
+	output, err := launchPlanRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,

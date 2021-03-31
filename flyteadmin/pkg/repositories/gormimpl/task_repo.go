@@ -30,7 +30,7 @@ func (r *TaskRepo) Create(ctx context.Context, input models.Task) error {
 	return nil
 }
 
-func (r *TaskRepo) Get(ctx context.Context, input interfaces.GetResourceInput) (models.Task, error) {
+func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
 	var task models.Task
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.Task{

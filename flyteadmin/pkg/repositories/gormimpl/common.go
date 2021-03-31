@@ -14,16 +14,10 @@ import (
 const Project = "project"
 const Domain = "domain"
 const Name = "name"
-const Version = "version"
-const Closure = "closure"
 const Description = "description"
 const ResourceType = "resource_type"
 const State = "state"
-
-const ProjectID = "project_id"
-const ProjectName = "project_name"
-const DomainID = "domain_id"
-const DomainName = "domain_name"
+const ID = "id"
 
 const executionTableName = "executions"
 const namedEntityMetadataTableName = "named_entity_metadata"

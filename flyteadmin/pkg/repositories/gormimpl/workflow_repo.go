@@ -30,7 +30,7 @@ func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow) error 
 	return nil
 }
 
-func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.GetResourceInput) (models.Workflow, error) {
+func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Workflow, error) {
 	var workflow models.Workflow
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.Workflow{

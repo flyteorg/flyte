@@ -81,7 +81,7 @@ func CreateOrGetWorkflowModel(
 		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
 		Version:      taskIdentifier.Version,
 	}
-	workflowModel, err := db.WorkflowRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
+	workflowModel, err := db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
 		Project: workflowIdentifier.Project,
 		Domain:  workflowIdentifier.Domain,
 		Name:    workflowIdentifier.Name,
@@ -145,7 +145,7 @@ func CreateOrGetWorkflowModel(
 			logger.Warningf(ctx, "Failed to set skeleton workflow state to system-generated: %v", err)
 			return nil, err
 		}
-		workflowModel, err = db.WorkflowRepo().Get(ctx, repositoryInterfaces.GetResourceInput{
+		workflowModel, err = db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
 			Project: workflowIdentifier.Project,
 			Domain:  workflowIdentifier.Domain,
 			Name:    workflowIdentifier.Name,
