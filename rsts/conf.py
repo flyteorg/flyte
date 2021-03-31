@@ -109,7 +109,7 @@ html_static_path = ["_static"]
 templates_path = ["_templates"]
 
 pygments_style = "tango"
-pygments_dark_style = "paraiso-dark"
+pygments_dark_style = "native"
 
 html_css_files = [
     "custom.css",
