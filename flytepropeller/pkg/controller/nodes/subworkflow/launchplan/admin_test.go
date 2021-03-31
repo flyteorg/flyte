@@ -5,6 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flytestdlib/cache"
+	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
+
 	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
@@ -37,6 +40,25 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		s, err := exec.GetStatus(ctx, id)
 		assert.NoError(t, err)
 		assert.Equal(t, result, s)
+	})
+
+	t.Run("terminal-sync", func(t *testing.T) {
+		mockClient := &mocks.AdminServiceClient{}
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Millisecond, defaultAdminConfig, promutils.NewTestScope())
+		assert.NoError(t, err)
+		iwMock := &mocks2.ItemWrapper{}
+		i := executionCacheItem{ExecutionClosure: &admin.ExecutionClosure{Phase: core.WorkflowExecution_SUCCEEDED, WorkflowId: &core.Identifier{Project: "p"}}}
+		iwMock.OnGetItem().Return(i)
+		iwMock.OnGetID().Return("id")
+		adminExec := exec.(*adminLaunchPlanExecutor)
+		v, err := adminExec.syncItem(ctx, cache.Batch{
+			iwMock,
+		})
+		assert.NoError(t, err)
+		assert.NotNil(t, v)
+		assert.Len(t, v, 1)
+		assert.Equal(t, v[0].ID, "id")
+		assert.Equal(t, v[0].Item, i)
 	})
 
 	t.Run("notFound", func(t *testing.T) {
@@ -130,6 +152,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 		assert.Nil(t, s)
 		assert.False(t, IsNotFound(err))
 	})
+
 }
 
 func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
@@ -312,4 +335,16 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 		assert.Nil(t, lp)
 		assert.Error(t, err)
 	})
+}
+
+func TestIsWorkflowTerminated(t *testing.T) {
+	assert.True(t, IsWorkflowTerminated(core.WorkflowExecution_SUCCEEDED))
+	assert.True(t, IsWorkflowTerminated(core.WorkflowExecution_ABORTED))
+	assert.True(t, IsWorkflowTerminated(core.WorkflowExecution_FAILED))
+	assert.True(t, IsWorkflowTerminated(core.WorkflowExecution_TIMED_OUT))
+	assert.False(t, IsWorkflowTerminated(core.WorkflowExecution_SUCCEEDING))
+	assert.False(t, IsWorkflowTerminated(core.WorkflowExecution_FAILING))
+	assert.False(t, IsWorkflowTerminated(core.WorkflowExecution_RUNNING))
+	assert.False(t, IsWorkflowTerminated(core.WorkflowExecution_QUEUED))
+	assert.False(t, IsWorkflowTerminated(core.WorkflowExecution_UNDEFINED))
 }

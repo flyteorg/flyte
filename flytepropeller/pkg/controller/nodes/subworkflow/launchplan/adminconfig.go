@@ -8,7 +8,7 @@ import (
 
 var (
 	defaultAdminConfig = &AdminConfig{
-		TPS:          5,
+		TPS:          100,
 		Burst:        10,
 		MaxCacheSize: 10000,
 		Workers:      10,
@@ -17,6 +17,8 @@ var (
 	adminConfigSection = ctrlConfig.MustRegisterSubSection("admin-launcher", defaultAdminConfig)
 )
 
+// AdminConfig provides a "admin-launcher" section in core Flytepropeller configuration and can be used to configure
+// the rate at which Flytepropeller can query for status of workflows in flyteadmin or create new executions
 type AdminConfig struct {
 	// TPS indicates the maximum transactions per second to flyte admin from this client.
 	// If it's zero, the created client will use DefaultTPS: 5
