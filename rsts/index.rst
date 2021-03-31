@@ -43,7 +43,7 @@ Meet Flyte
 
 Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-Created at `Lyft <https://www.lyft.com/>`__, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
+Created at `Lyft <https://www.lyft.com/>`__ and shared with Spotify, Freenome and many others, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
 
 The core unit of execution in Flyte is the ``task``, which you can easily write with the Flytekit Python SDK:
 
@@ -93,6 +93,8 @@ Who's Using Flyte?
 ------------------
 
 At `Lyft <https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59>`__, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA, Mapping teams, Growth, Autonomous and other teams.
+
+Flyte is also used in production by `Spotify <https://www.spotify.com/>`__, `Freenome <https://www.freenome.com/>`__, `USU Solutions <https://www.usu.com/>`__ and `Striveworks <https://striveworks.us/>`__.
 
 Next Steps
 ----------
