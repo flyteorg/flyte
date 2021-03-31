@@ -1,4 +1,13 @@
 #
+# COMMON
+#
+
+common:
+  databaseSecret: {}
+  ingress:
+    controllerType: "GKE"
+
+#
 # CONFIGMAPS
 #
 
