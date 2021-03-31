@@ -128,11 +128,9 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 master_doc = "index"
 
 pygments_style = "tango"
-pygments_dark_style = "paraiso-dark"
+pygments_dark_style = "native"
 
-html_css_files = [
-    "custom.css",
-]
+html_css_files = ["custom.css"]
 
 html_context = {
     "home_page": "https://docs.flyte.org",
@@ -227,6 +225,7 @@ sphinx_gallery_conf = {
     "capture_repr": (),
     "image_scrapers": image_scrapers,
     "default_thumb_file": "flyte_mark_offset_pink.png",
+    "thumbnail_size": (350, 350),
     # Support for binder
     # 'binder': {'org': 'sphinx-gallery',
     # 'repo': 'sphinx-gallery.github.io',
