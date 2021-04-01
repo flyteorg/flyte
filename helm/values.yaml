@@ -9,7 +9,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: ghcr.io/flyteorg/flyteadmin
-    tag: v0.3.38
+    tag: v0.4.0
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -27,7 +27,9 @@ flyteadmin:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
+      alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     type: ClusterIP
+    loadBalancerSourceRanges: []
   # -- Annotations for ServiceAccount attached to Flyteadmin pods
   serviceAccountAnnotations: {}
   # -- Annotations for Flyteadmin pods
@@ -67,6 +69,7 @@ datacatalog:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
+      alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     type: NodePort
   # -- Annotations for ServiceAccount attached to Datacatalog pods
   serviceAccountAnnotations: {}
@@ -89,7 +92,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.7.1
+    tag: v0.7.8
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -370,17 +373,17 @@ common:
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
     webpackHMR: false
+    # --- separateGrpcIngress puts GRPC routes into a separate ingress if true. Required for certain ingress controllers like nginx.
+    separateGrpcIngress: false
+    # --- Extra Ingress annotations applied only to the GRPC ingress. Only makes sense if `separateGrpcIngress` is enabled.
+    separateGrpcIngressAnnotations:
+      nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
     # --- Ingress annotations applied to both HTTP and GRPC ingresses.
-    annotations:
-      nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    # --- Extra Ingress annotations applied only to the HTTP ingress.
-    httpAnnotations: {}
-    # --- Extra Ingress annotations applied only to the GRPC ingress.
-    grpcAnnotations: {}
+    annotations: {}
+    # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
+    albSSLRedirect: false
     # --- Ingress hostname
     # host:
-    # --- controllerType defines the ingress controller type. Currently supported values are "contour", "ALB" or "GKE"
-    # controllerType:
   flyteNamespaceTemplate:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
