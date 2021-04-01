@@ -21,7 +21,7 @@
 * Better merging of custom info across task events
 
 # Bug fixes
-* Resolved non-backwards protobuf role changes that prevented launching single task executions
+* Resolved non-backwards protobuf role changes that prevented launching single task executions [thanks @kanterov]
 * Better handling of large workflows and errors in flytepropeller
 
 # Flytekit (Python)
