@@ -5,11 +5,36 @@
 A Helm chart for Flyte
 
 ### SANDBOX INSTALLATION:
-- Install `helm 3` release version
-- Generate `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- [Install helm 3](https://helm.sh/docs/intro/install/) 
+- Fetch chart dependencies `helm dep up`
+- Install Flyte sandbox:
+
+```bash
+cd helm
+helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
+```
+
+Customize your installation by changing settings in `values-sandbox.yaml`.
+You can use the helm diff plugin to review any value changes you've made to your values:
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff
+helm diff upgrade -f values-sandbox.yaml flyte .
+```
+
+Then apply your changes:
+```bash
+helm upgrade -f values-sandbox.yaml flyte .
+```
+
+#### Alternative: Generate raw kubernetes yaml with helm template
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
 - Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
+
+
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
 - Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
+
 
 ### CONFIGURATION NOTES:
 - The docker images, their tags and other default parameters are configured in `values.yaml` file.
