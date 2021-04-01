@@ -27,7 +27,7 @@ Running flyteconsole locally requires `NodeJS <https://nodejs.org>`_ and
 `yarn <https://yarnpkg.com>`_. Once these are installed, all of the dependencies
 can be installed by running ``yarn`` in the project directory.
 
-=====================
+====================
 Quickstart
 ====================
 
@@ -56,7 +56,7 @@ Quickstart
 
       yarn start
 
-#. Explore your local copy: `http://localhost:3000`_
+#. Explore your local copy: `http://localhost:3000`
 
 ======================
 Environment variables
