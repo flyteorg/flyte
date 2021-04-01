@@ -2,7 +2,7 @@ import typing
 from grafanalib.core import (
     Alert, AlertCondition, Dashboard, Graph,
     GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
-    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, DataSourceInput
+    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, DataSourceInput, MILLISECONDS_FORMAT
 )
 
 # ------------------------------
@@ -36,6 +36,26 @@ class FlyteAdmin(object):
         "list_node_execution",
         "list_task_execution",
         "list_active_launch_plan",
+    ]
+
+    ENTITIES = [
+        "executions",
+        "task_executions",
+        "node_executions",
+        "workflows",
+        "launch_plans",
+        "project",
+    ]
+
+    DB_OPS = [
+        "get",
+        "list",
+        "create",
+        "update",
+        "list",
+        "list_identifiers",
+        "delete",
+        "exists",
     ]
 
     @staticmethod
@@ -101,11 +121,11 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:admin:{api}:duration_ms[{interval}m])) by (quantile)',
+                    expr=f'sum(flyte:admin:{api}:duration_ms) by (quantile)',
                     refId='A',
                 ),
             ],
-            yAxes=single_y_axis(format=SECONDS_FORMAT),
+            yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
         )
 
     @staticmethod
@@ -121,10 +141,78 @@ class FlyteAdmin(object):
         )
 
     @staticmethod
+    def db_latency(entity: str, op: str, interval: int = 1) -> Graph:
+        return Graph(
+            title=f"{op} Latency",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr=f'sum(flyte:admin:database:postgres:repositories:{entity}:{op}_ms) by (quantile)',
+                    refId='A',
+                ),
+            ],
+            yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+        )
+
+    @staticmethod
+    def create_entity_db_row_latency(entity: str, collapse: bool, interval: int = 1) -> Row:
+        r = Row(
+            title=f"DB {entity} ops stats",
+            collapse=collapse,
+            panels=[],
+        )
+        for op in FlyteAdmin.DB_OPS:
+            r.panels.append(FlyteAdmin.db_latency(entity, op=op, interval=interval))
+        return r
+
+    @staticmethod
+    def db_count(entity: str, op: str, interval: int = 1) -> Graph:
+        return Graph(
+            title=f"{op} Count Ops",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr=f'sum(rate(flyte:admin:database:postgres:repositories:{entity}:{op}_ms_count[{interval}m]))',
+                    refId='A',
+                ),
+            ],
+            yAxes=YAxes(
+                YAxis(format=OPS_FORMAT),
+                YAxis(format=SHORT_FORMAT),
+            ),
+        )
+
+    @staticmethod
+    def create_entity_db_count(entity: str, collapse: bool, interval: int = 1) -> Row:
+        r = Row(
+            title=f"DB {entity} ops stats",
+            collapse=collapse,
+            panels=[],
+        )
+        for op in FlyteAdmin.DB_OPS:
+            r.panels.append(FlyteAdmin.db_count(entity, op=op, interval=interval))
+        return r
+
+    @staticmethod
+    def create_all_entity_db_rows(collapse: bool, interval: int = 1) -> typing.List[Row]:
+        rows = []
+        for entity in FlyteAdmin.ENTITIES:
+            rows.append(FlyteAdmin.create_entity_db_row_latency(entity=entity, collapse=collapse, interval=interval))
+            rows.append(FlyteAdmin.create_entity_db_count(entity=entity, collapse=collapse, interval=interval))
+        return rows
+
+    @staticmethod
     def create_all_apis(interval: int = 5) -> typing.List[Row]:
         rows = []
         for api in FlyteAdmin.APIS:
             rows.append(FlyteAdmin.create_api_row(api, collapse=True, interval=interval))
+        return rows
+
+    @staticmethod
+    def create_all_rows(interval: int = 5) -> typing.List[Row]:
+        rows = []
+        rows.extend(FlyteAdmin.create_all_entity_db_rows(collapse=True, interval=interval))
+        rows.extend(FlyteAdmin.create_all_apis(interval))
         return rows
 
 
@@ -141,7 +229,7 @@ dashboard = Dashboard(
     ],
     editable=False,
     title="Flyte Admin Dashboard (via Prometheus)",
-    rows=FlyteAdmin.create_all_apis(interval=5),
+    rows=FlyteAdmin.create_all_rows(),
     description="Flyte Admin/Control Plane Dashboard. This is great for monitoring FlyteAdmin and the Service API.",
 ).auto_panel_ids()
 
