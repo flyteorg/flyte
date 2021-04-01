@@ -2278,7 +2278,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording latency success",
+          "title": "wf event recording latency success",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -2398,7 +2398,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "node event recording count",
+          "title": "wf event recording count",
           "tooltip": {
             "msResolution": true,
             "shared": true,

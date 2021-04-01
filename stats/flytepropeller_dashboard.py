@@ -462,7 +462,7 @@ class FlytePropeller(object):
     def wf_event_recording() -> typing.List[Graph]:
         return [
             Graph(
-                title="node event recording latency success",
+                title="wf event recording latency success",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
@@ -473,7 +473,7 @@ class FlytePropeller(object):
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
             ),
             Graph(
-                title="node event recording count",
+                title="wf event recording count",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
