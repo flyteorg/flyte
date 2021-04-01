@@ -1,8 +1,9 @@
 import typing
+
 from grafanalib.core import (
-    Alert, AlertCondition, Dashboard, Graph,
-    GreaterThan, OP_AND, OPS_FORMAT, Row, RTYPE_SUM, SECONDS_FORMAT,
-    SHORT_FORMAT, single_y_axis, Target, TimeRange, YAxes, YAxis, MILLISECONDS_FORMAT, DataSourceInput
+    Dashboard, Graph,
+    OPS_FORMAT, Row, SHORT_FORMAT, single_y_axis, Target, YAxes, YAxis, MILLISECONDS_FORMAT, DataSourceInput,
+    PERCENT_FORMAT, NO_FORMAT
 )
 
 # ------------------------------
@@ -269,10 +270,7 @@ class FlytePropeller(object):
                     refId='A',
                 ),
             ],
-            yAxes=YAxes(
-                YAxis(format=OPS_FORMAT),
-                YAxis(format=SHORT_FORMAT),
-            ),
+            yAxes=single_y_axis(format=PERCENT_FORMAT),
         )
 
     @staticmethod
@@ -347,6 +345,219 @@ class FlytePropeller(object):
         )
 
     @staticmethod
+    def admin_launcher_cache() -> Graph:
+        return Graph(
+            title="Admin Launcher cache",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_hit[5m])) * 300',
+                    legendFormat="hit",
+                    refId='A',
+                ),
+
+                Target(
+                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_miss[5m])) * 300',
+                    legendFormat="miss",
+                    refId='B',
+                ),
+            ],
+            yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+        )
+
+    @staticmethod
+    def dynamic_wf_build() -> typing.List[Graph]:
+        return [
+            Graph(
+                title="Dynamic workflow build latency",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(flyte:propeller:all:node:build_dynamic_workflow_us) by (quantile, wf) / 1000',
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            ),
+            Graph(
+                title="Dynamic workflow build count",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf) * 300',
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=NO_FORMAT),
+            ),
+        ]
+
+    @staticmethod
+    def task_event_recording() -> typing.List[Graph]:
+        return [
+            Graph(
+                title="task event recording latency",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(flyte:propeller:all:task:event_recording:success_duration_ms) by (quantile, wf)',
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            ),
+            Graph(
+                title="task event recording count",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf) * 300',
+                        legendFormat="success wf",
+                        refId='A',
+                    ),
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf) * 300',
+                        legendFormat="failure",
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=NO_FORMAT),
+            ),
+        ]
+
+    @staticmethod
+    def node_event_recording() -> typing.List[Graph]:
+        return [
+            Graph(
+                title="node event recording latency success",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(flyte:propeller:all:node:event_recording:success_duration_ms) by (quantile, wf)',
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            ),
+            Graph(
+                title="node event recording count",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf) * 300',
+                        legendFormat="success",
+                        refId='A',
+                    ),
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf) * 300',
+                        legendFormat="failure",
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=NO_FORMAT),
+            ),
+        ]
+
+    @staticmethod
+    def wf_event_recording() -> typing.List[Graph]:
+        return [
+            Graph(
+                title="node event recording latency success",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(flyte:propeller:all:workflow:event_recording:success_duration_ms) by (quantile, wf)',
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            ),
+            Graph(
+                title="node event recording count",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count[5m])) by (wf) * 300',
+                        legendFormat="success",
+                        refId='A',
+                    ),
+                    Target(
+                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count[5m])) by (wf) * 300',
+                        legendFormat="failure",
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=NO_FORMAT),
+            ),
+        ]
+
+    @staticmethod
+    def wf_store_latency(collapse: bool) -> Row:
+        return Row(
+            title="etcD write metrics",
+            collapse=collapse,
+            panels=[
+                Graph(
+                    title="wf update etcD latency",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f'sum(flyte:propeller:all:wf_update_latency_ms) by (quantile)',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                ),
+                Graph(
+                    title="etcD writes",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f'sum(rate(flyte:propeller:all:wf_update_latency_ms_count[5m])) * 300',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=NO_FORMAT),
+                ),
+                Graph(
+                    title="etcD write conflicts",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f'sum(rate(flyte:propeller:all:wf_update_conflict[5m])) * 300',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=NO_FORMAT),
+                ),
+                Graph(
+                    title="etcD write fail",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f'sum(rate(flyte:propeller:all:wf_update_failed[5m])) * 300',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=NO_FORMAT),
+                ),
+            ])
+
+    @staticmethod
+    def perf_metrics(collapse: bool) -> Row:
+        r = Row(
+            title="Perf metrics",
+            collapse=collapse,
+            panels=[],
+        )
+        r.panels.extend(FlytePropeller.wf_event_recording())
+        r.panels.extend(FlytePropeller.node_event_recording())
+        r.panels.extend(FlytePropeller.task_event_recording())
+        r.panels.extend(FlytePropeller.dynamic_wf_build())
+        r.panels.append(FlytePropeller.admin_launcher_cache())
+        return r
+
+    @staticmethod
     def metastore_metrics(interval: int, collapse: bool) -> Row:
         return Row(
             title="Metastore failures and cache",
@@ -358,6 +569,31 @@ class FlytePropeller(object):
         )
 
     @staticmethod
+    def node_errors() -> Graph:
+        return Graph(
+            title="node event recording count",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr=f'sum(rate(flyte:propeller:all:node:perma_system_error_duration_unlabeled_ms_count[5m])) * 300',
+                    legendFormat="system error",
+                    refId='A',
+                ),
+                Target(
+                    expr=f'sum(rate(flyte:propeller:all:node:perma_user_error_duration_unlabeled_ms[5m])) * 300',
+                    legendFormat="user error",
+                    refId='A',
+                ),
+                Target(
+                    expr=f'sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m])) * 300',
+                    legendFormat="user error",
+                    refId='A',
+                ),
+            ],
+            yAxes=single_y_axis(format=NO_FORMAT),
+        )
+
+    @staticmethod
     def node_metrics(collapse: bool) -> Row:
         return Row(
             title="Node Metrics",
@@ -366,6 +602,7 @@ class FlytePropeller(object):
                 FlytePropeller.node_exec_latency(),
                 FlytePropeller.node_input_latency(),
                 FlytePropeller.node_event_recording_latency(),
+                FlytePropeller.node_errors(),
             ],
         )
 
@@ -393,6 +630,8 @@ class FlytePropeller(object):
             FlytePropeller.metastore_metrics(interval, True),
             FlytePropeller.metastore_latencies(True),
             FlytePropeller.node_metrics(True),
+            FlytePropeller.perf_metrics(True),
+            FlytePropeller.wf_store_latency(False),
         ]
 
 
