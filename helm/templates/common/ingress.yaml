@@ -1,5 +1,4 @@
 {{- if .Values.common.ingress.enabled }}
-# HTTP Routes
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,14 +8,11 @@ metadata:
   {{- with .Values.common.ingress.annotations }}
   {{ toYaml . | nindent 4}}
   {{- end }}
-  {{- with .Values.common.ingress.httpAnnotations }}
-  {{ toYaml . | nindent 4}}
-  {{- end }}
 spec:
   rules:
     - http:
         paths:
-          {{- if eq .Values.common.ingress.controllerType "ALB" }}
+          {{- if .Values.common.ingress.albSSLRedirect }}
           - path: /*
             pathType: ImplementationSpecific
             backend:
@@ -164,11 +160,30 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
+          {{- if not .Values.common.ingress.separateGrpcIngress }}
+          # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
+          - path: /flyteidl.service.AdminService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.AdminService/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          {{- end }}
       {{- with .Values.common.ingress.host }}
       host: {{ . }}
       {{- end }}
+{{- if .Values.common.ingress.separateGrpcIngress }}
+# Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
+# enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
-# GRPC Routes
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -178,15 +193,14 @@ metadata:
   {{- with .Values.common.ingress.annotations }}
   {{- toYaml . | nindent 4}}
   {{- end }}
-  {{- with .Values.common.ingress.grpcAnnotations }}
+  {{- with .Values.common.ingress.separateGrpcIngressAnnotations }}
   {{- toYaml . | nindent 4}}
   {{- end }}
 spec:
   rules:
     - http:
         paths:
-          # NOTE: Port 81 in flyteadmin is the GRPC server port for
-          # FlyteAdmin.
+          # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.AdminService
             pathType: ImplementationSpecific
             backend:
@@ -204,4 +218,5 @@ spec:
       {{- with .Values.common.ingress.host }}
       host: {{ . }}
       {{- end }}
+{{- end }}
 {{- end }}

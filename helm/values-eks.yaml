@@ -23,7 +23,15 @@ flyteadmin:
   configPath: /etc/flyte/config/*.yaml
   service:
     annotations:
-      projectcontour.io/upstream-protocol.h2c: grpc
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO add security groups
+      service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "sg-...,sg-...,sg-..."
+      # TODO alter domain
+      external-dns.alpha.kubernetes.io/hostname: "flyteadmin.subdomain.mydomain.com"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0
 
   affinity:
     podAntiAffinity:
@@ -58,8 +66,8 @@ datacatalog:
 
   service:
     annotations:
-      contour.heptio.com/upstream-protocol.h2c: grpc
-
+      cloud.google.com/load-balancer-type: Internal
+    type: LoadBalancer
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -206,14 +214,7 @@ common:
       alb.ingress.kubernetes.io/group.name: flytesystem
       # Replace certificate Arn with one deployed to your EKS cluster. Follow instructions in README.md
       alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:111111111111:certificate/e92fefd8-6197-4249-a524-431d611c9af6
-      # --- Extra Ingress annotations applied only to the HTTP ingress.
-    httpAnnotations:
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-    # --- Extra Ingress annotations applied only to the GRPC ingress.
-    grpcAnnotations:
-      alb.ingress.kubernetes.io/backend-protocol-version: GRPC
-      alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
-    controllerType: "ALB"
   databaseSecret:
     name: db-pass
     secretManifest:
