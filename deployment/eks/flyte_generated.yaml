@@ -8245,16 +8245,9 @@ data:
   core.yaml: |
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
-      metadata-prefix: metadata/propeller
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50
-      workflow-reeval-duration: 30s
-      downstream-eval-duration: 30s
-      limit-namespace: "all"
-      prof-port: 10254
-      metrics-prefix: flyte
-      enable-admin-launcher: true
       leader-election:
         lock-config-map:
           name: propeller-leader
@@ -8263,26 +8256,6 @@ data:
         lease-duration: 15s
         renew-deadline: 10s
         retry-period: 2s
-      kube-client-config:
-        qps: 100
-        burst: 25
-        timeout: 30s
-      queue:
-        type: batch
-        batching-interval: 2s
-        batch-size: -1
-        queue:
-          type: maxof
-          rate: 100
-          capacity: 1000
-          base-delay: 5s
-          max-delay: 120s
-        sub-queue:
-          type: bucket
-          rate: 100
-          capacity: 1000
-      workflowStore:
-        policy: "ResourceVersionCache"
   enabled_plugins.yaml: |
     tasks:
       max-plugin-phase-versions: 1000000
@@ -8302,10 +8275,6 @@ data:
   k8s.yaml: |
     plugins:
       k8s:
-        default-env-vars:
-          - FLYTE_AWS_ENDPOINT: "http://minio.flyte:9000"
-          - FLYTE_AWS_ACCESS_KEY_ID: minio
-          - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         default-cpus: 100m
         default-memory: 100Mi
   logger.yaml: |
@@ -8379,7 +8348,7 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-727k54546d
+  name: flyte-propeller-config-66f6fd796h
   namespace: flyte
 ---
 apiVersion: v1
@@ -8680,7 +8649,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-727k54546d
+          name: flyte-propeller-config-66f6fd796h
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8898,7 +8867,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-727k54546d
+          name: flyte-propeller-config-66f6fd796h
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -9129,7 +9098,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-727k54546d
+          name: flyte-propeller-config-66f6fd796h
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---

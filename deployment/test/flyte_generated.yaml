@@ -382,15 +382,6 @@ data:
   core.yaml: |
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
-      metadata-prefix: metadata/propeller
-      workers: 4
-      max-workflow-retries: 30
-      workflow-reeval-duration: 30s
-      downstream-eval-duration: 30s
-      limit-namespace: "all"
-      prof-port: 10254
-      metrics-prefix: flyte
-      enable-admin-launcher: true
       leader-election:
         lock-config-map:
           name: propeller-leader
@@ -399,23 +390,6 @@ data:
         lease-duration: 15s
         renew-deadline: 10s
         retry-period: 2s
-      queue:
-        type: batch
-        batching-interval: 2s
-        batch-size: -1
-        queue:
-          type: maxof
-          rate: 100
-          capacity: 1000
-          base-delay: 5s
-          max-delay: 120s
-        sub-queue:
-          type: bucket
-          rate: 10
-          capacity: 100
-    webhook:
-      certDir: /etc/webhook/certs
-      serviceName: flyte-pod-webhook
   enabled_plugins.yaml: |
     tasks:
       task-plugins:
@@ -458,7 +432,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-dtdt5gbgg2
+  name: flyte-propeller-config-69cf96mm8f
   namespace: flyte
 ---
 apiVersion: v1
@@ -670,7 +644,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-69cf96mm8f
         name: config-volume
       - name: webhook-certs
         secret:
@@ -854,7 +828,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-69cf96mm8f
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -958,7 +932,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-69cf96mm8f
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---
