@@ -11,6 +11,10 @@ spec:
   {{- with .Values.flyteadmin.service.type}}
   type: {{ . }}
   {{- end }}
+  {{- with .Values.flyteadmin.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{ . }}
+  {{- end }}
   ports:
   - name: redoc
     port: 87
