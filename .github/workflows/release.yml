@@ -16,4 +16,4 @@ jobs:
           version: latest
           args: release --rm-dist --debug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}

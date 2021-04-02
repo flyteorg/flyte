@@ -13,8 +13,9 @@ builds:
     ldflags:
       - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
 archives:
-  - replacements:
-      darwin: macOS
+  - name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    replacements:
+      darwin: Darwin
       linux: Linux
       windows: Windows
       386: i386
@@ -32,45 +33,10 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
-scoop:
-  # Default is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-  # url_template: "http://github.mycompany.com/foo/bar/releases/{{ .Tag }}/{{ .ArtifactName }}"
-
-  # Repository to push the app manifest to.
-  bucket:
-    owner: flyteorg
-    name: flytectl
-
-  # Git author used to commit to the repository.
-  # Defaults are shown.
-  commit_author:
-    name: goreleaserbot
-    email: goreleaser@carlosbecker.com
-
-  # Your app's homepage.
-  # Default is empty.
-  homepage: "https://godoc.org/github.com/flyteorg/flytectl"
-
-  # Your app's description.
-  # Default is empty.
-  description: "FlyteCtl is a command line tool to interact with a Flyte cluster."
-
-  # Your app's license
-  # Default is empty.
-  license: Apache-2.0
-
-  # Persist data between application updates
-  persist:
-    - "config.toml"
 brews:
   - # Name template of the recipe
     # Default to project name
     name: flytectl
-
-    # GOARM to specify which 32-bit arm version to use if there are multiple versions
-    # from the build section. Brew formulas support atm only one 32-bit version.
-    # Default is 6 for all artifacts or each id if there a multiple versions.
-    goarm: 6
 
     folder: Formula
     
@@ -78,21 +44,6 @@ brews:
     tap:
       owner: flyteorg
       name: homebrew-tap
-
-    # Template for the url which is determined by the given Token (github or gitlab)
-    # Default for github is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
-    # Default for gitlab is "https://gitlab.com/<repo_owner>/<repo_name>/uploads/{{ .ArtifactUploadHash }}/{{ .ArtifactName }}"
-    url_template: "http://github.com/flyteorg/flytectl/releases/{{ .Tag }}/{{ .ArtifactName }}"
-
-    # Allows you to set a custom download strategy. Note that you'll need
-    # to implement the strategy and add it to your tap repository.
-    # Example: https://docs.brew.sh/Formula-Cookbook#specifying-the-download-strategy-explicitly
-    # Default is empty.
-    download_strategy: CurlDownloadStrategy.
-
-    # Allows you to add a custom require_relative at the top of the formula template
-    # Default is empty
-    custom_require: custom_download_strategy
 
     # Git author used to commit to the repository.
     # Defaults are shown.
@@ -108,18 +59,8 @@ brews:
     # Default is empty.
     description: "FlyteCtl is a command line tool to interact with a Flyte cluster."
 
-    # Setting this will prevent goreleaser to actually try to commit the updated
-    # formula - instead, the formula file will be stored on the dist folder only,
-    # leaving the responsibility of publishing it to the user.
-    # If set to auto, the release will not be uploaded to the homebrew tap
-    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     # Default is false.
     skip_upload: auto
 
-    # So you can `brew test` your formula.
-    # Default is empty.
-    test: system "#{bin}/program --version"
-
-    # Custom install script for brew.
-    # Default is 'bin.install "program"'.
-    install: bin.install "program"
+    dependencies:
+    - name: go
