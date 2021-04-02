@@ -50,15 +50,15 @@ The generated file would look similar to this
 
 	 iamRoleARN: ""
 	 inputs:
-		numbers:
-		- 0
-   		numbers_count: 0
-   		run_local_at_count: 10
+	   numbers:
+	   - 0
+	   numbers_count: 0
+	   run_local_at_count: 10
 	 kubeServiceAcct: ""
 	 targetDomain: ""
 	 targetProject: ""
-	 workflow: core.advanced.run_merge_sort.merge
-	 version: "v3"
+	 version: v3
+	 workflow: core.advanced.run_merge_sort.merge_sort
 
 Check the create execution section on how to launch one using the generated file.
 

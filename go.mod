@@ -4,14 +4,15 @@ go 1.13
 
 require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/flyteorg/flyteidl v0.18.15
-	github.com/flyteorg/flytestdlib v0.3.13
+	github.com/flyteorg/flyteidl v0.18.25
+	github.com/flyteorg/flytestdlib v0.3.15
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/uuid v1.1.2
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/kr/text v0.2.0 // indirect
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27
+	github.com/magiconair/properties v1.8.4
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
@@ -26,5 +27,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	sigs.k8s.io/yaml v1.2.0
 )
-
-replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v0.18.21-0.20210317055906-f2ce9eb7bd1f

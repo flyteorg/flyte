@@ -65,5 +65,5 @@ SEE ALSO
 * :doc:`flytectl_get` 	 - Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.
 * :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
 * :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
-* :doc:`flytectl_version` 	 - Displays version information for the client and server.
+* :doc:`flytectl_version` 	 - Used for fetching flyte version
 

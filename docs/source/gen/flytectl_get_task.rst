@@ -58,7 +58,7 @@ The generated file would look similar to this
 	 targetDomain: ""
 	 targetProject: ""
 	 task: core.advanced.run_merge_sort.merge
-	 version: "v2"
+	 version: v2
 
 Check the create execution section on how to launch one using the generated file.
 
