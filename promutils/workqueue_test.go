@@ -39,4 +39,22 @@ func TestPrometheusMetricsProvider(t *testing.T) {
 		_, ok := c.(prometheus.Summary)
 		assert.True(t, ok)
 	})
+
+	t.Run("NewLongestRunningProcessorSecondsMetric", func(t *testing.T) {
+		c := provider.NewLongestRunningProcessorSecondsMetric("x")
+		_, ok := c.(prometheus.Gauge)
+		assert.True(t, ok)
+	})
+
+	t.Run("NewUnfinishedWorkSecondsMetric", func(t *testing.T) {
+		c := provider.NewUnfinishedWorkSecondsMetric("x")
+		_, ok := c.(prometheus.Gauge)
+		assert.True(t, ok)
+	})
+
+	t.Run("NewLongestRunningProcessorMicrosecondsMetric", func(t *testing.T) {
+		c := provider.NewLongestRunningProcessorMicrosecondsMetric("x")
+		_, ok := c.(prometheus.Gauge)
+		assert.True(t, ok)
+	})
 }

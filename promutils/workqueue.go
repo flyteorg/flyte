@@ -17,8 +17,6 @@ limitations under the License.
 package promutils
 
 import (
-	"fmt"
-
 	"k8s.io/client-go/util/workqueue"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,17 +26,22 @@ import (
 // prometheus metrics. To use this package, you just have to import it.
 
 func init() {
-	var provider interface{} //nolint
-	provider = prometheusMetricsProvider{}
-	if p, casted := provider.(workqueue.MetricsProvider); casted {
-		workqueue.SetProvider(p)
-	} else {
-		// This case happens in future versions of client-go where the interface has added methods
-		fmt.Println("Warn: No metricsProvider set for the workqueue")
-	}
+	provider := prometheusMetricsProvider{}
+	workqueue.SetProvider(provider)
 }
 
 type prometheusMetricsProvider struct{}
+
+func (prometheusMetricsProvider) NewLongestRunningProcessorSecondsMetric(name string) workqueue.SettableGaugeMetric {
+	unfinishedWork := prometheus.NewGauge(prometheus.GaugeOpts{
+		Subsystem: name,
+		Name:      "longest_running_processor_s",
+		Help:      "How many microseconds longest running processor from workqueue" + name + " takes.",
+	})
+
+	prometheus.MustRegister(unfinishedWork)
+	return unfinishedWork
+}
 
 func (prometheusMetricsProvider) NewUnfinishedWorkSecondsMetric(name string) workqueue.SettableGaugeMetric {
 	unfinishedWork := prometheus.NewGauge(prometheus.GaugeOpts{
@@ -80,8 +83,8 @@ func (prometheusMetricsProvider) NewAddsMetric(name string) workqueue.CounterMet
 	return adds
 }
 
-func (prometheusMetricsProvider) NewLatencyMetric(name string) workqueue.SummaryMetric {
-	latency := prometheus.NewSummary(prometheus.SummaryOpts{
+func (prometheusMetricsProvider) NewLatencyMetric(name string) workqueue.HistogramMetric {
+	latency := prometheus.NewHistogram(prometheus.HistogramOpts{
 		Subsystem: name,
 		Name:      "queue_latency_us",
 		Help:      "How long an item stays in workqueue" + name + " before being requested.",
@@ -90,8 +93,8 @@ func (prometheusMetricsProvider) NewLatencyMetric(name string) workqueue.Summary
 	return latency
 }
 
-func (prometheusMetricsProvider) NewWorkDurationMetric(name string) workqueue.SummaryMetric {
-	workDuration := prometheus.NewSummary(prometheus.SummaryOpts{
+func (prometheusMetricsProvider) NewWorkDurationMetric(name string) workqueue.HistogramMetric {
+	workDuration := prometheus.NewHistogram(prometheus.HistogramOpts{
 		Subsystem: name,
 		Name:      "work_duration_us",
 		Help:      "How long processing an item from workqueue" + name + " takes.",
