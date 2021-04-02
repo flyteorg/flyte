@@ -1,0 +1,10 @@
+plugins:
+  logs:
+    # Log links can link to multiple options
+    # #1 Kubernetes dashboard is disabled in GCP
+    kubernetes-enabled: false
+    # #2 AWS Cloudwatch
+    cloudwatch-enabled: true
+      # TODO Add region and log group
+    cloudwatch-region: <region>
+    cloudwatch-log-group: <log-group>

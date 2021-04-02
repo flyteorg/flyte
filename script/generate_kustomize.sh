@@ -15,7 +15,7 @@ kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash -s ${KUSTOMI
 cd -
 
 # All the overlays to be built
-DEPLOYMENT=${1:-sandbox test eks gcp}
+DEPLOYMENT=${1:-sandbox test eks gcp azure}
 
 KUSTOMIZE_OVERLAYS_ROOT=kustomize/overlays
 

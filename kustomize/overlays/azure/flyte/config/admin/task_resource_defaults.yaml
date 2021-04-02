@@ -1,0 +1,10 @@
+task_resources:
+  defaults:
+    cpu: 1000m
+    memory: 1000Mi
+    storage: 1000Mi
+  limits:
+    cpu: 2
+    memory: 8Gi
+    storage: 2000Mi
+    gpu: 1

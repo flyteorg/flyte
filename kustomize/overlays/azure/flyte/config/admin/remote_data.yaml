@@ -1,0 +1,6 @@
+remoteData:
+  # TODO change this to match the region of the s3 bucket
+  region: "us-west-2"
+  scheme: aws
+  signedUrls:
+    durationMinutes: 3

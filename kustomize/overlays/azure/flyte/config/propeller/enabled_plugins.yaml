@@ -1,0 +1,15 @@
+tasks:
+  max-plugin-phase-versions: 1000000
+  task-plugins:
+    enabled-plugins:
+      - container
+      - sidecar
+      - spark
+      - k8s-array
+      - pytorch
+    default-for-task-types:
+      container: container
+      sidecar: sidecar
+      spark: spark
+      container_array: k8s-array
+      pytorch: pytorch
