@@ -72,13 +72,12 @@ brews:
     # Default is 6 for all artifacts or each id if there a multiple versions.
     goarm: 6
 
-    # NOTE: make sure the url_template, the token and given repo (github or gitlab) owner and name are from the
-    # same kind. We will probably unify this in the next major version like it is done with scoop.
-
+    folder: Formula
+    
     # Github repository to push the tap to.
     tap:
       owner: flyteorg
-      name: flytectl
+      name: homebrew-tap
 
     # Template for the url which is determined by the given Token (github or gitlab)
     # Default for github is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
@@ -98,16 +97,12 @@ brews:
     # Git author used to commit to the repository.
     # Defaults are shown.
     commit_author:
-      name: flytebot
-      email: flytebot@flyte.org
-
-    # Caveats for the user of your binary.
-    # Default is empty.
-    caveats: "How to use this binary"
+      name: Flyte-Bot
+      email: admin@flyte.org
 
     # Your app's homepage.
     # Default is empty.
-    homepage: "https://flytectl.readthedocs.io/en/latest"
+    homepage: "https://docs.flyte.org/projects/flytectl"
 
     # Your app's description.
     # Default is empty.
