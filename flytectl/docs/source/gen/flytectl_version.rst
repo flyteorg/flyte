@@ -3,13 +3,18 @@
 flytectl version
 ----------------
 
-Displays version information for the client and server.
+Used for fetching flyte version
 
 Synopsis
 ~~~~~~~~
 
 
-Displays version information for the client and server.
+
+Example version.
+::
+
+ bin/flytectl version
+
 
 ::
 
