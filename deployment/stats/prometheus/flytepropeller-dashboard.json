@@ -4298,7 +4298,7 @@
       ],
       "repeat": null,
       "showTitle": true,
-      "title": "Metastore failures and cache"
+      "title": "FlytePropeller Queue metrics"
     }
   ],
   "schemaVersion": 12,
