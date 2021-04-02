@@ -94,7 +94,7 @@ Who's Using Flyte?
 
 At `Lyft <https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59>`__, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA, Mapping teams, Growth, Autonomous and other teams.
 
-Flyte is also used in production by `Spotify <https://www.spotify.com/>`__, `Freenome <https://www.freenome.com/>`__, `USU Solutions <https://www.usu.com/>`__ and `Striveworks <https://striveworks.us/>`__.
+For the most current list of Flyte's deployments, please click `here <https://github.com/flyteorg/flyte#%EF%B8%8F-current-deployments>`_.
 
 Next Steps
 ----------
