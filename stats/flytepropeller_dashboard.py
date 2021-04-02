@@ -1,7 +1,7 @@
 import typing
 
 from grafanalib.core import (
-    Dashboard, Graph,
+    Dashboard, Graph, Gauge, Stat,
     OPS_FORMAT, Row, SHORT_FORMAT, single_y_axis, Target, YAxes, YAxis, MILLISECONDS_FORMAT, DataSourceInput,
     PERCENT_FORMAT, NO_FORMAT
 )
@@ -103,7 +103,7 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(deriv(flyte:propeller:all:round:system_error_unlabeled[5m]))*300',
+                    expr='sum(deriv(flyte:propeller:all:round:system_error_unlabeled[5m]))',
                     refId='A',
                 ),
             ],
@@ -120,7 +120,7 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(rate(flyte:propeller:all:round:abort_error[5m]))*300',
+                    expr='sum(rate(flyte:propeller:all:round:abort_error[5m]))',
                     refId='A',
                 ),
             ],
@@ -351,13 +351,13 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_hit[5m])) * 300',
+                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_hit[5m]))',
                     legendFormat="hit",
                     refId='A',
                 ),
 
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_miss[5m])) * 300',
+                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_miss[5m]))',
                     legendFormat="miss",
                     refId='B',
                 ),
@@ -384,7 +384,7 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf)',
                         refId='A',
                     ),
                 ],
@@ -411,12 +411,12 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf)',
                         legendFormat="success wf",
                         refId='A',
                     ),
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)',
                         legendFormat="failure",
                         refId='A',
                     ),
@@ -444,12 +444,12 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf)',
                         legendFormat="success",
                         refId='A',
                     ),
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)',
                         legendFormat="failure",
                         refId='A',
                     ),
@@ -477,12 +477,12 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count[5m])) by (wf)',
                         legendFormat="success",
                         refId='A',
                     ),
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count[5m])) by (wf) * 300',
+                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count[5m])) by (wf)',
                         legendFormat="failure",
                         refId='A',
                     ),
@@ -513,7 +513,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(rate(flyte:propeller:all:wf_update_latency_ms_count[5m])) * 300',
+                            expr=f'sum(rate(flyte:propeller:all:wf_update_latency_ms_count[5m]))',
                             refId='A',
                         ),
                     ],
@@ -524,7 +524,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(rate(flyte:propeller:all:wf_update_conflict[5m])) * 300',
+                            expr=f'sum(rate(flyte:propeller:all:wf_update_conflict[5m]))',
                             refId='A',
                         ),
                     ],
@@ -535,7 +535,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(rate(flyte:propeller:all:wf_update_failed[5m])) * 300',
+                            expr=f'sum(rate(flyte:propeller:all:wf_update_failed[5m]))',
                             refId='A',
                         ),
                     ],
@@ -575,17 +575,17 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:node:perma_system_error_duration_unlabeled_ms_count[5m])) * 300',
+                    expr=f'sum(rate(flyte:propeller:all:node:perma_system_error_duration_unlabeled_ms_count[5m]))',
                     legendFormat="system error",
                     refId='A',
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:node:perma_user_error_duration_unlabeled_ms[5m])) * 300',
+                    expr=f'sum(rate(flyte:propeller:all:node:perma_user_error_duration_unlabeled_ms[5m]))',
                     legendFormat="user error",
                     refId='A',
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m])) * 300',
+                    expr=f'sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))',
                     legendFormat="user error",
                     refId='A',
                 ),
