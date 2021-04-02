@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workflow and pipelines</b> platform optimized for large scale processing and machine learning written in Golang
+Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workflow and pipelines platform</b> optimized for large scale processing and machine learning, written in Golang.
 </p>
 
 <p align="center">
@@ -60,8 +60,7 @@ Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workfl
 Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
 a history of all executions and provides an intuitive UI, CLI and REST/gRPC API to interact with the computation.
 
-Flyte is more than a workflow engine -- it provides `workflow` as a core concept and a single unit of execution called `task` as a top level concept. Multiple tasks arranged in a data
-producer-consumer order create a workflow.
+Flyte is more than a workflow engine -- `workflow` is the core concept, and a single unit of execution is called a `task` as a top level concept. Multiple tasks arranged in a data producer-consumer order create a workflow.
 
 `Workflows` and `Tasks` can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
 
@@ -103,16 +102,16 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </html>
 
 - Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
-- Enables **collaboration across your organization**, as in:
+- Enables **collaboration across your organization**, to:
   - Execute distributed data pipelines/workflows
   - Reuse tasks across projects, users, and workflows
-  - Backtrace to a specified workflow
+  - Backtrack to a specified workflow
   - Compare results of training workflows over time and across pipelines
   - Share workflows and tasks across your teams
 - **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- start locally and scale to the cloud instantly
-- **Centralized Inventory** constituting Tasks, Workflows and Executions
+- **Centralized Inventory** constituting of Tasks, Workflows and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
-- **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output; thus, illegal construction of pipelines fails during declaration rather than at runtime
+- **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output. Illegal construction of pipelines therefore fails during declaration rather than at runtime
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
 - Memoization and Lineage tracking
 - Workflow features:
@@ -157,7 +156,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_hive/index.html)
 - Presto Queries
 - Distributed Pytorch (K8s Native) -- [Pytorch Operator](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_kfpytorch/index.html)
-- Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_custom_training.html))
+- Sagemaker ([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_custom_training.html))
 - Distributed Tensorflow (K8s Native) - TFOperator
 - Papermill notebook execution ([Python](https://github.com/lyft/flytekit/tree/master/plugins/papermill) and Spark)
 - Type safe and data checking for Pandas dataframe using Pandera
@@ -201,7 +200,35 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </h2>
 </html>
 
-Here are the resources that would help you get a better understanding of Flyte.
+Here are some resources that would help you better understand Flyte.
+
+| Community Resources                                                                                                                                                                                                                                                                      |
+|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Communication Channels**                                                                                                                                                                                                                                                               |
+| [Slack Org](https://forms.gle/UVuek9WfBoweiqcJA)                                                                                                                                                                                                                                         |
+| [Email list](https://groups.google.com/a/flyte.org/g/users)                                                                                                                                                                                                                              |
+| **Biweekly Community Sync**                                                                                                                                                                                                                                                              |
+| Flyte OSS Community Sync, every other Tuesday, 9am-10am PDT                                                                                                                                                                                                                              |
+| [Events calendar & Sign Up](https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles)                                                                                                                                                                  |
+| [Zoom link](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09)                                                                                                                                                                                                  |
+| Meeting notes and topics are captured in this [document](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e)                                                                                                                    |
+| Previous meeting [video recordings](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ)                                                                                                                                                                                            |
+| **Blog Posts**                                                                                                                                                                                                                                                                           |
+| [Introducing Flyte: A Cloud Native Machine Learning and Data Processing Platform](https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59)                                                                                        |
+| [Building a Gateway to Flyte](https://eng.lyft.com/building-a-gateway-to-flyte-474b451b32c8)                                                                                                                                                                                             |
+| **Podcasts**                                                                                                                                                                                                                                                                             |
+| TWIML&AI - [Scalable and Maintainable ML Workflows at Lyft - Flyte](https://twimlai.com/twiml-talk-343-scalable-and-maintainable-workflows-at-lyft-with-flyte-w-haytham-abuelfutuh-and-ketan-umare/)                                                                                     |
+| Software Engineering Daily - [Flyte: Lyft Data Processing Platform](https://softwareengineeringdaily.com/2020/03/12/flyte-lyft-data-processing-platform-with-allyson-gale-and-ketan-umare/)                                                                                              |
+| MLOps Coffee session - [Flyte: an open-source tool for scalable, extensible, and portable workflows](https://anchor.fm/mlops/episodes/MLOps-Coffee-Sessions-12-Flyte-an-open-source-tool-for-scalable--extensible---and-portable-workflows-eksa5k)                                       |
+| **Conference Talks**                                                                                                                                                                                                                                                                     |
+| Kubecon 2019 - Flyte: Cloud Native Machine Learning and Data Processing Platform [video](https://www.youtube.com/watch?v=KdUJGSP1h9U) \| [deck](https://kccncna19.sched.com/event/UaYY/flyte-cloud-native-machine-learning-data-processing-platform-ketan-umare-haytham-abuelfutuh-lyft) |
+| Kubecon 2019 - Running LargeScale Stateful workloads on Kubernetes at Lyft [video](https://www.youtube.com/watch?v=ECeVQoble0g)                                                                                                                                                          |
+| re:invent 2019 - Implementing ML workflows with Kubernetes and Amazon Sagemaker [video](https://youtu.be/G-wzIQQJKaE)                                                                                                                                                                    |
+| Cloud-native machine learning at Lyft with AWS Batch and Amazon EKS [video](https://youtu.be/n_rRb8u1GSM)                                                                                                                                                                                |
+| OSS + ELC NA 2020 [splash](https://ossna2020.sched.com/event/313cec91aa38a430a25f9571039874b8)                                                                                                                                                                                           |
+| Datacouncil [splash](https://docs.google.com/document/d/1ZsCDOZ5ZJBPWzCNc45FhNtYQOxYHz0PAu9lrtDVnUpw/edit)                                                                                                                                                                               |
+| FB AI@Scale [Making MLOps & DataOps a reality](https://www.facebook.com/atscaleevents/videos/ai-scale-flyte-making-mlops-and-dataops-a-reality/1047312585732459/)                                                                                                                        |
+| [GAIC 2020](http://www.globalbigdataconference.com/seattle/global-artificial-intelligence-virtual-conference-122/speaker-details/ketan-umare-113746.html)                                                                                                                                |
 
 ### Communication Channels
 
