@@ -11,24 +11,24 @@ jobs:
       - uses: actions/checkout@v2
       # - name: Update flyteidl version in flyteadmin
       #   run: |
-      #     WORKFLOW_ID=curl -sS https://api.github.com/repos/flyteorg/flyteadmin/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id
+      #     WORKFLOW_ID=$(curl -sS https://api.github.com/repos/flyteorg/flyteadmin/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id)
       #     curl  -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/flyteorg/flyteadmin/actions/workflows/$WORKFLOW_ID/dispatches -H "Authorization: token ${{ secrets.FLYTE_BOT_PAT }}" -d '{"ref":"master"}'
       #   shell: bash
 
       - name: Update flyteidl version in flytepropeller
         run: |
-          WORKFLOW_ID=curl -sS https://api.github.com/repos/flyteorg/flytepropeller/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id
+          WORKFLOW_ID=$(curl -sS https://api.github.com/repos/flyteorg/flytepropeller/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id)
           curl  -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/flyteorg/flytepropeller/actions/workflows/$WORKFLOW_ID/dispatches -H "Authorization: token ${{ secrets.FLYTE_BOT_PAT }}" -d '{"ref":"master"}'
         shell: bash
 
       # - name: Update flyteidl version in flyteconsole
       #   run: |
-      #     WORKFLOW_ID=curl -sS https://api.github.com/repos/flyteorg/flyteconsole/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id
+      #     WORKFLOW_ID=$(curl -sS https://api.github.com/repos/flyteorg/flyteconsole/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id)
       #     curl  -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/flyteorg/flyteconsole/actions/workflows/$WORKFLOW_ID/dispatches -H "Authorization: token ${{ secrets.FLYTE_BOT_PAT }}" -d '{"ref":"master"}'
       #   shell: bash
 
       # - name: Update flyteidl version in flytekit
       #   run: |
-      #     WORKFLOW_ID=curl -sS https://api.github.com/repos/flyteorg/flytekit/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id
+      #     WORKFLOW_ID=$(curl -sS https://api.github.com/repos/flyteorg/flytekit/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/release-automation.yml") | {id}' | jq .id)
       #     curl  -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/flyteorg/flytekit/actions/workflows/$WORKFLOW_ID/dispatches -H "Authorization: token ${{ secrets.FLYTE_BOT_PAT }}" -d '{"ref":"master"}'
       #   shell: bash
