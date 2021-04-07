@@ -8,6 +8,8 @@ import (
 	"golang.org/x/time/rate"
 
 	"github.com/flyteorg/flytestdlib/logger"
+	// Setup workqueue metrics
+	_ "github.com/flyteorg/flytestdlib/promutils"
 	"k8s.io/client-go/util/workqueue"
 )
 

@@ -146,13 +146,13 @@ func (b *BatchingWorkQueue) AddToSubQueueRateLimited(item interface{}) {
 }
 
 func NewCompositeWorkQueue(ctx context.Context, cfg config.CompositeQueueConfig, scope promutils.Scope) (CompositeWorkQueue, error) {
-	workQ, err := NewWorkQueue(ctx, cfg.Queue, scope.CurrentScope())
+	workQ, err := NewWorkQueue(ctx, cfg.Queue, scope.NewScopedMetricName("main"))
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create WorkQueue in CompositeQueue type Batch")
 	}
 	switch cfg.Type {
 	case config.CompositeQueueBatch:
-		subQ, err := NewWorkQueue(ctx, cfg.Sub, scope.NewSubScope("sub").CurrentScope())
+		subQ, err := NewWorkQueue(ctx, cfg.Sub, scope.NewScopedMetricName("sub"))
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to create SubQueue in CompositeQueue type Batch")
 		}
