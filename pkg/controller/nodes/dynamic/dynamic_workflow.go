@@ -122,7 +122,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	defer t.Stop()
 	f, err := task.NewRemoteFutureFileReader(ctx, nCtx.NodeStatus().GetOutputDir(), nCtx.DataStore())
 	if err != nil {
-		return dynamicWorkflowContext{}, err
+		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to open futures file for reading")
 	}
 
 	// TODO: This is a hack to set parent task execution id, we should move to node-node relationship.
@@ -153,7 +153,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	// We know for sure that futures file was generated. Lets read it
 	djSpec, err := f.Read(ctx)
 	if err != nil {
-		return dynamicWorkflowContext{}, errors.Wrapf("DynamicJobSpecReadFailed", err, "unable to read futures file, maybe corrupted")
+		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to read futures file, maybe corrupted")
 	}
 
 	var closure *core.CompiledWorkflowClosure

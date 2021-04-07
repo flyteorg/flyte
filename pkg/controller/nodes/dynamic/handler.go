@@ -93,15 +93,13 @@ func (d dynamicNodeTaskNodeHandler) handleParentNode(ctx context.Context, prevSt
 func (d dynamicNodeTaskNodeHandler) handleDynamicSubNodes(ctx context.Context, nCtx handler.NodeExecutionContext, prevState handler.DynamicNodeState) (handler.Transition, handler.DynamicNodeState, error) {
 	dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
 	if err != nil {
-		kind := core.ExecutionError_UNKNOWN
 		if stdErrors.IsCausedBy(err, utils.ErrorCodeUser) {
-			kind = core.ExecutionError_USER
-		} else if stdErrors.IsCausedBy(err, utils.ErrorCodeSystem) {
-			kind = core.ExecutionError_SYSTEM
+			return handler.DoTransition(handler.TransitionTypeEphemeral,
+				handler.PhaseInfoFailure(core.ExecutionError_USER, "DynamicWorkflowBuildFailed", err.Error(), nil),
+			), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
 		}
-		return handler.DoTransition(handler.TransitionTypeEphemeral,
-			handler.PhaseInfoFailure(kind, "DynamicWorkflowBuildFailed", err.Error(), nil),
-		), handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: err.Error()}, nil
+		// Mostly a system error or unknnwn
+		return handler.Transition{}, handler.DynamicNodeState{}, err
 	}
 
 	trns, newState, err := d.progressDynamicWorkflow(ctx, dCtx.execContext, dCtx.subWorkflow, dCtx.nodeLookup, nCtx, prevState)
