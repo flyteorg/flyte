@@ -7,6 +7,9 @@ builds:
     env:
       - CGO_ENABLED=0
     main: ./cmd/main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+
     binary: flyteadmin
     goos:
       - linux

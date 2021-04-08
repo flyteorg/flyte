@@ -28,6 +28,15 @@ func (ServerConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (ServerConfig) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (ServerConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -66,6 +75,7 @@ func (cfg ServerConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.grpcAuthorizationHeader"), defaultServerConfig.Security.Oauth.GrpcAuthorizationHeader, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.oauth.disableForHttp"), defaultServerConfig.Security.Oauth.DisableForHTTP, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.oauth.disableForGrpc"), defaultServerConfig.Security.Oauth.DisableForGrpc, "")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "security.oauth.scopes"), []string{}, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.auditAccess"), defaultServerConfig.Security.AuditAccess, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.allowCors"), defaultServerConfig.Security.AllowCors, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "security.allowedOrigins"), []string{}, "")
