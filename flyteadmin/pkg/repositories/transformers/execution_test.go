@@ -38,8 +38,10 @@ func getRunningExecutionModel(specBytes []byte, existingClosureBytes []byte, sta
 
 func TestCreateExecutionModel(t *testing.T) {
 	execRequest := testutils.GetExecutionRequest()
+	principal := "principal"
 	execRequest.Spec.Metadata = &admin.ExecutionMetadata{
-		Mode: admin.ExecutionMetadata_SYSTEM,
+		Mode:      admin.ExecutionMetadata_SYSTEM,
+		Principal: principal,
 	}
 	lpID := uint(33)
 	wfID := uint(23)
@@ -53,7 +55,6 @@ func TestCreateExecutionModel(t *testing.T) {
 		Version: "version",
 	}
 
-	principal := "principal"
 	cluster := "cluster"
 	execution, err := CreateExecutionModel(CreateExecutionModelInput{
 		WorkflowExecutionID: core.WorkflowExecutionIdentifier{
@@ -69,7 +70,6 @@ func TestCreateExecutionModel(t *testing.T) {
 		WorkflowIdentifier:    workflowIdentifier,
 		ParentNodeExecutionID: nodeID,
 		SourceExecutionID:     sourceID,
-		Principal:             principal,
 		Cluster:               cluster,
 	})
 	assert.NoError(t, err)
