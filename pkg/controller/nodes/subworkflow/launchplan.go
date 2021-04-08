@@ -57,9 +57,6 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx handler.No
 	}
 
 	launchCtx := launchplan.LaunchContext{
-		// TODO we need to add principal and nestinglevel as annotations or labels?
-		Principal:           "unknown",
-		NestingLevel:        0,
 		ParentNodeExecution: parentNodeExecutionID,
 	}
 	err = l.launchPlan.Launch(ctx, launchCtx, childID, nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID().Identifier, nodeInputs)
