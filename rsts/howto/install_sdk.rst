@@ -21,4 +21,6 @@ All Flytekiplugins are also published to pypi as independent libraries and can b
 How to install Flytekit Java?
 #################################
 
-.. todo: coming soon
+.. CAUTION::
+
+    Coming soon 🛠

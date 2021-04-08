@@ -36,10 +36,10 @@ Cons:
 
 How to enable Spark in flyte backend?
 ======================================
-Flyte Spark uses the `Spark On K8s Operator <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator>`_ and a custom built `Flyte Spark Plugin <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark>`_.
+Flyte Spark uses the `Spark On K8s Operator <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator>`_ and a custom built `Flyte Spark Plugin <https://pkg.go.dev/github.com/flyteorg/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark>`_.
 The plugin is a backend plugin and you have to enable it in your deployment. To enable a plugin follow the steps in :ref:`howto-enable-backend-plugins`.
 
-You can optionally configure the Plugin as per the - `backend Config Structure <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark#Config>`_ and an example Config is defined
+You can optionally configure the Plugin as per the - `backend Config Structure <https://pkg.go.dev/github.com/flyteorg/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark#Config>`_ and an example Config is defined
 `here <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/config/propeller/plugins/spark.yaml>`_, which looks like,
 
 .. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/overlays/sandbox/config/propeller/plugins/spark.yaml

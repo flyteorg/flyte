@@ -3,6 +3,16 @@ kind: Namespace
 metadata:
   name: flyte
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubeflow
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sparkoperator
+---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
@@ -7601,6 +7611,12 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::111222333456:role/flyte-operator
   name: flyteadmin
@@ -7621,13 +7637,31 @@ metadata:
     app: pytorch-operator
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: sparkoperator
+  namespace: sparkoperator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-pod-webhook
   namespace: flyte
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - mutatingwebhookconfigurations
+  - secrets
+  - pods
+  verbs:
+  - get
+  - create
+  - update
+  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -7882,6 +7916,20 @@ rules:
   verbs:
   - '*'
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-pod-webhook
+subjects:
+- kind: ServiceAccount
+  name: flyte-pod-webhook
+  namespace: flyte
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -7924,7 +7972,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -7937,7 +7985,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 ---
 apiVersion: v1
 data:
@@ -8192,7 +8240,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2"
+          image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -8331,7 +8379,7 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-ct29cf4cch
+  name: flyte-propeller-config-727k54546d
   namespace: flyte
 ---
 apiVersion: v1
@@ -8362,6 +8410,38 @@ spec:
     targetPort: 8089
   selector:
     app: datacatalog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+  name: datacatalog-metrics
+  namespace: flyte
+spec:
+  ports:
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
+  selector:
+    app: datacatalog
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    projectcontour.io/upstream-protocol.h2c: grpc
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app: flyte-pod-webhook
 ---
 apiVersion: v1
 kind: Service
@@ -8414,23 +8494,17 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/path: /metrics
-    prometheus.io/port: "8443"
-    prometheus.io/scrape: "true"
-  labels:
-    app: pytorch-operator
-    kustomize.component: pytorch-operator
-  name: pytorch-operator
+    cloud.google.com/load-balancer-type: Internal
+  name: flytepropeller
   namespace: flyte
 spec:
   ports:
-  - name: monitoring-port
-    port: 8443
-    targetPort: 8443
+  - name: http-metrics
+    port: 10254
+    protocol: TCP
   selector:
-    kustomize.component: pytorch-operator
-    name: pytorch-operator
-  type: ClusterIP
+    app: flytepropeller
+  type: LoadBalancer
 ---
 apiVersion: v1
 kind: Service
@@ -8452,8 +8526,30 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8443"
+    prometheus.io/scrape: "true"
+  labels:
+    app: pytorch-operator
+    kustomize.component: pytorch-operator
+  name: pytorch-operator
+  namespace: kubeflow
+spec:
+  ports:
+  - name: monitoring-port
+    port: 8443
+    targetPort: 8443
+  selector:
+    kustomize.component: pytorch-operator
+    name: pytorch-operator
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: spark-webhook
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   ports:
   - name: webhook
@@ -8483,16 +8579,15 @@ spec:
       labels:
         app: datacatalog
         app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/version: 0.2.2
+        app.kubernetes.io/version: 0.3.0
     spec:
       containers:
       - command:
         - datacatalog
-        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/lyft/datacatalog:v0.2.130
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -8511,12 +8606,11 @@ spec:
       initContainers:
       - command:
         - datacatalog
-        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/datacatalog:v0.2.130
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8539,6 +8633,63 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: flyte-pod-webhook
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: flyte-pod-webhook
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flyte-pod-webhook
+        app.kubernetes.io/name: flyte-pod-webhook
+        app.kubernetes.io/version: 0.5.13
+    spec:
+      containers:
+      - args:
+        - webhook
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        imagePullPolicy: IfNotPresent
+        name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+          readOnly: true
+        - mountPath: /etc/webhook/certs
+          name: webhook-certs
+          readOnly: true
+      serviceAccountName: flyte-pod-webhook
+      volumes:
+      - configMap:
+          name: flyte-propeller-config-727k54546d
+        name: config-volume
+      - name: webhook-certs
+        secret:
+          secretName: flyte-pod-webhook
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: flyteadmin
   name: flyteadmin
   namespace: flyte
@@ -8556,16 +8707,15 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.29
+        app.kubernetes.io/version: 0.3.38
     spec:
       containers:
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -8606,12 +8756,11 @@ spec:
       initContainers:
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -8621,7 +8770,6 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
@@ -8629,7 +8777,7 @@ spec:
         - flytesnacks
         - flytetester
         - flyteexamples
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -8639,12 +8787,11 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -8691,7 +8838,7 @@ spec:
       - envFrom:
         - configMapRef:
             name: flyte-console-config
-        image: ghcr.io/lyft/flyteconsole:v0.19.1
+        image: ghcr.io/flyteorg/flyteconsole:v0.19.7
         name: flyteconsole
         ports:
         - containerPort: 8080
@@ -8722,7 +8869,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.5.13
+        app.kubernetes.io/version: 0.7.1
     spec:
       containers:
       - args:
@@ -8735,7 +8882,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.5.13
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -8751,7 +8898,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-ct29cf4cch
+          name: flyte-propeller-config-727k54546d
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -8760,7 +8907,7 @@ metadata:
   labels:
     kustomize.component: pytorch-operator
   name: pytorch-operator
-  namespace: flyte
+  namespace: kubeflow
 spec:
   replicas: 1
   selector:
@@ -8799,7 +8946,7 @@ metadata:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.5-v1beta2
   name: sparkoperator
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   replicas: 1
   selector:
@@ -8918,12 +9065,11 @@ spec:
           containers:
           - command:
             - flyteadmin
-            - --logtostderr
             - --config
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/lyft/flyteadmin:v0.3.29
+            image: ghcr.io/flyteorg/flyteadmin:v0.4.7
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -8950,11 +9096,51 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
+  name: flyte-pod-webhook-secret
+  namespace: flyte
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        imagePullPolicy: IfNotPresent
+        name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      restartPolicy: Never
+      serviceAccountName: flyte-pod-webhook
+      volumes:
+      - configMap:
+          name: flyte-propeller-config-727k54546d
+        name: config-volume
+  ttlSecondsAfterFinished: 0
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
   labels:
     app.kubernetes.io/name: sparkoperator
     app.kubernetes.io/version: v2.4.5-v1beta2
   name: sparkoperator-init
-  namespace: flyte
+  namespace: sparkoperator
 spec:
   backoffLimit: 3
   template:
@@ -8967,7 +9153,7 @@ spec:
       - command:
         - /usr/bin/gencerts.sh
         - --namespace
-        - flyte
+        - sparkoperator
         - -p
         image: gcr.io/spark-operator/spark-operator:v1beta2-1.1.2-2.4.5
         imagePullPolicy: IfNotPresent
@@ -8975,14 +9161,19 @@ spec:
       restartPolicy: Never
       serviceAccountName: sparkoperator
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:111111111111:certificate/e92fefd8-6197-4249-a524-431d611c9af6
+    alb.ingress.kubernetes.io/group.name: flytesystem
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  labels:
+    app: flyteadmin
   name: flytesystem
   namespace: flyte
 spec:
@@ -8990,30 +9181,150 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: flyteconsole
-          servicePort: 80
+          service:
+            name: ssl-redirect
+            port:
+              name: use-annotation
+        path: /*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteconsole
+            port:
+              number: 80
         path: /console
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteconsole
-          servicePort: 80
-        path: /__webpack_hmr
+          service:
+            name: flyteconsole
+            port:
+              number: 80
+        path: /console/*
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /api
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /api/*
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 80
+          service:
+            name: flyteadmin
+            port:
+              number: 80
         path: /healthcheck
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /v1
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /v1/*
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 81
-        path: /flyteidl.service.AdminService
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /openapi/*
+        pathType: ImplementationSpecific
       - backend:
-          serviceName: flyteadmin
-          servicePort: 87
-        path: /openapi
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /.well-known/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /login/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /logout/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /callback/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /me
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /config/*
+        pathType: ImplementationSpecific
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:111111111111:certificate/e92fefd8-6197-4249-a524-431d611c9af6
+    alb.ingress.kubernetes.io/group.name: flytesystem
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: service_instance=production
+    kubernetes.io/ingress.class: alb
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  labels:
+    app: flyteadmin
+  name: flytesystem-grpc
+  namespace: flyte
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.AdminService/*
+        pathType: ImplementationSpecific

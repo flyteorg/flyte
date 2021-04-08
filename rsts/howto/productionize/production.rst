@@ -12,14 +12,14 @@ A Flyte deployment contains around 50 kubernetes resources.
 The Flyte team has chosen to use the "kustomize" tool to manage these configs.
 Take a moment to read the `kustomize docs <https://github.com/kubernetes-sigs/kustomize>`__. Understanding kustomize will be important to modifying Flyte configurations.
 
-The ``/kustomize`` directory in the `flyte repository <https://github.com/lyft/flyte/tree/master/kustomize>`__ is designed for use with ``kustomize`` to tailor Flyte deployments to your needs.
+The ``/kustomize`` directory in the `flyte repository <https://github.com/flyteorg/flyte/tree/master/kustomize>`__ is designed for use with ``kustomize`` to tailor Flyte deployments to your needs.
 Important subdirectories are described below.
 
 base
-  The `base directory <https://github.com/lyft/flyte/tree/master/kustomize/base>`__ contains minimal configurations for each Flyte component.
+  The `base directory <https://github.com/flyteorg/flyte/tree/master/kustomize/base>`__ contains minimal configurations for each Flyte component.
 
 dependencies
-  The `dependencies directory <https://github.com/lyft/flyte/tree/master/kustomize/dependencies>`__ contains deploy configurations for components like ``PostgreSQL`` that Flyte depends on.
+  The `dependencies directory <https://github.com/flyteorg/flyte/tree/master/kustomize/dependencies>`__ contains deploy configurations for components like ``PostgreSQL`` that Flyte depends on.
 
 These directories were designed so that you can modify them using ``kustomize`` to generate a custom Flyte deployment.
 In fact, this is how we create the ``sandbox`` deployment.
@@ -31,21 +31,21 @@ Understanding the Sandbox
 
 The sandbox deployment is managed by a set of kustomize `overlays <https://github.com/kubernetes-sigs/kustomize/blob/master/docs/glossary.md#overlay>`__ that alter the ``base`` configurations to compose the sandbox deployment.
 
-The sandbox overlays live in the `kustomize/overlays/sandbox <https://github.com/lyft/flyte/tree/master/kustomize/overlays/sandbox>`__ directory. There are overlays for each component, and a "flyte" overlay that aggregates the components into a single deploy file.
+The sandbox overlays live in the `kustomize/overlays/sandbox <https://github.com/flyteorg/flyte/tree/master/kustomize/overlays/sandbox>`__ directory. There are overlays for each component, and a "flyte" overlay that aggregates the components into a single deploy file.
 
 **Component Overlays**
   For each modified component, there is an kustomize overlay at ``kustomize/overlays/sandbox/{{ component }}``.
   The overlay will typically reference the ``base`` for that component, and modify it to the needs of the sandbox.
 
-  Using kustomize "patches", we add or override specific configs from the ``base`` resources. For example, in the "console" overlay, we specify a patch in the `kustomization.yaml <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/console/kustomization.yaml>`__. This patch adds memory and cpu limits to the console deployment config.
+  Using kustomize "patches", we add or override specific configs from the ``base`` resources. For example, in the "console" overlay, we specify a patch in the `kustomization.yaml <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/console/kustomization.yaml>`__. This patch adds memory and cpu limits to the console deployment config.
 
-  Each Flyte component requires at least one configuration file. The configuration files for each component live in the component overlay. For example, the FlyteAdmin config lives at `kustomize/overlays/sandbox/admindeployment/flyteadmin_config.yaml <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/admindeployment/flyteadmin_config.yaml>`__. These files get included as Kubernetes configmaps and mounted into pods.
+  Each Flyte component requires at least one configuration file. The configuration files for each component live in the component overlay. For example, the FlyteAdmin config lives at `kustomize/overlays/sandbox/admindeployment/flyteadmin_config.yaml <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/admindeployment/flyteadmin_config.yaml>`__. These files get included as Kubernetes configmaps and mounted into pods.
 
 **Flyte Overlay**
   The ``flyte`` overlay is meant to aggregate the components into a single deployment file.
-  The `kustomization.yaml overlay <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/flyte/kustomization.yaml>`__ in that directory lists the components to be included in the deploy.
+  The `kustomization.yaml overlay <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/flyte/kustomization.yaml>`__ in that directory lists the components to be included in the deploy.
 
-  We run ``kustomize build`` against the ``flyte`` directory to generate the complete `sandbox deployment yaml <https://github.com/lyft/flyte/blob/master/deployment/sandbox/flyte_generated.yaml>`__ we used earlier to deploy Flyte sandbox.
+  We run ``kustomize build`` against the ``flyte`` directory to generate the complete `sandbox deployment yaml <https://github.com/flyteorg/flyte/blob/master/deployment/sandbox/flyte_generated.yaml>`__ we used earlier to deploy Flyte sandbox.
 
 Creating Your Own Deployment
 ****************************
@@ -59,7 +59,7 @@ NOTE:
 
 To do this, check out the ``flyte`` repo ::
 
-  git clone https://github.com/lyft/flyte.git
+  git clone https://github.com/flyteorg/flyte.git
 
 Copy the sandbox configuration to a new directory on your machine, and enter the new directory ::
 
@@ -68,8 +68,8 @@ Copy the sandbox configuration to a new directory on your machine, and enter the
 
 Since the ``base`` files are not in your local copy, you'll need to make some slight modifications to reference the ``base`` files from our GitHub repository. :: 
 
-  find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../base~github.com/lyft/flyte/kustomize/base~'
-  find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../dependencies~github.com/lyft/flyte/kustomize/dependencies~'
+  find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../base~github.com/flyteorg/flyte/kustomize/base~'
+  find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../dependencies~github.com/flyteorg/flyte/kustomize/dependencies~'
   find . -name '*.bak' | xargs rm
 
 You should now be able to run kustomize against the ``flyte`` directory ::
@@ -94,7 +94,7 @@ First, you'll need to set up a reliable PostgreSQL database. The easiest way ach
 
 Next, remove old sandbox database by opening up the ``flyte/kustomization.yaml`` file and deleting database component. ::
 
-  - github.com/lyft/flyte/kustomize/dependencies/database
+  - github.com/flyteorg/flyte/kustomize/dependencies/database
 
 With this line removed, you can re-run ``kustomize build flyte > flyte_generated.yaml`` and see that the the postgres deployment has been removed from the ``flyte_generated.yaml`` file.
 
@@ -119,7 +119,7 @@ Do the same thing in ``datacatalog/datacatalog_config.yaml``, but use the dbname
 
 Note: *You can mount the database password into the pod and use the "passwordPath" config to point to a file on disk instead of specifying the password here*
 
-Next, remove the "check-db-ready" init container from `admindeployment/admindeployment.yaml <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/admindeployment/admindeployment.yaml#L10-L14>`__. This check is no longer needed.
+Next, remove the "check-db-ready" init container from `admindeployment/admindeployment.yaml <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/admindeployment/admindeployment.yaml#L10-L14>`__. This check is no longer needed.
 
 Production Grade Object Store
 *****************************
@@ -133,7 +133,7 @@ To start, `create an s3 bucket <https://docs.aws.amazon.com/AmazonS3/latest/gsg/
 
 Next, remove the old sandbox object store by opening up the ``flyte/kustomization.yaml`` file and deleting the storage line. ::
 
-  - github.com/lyft/flyte/kustomize/dependencies/storage
+  - github.com/flyteorg/flyte/kustomize/dependencies/storage
 
 With this line gone, you can re-run ``kustomize build flyte > flyte_generated.yaml`` and see that the sandbox object store has been removed from the ``flyte_generated.yaml`` file.
 
@@ -152,7 +152,7 @@ Change the ``storage`` configuration in each of these configs to use your new s3
 
 Note: *To use IAM roles for authentication, switch to the "iam" auth-type.*
 
-Next, open ``propeller/plugins/config.yaml`` and remove the `default-env-vars <https://github.com/lyft/flyte/blob/master/kustomize/overlays/sandbox/propeller/plugins/config.yaml#L13-L15>`__ (no need to replace them, the default behavior is sufficient).
+Next, open ``propeller/plugins/config.yaml`` and remove the `default-env-vars <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/propeller/plugins/config.yaml#L13-L15>`__ (no need to replace them, the default behavior is sufficient).
 
 Now if you re-run ``kustomize build flyte > flyte_generated.yaml``, you should see that the configmaps have been updated.
 

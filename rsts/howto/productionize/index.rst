@@ -1,7 +1,7 @@
 .. _howto_productionize:
 
 ##############################################
-How Do I productionize my Flyte cluster
+How do I productionize my Flyte cluster
 ##############################################
 
 .. toctree::
@@ -10,3 +10,4 @@ How Do I productionize my Flyte cluster
    :name: howtoprovguidestoc
 
    production
+   production_eks

@@ -39,6 +39,7 @@ RUN apk add --no-cache bash git make tini
 
 # Copy entrypoints
 COPY docker/sandbox/flyte-entrypoint-default.sh /flyteorg/bin/flyte-entrypoint.sh
+COPY docker/sandbox/bashrc /root/.bashrc
 
 # Update PATH variable
 ENV PATH "/flyteorg/bin:${PATH}"
@@ -50,7 +51,7 @@ VOLUME /var/lib/cni
 VOLUME /var/log
 
 # Expose Flyte ports
-EXPOSE 30081 30084
+EXPOSE 30081 30082 30084
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
 
@@ -76,6 +77,6 @@ VOLUME /var/lib/cni
 VOLUME /var/log
 
 # Expose Flyte ports
-EXPOSE 30081 30084
+EXPOSE 30081 30082 30084
 
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]

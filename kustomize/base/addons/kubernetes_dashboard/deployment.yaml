@@ -1,0 +1,15 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: kubernetes-dashboard
+  namespace: kubernetes-dashboard
+spec:
+  template:
+    spec:
+      containers:
+        - name: kubernetes-dashboard
+          args:
+            - --namespace=kubernetes-dashboard
+            - --enable-insecure-login
+            - --enable-skip-login
+            - --disable-settings-authorizer

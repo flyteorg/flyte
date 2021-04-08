@@ -1,7 +1,7 @@
 .. _howto_exec_single_task:
 
 ####################################
-How Do I Execute a single task?
+How do I execute a single task?
 ####################################
 
 
@@ -32,7 +32,7 @@ After you've built an image with your updated task code, create an execution usi
 
 Just like workflow executions, you can optionally pass a user-defined name, labels, annotations, and/or notifications when launching a single task.
 
-The type of ``my_single_task_execution`` is `SdkWorkflowExecution <https://github.com/lyft/flytekit/blob/1926b1285591ae941d7fc9bd4c2e4391c5c1b21b/flytekit/common/workflow_execution.py#L14>`_
+The type of ``my_single_task_execution`` is `SdkWorkflowExecution <https://github.com/flyteorg/flytekit/blob/1926b1285591ae941d7fc9bd4c2e4391c5c1b21b/flytekit/common/workflow_execution.py#L14>`_
 and has the full set of methods and functionality available for conventional WorkflowExecutions.
 
 

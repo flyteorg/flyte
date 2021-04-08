@@ -18,151 +18,16 @@ spec:
   scope: Namespaced
   version: v1alpha1
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  labels:
-    component: ingressroute
-  name: ingressroutes.contour.heptio.com
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .spec.virtualhost.fqdn
-    description: Fully qualified domain name
-    name: FQDN
-    type: string
-  - JSONPath: .spec.virtualhost.tls.secretName
-    description: Secret with TLS credentials
-    name: TLS Secret
-    type: string
-  - JSONPath: .spec.routes[0].match
-    description: First routes defined
-    name: First route
-    type: string
-  - JSONPath: .status.currentStatus
-    description: The current status of the IngressRoute
-    name: Status
-    type: string
-  - JSONPath: .status.description
-    description: Description of the current status
-    name: Status Description
-    type: string
-  group: contour.heptio.com
-  names:
-    kind: IngressRoute
-    plural: ingressroutes
-  scope: Namespaced
-  validation:
-    openAPIV3Schema:
-      properties:
-        spec:
-          properties:
-            healthCheck:
-              properties:
-                healthyThresholdCount:
-                  type: integer
-                intervalSeconds:
-                  type: integer
-                path:
-                  pattern: ^\/.*$
-                  type: string
-                timeoutSeconds:
-                  type: integer
-                unhealthyThresholdCount:
-                  type: integer
-              required:
-              - path
-              type: object
-            routes:
-              items:
-                properties:
-                  delegate:
-                    properties:
-                      name:
-                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                        type: string
-                      namespace:
-                        pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                        type: string
-                    required:
-                    - name
-                    type: object
-                  match:
-                    pattern: ^\/.*$
-                    type: string
-                  services:
-                    items:
-                      properties:
-                        healthCheck:
-                          properties:
-                            healthyThresholdCount:
-                              type: integer
-                            intervalSeconds:
-                              type: integer
-                            path:
-                              pattern: ^\/.*$
-                              type: string
-                            timeoutSeconds:
-                              type: integer
-                            unhealthyThresholdCount:
-                              type: integer
-                          required:
-                          - path
-                          type: object
-                        name:
-                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                          type: string
-                        port:
-                          type: integer
-                        strategy:
-                          enum:
-                          - RoundRobin
-                          - WeightedLeastRequest
-                          - Random
-                          - RingHash
-                          - Maglev
-                          type: string
-                        weight:
-                          type: integer
-                      required:
-                      - name
-                      - port
-                      type: object
-                    type: array
-                required:
-                - match
-              type: array
-            strategy:
-              enum:
-              - RoundRobin
-              - LeastRequest
-              - Random
-              - RingHash
-              - Maglev
-              type: string
-            virtualhost:
-              properties:
-                aliases:
-                  items:
-                    pattern: ^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$
-                    type: string
-                  type: array
-                fqdn:
-                  pattern: ^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-z]{2,}$
-                  type: string
-          required:
-          - routes
-  version: v1beta1
----
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: contour
+  name: datacatalog
   namespace: flyte
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: datacatalog
+  name: flyte-pod-webhook
   namespace: flyte
 ---
 apiVersion: v1
@@ -176,6 +41,24 @@ kind: ServiceAccount
 metadata:
   name: flytepropeller
   namespace: flyte
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: flyte-pod-webhook
+  namespace: flyte
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - mutatingwebhookconfigurations
+  - secrets
+  - pods
+  verbs:
+  - get
+  - create
+  - update
+  - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -262,55 +145,19 @@ rules:
   - post
   - deletecollection
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
 metadata:
-  name: contour
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  - endpoints
-  - nodes
-  - pods
-  - secrets
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - extensions
-  resources:
-  - ingresses
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - contour.heptio.com
-  resources:
-  - ingressroutes
-  verbs:
-  - get
-  - list
-  - watch
-  - put
-  - post
-  - patch
+  name: flyte-pod-webhook
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: flyte-pod-webhook
+subjects:
+- kind: ServiceAccount
+  name: flyte-pod-webhook
+  namespace: flyte
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -338,19 +185,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flytepropeller
-  namespace: flyte
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: contour
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: contour
-subjects:
-- kind: ServiceAccount
-  name: contour
   namespace: flyte
 ---
 apiVersion: v1
@@ -543,7 +377,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2"
+          image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -579,6 +413,9 @@ data:
           type: bucket
           rate: 10
           capacity: 100
+    webhook:
+      certDir: /etc/webhook/certs
+      serviceName: flyte-pod-webhook
   enabled_plugins.yaml: |
     tasks:
       task-plugins:
@@ -619,15 +456,9 @@ data:
         region: us-east-1
       container: "my-s3-bucket"
 
-  task_logs.yaml: |
-    # TODO this is used to enable log links in the UI.
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-url: "http://localhost:30082"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-569h4b5459
+  name: flyte-propeller-config-dtdt5gbgg2
   namespace: flyte
 ---
 apiVersion: v1
@@ -638,22 +469,6 @@ metadata:
   name: db-pass-9dgchhk2bm
   namespace: flyte
 type: Opaque
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: contour
-  name: contour
-  namespace: flyte
-spec:
-  ports:
-  - nodePort: 30081
-    port: 80
-    protocol: TCP
-  selector:
-    app: contour
-  type: NodePort
 ---
 apiVersion: v1
 kind: Service
@@ -674,6 +489,22 @@ spec:
     targetPort: 8089
   selector:
     app: datacatalog
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    projectcontour.io/upstream-protocol.h2c: grpc
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app: flyte-pod-webhook
 ---
 apiVersion: v1
 kind: Service
@@ -726,88 +557,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: contour
-  name: contour
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: contour
-  template:
-    metadata:
-      annotations:
-        prometheus.io/format: prometheus
-        prometheus.io/path: /stats
-        prometheus.io/port: "8002"
-        prometheus.io/scrape: "true"
-      labels:
-        app: contour
-    spec:
-      containers:
-      - args:
-        - -c
-        - /config/contour.yaml
-        - --service-cluster
-        - cluster0
-        - --service-node
-        - node0
-        command:
-        - envoy
-        image: docker.io/envoyproxy/envoy-alpine:v1.6.0
-        name: envoy-envoyingressv1
-        ports:
-        - containerPort: 80
-          name: http
-        - containerPort: 8002
-          name: statsd
-        resources:
-          limits:
-            cpu: 100m
-            memory: 100Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        volumeMounts:
-        - mountPath: /config
-          name: contour-config
-      - args:
-        - serve
-        - --incluster
-        - --envoy-http-port=80
-        - --debug-http-port=6069
-        command:
-        - contour
-        image: gcr.io/heptio-images/contour:v0.6.1
-        imagePullPolicy: Always
-        name: contour-unknown
-        ports:
-        - containerPort: 8000
-          name: contour
-      dnsPolicy: ClusterFirst
-      initContainers:
-      - args:
-        - bootstrap
-        - /config/contour.yaml
-        - --statsd-enabled
-        command:
-        - contour
-        image: gcr.io/heptio-images/contour:v0.6.1
-        imagePullPolicy: Always
-        name: envoy-initconfig
-        volumeMounts:
-        - mountPath: /config
-          name: contour-config
-      serviceAccountName: contour
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - emptyDir: {}
-        name: contour-config
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app: datacatalog
   name: datacatalog
   namespace: flyte
@@ -825,16 +574,15 @@ spec:
       labels:
         app: datacatalog
         app.kubernetes.io/name: datacatalog
-        app.kubernetes.io/version: 0.2.2
+        app.kubernetes.io/version: 0.3.0
     spec:
       containers:
       - command:
         - datacatalog
-        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/lyft/datacatalog:v0.2.130
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -848,12 +596,11 @@ spec:
       initContainers:
       - command:
         - datacatalog
-        - --logtostderr
         - --config
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/datacatalog:v0.2.130
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -876,6 +623,63 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
+    app: flyte-pod-webhook
+  name: flyte-pod-webhook
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: flyte-pod-webhook
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "10254"
+        prometheus.io/scrape: "true"
+      labels:
+        app: flyte-pod-webhook
+        app.kubernetes.io/name: flyte-pod-webhook
+        app.kubernetes.io/version: 0.5.13
+    spec:
+      containers:
+      - args:
+        - webhook
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        imagePullPolicy: IfNotPresent
+        name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+          readOnly: true
+        - mountPath: /etc/webhook/certs
+          name: webhook-certs
+          readOnly: true
+      serviceAccountName: flyte-pod-webhook
+      volumes:
+      - configMap:
+          name: flyte-propeller-config-dtdt5gbgg2
+        name: config-volume
+      - name: webhook-certs
+        secret:
+          secretName: flyte-pod-webhook
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
     app: flyteadmin
   name: flyteadmin
   namespace: flyte
@@ -893,16 +697,15 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.29
+        app.kubernetes.io/version: 0.3.38
     spec:
       containers:
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -949,12 +752,11 @@ spec:
         name: check-db-ready
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -964,14 +766,13 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - migrate
         - seed-projects
         - flytetester
         - flytesnacks
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -981,12 +782,11 @@ spec:
           name: db-pass
       - command:
         - flyteadmin
-        - --logtostderr
         - --config
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/lyft/flyteadmin:v0.3.29
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -1030,7 +830,7 @@ spec:
       labels:
         app: flytepropeller
         app.kubernetes.io/name: flytepropeller
-        app.kubernetes.io/version: 0.5.13
+        app.kubernetes.io/version: 0.7.1
     spec:
       containers:
       - args:
@@ -1043,7 +843,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.5.13
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -1054,7 +854,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-569h4b5459
+          name: flyte-propeller-config-dtdt5gbgg2
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -1122,47 +922,47 @@ spec:
       - emptyDir: {}
         name: postgres-storage
 ---
-apiVersion: extensions/v1beta1
-kind: Ingress
+apiVersion: batch/v1
+kind: Job
 metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-  name: flytesystem
+  name: flyte-pod-webhook-secret
   namespace: flyte
 spec:
-  rules:
-  - http:
-      paths:
-      - backend:
-          serviceName: flyteconsole
-          servicePort: 80
-        path: /console
-      - backend:
-          serviceName: flyteconsole
-          servicePort: 80
-        path: /__webpack_hmr
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /api
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /healthcheck
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 80
-        path: /v1
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 81
-        path: /flyteidl.service.AdminService
-      - backend:
-          serviceName: flyteadmin
-          servicePort: 87
-        path: /openapi
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+      - args:
+        - webhook
+        - init-certs
+        - --config
+        - /etc/flyte/config/*.yaml
+        command:
+        - flytepropeller
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        imagePullPolicy: IfNotPresent
+        name: webhook
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+      restartPolicy: Never
+      serviceAccountName: flyte-pod-webhook
+      volumes:
+      - configMap:
+          name: flyte-propeller-config-dtdt5gbgg2
+        name: config-volume
+  ttlSecondsAfterFinished: 0
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   annotations:
@@ -1174,6 +974,9 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: minio
-          servicePort: 9000
+          service:
+            name: minio
+            port:
+              number: 9000
         path: /minio
+        pathType: ImplementationSpecific

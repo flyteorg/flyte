@@ -1,0 +1,4 @@
+plugins:
+  logs:
+    kubernetes-enabled: true
+    kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"

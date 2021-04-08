@@ -1,4 +1,0 @@
-plugins:
-  logs:
-    kubernetes-enabled: true
-    kubernetes-url: "http://localhost:30082"

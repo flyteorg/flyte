@@ -3,8 +3,12 @@ pip-compile $(1) --upgrade --verbose
 endef
 
 .PHONY: kustomize
-kustomize:
+kustomize: 
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
+
+.PHONY: release_automation
+release_automation:
+	bash script/release.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox:
@@ -20,11 +24,6 @@ end2end:
 end2end_execute:
 	@end2end/execute.sh
 
-# updates referenced docs from other repositories (e.g. flyteidl, flytekit)
-.PHONY: generate-dependent-repo-docs
-generate-dependent-repo-docs:
-	@FLYTEKIT_VERSION=0.15.4 FLYTEIDL_VERSION=0.18.11 ./script/update_ref_docs.sh
-
 .PHONY: install-piptools
 install-piptools:
 	pip install -U pip-tools
@@ -33,3 +32,12 @@ install-piptools:
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
+.PHONY: requirements.txt
+requirements.txt: requirements.in install-piptools
+	$(call PIP_COMPILE,requirements.in)
+
+.PHONY: stats
+stats:
+	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller_dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin_dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser_dashboard.py
