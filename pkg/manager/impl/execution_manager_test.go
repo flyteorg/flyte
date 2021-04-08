@@ -299,17 +299,27 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			}, nil
 		},
 	)
+
+	principal := "feeny"
 	getExecutionCalled := false
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 			assert.EqualValues(t, input.Project, parentNodeExecutionID.ExecutionId.Project)
 			assert.EqualValues(t, input.Domain, parentNodeExecutionID.ExecutionId.Domain)
 			assert.EqualValues(t, input.Name, parentNodeExecutionID.ExecutionId.Name)
+			spec := &admin.ExecutionSpec{
+				Metadata: &admin.ExecutionMetadata{
+					Nesting: 1,
+				},
+			}
+			specBytes, _ := proto.Marshal(spec)
 			getExecutionCalled = true
 			return models.Execution{
 				BaseModel: models.BaseModel{
 					ID: 2,
 				},
+				Spec: specBytes,
+				User: principal,
 			}, nil
 		},
 	)
@@ -322,10 +332,12 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, admin.ExecutionMetadata_CHILD_WORKFLOW, spec.Metadata.Mode)
 			assert.Equal(t, "feeny", spec.Metadata.Principal)
-			assert.EqualValues(t, 1, spec.Metadata.Nesting)
 			assert.True(t, proto.Equal(&parentNodeExecutionID, spec.Metadata.ParentNodeExecution))
 			assert.EqualValues(t, input.ParentNodeExecutionID, 1)
 			assert.EqualValues(t, input.SourceExecutionID, 2)
+			assert.Equal(t, 2, int(spec.Metadata.Nesting))
+			assert.Equal(t, principal, spec.Metadata.Principal)
+			assert.Equal(t, principal, input.User)
 			return nil
 		},
 	)
@@ -334,9 +346,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 	request := testutils.GetExecutionRequest()
 	request.Spec.Metadata = &admin.ExecutionMetadata{
 		Mode:                admin.ExecutionMetadata_CHILD_WORKFLOW,
-		Nesting:             1,
 		ParentNodeExecution: &parentNodeExecutionID,
-		Principal:           "feeny",
 	}
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)

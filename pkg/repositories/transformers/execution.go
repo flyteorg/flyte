@@ -33,7 +33,6 @@ type CreateExecutionModelInput struct {
 	Cluster               string
 	InputsURI             storage.DataReference
 	UserInputsURI         storage.DataReference
-	Principal             string
 }
 
 // Transforms a ExecutionCreateRequest to a Execution model
@@ -41,9 +40,6 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	requestSpec := input.RequestSpec
 	if requestSpec.Metadata == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
-	}
-	if len(input.Principal) > 0 {
-		requestSpec.Metadata.Principal = input.Principal
 	}
 	requestSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
 		ExecutionCluster: input.Cluster,
