@@ -3,6 +3,13 @@ include boilerplate/lyft/docker_build/Makefile
 include boilerplate/lyft/golang_test_targets/Makefile
 include boilerplate/lyft/end2end/Makefile
 
+GIT_VERSION := $(shell git describe --always --tags)
+GIT_HASH := $(shell git rev-parse --short HEAD)
+TIMESTAMP := $(shell date '+%Y-%m-%d')
+PACKAGE ?=github.com/flyteorg/flytestdlib
+
+LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
+
 .PHONY: update_boilerplate
 update_boilerplate:
 	@boilerplate/update.sh
@@ -21,15 +28,15 @@ k8s_integration_execute:
 
 .PHONY: compile
 compile:
-	go build -o flyteadmin ./cmd/ && mv ./flyteadmin ${GOPATH}/bin
+	go build -o flyteadmin -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyteadmin ${GOPATH}/bin
 
 .PHONY: linux_compile
 linux_compile:
-	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o /artifacts/flyteadmin ./cmd/
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -o /artifacts/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: server
 server:
-	go run cmd/main.go serve --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+	go run cmd/main.go serve  --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 .PHONY: migrate
 migrate:
