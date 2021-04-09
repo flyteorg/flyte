@@ -30,10 +30,10 @@ Basic Configuration
     endpoint: dns:///flyte.lyft.net
     # Change insecure flag to ensure that you use the right setting for your environment
     insecure: true
+  logger:
     # Logger settings to control logger output. Useful to debug logger:
     show-source: true
     level: 1
-
 
 
 .. toctree::
