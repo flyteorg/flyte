@@ -22,6 +22,7 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 
+	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyteadmin/pkg/errors"
@@ -90,6 +91,7 @@ type ExecutionManager struct {
 	resourceManager           interfaces.ResourceInterface
 	qualityOfServiceAllocator executions.QualityOfServiceAllocator
 	eventPublisher            notificationInterfaces.Publisher
+	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -1001,18 +1003,13 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 			request.Event.ExecutionId, err)
 		return nil, err
 	}
-	executionEventModel, err := transformers.CreateExecutionEventModel(request)
-	if err != nil {
-		logger.Debugf(ctx, "failed to transform workflow execution event %s for [%+v] after receiving event with err: %v",
-			request.RequestId, request.Event.ExecutionId, err)
-		return nil, err
-	}
-	err = m.db.ExecutionRepo().Update(ctx, *executionEventModel, *executionModel)
+	err = m.db.ExecutionRepo().Update(ctx, *executionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update execution with CreateWorkflowEvent [%+v] with err %v",
 			request, err)
 		return nil, err
 	}
+	m.dbEventWriter.Write(request)
 
 	if request.Event.Phase == core.WorkflowExecution_RUNNING {
 		// Workflow executions are created in state "UNDEFINED". All the time up until a RUNNING event is received is
@@ -1098,7 +1095,7 @@ func (m *ExecutionManager) GetExecutionData(
 		}
 		// Update model so as not to offload again.
 		executionModel.InputsURI = newInputsURI
-		if err := m.db.ExecutionRepo().UpdateExecution(ctx, *executionModel); err != nil {
+		if err := m.db.ExecutionRepo().Update(ctx, *executionModel); err != nil {
 			return nil, err
 		}
 	}
@@ -1296,7 +1293,7 @@ func (m *ExecutionManager) TerminateExecution(
 		logger.Debugf(ctx, "failed to add abort metadata for execution [%+v] with err: %v", request.Id, err)
 		return nil, err
 	}
-	err = m.db.ExecutionRepo().UpdateExecution(ctx, executionModel)
+	err = m.db.ExecutionRepo().Update(ctx, executionModel)
 	if err != nil {
 		logger.Debugf(ctx, "failed to save abort cause for terminated execution: %+v with err: %v", request.Id, err)
 		return nil, err
@@ -1332,7 +1329,11 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 	}
 }
 
-func NewExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, workflowExecutor workflowengineInterfaces.Executor, systemScope promutils.Scope, userScope promutils.Scope, publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface, workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, eventPublisher notificationInterfaces.Publisher) interfaces.ExecutionInterface {
+func NewExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration,
+	storageClient *storage.DataStore, workflowExecutor workflowengineInterfaces.Executor, systemScope promutils.Scope,
+	userScope promutils.Scope, publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
+	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
+	eventPublisher notificationInterfaces.Publisher, eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
@@ -1363,6 +1364,7 @@ func NewExecutionManager(db repositories.RepositoryInterface, config runtimeInte
 		resourceManager:           resourceManager,
 		qualityOfServiceAllocator: executions.NewQualityOfServiceAllocator(config, resourceManager),
 		eventPublisher:            eventPublisher,
+		dbEventWriter:             eventWriter,
 	}
 }
 

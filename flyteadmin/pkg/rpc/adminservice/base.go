@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
+	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/implementations"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
@@ -136,7 +138,15 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		db, configuration, workflowengine.NewCompiler(), dataStorageClient, applicationConfiguration.MetadataStoragePrefix,
 		adminScope.NewSubScope("workflow_manager"))
 	namedEntityManager := manager.NewNamedEntityManager(db, configuration, adminScope.NewSubScope("named_entity_manager"))
-	executionManager := manager.NewExecutionManager(db, configuration, dataStorageClient, workflowExecutor, adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"), publisher, urlData, workflowManager, namedEntityManager, eventPublisher)
+
+	executionEventWriter := eventWriter.NewWorkflowExecutionEventWriter(db, applicationConfiguration.AsyncEventsBufferSize)
+	go func() {
+		executionEventWriter.Run()
+	}()
+
+	executionManager := manager.NewExecutionManager(db, configuration, dataStorageClient, workflowExecutor,
+		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
@@ -155,6 +165,11 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		}
 	}()
 
+	nodeExecutionEventWriter := eventWriter.NewNodeExecutionEventWriter(db, applicationConfiguration.AsyncEventsBufferSize)
+	go func() {
+		nodeExecutionEventWriter.Run()
+	}()
+
 	logger.Info(context.Background(), "Initializing a new AdminService")
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(db, configuration, workflowengine.NewCompiler(),
@@ -165,7 +180,7 @@ func NewAdminServer(kubeConfig, master string) *AdminService {
 		NamedEntityManager: namedEntityManager,
 		VersionManager:     versionManager,
 		NodeExecutionManager: manager.NewNodeExecutionManager(db, configuration, dataStorageClient,
-			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher),
+			adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, nodeExecutionEventWriter),
 		TaskExecutionManager: manager.NewTaskExecutionManager(db, configuration, dataStorageClient,
 			adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher),
 		ProjectManager:  manager.NewProjectManager(db, configuration),
