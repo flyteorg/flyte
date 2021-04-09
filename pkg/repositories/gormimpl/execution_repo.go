@@ -56,26 +56,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 	return execution, nil
 }
 
-func (r *ExecutionRepo) Update(ctx context.Context, event models.ExecutionEvent, execution models.Execution) error {
-	timer := r.metrics.UpdateDuration.Start()
-	defer timer.Stop()
-	// Use a transaction to guarantee no partial updates.
-	tx := r.db.Begin()
-	if err := tx.Create(&event).Error; err != nil {
-		tx.Rollback()
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-	if err := r.db.Model(&execution).Updates(execution).Error; err != nil {
-		tx.Rollback()
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-	if err := tx.Commit().Error; err != nil {
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-	return nil
-}
-
-func (r *ExecutionRepo) UpdateExecution(ctx context.Context, execution models.Execution) error {
+func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.Model(&execution).Updates(execution)
 	timer.Stop()

@@ -7,8 +7,8 @@ import (
 	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
 )
 
-type CreateNodeExecutionFunc func(ctx context.Context, event *models.NodeExecutionEvent, input *models.NodeExecution) error
-type UpdateNodeExecutionFunc func(ctx context.Context, event *models.NodeExecutionEvent, nodeExecution *models.NodeExecution) error
+type CreateNodeExecutionFunc func(ctx context.Context, input *models.NodeExecution) error
+type UpdateNodeExecutionFunc func(ctx context.Context, nodeExecution *models.NodeExecution) error
 type GetNodeExecutionFunc func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error)
 type ListNodeExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.NodeExecutionCollectionOutput, error)
@@ -24,9 +24,9 @@ type MockNodeExecutionRepo struct {
 	ExistsFunction    func(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error)
 }
 
-func (r *MockNodeExecutionRepo) Create(ctx context.Context, event *models.NodeExecutionEvent, input *models.NodeExecution) error {
+func (r *MockNodeExecutionRepo) Create(ctx context.Context, input *models.NodeExecution) error {
 	if r.createFunction != nil {
-		return r.createFunction(ctx, event, input)
+		return r.createFunction(ctx, input)
 	}
 	return nil
 }
@@ -35,9 +35,9 @@ func (r *MockNodeExecutionRepo) SetCreateCallback(createFunction CreateNodeExecu
 	r.createFunction = createFunction
 }
 
-func (r *MockNodeExecutionRepo) Update(ctx context.Context, event *models.NodeExecutionEvent, nodeExecution *models.NodeExecution) error {
+func (r *MockNodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	if r.updateFunction != nil {
-		return r.updateFunction(ctx, event, nodeExecution)
+		return r.updateFunction(ctx, nodeExecution)
 	}
 	return nil
 }

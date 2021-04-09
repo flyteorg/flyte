@@ -27,9 +27,11 @@ type RepositoryInterface interface {
 	WorkflowRepo() interfaces.WorkflowRepoInterface
 	LaunchPlanRepo() interfaces.LaunchPlanRepoInterface
 	ExecutionRepo() interfaces.ExecutionRepoInterface
+	ExecutionEventRepo() interfaces.ExecutionEventRepoInterface
 	ProjectRepo() interfaces.ProjectRepoInterface
 	ResourceRepo() interfaces.ResourceRepoInterface
 	NodeExecutionRepo() interfaces.NodeExecutionRepoInterface
+	NodeExecutionEventRepo() interfaces.NodeExecutionEventRepoInterface
 	TaskExecutionRepo() interfaces.TaskExecutionRepoInterface
 	NamedEntityRepo() interfaces.NamedEntityRepoInterface
 }

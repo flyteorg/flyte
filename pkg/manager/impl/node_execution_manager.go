@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	eventWriter "github.com/flyteorg/flyteadmin/pkg/async/events/interfaces"
+
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/golang/protobuf/proto"
 
@@ -56,6 +58,7 @@ type NodeExecutionManager struct {
 	metrics        nodeExecutionMetrics
 	urlData        dataInterfaces.RemoteURLInterface
 	eventPublisher notificationInterfaces.Publisher
+	dbEventWriter  eventWriter.NodeExecutionEventWriter
 }
 
 type updateNodeExecutionStatus int
@@ -129,16 +132,9 @@ func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 			request.RequestId, err)
 		return err
 	}
-	nodeExecutionEventModel, err := transformers.CreateNodeExecutionEventModel(*request)
-	if err != nil {
-		logger.Debugf(ctx, "failed to transform node execution event request: %s into model with err: %v",
-			request.RequestId, err)
-		return err
-	}
-
-	if err := m.db.NodeExecutionRepo().Create(ctx, nodeExecutionEventModel, nodeExecutionModel); err != nil {
+	if err := m.db.NodeExecutionRepo().Create(ctx, nodeExecutionModel); err != nil {
 		logger.Debugf(ctx, "Failed to create node execution with id [%+v] and model [%+v] "+
-			"and event [%+v] with err %v", request.Event.Id, nodeExecutionModel, nodeExecutionEventModel, err)
+			"with err %v", request.Event.Id, nodeExecutionModel, err)
 		return err
 	}
 	m.metrics.ClosureSizeBytes.Observe(float64(len(nodeExecutionModel.Closure)))
@@ -181,14 +177,7 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 		logger.Debugf(ctx, "failed to update node execution model: %+v with err: %v", request.Event.Id, err)
 		return updateFailed, err
 	}
-
-	nodeExecutionEventModel, err := transformers.CreateNodeExecutionEventModel(*request)
-	if err != nil {
-		logger.Debugf(ctx, "failed to create node execution event model for request: %s with err: %v",
-			request.RequestId, err)
-		return updateFailed, err
-	}
-	err = m.db.NodeExecutionRepo().Update(ctx, nodeExecutionEventModel, nodeExecutionModel)
+	err = m.db.NodeExecutionRepo().Update(ctx, nodeExecutionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update node execution with id [%+v] with err %v",
 			request.Event.Id, err)
@@ -234,6 +223,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 			return nil, errors.NewAlreadyInTerminalStateError(ctx, errorMsg, curPhase)
 		}
 	}
+	m.dbEventWriter.Write(request)
 
 	if request.Event.Phase == core.NodeExecution_RUNNING {
 		m.metrics.ActiveNodeExecutions.Inc()
@@ -443,7 +433,9 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	return response, nil
 }
 
-func NewNodeExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface, eventPublisher notificationInterfaces.Publisher) interfaces.NodeExecutionInterface {
+func NewNodeExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration,
+	storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	eventPublisher notificationInterfaces.Publisher, eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{
 		Scope: scope,
 		ActiveNodeExecutions: scope.MustNewGauge("active_node_executions",
@@ -472,5 +464,6 @@ func NewNodeExecutionManager(db repositories.RepositoryInterface, config runtime
 		metrics:        metrics,
 		urlData:        urlData,
 		eventPublisher: eventPublisher,
+		dbEventWriter:  eventWriter,
 	}
 }

@@ -35,24 +35,6 @@ func TestCreateNodeExecution(t *testing.T) {
 		`"node_execution_created_at","node_execution_updated_at","duration","node_execution_metadata","parent_id","error_kind","error_code","cache_status") VALUES ` +
 		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 
-	nodeExecutionEventQuery := GlobalMock.NewMock()
-	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
-		`"deleted_at","execution_project","execution_domain","execution_name","node_id","request_id","occurred_at",` +
-		`"phase") VALUES (?,?,?,?,?,?,?,?,?,?)`)
-
-	nodeExecutionEvent := models.NodeExecutionEvent{
-		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: "1",
-			ExecutionKey: models.ExecutionKey{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "1",
-			},
-		},
-		RequestID:  "xxyzz",
-		Phase:      nodePhase,
-		OccurredAt: nodeStartedAt,
-	}
 	parentID := uint(10)
 	nodeExecution := models.NodeExecution{
 		BaseModel: models.BaseModel{
@@ -76,9 +58,8 @@ func TestCreateNodeExecution(t *testing.T) {
 		NodeExecutionUpdatedAt: &nodeCreatedAt,
 		ParentID:               &parentID,
 	}
-	err := nodeExecutionRepo.Create(context.Background(), &nodeExecutionEvent, &nodeExecution)
+	err := nodeExecutionRepo.Create(context.Background(), &nodeExecution)
 	assert.NoError(t, err)
-	assert.True(t, nodeExecutionEventQuery.Triggered)
 	assert.True(t, nodeExecutionQuery.Triggered)
 }
 
@@ -86,10 +67,6 @@ func TestUpdateNodeExecution(t *testing.T) {
 	nodeExecutionRepo := NewNodeExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append the name filter
-	nodeExecutionEventQuery := GlobalMock.NewMock()
-	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at",` +
-		`"deleted_at","execution_project","execution_domain","execution_name","node_id","request_id","occurred_at",` +
-		`"phase") VALUES (?,?,?,?,?,?,?,?,?,?)`)
 	nodeExecutionQuery := GlobalMock.NewMock()
 	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "closure" = ?, "duration" = ?, ` +
 		`"execution_domain" = ?, "execution_name" = ?, "execution_project" = ?, "id" = ?, "input_uri" = ?, ` +
@@ -98,19 +75,6 @@ func TestUpdateNodeExecution(t *testing.T) {
 		`"execution_project" = ? AND "node_executions"."execution_domain" = ? AND "node_executions".` +
 		`"execution_name" = ? AND "node_executions"."node_id" = ?`)
 	err := nodeExecutionRepo.Update(context.Background(),
-		&models.NodeExecutionEvent{
-			NodeExecutionKey: models.NodeExecutionKey{
-				NodeID: "1",
-				ExecutionKey: models.ExecutionKey{
-					Project: "project",
-					Domain:  "domain",
-					Name:    "1",
-				},
-			},
-			RequestID:  "request id 1",
-			OccurredAt: time.Now(),
-			Phase:      nodePhase,
-		},
 		&models.NodeExecution{
 			BaseModel: models.BaseModel{ID: 1},
 			NodeExecutionKey: models.NodeExecutionKey{
@@ -130,7 +94,6 @@ func TestUpdateNodeExecution(t *testing.T) {
 			NodeExecutionUpdatedAt: &nodePlanUpdatedAt,
 		})
 	assert.NoError(t, err)
-	assert.True(t, nodeExecutionEventQuery.Triggered)
 	assert.True(t, nodeExecutionQuery.Triggered)
 }
 

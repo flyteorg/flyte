@@ -19,7 +19,12 @@ const domains = "domains"
 const externalEvents = "externalEvents"
 
 var databaseConfig = config.MustRegisterSection(database, &interfaces.DbConfigSection{})
-var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, &interfaces.ApplicationConfig{})
+
+var defaultFlyteAdminConfig = &interfaces.ApplicationConfig{
+	AsyncEventsBufferSize: 100,
+}
+var flyteAdminConfig = config.MustRegisterSection(flyteAdmin, defaultFlyteAdminConfig)
+
 var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.SchedulerConfig{})
 var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.RemoteDataConfig{})
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{})

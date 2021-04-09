@@ -9,19 +9,25 @@ import (
 )
 
 type PostgresRepo struct {
-	executionRepo     interfaces.ExecutionRepoInterface
-	namedEntityRepo   interfaces.NamedEntityRepoInterface
-	launchPlanRepo    interfaces.LaunchPlanRepoInterface
-	projectRepo       interfaces.ProjectRepoInterface
-	nodeExecutionRepo interfaces.NodeExecutionRepoInterface
-	taskRepo          interfaces.TaskRepoInterface
-	taskExecutionRepo interfaces.TaskExecutionRepoInterface
-	workflowRepo      interfaces.WorkflowRepoInterface
-	resourceRepo      interfaces.ResourceRepoInterface
+	executionRepo          interfaces.ExecutionRepoInterface
+	executionEventRepo     interfaces.ExecutionEventRepoInterface
+	namedEntityRepo        interfaces.NamedEntityRepoInterface
+	launchPlanRepo         interfaces.LaunchPlanRepoInterface
+	projectRepo            interfaces.ProjectRepoInterface
+	nodeExecutionRepo      interfaces.NodeExecutionRepoInterface
+	nodeExecutionEventRepo interfaces.NodeExecutionEventRepoInterface
+	taskRepo               interfaces.TaskRepoInterface
+	taskExecutionRepo      interfaces.TaskExecutionRepoInterface
+	workflowRepo           interfaces.WorkflowRepoInterface
+	resourceRepo           interfaces.ResourceRepoInterface
 }
 
 func (p *PostgresRepo) ExecutionRepo() interfaces.ExecutionRepoInterface {
 	return p.executionRepo
+}
+
+func (p *PostgresRepo) ExecutionEventRepo() interfaces.ExecutionEventRepoInterface {
+	return p.executionEventRepo
 }
 
 func (p *PostgresRepo) LaunchPlanRepo() interfaces.LaunchPlanRepoInterface {
@@ -38,6 +44,10 @@ func (p *PostgresRepo) ProjectRepo() interfaces.ProjectRepoInterface {
 
 func (p *PostgresRepo) NodeExecutionRepo() interfaces.NodeExecutionRepoInterface {
 	return p.nodeExecutionRepo
+}
+
+func (p *PostgresRepo) NodeExecutionEventRepo() interfaces.NodeExecutionEventRepoInterface {
+	return p.nodeExecutionEventRepo
 }
 
 func (p *PostgresRepo) TaskRepo() interfaces.TaskRepoInterface {
@@ -58,14 +68,16 @@ func (p *PostgresRepo) ResourceRepo() interfaces.ResourceRepoInterface {
 
 func NewPostgresRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) RepositoryInterface {
 	return &PostgresRepo{
-		executionRepo:     gormimpl.NewExecutionRepo(db, errorTransformer, scope.NewSubScope("executions")),
-		launchPlanRepo:    gormimpl.NewLaunchPlanRepo(db, errorTransformer, scope.NewSubScope("launch_plans")),
-		projectRepo:       gormimpl.NewProjectRepo(db, errorTransformer, scope.NewSubScope("project")),
-		namedEntityRepo:   gormimpl.NewNamedEntityRepo(db, errorTransformer, scope.NewSubScope("named_entity")),
-		nodeExecutionRepo: gormimpl.NewNodeExecutionRepo(db, errorTransformer, scope.NewSubScope("node_executions")),
-		taskRepo:          gormimpl.NewTaskRepo(db, errorTransformer, scope.NewSubScope("tasks")),
-		taskExecutionRepo: gormimpl.NewTaskExecutionRepo(db, errorTransformer, scope.NewSubScope("task_executions")),
-		workflowRepo:      gormimpl.NewWorkflowRepo(db, errorTransformer, scope.NewSubScope("workflows")),
-		resourceRepo:      gormimpl.NewResourceRepo(db, errorTransformer, scope.NewSubScope("resources")),
+		executionRepo:          gormimpl.NewExecutionRepo(db, errorTransformer, scope.NewSubScope("executions")),
+		executionEventRepo:     gormimpl.NewExecutionEventRepo(db, errorTransformer, scope.NewSubScope("execution_events")),
+		launchPlanRepo:         gormimpl.NewLaunchPlanRepo(db, errorTransformer, scope.NewSubScope("launch_plans")),
+		projectRepo:            gormimpl.NewProjectRepo(db, errorTransformer, scope.NewSubScope("project")),
+		namedEntityRepo:        gormimpl.NewNamedEntityRepo(db, errorTransformer, scope.NewSubScope("named_entity")),
+		nodeExecutionRepo:      gormimpl.NewNodeExecutionRepo(db, errorTransformer, scope.NewSubScope("node_executions")),
+		nodeExecutionEventRepo: gormimpl.NewNodeExecutionEventRepo(db, errorTransformer, scope.NewSubScope("node_execution_events")),
+		taskRepo:               gormimpl.NewTaskRepo(db, errorTransformer, scope.NewSubScope("tasks")),
+		taskExecutionRepo:      gormimpl.NewTaskExecutionRepo(db, errorTransformer, scope.NewSubScope("task_executions")),
+		workflowRepo:           gormimpl.NewWorkflowRepo(db, errorTransformer, scope.NewSubScope("workflows")),
+		resourceRepo:           gormimpl.NewResourceRepo(db, errorTransformer, scope.NewSubScope("resources")),
 	}
 }

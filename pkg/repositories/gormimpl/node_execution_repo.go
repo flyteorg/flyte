@@ -21,25 +21,12 @@ type NodeExecutionRepo struct {
 	metrics          gormMetrics
 }
 
-// Persist the node execution and the initial event that triggers this execution. If any of the persistence fails
-// rollback the transaction all together.
-func (r *NodeExecutionRepo) Create(ctx context.Context, event *models.NodeExecutionEvent, execution *models.NodeExecution) error {
+func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeExecution) error {
 	timer := r.metrics.CreateDuration.Start()
-	defer timer.Stop()
-	// Use a transaction to guarantee no partial updates in
-	// creating the execution and event
-	tx := r.db.Begin()
-	if err := tx.Create(&execution).Error; err != nil {
-		tx.Rollback()
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-
-	if err := tx.Create(&event).Error; err != nil {
-		tx.Rollback()
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-	if err := tx.Commit().Error; err != nil {
-		return r.errorTransformer.ToFlyteAdminError(err)
+	tx := r.db.Create(&execution)
+	timer.Stop()
+	if tx.Error != nil {
+		return r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return nil
 }
@@ -75,22 +62,11 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	return nodeExecution, nil
 }
 
-// Persist the event that triggers an update in execution. If any of the persistence fails
-// rollback the transaction all together.
-func (r *NodeExecutionRepo) Update(ctx context.Context, event *models.NodeExecutionEvent, nodeExecution *models.NodeExecution) error {
+func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	defer timer.Stop()
-	// Use a transaction to guarantee no partial updates.
-	tx := r.db.Begin()
-	if err := tx.Create(&event).Error; err != nil {
-		tx.Rollback()
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-	if err := r.db.Model(nodeExecution).Updates(nodeExecution).Error; err != nil {
-		tx.Rollback()
-		return r.errorTransformer.ToFlyteAdminError(err)
-	}
-	if err := tx.Commit().Error; err != nil {
+	tx := r.db.Model(&nodeExecution).Updates(nodeExecution)
+	timer.Stop()
+	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
 	}
 	return nil
