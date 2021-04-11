@@ -3,13 +3,35 @@ server:
   grpcPort: 8089
   security:
     secure: false
-    useAuth: false
+    useAuth: true
     allowCors: true
     allowedOrigins:
       # Accepting all domains for Sandbox installation
       - "*"
     allowedHeaders:
       - "Content-Type"
+secrets:
+  secrets-prefix: /etc/secrets/auth/
+auth:
+  disableForGrpc: true
+  httpPublicUri: http://localhost:30081/
+  appAuth:
+    thirdPartyConfig:
+      flyteClient:
+        clientId: flytectl
+        redirectUri: https://localhost:53593/callback
+        scopes:
+          - offline
+          - all
+  userAuth:
+    openId:
+      baseUrl: https://accounts.google.com
+      scopes:
+        - profile
+        - openid
+      clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+      callbackUrl: "http://localhost:30081/callback"
+      redirectUrl: "/api/v1/projects"
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
   profilerPort: 10254
