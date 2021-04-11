@@ -1,6 +1,6 @@
 <html>
 <p align="center"> 
-  <img src="rsts/images/flyte_circle_gradient_1_4x4.png" alt="Flyte Logo" width="100">
+  <img src="rsts/images/flyte-and-lf.png" alt="Flyte and LF AI & Data Logo" width="300">
 </p>
 
 <h1 align="center">
