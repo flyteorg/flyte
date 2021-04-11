@@ -8148,13 +8148,35 @@ data:
       grpcPort: 8089
       security:
         secure: false
-        useAuth: false
+        useAuth: true
         allowCors: true
         allowedOrigins:
           # Accepting all domains for Sandbox installation
           - "*"
         allowedHeaders:
           - "Content-Type"
+    secrets:
+      secrets-prefix: /etc/secrets/auth/
+    auth:
+      disableForGrpc: true
+      httpPublicUri: http://localhost:30081/
+      appAuth:
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: https://localhost:53593/callback
+            scopes:
+              - offline
+              - all
+      userAuth:
+        openId:
+          baseUrl: https://accounts.google.com
+          scopes:
+            - profile
+            - openid
+          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+          callbackUrl: "http://localhost:30081/callback"
+          redirectUrl: "/api/v1/projects"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -8198,7 +8220,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-7k2dmcb4tg
+  name: flyte-admin-config-27ggcgm724
   namespace: flyte
 ---
 apiVersion: v1
@@ -8375,6 +8397,13 @@ data:
 kind: Secret
 metadata:
   name: db-pass-bthd2588cc
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-admin-auth
   namespace: flyte
 type: Opaque
 ---
@@ -8765,6 +8794,8 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+        - mountPath: /etc/secrets/auth
+          name: auth
       - command:
         - sh
         - -c
@@ -8833,12 +8864,51 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+      - args:
+        - --localPath
+        - /etc/secrets/auth-new
+        command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - secrets
+        - init
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        imagePullPolicy: IfNotPresent
+        name: generate-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - mountPath: /etc/secrets/auth-new
+          name: new-auth-secrets
+      - args:
+        - --fromPath
+        - /etc/secrets/auth-new
+        command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - secrets
+        - create
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        imagePullPolicy: IfNotPresent
+        name: save-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - mountPath: /etc/secrets/auth-new
+          name: new-auth-secrets
       serviceAccountName: flyteadmin
       volumes:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-7k2dmcb4tg
+          name: flyte-admin-config-27ggcgm724
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8846,6 +8916,11 @@ spec:
       - name: db-pass
         secret:
           secretName: db-pass-bthd2588cc
+      - name: auth
+        secret:
+          secretName: flyte-admin-auth
+      - emptyDir: {}
+        name: new-auth-secrets
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -9118,7 +9193,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-7k2dmcb4tg
+              name: flyte-admin-config-27ggcgm724
             name: config-volume
           - name: db-pass
             secret:

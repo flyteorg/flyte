@@ -2164,13 +2164,35 @@ data:
       grpcPort: 8089
       security:
         secure: false
-        useAuth: false
+        useAuth: true
         allowCors: true
         allowedOrigins:
           # Accepting all domains for Sandbox installation
           - "*"
         allowedHeaders:
           - "Content-Type"
+    secrets:
+      secrets-prefix: /etc/secrets/auth/
+    auth:
+      disableForGrpc: true
+      httpPublicUri: http://localhost:30081/
+      appAuth:
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: https://localhost:53593/callback
+            scopes:
+              - offline
+              - all
+      userAuth:
+        openId:
+          baseUrl: https://accounts.google.com
+          scopes:
+            - profile
+            - openid
+          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+          callbackUrl: "http://localhost:30081/callback"
+          redirectUrl: "/api/v1/projects"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -2206,7 +2228,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-5b5g7785h8
+  name: flyte-admin-config-tkg6c6ft28
   namespace: flyte
 ---
 apiVersion: v1
@@ -2463,6 +2485,13 @@ data:
 kind: Secret
 metadata:
   name: db-pass-9dgchhk2bm
+  namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-admin-auth
   namespace: flyte
 type: Opaque
 ---
@@ -2851,7 +2880,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2869,6 +2898,8 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+        - mountPath: /etc/secrets/auth
+          name: auth
       - command:
         - sh
         - -c
@@ -2902,7 +2933,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2918,7 +2949,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2932,7 +2963,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2942,6 +2973,45 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
+      - args:
+        - --localPath
+        - /etc/secrets/auth-new
+        command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - secrets
+        - init
+        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        imagePullPolicy: IfNotPresent
+        name: generate-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - mountPath: /etc/secrets/auth-new
+          name: new-auth-secrets
+      - args:
+        - --fromPath
+        - /etc/secrets/auth-new
+        command:
+        - flyteadmin
+        - --config
+        - /etc/flyte/config/*.yaml
+        - secrets
+        - create
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        imagePullPolicy: IfNotPresent
+        name: save-secrets
+        volumeMounts:
+        - mountPath: /etc/flyte/config
+          name: config-volume
+        - mountPath: /etc/secrets/auth-new
+          name: new-auth-secrets
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
@@ -2950,11 +3020,16 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-5b5g7785h8
+          name: flyte-admin-config-tkg6c6ft28
         name: config-volume
       - name: db-pass
         secret:
           secretName: db-pass-9dgchhk2bm
+      - name: auth
+        secret:
+          secretName: flyte-admin-auth
+      - emptyDir: {}
+        name: new-auth-secrets
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -3328,7 +3403,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+            image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3345,7 +3420,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-5b5g7785h8
+              name: flyte-admin-config-tkg6c6ft28
             name: config-volume
           - name: db-pass
             secret:

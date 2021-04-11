@@ -62,92 +62,62 @@ Please refer to the `inline documentation <https://github.com/flyteorg/flyteadmi
 Example Configurations
 ======================
 
-Common Configuration
-####################
-
-Flyte Admin secures cookies using AES encryption. In order to achieve that, follow the steps below:
-
-1. Generate secure cookie keys. Run this command to generate new keys:
-
-.. prompt:: bash
-
- go test -v github.com/lyft/flyteadmin/pkg/auth -run TestSecureCookieLifecycle
-
-2. Create two secrets in the ``flyte`` namespace with the generated keys:
-
-.. prompt:: bash
-
-  kubectl create secret generic flyteadmin-cookie-blockkey -n flyte --from-literal=blockkey=<block key value>
-
-.. prompt:: bash
-
-  kubectl create secret generic flyteadmin-cookie-hashkey -n flyte --from-literal=hashkey=<hash key value>
-  kubectl create secret generic flytepropeller-oauth -n flyte --from-literal=secret=5aATwGcDZmFd3n0mLDbuR1uA
-
-3. Configure FlyteAdmin deployment to mount them to FlyteAdmin pod.
-   e.g. Add the following to your existing configuration
-
-   .. code-block:: yaml
-
-     containers:
-        name: flyteadmin
-        volumeMounts:
-        - mountPath: /etc/secrets/oauth
-          name: oauth
-          readOnly: true
-        - mountPath: /etc/secrets/hashkey
-          name: hashkey
-          readOnly: true
-        - mountPath: /etc/secrets/blockkey
-          name: blockkey
-          readOnly: true
-      volumes:
-      - name: oauth
-        secret:
-          defaultMode: 420
-          secretName: flyteadmin-oauth-client
-      - name: hashkey
-        secret:
-          defaultMode: 420
-          secretName: flyteadmin-cookie-hashkey
-      - name: blockkey
-        secret:
-          defaultMode: 420
-          secretName: flyteadmin-cookie-blockkey
-
 Google IdP
 ##########
 
 1. Follow `Google Docs <https://developers.google.com/identity/protocols/oauth2/openid-connect>`__ on how to configure the IdP for OpenIDConnect.
 
-2. Create a secret in the ``flyte`` namespace with the value of the client password.
+.. note::
+
+  Make sure to create an OAuth2 Client Credential. The `client_id` and `client_secret` will be needed in the following
+  steps.
+
+2. Store the `client_secret` in a k8s secrt as follows:
 
 .. prompt:: bash
 
-  kubectl create secret generic -n flyte flyteadmin-oauth-client --from-literal=secret=<client secret>
+  kubectl edit secret -n flyte flyte-admin-auth
 
-3. Configure Flyte Admin with the following configuration:
+Add a new key under `data`:
 
 .. code-block:: yaml
 
-  server:
-    security:
-      useAuth: true
-      oauth:
-        scopes:
-          - profile
-          - openid
-        claims:
-          iss: https://accounts.google.com
-          aud: <Client Id Generated in the previous step>
-        clientId: <Client Id Generated in the previous step>
-        clientSecretFile: "/etc/secrets/oauth/secret"
-        cookieHashKeyFile: "/etc/secrets/hashkey/hashkey"
-        cookieBlockKeyFile: "/etc/secrets/blockkey/blockkey"
-        authorizeUrl: "https://accounts.google.com/o/oauth2/v2/auth?access_type=offline"
-        tokenUrl: "https://oauth2.googleapis.com/token"
-        callbackUrl: "http://localhost:8088/callback"
-        redirectUrl: "/api/v1/projects"
+  stringData:
+    oidc_client_secret: <client_secret> from the previous step
+
+Save and close your editor.
+
+3. Edit FlyteAdmin config to add `client_id` as follows:
+
+.. prompt:: bash
+
+  kubectl deploy -n flyte flyteadmin -o yaml | grep "name: flyte-admin-config"
+
+This will output the name of the config map where the `client_id` need to go.
+
+.. prompt:: bash
+
+  kubectl edit configmap -n flyte <the name of the config map from previous command>
+
+Find `client_id` and replace with the copied `client_id`
+
+.. code-block:: yaml
+
+  clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+
+Find `useAuth` and enable Auth enforcement:
+
+.. code-block:: yaml
+
+  useAuth: true
+
+Save and exit your editor.
+
+4. Restart `flyteadmin` for the changes to take effect:
+
+.. prompt:: bash
+
+  kubectl rollout restart deployment/flyteadmin -n flyte
 
 ******
 CI
