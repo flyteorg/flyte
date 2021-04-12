@@ -27,8 +27,8 @@ seed(datetime.now().microsecond)
 @task
 def split(numbers: typing.List[int]) -> (typing.List[int], typing.List[int], int):
     return (
-        numbers[0 : int(len(numbers) / 2)],
-        numbers[int(len(numbers) / 2) + 1 :],
+        numbers[0:int(len(numbers) / 2)],
+        numbers[int(len(numbers) / 2):],
         int(len(numbers) / 2),
     )
 
@@ -40,32 +40,17 @@ def split(numbers: typing.List[int]) -> (typing.List[int], typing.List[int], int
 def merge(
     sorted_list1: typing.List[int], sorted_list2: typing.List[int]
 ) -> typing.List[int]:
-    n1 = len(sorted_list1)
-    n2 = len(sorted_list2)
     result = []
-    i = 0
-    j = 0
-
-    # Traverse both array
-    while i < n1 and j < n2:
+    while len(sorted_list1) > 0 and len(sorted_list2) > 0:
         # Check if current element of first array is smaller than current element of second array. If yes,
         # store first array element and increment first array index. Otherwise do same with second array
-        if sorted_list1[i] < sorted_list2[j]:
-            result.append(sorted_list1[i])
-            i = i + 1
+        if sorted_list1[0] < sorted_list2[0]:
+            result.append(sorted_list1.pop(0))
         else:
-            result.append(sorted_list2[j])
-            j = j + 1
+            result.append(sorted_list2.pop(0))
 
-    # Store remaining elements of first array
-    while i < n1:
-        result.append(sorted_list1[i])
-        i = i + 1
-
-    # Store remaining elements of second array
-    while j < n2:
-        result.append(sorted_list2[j])
-        j = j + 1
+    result.extend(sorted_list1)
+    result.extend(sorted_list2)
 
     return result
 
