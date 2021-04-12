@@ -40,3 +40,5 @@ images:
   # Override postgres image to use alpine based (rather smaller) docker image
   - name: postgres
     newTag: 10.16-alpine
+  - name: minio/minio
+    newTag: RELEASE.2021-04-06T23-11-00Z
