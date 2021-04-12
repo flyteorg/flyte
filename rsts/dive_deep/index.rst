@@ -40,6 +40,7 @@ Execution Time Details
     :maxdepth: 1
 
     executions
+    state_machine
     execution_timeline
     observability
     dynamic_spec
