@@ -16,7 +16,9 @@ const (
 	projectDomainVariable = "project-domain"
 )
 
-var namespaceMappingConfig = config.MustRegisterSection(namespaceMappingKey, &interfaces.NamespaceMappingConfig{})
+var namespaceMappingConfig = config.MustRegisterSection(namespaceMappingKey, &interfaces.NamespaceMappingConfig{
+	Mapping: projectDomainVariable,
+})
 
 type NamespaceMappingConfigurationProvider struct{}
 

@@ -1,11 +1,8 @@
 package runtime
 
 import (
-	"context"
-
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const taskResourceKey = "task_resources"
@@ -21,19 +18,11 @@ type TaskResourceSpec struct {
 type TaskResourceProvider struct{}
 
 func (p *TaskResourceProvider) GetDefaults() interfaces.TaskResourceSet {
-	if taskResourceConfig != nil {
-		return taskResourceConfig.GetConfig().(*TaskResourceSpec).Defaults
-	}
-	logger.Warning(context.Background(), "failed to find task resource values in config. Returning empty struct")
-	return interfaces.TaskResourceSet{}
+	return taskResourceConfig.GetConfig().(*TaskResourceSpec).Defaults
 }
 
 func (p *TaskResourceProvider) GetLimits() interfaces.TaskResourceSet {
-	if taskResourceConfig != nil {
-		return taskResourceConfig.GetConfig().(*TaskResourceSpec).Limits
-	}
-	logger.Warning(context.Background(), "failed to find task resource values in config. Returning empty struct")
-	return interfaces.TaskResourceSet{}
+	return taskResourceConfig.GetConfig().(*TaskResourceSpec).Limits
 }
 
 func NewTaskResourceProvider() interfaces.TaskResourceConfiguration {

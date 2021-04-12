@@ -1,55 +1,39 @@
 package runtime
 
 import (
-	"context"
 	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const clusterResourceKey = "cluster_resources"
 
-var clusterResourceConfig = config.MustRegisterSection(clusterResourceKey, &interfaces.ClusterResourceConfig{})
+var clusterResourceConfig = config.MustRegisterSection(clusterResourceKey, &interfaces.ClusterResourceConfig{
+	TemplateData: make(map[string]interfaces.DataSource),
+	RefreshInterval: config.Duration{
+		Duration: time.Minute,
+	},
+	CustomData: make(map[interfaces.DomainName]interfaces.TemplateData),
+})
 
 // Implementation of an interfaces.ClusterResourceConfiguration
 type ClusterResourceConfigurationProvider struct{}
 
 func (p *ClusterResourceConfigurationProvider) GetTemplatePath() string {
-	if clusterResourceConfig != nil && clusterResourceConfig.GetConfig() != nil {
-		return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).TemplatePath
-	}
-	logger.Warningf(context.Background(),
-		"Failed to find cluster resource values in config. Returning an empty string for template path")
-	return ""
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).TemplatePath
 }
 
 func (p *ClusterResourceConfigurationProvider) GetTemplateData() interfaces.TemplateData {
-	if clusterResourceConfig != nil && clusterResourceConfig.GetConfig() != nil {
-		return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).TemplateData
-	}
-	logger.Warningf(context.Background(),
-		"Failed to find cluster resource values in config. Returning an empty map for template data")
-	return make(interfaces.TemplateData)
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).TemplateData
 }
 
 func (p *ClusterResourceConfigurationProvider) GetRefreshInterval() time.Duration {
-	if clusterResourceConfig != nil && clusterResourceConfig.GetConfig() != nil {
-		return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).RefreshInterval.Duration
-	}
-	logger.Warningf(context.Background(),
-		"Failed to find cluster resource values in config. Returning 1 minute for refresh interval")
-	return time.Minute
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).RefreshInterval.Duration
 }
 
 func (p *ClusterResourceConfigurationProvider) GetCustomTemplateData() map[interfaces.DomainName]interfaces.TemplateData {
-	if clusterResourceConfig != nil && clusterResourceConfig.GetConfig() != nil {
-		return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).CustomData
-	}
-	logger.Warningf(context.Background(),
-		"Failed to find cucluster resource values in config. Returning an empty map for custom template data")
-	return make(map[interfaces.DomainName]interfaces.TemplateData)
+	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).CustomData
 }
 
 func NewClusterResourceConfigurationProvider() interfaces.ClusterResourceConfiguration {
