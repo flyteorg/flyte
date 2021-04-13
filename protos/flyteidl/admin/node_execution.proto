@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/catalog.proto";
+import "flyteidl/core/compiler.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
 import "google/protobuf/timestamp.proto";
@@ -150,6 +151,18 @@ message TaskNodeMetadata {
     core.CatalogCacheStatus cache_status = 1;
     // This structure carries the catalog artifact information
     core.CatalogMetadata catalog_key = 2;
+
+    // In the case this task launched a dynamic workflow we capture its structure here.
+    DynamicWorkflowNodeMetadata dynamic_workflow = 16;
+}
+
+// For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated.
+message DynamicWorkflowNodeMetadata {
+    // id represents the unique identifier of the workflow.
+    core.Identifier id     = 1;
+
+    // Represents the compiled representation of the embedded dynamic workflow.
+    core.CompiledWorkflowClosure compiled_workflow = 2;
 }
 
 // Request structure to fetch inputs and output urls for a node execution.

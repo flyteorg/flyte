@@ -419,6 +419,16 @@ func (m *TaskNodeMetadata) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetDynamicWorkflow()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskNodeMetadataValidationError{
+				field:  "DynamicWorkflow",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -475,6 +485,94 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskNodeMetadataValidationError{}
+
+// Validate checks the field values on DynamicWorkflowNodeMetadata with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *DynamicWorkflowNodeMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DynamicWorkflowNodeMetadataValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetCompiledWorkflow()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DynamicWorkflowNodeMetadataValidationError{
+				field:  "CompiledWorkflow",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DynamicWorkflowNodeMetadataValidationError is the validation error returned
+// by DynamicWorkflowNodeMetadata.Validate if the designated constraints
+// aren't met.
+type DynamicWorkflowNodeMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DynamicWorkflowNodeMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DynamicWorkflowNodeMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DynamicWorkflowNodeMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DynamicWorkflowNodeMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DynamicWorkflowNodeMetadataValidationError) ErrorName() string {
+	return "DynamicWorkflowNodeMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DynamicWorkflowNodeMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDynamicWorkflowNodeMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DynamicWorkflowNodeMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DynamicWorkflowNodeMetadataValidationError{}
 
 // Validate checks the field values on ParentTaskExecutionMetadata with the
 // rules defined in the proto definition for this message. If any rules are

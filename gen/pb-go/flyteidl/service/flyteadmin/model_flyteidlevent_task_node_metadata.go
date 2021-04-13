@@ -13,4 +13,6 @@ type FlyteidleventTaskNodeMetadata struct {
 	// Captures the status of caching for this execution.
 	CacheStatus *CoreCatalogCacheStatus `json:"cache_status,omitempty"`
 	CatalogKey *CoreCatalogMetadata `json:"catalog_key,omitempty"`
+	// In the case this task launched a dynamic workflow we capture its structure here.
+	DynamicWorkflow *FlyteidleventDynamicWorkflowNodeMetadata `json:"dynamic_workflow,omitempty"`
 }
