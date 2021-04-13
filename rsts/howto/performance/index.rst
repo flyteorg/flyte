@@ -51,8 +51,8 @@ This is usually because the number of threads in FlytePropeller are not enough t
 
 In the above table the 2 most important configs are ``workers`` and ``kube-client-config``.
 
-Kubeclient config is usually configured poorly and leads to bad performance. Flytepropeller configures a default version, which is better than the actual default.
-This configuration is critical, as this improves the number of requests that Flyte can send to KubeAPI, which is critical. An example kube-client-config is as follows
+Kubeclient config is usually configured poorly and leads to bad performance. This is especially noticeable, if your workload involves spawning a lot of pods or other CRDs. For case in which your workload is a good mix of K8s local resources and external resources, the default for this configuration should suffice.
+Flytepropeller configures a default version, which is better than the actual default. This configuration is critical, as this improves the number of requests that Flyte can send to KubeAPI, which is critical. An example kube-client-config is as follows
 
 .. code-block:: yaml
 
