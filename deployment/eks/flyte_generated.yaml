@@ -8080,14 +8080,12 @@ data:
     storage:
       type: stow
       stow:
-        kind: google
+        kind: s3
         config:
-          json: ""
-          # TODO: replace <project-id> with the GCP project ID
-          project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+          auth_type: iam
+          region: us-east-2
+      # TODO replace with the container (bucket) in s3 used by Flyte as intermediate store
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8098,7 +8096,7 @@ data:
         maxDownloadMBs: 10
 kind: ConfigMap
 metadata:
-  name: datacatalog-config-2bb94tc5b5
+  name: datacatalog-config-fktmhdgfk8
   namespace: flyte
 ---
 apiVersion: v1
@@ -8178,14 +8176,12 @@ data:
     storage:
       type: stow
       stow:
-        kind: google
+        kind: s3
         config:
-          json: ""
-          # TODO: replace <project-id> with the GCP project ID
-          project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+          auth_type: iam
+          region: us-east-2
+      # TODO replace with the container (bucket) in s3 used by Flyte as intermediate store
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8207,7 +8203,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-t2f9g68k65
+  name: flyte-admin-config-4ft85ftt4m
   namespace: flyte
 ---
 apiVersion: v1
@@ -8350,14 +8346,12 @@ data:
     storage:
       type: stow
       stow:
-        kind: google
+        kind: s3
         config:
-          json: ""
-          # TODO: replace <project-id> with the GCP project ID
-          project_id: <project-id>
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      # TODO replace with the container (bucket) in GCS used by Flyte as intermediate store
-      container: "flyte"
+          auth_type: iam
+          region: us-east-2
+      # TODO replace with the container (bucket) in s3 used by Flyte as intermediate store
+      container: "flyte-demo"
       # NOTE this cache configuration is purely for propeller. But since we are having a common storage
       # config, we are configuring this value. In production create a separate storage config for
       # propeller and increase the cache size
@@ -8379,7 +8373,7 @@ data:
         cloudwatch-log-group: <log-group>
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-727k54546d
+  name: flyte-propeller-config-8fdc62895h
   namespace: flyte
 ---
 apiVersion: v1
@@ -8623,7 +8617,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: datacatalog-config-2bb94tc5b5
+          name: datacatalog-config-fktmhdgfk8
         name: config-volume
       - name: db-pass
         secret:
@@ -8680,7 +8674,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-727k54546d
+          name: flyte-propeller-config-8fdc62895h
         name: config-volume
       - name: webhook-certs
         secret:
@@ -8806,7 +8800,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-t2f9g68k65
+          name: flyte-admin-config-4ft85ftt4m
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -8898,7 +8892,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-727k54546d
+          name: flyte-propeller-config-8fdc62895h
         name: config-volume
 ---
 apiVersion: apps/v1
@@ -9086,7 +9080,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-t2f9g68k65
+              name: flyte-admin-config-4ft85ftt4m
             name: config-volume
           - name: db-pass
             secret:
@@ -9129,7 +9123,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-727k54546d
+          name: flyte-propeller-config-8fdc62895h
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---
