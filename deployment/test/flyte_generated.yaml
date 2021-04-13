@@ -312,13 +312,14 @@ data:
       grpcPort: 8089
       security:
         secure: false
-        useAuth: true
+        useAuth: false
         allowCors: true
         allowedOrigins:
           # Accepting all domains for Sandbox installation
           - "*"
         allowedHeaders:
           - "Content-Type"
+          - "flyte-authorization"
     secrets:
       secrets-prefix: /etc/secrets/auth/
     auth:
@@ -376,7 +377,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-42thh57bff
+  name: flyte-admin-config-f9cbgdhcbh
   namespace: flyte
 ---
 apiVersion: v1
@@ -874,7 +875,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-42thh57bff
+          name: flyte-admin-config-f9cbgdhcbh
         name: config-volume
       - name: db-pass
         secret:

@@ -142,9 +142,10 @@ Follow the inline comments to make the necessary changes:
         - "*"
       allowedHeaders:
         - "Content-Type"
+        - "flyte-athorization"
   auth:
     # 2. Update with the public facing url of flyte admin (e.g. https://flyte.mycompany.io/)
-    httpPublicUri: http://localhost:8088/
+    httpPublicUri: http://localhost:30081/
     userAuth:
       openId:
         # 3. Put the URL of the OpenID Connect provider.
@@ -157,7 +158,7 @@ Follow the inline comments to make the necessary changes:
         # 4. Replace with the client ID created for Flyte.
         clientId: 0oakkheteNjCMERst5d6
         # 5. Replace with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/callback)
-        callbackUrl: "http://localhost:8088/callback"
+        callbackUrl: "http://localhost:30081/callback"
         # 6. Replace with the flyte console's URL (e.g. https://flyte.mycompany.io/console) 
         redirectUrl: "/api/v1/projects"
 
@@ -190,7 +191,7 @@ It is possible to direct flyte admin to use an external authorization server. To
 
   auth:
     # 1. Update with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/)
-    httpPublicUri: http://localhost:8088/
+    httpPublicUri: http://localhost:30081/
     appAuth:
       # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
       #    Choose Self (or omit the value) to use Flyte Admin's internal (albeit limited) Authorization Server.
@@ -213,7 +214,7 @@ It is possible to direct flyte admin to use an external authorization server. To
           - openid
           # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
         clientId: 0oakkheteNjCMERst5d6
-        callbackUrl: "http://localhost:8088/callback"
+        callbackUrl: "http://localhost:30081/callback"
         redirectUrl: "/api/v1/projects"
 
 ***************************

@@ -3,13 +3,14 @@ server:
   grpcPort: 8089
   security:
     secure: false
-    useAuth: true
+    useAuth: false
     allowCors: true
     allowedOrigins:
       # Accepting all domains for Sandbox installation
       - "*"
     allowedHeaders:
       - "Content-Type"
+      - "flyte-authorization"
 secrets:
   secrets-prefix: /etc/secrets/auth/
 auth:
