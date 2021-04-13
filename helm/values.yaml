@@ -384,6 +384,8 @@ common:
     albSSLRedirect: false
     # --- Ingress hostname
     # host:
+    tls:
+      enabled: true
   flyteNamespaceTemplate:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false

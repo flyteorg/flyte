@@ -96,6 +96,8 @@ common:
   ingress:
     # enable HMR route to flyteconsole for frontend development.
     webpackHMR: true
+    tls:
+      enabled: false
   flyteNamespaceTemplate: {}
 
 #

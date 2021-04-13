@@ -20,7 +20,6 @@ flyteadmin:
       ephemeral-storage: 200Mi
       memory: 200Mi
 
-  configPath: /etc/flyte/config/*.yaml
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
