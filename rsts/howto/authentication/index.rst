@@ -146,7 +146,7 @@ Follow the inline comments to make the necessary changes:
     userAuth:
       openId:
         # 3. Put the URL of the OpenID Connect provider.
-        #    baseUrl: https://accounts.google.com/ # Uncomment for Google
+        #    baseUrl: https://accounts.google.com # Uncomment for Google
         baseUrl: https://dev-14186422.okta.com/oauth2/default # Okta with a custom Authorization Server
         scopes:
           - profile
