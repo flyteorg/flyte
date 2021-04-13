@@ -1,8 +1,8 @@
 .. _howto_authentication:
 
-#############################
-How to setup Authentication?
-#############################
+############################
+How to Set Up Authentication
+############################
 
 Flyte Admin ships with a canonical implementation of OAuth2, integrating seamlessly into an organization's existing identity provider.  At Lyft, we use Okta as the IDP, but if you have issues integrating with another implementation of the OAuth server, please open an issue.
 
@@ -14,13 +14,15 @@ While the most obvious interaction with the Flyte control plane is through the w
 
 Flyte CLI
 =========
-Principal amongst these is the Flyte CLI. This is the command-line entrypoint to Flyte Admin and is used by both administrators and users more comfortable in the command line, or are running in a headless OS.
+This is the primary component. Flyte CLI is the command-line entrypoint to Flyte Admin and is used by both administrators and users more comfortable in the command line, or are running in a headless OS.
 
 The IDP application corresponding to the CLI will need to support PKCE.
 
 Direct Client Access
 ====================
-The gRPC client provided by the Flyte IDL, or direct calls to the HTTP endpoints on Admin from within a running script are ways that we have seen users hit the control plane directly.  We generally discourage this behavior as it leads to a possible self-imposed DOS vector, as they are generally made from within a running workflow itself. For instance, a Flyte task can fetch the definition for a launch plan associated with a completely different workflow, and then launch an execution of it. This is not the correct way to launch one workflow from another but for the time being remains possible.
+The gRPC client provided by the Flyte IDL, or direct calls to the HTTP endpoints on Admin from within a running script are ways that we have seen users hit the control plane directly.  We generally discourage this course of action as it leads to a possible self-imposed DOS vector, which is generally made from within a running workflow itself. 
+
+For instance, a Flyte task can fetch the definition for a launch plan associated with a completely different workflow, and then launch an execution of it. This is not the correct way to launch one workflow from another but for the time being remains possible.
 
 *****************
 Swimlane Diagrams
@@ -80,8 +82,8 @@ Follow `Google Docs <https://developers.google.com/identity/protocols/oauth2/ope
 Okta OpenID Connect
 -------------------
 
-Okta supports OpenIDConnect protocol as well as allows the creation of custom OAuth2 Authorization Servers allowing it to act as both the user and apps IdP.
-It offers better fine grained control on access policies, users' consent, and app management.
+Okta supports OpenIDConnect protocol and the creation of custom OAuth2 Authorization Servers, allowing it to act as both the user and apps IdP.
+It offers more detailed control on access policies, users' consent, and app management.
 
 1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
 2. Create an app (choose Web for the platform) and OpenID Connect for the sign on method.
@@ -115,7 +117,7 @@ Save and close your editor.
 
   kubectl deploy -n flyte flyteadmin -o yaml | grep "name: flyte-admin-config"
 
-This will output the name of the config map where the `client_id` need to go.
+This will output the name of the config map where the `client_id` needs to go.
 
 .. prompt:: bash
 
@@ -152,7 +154,7 @@ Follow the inline comments to make the necessary changes:
           - profile
           - openid
           # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-        # 4. Replace with the client id created for Flyte.
+        # 4. Replace with the client ID created for Flyte.
         clientId: 0oakkheteNjCMERst5d6
         # 5. Replace with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/callback)
         callbackUrl: "http://localhost:8088/callback"
@@ -182,12 +184,12 @@ Okta IdP
 Apply Configurations
 --------------------
 
-It's possible to direct flyte admin to use an external authorization server, however. To do so, edit the same config map once more and follow these changes:
+It is possible to direct flyte admin to use an external authorization server. To do so, edit the same config map once more and follow these changes:
 
 .. code-block:: yaml
 
   auth:
-    # 1. Update with the public facing url of flyte admin (e.g. https://flyte.mycompany.io/)
+    # 1. Update with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/)
     httpPublicUri: http://localhost:8088/
     appAuth:
       # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
@@ -195,7 +197,7 @@ It's possible to direct flyte admin to use an external authorization server, how
       authServerType: External
       thirdPartyConfig:
         flyteClient:
-          # 2. Replace with a new native client id provisioned in the custom authorization server
+          # 2. Replace with a new native client ID provisioned in the custom authorization server
           clientId: flytectl
           redirectUri: https://localhost:53593/callback
           # 3. "all" is a required scope and must be configured in the custom authorization server
@@ -214,24 +216,26 @@ It's possible to direct flyte admin to use an external authorization server, how
         callbackUrl: "http://localhost:8088/callback"
         redirectUrl: "/api/v1/projects"
 
-******
-CI
-******
+***************************
+Continuous Integration - CI
+***************************
 
 If your organization does any automated registration, then you'll need to authenticate with the `basic authentication <https://tools.ietf.org/html/rfc2617>`_ flow (username and password effectively) as CI systems are generally not suitable OAuth resource owners. After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
 
-Flytekit configuration variables are automatically designed to look up values from relevant environment variables. To aid with continuous integration use-cases however, Flytekit configuration can also reference other environment variables.  For instance, if your CI system is not capable of setting custom environment variables like ``FLYTE_CREDENTIALS_CLIENT_SECRET`` but does set the necessary settings under a different variable, you may use ``export FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_ENV_VAR=OTHER_ENV_VARIABLE`` to redirect the lookup. A ``FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_FILE`` redirect is available as well, where the value should be the full path to the file containing the value for the configuration setting, in this case, the client secret. We found this redirect behavior necessary when setting up registration within our own CI pipelines.
+Flytekit configuration variables are automatically designed to look up values from relevant environment variables. However, to aid with continuous integration use-cases, Flytekit configuration can also reference other environment variables. 
 
-The following is a listing of the Flytekit configuration values we set in CI, along with a brief explanation where relevant.
+For instance, if your CI system is not capable of setting custom environment variables like ``FLYTE_CREDENTIALS_CLIENT_SECRET`` but does set the necessary settings under a different variable, you may use ``export FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_ENV_VAR=OTHER_ENV_VARIABLE`` to redirect the lookup. A ``FLYTE_CREDENTIALS_CLIENT_SECRET_FROM_FILE`` redirect is available as well, where the value should be the full path to the file containing the value for the configuration setting, in this case, the client secret. We found this redirect behavior necessary when setting up registration within our own CI pipelines.
+
+The following is a listing of the Flytekit configuration values we set in CI, along with a brief explanation.
 
 * ``FLYTE_CREDENTIALS_CLIENT_ID`` and ``FLYTE_CREDENTIALS_CLIENT_SECRET``
-  When using basic authentication, this is the username and password
+  When using basic authentication, this is the username and password.
 * ``export FLYTE_CREDENTIALS_AUTH_MODE=basic``
   This tells the SDK to use basic authentication. If not set, Flytekit will assume you want to use the standard OAuth based three-legged flow.
 * ``export FLYTE_CREDENTIALS_AUTHORIZATION_METADATA_KEY=text``
   At Lyft, we set this to conform to this `header config <https://github.com/flyteorg/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go#L53>`_ on the Admin side.
 * ``export FLYTE_CREDENTIALS_SCOPE=text``
-  When using basic authentication, you'll need to specify a scope to the IDP (instead of ``openid``, as that's only for OAuth). Set that here.
+  When using basic authentication, you'll need to specify a scope to the IDP (instead of ``openid``, which is only for OAuth). Set that here.
 * ``export FLYTE_PLATFORM_AUTH=True``
   Set this to force Flytekit to use authentication, even if not required by Admin. This is useful as you're rolling out the requirement.
 
