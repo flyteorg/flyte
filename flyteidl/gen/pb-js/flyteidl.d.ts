@@ -5434,6 +5434,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey */
             catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata dynamicWorkflow */
+            dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
         }
 
         /** Represents a TaskNodeMetadata. */
@@ -5450,6 +5453,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey. */
             public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata dynamicWorkflow. */
+            public dynamicWorkflow?: (flyteidl.event.IDynamicWorkflowNodeMetadata|null);
 
             /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
@@ -5478,6 +5484,64 @@ export namespace flyteidl {
 
             /**
              * Verifies a TaskNodeMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DynamicWorkflowNodeMetadata. */
+        interface IDynamicWorkflowNodeMetadata {
+
+            /** DynamicWorkflowNodeMetadata id */
+            id?: (flyteidl.core.IIdentifier|null);
+
+            /** DynamicWorkflowNodeMetadata compiledWorkflow */
+            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+        }
+
+        /** Represents a DynamicWorkflowNodeMetadata. */
+        class DynamicWorkflowNodeMetadata implements IDynamicWorkflowNodeMetadata {
+
+            /**
+             * Constructs a new DynamicWorkflowNodeMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IDynamicWorkflowNodeMetadata);
+
+            /** DynamicWorkflowNodeMetadata id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /** DynamicWorkflowNodeMetadata compiledWorkflow. */
+            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /**
+             * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DynamicWorkflowNodeMetadata instance
+             */
+            public static create(properties?: flyteidl.event.IDynamicWorkflowNodeMetadata): flyteidl.event.DynamicWorkflowNodeMetadata;
+
+            /**
+             * Encodes the specified DynamicWorkflowNodeMetadata message. Does not implicitly {@link flyteidl.event.DynamicWorkflowNodeMetadata.verify|verify} messages.
+             * @param message DynamicWorkflowNodeMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IDynamicWorkflowNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DynamicWorkflowNodeMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DynamicWorkflowNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.DynamicWorkflowNodeMetadata;
+
+            /**
+             * Verifies a DynamicWorkflowNodeMetadata message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -11055,6 +11119,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey */
             catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata dynamicWorkflow */
+            dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
         }
 
         /** Represents a TaskNodeMetadata. */
@@ -11071,6 +11138,9 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey. */
             public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** TaskNodeMetadata dynamicWorkflow. */
+            public dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
 
             /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
@@ -11099,6 +11169,64 @@ export namespace flyteidl {
 
             /**
              * Verifies a TaskNodeMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DynamicWorkflowNodeMetadata. */
+        interface IDynamicWorkflowNodeMetadata {
+
+            /** DynamicWorkflowNodeMetadata id */
+            id?: (flyteidl.core.IIdentifier|null);
+
+            /** DynamicWorkflowNodeMetadata compiledWorkflow */
+            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+        }
+
+        /** Represents a DynamicWorkflowNodeMetadata. */
+        class DynamicWorkflowNodeMetadata implements IDynamicWorkflowNodeMetadata {
+
+            /**
+             * Constructs a new DynamicWorkflowNodeMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IDynamicWorkflowNodeMetadata);
+
+            /** DynamicWorkflowNodeMetadata id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /** DynamicWorkflowNodeMetadata compiledWorkflow. */
+            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /**
+             * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DynamicWorkflowNodeMetadata instance
+             */
+            public static create(properties?: flyteidl.admin.IDynamicWorkflowNodeMetadata): flyteidl.admin.DynamicWorkflowNodeMetadata;
+
+            /**
+             * Encodes the specified DynamicWorkflowNodeMetadata message. Does not implicitly {@link flyteidl.admin.DynamicWorkflowNodeMetadata.verify|verify} messages.
+             * @param message DynamicWorkflowNodeMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IDynamicWorkflowNodeMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DynamicWorkflowNodeMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DynamicWorkflowNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DynamicWorkflowNodeMetadata;
+
+            /**
+             * Verifies a DynamicWorkflowNodeMetadata message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

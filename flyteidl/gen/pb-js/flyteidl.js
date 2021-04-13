@@ -13127,6 +13127,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface ITaskNodeMetadata
              * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] TaskNodeMetadata cacheStatus
              * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] TaskNodeMetadata catalogKey
+             * @property {flyteidl.event.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] TaskNodeMetadata dynamicWorkflow
              */
 
             /**
@@ -13161,6 +13162,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskNodeMetadata.prototype.catalogKey = null;
 
             /**
+             * TaskNodeMetadata dynamicWorkflow.
+             * @member {flyteidl.event.IDynamicWorkflowNodeMetadata|null|undefined} dynamicWorkflow
+             * @memberof flyteidl.event.TaskNodeMetadata
+             * @instance
+             */
+            TaskNodeMetadata.prototype.dynamicWorkflow = null;
+
+            /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
              * @function create
              * @memberof flyteidl.event.TaskNodeMetadata
@@ -13188,6 +13197,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.cacheStatus);
                 if (message.catalogKey != null && message.hasOwnProperty("catalogKey"))
                     $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
+                    $root.flyteidl.event.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -13214,6 +13225,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.catalogKey = $root.flyteidl.core.CatalogMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 16:
+                        message.dynamicWorkflow = $root.flyteidl.event.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -13251,10 +13265,146 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "catalogKey." + error;
                 }
+                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow")) {
+                    let error = $root.flyteidl.event.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
+                    if (error)
+                        return "dynamicWorkflow." + error;
+                }
                 return null;
             };
 
             return TaskNodeMetadata;
+        })();
+
+        event.DynamicWorkflowNodeMetadata = (function() {
+
+            /**
+             * Properties of a DynamicWorkflowNodeMetadata.
+             * @memberof flyteidl.event
+             * @interface IDynamicWorkflowNodeMetadata
+             * @property {flyteidl.core.IIdentifier|null} [id] DynamicWorkflowNodeMetadata id
+             * @property {flyteidl.core.ICompiledWorkflowClosure|null} [compiledWorkflow] DynamicWorkflowNodeMetadata compiledWorkflow
+             */
+
+            /**
+             * Constructs a new DynamicWorkflowNodeMetadata.
+             * @memberof flyteidl.event
+             * @classdesc Represents a DynamicWorkflowNodeMetadata.
+             * @implements IDynamicWorkflowNodeMetadata
+             * @constructor
+             * @param {flyteidl.event.IDynamicWorkflowNodeMetadata=} [properties] Properties to set
+             */
+            function DynamicWorkflowNodeMetadata(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * DynamicWorkflowNodeMetadata id.
+             * @member {flyteidl.core.IIdentifier|null|undefined} id
+             * @memberof flyteidl.event.DynamicWorkflowNodeMetadata
+             * @instance
+             */
+            DynamicWorkflowNodeMetadata.prototype.id = null;
+
+            /**
+             * DynamicWorkflowNodeMetadata compiledWorkflow.
+             * @member {flyteidl.core.ICompiledWorkflowClosure|null|undefined} compiledWorkflow
+             * @memberof flyteidl.event.DynamicWorkflowNodeMetadata
+             * @instance
+             */
+            DynamicWorkflowNodeMetadata.prototype.compiledWorkflow = null;
+
+            /**
+             * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.event.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {flyteidl.event.IDynamicWorkflowNodeMetadata=} [properties] Properties to set
+             * @returns {flyteidl.event.DynamicWorkflowNodeMetadata} DynamicWorkflowNodeMetadata instance
+             */
+            DynamicWorkflowNodeMetadata.create = function create(properties) {
+                return new DynamicWorkflowNodeMetadata(properties);
+            };
+
+            /**
+             * Encodes the specified DynamicWorkflowNodeMetadata message. Does not implicitly {@link flyteidl.event.DynamicWorkflowNodeMetadata.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.event.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {flyteidl.event.IDynamicWorkflowNodeMetadata} message DynamicWorkflowNodeMetadata message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            DynamicWorkflowNodeMetadata.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow"))
+                    $root.flyteidl.core.CompiledWorkflowClosure.encode(message.compiledWorkflow, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a DynamicWorkflowNodeMetadata message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.event.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.event.DynamicWorkflowNodeMetadata} DynamicWorkflowNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            DynamicWorkflowNodeMetadata.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.DynamicWorkflowNodeMetadata();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.compiledWorkflow = $root.flyteidl.core.CompiledWorkflowClosure.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a DynamicWorkflowNodeMetadata message.
+             * @function verify
+             * @memberof flyteidl.event.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            DynamicWorkflowNodeMetadata.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.Identifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow")) {
+                    let error = $root.flyteidl.core.CompiledWorkflowClosure.verify(message.compiledWorkflow);
+                    if (error)
+                        return "compiledWorkflow." + error;
+                }
+                return null;
+            };
+
+            return DynamicWorkflowNodeMetadata;
         })();
 
         event.ParentTaskExecutionMetadata = (function() {
@@ -26488,6 +26638,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface ITaskNodeMetadata
              * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] TaskNodeMetadata cacheStatus
              * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] TaskNodeMetadata catalogKey
+             * @property {flyteidl.admin.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] TaskNodeMetadata dynamicWorkflow
              */
 
             /**
@@ -26522,6 +26673,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskNodeMetadata.prototype.catalogKey = null;
 
             /**
+             * TaskNodeMetadata dynamicWorkflow.
+             * @member {flyteidl.admin.IDynamicWorkflowNodeMetadata|null|undefined} dynamicWorkflow
+             * @memberof flyteidl.admin.TaskNodeMetadata
+             * @instance
+             */
+            TaskNodeMetadata.prototype.dynamicWorkflow = null;
+
+            /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.TaskNodeMetadata
@@ -26549,6 +26708,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.cacheStatus);
                 if (message.catalogKey != null && message.hasOwnProperty("catalogKey"))
                     $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
+                    $root.flyteidl.admin.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -26575,6 +26736,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.catalogKey = $root.flyteidl.core.CatalogMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 16:
+                        message.dynamicWorkflow = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -26612,10 +26776,146 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "catalogKey." + error;
                 }
+                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow")) {
+                    let error = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
+                    if (error)
+                        return "dynamicWorkflow." + error;
+                }
                 return null;
             };
 
             return TaskNodeMetadata;
+        })();
+
+        admin.DynamicWorkflowNodeMetadata = (function() {
+
+            /**
+             * Properties of a DynamicWorkflowNodeMetadata.
+             * @memberof flyteidl.admin
+             * @interface IDynamicWorkflowNodeMetadata
+             * @property {flyteidl.core.IIdentifier|null} [id] DynamicWorkflowNodeMetadata id
+             * @property {flyteidl.core.ICompiledWorkflowClosure|null} [compiledWorkflow] DynamicWorkflowNodeMetadata compiledWorkflow
+             */
+
+            /**
+             * Constructs a new DynamicWorkflowNodeMetadata.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a DynamicWorkflowNodeMetadata.
+             * @implements IDynamicWorkflowNodeMetadata
+             * @constructor
+             * @param {flyteidl.admin.IDynamicWorkflowNodeMetadata=} [properties] Properties to set
+             */
+            function DynamicWorkflowNodeMetadata(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * DynamicWorkflowNodeMetadata id.
+             * @member {flyteidl.core.IIdentifier|null|undefined} id
+             * @memberof flyteidl.admin.DynamicWorkflowNodeMetadata
+             * @instance
+             */
+            DynamicWorkflowNodeMetadata.prototype.id = null;
+
+            /**
+             * DynamicWorkflowNodeMetadata compiledWorkflow.
+             * @member {flyteidl.core.ICompiledWorkflowClosure|null|undefined} compiledWorkflow
+             * @memberof flyteidl.admin.DynamicWorkflowNodeMetadata
+             * @instance
+             */
+            DynamicWorkflowNodeMetadata.prototype.compiledWorkflow = null;
+
+            /**
+             * Creates a new DynamicWorkflowNodeMetadata instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {flyteidl.admin.IDynamicWorkflowNodeMetadata=} [properties] Properties to set
+             * @returns {flyteidl.admin.DynamicWorkflowNodeMetadata} DynamicWorkflowNodeMetadata instance
+             */
+            DynamicWorkflowNodeMetadata.create = function create(properties) {
+                return new DynamicWorkflowNodeMetadata(properties);
+            };
+
+            /**
+             * Encodes the specified DynamicWorkflowNodeMetadata message. Does not implicitly {@link flyteidl.admin.DynamicWorkflowNodeMetadata.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {flyteidl.admin.IDynamicWorkflowNodeMetadata} message DynamicWorkflowNodeMetadata message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            DynamicWorkflowNodeMetadata.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.id != null && message.hasOwnProperty("id"))
+                    $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow"))
+                    $root.flyteidl.core.CompiledWorkflowClosure.encode(message.compiledWorkflow, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a DynamicWorkflowNodeMetadata message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.DynamicWorkflowNodeMetadata} DynamicWorkflowNodeMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            DynamicWorkflowNodeMetadata.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DynamicWorkflowNodeMetadata();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.compiledWorkflow = $root.flyteidl.core.CompiledWorkflowClosure.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a DynamicWorkflowNodeMetadata message.
+             * @function verify
+             * @memberof flyteidl.admin.DynamicWorkflowNodeMetadata
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            DynamicWorkflowNodeMetadata.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.id != null && message.hasOwnProperty("id")) {
+                    let error = $root.flyteidl.core.Identifier.verify(message.id);
+                    if (error)
+                        return "id." + error;
+                }
+                if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow")) {
+                    let error = $root.flyteidl.core.CompiledWorkflowClosure.verify(message.compiledWorkflow);
+                    if (error)
+                        return "compiledWorkflow." + error;
+                }
+                return null;
+            };
+
+            return DynamicWorkflowNodeMetadata;
         })();
 
         admin.NodeExecutionGetDataRequest = (function() {
