@@ -6115,6 +6115,20 @@
         }
       }
     },
+    "flyteidladminDynamicWorkflowNodeMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "description": "id represents the unique identifier of the workflow."
+        },
+        "compiled_workflow": {
+          "$ref": "#/definitions/coreCompiledWorkflowClosure",
+          "description": "Represents the compiled representation of the embedded dynamic workflow."
+        }
+      },
+      "description": "For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated."
+    },
     "flyteidladminNodeExecution": {
       "type": "object",
       "properties": {
@@ -6170,6 +6184,10 @@
         "catalog_key": {
           "$ref": "#/definitions/coreCatalogMetadata",
           "title": "This structure carries the catalog artifact information"
+        },
+        "dynamic_workflow": {
+          "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
+          "description": "In the case this task launched a dynamic workflow we capture its structure here."
         }
       },
       "title": "Metadata for the case in which the node is a TaskNode"
@@ -6195,6 +6213,20 @@
       },
       "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
     },
+    "flyteidleventDynamicWorkflowNodeMetadata": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "description": "id represents the unique identifier of the workflow."
+        },
+        "compiled_workflow": {
+          "$ref": "#/definitions/coreCompiledWorkflowClosure",
+          "description": "Represents the compiled representation of the embedded dynamic workflow."
+        }
+      },
+      "description": "For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated."
+    },
     "flyteidleventTaskNodeMetadata": {
       "type": "object",
       "properties": {
@@ -6205,6 +6237,10 @@
         "catalog_key": {
           "$ref": "#/definitions/coreCatalogMetadata",
           "title": "This structure carries the catalog artifact information"
+        },
+        "dynamic_workflow": {
+          "$ref": "#/definitions/flyteidleventDynamicWorkflowNodeMetadata",
+          "description": "In the case this task launched a dynamic workflow we capture its structure here."
         }
       }
     },
