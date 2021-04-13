@@ -1,14 +1,14 @@
 .. _howto_authentication:
 
-#######################################
+#############################
 How to setup Authentication?
-#######################################
+#############################
 
 Flyte Admin ships with a canonical implementation of OAuth2, integrating seamlessly into an organization's existing identity provider.  At Lyft, we use Okta as the IDP, but if you have issues integrating with another implementation of the OAuth server, please open an issue.
 
-***********************
+***********
 Components
-***********************
+***********
 
 While the most obvious interaction with the Flyte control plane is through the web based UI, there are other critical components of Flyte that also need to be considered. These components should be thought of as third-party services even though the Flyte codebase provides them.
 
@@ -18,11 +18,9 @@ Principal amongst these is the Flyte CLI. This is the command-line entrypoint to
 
 The IDP application corresponding to the CLI will need to support PKCE.
 
-
 Direct Client Access
 ====================
 The gRPC client provided by the Flyte IDL, or direct calls to the HTTP endpoints on Admin from within a running script are ways that we have seen users hit the control plane directly.  We generally discourage this behavior as it leads to a possible self-imposed DOS vector, as they are generally made from within a running workflow itself. For instance, a Flyte task can fetch the definition for a launch plan associated with a completely different workflow, and then launch an execution of it. This is not the correct way to launch one workflow from another but for the time being remains possible.
-
 
 *****************
 Swimlane Diagrams
@@ -59,35 +57,59 @@ Flyte Admin Configuration
 =========================
 Please refer to the `inline documentation <https://github.com/flyteorg/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go>`_ on the ``Config`` object in the ``auth`` package for a discussion on the settings required.
 
+***********************
 Example Configurations
-======================
+***********************
 
-Google IdP
-##########
+OpenID Connect
+===============
 
-1. Follow `Google Docs <https://developers.google.com/identity/protocols/oauth2/openid-connect>`__ on how to configure the IdP for OpenIDConnect.
+OpenID Connect allows users to authenticate to flyte in their browser using a familiar authentication provider (perhaps an organization-wide configured IdP).
+Flyte supports connecting with external OIdC providers. Here are some examples for how to set these up:
+
+Google OpenID Connect
+----------------------
+
+Follow `Google Docs <https://developers.google.com/identity/protocols/oauth2/openid-connect>`__ on how to configure the IdP for OpenIDConnect.
 
 .. note::
 
   Make sure to create an OAuth2 Client Credential. The `client_id` and `client_secret` will be needed in the following
   steps.
 
-2. Store the `client_secret` in a k8s secrt as follows:
+Okta OpenID Connect
+-------------------
+
+Okta supports OpenIDConnect protocol as well as allows the creation of custom OAuth2 Authorization Servers allowing it to act as both the user and apps IdP.
+It offers better fine grained control on access policies, users' consent, and app management.
+
+1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
+2. Create an app (choose Web for the platform) and OpenID Connect for the sign on method.
+3. Add Login redirect URIs (e.g. http://localhost:30081/callback for sandbox or https://<your deployment url>/callback)
+4. OPTIONAL: Add logout redirect URIs (e.g. http://localhost:30081/logout for sandbox)
+5. Note down the Client ID and Client Secret
+
+Apply configuration
+===================
+
+1. Store the `client_secret` in a k8s secrt as follows:
 
 .. prompt:: bash
 
   kubectl edit secret -n flyte flyte-admin-auth
 
-Add a new key under `data`:
+Add a new key under `stringData`:
 
 .. code-block:: yaml
 
   stringData:
     oidc_client_secret: <client_secret> from the previous step
+  data:
+    ...
 
 Save and close your editor.
 
-3. Edit FlyteAdmin config to add `client_id` as follows:
+2. Edit FlyteAdmin config to add `client_id`, `client_secret` and configure auth as follows:
 
 .. prompt:: bash
 
@@ -99,25 +121,98 @@ This will output the name of the config map where the `client_id` need to go.
 
   kubectl edit configmap -n flyte <the name of the config map from previous command>
 
-Find `client_id` and replace with the copied `client_id`
+Follow the inline comments to make the necessary changes:
 
 .. code-block:: yaml
 
-  clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
-
-Find `useAuth` and enable Auth enforcement:
-
-.. code-block:: yaml
-
-  useAuth: true
+  server:
+    httpPort: 8088
+    grpcPort: 8089
+    grpcServerReflection: true
+    kube-config: /Users/haythamabuelfutuh/.kube/config
+    security:
+      secure: false
+      # 1. Enable Auth by turning this to true
+      useAuth: true
+      allowCors: true
+      allowedOrigins:
+        # Accepting all domains for Sandbox installation
+        - "*"
+      allowedHeaders:
+        - "Content-Type"
+  auth:
+    # 2. Update with the public facing url of flyte admin (e.g. https://flyte.mycompany.io/)
+    httpPublicUri: http://localhost:8088/
+    userAuth:
+      openId:
+        # 3. Put the URL of the OpenID Connect provider.
+        #    baseUrl: https://accounts.google.com/ # Uncomment for Google
+        baseUrl: https://dev-14186422.okta.com/oauth2/default # Okta with a custom Authorization Server
+        scopes:
+          - profile
+          - openid
+          # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+        # 4. Replace with the client id created for Flyte.
+        clientId: 0oakkheteNjCMERst5d6
+        # 5. Replace with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/callback)
+        callbackUrl: "http://localhost:8088/callback"
+        # 6. Replace with the flyte console's URL (e.g. https://flyte.mycompany.io/console) 
+        redirectUrl: "/api/v1/projects"
 
 Save and exit your editor.
 
-4. Restart `flyteadmin` for the changes to take effect:
+3. Restart `flyteadmin` for the changes to take effect:
 
 .. prompt:: bash
 
   kubectl rollout restart deployment/flyteadmin -n flyte
+
+OAuth2 Authorization Server
+===========================
+
+Flyte Admin comes with a built-in authorization server that can be statically configured with a set of clients to request and act on behalf of the user.
+
+Okta IdP
+--------
+
+1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of flyte admin (e.g. https://flyte.mycompany.io/).
+2. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server.
+3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
+
+Apply Configurations
+--------------------
+
+It's possible to direct flyte admin to use an external authorization server, however. To do so, edit the same config map once more and follow these changes:
+
+.. code-block:: yaml
+
+  auth:
+    # 1. Update with the public facing url of flyte admin (e.g. https://flyte.mycompany.io/)
+    httpPublicUri: http://localhost:8088/
+    appAuth:
+      # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
+      #    Choose Self (or omit the value) to use Flyte Admin's internal (albeit limited) Authorization Server.
+      authServerType: External
+      thirdPartyConfig:
+        flyteClient:
+          # 2. Replace with a new native client id provisioned in the custom authorization server
+          clientId: flytectl
+          redirectUri: https://localhost:53593/callback
+          # 3. "all" is a required scope and must be configured in the custom authorization server
+          scopes:
+            - offline
+            - all
+    userAuth:
+      openId:
+        # 4. Use the URL of your custom authorization server created above:
+        baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
+        scopes:
+          - profile
+          - openid
+          # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+        clientId: 0oakkheteNjCMERst5d6
+        callbackUrl: "http://localhost:8088/callback"
+        redirectUrl: "/api/v1/projects"
 
 ******
 CI
