@@ -5,8 +5,11 @@ from flyteidl.datacatalog import datacatalog_pb2 as flyteidl_dot_datacatalog_dot
 
 
 class DataCatalogStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """
+  Data Catalog service definition
+  Data Catalog is a service for indexing parameterized, strongly-typed data artifacts across revisions.
+  Artifacts are associated with a Dataset, and can be tagged for retrieval.
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -52,54 +55,59 @@ class DataCatalogStub(object):
 
 
 class DataCatalogServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+  """
+  Data Catalog service definition
+  Data Catalog is a service for indexing parameterized, strongly-typed data artifacts across revisions.
+  Artifacts are associated with a Dataset, and can be tagged for retrieval.
+  """
 
   def CreateDataset(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Create a new Dataset. Datasets are unique based on the DatasetID. Datasets are logical groupings of artifacts.
+    Each dataset can have one or more artifacts
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetDataset(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Get a Dataset by the DatasetID. This returns the Dataset with the associated metadata.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def CreateArtifact(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Create an artifact and the artifact data associated with it. An artifact can be a hive partition or arbitrary
+    files or data values
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def GetArtifact(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def AddTag(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Associate a tag with an artifact. Tags are unique within a Dataset.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListArtifacts(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Return a paginated list of artifacts
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
   def ListDatasets(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+    """Return a paginated list of datasets
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')

@@ -39,6 +39,10 @@ class ServerContext;
 
 namespace datacatalog {
 
+//
+// Data Catalog service definition
+// Data Catalog is a service for indexing parameterized, strongly-typed data artifacts across revisions.
+// Artifacts are associated with a Dataset, and can be tagged for retrieval.
 class DataCatalog final {
  public:
   static constexpr char const* service_full_name() {
@@ -47,6 +51,8 @@ class DataCatalog final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
+    // Create a new Dataset. Datasets are unique based on the DatasetID. Datasets are logical groupings of artifacts.
+    // Each dataset can have one or more artifacts
     virtual ::grpc::Status CreateDataset(::grpc::ClientContext* context, const ::datacatalog::CreateDatasetRequest& request, ::datacatalog::CreateDatasetResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateDatasetResponse>> AsyncCreateDataset(::grpc::ClientContext* context, const ::datacatalog::CreateDatasetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateDatasetResponse>>(AsyncCreateDatasetRaw(context, request, cq));
@@ -54,6 +60,7 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateDatasetResponse>> PrepareAsyncCreateDataset(::grpc::ClientContext* context, const ::datacatalog::CreateDatasetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateDatasetResponse>>(PrepareAsyncCreateDatasetRaw(context, request, cq));
     }
+    // Get a Dataset by the DatasetID. This returns the Dataset with the associated metadata.
     virtual ::grpc::Status GetDataset(::grpc::ClientContext* context, const ::datacatalog::GetDatasetRequest& request, ::datacatalog::GetDatasetResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetDatasetResponse>> AsyncGetDataset(::grpc::ClientContext* context, const ::datacatalog::GetDatasetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetDatasetResponse>>(AsyncGetDatasetRaw(context, request, cq));
@@ -61,6 +68,8 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetDatasetResponse>> PrepareAsyncGetDataset(::grpc::ClientContext* context, const ::datacatalog::GetDatasetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetDatasetResponse>>(PrepareAsyncGetDatasetRaw(context, request, cq));
     }
+    // Create an artifact and the artifact data associated with it. An artifact can be a hive partition or arbitrary
+    // files or data values
     virtual ::grpc::Status CreateArtifact(::grpc::ClientContext* context, const ::datacatalog::CreateArtifactRequest& request, ::datacatalog::CreateArtifactResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateArtifactResponse>> AsyncCreateArtifact(::grpc::ClientContext* context, const ::datacatalog::CreateArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateArtifactResponse>>(AsyncCreateArtifactRaw(context, request, cq));
@@ -68,6 +77,7 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateArtifactResponse>> PrepareAsyncCreateArtifact(::grpc::ClientContext* context, const ::datacatalog::CreateArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::CreateArtifactResponse>>(PrepareAsyncCreateArtifactRaw(context, request, cq));
     }
+    // Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
     virtual ::grpc::Status GetArtifact(::grpc::ClientContext* context, const ::datacatalog::GetArtifactRequest& request, ::datacatalog::GetArtifactResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetArtifactResponse>> AsyncGetArtifact(::grpc::ClientContext* context, const ::datacatalog::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetArtifactResponse>>(AsyncGetArtifactRaw(context, request, cq));
@@ -75,6 +85,7 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetArtifactResponse>> PrepareAsyncGetArtifact(::grpc::ClientContext* context, const ::datacatalog::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::GetArtifactResponse>>(PrepareAsyncGetArtifactRaw(context, request, cq));
     }
+    // Associate a tag with an artifact. Tags are unique within a Dataset.
     virtual ::grpc::Status AddTag(::grpc::ClientContext* context, const ::datacatalog::AddTagRequest& request, ::datacatalog::AddTagResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::AddTagResponse>> AsyncAddTag(::grpc::ClientContext* context, const ::datacatalog::AddTagRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::AddTagResponse>>(AsyncAddTagRaw(context, request, cq));
@@ -82,6 +93,7 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::AddTagResponse>> PrepareAsyncAddTag(::grpc::ClientContext* context, const ::datacatalog::AddTagRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::AddTagResponse>>(PrepareAsyncAddTagRaw(context, request, cq));
     }
+    // Return a paginated list of artifacts
     virtual ::grpc::Status ListArtifacts(::grpc::ClientContext* context, const ::datacatalog::ListArtifactsRequest& request, ::datacatalog::ListArtifactsResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ListArtifactsResponse>> AsyncListArtifacts(::grpc::ClientContext* context, const ::datacatalog::ListArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ListArtifactsResponse>>(AsyncListArtifactsRaw(context, request, cq));
@@ -89,6 +101,7 @@ class DataCatalog final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ListArtifactsResponse>> PrepareAsyncListArtifacts(::grpc::ClientContext* context, const ::datacatalog::ListArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ListArtifactsResponse>>(PrepareAsyncListArtifactsRaw(context, request, cq));
     }
+    // Return a paginated list of datasets
     virtual ::grpc::Status ListDatasets(::grpc::ClientContext* context, const ::datacatalog::ListDatasetsRequest& request, ::datacatalog::ListDatasetsResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ListDatasetsResponse>> AsyncListDatasets(::grpc::ClientContext* context, const ::datacatalog::ListDatasetsRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::datacatalog::ListDatasetsResponse>>(AsyncListDatasetsRaw(context, request, cq));
@@ -99,30 +112,39 @@ class DataCatalog final {
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
+      // Create a new Dataset. Datasets are unique based on the DatasetID. Datasets are logical groupings of artifacts.
+      // Each dataset can have one or more artifacts
       virtual void CreateDataset(::grpc::ClientContext* context, const ::datacatalog::CreateDatasetRequest* request, ::datacatalog::CreateDatasetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateDataset(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::CreateDatasetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateDataset(::grpc::ClientContext* context, const ::datacatalog::CreateDatasetRequest* request, ::datacatalog::CreateDatasetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateDataset(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::CreateDatasetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Get a Dataset by the DatasetID. This returns the Dataset with the associated metadata.
       virtual void GetDataset(::grpc::ClientContext* context, const ::datacatalog::GetDatasetRequest* request, ::datacatalog::GetDatasetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetDataset(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetDatasetResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetDataset(::grpc::ClientContext* context, const ::datacatalog::GetDatasetRequest* request, ::datacatalog::GetDatasetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetDataset(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetDatasetResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Create an artifact and the artifact data associated with it. An artifact can be a hive partition or arbitrary
+      // files or data values
       virtual void CreateArtifact(::grpc::ClientContext* context, const ::datacatalog::CreateArtifactRequest* request, ::datacatalog::CreateArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::CreateArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateArtifact(::grpc::ClientContext* context, const ::datacatalog::CreateArtifactRequest* request, ::datacatalog::CreateArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::CreateArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
       virtual void GetArtifact(::grpc::ClientContext* context, const ::datacatalog::GetArtifactRequest* request, ::datacatalog::GetArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::datacatalog::GetArtifactRequest* request, ::datacatalog::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Associate a tag with an artifact. Tags are unique within a Dataset.
       virtual void AddTag(::grpc::ClientContext* context, const ::datacatalog::AddTagRequest* request, ::datacatalog::AddTagResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void AddTag(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::AddTagResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void AddTag(::grpc::ClientContext* context, const ::datacatalog::AddTagRequest* request, ::datacatalog::AddTagResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void AddTag(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::AddTagResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Return a paginated list of artifacts
       virtual void ListArtifacts(::grpc::ClientContext* context, const ::datacatalog::ListArtifactsRequest* request, ::datacatalog::ListArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ListArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListArtifacts(::grpc::ClientContext* context, const ::datacatalog::ListArtifactsRequest* request, ::datacatalog::ListArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void ListArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ListArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Return a paginated list of datasets
       virtual void ListDatasets(::grpc::ClientContext* context, const ::datacatalog::ListDatasetsRequest* request, ::datacatalog::ListDatasetsResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListDatasets(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::datacatalog::ListDatasetsResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListDatasets(::grpc::ClientContext* context, const ::datacatalog::ListDatasetsRequest* request, ::datacatalog::ListDatasetsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -267,12 +289,21 @@ class DataCatalog final {
    public:
     Service();
     virtual ~Service();
+    // Create a new Dataset. Datasets are unique based on the DatasetID. Datasets are logical groupings of artifacts.
+    // Each dataset can have one or more artifacts
     virtual ::grpc::Status CreateDataset(::grpc::ServerContext* context, const ::datacatalog::CreateDatasetRequest* request, ::datacatalog::CreateDatasetResponse* response);
+    // Get a Dataset by the DatasetID. This returns the Dataset with the associated metadata.
     virtual ::grpc::Status GetDataset(::grpc::ServerContext* context, const ::datacatalog::GetDatasetRequest* request, ::datacatalog::GetDatasetResponse* response);
+    // Create an artifact and the artifact data associated with it. An artifact can be a hive partition or arbitrary
+    // files or data values
     virtual ::grpc::Status CreateArtifact(::grpc::ServerContext* context, const ::datacatalog::CreateArtifactRequest* request, ::datacatalog::CreateArtifactResponse* response);
+    // Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
     virtual ::grpc::Status GetArtifact(::grpc::ServerContext* context, const ::datacatalog::GetArtifactRequest* request, ::datacatalog::GetArtifactResponse* response);
+    // Associate a tag with an artifact. Tags are unique within a Dataset.
     virtual ::grpc::Status AddTag(::grpc::ServerContext* context, const ::datacatalog::AddTagRequest* request, ::datacatalog::AddTagResponse* response);
+    // Return a paginated list of artifacts
     virtual ::grpc::Status ListArtifacts(::grpc::ServerContext* context, const ::datacatalog::ListArtifactsRequest* request, ::datacatalog::ListArtifactsResponse* response);
+    // Return a paginated list of datasets
     virtual ::grpc::Status ListDatasets(::grpc::ServerContext* context, const ::datacatalog::ListDatasetsRequest* request, ::datacatalog::ListDatasetsResponse* response);
   };
   template <class BaseClass>

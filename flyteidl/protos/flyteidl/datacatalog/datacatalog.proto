@@ -5,32 +5,71 @@ package datacatalog;
 import "flyteidl/core/literals.proto";
 import "google/protobuf/timestamp.proto";
 
+/*
+ * Data Catalog service definition
+ * Data Catalog is a service for indexing parameterized, strongly-typed data artifacts across revisions.
+ * Artifacts are associated with a Dataset, and can be tagged for retrieval.
+ */
 service DataCatalog {
+    // Create a new Dataset. Datasets are unique based on the DatasetID. Datasets are logical groupings of artifacts.
+    // Each dataset can have one or more artifacts
     rpc CreateDataset (CreateDatasetRequest) returns (CreateDatasetResponse);
+
+    // Get a Dataset by the DatasetID. This returns the Dataset with the associated metadata.
     rpc GetDataset (GetDatasetRequest) returns (GetDatasetResponse);
+
+    // Create an artifact and the artifact data associated with it. An artifact can be a hive partition or arbitrary
+    // files or data values
     rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse);
+
+    // Retrieve an artifact by an identifying handle. This returns an artifact along with the artifact data.
     rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse);
+
+    // Associate a tag with an artifact. Tags are unique within a Dataset.
     rpc AddTag (AddTagRequest) returns (AddTagResponse);
+
+    // Return a paginated list of artifacts
     rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse);
+
+    // Return a paginated list of datasets
     rpc ListDatasets (ListDatasetsRequest) returns (ListDatasetsResponse);
 }
 
+/*
+ * Request message for creating a Dataset.
+ */
 message CreateDatasetRequest {
     Dataset dataset = 1;
 }
 
+/*
+ * Response message for creating a Dataset
+ */
 message CreateDatasetResponse {
 
 }
 
+/*
+ * Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
+ * which is a combination of several fields.
+ */
 message GetDatasetRequest {
     DatasetID dataset = 1;
 }
 
+/*
+ * Response message for retrieving a Dataset. The response will include the metadata for the
+ * Dataset.
+ */
 message GetDatasetResponse {
     Dataset dataset = 1;
 }
 
+/*
+ * Request message for retrieving an Artifact. Retrieve an artifact based on a query handle that
+ * can be one of artifact_id or tag. The result returned will include the artifact data and metadata
+ * associated with the artifact.
+ */
 message GetArtifactRequest {
     DatasetID dataset = 1;
 
@@ -40,29 +79,47 @@ message GetArtifactRequest {
     }
 }
 
+/*
+ * Response message for retrieving an Artifact. The result returned will include the artifact data
+ * and metadata associated with the artifact.
+ */
 message GetArtifactResponse {
     Artifact artifact = 1;
 }
 
+/*
+ * Request message for creating an Artifact and its associated artifact Data.
+ */
 message CreateArtifactRequest {
     Artifact artifact = 1;
 }
 
+/*
+ * Response message for creating an Artifact.
+ */
 message CreateArtifactResponse {
 
 }
 
+/*
+ * Request message for tagging an Artifact.
+ */
 message AddTagRequest {
     Tag tag = 1;
 }
 
+/*
+ * Response message for tagging an Artifact.
+ */
 message AddTagResponse {
 
 }
 
-// List the artifacts that belong to the Dataset
+// List the artifacts that belong to the Dataset, optionally filtered using filtered expression.
 message ListArtifactsRequest {
+    // Use a datasetID for which you want to retrieve the artifacts
     DatasetID dataset = 1;
+
     // Apply the filter expression to this query
     FilterExpression filter = 2;
     // Pagination options to get a page of artifacts
@@ -93,17 +150,26 @@ message ListDatasetsResponse {
     string next_token = 2;
 }
 
+/*
+ * Dataset message. It is uniquely identified by DatasetID.
+ */
 message Dataset {
     DatasetID id = 1;
     Metadata metadata = 2;
     repeated string partitionKeys = 3;
 }
 
+/*
+ * An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
+ */
 message Partition {
     string key = 1;
     string value = 2;
 }
 
+/*
+ * DatasetID message that is composed of several string fields.
+ */
 message DatasetID {
     string project = 1;  // The name of the project
     string name = 2;     // The name of the dataset
@@ -112,27 +178,40 @@ message DatasetID {
     string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
 }
 
+/*
+ * Artifact message. It is composed of several string fields.
+ */
 message Artifact {
-    string id = 1;
-    DatasetID dataset = 2;
-    repeated ArtifactData data = 3;
-    Metadata metadata = 4;
+    string id = 1; // The unique ID of the artifact
+    DatasetID dataset = 2; // The Dataset that the artifact belongs to
+    repeated ArtifactData data = 3; // A list of data that is associated with the artifact
+    Metadata metadata = 4; // Free-form metadata associated with the artifact
     repeated Partition partitions = 5;
     repeated Tag tags = 6;
     google.protobuf.Timestamp created_at = 7; // creation timestamp of artifact, autogenerated by service
 }
 
+/*
+ * ArtifactData that belongs to an artifact
+ */
 message ArtifactData {
     string name = 1;
     flyteidl.core.Literal value = 2;
 }
 
+/*
+ * Tag message that is unique to a Dataset. It is associated to a single artifact and
+ * can be retrieved by name later.
+ */
 message Tag {
-    string name = 1;
-    string artifact_id = 2;
-    DatasetID dataset = 3;
+    string name = 1;        // Name of tag
+    string artifact_id = 2; // The tagged artifact
+    DatasetID dataset = 3;  // The Dataset that this tag belongs to
 }
 
+/*
+ * Metadata representation for artifacts and datasets
+ */
 message Metadata {
     map<string, string> key_map = 1; // key map is a dictionary of key/val strings that represent metadata
 }
