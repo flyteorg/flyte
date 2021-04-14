@@ -32,6 +32,10 @@ public final class Datacatalog {
     datacatalog.Datacatalog.DatasetOrBuilder getDatasetOrBuilder();
   }
   /**
+   * <pre>
+   * Request message for creating a Dataset.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.CreateDatasetRequest}
    */
   public  static final class CreateDatasetRequest extends
@@ -297,6 +301,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Request message for creating a Dataset.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.CreateDatasetRequest}
      */
     public static final class Builder extends
@@ -625,6 +633,10 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
   }
   /**
+   * <pre>
+   * Response message for creating a Dataset
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.CreateDatasetResponse}
    */
   public  static final class CreateDatasetResponse extends
@@ -839,6 +851,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Response message for creating a Dataset
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.CreateDatasetResponse}
      */
     public static final class Builder extends
@@ -1049,6 +1065,11 @@ public final class Datacatalog {
     datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder();
   }
   /**
+   * <pre>
+   * Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
+   * which is a combination of several fields.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.GetDatasetRequest}
    */
   public  static final class GetDatasetRequest extends
@@ -1314,6 +1335,11 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
+     * which is a combination of several fields.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.GetDatasetRequest}
      */
     public static final class Builder extends
@@ -1655,6 +1681,11 @@ public final class Datacatalog {
     datacatalog.Datacatalog.DatasetOrBuilder getDatasetOrBuilder();
   }
   /**
+   * <pre>
+   * Response message for retrieving a Dataset. The response will include the metadata for the
+   * Dataset.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.GetDatasetResponse}
    */
   public  static final class GetDatasetResponse extends
@@ -1920,6 +1951,11 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Response message for retrieving a Dataset. The response will include the metadata for the
+     * Dataset.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.GetDatasetResponse}
      */
     public static final class Builder extends
@@ -2283,6 +2319,12 @@ public final class Datacatalog {
     public datacatalog.Datacatalog.GetArtifactRequest.QueryHandleCase getQueryHandleCase();
   }
   /**
+   * <pre>
+   * Request message for retrieving an Artifact. Retrieve an artifact based on a query handle that
+   * can be one of artifact_id or tag. The result returned will include the artifact data and metadata
+   * associated with the artifact.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.GetArtifactRequest}
    */
   public  static final class GetArtifactRequest extends
@@ -2721,6 +2763,12 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Request message for retrieving an Artifact. Retrieve an artifact based on a query handle that
+     * can be one of artifact_id or tag. The result returned will include the artifact data and metadata
+     * associated with the artifact.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.GetArtifactRequest}
      */
     public static final class Builder extends
@@ -3263,6 +3311,11 @@ public final class Datacatalog {
     datacatalog.Datacatalog.ArtifactOrBuilder getArtifactOrBuilder();
   }
   /**
+   * <pre>
+   * Response message for retrieving an Artifact. The result returned will include the artifact data
+   * and metadata associated with the artifact.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.GetArtifactResponse}
    */
   public  static final class GetArtifactResponse extends
@@ -3528,6 +3581,11 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Response message for retrieving an Artifact. The result returned will include the artifact data
+     * and metadata associated with the artifact.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.GetArtifactResponse}
      */
     public static final class Builder extends
@@ -3869,6 +3927,10 @@ public final class Datacatalog {
     datacatalog.Datacatalog.ArtifactOrBuilder getArtifactOrBuilder();
   }
   /**
+   * <pre>
+   * Request message for creating an Artifact and its associated artifact Data.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.CreateArtifactRequest}
    */
   public  static final class CreateArtifactRequest extends
@@ -4134,6 +4196,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Request message for creating an Artifact and its associated artifact Data.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.CreateArtifactRequest}
      */
     public static final class Builder extends
@@ -4462,6 +4528,10 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
   }
   /**
+   * <pre>
+   * Response message for creating an Artifact.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.CreateArtifactResponse}
    */
   public  static final class CreateArtifactResponse extends
@@ -4676,6 +4746,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Response message for creating an Artifact.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.CreateArtifactResponse}
      */
     public static final class Builder extends
@@ -4886,6 +4960,10 @@ public final class Datacatalog {
     datacatalog.Datacatalog.TagOrBuilder getTagOrBuilder();
   }
   /**
+   * <pre>
+   * Request message for tagging an Artifact.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.AddTagRequest}
    */
   public  static final class AddTagRequest extends
@@ -5151,6 +5229,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Request message for tagging an Artifact.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.AddTagRequest}
      */
     public static final class Builder extends
@@ -5479,6 +5561,10 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
   }
   /**
+   * <pre>
+   * Response message for tagging an Artifact.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.AddTagResponse}
    */
   public  static final class AddTagResponse extends
@@ -5693,6 +5779,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Response message for tagging an Artifact.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.AddTagResponse}
      */
     public static final class Builder extends
@@ -5890,14 +5980,26 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Use a datasetID for which you want to retrieve the artifacts
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 1;</code>
      */
     boolean hasDataset();
     /**
+     * <pre>
+     * Use a datasetID for which you want to retrieve the artifacts
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 1;</code>
      */
     datacatalog.Datacatalog.DatasetID getDataset();
     /**
+     * <pre>
+     * Use a datasetID for which you want to retrieve the artifacts
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 1;</code>
      */
     datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder();
@@ -5954,7 +6056,7 @@ public final class Datacatalog {
   }
   /**
    * <pre>
-   * List the artifacts that belong to the Dataset
+   * List the artifacts that belong to the Dataset, optionally filtered using filtered expression.
    * </pre>
    *
    * Protobuf type {@code datacatalog.ListArtifactsRequest}
@@ -6069,18 +6171,30 @@ public final class Datacatalog {
     public static final int DATASET_FIELD_NUMBER = 1;
     private datacatalog.Datacatalog.DatasetID dataset_;
     /**
+     * <pre>
+     * Use a datasetID for which you want to retrieve the artifacts
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 1;</code>
      */
     public boolean hasDataset() {
       return dataset_ != null;
     }
     /**
+     * <pre>
+     * Use a datasetID for which you want to retrieve the artifacts
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 1;</code>
      */
     public datacatalog.Datacatalog.DatasetID getDataset() {
       return dataset_ == null ? datacatalog.Datacatalog.DatasetID.getDefaultInstance() : dataset_;
     }
     /**
+     * <pre>
+     * Use a datasetID for which you want to retrieve the artifacts
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 1;</code>
      */
     public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder() {
@@ -6347,7 +6461,7 @@ public final class Datacatalog {
     }
     /**
      * <pre>
-     * List the artifacts that belong to the Dataset
+     * List the artifacts that belong to the Dataset, optionally filtered using filtered expression.
      * </pre>
      *
      * Protobuf type {@code datacatalog.ListArtifactsRequest}
@@ -6536,12 +6650,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.DatasetID, datacatalog.Datacatalog.DatasetID.Builder, datacatalog.Datacatalog.DatasetIDOrBuilder> datasetBuilder_;
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public boolean hasDataset() {
         return datasetBuilder_ != null || dataset_ != null;
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public datacatalog.Datacatalog.DatasetID getDataset() {
@@ -6552,6 +6674,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public Builder setDataset(datacatalog.Datacatalog.DatasetID value) {
@@ -6568,6 +6694,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public Builder setDataset(
@@ -6582,6 +6712,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public Builder mergeDataset(datacatalog.Datacatalog.DatasetID value) {
@@ -6600,6 +6734,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public Builder clearDataset() {
@@ -6614,6 +6752,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public datacatalog.Datacatalog.DatasetID.Builder getDatasetBuilder() {
@@ -6622,6 +6764,10 @@ public final class Datacatalog {
         return getDatasetFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder() {
@@ -6633,6 +6779,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Use a datasetID for which you want to retrieve the artifacts
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -10139,6 +10289,10 @@ public final class Datacatalog {
         getPartitionKeysBytes(int index);
   }
   /**
+   * <pre>
+   * Dataset message. It is uniquely identified by DatasetID.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.Dataset}
    */
   public  static final class Dataset extends
@@ -10514,6 +10668,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Dataset message. It is uniquely identified by DatasetID.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.Dataset}
      */
     public static final class Builder extends
@@ -11108,6 +11266,10 @@ public final class Datacatalog {
         getValueBytes();
   }
   /**
+   * <pre>
+   * An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.Partition}
    */
   public  static final class Partition extends
@@ -11425,6 +11587,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.Partition}
      */
     public static final class Builder extends
@@ -11864,6 +12030,10 @@ public final class Datacatalog {
         getUUIDBytes();
   }
   /**
+   * <pre>
+   * DatasetID message that is composed of several string fields.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.DatasetID}
    */
   public  static final class DatasetID extends
@@ -12374,6 +12544,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * DatasetID message that is composed of several string fields.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.DatasetID}
      */
     public static final class Builder extends
@@ -13051,61 +13225,113 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * The unique ID of the artifact
+     * </pre>
+     *
      * <code>string id = 1;</code>
      */
     java.lang.String getId();
     /**
+     * <pre>
+     * The unique ID of the artifact
+     * </pre>
+     *
      * <code>string id = 1;</code>
      */
     com.google.protobuf.ByteString
         getIdBytes();
 
     /**
+     * <pre>
+     * The Dataset that the artifact belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 2;</code>
      */
     boolean hasDataset();
     /**
+     * <pre>
+     * The Dataset that the artifact belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 2;</code>
      */
     datacatalog.Datacatalog.DatasetID getDataset();
     /**
+     * <pre>
+     * The Dataset that the artifact belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 2;</code>
      */
     datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder();
 
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     java.util.List<datacatalog.Datacatalog.ArtifactData> 
         getDataList();
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     datacatalog.Datacatalog.ArtifactData getData(int index);
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     int getDataCount();
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     java.util.List<? extends datacatalog.Datacatalog.ArtifactDataOrBuilder> 
         getDataOrBuilderList();
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     datacatalog.Datacatalog.ArtifactDataOrBuilder getDataOrBuilder(
         int index);
 
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 4;</code>
      */
     boolean hasMetadata();
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 4;</code>
      */
     datacatalog.Datacatalog.Metadata getMetadata();
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 4;</code>
      */
     datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder();
@@ -13184,6 +13410,10 @@ public final class Datacatalog {
     com.google.protobuf.TimestampOrBuilder getCreatedAtOrBuilder();
   }
   /**
+   * <pre>
+   * Artifact message. It is composed of several string fields.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.Artifact}
    */
   public  static final class Artifact extends
@@ -13343,6 +13573,10 @@ public final class Datacatalog {
     public static final int ID_FIELD_NUMBER = 1;
     private volatile java.lang.Object id_;
     /**
+     * <pre>
+     * The unique ID of the artifact
+     * </pre>
+     *
      * <code>string id = 1;</code>
      */
     public java.lang.String getId() {
@@ -13358,6 +13592,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * The unique ID of the artifact
+     * </pre>
+     *
      * <code>string id = 1;</code>
      */
     public com.google.protobuf.ByteString
@@ -13377,18 +13615,30 @@ public final class Datacatalog {
     public static final int DATASET_FIELD_NUMBER = 2;
     private datacatalog.Datacatalog.DatasetID dataset_;
     /**
+     * <pre>
+     * The Dataset that the artifact belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 2;</code>
      */
     public boolean hasDataset() {
       return dataset_ != null;
     }
     /**
+     * <pre>
+     * The Dataset that the artifact belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 2;</code>
      */
     public datacatalog.Datacatalog.DatasetID getDataset() {
       return dataset_ == null ? datacatalog.Datacatalog.DatasetID.getDefaultInstance() : dataset_;
     }
     /**
+     * <pre>
+     * The Dataset that the artifact belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 2;</code>
      */
     public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder() {
@@ -13398,12 +13648,20 @@ public final class Datacatalog {
     public static final int DATA_FIELD_NUMBER = 3;
     private java.util.List<datacatalog.Datacatalog.ArtifactData> data_;
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     public java.util.List<datacatalog.Datacatalog.ArtifactData> getDataList() {
       return data_;
     }
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     public java.util.List<? extends datacatalog.Datacatalog.ArtifactDataOrBuilder> 
@@ -13411,18 +13669,30 @@ public final class Datacatalog {
       return data_;
     }
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     public int getDataCount() {
       return data_.size();
     }
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     public datacatalog.Datacatalog.ArtifactData getData(int index) {
       return data_.get(index);
     }
     /**
+     * <pre>
+     * A list of data that is associated with the artifact
+     * </pre>
+     *
      * <code>repeated .datacatalog.ArtifactData data = 3;</code>
      */
     public datacatalog.Datacatalog.ArtifactDataOrBuilder getDataOrBuilder(
@@ -13433,18 +13703,30 @@ public final class Datacatalog {
     public static final int METADATA_FIELD_NUMBER = 4;
     private datacatalog.Datacatalog.Metadata metadata_;
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 4;</code>
      */
     public boolean hasMetadata() {
       return metadata_ != null;
     }
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 4;</code>
      */
     public datacatalog.Datacatalog.Metadata getMetadata() {
       return metadata_ == null ? datacatalog.Datacatalog.Metadata.getDefaultInstance() : metadata_;
     }
     /**
+     * <pre>
+     * Free-form metadata associated with the artifact
+     * </pre>
+     *
      * <code>.datacatalog.Metadata metadata = 4;</code>
      */
     public datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder() {
@@ -13796,6 +14078,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Artifact message. It is composed of several string fields.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.Artifact}
      */
     public static final class Builder extends
@@ -14117,6 +14403,10 @@ public final class Datacatalog {
 
       private java.lang.Object id_ = "";
       /**
+       * <pre>
+       * The unique ID of the artifact
+       * </pre>
+       *
        * <code>string id = 1;</code>
        */
       public java.lang.String getId() {
@@ -14132,6 +14422,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the artifact
+       * </pre>
+       *
        * <code>string id = 1;</code>
        */
       public com.google.protobuf.ByteString
@@ -14148,6 +14442,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The unique ID of the artifact
+       * </pre>
+       *
        * <code>string id = 1;</code>
        */
       public Builder setId(
@@ -14161,6 +14459,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the artifact
+       * </pre>
+       *
        * <code>string id = 1;</code>
        */
       public Builder clearId() {
@@ -14170,6 +14472,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The unique ID of the artifact
+       * </pre>
+       *
        * <code>string id = 1;</code>
        */
       public Builder setIdBytes(
@@ -14188,12 +14494,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.DatasetID, datacatalog.Datacatalog.DatasetID.Builder, datacatalog.Datacatalog.DatasetIDOrBuilder> datasetBuilder_;
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public boolean hasDataset() {
         return datasetBuilder_ != null || dataset_ != null;
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public datacatalog.Datacatalog.DatasetID getDataset() {
@@ -14204,6 +14518,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public Builder setDataset(datacatalog.Datacatalog.DatasetID value) {
@@ -14220,6 +14538,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public Builder setDataset(
@@ -14234,6 +14556,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public Builder mergeDataset(datacatalog.Datacatalog.DatasetID value) {
@@ -14252,6 +14578,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public Builder clearDataset() {
@@ -14266,6 +14596,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public datacatalog.Datacatalog.DatasetID.Builder getDatasetBuilder() {
@@ -14274,6 +14608,10 @@ public final class Datacatalog {
         return getDatasetFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder() {
@@ -14285,6 +14623,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The Dataset that the artifact belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -14314,6 +14656,10 @@ public final class Datacatalog {
           datacatalog.Datacatalog.ArtifactData, datacatalog.Datacatalog.ArtifactData.Builder, datacatalog.Datacatalog.ArtifactDataOrBuilder> dataBuilder_;
 
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public java.util.List<datacatalog.Datacatalog.ArtifactData> getDataList() {
@@ -14324,6 +14670,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public int getDataCount() {
@@ -14334,6 +14684,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public datacatalog.Datacatalog.ArtifactData getData(int index) {
@@ -14344,6 +14698,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder setData(
@@ -14361,6 +14719,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder setData(
@@ -14375,6 +14737,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder addData(datacatalog.Datacatalog.ArtifactData value) {
@@ -14391,6 +14757,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder addData(
@@ -14408,6 +14778,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder addData(
@@ -14422,6 +14796,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder addData(
@@ -14436,6 +14814,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder addAllData(
@@ -14451,6 +14833,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder clearData() {
@@ -14464,6 +14850,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public Builder removeData(int index) {
@@ -14477,6 +14867,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public datacatalog.Datacatalog.ArtifactData.Builder getDataBuilder(
@@ -14484,6 +14878,10 @@ public final class Datacatalog {
         return getDataFieldBuilder().getBuilder(index);
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public datacatalog.Datacatalog.ArtifactDataOrBuilder getDataOrBuilder(
@@ -14494,6 +14892,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public java.util.List<? extends datacatalog.Datacatalog.ArtifactDataOrBuilder> 
@@ -14505,6 +14907,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public datacatalog.Datacatalog.ArtifactData.Builder addDataBuilder() {
@@ -14512,6 +14918,10 @@ public final class Datacatalog {
             datacatalog.Datacatalog.ArtifactData.getDefaultInstance());
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public datacatalog.Datacatalog.ArtifactData.Builder addDataBuilder(
@@ -14520,6 +14930,10 @@ public final class Datacatalog {
             index, datacatalog.Datacatalog.ArtifactData.getDefaultInstance());
       }
       /**
+       * <pre>
+       * A list of data that is associated with the artifact
+       * </pre>
+       *
        * <code>repeated .datacatalog.ArtifactData data = 3;</code>
        */
       public java.util.List<datacatalog.Datacatalog.ArtifactData.Builder> 
@@ -14545,12 +14959,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.Metadata, datacatalog.Datacatalog.Metadata.Builder, datacatalog.Datacatalog.MetadataOrBuilder> metadataBuilder_;
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public boolean hasMetadata() {
         return metadataBuilder_ != null || metadata_ != null;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public datacatalog.Datacatalog.Metadata getMetadata() {
@@ -14561,6 +14983,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public Builder setMetadata(datacatalog.Datacatalog.Metadata value) {
@@ -14577,6 +15003,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public Builder setMetadata(
@@ -14591,6 +15021,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public Builder mergeMetadata(datacatalog.Datacatalog.Metadata value) {
@@ -14609,6 +15043,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public Builder clearMetadata() {
@@ -14623,6 +15061,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public datacatalog.Datacatalog.Metadata.Builder getMetadataBuilder() {
@@ -14631,6 +15073,10 @@ public final class Datacatalog {
         return getMetadataFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       public datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder() {
@@ -14642,6 +15088,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Free-form metadata associated with the artifact
+       * </pre>
+       *
        * <code>.datacatalog.Metadata metadata = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -15371,6 +15821,10 @@ public final class Datacatalog {
     flyteidl.core.Literals.LiteralOrBuilder getValueOrBuilder();
   }
   /**
+   * <pre>
+   * ArtifactData that belongs to an artifact
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.ArtifactData}
    */
   public  static final class ArtifactData extends
@@ -15687,6 +16141,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * ArtifactData that belongs to an artifact
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.ArtifactData}
      */
     public static final class Builder extends
@@ -16091,39 +16549,72 @@ public final class Datacatalog {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Name of tag
+     * </pre>
+     *
      * <code>string name = 1;</code>
      */
     java.lang.String getName();
     /**
+     * <pre>
+     * Name of tag
+     * </pre>
+     *
      * <code>string name = 1;</code>
      */
     com.google.protobuf.ByteString
         getNameBytes();
 
     /**
+     * <pre>
+     * The tagged artifact
+     * </pre>
+     *
      * <code>string artifact_id = 2;</code>
      */
     java.lang.String getArtifactId();
     /**
+     * <pre>
+     * The tagged artifact
+     * </pre>
+     *
      * <code>string artifact_id = 2;</code>
      */
     com.google.protobuf.ByteString
         getArtifactIdBytes();
 
     /**
+     * <pre>
+     * The Dataset that this tag belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 3;</code>
      */
     boolean hasDataset();
     /**
+     * <pre>
+     * The Dataset that this tag belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 3;</code>
      */
     datacatalog.Datacatalog.DatasetID getDataset();
     /**
+     * <pre>
+     * The Dataset that this tag belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 3;</code>
      */
     datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder();
   }
   /**
+   * <pre>
+   * Tag message that is unique to a Dataset. It is associated to a single artifact and
+   * can be retrieved by name later.
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.Tag}
    */
   public  static final class Tag extends
@@ -16224,6 +16715,10 @@ public final class Datacatalog {
     public static final int NAME_FIELD_NUMBER = 1;
     private volatile java.lang.Object name_;
     /**
+     * <pre>
+     * Name of tag
+     * </pre>
+     *
      * <code>string name = 1;</code>
      */
     public java.lang.String getName() {
@@ -16239,6 +16734,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * Name of tag
+     * </pre>
+     *
      * <code>string name = 1;</code>
      */
     public com.google.protobuf.ByteString
@@ -16258,6 +16757,10 @@ public final class Datacatalog {
     public static final int ARTIFACT_ID_FIELD_NUMBER = 2;
     private volatile java.lang.Object artifactId_;
     /**
+     * <pre>
+     * The tagged artifact
+     * </pre>
+     *
      * <code>string artifact_id = 2;</code>
      */
     public java.lang.String getArtifactId() {
@@ -16273,6 +16776,10 @@ public final class Datacatalog {
       }
     }
     /**
+     * <pre>
+     * The tagged artifact
+     * </pre>
+     *
      * <code>string artifact_id = 2;</code>
      */
     public com.google.protobuf.ByteString
@@ -16292,18 +16799,30 @@ public final class Datacatalog {
     public static final int DATASET_FIELD_NUMBER = 3;
     private datacatalog.Datacatalog.DatasetID dataset_;
     /**
+     * <pre>
+     * The Dataset that this tag belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 3;</code>
      */
     public boolean hasDataset() {
       return dataset_ != null;
     }
     /**
+     * <pre>
+     * The Dataset that this tag belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 3;</code>
      */
     public datacatalog.Datacatalog.DatasetID getDataset() {
       return dataset_ == null ? datacatalog.Datacatalog.DatasetID.getDefaultInstance() : dataset_;
     }
     /**
+     * <pre>
+     * The Dataset that this tag belongs to
+     * </pre>
+     *
      * <code>.datacatalog.DatasetID dataset = 3;</code>
      */
     public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder() {
@@ -16491,6 +17010,11 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Tag message that is unique to a Dataset. It is associated to a single artifact and
+     * can be retrieved by name later.
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.Tag}
      */
     public static final class Builder extends
@@ -16661,6 +17185,10 @@ public final class Datacatalog {
 
       private java.lang.Object name_ = "";
       /**
+       * <pre>
+       * Name of tag
+       * </pre>
+       *
        * <code>string name = 1;</code>
        */
       public java.lang.String getName() {
@@ -16676,6 +17204,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Name of tag
+       * </pre>
+       *
        * <code>string name = 1;</code>
        */
       public com.google.protobuf.ByteString
@@ -16692,6 +17224,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * Name of tag
+       * </pre>
+       *
        * <code>string name = 1;</code>
        */
       public Builder setName(
@@ -16705,6 +17241,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Name of tag
+       * </pre>
+       *
        * <code>string name = 1;</code>
        */
       public Builder clearName() {
@@ -16714,6 +17254,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * Name of tag
+       * </pre>
+       *
        * <code>string name = 1;</code>
        */
       public Builder setNameBytes(
@@ -16730,6 +17274,10 @@ public final class Datacatalog {
 
       private java.lang.Object artifactId_ = "";
       /**
+       * <pre>
+       * The tagged artifact
+       * </pre>
+       *
        * <code>string artifact_id = 2;</code>
        */
       public java.lang.String getArtifactId() {
@@ -16745,6 +17293,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The tagged artifact
+       * </pre>
+       *
        * <code>string artifact_id = 2;</code>
        */
       public com.google.protobuf.ByteString
@@ -16761,6 +17313,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The tagged artifact
+       * </pre>
+       *
        * <code>string artifact_id = 2;</code>
        */
       public Builder setArtifactId(
@@ -16774,6 +17330,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The tagged artifact
+       * </pre>
+       *
        * <code>string artifact_id = 2;</code>
        */
       public Builder clearArtifactId() {
@@ -16783,6 +17343,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The tagged artifact
+       * </pre>
+       *
        * <code>string artifact_id = 2;</code>
        */
       public Builder setArtifactIdBytes(
@@ -16801,12 +17365,20 @@ public final class Datacatalog {
       private com.google.protobuf.SingleFieldBuilderV3<
           datacatalog.Datacatalog.DatasetID, datacatalog.Datacatalog.DatasetID.Builder, datacatalog.Datacatalog.DatasetIDOrBuilder> datasetBuilder_;
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public boolean hasDataset() {
         return datasetBuilder_ != null || dataset_ != null;
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public datacatalog.Datacatalog.DatasetID getDataset() {
@@ -16817,6 +17389,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public Builder setDataset(datacatalog.Datacatalog.DatasetID value) {
@@ -16833,6 +17409,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public Builder setDataset(
@@ -16847,6 +17427,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public Builder mergeDataset(datacatalog.Datacatalog.DatasetID value) {
@@ -16865,6 +17449,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public Builder clearDataset() {
@@ -16879,6 +17467,10 @@ public final class Datacatalog {
         return this;
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public datacatalog.Datacatalog.DatasetID.Builder getDatasetBuilder() {
@@ -16887,6 +17479,10 @@ public final class Datacatalog {
         return getDatasetFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       public datacatalog.Datacatalog.DatasetIDOrBuilder getDatasetOrBuilder() {
@@ -16898,6 +17494,10 @@ public final class Datacatalog {
         }
       }
       /**
+       * <pre>
+       * The Dataset that this tag belongs to
+       * </pre>
+       *
        * <code>.datacatalog.DatasetID dataset = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -17025,6 +17625,10 @@ public final class Datacatalog {
         java.lang.String key);
   }
   /**
+   * <pre>
+   * Metadata representation for artifacts and datasets
+   * </pre>
+   *
    * Protobuf type {@code datacatalog.Metadata}
    */
   public  static final class Metadata extends
@@ -17379,6 +17983,10 @@ public final class Datacatalog {
       return builder;
     }
     /**
+     * <pre>
+     * Metadata representation for artifacts and datasets
+     * </pre>
+     *
      * Protobuf type {@code datacatalog.Metadata}
      */
     public static final class Builder extends

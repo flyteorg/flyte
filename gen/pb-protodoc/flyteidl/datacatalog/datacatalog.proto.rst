@@ -8,8 +8,10 @@ datacatalog.proto
 datacatalog.CreateDatasetRequest
 --------------------------------
 
-`[datacatalog.CreateDatasetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L17>`_
+`[datacatalog.CreateDatasetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L40>`_
 
+
+Request message for creating a Dataset.
 
 .. code-block:: json
 
@@ -29,8 +31,10 @@ dataset
 datacatalog.CreateDatasetResponse
 ---------------------------------
 
-`[datacatalog.CreateDatasetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L21>`_
+`[datacatalog.CreateDatasetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L47>`_
 
+
+Response message for creating a Dataset
 
 .. code-block:: json
 
@@ -44,8 +48,11 @@ datacatalog.CreateDatasetResponse
 datacatalog.GetDatasetRequest
 -----------------------------
 
-`[datacatalog.GetDatasetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L25>`_
+`[datacatalog.GetDatasetRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L55>`_
 
+
+Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
+which is a combination of several fields.
 
 .. code-block:: json
 
@@ -65,8 +72,11 @@ dataset
 datacatalog.GetDatasetResponse
 ------------------------------
 
-`[datacatalog.GetDatasetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L29>`_
+`[datacatalog.GetDatasetResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L63>`_
 
+
+Response message for retrieving a Dataset. The response will include the metadata for the
+Dataset.
 
 .. code-block:: json
 
@@ -86,8 +96,12 @@ dataset
 datacatalog.GetArtifactRequest
 ------------------------------
 
-`[datacatalog.GetArtifactRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L33>`_
+`[datacatalog.GetArtifactRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L72>`_
 
+
+Request message for retrieving an Artifact. Retrieve an artifact based on a query handle that
+can be one of artifact_id or tag. The result returned will include the artifact data and metadata
+associated with the artifact.
 
 .. code-block:: json
 
@@ -125,8 +139,11 @@ tag_name
 datacatalog.GetArtifactResponse
 -------------------------------
 
-`[datacatalog.GetArtifactResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L42>`_
+`[datacatalog.GetArtifactResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L85>`_
 
+
+Response message for retrieving an Artifact. The result returned will include the artifact data
+and metadata associated with the artifact.
 
 .. code-block:: json
 
@@ -146,8 +163,10 @@ artifact
 datacatalog.CreateArtifactRequest
 ---------------------------------
 
-`[datacatalog.CreateArtifactRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L46>`_
+`[datacatalog.CreateArtifactRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L92>`_
 
+
+Request message for creating an Artifact and its associated artifact Data.
 
 .. code-block:: json
 
@@ -167,8 +186,10 @@ artifact
 datacatalog.CreateArtifactResponse
 ----------------------------------
 
-`[datacatalog.CreateArtifactResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L50>`_
+`[datacatalog.CreateArtifactResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L99>`_
 
+
+Response message for creating an Artifact.
 
 .. code-block:: json
 
@@ -182,8 +203,10 @@ datacatalog.CreateArtifactResponse
 datacatalog.AddTagRequest
 -------------------------
 
-`[datacatalog.AddTagRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L54>`_
+`[datacatalog.AddTagRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L106>`_
 
+
+Request message for tagging an Artifact.
 
 .. code-block:: json
 
@@ -203,8 +226,10 @@ tag
 datacatalog.AddTagResponse
 --------------------------
 
-`[datacatalog.AddTagResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L58>`_
+`[datacatalog.AddTagResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L113>`_
 
+
+Response message for tagging an Artifact.
 
 .. code-block:: json
 
@@ -218,9 +243,9 @@ datacatalog.AddTagResponse
 datacatalog.ListArtifactsRequest
 --------------------------------
 
-`[datacatalog.ListArtifactsRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L63>`_
+`[datacatalog.ListArtifactsRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L118>`_
 
-List the artifacts that belong to the Dataset
+List the artifacts that belong to the Dataset, optionally filtered using filtered expression.
 
 .. code-block:: json
 
@@ -233,7 +258,8 @@ List the artifacts that belong to the Dataset
 .. _api_field_datacatalog.ListArtifactsRequest.dataset:
 
 dataset
-  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) 
+  (:ref:`datacatalog.DatasetID <api_msg_datacatalog.DatasetID>`) Use a datasetID for which you want to retrieve the artifacts
+  
   
 .. _api_field_datacatalog.ListArtifactsRequest.filter:
 
@@ -254,7 +280,7 @@ pagination
 datacatalog.ListArtifactsResponse
 ---------------------------------
 
-`[datacatalog.ListArtifactsResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L72>`_
+`[datacatalog.ListArtifactsResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L129>`_
 
 Response to list artifacts
 
@@ -284,7 +310,7 @@ next_token
 datacatalog.ListDatasetsRequest
 -------------------------------
 
-`[datacatalog.ListDatasetsRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L80>`_
+`[datacatalog.ListDatasetsRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L137>`_
 
 List the datasets for the given query
 
@@ -314,7 +340,7 @@ pagination
 datacatalog.ListDatasetsResponse
 --------------------------------
 
-`[datacatalog.ListDatasetsResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L88>`_
+`[datacatalog.ListDatasetsResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L145>`_
 
 List the datasets response with token for next pagination
 
@@ -344,8 +370,10 @@ next_token
 datacatalog.Dataset
 -------------------
 
-`[datacatalog.Dataset proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L95>`_
+`[datacatalog.Dataset proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L155>`_
 
+
+Dataset message. It is uniquely identified by DatasetID.
 
 .. code-block:: json
 
@@ -377,8 +405,10 @@ partitionKeys
 datacatalog.Partition
 ---------------------
 
-`[datacatalog.Partition proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L101>`_
+`[datacatalog.Partition proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L164>`_
 
+
+An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
 
 .. code-block:: json
 
@@ -404,8 +434,10 @@ value
 datacatalog.DatasetID
 ---------------------
 
-`[datacatalog.DatasetID proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L106>`_
+`[datacatalog.DatasetID proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L172>`_
 
+
+DatasetID message that is composed of several string fields.
 
 .. code-block:: json
 
@@ -449,8 +481,10 @@ UUID
 datacatalog.Artifact
 --------------------
 
-`[datacatalog.Artifact proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L114>`_
+`[datacatalog.Artifact proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L183>`_
 
+
+Artifact message. It is composed of several string fields.
 
 .. code-block:: json
 
@@ -506,8 +540,10 @@ created_at
 datacatalog.ArtifactData
 ------------------------
 
-`[datacatalog.ArtifactData proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L124>`_
+`[datacatalog.ArtifactData proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L196>`_
 
+
+ArtifactData that belongs to an artifact
 
 .. code-block:: json
 
@@ -533,8 +569,11 @@ value
 datacatalog.Tag
 ---------------
 
-`[datacatalog.Tag proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L129>`_
+`[datacatalog.Tag proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L205>`_
 
+
+Tag message that is unique to a Dataset. It is associated to a single artifact and
+can be retrieved by name later.
 
 .. code-block:: json
 
@@ -566,8 +605,10 @@ dataset
 datacatalog.Metadata
 --------------------
 
-`[datacatalog.Metadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L135>`_
+`[datacatalog.Metadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L214>`_
 
+
+Metadata representation for artifacts and datasets
 
 .. code-block:: json
 
@@ -587,7 +628,7 @@ key_map
 datacatalog.FilterExpression
 ----------------------------
 
-`[datacatalog.FilterExpression proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L140>`_
+`[datacatalog.FilterExpression proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L219>`_
 
 Filter expression that is composed of a combination of single filters
 
@@ -609,7 +650,7 @@ filters
 datacatalog.SinglePropertyFilter
 --------------------------------
 
-`[datacatalog.SinglePropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L145>`_
+`[datacatalog.SinglePropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L224>`_
 
 A single property to filter on.
 
@@ -666,7 +707,7 @@ operator
 Enum datacatalog.SinglePropertyFilter.ComparisonOperator
 --------------------------------------------------------
 
-`[datacatalog.SinglePropertyFilter.ComparisonOperator proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L154>`_
+`[datacatalog.SinglePropertyFilter.ComparisonOperator proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L233>`_
 
 as use-cases come up we can add more operators, ex: gte, like, not eq etc.
 
@@ -681,7 +722,7 @@ EQUALS
 datacatalog.ArtifactPropertyFilter
 ----------------------------------
 
-`[datacatalog.ArtifactPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L163>`_
+`[datacatalog.ArtifactPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L242>`_
 
 Artifact properties we can filter by
 
@@ -705,7 +746,7 @@ artifact_id
 datacatalog.TagPropertyFilter
 -----------------------------
 
-`[datacatalog.TagPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L171>`_
+`[datacatalog.TagPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L250>`_
 
 Tag properties we can filter by
 
@@ -728,7 +769,7 @@ tag_name
 datacatalog.PartitionPropertyFilter
 -----------------------------------
 
-`[datacatalog.PartitionPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L178>`_
+`[datacatalog.PartitionPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L257>`_
 
 Partition properties we can filter by
 
@@ -751,7 +792,7 @@ key_val
 datacatalog.KeyValuePair
 ------------------------
 
-`[datacatalog.KeyValuePair proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L184>`_
+`[datacatalog.KeyValuePair proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L263>`_
 
 
 .. code-block:: json
@@ -778,7 +819,7 @@ value
 datacatalog.DatasetPropertyFilter
 ---------------------------------
 
-`[datacatalog.DatasetPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L190>`_
+`[datacatalog.DatasetPropertyFilter proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L269>`_
 
 Dataset properties we can filter by
 
@@ -830,7 +871,7 @@ version
 datacatalog.PaginationOptions
 -----------------------------
 
-`[datacatalog.PaginationOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L200>`_
+`[datacatalog.PaginationOptions proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L279>`_
 
 Pagination options for making list requests
 
@@ -873,7 +914,7 @@ sortOrder
 Enum datacatalog.PaginationOptions.SortOrder
 --------------------------------------------
 
-`[datacatalog.PaginationOptions.SortOrder proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L214>`_
+`[datacatalog.PaginationOptions.SortOrder proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L293>`_
 
 
 .. _api_enum_value_datacatalog.PaginationOptions.SortOrder.DESCENDING:
@@ -892,7 +933,7 @@ ASCENDING
 Enum datacatalog.PaginationOptions.SortKey
 ------------------------------------------
 
-`[datacatalog.PaginationOptions.SortKey proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L219>`_
+`[datacatalog.PaginationOptions.SortKey proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/datacatalog/datacatalog.proto#L298>`_
 
 
 .. _api_enum_value_datacatalog.PaginationOptions.SortKey.CREATION_TIME:
