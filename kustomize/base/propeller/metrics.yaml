@@ -1,0 +1,29 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: flyte
+  name: redis-exporter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9121"
+      labels:
+        app: redis-exporter
+    spec:
+      containers:
+      # Ideally we would like this to be a sidecar with propeller, but scraping metrics is a hassle
+      # One option could be to import the exporter into propeller and run it from there. We can explore this if it provides value, lets test it first
+      # More configuration refer to https://github.com/oliver006/redis_exporter
+      # Also dashboard template - https://grafana.com/grafana/dashboards/763
+      - name: redis-exporter
+        image: docker.io/bitnami/redis-exporter
+        args:  [ "-redis.addr=redis-resource-manager.flyte", "-redis.password=mypassword"]
+        resources:
+          requests:
+            cpu: 500m
+            memory: 200Mi
+        ports:
+        - containerPort: 9121
