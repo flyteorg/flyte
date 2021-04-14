@@ -104,6 +104,7 @@ flytepropeller:
       cpu: 10m
       ephemeral-storage: 50Mi
       memory: 50Mi
+  cacheSizeMbs: 0
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
   # -- Annotations for ServiceAccount attached to Flytepropeller pods
@@ -391,6 +392,25 @@ common:
     enabled: false
 
 #
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: sandbox
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  # bucketName: my-s3-bucket
+  # -- settings for storage type s3
+  s3:
+    region: us-east-1
+  # -- settings for storage type gcs
+  gcs:
+    # -- GCP project ID. Required for storage type gcs.
+    # projectId:
+  # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
+  custom: {}
+
+#
 # CONFIGMAPS SETTINGS
 #
 
@@ -481,15 +501,6 @@ configmap:
       grpcPort: 8089
       httpPort: 8080
       grpcServerReflection: true
-
-  # Storage configuration
-  storage:
-    storage:
-      type: minio
-      container: my-s3-bucket
-      connection:
-        auth-type: accesskey
-        region: us-east-1
 
   # Task default resources configuration
   task_resource_defaults:

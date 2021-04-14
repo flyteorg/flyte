@@ -40,9 +40,11 @@ data:
   spark.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- end }}
-{{- with .Values.configmap.storage }}
-  storage.yaml: | {{ toYaml . | nindent 4 }}
-{{- end }}
+  storage.yaml: | {{ include "storage" . | nindent 4 }}
+  cache.yaml: |
+    cache:
+      max_size_mbs: {{ .Values.flytepropeller.cacheSizeMbs }}
+      target_gc_percent: 70
 {{- with .Values.configmap.task_logs }}
   task_logs.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
