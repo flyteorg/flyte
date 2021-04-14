@@ -113,18 +113,6 @@ configmap:
       host: postgres
       dbname: flyte_development
 
-  storage:
-    storage:
-      type: minio
-      container: my-s3-bucket
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
-
   # Task default resources configuration
   task_resource_defaults:
     task_resources:
