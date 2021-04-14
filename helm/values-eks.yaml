@@ -272,15 +272,6 @@ configmap:
         - project: flytetester
         - project: spark-workflows
 
-
-  storage:
-    storage:
-      type: s3
-      container: s3-bucket-for-flyte
-      connection:
-        auth-type: iam
-        region: us-east-1
-
   task_resource_defaults:
     task_resources:
       defaults:
