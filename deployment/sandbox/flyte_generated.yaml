@@ -2152,12 +2152,6 @@ data:
     logger:
       show-source: true
       level: 2
-  remote_data.yaml: |
-    remoteData:
-      region: "us-east-1"
-      scheme: "local"
-      signedUrls:
-        durationMinutes: 3
   server.yaml: |
     server:
       httpPort: 8088
@@ -2173,14 +2167,6 @@ data:
           - "Content-Type"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
-      profilerPort: 10254
-      metricsScope: "flyte:"
-      metadataStoragePrefix:
-        - "metadata"
-        - "admin"
-      eventVersion: 1
-      testing:
-        host: http://flyteadmin
   storage.yaml: |+
     storage:
       type: minio
@@ -2206,7 +2192,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-5b5g7785h8
+  name: flyte-admin-config-8kt2hhhb92
   namespace: flyte
 ---
 apiVersion: v1
@@ -2843,7 +2829,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.38
+        app.kubernetes.io/version: 0.4.13
     spec:
       containers:
       - command:
@@ -2851,7 +2837,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.13
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2902,7 +2888,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.13
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2918,7 +2904,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.13
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2932,7 +2918,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.13
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2950,7 +2936,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-5b5g7785h8
+          name: flyte-admin-config-8kt2hhhb92
         name: config-volume
       - name: db-pass
         secret:
@@ -3337,7 +3323,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:v0.4.7
+            image: ghcr.io/flyteorg/flyteadmin:v0.4.13
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3354,7 +3340,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-5b5g7785h8
+              name: flyte-admin-config-8kt2hhhb92
             name: config-volume
           - name: db-pass
             secret:
