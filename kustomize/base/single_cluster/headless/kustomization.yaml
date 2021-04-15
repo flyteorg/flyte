@@ -19,7 +19,6 @@ configMapGenerator:
       - ./config/admin/domain.yaml
       - ./config/admin/db.yaml
       - ./config/admin/cluster_resources.yaml
-      - ./config/admin/remote_data.yaml
       - ./config/admin/task_resource_defaults.yaml
       - ./config/common/storage.yaml
       - ./config/common/logger.yaml
