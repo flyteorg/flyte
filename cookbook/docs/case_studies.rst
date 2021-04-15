@@ -7,7 +7,7 @@ Real world examples of using Flytekit
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents
 
    auto_case_studies_pima_diabetes/index

@@ -1,12 +1,14 @@
 """
-Predicting House Prices in Multiple Regions Using an XGBoost Model and Flytekit (Python)
-----------------------------------------------------------------------------------------
+Predicting the House Price in Multiple Regions Using an XGBoost Model and Flytekit (Python)
+-------------------------------------------------------------------------------------------
 
+In this example, you'll use the house price prediction model for one region to expand it to multiple regions. 
 """
 
 # %%
 # Step 1: Importing the Libraries
-# ----------------------------------
+# ===============================
+# First, import all the required libraries.
 import typing
 
 import flytekit
@@ -29,7 +31,8 @@ except ImportError:
 
 # %%
 # Step 2: Initializing the Variables
-# ----------------------------------
+# ==================================
+# Initialize the variables to be used while building the model.
 NUM_HOUSES_PER_LOCATION = 1000
 COLUMNS = [
     "PRICE",
@@ -55,9 +58,8 @@ LOCATIONS = [
 
 # %%
 # Step 3: Task -- Generating & Splitting the Data for Multiple Regions
-# --------------------------------------------------------------------
-#
-# Train, validation, and test datasets are lists of DataFrames.
+# ====================================================================
+# Call the previously defined helper functions to generate and split the data. Finally, return the DataFrame objects.
 
 dataset = typing.NamedTuple(
     "GenerateSplitDataOutputs",
@@ -94,10 +96,11 @@ def generate_and_split_data_multiloc(
 
 # %%
 # Step 4: Dynamic Task -- Training the XGBoost Model & Generating the Predictionsfor Multiple Regions
-# -----------------------------------------------------------------------
+# ===================================================================================================
 # (A "Dynamic" Task (aka Workflow) spins up internal workflows)
 #
 # Fit the model to the data and generate predictions (two functionalities in a single task to make it more powerful!)
+#
 # Note: You can also use two separate methods to fit the model and generate predictions but this basically means parallelizing an entire set of tasks.
 @dynamic(cache=True, cache_version="0.1", limits=Resources(mem="600Mi"))
 def parallel_fit_predict(
@@ -116,11 +119,11 @@ def parallel_fit_predict(
 
 # %%
 # Step 5: Workflow -- Defining the Workflow
-# -----------------------------------------
+# =========================================
+# Include the following three steps in the workflow:
 #
-# #. Generate and split the data
-# #. Parallelly fit the XGBoost model for multiple regions
-# #. Generate predictions for multiple regions
+# #. Generate and split the data (Step 3)
+# #. Parallelly fit the XGBoost model and generate predictions for multiple regions (Step 4)
 @workflow
 def multi_region_house_price_prediction_model_trainer(
     seed: int = 7, number_of_houses: int = NUM_HOUSES_PER_LOCATION

@@ -1,11 +1,11 @@
 """
-Predicting House Price in a Region Using an XGBoost Model and Flytekit (Python)
--------------------------------------------------------------------------------
-
+Predicting the House Price in a Region Using an XGBoost Model and Flytekit (Python)
+-----------------------------------------------------------------------------------
 """
 
 # %%
 # Install the following three libraries before running the model (locally):
+#
 # .. code-block:: python
 #
 #       pip install scikit-learn
@@ -14,7 +14,8 @@ Predicting House Price in a Region Using an XGBoost Model and Flytekit (Python)
 
 # %%
 # Step 1: Importing the Libraries
-# -------------------------------
+# ===============================
+# First, import all the required libraries.
 import typing
 
 import joblib
@@ -27,7 +28,8 @@ from flytekit.types.file import FlyteFile
 
 # %%
 # Step 2: Initializing the Variables
-# ----------------------------------
+# ==================================
+# Initialize the variables to be used while building the model.
 NUM_HOUSES_PER_LOCATION = 1000
 COLUMNS = [
     "PRICE",
@@ -43,9 +45,8 @@ SPLIT_RATIOS = [0.6, 0.3, 0.1]
 
 # %%
 # Step 3: Defining the Data Generation Functions
-# ----------------------------------------------
-#
-# House price generation function:
+# ==============================================
+# Define a function to generate the price of a house.
 def gen_price(house) -> int:
     _base_price = int(house["SQUARE_FEET"] * 150)
     _price = int(
@@ -60,7 +61,7 @@ def gen_price(house) -> int:
 
 
 # %%
-# Dataframe with All the House Details:
+# Define a function that returns a DataFrame object constituting all the houses' details.
 def gen_houses(num_houses) -> pd.DataFrame:
     _house_list = []
     for _ in range(num_houses):
@@ -92,7 +93,7 @@ def gen_houses(num_houses) -> pd.DataFrame:
 
 
 # %%
-# Splitting the Data into Train, Val, and Test Datasets:
+# Split the data into train, val, and test datasets.
 def split_data(
     df: pd.DataFrame, seed: int, split: typing.List[float]
 ) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
@@ -142,9 +143,8 @@ def split_data(
 
 # %%
 # Step 4: Task -- Generating & Splitting the Data
-# -----------------------------------------------
-#
-# Train, validation, and test datasets are DataFrames.
+# ===============================================
+# Call the previously defined helper functions to generate and split the data. Finally, return the DataFrame objects.
 dataset = typing.NamedTuple(
     "GenerateSplitDataOutputs",
     train_data=pd.DataFrame,
@@ -161,8 +161,7 @@ def generate_and_split_data(number_of_houses: int, seed: int) -> dataset:
 
 # %%
 # Step 5: Task -- Training the XGBoost Model
-# ------------------------------------------
-#
+# ==========================================
 # Serialize the XGBoost model using joblib and store the model in a dat file.
 model_file = typing.NamedTuple("Model", model=FlyteFile[typing.TypeVar("joblib.dat")])
 
@@ -188,8 +187,7 @@ def fit(loc: str, train: pd.DataFrame, val: pd.DataFrame) -> model_file:
 
 # %%
 # Step 6: Task -- Generating the Predictions
-# ------------------------------------------
-#
+# ==========================================
 # Unserialize the XGBoost model using joblib and generate the predictions.
 @task(cache_version="1.0", cache=True, limits=Resources(mem="600Mi"))
 def predict(
@@ -211,11 +209,12 @@ def predict(
 
 # %%
 # Step 7: Workflow -- Defining the Workflow
-# -----------------------------------------
+# =========================================
+# Include the following three steps in the workflow:
 #
-# #. Generate and split the data
-# #. Fit the XGBoost model
-# #. Generate predictions
+# #. Generate and split the data (Step 4)
+# #. Fit the XGBoost model (Step 5)
+# #. Generate predictions (Step 6)
 @workflow
 def house_price_predictor_trainer(
     seed: int = 7, number_of_houses: int = NUM_HOUSES_PER_LOCATION
