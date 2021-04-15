@@ -41,11 +41,3 @@ auth:
       clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
-  profilerPort: 10254
-  metricsScope: "flyte:"
-  metadataStoragePrefix:
-    - "metadata"
-    - "admin"
-  eventVersion: 1
-  testing:
-    host: http://flyteadmin

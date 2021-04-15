@@ -12,7 +12,7 @@ spec:
           serviceAccountName: flyteadmin
           containers:
           - name: sync-cluster-resources
-            image: flyteadmin:v0.3.29
+            image: flyteadmin:v0.4.13
             imagePullPolicy: IfNotPresent
             command: ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync"]
             volumeMounts:

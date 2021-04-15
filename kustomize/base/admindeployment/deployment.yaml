@@ -16,7 +16,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.38
+        app.kubernetes.io/version: 0.4.13
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "10254"

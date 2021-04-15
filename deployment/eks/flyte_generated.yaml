@@ -8142,13 +8142,6 @@ data:
     logger:
       show-source: true
       level: 2
-  remote_data.yaml: |
-    remoteData:
-      # TODO change this to match the region of the s3 bucket
-      region: "us-west-2"
-      scheme: aws
-      signedUrls:
-        durationMinutes: 3
   server.yaml: |
     server:
       httpPort: 8088
@@ -8193,14 +8186,6 @@ data:
           clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
-      profilerPort: 10254
-      metricsScope: "flyte:"
-      metadataStoragePrefix:
-        - "metadata"
-        - "admin"
-      eventVersion: 1
-      testing:
-        host: http://flyteadmin
   storage.yaml: |
     storage:
       type: stow
@@ -8232,7 +8217,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-4fd96h5bd6
+  name: flyte-admin-config-fh8cdtgk68
   namespace: flyte
 ---
 apiVersion: v1
@@ -8747,7 +8732,7 @@ spec:
       labels:
         app: flyteadmin
         app.kubernetes.io/name: flyteadmin
-        app.kubernetes.io/version: 0.3.38
+        app.kubernetes.io/version: 0.4.13
     spec:
       containers:
       - command:
@@ -8864,7 +8849,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-4fd96h5bd6
+          name: flyte-admin-config-fh8cdtgk68
         name: config-volume
       - configMap:
           name: clusterresource-template-tkdkkt4cb5
@@ -9152,7 +9137,7 @@ spec:
               name: clusterresource-template-tkdkkt4cb5
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-4fd96h5bd6
+              name: flyte-admin-config-fh8cdtgk68
             name: config-volume
           - name: db-pass
             secret:
