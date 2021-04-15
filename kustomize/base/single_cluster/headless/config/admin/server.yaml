@@ -12,11 +12,3 @@ server:
       - "Content-Type"
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
-  profilerPort: 10254
-  metricsScope: "flyte:"
-  metadataStoragePrefix:
-    - "metadata"
-    - "admin"
-  eventVersion: 1
-  testing:
-    host: http://flyteadmin

@@ -20,7 +20,7 @@ spec:
               do echo waiting for database; sleep 2; done;",
             ]
         - name: run-migrations
-          image: flyteadmin:v0.4.0
+          image: flyteadmin:v0.4.13
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -34,7 +34,7 @@ spec:
             - name: config-volume
               mountPath: /etc/flyte/config
         - name: seed-projects
-          image: flyteadmin:v0.4.0
+          image: flyteadmin:v0.4.13
           imagePullPolicy: IfNotPresent
           command:
             [
@@ -50,7 +50,7 @@ spec:
             - name: config-volume
               mountPath: /etc/flyte/config
         - name: sync-cluster-resources
-          image: flyteadmin:v0.4.0
+          image: flyteadmin:v0.4.13
           imagePullPolicy: IfNotPresent
           command:
             [
