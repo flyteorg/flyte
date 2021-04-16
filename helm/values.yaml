@@ -463,14 +463,6 @@ configmap:
     - id: production
       name: production
 
-  # Remote data configuration
-  remote_data:
-    remoteData:
-      region: us-east-1
-      scheme: local
-      signedUrls:
-        durationMinutes: 3
-
   # -- Flyteadmin server config
   server:
     server:
@@ -533,15 +525,6 @@ configmap:
       type: datacatalog
       insecure: true
 
-  # Catalog cache configuration
-  catalog_cache:
-    plugins:
-      catalogCache:
-        reader:
-          maxItems: 10000
-        writer:
-          maxItems: 10000
-
   # Copilot configuration
   copilot:
     plugins:
@@ -555,42 +538,12 @@ configmap:
   core:
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
-      metadata-prefix: metadata/propeller
-      workers: 4
+      workers: 20
       max-workflow-retries: 30
-      workflow-reeval-duration: 30s
-      downstream-eval-duration: 30s
-      limit-namespace: "all"
-      prof-port: 10254
-      metrics-prefix: flyte
-      enable-admin-launcher: true
-      leader-election:
-        lock-config-map:
-          name: propeller-leader
-          namespace: flyte
-        enabled: true
-        lease-duration: 15s
-        renew-deadline: 10s
-        retry-period: 2s
-      queue:
-        type: batch
-        batching-interval: 2s
-        batch-size: -1
-        queue:
-          type: maxof
-          rate: 100
-          capacity: 1000
-          base-delay: 5s
-          max-delay: 120s
-        sub-queue:
-          type: bucket
-          rate: 10
-          capacity: 100
 
   # Plugins configuration
   enabled_plugins:
     tasks:
-      max-plugin-phase-versions: 1000000
       task-plugins:
         enabled-plugins: []
 
@@ -609,12 +562,6 @@ configmap:
     logger:
       show-source: true
       level: 4
-
-  # Qubole plugin configuration
-  qubole:
-    plugins:
-      qubole:
-        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
 
   # Resource manager configuration
   resource_manager:
@@ -653,63 +600,109 @@ configmap:
       logs:
         kubernetes-enabled: false
 
-  # -- Template for namespaces resources
-  aa_namespace: |
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: {{ namespace }}
-    spec:
-      finalizers:
-      - kubernetes
 
-  # -- Template for spark role
-  ad_spark_role: |
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: Role
-    metadata:
-      name: spark-role
-      namespace: {{ namespace }}
-    rules:
-    - apiGroups:
-      - ""
-      resources:
-      - pods
-      verbs:
-      - '*'
-    - apiGroups:
-      - ""
-      resources:
-      - services
-      verbs:
-      - '*'
-    - apiGroups:
-      - ""
-      resources:
-      - configmaps
-      verbs:
-      - '*'
+workflow_scheduler:
+  enabled: false
+  config:
+    scheduler:
+      eventScheduler:
+        scheme: aws
+        region: us-east-1
+        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:us-east-1:<ACCOUNT-NUMBER>:flyte-cron-scheduler-queue
+        scheduleNamePrefix: flyte
+      workflowExecutor:
+        scheme: aws
+        region: us-east-1
+        scheduleQueueName: flyte-cron-scheduler-queue
+        accountId: <ACCOUNT-NUMBER>
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30
 
-  # -- Template for spark SA
-  ae_spark_service_account: |
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: spark
-      namespace: {{ namespace }}
 
-  # -- Template for spark role binding
-  af_spark_role_binding: |
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: RoleBinding
-    metadata:
-      name: spark-role-binding
-      namespace: {{ namespace }} 
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
+workflow_notifications:
+    enabled: false
+    config:
+       notifications:
+         type: aws
+         region: us-east-1
+         publisher:
+           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
+         processor:
+           queueName: flyte-notifications-queue
+           accountId: <ACCOUNT-NUMBER>
+         emailer:
+           subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+           sender:  "flyte@example.com"
+           body: |
+             Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+             Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+             {{ error }}
+
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+  templates:
+    # -- Template for namespaces resources
+    aa_namespace: |
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: {{ namespace }}
+      spec:
+        finalizers:
+        - kubernetes
+
+    # -- Template for spark role
+    ad_spark_role: |
+      apiVersion: rbac.authorization.k8s.io/v1beta1
       kind: Role
-      name: spark-role
-    subjects:
-    - kind: ServiceAccount
-      name: spark
-      namespace: {{ namespace }}
+      metadata:
+        name: spark-role
+        namespace: {{ namespace }}
+      rules:
+      - apiGroups:
+        - ""
+        resources:
+        - pods
+        verbs:
+        - '*'
+      - apiGroups:
+        - ""
+        resources:
+        - services
+        verbs:
+        - '*'
+      - apiGroups:
+        - ""
+        resources:
+        - configmaps
+        verbs:
+        - '*'
+
+    # -- Template for spark SA
+    ae_spark_service_account: |
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: spark
+        namespace: {{ namespace }}
+
+    # -- Template for spark role binding
+    af_spark_role_binding: |
+      apiVersion: rbac.authorization.k8s.io/v1beta1
+      kind: RoleBinding
+      metadata:
+        name: spark-role-binding
+        namespace: {{ namespace }}
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: Role
+        name: spark-role
+      subjects:
+      - kind: ServiceAccount
+        name: spark
+        namespace: {{ namespace }}

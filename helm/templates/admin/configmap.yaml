@@ -5,9 +5,6 @@ metadata:
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
 data:
-{{- with .Values.configmap.cluster_resources }}
-  cluster_resources.yaml: | {{ toYaml . | nindent 4 }}
-{{- end }}
 {{- with .Values.configmap.db }}
   db.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
@@ -17,13 +14,25 @@ data:
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-{{- with .Values.configmap.remote_data }}
-  remote_data.yaml: | {{ toYaml . | nindent 4 }}
-{{- end }}
 {{- with .Values.configmap.server }}
   server.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
   storage.yaml: | {{ include "storage" . | nindent 4 }}
 {{- with .Values.configmap.task_resource_defaults }}
   task_resource_defaults.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- if .Values.workflow_notifications.enabled }}
+{{- with .Values.workflow_notifications.config }}
+  notifications.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- if .Values.cluster_resource_manager.enabled }}
+{{- with .Values.cluster_resource_manager.templates }}
+  cluster_resources.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
+{{- end }}
+{{- if .Values.workflow_scheduler.enabled }}
+{{- with .Values.workflow_scheduler.config }}
+  scheduler.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
 {{- end }}
