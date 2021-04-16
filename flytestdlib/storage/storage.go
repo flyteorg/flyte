@@ -40,6 +40,8 @@ type DataStore struct {
 	ReferenceConstructor
 }
 
+//go:generate mockery -name RawStore -case=underscore
+
 // Defines a low level interface for accessing and storing bytes.
 type RawStore interface {
 	// returns a FQN DataReference with the configured base init container
@@ -58,6 +60,8 @@ type RawStore interface {
 	CopyRaw(ctx context.Context, source, destination DataReference, opts Options) error
 }
 
+//go:generate mockery -name ReferenceConstructor -case=underscore
+
 // Defines an interface for building data reference paths.
 type ReferenceConstructor interface {
 	// Creates a new dataReference that matches the storage structure.
@@ -72,6 +76,8 @@ type ProtobufStore interface {
 	// Serializes and stores the protobuf.
 	WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error
 }
+
+//go:generate mockery -name ComposedProtobufStore -case=underscore
 
 // A ProtobufStore needs a RawStore to get the RawData. This interface provides all the necessary components to make
 // Protobuf fetching work
