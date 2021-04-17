@@ -27,7 +27,7 @@ data:
 {{- end }}
 {{- end }}
 {{- if .Values.cluster_resource_manager.enabled }}
-{{- with .Values.cluster_resource_manager.templates }}
+{{- with .Values.cluster_resource_manager.config }}
   cluster_resources.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- end }}
