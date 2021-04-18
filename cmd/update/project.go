@@ -20,7 +20,7 @@ type ProjectConfig struct {
 const (
 	projectShort = "Updates project resources"
 	projectLong  = `
-Updates the project according the flags passed.Allows you to archive or activate a project.
+Updates the project according the flags passed. Allows you to archive or activate a project.
 Activates project named flytesnacks.
 ::
 
