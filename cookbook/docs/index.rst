@@ -48,6 +48,7 @@ Main Sections
    plugins
    auto_plugins_pod/index
    auto_plugins_k8s_spark/index
+   auto_plugins_pandera/index
    auto_plugins_papermilltasks/index
    auto_plugins_hive/index
    auto_plugins_sagemaker_training/index

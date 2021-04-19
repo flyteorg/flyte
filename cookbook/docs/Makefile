@@ -4,7 +4,7 @@ rsts:
 
 .PHONY: html
 html:
-	sphinx-build -n -b html . _build
+	sphinx-build -n -b html . _build && sphinx-build -n -b doctest . _build
 
 .PHONY: clean
 clean:

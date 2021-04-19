@@ -177,6 +177,7 @@ examples_dirs = [
     "../plugins/k8s_spark",
     "../plugins/kfpytorch",
     "../plugins/pod/",
+    "../plugins/pandera/",
     "../plugins/papermilltasks/",
     "../plugins/sagemaker_pytorch/",
 ]
@@ -192,6 +193,7 @@ gallery_dirs = [
     "auto_plugins_k8s_spark",
     "auto_plugins_kfpytorch",
     "auto_plugins_pod",
+    "auto_plugins_pandera",
     "auto_plugins_papermilltasks",
     "auto_plugins_sagemaker_pytorch",
 ]
@@ -214,6 +216,7 @@ sphinx_gallery_conf = {
             "../case_studies/house_price_prediction",
             "../plugins/pod/",
             "../plugins/k8s_spark",
+            "../plugins/pandera/",
             "../plugins/papermilltasks/",
             "../plugins/hive",
             "../plugins/sagemaker_training",
@@ -245,10 +248,11 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
+    "pandera": ("https://pandera.readthedocs.io/en/stable/", None),
     "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
-    "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
+    "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/latest/", None),
     "flyte": ("https://flyte.readthedocs.io/en/latest/", None),
     # Uncomment for local development and change to your username
     # "flytekit": ("/Users/ytong/go/src/github.com/lyft/flytekit/docs/build/html", None),
