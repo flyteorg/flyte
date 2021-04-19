@@ -70,33 +70,33 @@ Steps
 
     print(f"Running my_wf(name='adam') {my_wf(name='adam')}")
 
-8. When you run this file locally, it should output ``hello world, adam``. Run this command in your terminal:
+7. When you run this file locally, it should output ``hello world, adam``. Run this command in your terminal:
 
 .. prompt:: bash
 
   python cookbook/core/basic/hello_world.py
 
-*Congratulations!* You have just ran your first workflow. Let's now run it on the sandbox cluster you deployed earlier.
+*Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
 
-6. Run:
+8. Run:
 
 .. prompt:: bash
 
   REGISTRY=ghcr.io/flyteorg make fast_register
 
-7. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
+9. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
 
-8. Give it a minute and one it's done, check out "Inputs/Outputs" on the top right corner to see your greeting updated.
+10. Give it a minute and once it's done, check out "Inputs/Outputs" on the top right corner to see your updated greeting.
 
 .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/exercise.gif
-    :alt: A quick visual tour for launching a workflow and checking the outputs when it's done.
+    :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
 
 .. admonition:: Recap
 
   You have successfully:
 
-  1. Ran a flyte sandbox cluster,
-  2. Ran a flyte workflow locally,
-  3. Ran a flyte workflow on a cluster.
+  1. Run a flyte sandbox cluster,
+  2. Run a flyte workflow locally,
+  3. Run a flyte workflow on a cluster.
 
-Head over to the next section to :ref:`flyte-core` learn more about FlyteKit and how to start leveraging all the functionality flyte has to offer in simple and idiomatic python.
+Head over to the next section :ref:`flyte-core` to learn more about FlyteKit and how to start leveraging all the functionality flyte has to offer in simple and idiomatic python.
