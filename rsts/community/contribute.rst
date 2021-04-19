@@ -1,0 +1,255 @@
+######################
+Contributing to Flyte
+######################
+
+Thank you for taking the time to contribute to Flyte! Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.
+
+.. note::
+    Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduct/>`_ before contributing to Flyte.
+
+Code
+====
+An issue tagged with ``good first issue`` is the best place to start for first-time contributors. Look into them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`_.
+
+To take a step ahead, check out the repositories available under `flyteorg <https://github.com/flyteorg>`_.
+
+**Appetizer (for every repo): Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.** 
+
+.. note::
+    Note: To open a pull request, follow this `guide <https://guides.github.com/activities/forking/>`_.
+
+*A piece of good news -- You can be added as a committer to any ``flyteorg`` repo as you become more involved with the project.*
+
+Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`_. A couple of checks are introduced to help in maintaining the robustness of the project. 
+
+#. To get through DCO, sign off on every commit. (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`_) 
+#. To improve code coverage, write unit tests to test your code.
+
+.. note::
+    Format your Go code using the ``go fmt`` command and Python code with ``black`` (using ``make fmt`` command which contains both black and isort). 
+
+Environment Setup
+*****************
+
+.. figure:: ../images/dependency_graph.png
+    :alt: Dependency Graph between various flyteorg repos
+    :align: center
+    :figclass: align-center
+
+    The dependency graph between various flyteorg repos
+
+#. `flyte <https://github.com/lyft/flyte>`_
+    | Purpose: Deployment, Documentation, and Issues 
+    | Languages: Kustomize & RST
+#. `flyteidl <https://github.com/lyft/flyteidl>`_
+    | Purpose: The Flyte Workflow specification in `protocol buffers <https://developers.google.com/protocol-buffers>`_ which forms the core of Flyte
+    | Language: Protobuf
+    | Setup: Refer to the `README <https://github.com/flyteorg/flyteidl#generate-code-from-protobuf>`_
+#. `flytepropeller <https://github.com/lyft/flytepropeller>`_
+    | Purpose: Kubernetes native execution engine for Flyte Workflows and Tasks
+    | Language: Go
+
+    Setup: 
+        * Check for the Makefile in the root repo
+        * Run the following commands:
+            * ``make generate``
+            * ``make test_unit``
+            * ``make link``
+        * To compile, run ``make compile``
+#. `flyteadmin <https://github.com/lyft/flyteadmin>`_
+    | Purpose: Control Plane
+    | Language: Go
+
+    Setup:
+        * Check for the Makefile in the root repo
+        * If the service code has to be tested, run it locally:
+            * ``make compile``
+            * ``make server``
+        * To seed data locally:
+            * ``make compile``
+            * ``make seed_projects``
+            * ``make migrate``
+        * To run integration tests locally:
+            * ``make integration``
+            * (or, to run in containerized dockernetes): ``make k8s_integration``
+#. `flytekit <https://github.com/lyft/flytekit>`_
+    | Purpose: Python SDK & Tools
+    | Language: Python
+    | Setup: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/projects/flytekit/en/latest/contributing.html>`_
+#. `flyteconsole <https://github.com/lyft/flyteconsole>`_
+    | Purpose: Admin Console
+    | Language: Typescript
+    | Setup: Refer to the `README <https://github.com/flyteorg/flyteconsole#running-flyteconsole>`_
+#. `datacatalog <https://github.com/lyft/datacatalog>`_
+    | Purpose: Manage Input & Output Artifacts
+    | Language: Go
+#. `flyteplugins <https://github.com/lyft/flyteplugins>`_
+    | Purpose: Flyte Plugins
+    | Language: Go
+
+    Setup:
+        * Check for the Makefile in the root repo
+        * Run the following commands:
+            * ``make generate``
+            * ``make test_unit``
+            * ``make link``
+#. `flytestdlib <https://github.com/lyft/flytestdlib>`_
+    | Purpose: Standard Library for Shared Components
+    | Language: Go
+#. `flytesnacks <https://github.com/lyft/flytesnacks>`_
+    | Purpose: Examples, Tips, and Tricks to use Flytekit SDKs
+    | Language: Python (In future, Java shall be added)
+
+    Setup:
+        * If the Python code has to be tested, run it locally
+        * If the Python code has to be tested in a cluster:
+            * Run the ``make start`` command in the root directory of the flytesnacks repo
+            * Visit https://localhost:30081 to view the Flyte console consisting of the examples present in ``flytesnacks/cookbook/core`` directory
+            * To fetch the new dependencies and rebuild the image, run ``make register``
+#. `flytectl <https://github.com/lyft/flytectl>`_
+    | Purpose: A Standalone Flyte CLI
+    | Language: Go
+
+    Setup:
+        * Check for the Makefile in the root repo
+        * Run the following commands:
+            * ``make generate``
+            * ``make test_unit``
+            * ``make link``    
+
+Issues
+======
+`GitHub Issues <https://github.com/flyteorg/flyte/issues>`_ is used for issue tracking. There are a variety of issue types available that you could use while filing an issue.
+
+* `Plugin Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=untriaged%2Cplugins&template=backend-plugin-request.md&title=%5BPlugin%5D>`_
+* `Bug Report <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2C+untriaged&template=bug_report.md&title=%5BBUG%5D+>`_
+* `Documentation Bug/Update Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2C+untriaged&template=docs_issue.md&title=%5BDocs%5D>`_
+* `Core Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged&template=feature_request.md&title=%5BCore+Feature%5D>`_
+* `Flytectl Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+flytectl&template=flytectl_issue.md&title=%5BFlytectl+Feature%5D>`_
+* `Housekeeping <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=housekeeping&template=housekeeping_template.md&title=%5BHousekeeping%5D+>`_
+* `UI Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+ui&template=ui_feature_request.md&title=%5BUI+Feature%5D>`_
+
+If none of the above fits your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`_ issue.
+
+Documentation
+=============
+Flyte uses Sphinx for documentation and ``godocs`` for Golang. ``godocs`` is quite simple -- comment your code and you are good to go!
+
+Sphinx spans across multiple repositories under the `flyteorg <https://github.com/flyteorg>`_ repository. It uses reStructured Text (rst) files to store the documentation content. For both the API and code-related content, it extracts docstrings from the code files. 
+
+To get started, look into `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`_. 
+
+Environment Setup
+*****************
+Install all the requirements from the `docs-requirements.txt` file present in the root of a repository.
+
+.. code-block:: console
+
+    pip install -r docs-requirements.txt
+
+From the ``docs`` directory present in the repository root (for ``flytesnacks``, ``docs`` is present in ``flytesnacks/cookbook``), run the command:
+
+.. code-block:: console
+
+    make html
+
+.. note::
+    For implicit targets, run ``make -C docs html``. 
+
+You can then view the HTML pages in the ``docs/_build`` directory.
+
+.. note::
+    For ``flyte`` repo, there is no ``docs`` directory. Instead, consider the ``rsts`` directory. To generate HTML files, run the following command in the root of the repo.
+
+    .. code-block:: console
+
+        make -C rsts html
+
+For minor edits that don’t require a local setup, you can edit the GitHub page in the documentation to propose the improvements.
+
+The edit option is found at the bottom of a page, as shown below.
+
+.. figure:: ../images/docs_edit.png
+    :alt: GitHub edit option for Documentation
+    :align: center
+    :figclass: align-center
+
+Intersphinx
+***********
+`Intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`_ can generate automatic links to the documentation of objects in other projects.
+
+To establish a reference to any other documentation from Flyte or within it, use intersphinx. 
+
+To do so, create an ``intersphinx_mapping`` in the ``conf.py`` file present in the ``docs/source`` directory.
+
+For example:
+
+.. code-block:: python
+
+    intersphinx_mapping = {
+        "python": ("https://docs.python.org/3", None),
+        "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
+    }
+
+.. note::
+    ``docs/source`` is present in the repository root. Click `here <https://github.com/flyteorg/flytekit/blob/55505c4a6f0240d8273eb16febcad64623764929/docs/source/conf.py#L194-L200>`_ to view the intersphinx configuration.
+
+The key refers to the name used to refer to the file (while referencing the documentation), and the URL denotes the precise location. 
+
+Here are a couple of examples that you can refer to:
+
+.. code-block:: text
+
+    Task: :std:doc:`generated/flytekit.task`
+
+Output:
+
+Task: :std:doc:`generated/flytekit.task`
+
+.. code-block:: text
+
+    :std:doc:`Using custom words <generated/flytekit.task>`
+
+Output:
+
+:std:doc:`Using custom words <generated/flytekit.task>`
+
+|
+
+Linking to Python elements changes based on what you're linking to. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`_ to learn more. 
+
+|
+
+For instance, linking to the `task` decorator in flytekit uses the ``func`` role.
+
+.. code-block:: text
+
+    Link to flytekit code :py:func:`flytekit:flytekit.task`
+
+Output:
+
+Link to flytekit code :py:func:`flytekit:flytekit.task`
+
+|
+
+Here are a couple more examples.
+
+.. code-block:: text
+
+    :py:mod:`Module <python:typing>`
+    :py:class:`Class <python:typing.Type>`
+    :py:data:`Data <python:typing.Callable>`
+    :py:func:`Function <python:typing.cast>`
+    :py:meth:`Method <python:pprint.PrettyPrinter.format>`
+
+Output:
+
+:py:mod:`Module <python:typing>`
+
+:py:class:`Class <python:typing.Type>`
+
+:py:data:`Data <python:typing.Callable>`
+
+:py:func:`Function <python:typing.cast>`
+
+:py:meth:`Method <python:pprint.PrettyPrinter.format>`
