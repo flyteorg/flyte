@@ -6,7 +6,7 @@ Create a single repository that will provide useful snippets, examples and demos
 ## Pre-Requiste
 First time users: refer to [flyte.org](https://flyte.org) for a Flyte orientation (highly recommended).
 
-To start using Flyte, go to the [Getting started guide](https://flyte.readthedocs.io/en/latest/tutorials/first_example.html). 
+To start using Flyte, go to the [Getting started guide](https://docs.flyte.org/en/latest/getting_started.html). 
 
 After Getting Started, use this repository for a deeper dive.
 
