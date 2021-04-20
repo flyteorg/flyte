@@ -2,7 +2,6 @@ package create
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -11,7 +10,6 @@ import (
 	cmdGet "github.com/flyteorg/flytectl/cmd/get"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/google/uuid"
 	"sigs.k8s.io/yaml"
 )
@@ -20,7 +18,7 @@ func createExecutionRequestForWorkflow(ctx context.Context, workflowName string,
 	var lp *admin.LaunchPlan
 	var err error
 	// Fetch the launch plan
-	if lp, err = cmdGet.FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain, cmdCtx); err != nil {
+	if lp, err = cmdGet.DefaultFetcher.FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain, cmdCtx); err != nil {
 		return nil, err
 	}
 	// Create workflow params literal map
@@ -70,6 +68,21 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 	return createExecutionRequest(ID, inputs, authRole), nil
 }
 
+func relaunchExecution(ctx context.Context, executionName string, project string, domain string, cmdCtx cmdCore.CommandContext) error {
+	relaunchedExec, err := cmdCtx.AdminClient().RelaunchExecution(ctx, &admin.ExecutionRelaunchRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Name:    executionName,
+			Project: project,
+			Domain:  domain,
+		},
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Printf("execution identifier %v\n", relaunchedExec.Id)
+	return nil
+}
+
 func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, authRole *admin.AuthRole) *admin.ExecutionCreateRequest {
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
@@ -100,32 +113,36 @@ func readExecConfigFromFile(fileName string) (*ExecutionConfig, error) {
 	return &executionConfigRead, nil
 }
 
-func resolveOverrides(readExecutionConfig *ExecutionConfig, project string, domain string) {
+func resolveOverrides(toBeOverridden *ExecutionConfig, project string, domain string) {
 	if executionConfig.KubeServiceAcct != "" {
-		readExecutionConfig.KubeServiceAcct = executionConfig.KubeServiceAcct
+		toBeOverridden.KubeServiceAcct = executionConfig.KubeServiceAcct
 	}
 	if executionConfig.IamRoleARN != "" {
-		readExecutionConfig.IamRoleARN = executionConfig.IamRoleARN
+		toBeOverridden.IamRoleARN = executionConfig.IamRoleARN
 	}
 	if executionConfig.TargetProject != "" {
-		readExecutionConfig.TargetProject = executionConfig.TargetProject
+		toBeOverridden.TargetProject = executionConfig.TargetProject
 	}
 	if executionConfig.TargetDomain != "" {
-		readExecutionConfig.TargetDomain = executionConfig.TargetDomain
+		toBeOverridden.TargetDomain = executionConfig.TargetDomain
 	}
 	// Use the root project and domain to launch the task/workflow if target is unspecified
 	if executionConfig.TargetProject == "" {
-		readExecutionConfig.TargetProject = project
+		toBeOverridden.TargetProject = project
 	}
 	if executionConfig.TargetDomain == "" {
-		readExecutionConfig.TargetDomain = domain
+		toBeOverridden.TargetDomain = domain
 	}
 }
 
 func readConfigAndValidate(project string, domain string) (ExecutionParams, error) {
 	executionParams := ExecutionParams{}
-	if executionConfig.ExecFile == "" {
-		return executionParams, errors.New("executionConfig can't be empty. Run the flytectl get task/launchplan to generate the config")
+	if executionConfig.ExecFile == "" && executionConfig.Relaunch == "" {
+		return executionParams, fmt.Errorf("executionConfig or relaunch can't be empty. Run the flytectl get task/launchplan to generate the config")
+	}
+	if executionConfig.Relaunch != "" {
+		resolveOverrides(executionConfig, project, domain)
+		return ExecutionParams{name: executionConfig.Relaunch, execType: Relaunch}, nil
 	}
 	var readExecutionConfig *ExecutionConfig
 	var err error
@@ -138,11 +155,13 @@ func readConfigAndValidate(project string, domain string) (ExecutionParams, erro
 	isTask := readExecutionConfig.Task != ""
 	isWorkflow := readExecutionConfig.Workflow != ""
 	if isTask == isWorkflow {
-		return executionParams, errors.New("either one of task or workflow name should be specified to launch an execution")
+		return executionParams, fmt.Errorf("either one of task or workflow name should be specified to launch an execution")
 	}
 	name := readExecutionConfig.Task
+	execType := Task
 	if !isTask {
 		name = readExecutionConfig.Workflow
+		execType = Workflow
 	}
-	return ExecutionParams{name: name, isTask: isTask}, nil
+	return ExecutionParams{name: name, execType: execType}, nil
 }

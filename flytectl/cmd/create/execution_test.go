@@ -1,6 +1,7 @@
 package create
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/flyteorg/flytectl/cmd/config"
@@ -129,6 +130,36 @@ func createExecutionSetup() {
 	}
 	mockClient.OnGetLaunchPlanMatch(ctx, objectGetRequest).Return(launchPlan1, nil)
 }
+
+func TestCreateTaskExecutionFunc(t *testing.T) {
+	setup()
+	createExecutionSetup()
+	executionCreateResponseTask := &admin.ExecutionCreateResponse{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: "flytesnacks",
+			Domain:  "development",
+			Name:    "ff513c0e44b5b4a35aa5",
+		},
+	}
+	mockClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(executionCreateResponseTask, nil)
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
+	err = createExecutionCommand(ctx, args, cmdCtx)
+	assert.Nil(t, err)
+	mockClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
+	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"ff513c0e44b5b4a35aa5" `)
+}
+
+func TestCreateTaskExecutionFuncError(t *testing.T) {
+	setup()
+	createExecutionSetup()
+	mockClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(nil, fmt.Errorf("error launching task"))
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
+	err = createExecutionCommand(ctx, args, cmdCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("error launching task"), err)
+	mockClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
+}
+
 func TestCreateLaunchPlanExecutionFunc(t *testing.T) {
 	setup()
 	createExecutionSetup()
@@ -147,20 +178,46 @@ func TestCreateLaunchPlanExecutionFunc(t *testing.T) {
 	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
 }
 
-func TestCreateTaskExecutionFunc(t *testing.T) {
+func TestCreateRelaunchExecutionFunc(t *testing.T) {
 	setup()
 	createExecutionSetup()
-	executionCreateResponseTask := &admin.ExecutionCreateResponse{
+	relaunchExecResponse := &admin.ExecutionCreateResponse{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "flytesnacks",
 			Domain:  "development",
-			Name:    "ff513c0e44b5b4a35aa5",
+			Name:    "f652ea3596e7f4d80a0e",
 		},
 	}
-	mockClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(executionCreateResponseTask, nil)
-	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
+
+	executionConfig.Relaunch = relaunchExecResponse.Id.Name
+	relaunchRequest := &admin.ExecutionRelaunchRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Name:    executionConfig.Relaunch,
+			Project: config.GetConfig().Project,
+			Domain:  config.GetConfig().Domain,
+		},
+	}
+	mockClient.OnRelaunchExecutionMatch(ctx, relaunchRequest).Return(relaunchExecResponse, nil)
 	err = createExecutionCommand(ctx, args, cmdCtx)
 	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
-	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"ff513c0e44b5b4a35aa5" `)
+	mockClient.AssertCalled(t, "RelaunchExecution", ctx, relaunchRequest)
+	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
+}
+
+func TestCreateExecutionFuncInvalid(t *testing.T) {
+	setup()
+	createExecutionSetup()
+	executionConfig.Relaunch = ""
+	executionConfig.ExecFile = ""
+	err = createExecutionCommand(ctx, args, cmdCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("executionConfig or relaunch can't be empty. Run the flytectl get task/launchplan to generate the config"), err)
+	executionConfig.ExecFile = "Invalid-file"
+	err = createExecutionCommand(ctx, args, cmdCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("unable to read from %v yaml file", executionConfig.ExecFile), err)
+	executionConfig.ExecFile = testDataFolder + "invalid_execution_spec.yaml"
+	err = createExecutionCommand(ctx, args, cmdCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("either one of task or workflow name should be specified to launch an execution"), err)
 }

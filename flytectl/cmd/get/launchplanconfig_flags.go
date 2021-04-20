@@ -43,6 +43,6 @@ func (cfg LaunchPlanConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("LaunchPlanConfig", pflag.ExitOnError)
 	cmdFlags.StringVar(&(launchPlanConfig.ExecFile), fmt.Sprintf("%v%v", prefix, "execFile"), launchPlanConfig.ExecFile, "execution file name to be used for generating execution spec of a single launchplan.")
 	cmdFlags.StringVar(&(launchPlanConfig.Version), fmt.Sprintf("%v%v", prefix, "version"), launchPlanConfig.Version, "version of the launchplan to be fetched.")
-	cmdFlags.BoolVar(&(launchPlanConfig.Latest),fmt.Sprintf("%v%v", prefix, "latest"), launchPlanConfig.Latest, "flag to indicate to fetch the latest version, version flag will be ignored in this case")
+	cmdFlags.BoolVar(&(launchPlanConfig.Latest), fmt.Sprintf("%v%v", prefix, "latest"), launchPlanConfig.Latest, "flag to indicate to fetch the latest version, version flag will be ignored in this case")
 	return cmdFlags
 }

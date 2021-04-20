@@ -1,0 +1,12 @@
+iamRoleARN: ""
+inputs:
+  numbers:
+  - 0
+  numbers_count: 0
+  run_local_at_count: 10
+kubeServiceAcct: ""
+targetDomain: ""
+targetProject: ""
+version: v3
+workflow: core.advanced.run_merge_sort.merge_sort
+task: core.advanced.run_merge_sort.merge
