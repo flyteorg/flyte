@@ -362,7 +362,7 @@ storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: sandbox
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  # bucketName: my-s3-bucket
+  bucketName: my-s3-bucket
   # -- settings for storage type s3
   s3:
     region: us-east-1
@@ -482,8 +482,37 @@ configmap:
   core:
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
-      workers: 20
+      metadata-prefix: metadata/propeller
+      workers: 4
       max-workflow-retries: 30
+      workflow-reeval-duration: 30s
+      downstream-eval-duration: 30s
+      limit-namespace: "all"
+      prof-port: 10254
+      metrics-prefix: flyte
+      enable-admin-launcher: true
+      leader-election:
+        lock-config-map:
+          name: propeller-leader
+          namespace: flyte
+        enabled: true
+        lease-duration: 15s
+        renew-deadline: 10s
+        retry-period: 2s
+      queue:
+        type: batch
+        batching-interval: 2s
+        batch-size: -1
+        queue:
+          type: maxof
+          rate: 100
+          capacity: 1000
+          base-delay: 5s
+          max-delay: 120s
+        sub-queue:
+          type: bucket
+          rate: 10
+          capacity: 100
 
   # Plugins configuration
   enabled_plugins:
@@ -619,36 +648,36 @@ cluster_resource_manager:
     - key: ab_project_resource_quota
       value: |
         apiVersion: v1
-            kind: ResourceQuota
-            metadata:
-              name: project-quota
-              namespace: {{ namespace }}
-            spec:
-              hard:
-                limits.cpu: {{ projectQuotaCpu }}
-                limits.memory: {{ projectQuotaMemory }}
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
 
     # -- Template for spark role
     - key: ac_project_copilot_dataconfig
       value: |
         kind: ConfigMap
-            apiVersion: v1
-            metadata:
-              name: flyte-data-config
-              namespace: {{ namespace }}
-            data:
-              config.yaml: |
-                storage:
-                  connection:
-                    access-key: minio
-                    auth-type: accesskey
-                    disable-ssl: true
-                    endpoint: http://minio.flyte.svc.cluster.local:9000
-                    region: us-east-1
-                    secret-key: miniostorage
-                  type: minio
-                  container: my-s3-bucket
-                  enable-multicontainer: true
+        apiVersion: v1
+        metadata:
+          name: flyte-data-config
+          namespace: {{ namespace }}
+        data:
+          config.yaml: |
+            storage:
+              connection:
+                access-key: minio
+                auth-type: accesskey
+                disable-ssl: true
+                endpoint: http://minio.flyte.svc.cluster.local:9000
+                region: us-east-1
+                secret-key: miniostorage
+              type: minio
+              container: my-s3-bucket
+              enable-multicontainer: true
 
 
 # --------------------------------------------------------

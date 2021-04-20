@@ -53,6 +53,7 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config
           name: config-volume
+      {{- if .Values.cluster_resource_manager.enabled }}
       - command:
         - flyteadmin
         - --config
@@ -67,6 +68,7 @@ spec:
           name: resource-templates
         - mountPath: /etc/flyte/config
           name: config-volume
+      {{- end }}
       containers:
       - command:
         - flyteadmin
@@ -115,9 +117,11 @@ spec:
       - configMap:
           name: flyte-admin-config
         name: config-volume
+      {{- if .Values.cluster_resource_manager.enabled }}
       - configMap:
           name: clusterresource-template
         name: resource-templates
+      {{- end }}
       {{- with .Values.flyteadmin.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}
