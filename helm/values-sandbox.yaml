@@ -1,4 +1,11 @@
 
+# ---------------------------------------------------------------------
+# Core System settings
+# This section consists of Core components of Flyte and their deployment
+# settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
+# Flyteconsole
+# ---------------------------------------------------------------------
+
 #
 # FLYTEADMIN
 #
@@ -23,8 +30,15 @@ flytepropeller: {}
 
 flyteconsole: {}
 
+
+# ----------------------------------------------
+# Sandbox Configuration
+# Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop.
+# This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal
+# for a high performance setup, but are great to try out flyte
+# -----------------------------------------------
 #
-# REDIS
+# REDIS SETTINGS
 #
 
 redis:
@@ -59,19 +73,6 @@ contour:
       nodePorts:
         http: 30081
 
-#
-# SPARKOPERATOR
-#
-
-sparkoperator:
-  enabled: false
-
-#
-# PYTORCHOPERATOR
-#
-
-pytorchoperator:
-  enabled: false
 
 #
 # KUBERNETES DASHBOARD
@@ -87,8 +88,9 @@ kubernetes-dashboard:
     type: NodePort
     externalPort: 30082
 
+# ------------------------------------------------
 #
-# COMMON
+# COMMON SETTINGS
 #
 
 common:
@@ -100,18 +102,39 @@ common:
       enabled: false
   flyteNamespaceTemplate: {}
 
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
 #
-# CONFIGMAPS
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: sandbox
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  bucketName: my-s3-bucket
+
+# Database configuration
+db:
+  database:
+    port: 5432
+    username: postgres
+    host: postgres
+    dbname: flyte_development
+
+
+
+# --------------------------------------------------------------------
+# Specializing your deployment using configuration
+# -------------------------------------------------------------------
+#
+# CONFIGMAPS SETTINGS
 #
 
 configmap:
-
-  db:
-    database:
-      port: 5432
-      username: postgres
-      host: postgres
-      dbname: flyte_development
 
   # Task default resources configuration
   task_resource_defaults:
@@ -119,6 +142,14 @@ configmap:
       defaults:
         memory: 200Mi
 
+  # Core propeller configuration
+  core:
+    propeller:
+      rawoutput-prefix: s3://my-s3-bucket/
+      workers: 20
+      max-workflow-retries: 30
+
+  # Plugins configuration
   enabled_plugins:
     tasks:
       task-plugins:
@@ -131,6 +162,7 @@ configmap:
           sidecar: sidecar
           container_array: k8s-array
 
+  # Kubernetes plugin configuration
   k8s:
     plugins:
       k8s:
@@ -139,55 +171,81 @@ configmap:
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         default-memory: 200Mi
-  
-  task_logs:
-    plugins:
-      logs:
-        kubernetes-enabled: true
-        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 
+  # Logger configuration
   logger:
     logger:
       show-source: true
-      level: 5
+      level: 4
 
-  # Disable Qubole
-  qubole: null
-
-  # Use noop resource-manager
+  # Resource manager configuration
   resource_manager:
     propeller:
       resourcemanager:
         type: noop
         redis: null
 
-  ab_project_resource_quota: |
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }} 
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }} 
-        limits.memory: {{ projectQuotaMemory }}
+  # Tasks logs plugin configuration
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: true
+        kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 
-  ac_project_copilot_dataconfig: |
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: |
-        storage:
-          connection:
-            access-key: minio
-            auth-type: accesskey
-            disable-ssl: true
-            endpoint: http://minio.flyte.svc.cluster.local:9000
-            region: us-east-1
-            secret-key: miniostorage
-          type: minio
-          container: my-s3-bucket
-          enable-multicontainer: true
+# ----------------------------------------------------------------
+# Optional Modules
+# Flyte built extensions that enable various additional features in Flyte.
+# All these features are optional, but are critical to run certain features
+# ------------------------------------------------------------------------
+
+# --
+# Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+workflow_scheduler:
+  enabled: false
+
+
+# --
+# Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
+# various events in their workflows
+workflow_notifications:
+    enabled: false
+
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+
+
+# --------------------------------------------------------
+# Optional Plugins
+# --------------------------------------------------------
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator:
+  enabled: false
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: false
+
+# ----------------------
+# Distributed tensorflow training using the TF-Operator
+#
+
+
+# ----------------------
+# Training on AWS Sagemaker using AWS Sagemaker operator
+#
+
+# ---------------------------
+# Flink jobs using the Flink Operator
+#
