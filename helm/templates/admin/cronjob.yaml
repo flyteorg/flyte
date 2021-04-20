@@ -1,3 +1,4 @@
+{{- if .Values.cluster_resource_manager.enabled }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -38,3 +39,4 @@ spec:
           - configMap:
               name: flyte-admin-config
             name: config-volume
+  {{- end }}

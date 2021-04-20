@@ -606,65 +606,49 @@ cluster_resource_manager:
   # -- Resource templates that should be applied
   templates:
     # -- Template for namespaces resources
-    aa_namespace: |
-      apiVersion: v1
-      kind: Namespace
-      metadata:
-        name: {{ namespace }}
-      spec:
-        finalizers:
-        - kubernetes
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+            kind: ResourceQuota
+            metadata:
+              name: project-quota
+              namespace: {{ namespace }}
+            spec:
+              hard:
+                limits.cpu: {{ projectQuotaCpu }}
+                limits.memory: {{ projectQuotaMemory }}
 
     # -- Template for spark role
-    ad_spark_role: |
-      apiVersion: rbac.authorization.k8s.io/v1beta1
-      kind: Role
-      metadata:
-        name: spark-role
-        namespace: {{ namespace }}
-      rules:
-      - apiGroups:
-        - ""
-        resources:
-        - pods
-        verbs:
-        - '*'
-      - apiGroups:
-        - ""
-        resources:
-        - services
-        verbs:
-        - '*'
-      - apiGroups:
-        - ""
-        resources:
-        - configmaps
-        verbs:
-        - '*'
-
-    # -- Template for spark SA
-    ae_spark_service_account: |
-      apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: spark
-        namespace: {{ namespace }}
-
-    # -- Template for spark role binding
-    af_spark_role_binding: |
-      apiVersion: rbac.authorization.k8s.io/v1beta1
-      kind: RoleBinding
-      metadata:
-        name: spark-role-binding
-        namespace: {{ namespace }}
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: Role
-        name: spark-role
-      subjects:
-      - kind: ServiceAccount
-        name: spark
-        namespace: {{ namespace }}
+    - key: ac_project_copilot_dataconfig
+      value: |
+        kind: ConfigMap
+            apiVersion: v1
+            metadata:
+              name: flyte-data-config
+              namespace: {{ namespace }}
+            data:
+              config.yaml: |
+                storage:
+                  connection:
+                    access-key: minio
+                    auth-type: accesskey
+                    disable-ssl: true
+                    endpoint: http://minio.flyte.svc.cluster.local:9000
+                    region: us-east-1
+                    secret-key: miniostorage
+                  type: minio
+                  container: my-s3-bucket
+                  enable-multicontainer: true
 
 
 # --------------------------------------------------------
