@@ -20,7 +20,7 @@ func FetchLPForName(ctx context.Context, name string, project string, domain str
 		}
 		launchPlans = append(launchPlans, lp)
 	} else if launchPlanConfig.Version != "" {
-		if lp, err = FetchLPVersion(ctx, name, launchPlanConfig.Version, project, domain, cmdCtx); err != nil {
+		if lp, err = DefaultFetcher.FetchLPVersion(ctx, name, launchPlanConfig.Version, project, domain, cmdCtx); err != nil {
 			return nil, err
 		}
 		launchPlans = append(launchPlans, lp)
@@ -73,7 +73,7 @@ func FetchLPLatestVersion(ctx context.Context, name string, project string, doma
 	return lp, nil
 }
 
-func FetchLPVersion(ctx context.Context, name string, version string, project string, domain string, cmdCtx cmdCore.CommandContext) (*admin.LaunchPlan, error) {
+func (f FetcherImpl) FetchLPVersion(ctx context.Context, name string, version string, project string, domain string, cmdCtx cmdCore.CommandContext) (*admin.LaunchPlan, error) {
 	lp, err := cmdCtx.AdminClient().GetLaunchPlan(ctx, &admin.ObjectGetRequest{
 		Id: &core.Identifier{
 			ResourceType: core.ResourceType_LAUNCH_PLAN,

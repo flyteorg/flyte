@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 
@@ -70,13 +69,7 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 	var executions []*admin.Execution
 	if len(args) > 0 {
 		name := args[0]
-		execution, err := cmdCtx.AdminClient().GetExecution(ctx, &admin.WorkflowExecutionGetRequest{
-			Id: &core.WorkflowExecutionIdentifier{
-				Project: config.GetConfig().Project,
-				Domain:  config.GetConfig().Domain,
-				Name:    name,
-			},
-		})
+		execution, err := DefaultFetcher.FetchExecution(ctx, name, config.GetConfig().Project, config.GetConfig().Domain, cmdCtx)
 		if err != nil {
 			return err
 		}

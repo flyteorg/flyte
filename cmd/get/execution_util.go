@@ -1,11 +1,13 @@
 package get
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -25,6 +27,20 @@ type ExecutionConfig struct {
 	Task            string                 `json:"task,omitempty"`
 	Version         string                 `json:"version"`
 	Inputs          map[string]interface{} `json:"inputs"`
+}
+
+func (f FetcherImpl) FetchExecution(ctx context.Context, name string, project string, domain string, cmdCtx cmdCore.CommandContext) (*admin.Execution, error) {
+	e, err := cmdCtx.AdminClient().GetExecution(ctx, &admin.WorkflowExecutionGetRequest{
+		Id: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return e, nil
 }
 
 func WriteExecConfigToFile(executionConfig ExecutionConfig, fileName string) error {

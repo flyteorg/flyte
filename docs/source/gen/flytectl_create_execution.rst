@@ -70,6 +70,12 @@ The root project and domain flags of -p and -d should point to task/launch plans
 
  flytectl create execution --execFile execution_spec.yaml -p flytectldemo -d development --targetProject flytesnacks
 
+Also an execution can be relaunched by passing in current execution id.
+
+::
+
+ flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytectldemo -d development
+
 Usage
 
 
@@ -86,6 +92,7 @@ Options
   -h, --help                     help for execution
       --iamRoleARN string        iam role ARN AuthRole for launching execution.
       --kubeServiceAcct string   kubernetes service account AuthRole for launching execution.
+      --relaunch string          execution id to be relaunched.
       --targetDomain string      project where execution needs to be created.If not specified configured domain would be used.
       --targetProject string     project where execution needs to be created.If not specified configured project would be used.
 
