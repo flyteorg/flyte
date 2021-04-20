@@ -438,7 +438,7 @@ configmap:
       httpPort: 8080
       grpcServerReflection: true
 
-  # Task default resources configuration
+  # -- Task default resources configuration
   task_resource_defaults:
     # -- Task default resources parameters
     task_resources:
@@ -452,7 +452,7 @@ configmap:
         storage: 20Mi
         gpu: 1
 
-  # Admin configuration
+  # -- Admin configuration
   admin:
     event:
       type: admin
@@ -462,14 +462,14 @@ configmap:
       endpoint: flyteadmin:81
       insecure: true
 
-  # Catalog configuration
+  # -- Catalog configuration
   catalog:
     catalog-cache:
       endpoint: datacatalog:89
       type: datacatalog
       insecure: true
 
-  # Copilot configuration
+  # -- Copilot configuration
   copilot:
     plugins:
       k8s:
@@ -478,7 +478,7 @@ configmap:
           image: ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
           start-timeout: 30s
 
-  # Core propeller configuration
+  # -- Core propeller configuration, follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller@v0.10.3/pkg/controller/config)
   core:
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
@@ -678,7 +678,7 @@ sparkoperator:
       cpu: 10m
       memory: 50M
 
-  # Spark plugin configuration
+  # -- Spark plugin configuration
   plugin_config:
     plugins:
       spark:
