@@ -6,9 +6,38 @@
    :hidden:
 
    getting_started
-   Tutorials <https://flytecookbook.readthedocs.io>
+   User Guide <https://flytecookbook.readthedocs.io>
+   Concepts <https://docs.flyte.org/en/latest/concepts/index.html>
    reference/index
    community/index
+
+.. toctree::
+   :caption: Basics
+   :hidden:
+
+   basics/flyte_ui
+   basics/deployment_options
+   basics/glossary
+
+.. toctree::
+   :caption: Concepts
+   :maxdepth: 1
+   :name: divedeeptoc
+   :hidden:
+
+   concepts/core
+   concepts/control_plane
+   concepts/execution_time
+
+.. toctree::
+   :caption: Community
+   :maxdepth: 1
+   :name: roadmaptoc
+   :hidden:
+
+   Join the Community <community/index>
+   community/docs
+   community/roadmap
 
 .. toctree::
    :caption: How-Tos
@@ -18,26 +47,7 @@
 
    plugins/index
    howto/index
-
-.. toctree::
-   :caption: Deep Dive
-   :maxdepth: 1
-   :name: divedeeptoc
-   :hidden:
-
-   dive_deep/index
-
-.. toctree::
-   :caption: Developers
-   :maxdepth: 1
-   :name: roadmaptoc
-   :hidden:
-
-   Join the Community <community/index>
-   community/docs
-   community/roadmap
-   community/compare
-
+   
 Meet Flyte
 ==========
 
