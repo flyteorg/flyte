@@ -49,6 +49,6 @@ Most Flyte workloads should be good candidates for spot instances. If your task 
 How to recover from interruptions?
 ===================================
 
-.. CAUTION::
+.. NOTE::
 
     Coming soon 🛠

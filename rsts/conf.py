@@ -111,10 +111,6 @@ templates_path = ["_templates"]
 pygments_style = "tango"
 pygments_dark_style = "native"
 
-html_css_files = [
-    "custom.css",
-]
-
 html_theme_options = {
     "light_css_variables": {
         "color-brand-primary": "#4300c9",

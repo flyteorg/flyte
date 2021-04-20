@@ -4,7 +4,7 @@
 How do I use Fast Registration?
 ********************************
 
-.. caution:: Experimental feature (beta)
+.. NOTE:: Experimental feature (beta)
 
 Are you frustrated by having to wait for an image build in order to test out simple code changes to your Flyte workflows? If you're interested in reducing to your iteration cycle to mere seconds, read on below.
 

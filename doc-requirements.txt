@@ -6,9 +6,9 @@
 #
 alabaster==0.7.12
     # via sphinx
-astroid==2.5.2
+astroid==2.5.6
     # via sphinx-autoapi
-babel==2.9.0
+babel==2.9.1
     # via sphinx
 beautifulsoup4==4.9.3
     # via
@@ -20,7 +20,7 @@ chardet==4.0.0
     # via requests
 docutils==0.16
     # via sphinx
-furo==2021.3.20b30
+git+git://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
 idna==2.10
     # via requests
@@ -59,7 +59,7 @@ snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.2.1
     # via beautifulsoup4
-sphinx-autoapi==1.7.0
+sphinx-autoapi==1.8.1
     # via -r doc-requirements.in
 sphinx-code-include==1.1.1
     # via -r doc-requirements.in
@@ -71,7 +71,7 @@ sphinx-prompt==1.4.0
     # via -r doc-requirements.in
 sphinx-tabs==2.1.0
     # via -r doc-requirements.in
-sphinx==3.5.3
+sphinx==3.5.4
     # via
     #   -r doc-requirements.in
     #   furo
