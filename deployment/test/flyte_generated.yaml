@@ -582,7 +582,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.0
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -600,7 +600,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.0
+        image: ghcr.io/flyteorg/datacatalog:v0.3.1
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -657,7 +657,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -705,7 +705,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -756,7 +756,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -772,7 +772,7 @@ spec:
         - seed-projects
         - flytetester
         - flytesnacks
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -786,7 +786,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.0
+        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -843,7 +843,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -880,11 +880,20 @@ spec:
           value: minio
         - name: MINIO_SECRET_KEY
           value: miniostorage
-        image: minio/minio:RELEASE.2020-12-16T05-05-17Z
+        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
         name: minio
         ports:
         - containerPort: 9000
           name: minio
+        volumeMounts:
+        - mountPath: /data
+          name: minio-storage
+      initContainers:
+      - command:
+        - mkdir
+        - /data/my-s3-bucket
+        image: minio/minio:RELEASE.2021-04-06T23-11-00Z
+        name: create-bucket
         volumeMounts:
         - mountPath: /data
           name: minio-storage
@@ -948,7 +957,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.7.8
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
