@@ -392,12 +392,12 @@ db:
 #
 
 configmap:
-  # Configmap for Flyte console UI
+  # -- Configuration for Flyte console UI
   console:
     BASE_URL: /console
     CONFIG_DIR: /etc/flyte/config
 
-  # Domains configuration for Flyte projects
+  # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
     domains:
     - id: development
@@ -407,7 +407,7 @@ configmap:
     - id: production
       name: production
 
-  # -- Flyteadmin server config
+  # -- FlyteAdmin server configuration
   server:
     server:
       httpPort: 8088
@@ -427,7 +427,7 @@ configmap:
       testing:
         host: http://flyteadmin
   
-  # Datacatalog server config
+  # -- Datacatalog server config
   datacatalogServer:
     datacatalog:
       storage-prefix: metadata/datacatalog
@@ -452,7 +452,7 @@ configmap:
         storage: 20Mi
         gpu: 1
 
-  # -- Admin configuration
+  # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
   admin:
     event:
       type: admin
@@ -462,7 +462,8 @@ configmap:
       endpoint: flyteadmin:81
       insecure: true
 
-  # -- Catalog configuration
+  # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
+  # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
   catalog:
     catalog-cache:
       endpoint: datacatalog:89
@@ -473,13 +474,15 @@ configmap:
   copilot:
     plugins:
       k8s:
+        # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
           image: ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
           start-timeout: 30s
 
-  # -- Core propeller configuration, follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller@v0.10.3/pkg/controller/config)
+  # -- Core propeller configuration
   core:
+    # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config).
     propeller:
       rawoutput-prefix: s3://my-s3-bucket/
       metadata-prefix: metadata/propeller
@@ -513,30 +516,34 @@ configmap:
           type: bucket
           rate: 10
           capacity: 100
+    # -- For Workflow store use configuration [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/workflowstore#Config)
+    #
 
-  # Plugins configuration
   enabled_plugins:
+    # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
     tasks:
+      # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
       task-plugins:
+        # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config)
         enabled-plugins: []
 
-  # Kubernetes plugin configuration
+  # -- Kubernetes specific Flyte configuration
   k8s:
     plugins:
+      # -- Configuration section for all K8s specific plugins [Configuration structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/flytek8s/config)
       k8s:
         default-env-vars: []
-        # - DEFAULT_ENV_VAR: VALUE
-
+        #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
 
-  # Logger configuration
+  # -- Logger configuration
   logger:
     logger:
       show-source: true
       level: 4
 
-  # Resource manager configuration
+  # -- Resource manager configuration
   resource_manager:
     # -- resource manager configuration
     propeller:
@@ -547,7 +554,9 @@ configmap:
           hostPath: redis-resource-manager:6379
           hostKey: mypassword
 
-  # Tasks logs plugin configuration
+  # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
+  # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
+  # logging engines
   task_logs:
     plugins:
       logs:
@@ -559,16 +568,16 @@ configmap:
 # All these features are optional, but are critical to run certain features
 # ------------------------------------------------------------------------
 
-# --
+# -- **Optional Component**
 # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
-# this module, you will not have scheduled launchplans/workflows.
+# this module, you will not have scheduled launchplans / workflows.
 workflow_scheduler:
   enabled: false
   config: {}
 
 
 
-# --
+# -- **Optional Component**
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
@@ -582,7 +591,7 @@ workflow_notifications:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
-  # Configmap for ClusterResource parameters
+  # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
     cluster_resources:
@@ -657,10 +666,7 @@ cluster_resource_manager:
 # Optional Plugins
 # --------------------------------------------------------
 
-#
-# SPARK Plugin using the Spark Operator
-#
-
+# -- Optional: Spark Plugin using the Spark Operator
 sparkoperator:
   # --- enable or disable Sparkoperator deployment installation
   enabled: true
