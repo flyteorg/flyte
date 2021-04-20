@@ -1,3 +1,4 @@
+import { FormControlLabel, Checkbox } from '@material-ui/core';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { MultiSelectForm } from 'components/common/MultiSelectForm';
 import { SearchInputForm } from 'components/common/SearchInputForm';
@@ -8,7 +9,8 @@ import {
     FilterState,
     MultiFilterState,
     SearchFilterState,
-    SingleFilterState
+    SingleFilterState,
+    BooleanFilterState
 } from './filters/types';
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -22,6 +24,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         width: '100%'
     },
     filterButton: {
+        marginLeft: theme.spacing(1)
+    },
+    checkbox: {
         marginLeft: theme.spacing(1)
     }
 }));
@@ -53,13 +58,37 @@ const RenderFilter: React.FC<{ filter: FilterState }> = ({ filter }) => {
  * This allows for the consuming code to have direct access to the
  * current filters without relying on complicated callback arrangements
  */
-export const ExecutionFilters: React.FC<{ filters: FilterState[] }> = ({
-    filters
-}) => {
+export const ExecutionFilters: React.FC<{
+    filters: (FilterState | BooleanFilterState)[];
+}> = ({ filters }) => {
     const styles = useStyles();
+
     return (
         <div className={styles.container}>
-            {filters.map(filter => {
+            {filters.map((filter: any) => {
+                if (filter.hidden) {
+                    return null;
+                }
+                if (filter.type === 'boolean') {
+                    const handleChange = (
+                        event: React.ChangeEvent<HTMLInputElement>
+                    ) => filter.setActive(event.target.checked);
+
+                    return (
+                        <FormControlLabel
+                            key={filter.label}
+                            data-testid="checkbox"
+                            control={
+                                <Checkbox
+                                    checked={filter.active}
+                                    onChange={handleChange}
+                                />
+                            }
+                            className={styles.checkbox}
+                            label={filter.label}
+                        />
+                    );
+                }
                 const renderContent = () => <RenderFilter filter={filter} />;
                 return (
                     <FilterPopoverButton

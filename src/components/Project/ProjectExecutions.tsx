@@ -95,10 +95,15 @@ export const ProjectExecutions: React.FC<ProjectExecutionsProps> = ({
         />
     );
 
-    return (
-        <div className={styles.container}>
-            <ExecutionFilters {...filtersState} />
-            <ErrorBoundary>{content}</ErrorBoundary>
-        </div>
-    );
+    /** Don't render component until finish fetching user profile */
+    if (filtersState.filters[4].status === 'LOADED') {
+        return (
+            <div className={styles.container}>
+                <ExecutionFilters {...filtersState} />
+                <ErrorBoundary>{content}</ErrorBoundary>
+            </div>
+        );
+    } else {
+        return null;
+    }
 };

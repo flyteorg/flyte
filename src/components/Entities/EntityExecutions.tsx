@@ -50,6 +50,11 @@ export const EntityExecutions: React.FC<EntityExecutionsProps> = ({ id }) => {
         }
     );
 
+    /** Don't render component until finish fetching user profile */
+    if (filtersState.filters[4].status !== 'LOADED') {
+        return null;
+    }
+
     return (
         <>
             <Typography className={styles.header} variant="h6">

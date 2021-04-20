@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react';
+import { render, waitFor, fireEvent } from '@testing-library/react';
 import { basicPythonWorkflow } from 'mocks/data/fixtures/basicPythonWorkflow';
 import { oneFailedTaskWorkflow } from 'mocks/data/fixtures/oneFailedTaskWorkflow';
 import { insertFixture } from 'mocks/data/insertFixture';
@@ -20,59 +20,116 @@ import {
 import { failedToLoadExecutionsString } from '../constants';
 import { ProjectExecutions } from '../ProjectExecutions';
 
-jest.mock('components/Executions/Tables/WorkflowExecutionsTable');
+import { APIContext } from 'components/data/apiContext';
+import { mockAPIContextValue } from 'components/data/__mocks__/apiContext';
+import { getUserProfile } from 'models/Common/api';
+import { UserProfile } from 'models/Common/types';
 
-const defaultQueryParams = {
-    [sortQueryKeys.direction]: SortDirection[SortDirection.DESCENDING],
-    [sortQueryKeys.key]: executionSortFields.createdAt
-};
+jest.mock('components/Executions/Tables/WorkflowExecutionsTable');
 
 describe('ProjectExecutions', () => {
     let basicPythonFixture: ReturnType<typeof basicPythonWorkflow.generate>;
     let failedTaskFixture: ReturnType<typeof oneFailedTaskWorkflow.generate>;
-    let executions: Execution[];
+    let executions1: Execution[];
+    let executions2: Execution[];
     let scope: DomainIdentifierScope;
     let queryClient: QueryClient;
+    let mockGetUserProfile: jest.Mock<ReturnType<typeof getUserProfile>>;
+
+    const sampleUserProfile: UserProfile = {
+        sub: 'sub'
+    } as UserProfile;
+
+    const defaultQueryParams1 = {
+        [sortQueryKeys.direction]: SortDirection[SortDirection.DESCENDING],
+        [sortQueryKeys.key]: executionSortFields.createdAt
+    };
+
+    const defaultQueryParams2 = {
+        filters: 'eq(user,sub)',
+        [sortQueryKeys.direction]: SortDirection[SortDirection.DESCENDING],
+        [sortQueryKeys.key]: executionSortFields.createdAt
+    };
 
     beforeEach(() => {
+        mockGetUserProfile = jest.fn().mockResolvedValue(null);
         queryClient = createTestQueryClient();
         basicPythonFixture = basicPythonWorkflow.generate();
         failedTaskFixture = oneFailedTaskWorkflow.generate();
         insertFixture(mockServer, basicPythonFixture);
         insertFixture(mockServer, failedTaskFixture);
-        executions = [
+        executions1 = [
             basicPythonFixture.workflowExecutions.top.data,
             failedTaskFixture.workflowExecutions.top.data
         ];
-        const { domain, project } = executions[0].id;
+        executions2 = [];
+        const { domain, project } = executions1[0].id;
         scope = { domain, project };
         mockServer.insertWorkflowExecutionList(
             scope,
-            executions,
-            defaultQueryParams
+            executions1,
+            defaultQueryParams1
+        );
+        mockServer.insertWorkflowExecutionList(
+            scope,
+            executions2,
+            defaultQueryParams2
         );
     });
 
     const renderView = () =>
         render(
             <QueryClientProvider client={queryClient}>
-                <ProjectExecutions
-                    projectId={scope.project}
-                    domainId={scope.domain}
-                />
+                <APIContext.Provider
+                    value={mockAPIContextValue({
+                        getUserProfile: mockGetUserProfile
+                    })}
+                >
+                    <ProjectExecutions
+                        projectId={scope.project}
+                        domainId={scope.domain}
+                    />
+                </APIContext.Provider>
             </QueryClientProvider>,
             { wrapper: MemoryRouter }
         );
 
-    it('displays executions after successful load', async () => {
-        const { getByText } = renderView();
-        await waitFor(() => expect(getByText(executions[0].id.name)));
+    it('should not display checkbox if user does not login', async () => {
+        const { queryByTestId } = renderView();
+        await waitFor(() => {});
+        expect(mockGetUserProfile).toHaveBeenCalled();
+        expect(queryByTestId(/checkbox/i)).toBeNull();
     });
 
-    it('shows name of corresponding workflow in row items', async () => {
-        const { getByText } = renderView();
+    it('should display checkbox if user login', async () => {
+        mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+        const { queryByTestId } = renderView();
+        await waitFor(() => {});
+        expect(mockGetUserProfile).toHaveBeenCalled();
+        const checkbox = queryByTestId(/checkbox/i) as HTMLInputElement;
+        expect(checkbox).toBeTruthy();
+    });
+
+    /** user doesn't have its own workflow */
+    it('should not display workflow if user does not have workflow', async () => {
+        mockGetUserProfile.mockResolvedValue(sampleUserProfile);
+        const { getByText, queryByText, queryByTestId } = renderView();
+        await waitFor(() => {});
+        expect(mockGetUserProfile).toHaveBeenCalled();
+        const checkbox = queryByTestId(/checkbox/i)?.querySelector(
+            'input'
+        ) as HTMLInputElement;
+        expect(checkbox).toBeTruthy();
+        expect(checkbox?.checked).toEqual(true);
         await waitFor(() =>
-            expect(getByText(executions[0].closure.workflowId.name))
+            expect(
+                queryByText(executions1[0].closure.workflowId.name)
+            ).toBeNull()
+        );
+        fireEvent.click(checkbox);
+        // in case that user uncheck checkbox, table should display all executions
+        await waitFor(() =>
+            expect(getByText(executions1[0].closure.workflowId.name))
         );
     });
 
@@ -85,7 +142,7 @@ describe('ProjectExecutions', () => {
             mockServer.insertWorkflowExecutionList(
                 scope,
                 unexpectedError(errorMessage),
-                defaultQueryParams
+                defaultQueryParams1
             );
         });
         afterEach(() => {

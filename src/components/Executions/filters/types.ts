@@ -20,13 +20,15 @@ export interface FilterButtonState {
     onClick: () => void;
 }
 
-export type FilterStateType = 'single' | 'multi' | 'search';
+export type FilterStateType = 'single' | 'multi' | 'search' | 'boolean';
 
 export interface FilterState {
     active: boolean;
     button: FilterButtonState;
+    hidden?: boolean;
     label: string;
     type: FilterStateType;
+    status?: string;
     getFilter: () => FilterOperation[];
     onReset: () => void;
 }
@@ -53,4 +55,9 @@ export interface MultiFilterState<FilterKey extends string, DataType>
     selectedStates: Record<FilterKey, boolean>;
     type: 'multi';
     values: FilterValue<FilterKey, DataType>[];
+}
+
+export interface BooleanFilterState extends FilterState {
+    setActive: (active: boolean) => void;
+    type: 'boolean';
 }
