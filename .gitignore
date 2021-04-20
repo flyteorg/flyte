@@ -2,3 +2,5 @@
 _bin/
 rsts/
 stats/
+.DS_Store
+.vscode/
