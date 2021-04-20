@@ -26,12 +26,12 @@ Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flyteprop
 #. To improve code coverage, write unit tests to test your code.
 
 .. note::
-    Format your Go code using the ``go fmt`` command and Python code with ``black`` (using ``make fmt`` command which contains both black and isort). 
+    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`_), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). 
 
 Environment Setup
 *****************
 
-.. figure:: ../images/dependency_graph.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/dependency_graph.png
     :alt: Dependency Graph between various flyteorg repos
     :align: center
     :figclass: align-center
@@ -169,7 +169,7 @@ For minor edits that don’t require a local setup, you can edit the GitHub page
 
 The edit option is found at the bottom of a page, as shown below.
 
-.. figure:: ../images/docs_edit.png
+.. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/docs_edit.png
     :alt: GitHub edit option for Documentation
     :align: center
     :figclass: align-center
