@@ -140,32 +140,7 @@ minio:
 contour:
   enabled: false
 
-#
-# SPARKOPERATOR
-#
 
-sparkoperator:
-  enabled: true
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1000Mi
-    requests:
-      cpu: 50m
-      memory: 250Mi
-
-#
-# PYTORCHOPERATOR
-#
-
-pytorchoperator:
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 1000Mi
-    requests:
-      cpu: 50m
-      memory: 250Mi
 
 #
 # COMMON
@@ -209,22 +184,36 @@ common:
       #     key: k8s/data/path/to/secret
       #     property: password
 
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
+#
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: s3
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  bucketName: <my-s3-bucket>
+  s3:
+    region: us-east-1
+
+db:
+  database:
+    port: 5432
+    username: postgres
+    host: <DB-NAME>
+    dbname: flyte-development
+    passwordPath: /etc/db/pass.txt
+
 #
 # CONFIGMAPS
 #
 
 configmap:
-  db:
-    database:
-      port: 5432
-      username: postgres
-      host: <DB-NAME>
-      dbname: flyte-development
-      passwordPath: /etc/db/pass.txt
-  remote_data:
-    remoteData:
-      region: us-east-1
-      scheme: aws
   server:
     server:
       httpPort: 8088
@@ -238,35 +227,7 @@ configmap:
           - "*"
         allowedHeaders:
           - "Content-Type"
-    scheduler:
-      eventScheduler:
-        scheme: aws
-        region: us-east-1
-        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
-        targetName: arn:aws:sqs:us-east-1:<ACCOUNT-NUMBER>:flyte-cron-scheduler-queue
-        scheduleNamePrefix: flyte
-      workflowExecutor:
-        scheme: aws
-        region: us-east-1
-        scheduleQueueName: flyte-cron-scheduler-queue
-        accountId: <ACCOUNT-NUMBER>
-        reconnectAttempts: 10
-        reconnectDelaySeconds: 30
-    notifications:
-      type: aws
-      region: us-east-1
-      publisher:
-        topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
-      processor:
-        queueName: flyte-notifications-queue
-        accountId: <ACCOUNT-NUMBER>
-      emailer:
-        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
-        sender:  "flyte@example.com"
-        body: |
-          Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
-          Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-          {{ error }}
+
     task_type_whitelist:
       spark:
         - project: flytetester
@@ -296,8 +257,6 @@ configmap:
           type: bucket
           rate: 100
           capacity: 1000
-      workflowStore:
-        policy: "ResourceVersionCache"
 
   enabled_plugins:
     tasks:
@@ -319,51 +278,187 @@ configmap:
     logger:
       level: 5
 
-  spark:
-    plugins:
-      spark:
-        spark-config-default:
-          - # We override the default credentials chain provider for Hadoop so that
-            # it can use the serviceAccount based IAM role or ec2 metadata based.
-            # This is more in line with how AWS works
-          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-          - spark.kubernetes.allocation.batch.size: "50"
-          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-          - spark.blacklist.enabled: "true"
-          - spark.blacklist.timeout: "5m"
-          - spark.task.maxfailures: "8"
 
-  ab_project_resource_quota: |
-    apiVersion: v1
-    kind: ResourceQuota
-    metadata:
-      name: project-quota
-      namespace: {{ namespace }} 
-    spec:
-      hard:
-        limits.cpu: {{ projectQuotaCpu }} 
-        limits.memory: {{ projectQuotaMemory }}
+# ----------------------------------------------------------------
+# Optional Modules
+# Flyte built extensions that enable various additional features in Flyte.
+# All these features are optional, but are critical to run certain features
+# ------------------------------------------------------------------------
 
-  ac_project_copilot_dataconfig: |
-    kind: ConfigMap
-    apiVersion: v1
-    metadata:
-      name: flyte-data-config
-      namespace: {{ namespace }}
-    data:
-      config.yaml: |
-        storage:
-          connection:
-            auth-type: iam
-            region: us-east-1
-          type: s3
-          container: my-s3-bucket
-          enable-multicontainer: true
+# --
+# Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+workflow_scheduler:
+  enabled: true
+  config:
+    scheduler:
+      eventScheduler:
+        scheme: aws
+        region: us-east-1
+        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:us-east-1:<ACCOUNT-NUMBER>:flyte-cron-scheduler-queue
+        scheduleNamePrefix: flyte
+      workflowExecutor:
+        scheme: aws
+        region: us-east-1
+        scheduleQueueName: flyte-cron-scheduler-queue
+        accountId: <ACCOUNT-NUMBER>
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30
+
+
+# --
+# Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
+# various events in their workflows
+workflow_notifications:
+    enabled: true
+    config:
+       notifications:
+         type: aws
+         region: us-east-1
+         publisher:
+           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
+         processor:
+           queueName: flyte-notifications-queue
+           accountId: <ACCOUNT-NUMBER>
+         emailer:
+           subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+           sender:  "flyte@example.com"
+           body: |
+             Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+             Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+             {{ error }}
+
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
+
+    # -- Template for spark role
+    - key: ac_project_copilot_dataconfig
+      value: |
+        kind: ConfigMap
+        apiVersion: v1
+        metadata:
+          name: flyte-data-config
+          namespace: {{ namespace }}
+        data:
+          config.yaml: |
+            storage:
+              connection:
+                access-key: minio
+                auth-type: accesskey
+                disable-ssl: true
+                endpoint: http://minio.flyte.svc.cluster.local:9000
+                region: us-east-1
+                secret-key: miniostorage
+              type: minio
+              container: my-s3-bucket
+              enable-multicontainer: true
+
+    # -- Template for spark role
+    - key: ad_spark_role
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: Role
+        metadata:
+          name: spark-role
+          namespace: {{ namespace }}
+        rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - '*'
+
+    # -- Template for spark SA
+    - key: ae_spark_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: spark
+          namespace: {{ namespace }}
+
+    # -- Template for spark role binding
+    - key: af_spark_role_binding
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: RoleBinding
+        metadata:
+          name: spark-role-binding
+          namespace: {{ namespace }}
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: Role
+          name: spark-role
+        subjects:
+        - kind: ServiceAccount
+          name: spark
+          namespace: {{ namespace }}
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi

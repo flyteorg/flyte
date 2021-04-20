@@ -1,4 +1,11 @@
 
+# ---------------------------------------------------------------------
+# Core System settings
+# This section consists of Core components of Flyte and their deployment
+# settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
+# Flyteconsole
+# ---------------------------------------------------------------------
+
 #
 # FLYTEADMIN SETTINGS
 #
@@ -151,6 +158,13 @@ flyteconsole:
   # -- affinity for Flyteconsole deployment
   affinity: {}
 
+
+# ----------------------------------------------
+# Sandbox Configuration
+# Sandbox allows to run flyte without any cloud dependencies and can be run even locally on your laptop.
+# This is achieved by replacing cloud service dependencies by k8s local alternatives. These may not be ideal
+# for a high performance setup, but are great to try out flyte
+# -----------------------------------------------
 #
 # REDIS SETTINGS
 #
@@ -294,63 +308,6 @@ contour:
   # -- affinity for Contour deployment
   affinity: {}
 
-#
-# SPARKOPERATOR SETTINGS
-#
-
-sparkoperator:
-  # --- enable or disable Sparkoperator deployment installation
-  enabled: true
-  # -- Replicas count for Sparkoperator deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Sparkoperator
-    tag: v1beta2-1.2.0-3.0.0 # Set to v1beta2-1.1.2-2.4.5 for Spark 2
-  # -- Default resources requests and limits for Sparkoperator
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 500M
-    requests:
-      cpu: 10m
-      memory: 50M
-
-#
-# PYTORCHOPERATOR SETTINGS
-#
-
-pytorchoperator:
-  # --- enable or disable Pytorchoperator deployment installation
-  enabled: true   # Set false to disable
-  # -- Replicas count for Pytorchoperator deployment
-  replicaCount: 1
-  image:
-    # -- Docker image for Pytorchoperator
-    repository: gcr.io/kubeflow-images-public/pytorch-operator
-    tag: v1.0.0-g047cf0f
-    pullPolicy: IfNotPresent
-  # -- Default resources requests and limits for Pytorchoperator
-  resources:
-    limits:
-      cpu: 500m
-      memory: 1000M
-    requests:
-      cpu: 10m
-      memory: 50M
-  # -- Service settings for Pytorchoperator
-  service:
-    annotations: {}
-    type: ClusterIP
-  # -- Annotations for ServiceAccount attached to Pytorchoperator pods
-  serviceAccountAnnotations: {}
-  # -- Annotations for Pytorchoperator pods
-  podAnnotations: {}
-  # -- nodeSelector for Pytorchoperator deployment
-  nodeSelector: {}
-  # -- tolerations for Pytorchoperator deployment
-  tolerations: []
-  # -- affinity for Pytorchoperator deployment
-  affinity: {}
 
 #
 # KUBERNETES DASHBOARD
@@ -359,6 +316,7 @@ pytorchoperator:
 kubernetes-dashboard:
   enabled: false
 
+# ------------------------------------------------
 #
 # COMMON SETTINGS
 #
@@ -391,6 +349,11 @@ common:
     # --- Enable or disable creating Flyte namespace in template. Enable when using helm as template-engine only. Disable when using `helm install ...`.
     enabled: false
 
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
 #
 # STORAGE SETTINGS
 #
@@ -399,7 +362,7 @@ storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: sandbox
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  # bucketName: my-s3-bucket
+  bucketName: my-s3-bucket
   # -- settings for storage type s3
   s3:
     region: us-east-1
@@ -410,48 +373,29 @@ storage:
   # -- Settings for storage type custom. See https://github:com/graymeta/stow for supported storage providers/settings.
   custom: {}
 
+# Database configuration
+db:
+  database: {}
+    # port: 5432
+    # username: postgres
+    # host: postgres
+    # dbname: flyte
+    # passwordPath: /etc/db/pass.txt
+
+
+
+# --------------------------------------------------------------------
+# Specializing your deployment using configuration
+# -------------------------------------------------------------------
 #
 # CONFIGMAPS SETTINGS
 #
 
 configmap:
-
   # Configmap for Flyte console UI
   console:
     BASE_URL: /console
     CONFIG_DIR: /etc/flyte/config
-
-  # Configmap for ClusterResource parameters
-  cluster_resources:
-    # -- ClusterResource parameters
-    cluster_resources:
-      templatePath: "/etc/flyte/clusterresource/templates"
-      customData:
-        production:
-          - projectQuotaCpu:
-              value: "5"
-          - projectQuotaMemory:
-              value: "4000Mi"
-        staging:
-          - projectQuotaCpu:
-              value: "2"
-          - projectQuotaMemory:
-              value: "3000Mi"
-        development:
-          - projectQuotaCpu:
-              value: "4"
-          - projectQuotaMemory:
-              value: "3000Mi"
-      refresh: 5m
-
-  # Database configuration
-  db:
-    database: {}
-      # port: 5432
-      # username: postgres
-      # host: postgres
-      # dbname: flyte
-      # passwordPath: /etc/db/pass.txt
 
   # Domains configuration for Flyte projects
   domain:
@@ -462,14 +406,6 @@ configmap:
       name: staging
     - id: production
       name: production
-
-  # Remote data configuration
-  remote_data:
-    remoteData:
-      region: us-east-1
-      scheme: local
-      signedUrls:
-        durationMinutes: 3
 
   # -- Flyteadmin server config
   server:
@@ -533,15 +469,6 @@ configmap:
       type: datacatalog
       insecure: true
 
-  # Catalog cache configuration
-  catalog_cache:
-    plugins:
-      catalogCache:
-        reader:
-          maxItems: 10000
-        writer:
-          maxItems: 10000
-
   # Copilot configuration
   copilot:
     plugins:
@@ -590,7 +517,6 @@ configmap:
   # Plugins configuration
   enabled_plugins:
     tasks:
-      max-plugin-phase-versions: 1000000
       task-plugins:
         enabled-plugins: []
 
@@ -610,12 +536,6 @@ configmap:
       show-source: true
       level: 4
 
-  # Qubole plugin configuration
-  qubole:
-    plugins:
-      qubole:
-        quboleTokenKey: "FLYTE_QUBOLE_CLIENT_TOKEN"
-
   # Resource manager configuration
   resource_manager:
     # -- resource manager configuration
@@ -627,8 +547,139 @@ configmap:
           hostPath: redis-resource-manager:6379
           hostKey: mypassword
 
+  # Tasks logs plugin configuration
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: false
+
+# ----------------------------------------------------------------
+# Optional Modules
+# Flyte built extensions that enable various additional features in Flyte.
+# All these features are optional, but are critical to run certain features
+# ------------------------------------------------------------------------
+
+# --
+# Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+workflow_scheduler:
+  enabled: false
+  config: {}
+
+
+
+# --
+# Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
+# various events in their workflows
+workflow_notifications:
+    enabled: false
+    config: {}
+
+
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+  # Configmap for ClusterResource parameters
+  config:
+    # -- ClusterResource parameters
+    cluster_resources:
+      templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        production:
+          - projectQuotaCpu:
+              value: "5"
+          - projectQuotaMemory:
+              value: "4000Mi"
+        staging:
+          - projectQuotaCpu:
+              value: "2"
+          - projectQuotaMemory:
+              value: "3000Mi"
+        development:
+          - projectQuotaCpu:
+              value: "4"
+          - projectQuotaMemory:
+              value: "3000Mi"
+      refresh: 5m
+
+  # -- Resource templates that should be applied
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
+
+    # -- Template for spark role
+    - key: ac_project_copilot_dataconfig
+      value: |
+        kind: ConfigMap
+        apiVersion: v1
+        metadata:
+          name: flyte-data-config
+          namespace: {{ namespace }}
+        data:
+          config.yaml: |
+            storage:
+              connection:
+                access-key: minio
+                auth-type: accesskey
+                disable-ssl: true
+                endpoint: http://minio.flyte.svc.cluster.local:9000
+                region: us-east-1
+                secret-key: miniostorage
+              type: minio
+              container: my-s3-bucket
+              enable-multicontainer: true
+
+
+# --------------------------------------------------------
+# Optional Plugins
+# --------------------------------------------------------
+
+#
+# SPARK Plugin using the Spark Operator
+#
+
+sparkoperator:
+  # --- enable or disable Sparkoperator deployment installation
+  enabled: true
+  # -- Replicas count for Sparkoperator deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Sparkoperator
+    tag: v1beta2-1.2.0-3.0.0 # Set to v1beta2-1.1.2-2.4.5 for Spark 2
+  # -- Default resources requests and limits for Sparkoperator
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 500M
+    requests:
+      cpu: 10m
+      memory: 50M
+
   # Spark plugin configuration
-  spark:
+  plugin_config:
     plugins:
       spark:
         # -- Spark default configuration
@@ -647,69 +698,53 @@ configmap:
           - spark.blacklist.timeout: "5m"
           - spark.task.maxfailures: "8"
 
-  # Tasks logs plugin configuration
-  task_logs:
-    plugins:
-      logs:
-        kubernetes-enabled: false
 
-  # -- Template for namespaces resources
-  aa_namespace: |
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: {{ namespace }}
-    spec:
-      finalizers:
-      - kubernetes
+# ----------------------
+# Distributed Pytorch execution using the K8s Pytorch operator
+#
 
-  # -- Template for spark role
-  ad_spark_role: |
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: Role
-    metadata:
-      name: spark-role
-      namespace: {{ namespace }}
-    rules:
-    - apiGroups:
-      - ""
-      resources:
-      - pods
-      verbs:
-      - '*'
-    - apiGroups:
-      - ""
-      resources:
-      - services
-      verbs:
-      - '*'
-    - apiGroups:
-      - ""
-      resources:
-      - configmaps
-      verbs:
-      - '*'
+pytorchoperator:
+  # --- enable or disable Pytorchoperator deployment installation
+  enabled: true   # Set false to disable
+  # -- Replicas count for Pytorchoperator deployment
+  replicaCount: 1
+  image:
+    # -- Docker image for Pytorchoperator
+    repository: gcr.io/kubeflow-images-public/pytorch-operator
+    tag: v1.0.0-g047cf0f
+    pullPolicy: IfNotPresent
+  # -- Default resources requests and limits for Pytorchoperator
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1000M
+    requests:
+      cpu: 10m
+      memory: 50M
+  # -- Service settings for Pytorchoperator
+  service:
+    annotations: {}
+    type: ClusterIP
+  # -- Annotations for ServiceAccount attached to Pytorchoperator pods
+  serviceAccountAnnotations: {}
+  # -- Annotations for Pytorchoperator pods
+  podAnnotations: {}
+  # -- nodeSelector for Pytorchoperator deployment
+  nodeSelector: {}
+  # -- tolerations for Pytorchoperator deployment
+  tolerations: []
+  # -- affinity for Pytorchoperator deployment
+  affinity: {}
 
-  # -- Template for spark SA
-  ae_spark_service_account: |
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: spark
-      namespace: {{ namespace }}
+# ----------------------
+# Distributed tensorflow training using the TF-Operator
+#
 
-  # -- Template for spark role binding
-  af_spark_role_binding: |
-    apiVersion: rbac.authorization.k8s.io/v1beta1
-    kind: RoleBinding
-    metadata:
-      name: spark-role-binding
-      namespace: {{ namespace }} 
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
-      name: spark-role
-    subjects:
-    - kind: ServiceAccount
-      name: spark
-      namespace: {{ namespace }}
+
+# ----------------------
+# Training on AWS Sagemaker using AWS Sagemaker operator
+#
+
+# ---------------------------
+# Flink jobs using the Flink Operator
+#
