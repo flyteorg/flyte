@@ -564,21 +564,8 @@ configmap:
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
   enabled: false
-  config:
-    scheduler:
-      eventScheduler:
-        scheme: aws
-        region: us-east-1
-        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
-        targetName: arn:aws:sqs:us-east-1:<ACCOUNT-NUMBER>:flyte-cron-scheduler-queue
-        scheduleNamePrefix: flyte
-      workflowExecutor:
-        scheme: aws
-        region: us-east-1
-        scheduleQueueName: flyte-cron-scheduler-queue
-        accountId: <ACCOUNT-NUMBER>
-        reconnectAttempts: 10
-        reconnectDelaySeconds: 30
+  config: {}
+
 
 
 # --
@@ -586,22 +573,8 @@ workflow_scheduler:
 # various events in their workflows
 workflow_notifications:
     enabled: false
-    config:
-       notifications:
-         type: aws
-         region: us-east-1
-         publisher:
-           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
-         processor:
-           queueName: flyte-notifications-queue
-           accountId: <ACCOUNT-NUMBER>
-         emailer:
-           subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
-           sender:  "flyte@example.com"
-           body: |
-             Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
-             Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-             {{ error }}
+    config: {}
+
 
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic

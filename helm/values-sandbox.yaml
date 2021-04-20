@@ -135,83 +135,12 @@ db:
 #
 
 configmap:
-  # Configmap for Flyte console UI
-  console:
-    BASE_URL: /console
-    CONFIG_DIR: /etc/flyte/config
-
-  # Domains configuration for Flyte projects
-  domain:
-    domains:
-    - id: development
-      name: development
-    - id: staging
-      name: staging
-    - id: production
-      name: production
-
-  # -- Flyteadmin server config
-  server:
-    server:
-      httpPort: 8088
-      grpcPort: 8089
-      security:
-        secure: false
-        useAuth: false
-        allowCors: true
-    flyteadmin:
-      roleNameKey: "iam.amazonaws.com/role"
-      profilerPort: 10254
-      metricsScope: "flyte:"
-      metadataStoragePrefix:
-        - "metadata"
-        - "admin"
-      eventVersion: 1
-      testing:
-        host: http://flyteadmin
-  
-  # Datacatalog server config
-  datacatalogServer:
-    datacatalog:
-      storage-prefix: metadata/datacatalog
-      metrics-scope: datacatalog
-      profiler-port: 10254
-    application:
-      grpcPort: 8089
-      httpPort: 8080
-      grpcServerReflection: true
 
   # Task default resources configuration
   task_resource_defaults:
     task_resources:
       defaults:
         memory: 200Mi
-
-  # Admin configuration
-  admin:
-    event:
-      type: admin
-      rate: 500
-      capacity: 1000
-    admin:
-      endpoint: flyteadmin:81
-      insecure: true
-
-  # Catalog configuration
-  catalog:
-    catalog-cache:
-      endpoint: datacatalog:89
-      type: datacatalog
-      insecure: true
-
-  # Copilot configuration
-  copilot:
-    plugins:
-      k8s:
-        co-pilot:
-          name: flyte-copilot-
-          image: ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
-          start-timeout: 30s
 
   # Core propeller configuration
   core:
