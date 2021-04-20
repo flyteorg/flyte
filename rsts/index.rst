@@ -34,7 +34,7 @@
    :hidden:
 
    Join the Community <community/index>
-   community/docs
+   community/contribute
    community/roadmap
    community/compare
 
