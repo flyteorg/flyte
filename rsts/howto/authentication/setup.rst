@@ -105,7 +105,7 @@ Follow the inline comments to make the necessary changes:
     kube-config: /Users/haythamabuelfutuh/.kube/config
     security:
       secure: false
-      # 1. Enable Auth by turning this to true
+      # 1. Enable Auth by turning useAuth to true
       useAuth: true
       allowCors: true
       allowedOrigins:
@@ -115,23 +115,17 @@ Follow the inline comments to make the necessary changes:
         - "Content-Type"
         - "flyte-athorization"
   auth:
-    # 2. Update with the public facing url of flyte admin (e.g. https://flyte.mycompany.io/)
-    httpPublicUri: http://localhost:30081/
     userAuth:
       openId:
-        # 3. Put the URL of the OpenID Connect provider.
+        # 2. Put the URL of the OpenID Connect provider.
         #    baseUrl: https://accounts.google.com # Uncomment for Google
         baseUrl: https://dev-14186422.okta.com/oauth2/default # Okta with a custom Authorization Server
         scopes:
           - profile
           - openid
           # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-        # 4. Replace with the client ID created for Flyte.
+        # 3. Replace with the client ID created for Flyte.
         clientId: 0oakkheteNjCMERst5d6
-        # 5. Replace with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/callback)
-        callbackUrl: "http://localhost:30081/callback"
-        # 6. Replace with the flyte console's URL (e.g. https://flyte.mycompany.io/console) 
-        redirectUrl: "/api/v1/projects"
 
 Save and exit your editor.
 
@@ -177,35 +171,36 @@ Apply Configurations
 
 1. It is possible to direct flyte admin to use an external authorization server. To do so, edit the same config map once more and follow these changes:
 
-    .. code-block:: yaml
+.. code-block:: yaml
 
     auth:
-        # 1. Update with the public facing URL of flyte admin (e.g. https://flyte.mycompany.io/)
-        httpPublicUri: http://localhost:30081/
         appAuth:
-        # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
-        #    Choose Self (or omit the value) to use Flyte Admin's internal (albeit limited) Authorization Server.
-        authServerType: External
+            # 1. Choose External if you will use an external Authorization Server (e.g. a Custom Authorization server in Okta)
+            #    Choose Self (or omit the value) to use Flyte Admin's internal (albeit limited) Authorization Server.
+            authServerType: External
+
+            # 2. Optional: Set external auth server baseUrl if different from OpenId baseUrl.
+            externalAuthServer:
+                baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
         thirdPartyConfig:
             flyteClient:
-            # 2. Replace with a new native client ID provisioned in the custom authorization server
-            clientId: flytectl
-            redirectUri: https://localhost:53593/callback
-            # 3. "all" is a required scope and must be configured in the custom authorization server
-            scopes:
+                # 3. Replace with a new Native Client ID provisioned in the custom authorization server
+                clientId: flytectl
+
+                redirectUri: https://localhost:53593/callback
+                
+                # 4. "all" is a required scope and must be configured in the custom authorization server
+                scopes:
                 - offline
                 - all
         userAuth:
-        openId:
-            # 4. Use the URL of your custom authorization server created above:
-            baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
-            scopes:
-            - profile
-            - openid
-            # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
-            clientId: 0oakkheteNjCMERst5d6
-            callbackUrl: "http://localhost:30081/callback"
-            redirectUrl: "/api/v1/projects"
+            openId:
+                baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6 # Okta with a custom Authorization Server
+                scopes:
+                - profile
+                - openid
+                # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+                clientId: 0oakkheteNjCMERst5d6
 
 1. Store flyte propeller's `client_secret` in a k8s secrt as follows:
 
@@ -240,13 +235,13 @@ Follow the inline comments to make the necessary changes:
 
 .. code-block:: yaml
 
-admin:
-  # 1. Turn to true
-  useAuth: true
-  # 2. Replace with the client_id provided by the OAuth2 Authorization Server above.
-  clientId: flytepropeller
-  # 3. Replace with the OAuth2 authorization server url provided in the previous step.
-  authorizationServerUrl: http://localhost:30081/
+    admin:
+        # 1. Turn to true
+        useAuth: true
+        # 2. Replace with the client_id provided by the OAuth2 Authorization Server above.
+        clientId: flytepropeller
+        # 3. Replace with the OAuth2 authorization server url provided in the previous step.
+        authorizationServerUrl: http://localhost:30081/
 
 Close the editor
 
@@ -254,7 +249,7 @@ Close the editor
 Continuous Integration - CI
 ***************************
 
-If your organization does any automated registration, then you'll need to authenticate with the `basic authentication <https://tools.ietf.org/html/rfc2617>`_ flow (username and password effectively) as CI systems are generally not suitable OAuth resource owners. After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
+If your organization does any automated registration, then you'll need to authenticate with the `basic authentication <https://tools.ietf.org/html/rfc2617>`_ flow (username and password effectively). After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
 
 Flytekit configuration variables are automatically designed to look up values from relevant environment variables. However, to aid with continuous integration use-cases, Flytekit configuration can also reference other environment variables. 
 
