@@ -527,8 +527,16 @@ configmap:
     tasks:
       # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
       task-plugins:
-        # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config)
-        enabled-plugins: []
+        # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+        # plugins
+        enabled-plugins:
+          - container
+          - sidecar
+          - k8s-array
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          container_array: k8s-array
 
   # -- Kubernetes specific Flyte configuration
   k8s:
@@ -564,6 +572,12 @@ configmap:
     plugins:
       logs:
         kubernetes-enabled: false
+        # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
+        cloudwatch-enabled: true
+        # -- region where logs are hosted
+        cloudwatch-region: us-east-2
+        # -- cloudwatch log-group
+        cloudwatch-log-group: /aws/containerinsights/flyte-demo-2/application
 
 # ----------------------------------------------------------------
 # Optional Modules
@@ -747,14 +761,23 @@ pytorchoperator:
   affinity: {}
 
 # ----------------------
-# Distributed tensorflow training using the TF-Operator
-#
+# -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
+# There is no helm chart maintained and hence it might need an independent installation
+tf_operator:
+  enabled: false
 
 
-# ----------------------
-# Training on AWS Sagemaker using AWS Sagemaker operator
-#
+# -----------------
+# -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
+# Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
+sagemaker:
+  enabled: false
+  plugin_config:
+    plugins:
+      sagemaker:
+        roleArn: <arn>
+        region: <region>
+
 
 # ---------------------------
-# Flink jobs using the Flink Operator
-#
+# -- Flink jobs using the Flink Operator: this is work in progress 
