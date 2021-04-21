@@ -1134,6 +1134,561 @@ var _ interface {
 	ErrorName() string
 } = ListDatasetsResponseValidationError{}
 
+// Validate checks the field values on GetOrReserveArtifactRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetOrReserveArtifactRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDatasetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetOrReserveArtifactRequestValidationError{
+				field:  "DatasetId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TagName
+
+	// no validation rules for OwnerId
+
+	return nil
+}
+
+// GetOrReserveArtifactRequestValidationError is the validation error returned
+// by GetOrReserveArtifactRequest.Validate if the designated constraints
+// aren't met.
+type GetOrReserveArtifactRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOrReserveArtifactRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOrReserveArtifactRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOrReserveArtifactRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOrReserveArtifactRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOrReserveArtifactRequestValidationError) ErrorName() string {
+	return "GetOrReserveArtifactRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOrReserveArtifactRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOrReserveArtifactRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOrReserveArtifactRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOrReserveArtifactRequestValidationError{}
+
+// Validate checks the field values on ReservationStatus with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *ReservationStatus) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for State
+
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ReservationStatusValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for OwnerId
+
+	return nil
+}
+
+// ReservationStatusValidationError is the validation error returned by
+// ReservationStatus.Validate if the designated constraints aren't met.
+type ReservationStatusValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReservationStatusValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReservationStatusValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReservationStatusValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReservationStatusValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReservationStatusValidationError) ErrorName() string {
+	return "ReservationStatusValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ReservationStatusValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReservationStatus.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReservationStatusValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReservationStatusValidationError{}
+
+// Validate checks the field values on GetOrReserveArtifactResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetOrReserveArtifactResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Value.(type) {
+
+	case *GetOrReserveArtifactResponse_Artifact:
+
+		if v, ok := interface{}(m.GetArtifact()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetOrReserveArtifactResponseValidationError{
+					field:  "Artifact",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *GetOrReserveArtifactResponse_ReservationStatus:
+
+		if v, ok := interface{}(m.GetReservationStatus()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetOrReserveArtifactResponseValidationError{
+					field:  "ReservationStatus",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// GetOrReserveArtifactResponseValidationError is the validation error returned
+// by GetOrReserveArtifactResponse.Validate if the designated constraints
+// aren't met.
+type GetOrReserveArtifactResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetOrReserveArtifactResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetOrReserveArtifactResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetOrReserveArtifactResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetOrReserveArtifactResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetOrReserveArtifactResponseValidationError) ErrorName() string {
+	return "GetOrReserveArtifactResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetOrReserveArtifactResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetOrReserveArtifactResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetOrReserveArtifactResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetOrReserveArtifactResponseValidationError{}
+
+// Validate checks the field values on ExtendReservationRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExtendReservationRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDatasetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtendReservationRequestValidationError{
+				field:  "DatasetId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TagName
+
+	// no validation rules for OwnerId
+
+	return nil
+}
+
+// ExtendReservationRequestValidationError is the validation error returned by
+// ExtendReservationRequest.Validate if the designated constraints aren't met.
+type ExtendReservationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExtendReservationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExtendReservationRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExtendReservationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExtendReservationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExtendReservationRequestValidationError) ErrorName() string {
+	return "ExtendReservationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExtendReservationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExtendReservationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExtendReservationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExtendReservationRequestValidationError{}
+
+// Validate checks the field values on ExtendReservationResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ExtendReservationResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ExtendReservationResponseValidationError is the validation error returned by
+// ExtendReservationResponse.Validate if the designated constraints aren't met.
+type ExtendReservationResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExtendReservationResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExtendReservationResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExtendReservationResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExtendReservationResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExtendReservationResponseValidationError) ErrorName() string {
+	return "ExtendReservationResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExtendReservationResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExtendReservationResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExtendReservationResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExtendReservationResponseValidationError{}
+
+// Validate checks the field values on ReleaseReservationRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ReleaseReservationRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetDatasetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ReleaseReservationRequestValidationError{
+				field:  "DatasetId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for TagName
+
+	// no validation rules for OwnerId
+
+	return nil
+}
+
+// ReleaseReservationRequestValidationError is the validation error returned by
+// ReleaseReservationRequest.Validate if the designated constraints aren't met.
+type ReleaseReservationRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReleaseReservationRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReleaseReservationRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReleaseReservationRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReleaseReservationRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReleaseReservationRequestValidationError) ErrorName() string {
+	return "ReleaseReservationRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ReleaseReservationRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReleaseReservationRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReleaseReservationRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReleaseReservationRequestValidationError{}
+
+// Validate checks the field values on ReleaseReservationResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ReleaseReservationResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ReleaseReservationResponseValidationError is the validation error returned
+// by ReleaseReservationResponse.Validate if the designated constraints aren't met.
+type ReleaseReservationResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReleaseReservationResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReleaseReservationResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReleaseReservationResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReleaseReservationResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReleaseReservationResponseValidationError) ErrorName() string {
+	return "ReleaseReservationResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ReleaseReservationResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReleaseReservationResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReleaseReservationResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReleaseReservationResponseValidationError{}
+
 // Validate checks the field values on Dataset with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *Dataset) Validate() error {
