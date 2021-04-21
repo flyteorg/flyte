@@ -7,7 +7,7 @@
 
    getting_started
    User Guide <https://flytecookbook.readthedocs.io>
-   Tutorials <https://docs.flyte.org/en/latest/tutorials.html>
+   Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    Concepts <https://docs.flyte.org/en/latest/concepts/index.html>
    reference/index
    community/index
