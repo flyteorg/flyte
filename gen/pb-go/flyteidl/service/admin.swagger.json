@@ -3851,6 +3851,10 @@
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
+        },
+        "dynamic_workflow": {
+          "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
+          "description": "Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here."
         }
       },
       "description": "Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution."
@@ -6127,7 +6131,7 @@
           "description": "Represents the compiled representation of the embedded dynamic workflow."
         }
       },
-      "description": "For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated."
+      "description": "For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated."
     },
     "flyteidladminNodeExecution": {
       "type": "object",
@@ -6184,10 +6188,6 @@
         "catalog_key": {
           "$ref": "#/definitions/coreCatalogMetadata",
           "title": "This structure carries the catalog artifact information"
-        },
-        "dynamic_workflow": {
-          "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
-          "description": "In the case this task launched a dynamic workflow we capture its structure here."
         }
       },
       "title": "Metadata for the case in which the node is a TaskNode"
