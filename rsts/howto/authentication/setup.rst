@@ -37,11 +37,6 @@ Follow `Google Docs <https://developers.google.com/identity/protocols/oauth2/ope
   Make sure to create an OAuth2 Client Credential. The `client_id` and `client_secret` will be needed in the following
   steps.
 
-Github OpenID Connect
----------------------
-
-<TBD>
-
 Okta OpenID Connect
 -------------------
 
@@ -86,7 +81,7 @@ Save and close your editor.
 
 .. prompt:: bash
 
-  kubectl deploy -n flyte flyteadmin -o yaml | grep "name: flyte-admin-config"
+  kubectl get deploy -n flyte flyteadmin -o yaml | grep "name: flyte-admin-config"
 
 This will output the name of the config map where the `client_id` needs to go.
 
@@ -134,6 +129,34 @@ Save and exit your editor.
 .. prompt:: bash
 
   kubectl rollout restart deployment/flyteadmin -n flyte
+
+4. Edit FlytePropeller config enable auth as follows:
+
+.. prompt:: bash
+
+  kubectl get deploy -n flyte flytepropeller -o yaml | grep "name: flyte-propeller-config"
+
+This will output the name of the config map where the `client_id` needs to go.
+
+.. prompt:: bash
+
+  kubectl edit configmap -n flyte <the name of the config map from previous command>
+
+Follow the inline comments to make the necessary changes:
+
+.. code-block:: yaml
+
+    admin:
+        # 1. Turn to true
+        useAuth: true
+
+Close the editor
+
+5. Restart `flytepropeller` for the changes to take effect:
+
+.. prompt:: bash
+
+  kubectl rollout restart deployment/flytepropeller -n flyte
 
 OAuth2 Authorization Server
 ===========================
@@ -223,7 +246,7 @@ Save and close your editor.
 
 .. prompt:: bash
 
-  kubectl deploy -n flyte flytepropeller -o yaml | grep "name: flyte-propeller-config"
+  kubectl get deploy -n flyte flytepropeller -o yaml | grep "name: flyte-propeller-config"
 
 This will output the name of the config map where the `client_id` needs to go.
 
@@ -236,14 +259,16 @@ Follow the inline comments to make the necessary changes:
 .. code-block:: yaml
 
     admin:
-        # 1. Turn to true
-        useAuth: true
-        # 2. Replace with the client_id provided by the OAuth2 Authorization Server above.
+        # 1. Replace with the client_id provided by the OAuth2 Authorization Server above.
         clientId: flytepropeller
-        # 3. Replace with the OAuth2 authorization server url provided in the previous step.
-        authorizationServerUrl: http://localhost:30081/
 
 Close the editor
+
+3. Restart `flytepropeller` for the changes to take effect:
+
+.. prompt:: bash
+
+  kubectl rollout restart deployment/flytepropeller -n flyte
 
 ***************************
 Continuous Integration - CI
@@ -267,5 +292,3 @@ The following is a listing of the Flytekit configuration values we set in CI, al
   When using basic authentication, you'll need to specify a scope to the IDP (instead of ``openid``, which is only for OAuth). Set that here.
 * ``export FLYTE_PLATFORM_AUTH=True``
   Set this to force Flytekit to use authentication, even if not required by Admin. This is useful as you're rolling out the requirement.
-
-

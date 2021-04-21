@@ -25,7 +25,7 @@ spec:
       serviceAccountName: flyteadmin
       volumes:
         - name: shared-data
-          emptyDir: { }
+          emptyDir: {}
         - name: config-volume
           configMap:
             name: flyte-admin-config
@@ -38,13 +38,18 @@ spec:
         - name: auth
           secret:
             secretName: flyte-admin-auth
-        - name: new-auth-secrets
-          emptyDir: { }
       initContainers:
         - name: run-migrations
           image: flyteadmin:v0.4.0
           imagePullPolicy: IfNotPresent
-          command: [ "flyteadmin", "--config", "/etc/flyte/config/*.yaml", "migrate", "run" ]
+          command:
+            [
+              "flyteadmin",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "migrate",
+              "run",
+            ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -54,8 +59,17 @@ spec:
         - name: seed-projects
           image: flyteadmin:v0.4.0
           imagePullPolicy: IfNotPresent
-          command: [ "flyteadmin", "--config", "/etc/flyte/config/*.yaml",
-                     "migrate", "seed-projects", "flytesnacks", "flytetester", "flyteexamples" ]
+          command:
+            [
+              "flyteadmin",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "migrate",
+              "seed-projects",
+              "flytesnacks",
+              "flytetester",
+              "flyteexamples",
+            ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -64,7 +78,14 @@ spec:
         - name: sync-cluster-resources
           image: flyteadmin:v0.4.0
           imagePullPolicy: IfNotPresent
-          command: [ "flyteadmin", "--config", "/etc/flyte/config/*.yaml", "clusterresource", "sync" ]
+          command:
+            [
+              "flyteadmin",
+              "--config",
+              "/etc/flyte/config/*.yaml",
+              "clusterresource",
+              "sync",
+            ]
           volumeMounts:
             - name: resource-templates
               mountPath: /etc/flyte/clusterresource/templates
@@ -75,33 +96,25 @@ spec:
         - name: generate-secrets
           image: flyteadmin:v0.4.0
           imagePullPolicy: IfNotPresent
-          command: [ "flyteadmin", "--config", "/etc/flyte/config/*.yaml", "secrets", "init" ]
-          args: [ "--localPath", "/etc/secrets/auth-new" ]
+          command: ["/bin/sh", "-c"]
+          args:
+            [
+              "flyteadmin --config=etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth",
+            ]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
-            - name: new-auth-secrets
-              mountPath: /etc/secrets/auth-new
-        - name: save-secrets
-          image: flyteadmin:v0.4.0
-          imagePullPolicy: IfNotPresent
-          command: [ "flyteadmin", "--config", "/etc/flyte/config/*.yaml", "secrets", "create" ]
-          args: [ "--fromPath", "/etc/secrets/auth-new" ]
           env:
             - name: POD_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-            - name: new-auth-secrets
-              mountPath: /etc/secrets/auth-new
       containers:
         - name: flyteadmin
           image: flyteadmin:v0.4.0
           imagePullPolicy: IfNotPresent
-          command: [ "flyteadmin", "--config", "/etc/flyte/config/*.yaml", "serve" ]
+          command:
+            ["flyteadmin", "--config", "/etc/flyte/config/*.yaml", "serve"]
           ports:
             - containerPort: 8088
             - containerPort: 8089
@@ -113,7 +126,7 @@ spec:
             - name: db-pass
               mountPath: /etc/db
             - name: auth
-              mountPath: /etc/secrets/auth
+              mountPath: /etc/secrets/
         - name: redoc
           image: docker.io/redocly/redoc
           imagePullPolicy: IfNotPresent

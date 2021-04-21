@@ -5,3 +5,4 @@ event:
 admin:
   endpoint: flyteadmin:81
   insecure: true
+  useAuth: false

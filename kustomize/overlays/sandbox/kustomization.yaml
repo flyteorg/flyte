@@ -25,7 +25,7 @@ resources:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2 # FLYTEADMIN_TAG override the tag
+    newTag: dc28c2b9e1c3372e62ab05ab775eae74963347ff # FLYTEADMIN_TAG override the tag
     newName: ghcr.io/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
@@ -37,11 +37,11 @@ images:
     newName: ghcr.io/flyteorg/datacatalog # override the name
   # FlytePropeller
   - name: flytepropeller # match images with this name
-    newTag: v0.10.0 # FLYTEPROPELLER_TAG override the tag
+    newTag: 796c99dd00b0c073c0c48b6a7da413a00417d525 # FLYTEPROPELLER_TAG override the tag
     newName: ghcr.io/flyteorg/flytepropeller # override the name
   # Webhook
   - name: webhook # match images with this name
-    newTag: v0.10.0 # FLYTEPROPELLER_TAG override the tag
+    newTag: 796c99dd00b0c073c0c48b6a7da413a00417d525 # FLYTEPROPELLER_TAG override the tag
     newName: ghcr.io/flyteorg/flytepropeller # override the name
   # Override postgres image to use alpine based (rather smaller) docker image
   - name: postgres

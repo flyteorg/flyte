@@ -320,11 +320,7 @@ data:
         allowedHeaders:
           - "Content-Type"
           - "flyte-authorization"
-    secrets:
-      secrets-prefix: /etc/secrets/auth/
     auth:
-      disableForGrpc: true
-      httpPublicUri: http://localhost:30081/
       appAuth:
         thirdPartyConfig:
           flyteClient:
@@ -340,8 +336,6 @@ data:
             - profile
             - openid
           clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
-          callbackUrl: "http://localhost:30081/callback"
-          redirectUrl: "/api/v1/projects"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -377,7 +371,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-f9cbgdhcbh
+  name: flyte-admin-config-hb74mc6784
   namespace: flyte
 ---
 apiVersion: v1
@@ -390,6 +384,7 @@ data:
     admin:
       endpoint: flyteadmin:81
       insecure: true
+      useAuth: false
   catalog.yaml: |
     catalog-cache:
       endpoint: datacatalog:89
@@ -481,7 +476,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-dtdt5gbgg2
+  name: flyte-propeller-config-68bh2f6c6f
   namespace: flyte
 ---
 apiVersion: v1
@@ -498,6 +493,15 @@ kind: Secret
 metadata:
   name: flyte-admin-auth
   namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-propeller-auth
+  namespace: flyte
+stringData:
+  client_secret: foobar
 type: Opaque
 ---
 apiVersion: v1
@@ -700,7 +704,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-68bh2f6c6f
         name: config-volume
       - name: webhook-certs
         secret:
@@ -753,7 +757,7 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
-        - mountPath: /etc/secrets/auth
+        - mountPath: /etc/secrets/
           name: auth
       - command:
         - sh
@@ -829,31 +833,10 @@ spec:
         - mountPath: /etc/db
           name: db-pass
       - args:
-        - --localPath
-        - /etc/secrets/auth-new
+        - flyteadmin --config=etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
         command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - secrets
-        - init
-        image: ghcr.io/flyteorg/flyteadmin:v0.4.7
-        imagePullPolicy: IfNotPresent
-        name: generate-secrets
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-        - mountPath: /etc/secrets/auth-new
-          name: new-auth-secrets
-      - args:
-        - --fromPath
-        - /etc/secrets/auth-new
-        command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - secrets
-        - create
+        - /bin/sh
+        - -c
         env:
         - name: POD_NAMESPACE
           valueFrom:
@@ -861,12 +844,10 @@ spec:
               fieldPath: metadata.namespace
         image: ghcr.io/flyteorg/flyteadmin:v0.4.7
         imagePullPolicy: IfNotPresent
-        name: save-secrets
+        name: generate-secrets
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
-        - mountPath: /etc/secrets/auth-new
-          name: new-auth-secrets
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
@@ -875,7 +856,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-f9cbgdhcbh
+          name: flyte-admin-config-hb74mc6784
         name: config-volume
       - name: db-pass
         secret:
@@ -883,8 +864,6 @@ spec:
       - name: auth
         secret:
           secretName: flyte-admin-auth
-      - emptyDir: {}
-        name: new-auth-secrets
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -927,11 +906,16 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/secrets/
+          name: auth
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-68bh2f6c6f
         name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-propeller-auth
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -1043,7 +1027,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-68bh2f6c6f
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---

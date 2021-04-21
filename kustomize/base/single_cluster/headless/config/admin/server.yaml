@@ -11,11 +11,7 @@ server:
     allowedHeaders:
       - "Content-Type"
       - "flyte-authorization"
-secrets:
-  secrets-prefix: /etc/secrets/auth/
 auth:
-  disableForGrpc: true
-  httpPublicUri: http://localhost:30081/
   appAuth:
     thirdPartyConfig:
       flyteClient:
@@ -31,8 +27,6 @@ auth:
         - profile
         - openid
       clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
-      callbackUrl: "http://localhost:30081/callback"
-      redirectUrl: "/api/v1/projects"
 flyteadmin:
   roleNameKey: "iam.amazonaws.com/role"
   profilerPort: 10254

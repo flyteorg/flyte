@@ -2172,11 +2172,7 @@ data:
         allowedHeaders:
           - "Content-Type"
           - "flyte-authorization"
-    secrets:
-      secrets-prefix: /etc/secrets/auth/
     auth:
-      disableForGrpc: true
-      httpPublicUri: http://localhost:30081/
       appAuth:
         thirdPartyConfig:
           flyteClient:
@@ -2192,8 +2188,6 @@ data:
             - profile
             - openid
           clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
-          callbackUrl: "http://localhost:30081/callback"
-          redirectUrl: "/api/v1/projects"
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -2229,7 +2223,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-bkfh292hd6
+  name: flyte-admin-config-kg9mm798hc
   namespace: flyte
 ---
 apiVersion: v1
@@ -2251,6 +2245,7 @@ data:
     admin:
       endpoint: flyteadmin:81
       insecure: true
+      useAuth: false
   catalog.yaml: |
     catalog-cache:
       endpoint: datacatalog:89
@@ -2347,7 +2342,7 @@ data:
         kubernetes-template-uri: "http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-6gd7cgkkdt
+  name: flyte-propeller-config-4b26tfd275
   namespace: flyte
 ---
 apiVersion: v1
@@ -2494,6 +2489,15 @@ kind: Secret
 metadata:
   name: flyte-admin-auth
   namespace: flyte
+type: Opaque
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-propeller-auth
+  namespace: flyte
+stringData:
+  client_secret: foobar
 type: Opaque
 ---
 apiVersion: v1
@@ -2827,7 +2831,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        image: ghcr.io/flyteorg/flytepropeller:796c99dd00b0c073c0c48b6a7da413a00417d525
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -2846,7 +2850,7 @@ spec:
         secret:
           secretName: user-info
       - configMap:
-          name: flyte-propeller-config-6gd7cgkkdt
+          name: flyte-propeller-config-4b26tfd275
         name: config-volume
       - name: webhook-certs
         secret:
@@ -2881,7 +2885,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2899,7 +2903,7 @@ spec:
           name: config-volume
         - mountPath: /etc/db
           name: db-pass
-        - mountPath: /etc/secrets/auth
+        - mountPath: /etc/secrets/
           name: auth
       - command:
         - sh
@@ -2934,7 +2938,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2950,7 +2954,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2964,7 +2968,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2975,44 +2979,21 @@ spec:
         - mountPath: /etc/db
           name: db-pass
       - args:
-        - --localPath
-        - /etc/secrets/auth-new
+        - flyteadmin --config=etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
         command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - secrets
-        - init
-        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
-        imagePullPolicy: IfNotPresent
-        name: generate-secrets
-        volumeMounts:
-        - mountPath: /etc/flyte/config
-          name: config-volume
-        - mountPath: /etc/secrets/auth-new
-          name: new-auth-secrets
-      - args:
-        - --fromPath
-        - /etc/secrets/auth-new
-        command:
-        - flyteadmin
-        - --config
-        - /etc/flyte/config/*.yaml
-        - secrets
-        - create
+        - /bin/sh
+        - -c
         env:
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
         imagePullPolicy: IfNotPresent
-        name: save-secrets
+        name: generate-secrets
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
-        - mountPath: /etc/secrets/auth-new
-          name: new-auth-secrets
       serviceAccountName: flyteadmin
       volumes:
       - configMap:
@@ -3021,7 +3002,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-bkfh292hd6
+          name: flyte-admin-config-kg9mm798hc
         name: config-volume
       - name: db-pass
         secret:
@@ -3029,8 +3010,6 @@ spec:
       - name: auth
         secret:
           secretName: flyte-admin-auth
-      - emptyDir: {}
-        name: new-auth-secrets
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -3099,7 +3078,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        image: ghcr.io/flyteorg/flytepropeller:796c99dd00b0c073c0c48b6a7da413a00417d525
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -3107,11 +3086,16 @@ spec:
         volumeMounts:
         - mountPath: /etc/flyte/config
           name: config-volume
+        - mountPath: /etc/secrets/
+          name: auth
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-6gd7cgkkdt
+          name: flyte-propeller-config-4b26tfd275
         name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-propeller-auth
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -3413,7 +3397,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:ee6db644c1ad1495ccd3b2b6fac059133cfb4293-2
+            image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3430,7 +3414,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-bkfh292hd6
+              name: flyte-admin-config-kg9mm798hc
             name: config-volume
           - name: db-pass
             secret:
@@ -3597,7 +3581,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.10.0
+        image: ghcr.io/flyteorg/flytepropeller:796c99dd00b0c073c0c48b6a7da413a00417d525
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -3607,7 +3591,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-6gd7cgkkdt
+          name: flyte-propeller-config-4b26tfd275
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---
