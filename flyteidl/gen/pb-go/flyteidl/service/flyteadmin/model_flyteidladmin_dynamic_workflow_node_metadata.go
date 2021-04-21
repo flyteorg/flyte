@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated.
+// For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated.
 type FlyteidladminDynamicWorkflowNodeMetadata struct {
 	// id represents the unique identifier of the workflow.
 	Id *CoreIdentifier `json:"id,omitempty"`
