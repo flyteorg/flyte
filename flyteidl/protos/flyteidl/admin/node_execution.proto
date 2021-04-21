@@ -151,12 +151,9 @@ message TaskNodeMetadata {
     core.CatalogCacheStatus cache_status = 1;
     // This structure carries the catalog artifact information
     core.CatalogMetadata catalog_key = 2;
-
-    // In the case this task launched a dynamic workflow we capture its structure here.
-    DynamicWorkflowNodeMetadata dynamic_workflow = 16;
 }
 
-// For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated.
+// For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated.
 message DynamicWorkflowNodeMetadata {
     // id represents the unique identifier of the workflow.
     core.Identifier id     = 1;
@@ -184,4 +181,7 @@ message NodeExecutionGetDataResponse {
 
     // Optional, full_outputs will only be populated if they are under a configured size threshold. 
     core.LiteralMap full_outputs               = 4;
+
+    // Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
+    DynamicWorkflowNodeMetadata dynamic_workflow = 16;
 }

@@ -11119,9 +11119,6 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey */
             catalogKey?: (flyteidl.core.ICatalogMetadata|null);
-
-            /** TaskNodeMetadata dynamicWorkflow */
-            dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
         }
 
         /** Represents a TaskNodeMetadata. */
@@ -11138,9 +11135,6 @@ export namespace flyteidl {
 
             /** TaskNodeMetadata catalogKey. */
             public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
-
-            /** TaskNodeMetadata dynamicWorkflow. */
-            public dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
 
             /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
@@ -11299,6 +11293,9 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse fullOutputs */
             fullOutputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionGetDataResponse dynamicWorkflow */
+            dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
         }
 
         /** Represents a NodeExecutionGetDataResponse. */
@@ -11321,6 +11318,9 @@ export namespace flyteidl {
 
             /** NodeExecutionGetDataResponse fullOutputs. */
             public fullOutputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** NodeExecutionGetDataResponse dynamicWorkflow. */
+            public dynamicWorkflow?: (flyteidl.admin.IDynamicWorkflowNodeMetadata|null);
 
             /**
              * Creates a new NodeExecutionGetDataResponse instance using the specified properties.

@@ -26638,7 +26638,6 @@ export const flyteidl = $root.flyteidl = (() => {
              * @interface ITaskNodeMetadata
              * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] TaskNodeMetadata cacheStatus
              * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] TaskNodeMetadata catalogKey
-             * @property {flyteidl.admin.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] TaskNodeMetadata dynamicWorkflow
              */
 
             /**
@@ -26673,14 +26672,6 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskNodeMetadata.prototype.catalogKey = null;
 
             /**
-             * TaskNodeMetadata dynamicWorkflow.
-             * @member {flyteidl.admin.IDynamicWorkflowNodeMetadata|null|undefined} dynamicWorkflow
-             * @memberof flyteidl.admin.TaskNodeMetadata
-             * @instance
-             */
-            TaskNodeMetadata.prototype.dynamicWorkflow = null;
-
-            /**
              * Creates a new TaskNodeMetadata instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.TaskNodeMetadata
@@ -26708,8 +26699,6 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer.uint32(/* id 1, wireType 0 =*/8).int32(message.cacheStatus);
                 if (message.catalogKey != null && message.hasOwnProperty("catalogKey"))
                     $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
-                    $root.flyteidl.admin.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -26736,9 +26725,6 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 2:
                         message.catalogKey = $root.flyteidl.core.CatalogMetadata.decode(reader, reader.uint32());
-                        break;
-                    case 16:
-                        message.dynamicWorkflow = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -26775,11 +26761,6 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.core.CatalogMetadata.verify(message.catalogKey);
                     if (error)
                         return "catalogKey." + error;
-                }
-                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow")) {
-                    let error = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
-                    if (error)
-                        return "dynamicWorkflow." + error;
                 }
                 return null;
             };
@@ -27040,6 +27021,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.IUrlBlob|null} [outputs] NodeExecutionGetDataResponse outputs
              * @property {flyteidl.core.ILiteralMap|null} [fullInputs] NodeExecutionGetDataResponse fullInputs
              * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] NodeExecutionGetDataResponse fullOutputs
+             * @property {flyteidl.admin.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] NodeExecutionGetDataResponse dynamicWorkflow
              */
 
             /**
@@ -27090,6 +27072,14 @@ export const flyteidl = $root.flyteidl = (() => {
             NodeExecutionGetDataResponse.prototype.fullOutputs = null;
 
             /**
+             * NodeExecutionGetDataResponse dynamicWorkflow.
+             * @member {flyteidl.admin.IDynamicWorkflowNodeMetadata|null|undefined} dynamicWorkflow
+             * @memberof flyteidl.admin.NodeExecutionGetDataResponse
+             * @instance
+             */
+            NodeExecutionGetDataResponse.prototype.dynamicWorkflow = null;
+
+            /**
              * Creates a new NodeExecutionGetDataResponse instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.NodeExecutionGetDataResponse
@@ -27121,6 +27111,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                 if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
                     $root.flyteidl.core.LiteralMap.encode(message.fullOutputs, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow"))
+                    $root.flyteidl.admin.DynamicWorkflowNodeMetadata.encode(message.dynamicWorkflow, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 return writer;
             };
 
@@ -27153,6 +27145,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 4:
                         message.fullOutputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                        break;
+                    case 16:
+                        message.dynamicWorkflow = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -27192,6 +27187,11 @@ export const flyteidl = $root.flyteidl = (() => {
                     let error = $root.flyteidl.core.LiteralMap.verify(message.fullOutputs);
                     if (error)
                         return "fullOutputs." + error;
+                }
+                if (message.dynamicWorkflow != null && message.hasOwnProperty("dynamicWorkflow")) {
+                    let error = $root.flyteidl.admin.DynamicWorkflowNodeMetadata.verify(message.dynamicWorkflow);
+                    if (error)
+                        return "dynamicWorkflow." + error;
                 }
                 return null;
             };

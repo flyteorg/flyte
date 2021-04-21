@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.admin_url_blob import AdminUrlBlob  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.models.flyteidladmin_dynamic_workflow_node_metadata import FlyteidladminDynamicWorkflowNodeMetadata  # noqa: F401,E501
 
 
 class AdminNodeExecutionGetDataResponse(object):
@@ -37,23 +38,26 @@ class AdminNodeExecutionGetDataResponse(object):
         'inputs': 'AdminUrlBlob',
         'outputs': 'AdminUrlBlob',
         'full_inputs': 'CoreLiteralMap',
-        'full_outputs': 'CoreLiteralMap'
+        'full_outputs': 'CoreLiteralMap',
+        'dynamic_workflow': 'FlyteidladminDynamicWorkflowNodeMetadata'
     }
 
     attribute_map = {
         'inputs': 'inputs',
         'outputs': 'outputs',
         'full_inputs': 'full_inputs',
-        'full_outputs': 'full_outputs'
+        'full_outputs': 'full_outputs',
+        'dynamic_workflow': 'dynamic_workflow'
     }
 
-    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None):  # noqa: E501
+    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None, dynamic_workflow=None):  # noqa: E501
         """AdminNodeExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
 
         self._inputs = None
         self._outputs = None
         self._full_inputs = None
         self._full_outputs = None
+        self._dynamic_workflow = None
         self.discriminator = None
 
         if inputs is not None:
@@ -64,6 +68,8 @@ class AdminNodeExecutionGetDataResponse(object):
             self.full_inputs = full_inputs
         if full_outputs is not None:
             self.full_outputs = full_outputs
+        if dynamic_workflow is not None:
+            self.dynamic_workflow = dynamic_workflow
 
     @property
     def inputs(self):
@@ -156,6 +162,29 @@ class AdminNodeExecutionGetDataResponse(object):
         """
 
         self._full_outputs = full_outputs
+
+    @property
+    def dynamic_workflow(self):
+        """Gets the dynamic_workflow of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+
+        Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.  # noqa: E501
+
+        :return: The dynamic_workflow of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :rtype: FlyteidladminDynamicWorkflowNodeMetadata
+        """
+        return self._dynamic_workflow
+
+    @dynamic_workflow.setter
+    def dynamic_workflow(self, dynamic_workflow):
+        """Sets the dynamic_workflow of this AdminNodeExecutionGetDataResponse.
+
+        Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.  # noqa: E501
+
+        :param dynamic_workflow: The dynamic_workflow of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :type: FlyteidladminDynamicWorkflowNodeMetadata
+        """
+
+        self._dynamic_workflow = dynamic_workflow
 
     def to_dict(self):
         """Returns the model properties as a dict"""

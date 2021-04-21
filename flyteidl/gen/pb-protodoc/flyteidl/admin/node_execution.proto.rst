@@ -391,8 +391,7 @@ Metadata for the case in which the node is a TaskNode
 
   {
     "cache_status": "...",
-    "catalog_key": "{...}",
-    "dynamic_workflow": "{...}"
+    "catalog_key": "{...}"
   }
 
 .. _api_field_flyteidl.admin.TaskNodeMetadata.cache_status:
@@ -407,12 +406,6 @@ catalog_key
   (:ref:`flyteidl.core.CatalogMetadata <api_msg_flyteidl.core.CatalogMetadata>`) This structure carries the catalog artifact information
   
   
-.. _api_field_flyteidl.admin.TaskNodeMetadata.dynamic_workflow:
-
-dynamic_workflow
-  (:ref:`flyteidl.admin.DynamicWorkflowNodeMetadata <api_msg_flyteidl.admin.DynamicWorkflowNodeMetadata>`) In the case this task launched a dynamic workflow we capture its structure here.
-  
-  
 
 
 .. _api_msg_flyteidl.admin.DynamicWorkflowNodeMetadata:
@@ -420,9 +413,9 @@ dynamic_workflow
 flyteidl.admin.DynamicWorkflowNodeMetadata
 ------------------------------------------
 
-`[flyteidl.admin.DynamicWorkflowNodeMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L159>`_
+`[flyteidl.admin.DynamicWorkflowNodeMetadata proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L156>`_
 
-For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated.
+For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated.
 
 .. code-block:: json
 
@@ -450,7 +443,7 @@ compiled_workflow
 flyteidl.admin.NodeExecutionGetDataRequest
 ------------------------------------------
 
-`[flyteidl.admin.NodeExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L168>`_
+`[flyteidl.admin.NodeExecutionGetDataRequest proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L165>`_
 
 Request structure to fetch inputs and output urls for a node execution.
 
@@ -473,7 +466,7 @@ id
 flyteidl.admin.NodeExecutionGetDataResponse
 -------------------------------------------
 
-`[flyteidl.admin.NodeExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L174>`_
+`[flyteidl.admin.NodeExecutionGetDataResponse proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/admin/node_execution.proto#L171>`_
 
 Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution.
 
@@ -483,7 +476,8 @@ Response structure for NodeExecutionGetDataRequest which contains inputs and out
     "inputs": "{...}",
     "outputs": "{...}",
     "full_inputs": "{...}",
-    "full_outputs": "{...}"
+    "full_outputs": "{...}",
+    "dynamic_workflow": "{...}"
   }
 
 .. _api_field_flyteidl.admin.NodeExecutionGetDataResponse.inputs:
@@ -508,6 +502,12 @@ full_inputs
 
 full_outputs
   (:ref:`flyteidl.core.LiteralMap <api_msg_flyteidl.core.LiteralMap>`) Optional, full_outputs will only be populated if they are under a configured size threshold. 
+  
+  
+.. _api_field_flyteidl.admin.NodeExecutionGetDataResponse.dynamic_workflow:
+
+dynamic_workflow
+  (:ref:`flyteidl.admin.DynamicWorkflowNodeMetadata <api_msg_flyteidl.admin.DynamicWorkflowNodeMetadata>`) Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
   
   
 
