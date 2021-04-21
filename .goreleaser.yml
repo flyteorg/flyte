@@ -1,0 +1,14 @@
+project_name: flyte
+builds:
+  - skip: true
+release:
+  github:
+    owner: flyteorg
+    name: flyte
+  draft: false
+  prerelease: auto
+  discussion_category_name: General
+  name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
+  disable: false
+  extra_files:
+    - glob: ./deployment/**/*
