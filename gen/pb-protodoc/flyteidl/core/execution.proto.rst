@@ -140,13 +140,18 @@ SKIPPED
 TIMED_OUT
   ⁣
   
+.. _api_enum_value_flyteidl.core.NodeExecution.Phase.DYNAMIC_RUNNING:
+
+DYNAMIC_RUNNING
+  ⁣
+  
 
 .. _api_msg_flyteidl.core.TaskExecution:
 
 flyteidl.core.TaskExecution
 ---------------------------
 
-`[flyteidl.core.TaskExecution proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L40>`_
+`[flyteidl.core.TaskExecution proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L41>`_
 
 Phases that task plugins can go through. Not all phases may be applicable to a specific plugin task,
 but this is the cumulative list that customers may want to know about for their task.
@@ -162,7 +167,7 @@ but this is the cumulative list that customers may want to know about for their 
 Enum flyteidl.core.TaskExecution.Phase
 --------------------------------------
 
-`[flyteidl.core.TaskExecution.Phase proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L41>`_
+`[flyteidl.core.TaskExecution.Phase proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L42>`_
 
 
 .. _api_enum_value_flyteidl.core.TaskExecution.Phase.UNDEFINED:
@@ -213,7 +218,7 @@ WAITING_FOR_RESOURCES
 flyteidl.core.ExecutionError
 ----------------------------
 
-`[flyteidl.core.ExecutionError proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L57>`_
+`[flyteidl.core.ExecutionError proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L58>`_
 
 Represents the error message from the execution.
 
@@ -256,7 +261,7 @@ kind
 Enum flyteidl.core.ExecutionError.ErrorKind
 -------------------------------------------
 
-`[flyteidl.core.ExecutionError.ErrorKind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L66>`_
+`[flyteidl.core.ExecutionError.ErrorKind proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L67>`_
 
 Error type: System or User
 
@@ -281,7 +286,7 @@ SYSTEM
 flyteidl.core.TaskLog
 ---------------------
 
-`[flyteidl.core.TaskLog proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L76>`_
+`[flyteidl.core.TaskLog proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L77>`_
 
 Log information for the task that is specific to a log sink
 When our log story is flushed out, we may have more metadata here like log link expiry
@@ -321,7 +326,7 @@ ttl
 Enum flyteidl.core.TaskLog.MessageFormat
 ----------------------------------------
 
-`[flyteidl.core.TaskLog.MessageFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L78>`_
+`[flyteidl.core.TaskLog.MessageFormat proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L79>`_
 
 
 .. _api_enum_value_flyteidl.core.TaskLog.MessageFormat.UNKNOWN:
@@ -345,7 +350,7 @@ JSON
 flyteidl.core.QualityOfServiceSpec
 ----------------------------------
 
-`[flyteidl.core.QualityOfServiceSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L91>`_
+`[flyteidl.core.QualityOfServiceSpec proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L92>`_
 
 Represents customized execution run-time attributes.
 
@@ -368,7 +373,7 @@ queueing_budget
 flyteidl.core.QualityOfService
 ------------------------------
 
-`[flyteidl.core.QualityOfService proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L99>`_
+`[flyteidl.core.QualityOfService proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L100>`_
 
 Indicates the priority of an execution.
 
@@ -401,7 +406,7 @@ spec
 Enum flyteidl.core.QualityOfService.Tier
 ----------------------------------------
 
-`[flyteidl.core.QualityOfService.Tier proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L100>`_
+`[flyteidl.core.QualityOfService.Tier proto] <https://github.com/lyft/flyteidl/blob/master/protos/flyteidl/core/execution.proto#L101>`_
 
 
 .. _api_enum_value_flyteidl.core.QualityOfService.Tier.UNDEFINED:

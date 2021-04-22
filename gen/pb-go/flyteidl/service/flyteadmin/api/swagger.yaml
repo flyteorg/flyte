@@ -26873,6 +26873,7 @@ definitions:
     - "ABORTED"
     - "SKIPPED"
     - "TIMED_OUT"
+    - "DYNAMIC_RUNNING"
     default: "UNDEFINED"
   coreNodeMetadata:
     type: "object"

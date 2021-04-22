@@ -5247,7 +5247,8 @@
         "FAILED",
         "ABORTED",
         "SKIPPED",
-        "TIMED_OUT"
+        "TIMED_OUT",
+        "DYNAMIC_RUNNING"
       ],
       "default": "UNDEFINED"
     },
