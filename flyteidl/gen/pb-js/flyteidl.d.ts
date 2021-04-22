@@ -3196,7 +3196,8 @@ export namespace flyteidl {
                 FAILED = 5,
                 ABORTED = 6,
                 SKIPPED = 7,
-                TIMED_OUT = 8
+                TIMED_OUT = 8,
+                DYNAMIC_RUNNING = 9
             }
         }
 
