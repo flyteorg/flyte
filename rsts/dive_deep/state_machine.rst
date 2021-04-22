@@ -50,7 +50,7 @@ Nodes can be of different types, as follows, but all the nodes traverse through 
 #. :std:ref:`gen/pb-protodoc/flyteidl/core/workflow.proto:flyteidl.core.tasknode`
 #. :std:ref:`gen/pb-protodoc/flyteidl/core/workflow.proto:flyteidl.core.branchnode`
 #. :std:ref:`gen/pb-protodoc/flyteidl/core/workflow.proto:flyteidl.core.workflownode`
-#. Dynamic node - which is just a task node that does not return outputs, but futures. When a dynamic node is running the status trasitions to `DYNAMIC_RUNNING`.
+#. Dynamic node - which is just a task node that does not return outputs, but a dynamic workflow. When the task runs, it stays in a `RUNNING` state. Once the task completes and Flyte starts executing the dynamic workflow, the overarching node that contains both the original task and the dynamic workflow enters `DYNAMIC_RUNNING` state.
 #. End Node - only exists during the execution and is not modeled in the core spec
 
 Every transition between states is recorded in Flyteadmin using :std:ref:`gen/pb-protodoc/flyteidl/event/event.proto:flyteidl.event.nodeexecutionevent`
