@@ -409,6 +409,7 @@ configmap:
 
   # -- FlyteAdmin server configuration
   server:
+    # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
     server:
       httpPort: 8088
       grpcPort: 8089
@@ -416,6 +417,7 @@ configmap:
         secure: false
         useAuth: false
         allowCors: true
+    # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
@@ -439,6 +441,7 @@ configmap:
       grpcServerReflection: true
 
   # -- Task default resources configuration
+  # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration).
   task_resource_defaults:
     # -- Task default resources parameters
     task_resources:
@@ -594,6 +597,7 @@ cluster_resource_manager:
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
+    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
