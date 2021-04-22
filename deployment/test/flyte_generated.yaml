@@ -134,6 +134,7 @@ rules:
   - flyte.lyft.com
   resources:
   - flyteworkflows
+  - flyteworkflows/finalizers
   verbs:
   - get
   - list
