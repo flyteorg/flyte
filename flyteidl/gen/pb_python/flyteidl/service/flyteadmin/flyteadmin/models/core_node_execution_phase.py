@@ -35,6 +35,7 @@ class CoreNodeExecutionPhase(object):
     ABORTED = "ABORTED"
     SKIPPED = "SKIPPED"
     TIMED_OUT = "TIMED_OUT"
+    DYNAMIC_RUNNING = "DYNAMIC_RUNNING"
 
     """
     Attributes:

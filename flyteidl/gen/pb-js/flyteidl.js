@@ -7662,6 +7662,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {number} ABORTED=6 ABORTED value
              * @property {number} SKIPPED=7 SKIPPED value
              * @property {number} TIMED_OUT=8 TIMED_OUT value
+             * @property {number} DYNAMIC_RUNNING=9 DYNAMIC_RUNNING value
              */
             NodeExecution.Phase = (function() {
                 const valuesById = {}, values = Object.create(valuesById);
@@ -7674,6 +7675,7 @@ export const flyteidl = $root.flyteidl = (() => {
                 values[valuesById[6] = "ABORTED"] = 6;
                 values[valuesById[7] = "SKIPPED"] = 7;
                 values[valuesById[8] = "TIMED_OUT"] = 8;
+                values[valuesById[9] = "DYNAMIC_RUNNING"] = 9;
                 return values;
             })();
 
@@ -12939,6 +12941,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 6:
                     case 7:
                     case 8:
+                    case 9:
                         break;
                     }
                 if (message.occurredAt != null && message.hasOwnProperty("occurredAt")) {
@@ -26472,6 +26475,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 6:
                     case 7:
                     case 8:
+                    case 9:
                         break;
                     }
                 if (message.startedAt != null && message.hasOwnProperty("startedAt")) {
