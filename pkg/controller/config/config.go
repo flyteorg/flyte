@@ -52,7 +52,11 @@ var (
 		DownstreamEval: config.Duration{
 			Duration: 30 * time.Second,
 		},
-		MaxWorkflowRetries:  10,
+		MaxWorkflowRetries: 10,
+		MaxTTLInHours:      23,
+		GCInterval: config.Duration{
+			Duration: 30 * time.Minute,
+		},
 		MaxDatasetSizeBytes: 10 * 1024 * 1024,
 		Queue: CompositeQueueConfig{
 			Type: CompositeQueueBatch,
@@ -110,19 +114,19 @@ var (
 type Config struct {
 	KubeConfigPath         string               `json:"kube-config" pflag:",Path to kubernetes client config file."`
 	MasterURL              string               `json:"master"`
-	Workers                int                  `json:"workers" pflag:"2,Number of threads to process workflows"`
-	WorkflowReEval         config.Duration      `json:"workflow-reeval-duration" pflag:"\"30s\",Frequency of re-evaluating workflows"`
-	DownstreamEval         config.Duration      `json:"downstream-eval-duration" pflag:"\"60s\",Frequency of re-evaluating downstream tasks"`
-	LimitNamespace         string               `json:"limit-namespace" pflag:"\"all\",Namespaces to watch for this propeller"`
-	ProfilerPort           config.Port          `json:"prof-port" pflag:"\"10254\",Profiler port"`
+	Workers                int                  `json:"workers" pflag:",Number of threads to process workflows"`
+	WorkflowReEval         config.Duration      `json:"workflow-reeval-duration" pflag:",Frequency of re-evaluating workflows"`
+	DownstreamEval         config.Duration      `json:"downstream-eval-duration" pflag:",Frequency of re-evaluating downstream tasks"`
+	LimitNamespace         string               `json:"limit-namespace" pflag:",Namespaces to watch for this propeller"`
+	ProfilerPort           config.Port          `json:"prof-port" pflag:",Profiler port"`
 	MetadataPrefix         string               `json:"metadata-prefix,omitempty" pflag:",MetadataPrefix should be used if all the metadata for Flyte executions should be stored under a specific prefix in CloudStorage. If not specified, the data will be stored in the base container directly."`
 	DefaultRawOutputPrefix string               `json:"rawoutput-prefix" pflag:",a fully qualified storage path of the form s3://flyte/abc/..., where all data sandboxes should be stored."`
 	Queue                  CompositeQueueConfig `json:"queue,omitempty" pflag:",Workflow workqueue configuration, affects the way the work is consumed from the queue."`
-	MetricsPrefix          string               `json:"metrics-prefix" pflag:"\"flyte:\",An optional prefix for all published metrics."`
-	EnableAdminLauncher    bool                 `json:"enable-admin-launcher" pflag:"false, Enable remote Workflow launcher to Admin"`
-	MaxWorkflowRetries     int                  `json:"max-workflow-retries" pflag:"50,Maximum number of retries per workflow"`
-	MaxTTLInHours          int                  `json:"max-ttl-hours" pflag:"23,Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
-	GCInterval             config.Duration      `json:"gc-interval" pflag:"\"30m\",Run periodic GC every 30 minutes"`
+	MetricsPrefix          string               `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
+	EnableAdminLauncher    bool                 `json:"enable-admin-launcher" pflag:"Enable remote Workflow launcher to Admin"`
+	MaxWorkflowRetries     int                  `json:"max-workflow-retries" pflag:"Maximum number of retries per workflow"`
+	MaxTTLInHours          int                  `json:"max-ttl-hours" pflag:"Maximum number of hours a completed workflow should be retained. Number between 1-23 hours"`
+	GCInterval             config.Duration      `json:"gc-interval" pflag:"Run periodic GC every 30 minutes"`
 	LeaderElection         LeaderElectionConfig `json:"leader-election,omitempty" pflag:",Config for leader election."`
 	PublishK8sEvents       bool                 `json:"publish-k8s-events" pflag:",Enable events publishing to K8s events API."`
 	MaxDatasetSizeBytes    int64                `json:"max-output-size-bytes" pflag:",Maximum size of outputs per task"`
