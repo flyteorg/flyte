@@ -6,9 +6,8 @@
    :hidden:
 
    getting_started
-   User Guide <https://flytecookbook.readthedocs.io>
-   Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
-   Concepts <https://docs.flyte.org/en/latest/concepts/index.html>
+   Cookbook <https://flytecookbook.readthedocs.io>
+   Concepts <https://docs.flyte.org/en/latest/concepts/core.html>
    reference/index
    community/index
 
@@ -17,6 +16,7 @@
    :hidden:
 
    basics/flyte_ui
+   basics/flyte_cli
    basics/deployment_options
    basics/glossary
 
