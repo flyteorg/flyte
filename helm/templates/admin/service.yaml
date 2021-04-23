@@ -16,16 +16,19 @@ spec:
     {{ . }}
   {{- end }}
   ports:
-  - name: redoc
-    port: 87
-    protocol: TCP
-    targetPort: 8087
-  - name: http
-    port: 80
-    protocol: TCP
-    targetPort: 8088
-  - name: grpc
-    port: 81
-    protocol: TCP
-    targetPort: 8089
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8088
+    - name: grpc
+      port: 81
+      protocol: TCP
+      targetPort: 8089
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087
+    - name: http-metrics
+      protocol: TCP
+      port: 10254
   selector: {{ include "flyteadmin.selectorLabels" . | nindent 4 }}
