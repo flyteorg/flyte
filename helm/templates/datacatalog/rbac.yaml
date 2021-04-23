@@ -1,5 +1,6 @@
 
 ---
+{{- if .Values.datacatalog.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -9,3 +10,4 @@ metadata:
   {{- with .Values.datacatalog.serviceAccountAnnotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
+{{- end }}
