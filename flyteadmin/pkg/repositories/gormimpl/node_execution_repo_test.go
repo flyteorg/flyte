@@ -32,8 +32,9 @@ func TestCreateNodeExecution(t *testing.T) {
 	nodeExecutionQuery := GlobalMock.NewMock()
 	nodeExecutionQuery.WithQuery(`INSERT INTO "node_executions" ("id","created_at","updated_at","deleted_at",` +
 		`"execution_project","execution_domain","execution_name","node_id","phase","input_uri","closure","started_at",` +
-		`"node_execution_created_at","node_execution_updated_at","duration","node_execution_metadata","parent_id","error_kind","error_code","cache_status") VALUES ` +
-		`(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+		`"node_execution_created_at","node_execution_updated_at","duration","node_execution_metadata","parent_id",` +
+		`"error_kind","error_code","cache_status","dynamic_workflow_remote_closure_reference") ` +
+		`VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 
 	parentID := uint(10)
 	nodeExecution := models.NodeExecution{

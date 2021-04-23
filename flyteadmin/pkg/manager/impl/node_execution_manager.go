@@ -54,6 +54,7 @@ type nodeExecutionMetrics struct {
 type NodeExecutionManager struct {
 	db             repositories.RepositoryInterface
 	config         runtimeInterfaces.Configuration
+	storagePrefix  []string
 	storageClient  *storage.DataStore
 	metrics        nodeExecutionMetrics
 	urlData        dataInterfaces.RemoteURLInterface
@@ -81,7 +82,7 @@ func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecution
 }
 
 func (m *NodeExecutionManager) createNodeExecutionWithEvent(
-	ctx context.Context, request *admin.NodeExecutionEventRequest) error {
+	ctx context.Context, request *admin.NodeExecutionEventRequest, dynamicWorkflowRemoteClosureReference string) error {
 
 	executionID := request.Event.Id.ExecutionId
 	workflowExecutionExists, err := m.db.ExecutionRepo().Exists(ctx, repoInterfaces.Identifier{
@@ -123,9 +124,10 @@ func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 		parentID = &parentNodeExecutionModel.ID
 	}
 	nodeExecutionModel, err := transformers.CreateNodeExecutionModel(transformers.ToNodeExecutionModelInput{
-		Request:               request,
-		ParentTaskExecutionID: parentTaskExecutionID,
-		ParentID:              parentID,
+		Request:                      request,
+		ParentTaskExecutionID:        parentTaskExecutionID,
+		ParentID:                     parentID,
+		DynamicWorkflowRemoteClosure: dynamicWorkflowRemoteClosureReference,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "failed to create node execution model for event request: %s with err: %v",
@@ -142,7 +144,8 @@ func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 }
 
 func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
-	ctx context.Context, request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution) (updateNodeExecutionStatus, error) {
+	ctx context.Context, request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
+	dynamicWorkflowRemoteClosureReference string) (updateNodeExecutionStatus, error) {
 	// If we have an existing execution, check if the phase change is valid
 	nodeExecPhase := core.NodeExecution_Phase(core.NodeExecution_Phase_value[nodeExecutionModel.Phase])
 	if nodeExecPhase == request.Event.Phase {
@@ -172,7 +175,7 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 			return updateFailed, err
 		}
 	}
-	err := transformers.UpdateNodeExecutionModel(request, nodeExecutionModel, childExecutionID)
+	err := transformers.UpdateNodeExecutionModel(request, nodeExecutionModel, childExecutionID, dynamicWorkflowRemoteClosureReference)
 	if err != nil {
 		logger.Debugf(ctx, "failed to update node execution model: %+v with err: %v", request.Event.Id, err)
 		return updateFailed, err
@@ -187,14 +190,55 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 	return updateSucceeded, nil
 }
 
+func formatDynamicWorkflowID(identifier *core.Identifier) string {
+	return fmt.Sprintf("%s_%s_%s_%s", identifier.Project, identifier.Domain, identifier.Name, identifier.Version)
+}
+
+func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
+	ctx context.Context, nodeID *core.NodeExecutionIdentifier, workflowID *core.Identifier,
+	compiledWorkflowClosure *core.CompiledWorkflowClosure) (storage.DataReference, error) {
+	nestedSubKeys := []string{
+		nodeID.ExecutionId.Project,
+		nodeID.ExecutionId.Domain,
+		nodeID.ExecutionId.Name,
+		nodeID.NodeId,
+		formatDynamicWorkflowID(workflowID),
+	}
+	nestedKeys := append(m.storagePrefix, nestedSubKeys...)
+	remoteClosureDataRef, err := m.storageClient.ConstructReference(ctx, m.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
+
+	if err != nil {
+		return "", errors.NewFlyteAdminErrorf(codes.Internal,
+			"Failed to produce remote closure data reference for dynamic workflow yielded by node id [%+v] with workflow id [%+v]; err: %v", nodeID, workflowID, err)
+	}
+
+	err = m.storageClient.WriteProtobuf(ctx, remoteClosureDataRef, defaultStorageOptions, compiledWorkflowClosure)
+	if err != nil {
+		return "", errors.NewFlyteAdminErrorf(codes.Internal,
+			"Failed to upload dynamic workflow closure for node id [%+v] and workflow id [%+v] with err: %v", nodeID, workflowID, err)
+	}
+	return remoteClosureDataRef, nil
+}
+
 func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admin.NodeExecutionEventRequest) (
 	*admin.NodeExecutionEventResponse, error) {
-	if err := validation.ValidateNodeExecutionIdentifier(request.Event.Id); err != nil {
+	if err := validation.ValidateNodeExecutionEventRequest(&request); err != nil {
 		logger.Debugf(ctx, "CreateNodeEvent called with invalid identifier [%+v]: %v", request.Event.Id, err)
 	}
 	ctx = getNodeExecutionContext(ctx, request.Event.Id)
 	logger.Debugf(ctx, "Received node execution event for Node Exec Id [%+v] transitioning to phase [%v], w/ Metadata [%v]",
 		request.Event.Id, request.Event.Phase, request.Event.ParentTaskMetadata)
+
+	var dynamicWorkflowRemoteClosureReference string
+	if request.Event.GetTaskNodeMetadata() != nil && request.Event.GetTaskNodeMetadata().DynamicWorkflow != nil {
+		dynamicWorkflowRemoteClosureDataReference, err := m.uploadDynamicWorkflowClosure(
+			ctx, request.Event.Id, request.Event.GetTaskNodeMetadata().DynamicWorkflow.Id,
+			request.Event.GetTaskNodeMetadata().DynamicWorkflow.CompiledWorkflow)
+		if err != nil {
+			return nil, err
+		}
+		dynamicWorkflowRemoteClosureReference = dynamicWorkflowRemoteClosureDataReference.String()
+	}
 
 	nodeExecutionModel, err := m.db.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
 		NodeExecutionIdentifier: *request.Event.Id,
@@ -205,14 +249,14 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 				request.Event.Id, err)
 			return nil, err
 		}
-		err = m.createNodeExecutionWithEvent(ctx, &request)
+		err = m.createNodeExecutionWithEvent(ctx, &request, dynamicWorkflowRemoteClosureReference)
 		if err != nil {
 			return nil, err
 		}
 		m.metrics.NodeExecutionsCreated.Inc()
 	} else {
 		phase := core.NodeExecution_Phase(core.NodeExecution_Phase_value[nodeExecutionModel.Phase])
-		updateStatus, err := m.updateNodeExecutionWithEvent(ctx, &request, &nodeExecutionModel)
+		updateStatus, err := m.updateNodeExecutionWithEvent(ctx, &request, &nodeExecutionModel, dynamicWorkflowRemoteClosureReference)
 		if err != nil {
 			return nil, err
 		}
@@ -427,6 +471,19 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		response.FullOutputs = &fullOutputs
 	}
 
+	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
+		closure := &core.CompiledWorkflowClosure{}
+		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecutionModel.DynamicWorkflowRemoteClosureReference), closure)
+		if err != nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+				"Unable to read WorkflowClosure from location %s : %v", nodeExecutionModel.DynamicWorkflowRemoteClosureReference, err)
+		}
+		response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
+			Id:               closure.Primary.Template.Id,
+			CompiledWorkflow: closure,
+		}
+	}
+
 	m.metrics.NodeExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
 	m.metrics.NodeExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
 
@@ -434,7 +491,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 }
 
 func NewNodeExecutionManager(db repositories.RepositoryInterface, config runtimeInterfaces.Configuration,
-	storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
 	eventPublisher notificationInterfaces.Publisher, eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{
 		Scope: scope,
@@ -458,8 +515,10 @@ func NewNodeExecutionManager(db repositories.RepositoryInterface, config runtime
 			"overall count of publish event errors when invoking publish()"),
 	}
 	return &NodeExecutionManager{
-		db:             db,
-		config:         config,
+		db:     db,
+		config: config,
+
+		storagePrefix:  storagePrefix,
 		storageClient:  storageClient,
 		metrics:        metrics,
 		urlData:        urlData,

@@ -3,6 +3,8 @@ package validation
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -13,6 +15,14 @@ var testExecutionID = core.WorkflowExecutionIdentifier{
 	Project: "project",
 	Domain:  "domain",
 	Name:    "name",
+}
+
+var dynamicWfID = core.Identifier{
+	ResourceType: core.ResourceType_WORKFLOW,
+	Project:      "project",
+	Domain:       "domain",
+	Name:         "name",
+	Version:      "abc123",
 }
 
 func TestValidateNodeExecutionIdentifier(t *testing.T) {
@@ -33,6 +43,148 @@ func TestValidateNodeExecutionIdentifier_MissingFields(t *testing.T) {
 		ExecutionId: &testExecutionID,
 	})
 	assert.EqualError(t, err, "missing node_id")
+}
+
+func TestValidateNodeExecutionEventRequest(t *testing.T) {
+	request := admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				ExecutionId: &testExecutionID,
+				NodeId:      "node id",
+			},
+		},
+	}
+	assert.NoError(t, ValidateNodeExecutionEventRequest(&request))
+
+	request = admin.NodeExecutionEventRequest{
+		Event: &event.NodeExecutionEvent{
+			Id: &core.NodeExecutionIdentifier{
+				ExecutionId: &testExecutionID,
+				NodeId:      "node id",
+			},
+			TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+				TaskNodeMetadata: &event.TaskNodeMetadata{
+					DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
+						Id: &dynamicWfID,
+						CompiledWorkflow: &core.CompiledWorkflowClosure{
+							Primary: &core.CompiledWorkflow{
+								Template: &core.WorkflowTemplate{
+									Id: &dynamicWfID,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	assert.NoError(t, ValidateNodeExecutionEventRequest(&request))
+}
+
+func TestValidateNodeExecutionEventRequest_Invalid(t *testing.T) {
+	t.Run("missing dynamic workflow id", func(t *testing.T) {
+		request := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Id: &core.NodeExecutionIdentifier{
+					ExecutionId: &testExecutionID,
+					NodeId:      "node id",
+				},
+				TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+					TaskNodeMetadata: &event.TaskNodeMetadata{
+						DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{},
+					},
+				},
+			},
+		}
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing id")
+	})
+
+	t.Run("missing dynamic compiled workflow", func(t *testing.T) {
+		request := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Id: &core.NodeExecutionIdentifier{
+					ExecutionId: &testExecutionID,
+					NodeId:      "node id",
+				},
+				TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+					TaskNodeMetadata: &event.TaskNodeMetadata{
+						DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
+							Id: &dynamicWfID,
+						},
+					},
+				},
+			},
+		}
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing compiled dynamic workflow")
+	})
+
+	t.Run("missing dynamic compiled workflow primary", func(t *testing.T) {
+		request := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Id: &core.NodeExecutionIdentifier{
+					ExecutionId: &testExecutionID,
+					NodeId:      "node id",
+				},
+				TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+					TaskNodeMetadata: &event.TaskNodeMetadata{
+						DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
+							Id:               &dynamicWfID,
+							CompiledWorkflow: &core.CompiledWorkflowClosure{},
+						},
+					},
+				},
+			},
+		}
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing primary dynamic workflow")
+	})
+
+	t.Run("missing dynamic compiled primary template", func(t *testing.T) {
+		request := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Id: &core.NodeExecutionIdentifier{
+					ExecutionId: &testExecutionID,
+					NodeId:      "node id",
+				},
+				TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+					TaskNodeMetadata: &event.TaskNodeMetadata{
+						DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
+							Id: &dynamicWfID,
+							CompiledWorkflow: &core.CompiledWorkflowClosure{
+								Primary: &core.CompiledWorkflow{},
+							},
+						},
+					},
+				},
+			},
+		}
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "missing primary dynamic workflow template")
+	})
+
+	t.Run("missing dynamic compiled workflow primary identifier", func(t *testing.T) {
+		request := admin.NodeExecutionEventRequest{
+			Event: &event.NodeExecutionEvent{
+				Id: &core.NodeExecutionIdentifier{
+					ExecutionId: &testExecutionID,
+					NodeId:      "node id",
+				},
+				TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
+					TaskNodeMetadata: &event.TaskNodeMetadata{
+						DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
+							Id: &dynamicWfID,
+							CompiledWorkflow: &core.CompiledWorkflowClosure{
+								Primary: &core.CompiledWorkflow{
+									Template: &core.WorkflowTemplate{
+										Id: &core.Identifier{},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		assert.EqualError(t, ValidateNodeExecutionEventRequest(&request), "unexpected resource type unspecified for identifier [], expected workflow instead")
+	})
 }
 
 func TestValidateNodeExecutionListRequest(t *testing.T) {

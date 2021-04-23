@@ -20,9 +20,10 @@ import (
 )
 
 type ToNodeExecutionModelInput struct {
-	Request               *admin.NodeExecutionEventRequest
-	ParentTaskExecutionID uint
-	ParentID              *uint
+	Request                      *admin.NodeExecutionEventRequest
+	ParentTaskExecutionID        uint
+	ParentID                     *uint
+	DynamicWorkflowRemoteClosure string
 }
 
 func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
@@ -132,12 +133,13 @@ func CreateNodeExecutionModel(input ToNodeExecutionModelInput) (*models.NodeExec
 		nodeExecution.ParentTaskExecutionID = input.ParentTaskExecutionID
 	}
 	nodeExecution.ParentID = input.ParentID
+	nodeExecution.DynamicWorkflowRemoteClosureReference = input.DynamicWorkflowRemoteClosure
 	return nodeExecution, nil
 }
 
 func UpdateNodeExecutionModel(
 	request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
-	targetExecution *core.WorkflowExecutionIdentifier) error {
+	targetExecution *core.WorkflowExecutionIdentifier, dynamicWorkflowRemoteClosure string) error {
 	var nodeExecutionClosure admin.NodeExecutionClosure
 	err := proto.Unmarshal(nodeExecutionModel.Closure, &nodeExecutionClosure)
 	if err != nil {
@@ -171,14 +173,15 @@ func UpdateNodeExecutionModel(
 	}
 
 	// Update TaskNodeMetadata, which includes caching information today.
-	if request.Event.GetTaskNodeMetadata() != nil {
+	if request.Event.GetTaskNodeMetadata() != nil && request.Event.GetTaskNodeMetadata().CatalogKey != nil {
 		st := request.Event.GetTaskNodeMetadata().GetCacheStatus().String()
-		nodeExecutionClosure.TargetMetadata = &admin.NodeExecutionClosure_TaskNodeMetadata{
+		targetMetadata := &admin.NodeExecutionClosure_TaskNodeMetadata{
 			TaskNodeMetadata: &admin.TaskNodeMetadata{
 				CacheStatus: request.Event.GetTaskNodeMetadata().GetCacheStatus(),
 				CatalogKey:  request.Event.GetTaskNodeMetadata().GetCatalogKey(),
 			},
 		}
+		nodeExecutionClosure.TargetMetadata = targetMetadata
 		nodeExecutionModel.CacheStatus = &st
 	}
 
@@ -194,6 +197,7 @@ func UpdateNodeExecutionModel(
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to parse updated at timestamp")
 	}
 	nodeExecutionModel.NodeExecutionUpdatedAt = &updatedAt
+	nodeExecutionModel.DynamicWorkflowRemoteClosureReference = dynamicWorkflowRemoteClosure
 	return nil
 }
 

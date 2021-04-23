@@ -15,7 +15,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/evanphx/json-patch v4.9.0+incompatible
-	github.com/flyteorg/flyteidl v0.18.32
+	github.com/flyteorg/flyteidl v0.18.38
 	github.com/flyteorg/flytepropeller v0.7.8
 	github.com/flyteorg/flytestdlib v0.3.15
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
@@ -40,7 +40,7 @@ require (
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
 	github.com/prometheus/client_golang v1.9.0
 	github.com/prometheus/common v0.19.0 // indirect
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.7.0
