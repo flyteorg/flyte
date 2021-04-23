@@ -6,8 +6,11 @@
 flyteadmin:
   replicaCount: 2
   # -- IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-  serviceAccountAnnotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+  serviceAccount:
+    # -- If the service account is created by you, make this false
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
 
   resources:
     limits:
@@ -20,14 +23,12 @@ flyteadmin:
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
-      # TODO add security groups
-      service.beta.kubernetes.io/aws-load-balancer-extra-security-groups: "sg-...,sg-...,sg-..."
       # TODO alter domain
-      external-dns.alpha.kubernetes.io/hostname: "flyteadmin.subdomain.mydomain.com"
+      external-dns.alpha.kubernetes.io/hostname: "demo2.nuclyde.io"
     type: LoadBalancer
     loadBalancerSourceRanges:
       # TODO change source ip range if desired
-      - 0.0.0.0
+      - 0.0.0.0/0
 
   affinity:
     podAntiAffinity:
@@ -43,9 +44,11 @@ flyteadmin:
 
 datacatalog:
   replicaCount: 2
-  # IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-  serviceAccountAnnotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+  serviceAccount:
+    # -- If the service account is created by you, make this false
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
   resources:
     limits:
       cpu: 500m
@@ -56,8 +59,13 @@ datacatalog:
       memory: 200Mi
   service:
     annotations:
-      cloud.google.com/load-balancer-type: Internal
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO alter domain
+      # external-dns.alpha.kubernetes.io/hostname: "demo2.nuclyde.io"
     type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -72,19 +80,21 @@ datacatalog:
 
 flytepropeller:
   replicaCount: 2
-  # IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
-  serviceAccountAnnotations:
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+  serviceAccount:
+    # -- If the service account is created by you, make this false
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
   resources:
     limits:
       cpu: 1
-      ephemeral-storage: 1GB
-      memory: 2GB
+      ephemeral-storage: 1Gi
+      memory: 2Gi
     requests:
       cpu: 1
-      ephemeral-storage: 1GB
-      memory: 2GB
-  cacheSizeMbs: 512
+      ephemeral-storage: 1Gi
+      memory: 2Gi
+  cacheSizeMbs: 1024
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -102,6 +112,15 @@ flyteconsole:
   resources:
     limits:
       cpu: 250m
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO alter domain
+      external-dns.alpha.kubernetes.io/hostname: "demo2.nuclyde.io"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -165,26 +184,18 @@ common:
   databaseSecret:
     name: db-pass
     secretManifest:
-      # # Leave it empty if your secret already exists
-
-      # # Else you can create your own secret object: 
-      # # Necessary dependencies:
-      # # - https://github.com/hashicorp/vault
-      # # - https://github.com/godaddy/kubernetes-external-secrets
-
-      # apiVersion: kubernetes-client.io/v1
-      # kind: ExternalSecret
-      # metadata:
-      #   name: db-pass
-      #   namespace: flyte
-      # spec:
-      #   backendType: vault
-      #   vaultMountPoint: <MOUNT_PATH>
-      #   vaultRole: <VAULT-ROLE>
-      #   data:
-      #   - name: pass.txt
-      #     key: k8s/data/path/to/secret
-      #     property: password
+      # -- Leave it empty if your secret already exists
+      # Else you can create your own secret object. You can use Kubernetes secrets, else you can configure external secrets
+      # For external secrets please install Necessary dependencies, like, of your choice
+      # - https://github.com/hashicorp/vault
+      # - https://github.com/godaddy/kubernetes-external-secrets
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: db-pass
+      type: Opaque
+      stringData:
+        pass.txt: awesomesauce
 
 
 # -----------------------------------------------------
@@ -207,7 +218,7 @@ db:
   database:
     port: 5432
     username: flyte
-    host: flyteadmin.cluster-cguibupmpitq.us-east-2.rds.amazonaws.com
+    host: flyte-helm-test.cluster-cguibupmpitq.us-east-2.rds.amazonaws.com
     dbname: flyteadmin
     passwordPath: /etc/db/pass.txt
 
@@ -273,19 +284,19 @@ configmap:
           - spark
           - k8s-array
           - pytorch
-          - sagemaker_hyperparameter_tuning
-          - sagemaker_custom_training
-          - sagemaker_training
           - athena
+#          - sagemaker_hyperparameter_tuning
+#          - sagemaker_custom_training
+#          - sagemaker_training
         default-for-task-types:
           container: container
           sidecar: sidecar
           spark: spark
           container_array: k8s-array
           pytorch: pytorch
-          sagemaker_custom_training_task: sagemaker_custom_training
-          sagemaker_custom_training_job_task: sagemaker_custom_training
           hive: athena
+#          sagemaker_custom_training_task: sagemaker_custom_training
+#          sagemaker_custom_training_job_task: sagemaker_custom_training
 
   logger:
     logger:
@@ -312,24 +323,28 @@ configmap:
 # All these features are optional, but are critical to run certain features
 # ------------------------------------------------------------------------
 
-# --
-# Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans/workflows.
 workflow_scheduler:
-  enabled: true
+  enabled: false
   config:
     scheduler:
+      # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
       eventScheduler:
         scheme: aws
-        region: us-east-1
-        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
-        targetName: arn:aws:sqs:us-east-1:<ACCOUNT-NUMBER>:flyte-cron-scheduler-queue
+        region: us-east-2
+        # -- This is the role used by cloudwatch to insert a new event into the queue
+        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
+        # -- This is the queue into which cloudwatch will enqueue a request and flyteadmin will consume from.
+        # This queue should be accessible by flyteadmin
+        targetName: arn:aws:sqs:us-east-2:<ACCOUNT_NUMBER>:<SQS_QUEUE>
         scheduleNamePrefix: flyte
       workflowExecutor:
         scheme: aws
-        region: us-east-1
-        scheduleQueueName: flyte-cron-scheduler-queue
-        accountId: <ACCOUNT-NUMBER>
+        region: us-east-2
+        # -- this is the same queue as eventScheduler.targetName
+        scheduleQueueName: <SQS_QUEUE>
+        accountId: <ACCOUNT_NUMBER>
         reconnectAttempts: 10
         reconnectDelaySeconds: 30
 
@@ -338,16 +353,19 @@ workflow_scheduler:
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-    enabled: true
+    enabled: false
     config:
        notifications:
          type: aws
-         region: us-east-1
+         region: us-east-2
          publisher:
-           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
+           # -- The notifications topic on which event notifications will be sent
+           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:<SNS_TOPIC>
          processor:
-           queueName: flyte-notifications-queue
+           # -- SQS queue from which the event notifications will be consumed
+           queueName: <SQS_QUEUE_NOTIFICATIONS>
            accountId: <ACCOUNT-NUMBER>
+         # -- For every notification this will be the message sent by FlyteAdmin
          emailer:
            subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
            sender:  "flyte@example.com"
@@ -494,14 +512,14 @@ pytorchoperator:
 # -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
 # There is no helm chart maintained and hence it might need an independent installation
 tf_operator:
-  enabled: true
+  enabled: false
 
 
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
 # Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
 sagemaker:
-  enabled: true
+  enabled: false
   plugin_config:
     plugins:
       sagemaker:

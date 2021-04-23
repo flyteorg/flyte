@@ -37,8 +37,12 @@ flyteadmin:
       alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     type: ClusterIP
     loadBalancerSourceRanges: []
-  # -- Annotations for ServiceAccount attached to Flyteadmin pods
-  serviceAccountAnnotations: {}
+  # -- Configuration for service accounts for FlyteAdmin
+  serviceAccount:
+    # -- Should a service account be created for flyteadmin
+    create: true
+    # -- Annotations for ServiceAccount attached to Flyteadmin pods
+    annotations: {}
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
   # -- nodeSelector for Flyteadmin deployment
@@ -78,8 +82,12 @@ datacatalog:
       projectcontour.io/upstream-protocol.h2c: grpc
       alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     type: NodePort
-  # -- Annotations for ServiceAccount attached to Datacatalog pods
-  serviceAccountAnnotations: {}
+  # -- Configuration for service accounts for Datacatalog
+  serviceAccount:
+    # -- Should a service account be created for Datacatalog
+    create: true
+    # -- Annotations for ServiceAccount attached to Datacatalog pods
+    annotations: {}
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
   # -- nodeSelector for Datacatalog deployment
@@ -114,8 +122,14 @@ flytepropeller:
   cacheSizeMbs: 0
   # -- Default regex string for searching configuration files
   configPath: /etc/flyte/config/*.yaml
-  # -- Annotations for ServiceAccount attached to Flytepropeller pods
-  serviceAccountAnnotations: {}
+
+  # -- Configuration for service accounts for FlytePropeller
+  serviceAccount:
+    # -- Should a service account be created for FlytePropeller
+    create: true
+    # -- Annotations for ServiceAccount attached to FlytePropeller pods
+    annotations: {}
+
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
   # -- nodeSelector for Flytepropeller deployment
@@ -396,6 +410,7 @@ configmap:
   console:
     BASE_URL: /console
     CONFIG_DIR: /etc/flyte/config
+    DISABLE_AUTH: "1"
 
   # -- Domains configuration for Flyte projects. This enables the specified number of domains across all projects in Flyte.
   domain:
@@ -588,6 +603,7 @@ configmap:
 # -- **Optional Component**
 # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
 # this module, you will not have scheduled launchplans / workflows.
+# Docs: https://docs.flyte.org/en/latest/howto/enable_and_use_schedules.html#setting-up-scheduled-workflows
 workflow_scheduler:
   enabled: false
   config: {}
