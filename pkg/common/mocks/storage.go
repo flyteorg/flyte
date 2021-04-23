@@ -21,7 +21,8 @@ type TestDataStore struct {
 	ReadProtobufCb  func(ctx context.Context, reference storage.DataReference, msg proto.Message) error
 	WriteProtobufCb func(
 		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error
-
+	ConstructReferenceCb func(
+		ctx context.Context, reference storage.DataReference, nestedKeys ...string) (storage.DataReference, error)
 	Store map[storage.DataReference][]byte
 }
 
@@ -60,6 +61,9 @@ func (t *TestDataStore) CopyRaw(ctx context.Context, source, destination storage
 
 func (t *TestDataStore) ConstructReference(
 	ctx context.Context, reference storage.DataReference, nestedKeys ...string) (storage.DataReference, error) {
+	if t.ConstructReferenceCb != nil {
+		return t.ConstructReferenceCb(ctx, reference, nestedKeys...)
+	}
 	nestedPath := strings.Join(nestedKeys, "/")
 	return storage.DataReference(fmt.Sprintf("%s/%v", reference, nestedPath)), nil
 }

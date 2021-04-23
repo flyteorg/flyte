@@ -296,4 +296,13 @@ var Migrations = []*gormigrate.Migration{
 			return tx.Model(&models.Execution{}).DropColumn("user").Error
 		},
 	},
+	{
+		ID: "2021-04-19-node-execution_dynamic-workflow",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.AutoMigrate(&models.NodeExecution{}).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Model(&models.NodeExecution{}).DropColumn("dynamic_workflow_remote_closure_reference").Error
+		},
+	},
 }

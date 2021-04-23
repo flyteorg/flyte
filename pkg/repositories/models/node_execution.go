@@ -47,4 +47,6 @@ type NodeExecution struct {
 	ErrorCode *string
 	// If the node is of Type Task, this should always exist for a successful execution, indicating the cache status for the execution
 	CacheStatus *string
+	// In the case of dynamic workflow nodes, the remote closure is uploaded to the path specified here.
+	DynamicWorkflowRemoteClosureReference string
 }
