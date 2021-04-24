@@ -36,7 +36,7 @@ import typing
 from flytekit import Resources, task, workflow
 
 
-@task(requests=Resources(cpu="1", mem="2048"), limits=Resources(cpu="2", mem="4096"))
+@task(requests=Resources(cpu="1", mem="100Mi"), limits=Resources(cpu="2", mem="150Mi"))
 def count_unique_numbers(x: typing.List[int]) -> int:
     s = set()
     for i in x:
