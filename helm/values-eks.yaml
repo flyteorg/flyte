@@ -7,7 +7,8 @@ flyteadmin:
   replicaCount: 2
   # -- IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
   serviceAccount:
-    # -- If the service account is created by you, make this false
+    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # you can change the name of this role
     create: false
     annotations:
       eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
@@ -24,7 +25,7 @@ flyteadmin:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
       # TODO alter domain
-      external-dns.alpha.kubernetes.io/hostname: "demo2.nuclyde.io"
+      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
     type: LoadBalancer
     loadBalancerSourceRanges:
       # TODO change source ip range if desired
@@ -60,8 +61,6 @@ datacatalog:
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
-      # TODO alter domain
-      # external-dns.alpha.kubernetes.io/hostname: "demo2.nuclyde.io"
     type: LoadBalancer
     loadBalancerSourceRanges:
       # TODO change source ip range if desired
@@ -116,7 +115,7 @@ flyteconsole:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
       # TODO alter domain
-      external-dns.alpha.kubernetes.io/hostname: "demo2.nuclyde.io"
+      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
     type: LoadBalancer
     loadBalancerSourceRanges:
       # TODO change source ip range if desired
@@ -168,19 +167,20 @@ contour:
 
 common:
   ingress:
-    host: demo2.nuclyde.io
+    host: flyte.example.com
     albSSLRedirect: true
+    separateGrpcIngress: true
     annotations:
       # -- aws-load-balancer-controller v2.1 or higher is required - https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/
       # For EKS if using [ALB](https://kubernetes-sigs.github.io/aws-load-balancer-controller/guide/ingress/annotations/), these annotations are set
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:590375264460:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:<ACCOUNT_NUMBER>:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
       # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)
-      alb.ingress.kubernetes.io/group.name: flytesystem
+      alb.ingress.kubernetes.io/group.name: flyte
   databaseSecret:
     name: db-pass
     secretManifest:
@@ -195,6 +195,7 @@ common:
         name: db-pass
       type: Opaque
       stringData:
+        # -- If using plain text you can provide the password here
         pass.txt: awesomesauce
 
 
@@ -210,15 +211,17 @@ storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: s3
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  bucketName: flyte-demo
+  bucketName: <BUCKET_NAME>
   s3:
-    region: us-east-2
+    region: <AWS_REGION>
 
 db:
   database:
     port: 5432
+    # -- Create a user called flyte
     username: flyte
-    host: flyte-helm-test.cluster-cguibupmpitq.us-east-2.rds.amazonaws.com
+    host: <RDS_HOST_DNS>
+    # -- Create a DB called flyteadmin (OR change the name here)
     dbname: flyteadmin
     passwordPath: /etc/db/pass.txt
 
@@ -310,11 +313,12 @@ configmap:
       logs:
         kubernetes-enabled: false
         # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
+        # You can even disable this
         cloudwatch-enabled: true
         # -- region where logs are hosted
-        cloudwatch-region: us-east-2
+        cloudwatch-region: <AWS_REGION>
         # -- cloudwatch log-group
-        cloudwatch-log-group: /aws/containerinsights/flyte-demo-2/application
+        cloudwatch-log-group: <LOG_GROUP_NAME>
 
 
 # ----------------------------------------------------------------
@@ -333,17 +337,13 @@ workflow_scheduler:
       eventScheduler:
         scheme: aws
         region: us-east-2
-        # -- This is the role used by cloudwatch to insert a new event into the queue
         scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
-        # -- This is the queue into which cloudwatch will enqueue a request and flyteadmin will consume from.
-        # This queue should be accessible by flyteadmin
-        targetName: arn:aws:sqs:us-east-2:<ACCOUNT_NUMBER>:<SQS_QUEUE>
+        targetName: arn:aws:sqs:us-east-2:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
         scheduleNamePrefix: flyte
       workflowExecutor:
         scheme: aws
         region: us-east-2
-        # -- this is the same queue as eventScheduler.targetName
-        scheduleQueueName: <SQS_QUEUE>
+        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
         accountId: <ACCOUNT_NUMBER>
         reconnectAttempts: 10
         reconnectDelaySeconds: 30
@@ -359,13 +359,10 @@ workflow_notifications:
          type: aws
          region: us-east-2
          publisher:
-           # -- The notifications topic on which event notifications will be sent
-           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:<SNS_TOPIC>
+           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
          processor:
-           # -- SQS queue from which the event notifications will be consumed
-           queueName: <SQS_QUEUE_NOTIFICATIONS>
+           queueName: flyte-notifications-queue
            accountId: <ACCOUNT-NUMBER>
-         # -- For every notification this will be the message sent by FlyteAdmin
          emailer:
            subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
            sender:  "flyte@example.com"
@@ -404,7 +401,7 @@ cluster_resource_manager:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
 
-    # -- Template for spark role
+    # -- Template copilot configuration
     - key: ac_project_copilot_dataconfig
       value: |
         kind: ConfigMap
@@ -415,15 +412,11 @@ cluster_resource_manager:
         data:
           config.yaml: |
             storage:
+              type: s3
+              container: <BUCKET_NAME>
               connection:
-                access-key: minio
-                auth-type: accesskey
-                disable-ssl: true
-                endpoint: http://minio.flyte.svc.cluster.local:9000
-                region: us-east-1
-                secret-key: miniostorage
-              type: minio
-              container: my-s3-bucket
+                auth-type: iam
+                region: <AWS_REGION>
               enable-multicontainer: true
 
     # -- Template for spark role
@@ -523,7 +516,7 @@ sagemaker:
   plugin_config:
     plugins:
       sagemaker:
-        roleArn: arn:aws:iam::590375264460:role/eksctl-flyte-demo-2-addon-iamserviceaccount-Role1-62EXWRIT27CA
+        roleArn: arn:aws:iam::<ACCOUNT_NUMBER>:role/<ROLE_FOR_SAGEMAKER>
         region: us-east-2
 
 
