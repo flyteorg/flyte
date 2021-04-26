@@ -185,6 +185,8 @@ spec:
       hosts:
         - {{ .Values.common.ingress.host }}
   {{ end }}
+
+
 {{- if .Values.common.ingress.separateGrpcIngress }}
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
@@ -210,7 +212,7 @@ spec:
               service:
                 name: ssl-redirect
                 port:
-                  name: ssl-redirect
+                  name: use-annotation
             path: /*
             pathType: ImplementationSpecific
           {{- end }}

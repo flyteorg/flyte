@@ -86,10 +86,8 @@ helm upgrade -f values-sandbox.yaml flyte .
 | configmap.resource_manager | object | `{"propeller":{"resourcemanager":{"redis":{"hostKey":"mypassword","hostPath":"redis-resource-manager:6379"},"resourceMaxQuota":10000,"type":"redis"}}}` | Resource manager configuration |
 | configmap.resource_manager.propeller | object | `{"resourcemanager":{"redis":{"hostKey":"mypassword","hostPath":"redis-resource-manager:6379"},"resourceMaxQuota":10000,"type":"redis"}}` | resource manager configuration |
 | configmap.server | object | `{"flyteadmin":{"eventVersion":1,"metadataStoragePrefix":["metadata","admin"],"metricsScope":"flyte:","profilerPort":10254,"roleNameKey":"iam.amazonaws.com/role","testing":{"host":"http://flyteadmin"}},"server":{"grpcPort":8089,"httpPort":8088,"security":{"allowCors":true,"secure":false,"useAuth":false}}}` | FlyteAdmin server configuration |
-| configmap.task_logs | object | `{"plugins":{"logs":{"cloudwatch-enabled":true,"cloudwatch-log-group":"/aws/containerinsights/flyte-demo-2/application","cloudwatch-region":"us-east-2","kubernetes-enabled":false}}}` | Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider. Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various logging engines |
-| configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `true` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
-| configmap.task_logs.plugins.logs.cloudwatch-log-group | string | `"/aws/containerinsights/flyte-demo-2/application"` | cloudwatch log-group |
-| configmap.task_logs.plugins.logs.cloudwatch-region | string | `"us-east-2"` | region where logs are hosted |
+| configmap.task_logs | object | `{"plugins":{"logs":{"cloudwatch-enabled":false,"kubernetes-enabled":false}}}` | Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider. Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various logging engines |
+| configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `false` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
 | configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}}` | Task default resources configuration Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration). |
 | configmap.task_resource_defaults.task_resources | object | `{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}` | Task default resources parameters |
 | contour.affinity | object | `{}` | affinity for Contour deployment |
@@ -110,7 +108,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
 | datacatalog.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Datacatalog deployment |
-| datacatalog.service | object | `{"annotations":{"alb.ingress.kubernetes.io/backend-protocol-version":"GRPC","projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
+| datacatalog.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
 | datacatalog.serviceAccount | object | `{"annotations":{},"create":true}` | Configuration for service accounts for Datacatalog |
 | datacatalog.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Datacatalog pods |
 | datacatalog.serviceAccount.create | bool | `true` | Should a service account be created for Datacatalog |
@@ -125,7 +123,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
-| flyteadmin.service | object | `{"annotations":{"alb.ingress.kubernetes.io/backend-protocol-version":"GRPC","projectcontour.io/upstream-protocol.h2c":"grpc"},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
+| flyteadmin.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
 | flyteadmin.serviceAccount | object | `{"annotations":{},"create":true}` | Configuration for service accounts for FlyteAdmin |
 | flyteadmin.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flyteadmin pods |
 | flyteadmin.serviceAccount.create | bool | `true` | Should a service account be created for flyteadmin |
