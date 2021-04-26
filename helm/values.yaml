@@ -34,7 +34,6 @@ flyteadmin:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
-      alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     type: ClusterIP
     loadBalancerSourceRanges: []
   # -- Configuration for service accounts for FlyteAdmin
@@ -80,7 +79,6 @@ datacatalog:
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
-      alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     type: NodePort
   # -- Configuration for service accounts for Datacatalog
   serviceAccount:
@@ -588,11 +586,7 @@ configmap:
       logs:
         kubernetes-enabled: false
         # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
-        cloudwatch-enabled: true
-        # -- region where logs are hosted
-        cloudwatch-region: us-east-2
-        # -- cloudwatch log-group
-        cloudwatch-log-group: /aws/containerinsights/flyte-demo-2/application
+        cloudwatch-enabled: false
 
 # ----------------------------------------------------------------
 # Optional Modules
