@@ -270,6 +270,8 @@ func defaultDecoderConfig(output interface{}, opts ...viperLib.DecoderConfigOpti
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
 		),
+		// Empty/zero fields before applying provided values. This avoids potentially undesired/unexpected merging logic.
+		ZeroFields: true,
 	}
 
 	for _, opt := range opts {

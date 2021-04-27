@@ -1,0 +1,4 @@
+my-component:
+  items:
+    - id: abc
+      name: "A b c"
