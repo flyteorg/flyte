@@ -264,8 +264,8 @@ github.com/flyteorg/flyteplugins v0.5.38/go.mod h1:CxerBGWWEmNYmPxSMHnwQEr9cc1Fb
 github.com/flyteorg/flytepropeller v0.7.8 h1:O441kDHJUayS/2rebTj7VG4e1LowrweazQhzTaZ97m4=
 github.com/flyteorg/flytepropeller v0.7.8/go.mod h1:2SPJtYS0oM5lN4OCqBDbSRozRWvobFTXXlAC2ygbbWk=
 github.com/flyteorg/flytestdlib v0.3.13/go.mod h1:Tz8JCECAbX6VWGwFT6cmEQ+RJpZ/6L9pswu3fzWs220=
-github.com/flyteorg/flytestdlib v0.3.15 h1:vzsfqriENyavv6EBwsIm55di2wC+j0jkmjw30JGHAkM=
-github.com/flyteorg/flytestdlib v0.3.15/go.mod h1:Tz8JCECAbX6VWGwFT6cmEQ+RJpZ/6L9pswu3fzWs220=
+github.com/flyteorg/flytestdlib v0.3.18 h1:G6OUvhN8r3OCP90uvEvEqRilYpITtmGGWIlR/GO1Gfk=
+github.com/flyteorg/flytestdlib v0.3.18/go.mod h1:VlbQuHTE+z2N5qusfwi+6WEkeJoqr8Q0E4NtBAsdwkU=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible h1:TcekIExNqud5crz4xD2pavyTgWiPvpYe4Xau31I0PRk=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
