@@ -181,7 +181,7 @@ spec:
       {{- end }}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
-    - secretName: {{ .Release.Name }}-tls
+    - secretName: {{ .Release.Name }}-flyte-tls
       hosts:
         - {{ .Values.common.ingress.host }}
   {{ end }}
@@ -234,7 +234,7 @@ spec:
       {{- end }}
   {{- if .Values.common.ingress.tls.enabled }}
   tls:
-    - secretName: {{ .Release.Name }}-tls
+    - secretName: {{ .Release.Name }}-flyte-tls
       hosts:
         - {{ .Values.common.ingress.host }}
   {{ end }}

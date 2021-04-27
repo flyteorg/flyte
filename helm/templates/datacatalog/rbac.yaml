@@ -7,7 +7,7 @@ metadata:
   name: {{ template "datacatalog.name" . }}
   namespace: {{ template "flyte.namespace" . }}
   labels: {{ include "datacatalog.labels" . | nindent 4 }}
-  {{- with .Values.datacatalog.serviceAccountAnnotations }}
+  {{- with .Values.datacatalog.serviceAccount.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
