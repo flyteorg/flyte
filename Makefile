@@ -20,6 +20,9 @@ generate:
 compile:
 	go build -o bin/flytectl -ldflags=$(LD_FLAGS) main.go
 
+compile_debug:
+	go build -gcflags='all=-N -l' -o bin/flytectl main.go
+
 .PHONY: update_boilerplate
 update_boilerplate:
 	@boilerplate/update.sh

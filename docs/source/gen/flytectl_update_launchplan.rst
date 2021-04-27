@@ -1,29 +1,47 @@
-.. _flytectl_update:
+.. _flytectl_update_launchplan:
 
-flytectl update
----------------
+flytectl update launchplan
+--------------------------
 
-Used for updating flyte resources eg: project.
+Updates launch plan metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Currently this command only provides subcommands to update project.
-Takes input project which need to be archived or unarchived. Name of the project to be updated is mandatory field.
-Example update project to activate it.
+Updates launchplan metadata.
+Following command updates the description on the launchplan.
 ::
 
- bin/flytectl update project -p flytesnacks --activateProject
+ flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --description "Mergesort example"
 
+Archiving launchplan named entity is not supported and would throw an error.
+::
+
+ flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --archive
+
+Activating launchplan named entity would be a noop.
+::
+
+ flytectl update launchplan -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --activate
+
+Usage
+
+
+::
+
+  flytectl update launchplan [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for update
+      --activate             Activates the named entity specified as argument.
+      --archive              Archives the named entity specified as argument.
+      --description string   description of the namedentity.
+  -h, --help                 help for launchplan
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,9 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_update_launchplan` 	 - Updates launch plan metadata
-* :doc:`flytectl_update_project` 	 - Updates project resources
-* :doc:`flytectl_update_task` 	 - Updates task metadata
-* :doc:`flytectl_update_workflow` 	 - Updates launch plan metadata
+* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
 

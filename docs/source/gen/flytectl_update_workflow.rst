@@ -1,29 +1,47 @@
-.. _flytectl_update:
+.. _flytectl_update_workflow:
 
-flytectl update
----------------
+flytectl update workflow
+------------------------
 
-Used for updating flyte resources eg: project.
+Updates launch plan metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Currently this command only provides subcommands to update project.
-Takes input project which need to be archived or unarchived. Name of the project to be updated is mandatory field.
-Example update project to activate it.
+Updates workflow metadata.
+Following command updates the description on the workflow.
 ::
 
- bin/flytectl update project -p flytesnacks --activateProject
+ flytectl update workflow -p flytectldemo -d development core.advanced.run_merge_sort.merge_sort --description "Mergesort workflow example"
 
+Archiving workflow named entity would cause this to disapper from flyteconsole UI.
+::
+
+ flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --archive
+
+Activating workflow named entity would unarchive it.
+::
+
+ flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --activate
+
+Usage
+
+
+::
+
+  flytectl update workflow [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for update
+      --activate             Activates the named entity specified as argument.
+      --archive              Archives the named entity specified as argument.
+      --description string   description of the namedentity.
+  -h, --help                 help for workflow
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,9 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_update_launchplan` 	 - Updates launch plan metadata
-* :doc:`flytectl_update_project` 	 - Updates project resources
-* :doc:`flytectl_update_task` 	 - Updates task metadata
-* :doc:`flytectl_update_workflow` 	 - Updates launch plan metadata
+* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
 

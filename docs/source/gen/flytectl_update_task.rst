@@ -1,29 +1,47 @@
-.. _flytectl_update:
+.. _flytectl_update_task:
 
-flytectl update
----------------
+flytectl update task
+--------------------
 
-Used for updating flyte resources eg: project.
+Updates task metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Currently this command only provides subcommands to update project.
-Takes input project which need to be archived or unarchived. Name of the project to be updated is mandatory field.
-Example update project to activate it.
+Updates task metadata.
+Following command updates the description on the task.
 ::
 
- bin/flytectl update project -p flytesnacks --activateProject
+ flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --description "Merge sort example"
 
+Archiving task named entity would is not supported and would throw an error.
+::
+
+ flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --archive
+
+Activating workflow named entity would be a noop as archiving is not possible.
+::
+
+ flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --activate
+
+Usage
+
+
+::
+
+  flytectl update task [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for update
+      --activate             Activates the named entity specified as argument.
+      --archive              Archives the named entity specified as argument.
+      --description string   description of the namedentity.
+  -h, --help                 help for task
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,9 +90,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_update_launchplan` 	 - Updates launch plan metadata
-* :doc:`flytectl_update_project` 	 - Updates project resources
-* :doc:`flytectl_update_task` 	 - Updates task metadata
-* :doc:`flytectl_update_workflow` 	 - Updates launch plan metadata
+* :doc:`flytectl_update` 	 - Used for updating flyte resources eg: project.
 

@@ -1,8 +1,7 @@
 package update
 
 import (
-	cmdcore "github.com/flyteorg/flytectl/cmd/core"
-
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/spf13/cobra"
 )
 
@@ -27,13 +26,16 @@ func CreateUpdateCommand() *cobra.Command {
 		Short: updateShort,
 		Long:  updatecmdLong,
 	}
-
-	updateResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{"projects"}, ProjectDomainNotRequired: true, PFlagProvider: projectConfig,
-			Short: projectShort,
-			Long:  projectLong},
+	updateResourcesFuncs := map[string]cmdCore.CommandEntry{
+		"launchplan": {CmdFunc: updateLPFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
+			Short: updateLPShort, Long: updateLPLong},
+		"project": {CmdFunc: updateProjectsFunc, Aliases: []string{}, ProjectDomainNotRequired: true, PFlagProvider: projectConfig,
+			Short: projectShort, Long: projectLong},
+		"task": {CmdFunc: updateTaskFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
+			Short: updateTaskShort, Long: updateTaskLong},
+		"workflow": {CmdFunc: updateWorkflowFunc, Aliases: []string{}, ProjectDomainNotRequired: false, PFlagProvider: namedEntityConfig,
+			Short: updateWorkflowShort, Long: updateWorkflowLong},
 	}
-
-	cmdcore.AddCommands(updateCmd, updateResourcesFuncs)
+	cmdCore.AddCommands(updateCmd, updateResourcesFuncs)
 	return updateCmd
 }
