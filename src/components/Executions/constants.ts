@@ -96,6 +96,11 @@ export const nodeExecutionPhaseConstants: {
         text: 'Running',
         textColor: secondaryTextColor
     },
+    [NodeExecutionPhase.DYNAMIC_RUNNING]: {
+        badgeColor: statusColors.RUNNING,
+        text: 'Running',
+        textColor: secondaryTextColor
+    },
     [NodeExecutionPhase.SUCCEEDED]: {
         badgeColor: statusColors.SUCCESS,
         text: 'Succeeded',

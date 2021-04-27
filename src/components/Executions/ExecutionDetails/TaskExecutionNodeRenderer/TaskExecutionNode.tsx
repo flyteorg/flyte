@@ -49,7 +49,10 @@ export const TaskExecutionNode: React.FC<NodeRendererProps<
         <StatusIndicator
             color={color}
             config={config}
-            pulse={phase === NodeExecutionPhase.RUNNING}
+            pulse={
+                phase === NodeExecutionPhase.RUNNING ||
+                phase === NodeExecutionPhase.DYNAMIC_RUNNING
+            }
             position={statusPosition}
         />
     ) : (
