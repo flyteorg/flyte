@@ -1,13 +1,17 @@
 name: Publish flyte manifest 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version name. example v0.1.1'
+        required: true
 
 jobs:
   goreleaser:
     name: Goreleaser
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump-version.outputs.tag }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -16,6 +20,13 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.14
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          WITH_V: true
+          CUSTOM_TAG: ${{ github.event.inputs.version }}
       - name: build Release Menifest
         run: |
           make prepare_artifacts
