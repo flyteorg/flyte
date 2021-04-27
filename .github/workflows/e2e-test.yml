@@ -1,0 +1,26 @@
+name: Test Flyte Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'flyte version for running e2e test'
+        required: true
+        default: 'latest'
+  schedule:
+    # Every day at 8:00am UTC
+    - cron: '00 14 * * *'
+
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        RUNNER: [ubuntu-latest]
+      fail-fast: false
+    runs-on: ${{matrix.RUNNER}}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create Cluster
+        run: |
+          echo "Hello"
+        shell: bash
