@@ -1,0 +1,15 @@
+# Comment to be posted on PRs from first-time contributors in your repository
+newPRWelcomeComment: >
+  Thank you for opening this pull request! 🙌
+
+  These tips will help get your PR across the finish line:
+  - Most of the repos have a PR template; if not, fill it out to the best of your knowledge.
+  - Sign off your commits (Reference: [DCO Guide](https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md)).
+
+# Comment to be posted to on pull requests merged by a first time user
+firstPRMergeComment: >
+  Congrats on merging your first pull request! 🎉
+
+# Comment to be posted on first-time issues
+newIssueWelcomeComment: >
+  Thank you for opening your first issue here! 🛠
