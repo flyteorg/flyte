@@ -1,6 +1,12 @@
+export REPOSITORY=flyteidl
+
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
+
+.PHONY: update_boilerplate
+update_boilerplate:
+	@boilerplate/update.sh
 
 .PHONY: kustomize
 kustomize: 
