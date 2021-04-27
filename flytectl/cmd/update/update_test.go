@@ -12,14 +12,20 @@ func TestUpdateCommand(t *testing.T) {
 	assert.Equal(t, updateCommand.Use, updateUse)
 	assert.Equal(t, updateCommand.Short, updateShort)
 	assert.Equal(t, updateCommand.Long, updatecmdLong)
-	assert.Equal(t, len(updateCommand.Commands()), 1)
+	assert.Equal(t, len(updateCommand.Commands()), 4)
 	cmdNouns := updateCommand.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
 		return cmdNouns[i].Use < cmdNouns[j].Use
 	})
-	assert.Equal(t, cmdNouns[0].Use, "project")
-	assert.Equal(t, cmdNouns[0].Aliases, []string{"projects"})
-	assert.Equal(t, cmdNouns[0].Short, projectShort)
-	assert.Equal(t, cmdNouns[0].Long, projectLong)
+	useArray := []string{"launchplan", "project", "task", "workflow"}
+	aliases := [][]string{{}, {}, {}, {}}
+	shortArray := []string{updateLPShort, projectShort, updateTaskShort, updateWorkflowShort}
+	longArray := []string{updateLPLong, projectLong, updateTaskLong, updateWorkflowLong}
+	for i := range cmdNouns {
+		assert.Equal(t, cmdNouns[i].Use, useArray[i])
+		assert.Equal(t, cmdNouns[i].Aliases, aliases[i])
+		assert.Equal(t, cmdNouns[i].Short, shortArray[i])
+		assert.Equal(t, cmdNouns[i].Long, longArray[i])
+	}
 }

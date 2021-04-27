@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytectl/clierrors"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -65,23 +67,18 @@ Usage
 `
 )
 
-var (
-	projectConfig      = &ProjectConfig{}
-	errProjectNotFound = "Project %v not found\n"
-	errInvalidUpdate   = "Invalid state passed. Specify either activate or archive\n"
-	errFailedUpdate    = "Project %v failed to get updated to %v state due to %v\n"
-)
+var projectConfig = &ProjectConfig{}
 
 func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	id := config.GetConfig().Project
 	if id == "" {
-		fmt.Printf(errProjectNotFound, id)
+		fmt.Printf(clierrors.ErrProjectNotPassed)
 		return nil
 	}
 	archiveProject := projectConfig.ArchiveProject
 	activateProject := projectConfig.ActivateProject
 	if activateProject == archiveProject {
-		return fmt.Errorf(errInvalidUpdate)
+		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
 	}
 	projectState := admin.Project_ACTIVE
 	if archiveProject {
@@ -92,8 +89,8 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 		State: projectState,
 	})
 	if err != nil {
-		fmt.Printf(errFailedUpdate, id, projectState, err)
-		return nil
+		fmt.Printf(clierrors.ErrFailedProjectUpdate, id, projectState, err)
+		return err
 	}
 	fmt.Printf("Project %v updated to %v state\n", id, projectState)
 	return nil
