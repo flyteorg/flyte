@@ -11,4 +11,4 @@ release:
   name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
   disable: false
   extra_files:
-    - glob: ./deployment/**/*
+    - glob: ./release/*
