@@ -27,6 +27,16 @@ type OtherComponentConfig struct {
 	StringArrayWithDefaults []string        `json:"strings-def"`
 }
 
+type Item struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+type ItemArray struct {
+	Items     []Item `json:"items"`
+	OtherItem Item   `json:"otherItem"`
+}
+
 func (MyComponentConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("MyComponentConfig", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "str"), "hello world", "life is short")
