@@ -27,6 +27,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           WITH_V: true
           CUSTOM_TAG: ${{ github.event.inputs.version }}
+          RELEASE_BRANCHES: master
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+          ref: ${{ github.event.inputs.version }}
       - name: build Release Menifest
         run: |
           make prepare_artifacts
