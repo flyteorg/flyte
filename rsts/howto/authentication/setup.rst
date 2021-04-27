@@ -130,34 +130,6 @@ Save and exit your editor.
 
   kubectl rollout restart deployment/flyteadmin -n flyte
 
-4. Edit FlytePropeller config enable auth as follows:
-
-.. prompt:: bash
-
-  kubectl get deploy -n flyte flytepropeller -o yaml | grep "name: flyte-propeller-config"
-
-This will output the name of the config map where the `client_id` needs to go.
-
-.. prompt:: bash
-
-  kubectl edit configmap -n flyte <the name of the config map from previous command>
-
-Follow the inline comments to make the necessary changes:
-
-.. code-block:: yaml
-
-    admin:
-        # 1. Turn to true
-        useAuth: true
-
-Close the editor
-
-5. Restart `flytepropeller` for the changes to take effect:
-
-.. prompt:: bash
-
-  kubectl rollout restart deployment/flytepropeller -n flyte
-
 OAuth2 Authorization Server
 ===========================
 

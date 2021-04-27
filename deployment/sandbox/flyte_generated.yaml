@@ -2831,7 +2831,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:796c99dd00b0c073c0c48b6a7da413a00417d525
+        image: ghcr.io/flyteorg/flytepropeller:6519864dab8db1c8f183aec34fb3d03f97c92c05
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -2885,7 +2885,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
+        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2938,7 +2938,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
+        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2954,7 +2954,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
+        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2968,7 +2968,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
+        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2988,7 +2988,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
+        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -3078,7 +3078,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:796c99dd00b0c073c0c48b6a7da413a00417d525
+        image: ghcr.io/flyteorg/flytepropeller:6519864dab8db1c8f183aec34fb3d03f97c92c05
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -3397,7 +3397,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:dc28c2b9e1c3372e62ab05ab775eae74963347ff
+            image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3581,7 +3581,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:796c99dd00b0c073c0c48b6a7da413a00417d525
+        image: ghcr.io/flyteorg/flytepropeller:6519864dab8db1c8f183aec34fb3d03f97c92c05
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -3663,6 +3663,20 @@ spec:
           service:
             name: flyteadmin
             port:
+              number: 81
+        path: /flyteidl.service.AuthMetadataService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.IdentityService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
               number: 87
         path: /openapi
         pathType: ImplementationSpecific
@@ -3714,6 +3728,13 @@ spec:
             port:
               number: 80
         path: /openapi/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 80
+        path: /.well-known
         pathType: ImplementationSpecific
       - backend:
           service:

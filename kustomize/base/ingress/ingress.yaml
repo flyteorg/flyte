@@ -26,6 +26,20 @@ spec:
                 name: flyteadmin
                 port:
                   number: 81
+          - path: /flyteidl.service.AuthMetadataService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
+          - path: /flyteidl.service.IdentityService
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 81
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
             pathType: ImplementationSpecific
@@ -79,6 +93,13 @@ spec:
                   number: 80
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi/*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: flyteadmin
+                port:
+                  number: 80
+          - path: /.well-known
             pathType: ImplementationSpecific
             backend:
               service:
