@@ -1108,7 +1108,8 @@ func (m *ExecutionManager) GetExecutionData(
 		Inputs:  &inputsURLBlob,
 	}
 	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
-	if maxDataSize == 0 || inputsURLBlob.Bytes < maxDataSize {
+	remoteDataScheme := m.config.ApplicationConfiguration().GetRemoteDataConfig().Scheme
+	if remoteDataScheme == common.Local || inputsURLBlob.Bytes < maxDataSize {
 		var fullInputs core.LiteralMap
 		err := m.storageClient.ReadProtobuf(ctx, executionModel.InputsURI, &fullInputs)
 		if err != nil {
@@ -1116,7 +1117,7 @@ func (m *ExecutionManager) GetExecutionData(
 		}
 		response.FullInputs = &fullInputs
 	}
-	if maxDataSize == 0 || (signedOutputsURLBlob.Bytes < maxDataSize && execution.Closure.GetOutputs() != nil) {
+	if remoteDataScheme == common.Local || (signedOutputsURLBlob.Bytes < maxDataSize && execution.Closure.GetOutputs() != nil) {
 		var fullOutputs core.LiteralMap
 		outputsURI := execution.Closure.GetOutputs().GetUri()
 		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(outputsURI), &fullOutputs)

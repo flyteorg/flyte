@@ -49,6 +49,7 @@ var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.Remote
 	SignedURL: interfaces.SignedURL{
 		DurationMinutes: 3,
 	},
+	MaxSizeInBytes: 1048576, // 1 Mib
 })
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
 	Type: common.Local,
