@@ -13,9 +13,32 @@ A Helm chart for Flyte
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 4.0.2 |
 
 ### SANDBOX INSTALLATION:
-- Install `helm 3` realese version
-- Generate `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
+- [Install helm 3](https://helm.sh/docs/intro/install/)
+- Fetch chart dependencies `helm dep up`
+- Install Flyte sandbox:
+
+```bash
+cd helm
+helm install -n flyte -f values-sandbox.yaml --create-namespace flyte .
+```
+
+Customize your installation by changing settings in `values-sandbox.yaml`.
+You can use the helm diff plugin to review any value changes you've made to your values:
+
+```bash
+helm plugin install https://github.com/databus23/helm-diff
+helm diff upgrade -f values-sandbox.yaml flyte .
+```
+
+Then apply your changes:
+```bash
+helm upgrade -f values-sandbox.yaml flyte .
+```
+
+#### Alternative: Generate raw kubernetes yaml with helm template
+- `helm template --name-template=flyte-sandbox . -n flyte -f values-sandbox.yaml > flyte_generated_sandbox.yaml`
 - Deploy the manifest `kubectl apply -f flyte_generated_sandbox.yaml`
+
 - When all pods are running - run end2end tests: `kubectl apply -f ../end2end/tests/endtoend.yaml`
 - Get flyte host `minikube service contour -n heptio-contour --url`. And then visit `http://<HOST>/console`
 
@@ -30,7 +53,7 @@ A Helm chart for Flyte
 |-----|------|---------|-------------|
 | cluster_resource_manager | object | `{"config":{"cluster_resources":{"customData":{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}],"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}],"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},"refresh":"5m","templatePath":"/etc/flyte/clusterresource/templates"}},"enabled":true,"templates":[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"},{"key":"ac_project_copilot_dataconfig","value":"kind: ConfigMap\napiVersion: v1\nmetadata:\n  name: flyte-data-config\n  namespace: {{ namespace }}\ndata:\n  config.yaml: |\n    storage:\n      connection:\n        access-key: minio\n        auth-type: accesskey\n        disable-ssl: true\n        endpoint: http://minio.flyte.svc.cluster.local:9000\n        region: us-east-1\n        secret-key: miniostorage\n      type: minio\n      container: my-s3-bucket\n      enable-multicontainer: true\n"}]}` | Configuration for the Cluster resource manager component. This is an optional component, that enables automatic cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain |
 | cluster_resource_manager.config | object | `{"cluster_resources":{"customData":{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}],"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}],"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},"refresh":"5m","templatePath":"/etc/flyte/clusterresource/templates"}}` | Configmap for ClusterResource parameters |
-| cluster_resource_manager.config.cluster_resources | object | `{"customData":{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}],"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}],"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},"refresh":"5m","templatePath":"/etc/flyte/clusterresource/templates"}` | ClusterResource parameters |
+| cluster_resource_manager.config.cluster_resources | object | `{"customData":{"development":[{"projectQuotaCpu":{"value":"4"}},{"projectQuotaMemory":{"value":"3000Mi"}}],"production":[{"projectQuotaCpu":{"value":"5"}},{"projectQuotaMemory":{"value":"4000Mi"}}],"staging":[{"projectQuotaCpu":{"value":"2"}},{"projectQuotaMemory":{"value":"3000Mi"}}]},"refresh":"5m","templatePath":"/etc/flyte/clusterresource/templates"}` | ClusterResource parameters Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize. |
 | cluster_resource_manager.enabled | bool | `true` | Enables the Cluster resource manager component |
 | cluster_resource_manager.templates | list | `[{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"},{"key":"ab_project_resource_quota","value":"apiVersion: v1\nkind: ResourceQuota\nmetadata:\n  name: project-quota\n  namespace: {{ namespace }}\nspec:\n  hard:\n    limits.cpu: {{ projectQuotaCpu }}\n    limits.memory: {{ projectQuotaMemory }}\n"},{"key":"ac_project_copilot_dataconfig","value":"kind: ConfigMap\napiVersion: v1\nmetadata:\n  name: flyte-data-config\n  namespace: {{ namespace }}\ndata:\n  config.yaml: |\n    storage:\n      connection:\n        access-key: minio\n        auth-type: accesskey\n        disable-ssl: true\n        endpoint: http://minio.flyte.svc.cluster.local:9000\n        region: us-east-1\n        secret-key: miniostorage\n      type: minio\n      container: my-s3-bucket\n      enable-multicontainer: true\n"}]` | Resource templates that should be applied |
 | cluster_resource_manager.templates[0] | object | `{"key":"aa_namespace","value":"apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {{ namespace }}\nspec:\n  finalizers:\n  - kubernetes\n"}` | Template for namespaces resources |
@@ -67,7 +90,7 @@ A Helm chart for Flyte
 | configmap.task_logs.plugins.logs.cloudwatch-enabled | bool | `true` | One option is to enable cloudwatch logging for EKS, update the region and log group accordingly |
 | configmap.task_logs.plugins.logs.cloudwatch-log-group | string | `"/aws/containerinsights/flyte-demo-2/application"` | cloudwatch log-group |
 | configmap.task_logs.plugins.logs.cloudwatch-region | string | `"us-east-2"` | region where logs are hosted |
-| configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}}` | Task default resources configuration |
+| configmap.task_resource_defaults | object | `{"task_resources":{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}}` | Task default resources configuration Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#TaskResourceConfiguration). |
 | configmap.task_resource_defaults.task_resources | object | `{"defaults":{"cpu":"100m","memory":"100Mi","storage":"5Mi"},"limits":{"cpu":2,"gpu":1,"memory":"8Gi","storage":"20Mi"}}` | Task default resources parameters |
 | contour.affinity | object | `{}` | affinity for Contour deployment |
 | contour.contour.resources | object | `{"limits":{"cpu":"100m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Contour |
@@ -82,7 +105,7 @@ A Helm chart for Flyte
 | datacatalog.configPath | string | `"/etc/datacatalog/config/*.yaml"` | Default regex string for searching configuration files |
 | datacatalog.image.pullPolicy | string | `"IfNotPresent"` |  |
 | datacatalog.image.repository | string | `"ghcr.io/flyteorg/datacatalog"` | Docker image for Datacatalog deployment |
-| datacatalog.image.tag | string | `"v0.3.0"` |  |
+| datacatalog.image.tag | string | `"v0.3.2"` |  |
 | datacatalog.nodeSelector | object | `{}` | nodeSelector for Datacatalog deployment |
 | datacatalog.podAnnotations | object | `{}` | Annotations for Datacatalog pods |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
@@ -97,7 +120,7 @@ A Helm chart for Flyte
 | flyteadmin.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flyteadmin.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteadmin.image.repository | string | `"ghcr.io/flyteorg/flyteadmin"` | Docker image for Flyteadmin deployment |
-| flyteadmin.image.tag | string | `"v0.4.0"` |  |
+| flyteadmin.image.tag | string | `"v0.4.14"` |  |
 | flyteadmin.nodeSelector | object | `{}` | nodeSelector for Flyteadmin deployment |
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
@@ -110,7 +133,7 @@ A Helm chart for Flyte
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flyteconsole.image.repository | string | `"ghcr.io/flyteorg/flyteconsole"` | Docker image for Flyteconsole deployment |
-| flyteconsole.image.tag | string | `"v0.19.6"` |  |
+| flyteconsole.image.tag | string | `"v0.19.7"` |  |
 | flyteconsole.nodeSelector | object | `{}` | nodeSelector for Flyteconsole deployment |
 | flyteconsole.podAnnotations | object | `{}` | Annotations for Flyteconsole pods |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
@@ -122,7 +145,7 @@ A Helm chart for Flyte
 | flytepropeller.configPath | string | `"/etc/flyte/config/*.yaml"` | Default regex string for searching configuration files |
 | flytepropeller.image.pullPolicy | string | `"IfNotPresent"` |  |
 | flytepropeller.image.repository | string | `"ghcr.io/flyteorg/flytepropeller"` | Docker image for Flytepropeller deployment |
-| flytepropeller.image.tag | string | `"v0.7.8"` |  |
+| flytepropeller.image.tag | string | `"v0.10.4"` |  |
 | flytepropeller.nodeSelector | object | `{}` | nodeSelector for Flytepropeller deployment |
 | flytepropeller.podAnnotations | object | `{}` | Annotations for Flytepropeller pods |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |

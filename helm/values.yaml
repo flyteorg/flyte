@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: ghcr.io/flyteorg/flyteadmin
-    tag: v0.4.0
+    tag: v0.4.14
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -62,7 +62,7 @@ datacatalog:
   image:
     # -- Docker image for Datacatalog deployment
     repository: ghcr.io/flyteorg/datacatalog
-    tag: v0.3.0
+    tag: v0.3.2
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -107,7 +107,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.7.8
+    tag: v0.10.4
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -149,7 +149,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: ghcr.io/flyteorg/flyteconsole
-    tag: v0.19.6
+    tag: v0.19.7
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -395,7 +395,7 @@ db:
     # host: postgres
     # dbname: flyte
     # passwordPath: /etc/db/pass.txt
-
+    # options:
 
 
 # --------------------------------------------------------------------
