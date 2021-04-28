@@ -25,12 +25,15 @@ RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download
 # Install buildkit-cli-for-kubectl
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
+# Install flytectl
+RUN curl https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | bash
+
 # Download flyte manifest
-COPY deployment/sandbox/flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
+ARG FLYTE_VERSION="v0.12.1"
+RUN curl https://github.com/flyteorg/flyte/releases/download/${FLYTE_VERSION}/flyte_sandbox_manifest.yaml -o /flyteorg/share/flyte_generated.yaml
 
 # Copy scripts
-COPY docker/sandbox/kubectl docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
-
+COPY docker/sandbox/kubectl bin/flytectl docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
 
 FROM base_ AS default
 
