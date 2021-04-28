@@ -7,6 +7,24 @@ h6 {
   font-weight: bold;
 }
 
+.sidebar-tree > :not(p, .current) {
+  font-weight: lighter;
+}
+
+.sidebar-tree ul:first-child {
+  font-weight: 250;
+  font-size: 18px;
+  border: 1px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  margin: 30px;
+  padding: 10px;
+}
+
+.sidebar-tree ul:first-child li:not(:last-child) {
+  margin-bottom: 5px;
+}
+
 @media only screen and (min-width: 1200px) {
   .sidebar-drawer {
     width: 20em;

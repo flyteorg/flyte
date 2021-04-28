@@ -6,19 +6,11 @@
    :hidden:
 
    getting_started
-   Cookbook <https://flytecookbook.readthedocs.io>
-   Concepts <https://docs.flyte.org/en/latest/concepts/core.html>
+   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
+   Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
+   Concepts <basics/flyte_ui>
    reference/index
    community/index
-
-.. toctree::
-   :caption: Basics
-   :hidden:
-
-   basics/flyte_ui
-   basics/flyte_cli
-   basics/deployment_options
-   basics/glossary
 
 .. toctree::
    :caption: Concepts
@@ -26,6 +18,7 @@
    :name: divedeeptoc
    :hidden:
 
+   basics
    concepts/core
    concepts/control_plane
    concepts/execution_time
