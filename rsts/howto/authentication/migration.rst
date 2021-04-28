@@ -116,3 +116,31 @@ This will generate the new cookie hash/block keys, as well as other secrets Admi
 * The **thirdPartyConfig** has been moved to **appAuth** as well.
 * **redirectUrl** has been defaulted to **/console**. If that's the value you want, then you no longer need this setting.
 
+From propeller side, you might have a configuration section that looks like this:
+
+.. code-block:: yaml
+
+    admin:
+      endpoint: dns:///mycompany.domain.com
+      useAuth: true
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+      tokenUrl: https://demo.nuclyde.io/oauth2/token
+      scopes:
+      - all
+
+This can now be simplified to:
+
+.. code-block:: yaml
+
+    admin:
+      endpoint: dns:///mycompany.domain.com
+      # If you are using the built-in authorization server, you can delete these two lines:
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
+
+Specifically,
+
+* **useAuth** is deprecated. Auth requirement will be discovered through an anonymous admin discovery call.
+* **tokenUrl** and **scopes** will also be discovered through a metadata call.
+* **clientId** and **clientSecretLocation** have defaults that work out of the box with the built-in authorization server (e.g. if you setup Google OpenID Connect).
