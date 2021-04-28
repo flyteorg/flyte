@@ -22,7 +22,7 @@ jobs:
           image_name: ${{ github.repository_owner }}/flyte-sandbox
           image_tag: latest,${{ github.sha }},${{ github.event.ref }}
           registry: ghcr.io
-          build_extra_args: "--target=default --compress=true --build-arg=FLYTE_VERSION=${{ github.event.ref }}"
+          build_extra_args: "--target=default --compress=true"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: ${{ github.event_name == 'release' }}
@@ -41,7 +41,7 @@ jobs:
           image_name: ${{ github.repository_owner }}/flyte-sandbox
           image_tag: dind,dind-${{ github.sha }},dind-${{ github.event.ref }}
           registry: ghcr.io
-          build_extra_args: "--target=dind --compress=true --build-arg=FLYTE_VERSION=${{ github.event.ref }}"
+          build_extra_args: "--target=dind --compress=true"
           context: ./
           dockerfile: docker/sandbox/Dockerfile
           push_image_and_stages: ${{ github.event_name == 'release' }}
