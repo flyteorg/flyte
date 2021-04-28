@@ -89,6 +89,8 @@ const (
 	DynamicNodePhaseFailing
 	// This Phase implies that the Parent node is done but it needs to be finalized before progressing to the sub-nodes (or dynamically yielded nodes)
 	DynamicNodePhaseParentFinalizing
+	// This Phase implies that the Parent node has finalized and the sub-node (or dynamically yielded nodes) can now be processed.
+	DynamicNodePhaseParentFinalized
 )
 
 type DynamicNodeStatus struct {

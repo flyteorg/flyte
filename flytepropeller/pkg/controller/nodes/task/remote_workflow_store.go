@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/pkg/errors"
@@ -26,7 +28,7 @@ func (r RemoteFileWorkflowStore) Exists(ctx context.Context, path storage.DataRe
 	return metadata.Exists(), nil
 }
 
-func (r RemoteFileWorkflowStore) Put(ctx context.Context, wf *v1alpha1.FlyteWorkflow, target storage.DataReference) error {
+func (r RemoteFileWorkflowStore) PutFlyteWorkflowCRD(ctx context.Context, wf *v1alpha1.FlyteWorkflow, target storage.DataReference) error {
 	raw, err := json.Marshal(wf)
 	if err != nil {
 		return err
@@ -35,7 +37,11 @@ func (r RemoteFileWorkflowStore) Put(ctx context.Context, wf *v1alpha1.FlyteWork
 	return r.store.WriteRaw(ctx, target, int64(len(raw)), storage.Options{}, bytes.NewReader(raw))
 }
 
-func (r RemoteFileWorkflowStore) Get(ctx context.Context, source storage.DataReference) (*v1alpha1.FlyteWorkflow, error) {
+func (r RemoteFileWorkflowStore) PutCompiledFlyteWorkflow(ctx context.Context, workflow *core.CompiledWorkflowClosure, target storage.DataReference) error {
+	return r.store.WriteProtobuf(ctx, target, storage.Options{}, workflow)
+}
+
+func (r RemoteFileWorkflowStore) getRawBytes(ctx context.Context, source storage.DataReference) ([]byte, error) {
 
 	rawReader, err := r.store.ReadRaw(ctx, source)
 	if err != nil {
@@ -52,9 +58,23 @@ func (r RemoteFileWorkflowStore) Get(ctx context.Context, source storage.DataRef
 	if err != nil {
 		return nil, err
 	}
+	return buf.Bytes(), nil
+}
+
+func (r RemoteFileWorkflowStore) GetWorkflowCRD(ctx context.Context, source storage.DataReference) (*v1alpha1.FlyteWorkflow, error) {
+	wfBytes, err := r.getRawBytes(ctx, source)
+	if err != nil {
+		return nil, err
+	}
 
 	wf := &v1alpha1.FlyteWorkflow{}
-	return wf, json.Unmarshal(buf.Bytes(), wf)
+	return wf, json.Unmarshal(wfBytes, wf)
+}
+
+func (r RemoteFileWorkflowStore) GetCompiledWorkflow(ctx context.Context, source storage.DataReference) (*core.CompiledWorkflowClosure, error) {
+	var closure core.CompiledWorkflowClosure
+	err := r.store.ReadProtobuf(ctx, source, &closure)
+	return &closure, err
 }
 
 func NewRemoteWorkflowStore(store *storage.DataStore) RemoteFileWorkflowStore {

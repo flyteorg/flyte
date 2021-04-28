@@ -23,6 +23,7 @@ const (
 	EPhaseSuccess
 	EPhaseTimedout
 	EPhaseFailing
+	EPhaseDynamicRunning
 )
 
 func (p EPhase) IsTerminal() bool {
@@ -119,6 +120,10 @@ func PhaseInfoQueued(reason string) PhaseInfo {
 
 func PhaseInfoRunning(info *ExecutionInfo) PhaseInfo {
 	return phaseInfo(EPhaseRunning, nil, info, "running")
+}
+
+func PhaseInfoDynamicRunning(info *ExecutionInfo) PhaseInfo {
+	return phaseInfo(EPhaseDynamicRunning, nil, info, "dynamic workflow running")
 }
 
 func PhaseInfoSuccess(info *ExecutionInfo) PhaseInfo {

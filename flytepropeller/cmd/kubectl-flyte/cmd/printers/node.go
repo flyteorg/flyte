@@ -23,7 +23,7 @@ func ColorizeNodePhase(p v1alpha1.NodePhase) string {
 	switch p {
 	case v1alpha1.NodePhaseNotYetStarted:
 		return p.String()
-	case v1alpha1.NodePhaseRunning:
+	case v1alpha1.NodePhaseRunning, v1alpha1.NodePhaseDynamicRunning:
 		return color.YellowString("%s", p.String())
 	case v1alpha1.NodePhaseSucceeded:
 		return color.HiGreenString("%s", p.String())

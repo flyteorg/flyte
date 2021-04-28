@@ -22,9 +22,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/flyteorg/flyteidl/clients/go/datacatalog/mocks"
 	"github.com/golang/protobuf/ptypes"
-
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog/datacatalog/mocks"
 )
 
 func init() {
