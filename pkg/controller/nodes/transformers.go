@@ -56,6 +56,8 @@ func ToNodeExecEventPhase(p handler.EPhase) core.NodeExecution_Phase {
 		return core.NodeExecution_QUEUED
 	case handler.EPhaseRunning, handler.EPhaseRetryableFailure:
 		return core.NodeExecution_RUNNING
+	case handler.EPhaseDynamicRunning:
+		return core.NodeExecution_DYNAMIC_RUNNING
 	case handler.EPhaseSkip:
 		return core.NodeExecution_SKIPPED
 	case handler.EPhaseSuccess:
@@ -85,9 +87,15 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 		return nil, err
 	}
 
+	phase := ToNodeExecEventPhase(info.GetPhase())
+	if eventVersion < v1alpha1.EventVersion2 && phase == core.NodeExecution_DYNAMIC_RUNNING {
+		// For older workflow event versions we lump dynamic running with running.
+		phase = core.NodeExecution_RUNNING
+	}
+
 	nev := &event.NodeExecutionEvent{
 		Id:         nodeExecID,
-		Phase:      ToNodeExecEventPhase(info.GetPhase()),
+		Phase:      phase,
 		InputUri:   reader.GetInputPath().String(),
 		OccurredAt: occurredTime,
 	}
@@ -146,6 +154,8 @@ func ToNodePhase(p handler.EPhase) (v1alpha1.NodePhase, error) {
 		return v1alpha1.NodePhaseQueued, nil
 	case handler.EPhaseRunning:
 		return v1alpha1.NodePhaseRunning, nil
+	case handler.EPhaseDynamicRunning:
+		return v1alpha1.NodePhaseDynamicRunning, nil
 	case handler.EPhaseRetryableFailure:
 		return v1alpha1.NodePhaseRetryableFailure, nil
 	case handler.EPhaseSkip:

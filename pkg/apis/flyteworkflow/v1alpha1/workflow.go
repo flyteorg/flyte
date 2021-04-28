@@ -85,6 +85,7 @@ type EventVersion int
 const (
 	EventVersion0 EventVersion = iota
 	EventVersion1
+	EventVersion2
 )
 
 type NodeDefaults struct {

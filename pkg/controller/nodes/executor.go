@@ -376,7 +376,8 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx *node
 	// execErr in phase-info 'p' is only available if node has failed to execute, and the current phase at that time
 	// will be v1alpha1.NodePhaseRunning
 	execErr := p.GetErr()
-	if execErr != nil && (currentPhase == v1alpha1.NodePhaseRunning || currentPhase == v1alpha1.NodePhaseQueued) {
+	if execErr != nil && (currentPhase == v1alpha1.NodePhaseRunning || currentPhase == v1alpha1.NodePhaseQueued ||
+		currentPhase == v1alpha1.NodePhaseDynamicRunning) {
 		endTime := time.Now()
 		startTime := endTime
 		if lastAttemptStartTime != nil {
@@ -650,7 +651,8 @@ func canHandleNode(phase v1alpha1.NodePhase) bool {
 		phase == v1alpha1.NodePhaseFailing ||
 		phase == v1alpha1.NodePhaseTimingOut ||
 		phase == v1alpha1.NodePhaseRetryableFailure ||
-		phase == v1alpha1.NodePhaseSucceeding
+		phase == v1alpha1.NodePhaseSucceeding ||
+		phase == v1alpha1.NodePhaseDynamicRunning
 }
 
 func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext,

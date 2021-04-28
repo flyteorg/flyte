@@ -5,14 +5,11 @@ import (
 	"fmt"
 	"strconv"
 
+	"k8s.io/apimachinery/pkg/util/rand"
+
 	node_common "github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/storage"
-	"k8s.io/apimachinery/pkg/util/rand"
-
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
@@ -22,14 +19,20 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/storage"
 )
 
 type dynamicWorkflowContext struct {
-	execContext executors.ExecutionContext
-	subWorkflow v1alpha1.ExecutableWorkflow
-	nodeLookup  executors.NodeLookup
-	isDynamic   bool
+	execContext        executors.ExecutionContext
+	subWorkflow        v1alpha1.ExecutableWorkflow
+	subWorkflowClosure *core.CompiledWorkflowClosure
+	nodeLookup         executors.NodeLookup
+	isDynamic          bool
 }
+
+const dynamicWfNameTemplate = "dynamic_%s"
 
 func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Context, djSpec *core.DynamicJobSpec,
 	nCtx handler.NodeExecutionContext, parentNodeStatus v1alpha1.ExecutableNodeStatus) (*core.WorkflowTemplate, error) {
@@ -106,8 +109,8 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 		Id: &core.Identifier{
 			Project:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Project,
 			Domain:       nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Domain,
+			Name:         fmt.Sprintf(dynamicWfNameTemplate, nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId),
 			Version:      rand.String(10),
-			Name:         rand.String(10),
 			ResourceType: core.ResourceType_WORKFLOW,
 		},
 		Nodes:     djSpec.Nodes,
@@ -132,23 +135,35 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	dynamicNodeStatus.SetOutputDir(nCtx.NodeStatus().GetOutputDir())
 	dynamicNodeStatus.SetParentTaskID(execID)
 
-	// cacheHitStopWatch := d.metrics.CacheHit.Start(ctx)
+	cacheHitStopWatch := d.metrics.CacheHit.Start(ctx)
 	// Check if we have compiled the workflow before:
 	// If there is a cached compiled Workflow, load and return it.
-	// if ok, err := f.CacheExists(ctx); err != nil {
-	//	logger.Warnf(ctx, "Failed to call head on compiled futures file. Error: %v", err)
-	//	return nil, false, errors.Wrapf(errors.CausedByError, nCtx.NodeID(), err, "Failed to do HEAD on compiled futures file.")
-	// } else if ok {
-	//	// It exists, load and return it
-	//	compiledWf, err := f.RetrieveCache(ctx)
-	//	if err != nil {
-	//		logger.Warnf(ctx, "Failed to load cached flyte workflow , this will cause the dynamic workflow to be recompiled. Error: %v", err)
-	//		d.metrics.CacheError.Inc(ctx)
-	//	} else {
-	//		cacheHitStopWatch.Stop()
-	//		return newContextualWorkflow(nCtx.Workflow(), compiledWf, dynamicNodeStatus, compiledWf.Tasks, compiledWf.SubWorkflows), true, nil
-	//	}
-	// }
+	if ok, err := f.CacheExists(ctx); err != nil {
+		logger.Warnf(ctx, "Failed to call head on compiled workflow files. Error: %v", err)
+		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "Failed to do HEAD on compiled workflow files.")
+	} else if ok {
+		// It exists, load and return it
+		workflowCacheContents, err := f.RetrieveCache(ctx)
+		if err != nil {
+			logger.Warnf(ctx, "Failed to load cached flyte workflow, this will cause the dynamic workflow to be recompiled. Error: %v", err)
+			d.metrics.CacheError.Inc(ctx)
+		} else {
+			cacheHitStopWatch.Stop()
+			newParentInfo, err := node_common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+			if err != nil {
+				return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to generate uniqueID")
+			}
+			compiledWf := workflowCacheContents.WorkflowCRD
+			return dynamicWorkflowContext{
+				isDynamic:          true,
+				subWorkflow:        compiledWf,
+				subWorkflowClosure: workflowCacheContents.CompiledWorkflow,
+				execContext:        executors.NewExecutionContext(nCtx.ExecutionContext(), compiledWf, compiledWf, newParentInfo, nCtx.ExecutionContext()),
+				nodeLookup:         executors.NewNodeLookup(compiledWf, dynamicNodeStatus),
+			}, nil
+		}
+	}
+	d.metrics.CacheMiss.Inc(ctx)
 
 	// We know for sure that futures file was generated. Lets read it
 	djSpec, err := f.Read(ctx)
@@ -156,7 +171,6 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "unable to read futures file, maybe corrupted")
 	}
 
-	var closure *core.CompiledWorkflowClosure
 	wf, err := d.buildDynamicWorkflowTemplate(ctx, djSpec, nCtx, dynamicNodeStatus)
 	if err != nil {
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build dynamic workflow template")
@@ -184,6 +198,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 	// 	 	 The reason they might be missing is because if a user yields a task that is SdkTask.fetch'ed, it should not be included
 	// 	     See https://github.com/flyteorg/flyte/issues/219 for more information.
 
+	var closure *core.CompiledWorkflowClosure
 	closure, err = compiler.CompileWorkflow(wf, djSpec.Subworkflows, compiledTasks, launchPlanInterfaces)
 	if err != nil {
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeUser, err, "malformed dynamic workflow")
@@ -194,7 +209,7 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build workflow")
 	}
 
-	if err := f.Cache(ctx, dynamicWf); err != nil {
+	if err := f.Cache(ctx, dynamicWf, closure); err != nil {
 		logger.Errorf(ctx, "Failed to cache Dynamic workflow [%s]", err.Error())
 	}
 
@@ -205,10 +220,11 @@ func (d dynamicNodeTaskNodeHandler) buildContextualDynamicWorkflow(ctx context.C
 		return dynamicWorkflowContext{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to generate uniqueID")
 	}
 	return dynamicWorkflowContext{
-		isDynamic:   true,
-		subWorkflow: dynamicWf,
-		execContext: executors.NewExecutionContext(nCtx.ExecutionContext(), dynamicWf, dynamicWf, newParentInfo, nCtx.ExecutionContext()),
-		nodeLookup:  executors.NewNodeLookup(dynamicWf, dynamicNodeStatus),
+		isDynamic:          true,
+		subWorkflow:        dynamicWf,
+		subWorkflowClosure: closure,
+		execContext:        executors.NewExecutionContext(nCtx.ExecutionContext(), dynamicWf, dynamicWf, newParentInfo, nCtx.ExecutionContext()),
+		nodeLookup:         executors.NewNodeLookup(dynamicWf, dynamicNodeStatus),
 	}, nil
 }
 
@@ -228,7 +244,7 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 		}
 
 		// As we do not support Failure Node, we can just return failure in this case
-		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)),
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoDynamicRunning(nil)),
 			handler.DynamicNodeState{Phase: v1alpha1.DynamicNodePhaseFailing, Reason: "Dynamic workflow failed", Error: state.Err},
 			nil
 	}
@@ -278,7 +294,7 @@ func (d dynamicNodeTaskNodeHandler) progressDynamicWorkflow(ctx context.Context,
 		}
 	}
 
-	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), prevState, nil
+	return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoDynamicRunning(nil)), prevState, nil
 }
 
 func (d dynamicNodeTaskNodeHandler) getLaunchPlanInterfaces(ctx context.Context, launchPlanIDs []compiler.LaunchPlanRefIdentifier) (

@@ -16,12 +16,14 @@ import (
 // Once closure migration is done, this file should be deleted.
 const implicitFutureFileName = "futures.pb"
 const implicitCompileWorkflowsName = "futures_compiled.pb"
+const implicitCompiledWorkflowClosureName = "dynamic_compiled.pb"
 
 type FutureFileReader struct {
 	RemoteFileWorkflowStore
-	loc      storage.DataReference
-	cacheLoc storage.DataReference
-	store    *storage.DataStore
+	loc                    storage.DataReference
+	flyteWfCRDCacheLoc     storage.DataReference
+	flyteWfClosureCacheLoc storage.DataReference
+	store                  *storage.DataStore
 }
 
 func (f FutureFileReader) Exists(ctx context.Context) (bool, error) {
@@ -45,15 +47,39 @@ func (f FutureFileReader) Read(ctx context.Context) (*core.DynamicJobSpec, error
 }
 
 func (f FutureFileReader) CacheExists(ctx context.Context) (bool, error) {
-	return f.RemoteFileWorkflowStore.Exists(ctx, f.cacheLoc)
+	exists, err := f.RemoteFileWorkflowStore.Exists(ctx, f.flyteWfCRDCacheLoc)
+	if err != nil || !exists {
+		return exists, err
+	}
+	return f.RemoteFileWorkflowStore.Exists(ctx, f.flyteWfClosureCacheLoc)
 }
 
-func (f FutureFileReader) Cache(ctx context.Context, wf *v1alpha1.FlyteWorkflow) error {
-	return f.RemoteFileWorkflowStore.Put(ctx, wf, f.cacheLoc)
+func (f FutureFileReader) Cache(ctx context.Context, wf *v1alpha1.FlyteWorkflow, workflowClosure *core.CompiledWorkflowClosure) error {
+	err := f.RemoteFileWorkflowStore.PutFlyteWorkflowCRD(ctx, wf, f.flyteWfCRDCacheLoc)
+	if err != nil {
+		return err
+	}
+	return f.RemoteFileWorkflowStore.PutCompiledFlyteWorkflow(ctx, workflowClosure, f.flyteWfClosureCacheLoc)
 }
 
-func (f FutureFileReader) RetrieveCache(ctx context.Context) (*v1alpha1.FlyteWorkflow, error) {
-	return f.RemoteFileWorkflowStore.Get(ctx, f.cacheLoc)
+type CacheContents struct {
+	WorkflowCRD      *v1alpha1.FlyteWorkflow
+	CompiledWorkflow *core.CompiledWorkflowClosure
+}
+
+func (f FutureFileReader) RetrieveCache(ctx context.Context) (CacheContents, error) {
+	workflowCRD, err := f.RemoteFileWorkflowStore.GetWorkflowCRD(ctx, f.flyteWfCRDCacheLoc)
+	if err != nil {
+		return CacheContents{}, err
+	}
+	compiledWorkflow, err := f.RemoteFileWorkflowStore.GetCompiledWorkflow(ctx, f.flyteWfClosureCacheLoc)
+	if err != nil {
+		return CacheContents{}, err
+	}
+	return CacheContents{
+		WorkflowCRD:      workflowCRD,
+		CompiledWorkflow: compiledWorkflow,
+	}, nil
 }
 
 func NewRemoteFutureFileReader(ctx context.Context, dataDir storage.DataReference, store *storage.DataStore) (FutureFileReader, error) {
@@ -63,14 +89,21 @@ func NewRemoteFutureFileReader(ctx context.Context, dataDir storage.DataReferenc
 		return FutureFileReader{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to construct data path")
 	}
 
-	cacheLoc, err := store.ConstructReference(ctx, dataDir, implicitCompileWorkflowsName)
+	flyteWfCRDCacheLoc, err := store.ConstructReference(ctx, dataDir, implicitCompileWorkflowsName)
 	if err != nil {
 		logger.Warnf(ctx, "Failed to construct data path for compile workflows file, error: %s", err)
-		return FutureFileReader{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to construct reference for cache location")
+		return FutureFileReader{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to construct reference for workflow CRD cache location")
 	}
+	flyteWfClosureCacheLoc, err := store.ConstructReference(ctx, dataDir, implicitCompiledWorkflowClosureName)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to construct data path for compile workflows file, error: %s", err)
+		return FutureFileReader{}, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to construct reference for compiled workflow closure cache location")
+	}
+
 	return FutureFileReader{
 		loc:                     loc,
-		cacheLoc:                cacheLoc,
+		flyteWfCRDCacheLoc:      flyteWfCRDCacheLoc,
+		flyteWfClosureCacheLoc:  flyteWfClosureCacheLoc,
 		store:                   store,
 		RemoteFileWorkflowStore: NewRemoteWorkflowStore(store),
 	}, nil

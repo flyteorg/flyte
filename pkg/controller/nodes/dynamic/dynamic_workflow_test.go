@@ -1,8 +1,12 @@
 package dynamic
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"testing"
+
+	"github.com/pkg/errors"
 
 	"github.com/flyteorg/flytepropeller/pkg/utils"
 
@@ -11,6 +15,7 @@ import (
 	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
+	storageMocks "github.com/flyteorg/flytestdlib/storage/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -26,7 +31,7 @@ import (
 )
 
 func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *testing.T) {
-	createNodeContext := func(ttype string, finalOutput storage.DataReference) *mocks.NodeExecutionContext {
+	createNodeContext := func(ttype string, finalOutput storage.DataReference, dataStore *storage.DataStore) *mocks.NodeExecutionContext {
 		ctx := context.TODO()
 
 		wfExecID := &core.WorkflowExecutionIdentifier{
@@ -78,8 +83,11 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		tID := "dyn-task-1"
 		n.OnGetTaskID().Return(&tID)
 
-		dataStore, err := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
-		assert.NoError(t, err)
+		if dataStore == nil {
+			var err error
+			dataStore, err = storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
+			assert.NoError(t, err)
+		}
 
 		ir := &mocks3.InputReader{}
 		nCtx := &mocks.NodeExecutionContext{}
@@ -143,7 +151,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 		djSpec := createDynamicJobSpecWithLaunchPlans()
 		finalOutput := storage.DataReference("/subnode")
-		nCtx := createNodeContext("test", finalOutput)
+		nCtx := createNodeContext("test", finalOutput, nil)
 		s := &dynamicNodeStateHolder{}
 		nCtx.On("NodeStateWriter").Return(s)
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
@@ -195,6 +203,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		assert.True(t, callsAdmin)
 		assert.True(t, dCtx.isDynamic)
 		assert.NotNil(t, dCtx.subWorkflow)
+		assert.NotNil(t, dCtx.subWorkflowClosure)
 		assert.NotNil(t, dCtx.execContext)
 		assert.NotNil(t, dCtx.execContext.GetParentInfo())
 		expectedParentUniqueID, err := utils.FixedLengthUniqueIDForParts(20, "c1", "2", "n1")
@@ -214,7 +223,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 		djSpec := createDynamicJobSpecWithLaunchPlans()
 		finalOutput := storage.DataReference("/subnode")
-		nCtx := createNodeContext("test", finalOutput)
+		nCtx := createNodeContext("test", finalOutput, nil)
 		s := &dynamicNodeStateHolder{}
 		nCtx.On("NodeStateWriter").Return(s)
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
@@ -263,6 +272,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		assert.True(t, callsAdmin)
 		assert.True(t, dCtx.isDynamic)
 		assert.NotNil(t, dCtx.subWorkflow)
+		assert.NotNil(t, dCtx.subWorkflowClosure)
 		assert.NotNil(t, dCtx.execContext)
 		assert.NotNil(t, dCtx.execContext.GetParentInfo())
 		expectedParentUniqueID, err := utils.FixedLengthUniqueIDForParts(20, "", "", "n1")
@@ -282,7 +292,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		}
 		djSpec := createDynamicJobSpecWithLaunchPlans()
 		finalOutput := storage.DataReference("/subnode")
-		nCtx := createNodeContext("test", finalOutput)
+		nCtx := createNodeContext("test", finalOutput, nil)
 		s := &dynamicNodeStateHolder{}
 		nCtx.OnNodeStateWriter().Return(s)
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
@@ -329,4 +339,250 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		assert.Error(t, err)
 		assert.True(t, callsAdmin)
 	})
+	t.Run("dynamic wf cached", func(t *testing.T) {
+		ctx := context.Background()
+		lpID := &core.Identifier{
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+			Name:         "my_plan",
+			Project:      "p",
+			Domain:       "d",
+		}
+		djSpec := createDynamicJobSpecWithLaunchPlans()
+		finalOutput := storage.DataReference("/subnode")
+		nCtx := createNodeContext("test", finalOutput, nil)
+
+		s := &dynamicNodeStateHolder{}
+		nCtx.On("NodeStateWriter").Return(s)
+
+		// Create a k8s Flyte workflow and store that in the cache
+		dynamicWf := &v1alpha1.FlyteWorkflow{
+			ServiceAccountName: "sa",
+		}
+
+		rawDynamicWf, err := json.Marshal(dynamicWf)
+		assert.NoError(t, err)
+		_, err = nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures_compiled.pb")
+		assert.NoError(t, err)
+		assert.NoError(t, nCtx.DataStore().WriteRaw(context.TODO(), storage.DataReference("/output-dir/futures_compiled.pb"), int64(len(rawDynamicWf)), storage.Options{}, bytes.NewReader(rawDynamicWf)))
+
+		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
+		assert.NoError(t, err)
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, djSpec))
+
+		f, err = nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "dynamic_compiled.pb")
+		assert.NoError(t, err)
+		assert.NoError(t, nCtx.DataStore().WriteProtobuf(context.TODO(), f, storage.Options{}, &core.CompiledWorkflowClosure{
+			Primary: &core.CompiledWorkflow{
+				Template: &core.WorkflowTemplate{
+					Id: &core.Identifier{
+						ResourceType: core.ResourceType_WORKFLOW,
+					},
+				},
+			},
+		}))
+
+		mockLPLauncher := &mocks5.Reader{}
+		var callsAdmin = false
+		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Run(func(args mock.Arguments) {
+			// When a launch plan node is detected, a call should be made to Admin to fetch the interface for the LP.
+			// However in the cached case no such call should be necessary.
+			callsAdmin = true
+		}).Return(&admin.LaunchPlan{
+			Id: lpID,
+			Closure: &admin.LaunchPlanClosure{
+				ExpectedInputs: &core.ParameterMap{},
+				ExpectedOutputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+							Description: "output of the launch plan",
+						},
+					},
+				},
+			},
+		}, nil)
+		h := &mocks6.TaskNodeHandler{}
+		n := &mocks4.Node{}
+		d := dynamicNodeTaskNodeHandler{
+			TaskNodeHandler: h,
+			nodeExecutor:    n,
+			lpReader:        mockLPLauncher,
+			metrics:         newMetrics(promutils.NewTestScope()),
+		}
+
+		execContext := &mocks4.ExecutionContext{}
+		immutableParentInfo := mocks4.ImmutableParentInfo{}
+		immutableParentInfo.OnGetUniqueID().Return("c1")
+		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
+		execContext.OnGetParentInfo().Return(&immutableParentInfo)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.OnExecutionContext().Return(execContext)
+
+		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.False(t, callsAdmin)
+		assert.True(t, dCtx.isDynamic)
+		assert.NotNil(t, dCtx.subWorkflow)
+		assert.NotNil(t, dCtx.execContext)
+		assert.NotNil(t, dCtx.execContext.GetParentInfo())
+		expectedParentUniqueID, err := utils.FixedLengthUniqueIDForParts(20, "c1", "2", "n1")
+		assert.Nil(t, err)
+		assert.Equal(t, expectedParentUniqueID, dCtx.execContext.GetParentInfo().GetUniqueID())
+		assert.Equal(t, uint32(1), dCtx.execContext.GetParentInfo().CurrentAttempt())
+		assert.NotNil(t, dCtx.nodeLookup)
+	})
+
+	t.Run("dynamic wf cache read fails", func(t *testing.T) {
+		ctx := context.Background()
+		finalOutput := storage.DataReference("/subnode")
+
+		composedPBStore := storageMocks.ComposedProtobufStore{}
+		composedPBStore.On("Head", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb")).
+			Return(nil, errors.New("foo"))
+		referenceConstructor := storageMocks.ReferenceConstructor{}
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "futures.pb").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures.pb"), nil)
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "futures_compiled.pb").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb"), nil)
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "dynamic_compiled.pb").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/dynamic_compiled.pb"), nil)
+		dataStore := &storage.DataStore{
+			ComposedProtobufStore: &composedPBStore,
+			ReferenceConstructor:  &referenceConstructor,
+		}
+
+		nCtx := createNodeContext("test", finalOutput, dataStore)
+		nCtx.OnCurrentAttempt().Return(uint32(1))
+		mockLPLauncher := &mocks5.Reader{}
+
+		h := &mocks6.TaskNodeHandler{}
+		n := &mocks4.Node{}
+		d := dynamicNodeTaskNodeHandler{
+			TaskNodeHandler: h,
+			nodeExecutor:    n,
+			lpReader:        mockLPLauncher,
+			metrics:         newMetrics(promutils.NewTestScope()),
+		}
+
+		execContext := &mocks4.ExecutionContext{}
+		immutableParentInfo := mocks4.ImmutableParentInfo{}
+		immutableParentInfo.OnGetUniqueID().Return("c1")
+		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
+		execContext.OnGetParentInfo().Return(&immutableParentInfo)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.OnExecutionContext().Return(execContext)
+
+		_, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		assert.EqualError(t, err, "[system] Failed to do HEAD on compiled workflow files., caused by: Failed to do HEAD on futures file.: foo")
+	})
+	t.Run("dynamic wf cache write fails", func(t *testing.T) {
+		ctx := context.Background()
+		finalOutput := storage.DataReference("/subnode")
+
+		metadata := existsMetadata{}
+		composedPBStore := storageMocks.ComposedProtobufStore{}
+		composedPBStore.On("Head", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb")).
+			Return(&metadata, nil)
+
+		djSpec := createDynamicJobSpecWithLaunchPlans()
+		composedPBStore.On("ReadProtobuf", mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures.pb"), &core.DynamicJobSpec{}).Return(nil).Run(func(args mock.Arguments) {
+			djSpecPtr := args.Get(2).(*core.DynamicJobSpec)
+			*djSpecPtr = *djSpec
+		})
+		composedPBStore.On("WriteRaw",
+			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb"),
+			int64(1039),
+			storage.Options{},
+			mock.MatchedBy(func(rdr *bytes.Reader) bool { return true })).Return(errors.New("foo"))
+
+		referenceConstructor := storageMocks.ReferenceConstructor{}
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "futures.pb").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures.pb"), nil)
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "dynamic_compiled.pb").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/dynamic_compiled.pb"), nil)
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "Node_1").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/Node_1"), nil)
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/Node_1"), "0").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/Node_1/0"), nil)
+		referenceConstructor.On("ConstructReference", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("output-dir"), "futures_compiled.pb").Return(
+			storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb"), nil)
+		dataStore := &storage.DataStore{
+			ComposedProtobufStore: &composedPBStore,
+			ReferenceConstructor:  &referenceConstructor,
+		}
+
+		nCtx := createNodeContext("test", finalOutput, dataStore)
+		nCtx.OnCurrentAttempt().Return(uint32(1))
+
+		lpID := &core.Identifier{
+			ResourceType: core.ResourceType_LAUNCH_PLAN,
+			Name:         "my_plan",
+			Project:      "p",
+			Domain:       "d",
+		}
+		mockLPLauncher := &mocks5.Reader{}
+		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Return(&admin.LaunchPlan{
+			Id: lpID,
+			Closure: &admin.LaunchPlanClosure{
+				ExpectedInputs: &core.ParameterMap{},
+				ExpectedOutputs: &core.VariableMap{
+					Variables: map[string]*core.Variable{
+						"x": {
+							Type: &core.LiteralType{
+								Type: &core.LiteralType_Simple{
+									Simple: core.SimpleType_INTEGER,
+								},
+							},
+							Description: "output of the launch plan",
+						},
+					},
+				},
+			},
+		}, nil)
+
+		h := &mocks6.TaskNodeHandler{}
+		n := &mocks4.Node{}
+		d := dynamicNodeTaskNodeHandler{
+			TaskNodeHandler: h,
+			nodeExecutor:    n,
+			lpReader:        mockLPLauncher,
+			metrics:         newMetrics(promutils.NewTestScope()),
+		}
+
+		execContext := &mocks4.ExecutionContext{}
+		immutableParentInfo := mocks4.ImmutableParentInfo{}
+		immutableParentInfo.OnGetUniqueID().Return("c1")
+		immutableParentInfo.OnCurrentAttempt().Return(uint32(2))
+		execContext.OnGetParentInfo().Return(&immutableParentInfo)
+		execContext.OnGetEventVersion().Return(v1alpha1.EventVersion1)
+		nCtx.OnExecutionContext().Return(execContext)
+
+		dCtx, err := d.buildContextualDynamicWorkflow(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.True(t, dCtx.isDynamic)
+		assert.NotNil(t, dCtx.subWorkflow)
+		assert.NotNil(t, dCtx.execContext)
+		assert.NotNil(t, dCtx.execContext.GetParentInfo())
+		expectedParentUniqueID, err := utils.FixedLengthUniqueIDForParts(20, "c1", "2", "n1")
+		assert.Nil(t, err)
+		assert.Equal(t, expectedParentUniqueID, dCtx.execContext.GetParentInfo().GetUniqueID())
+		assert.Equal(t, uint32(1), dCtx.execContext.GetParentInfo().CurrentAttempt())
+		assert.NotNil(t, dCtx.nodeLookup)
+	})
+}
+
+type existsMetadata struct{}
+
+func (e existsMetadata) Exists() bool {
+	return false
+}
+
+func (e existsMetadata) Size() int64 {
+	return int64(1)
 }
