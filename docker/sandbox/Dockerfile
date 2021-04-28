@@ -14,6 +14,9 @@ RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 h
 
 FROM alpine:3.13.2 AS base_
 
+# Install dependencies
+RUN apk add --no-cache curl
+
 # Make directory to store artifacts
 RUN mkdir -p /flyteorg/bin /flyteorg/share
 
@@ -25,12 +28,15 @@ RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download
 # Install buildkit-cli-for-kubectl
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
 
-# Download flyte manifest
+# Install flytectl
+RUN curl https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | sh
+
+# Copy flyte manifest
 COPY deployment/sandbox/flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
 
 # Copy scripts
+RUN cp /bin/flytectl /flyteorg/bin/
 COPY docker/sandbox/kubectl docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
-
 
 FROM base_ AS default
 
