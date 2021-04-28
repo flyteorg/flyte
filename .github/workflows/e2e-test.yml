@@ -3,14 +3,10 @@ name: Test Flyte Release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'flyte version for running e2e test'
+      priority:
+        description: 'priority for e2e test'
         required: true
-        default: 'latest'
-  schedule:
-    # Every day at 8:00am UTC
-    - cron: '00 14 * * *'
-
+        default: 'all'
 jobs:
   deploy:
     strategy:
@@ -22,5 +18,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Create Cluster
         run: |
-          echo "Hello"
+          bash ./script/e2e_test.sh ${{matrix.RUNNER}} ${{ github.event.inputs.priority }}
         shell: bash
