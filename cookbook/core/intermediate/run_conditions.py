@@ -160,7 +160,21 @@ def basic_boolean_wf() -> int:
     )
 
 
+# %%
+# Ofcourse it is also possible to pass a boolean directly to a workflow as follows
+#
+# .. note::
+#
+#   Note that the boolean passed in automagically has a method called `is_true`. This is because the boolean is within
+#   the workflow context and hence is actually wrapped in a flytekit special object, which allows it to have additional
+#   behavior
+@workflow
+def bool_input_wf(b: bool) -> int:
+    return conditional("test").if_(b.is_true()).then(success()).else_().then(failed())
+
+
 if __name__ == "__main__":
     print("Running basic_boolean_wf a few times")
     for i in range(0, 5):
         print(f"Basic boolean wf output {basic_boolean_wf()}")
+        print(f"Boolean input {True if i < 2 else False}, workflow output {bool_input_wf(b=True if i < 2 else False)}")
