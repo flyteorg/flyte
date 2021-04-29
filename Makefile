@@ -1,4 +1,4 @@
-export REPOSITORY=flyteidl
+export REPOSITORY=flyte
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
