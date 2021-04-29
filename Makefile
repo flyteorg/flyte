@@ -47,3 +47,7 @@ stats:
 	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller_dashboard.py
 	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin_dashboard.py
 	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser_dashboard.py
+
+.PHONY: prepare_artifacts
+prepare_artifacts:
+	bash script/prepare_artifacts.sh

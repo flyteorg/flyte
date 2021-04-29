@@ -1,0 +1,40 @@
+name: Create a flyte release
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version name. example v0.1.1'
+        required: true
+
+jobs:
+  goreleaser:
+    name: Goreleaser
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump-version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Bump version and push tag
+        id: bump-version
+        uses: anothrNick/github-tag-action@1.17.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
+          WITH_V: true
+          CUSTOM_TAG: ${{ github.event.inputs.version }}
+          RELEASE_BRANCHES: master
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+          ref: ${{ github.event.inputs.version }}
+      - name: build Release Menifest
+        run: |
+          make prepare_artifacts
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
