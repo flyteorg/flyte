@@ -1,0 +1,108 @@
+{{- if .Values.pytorchoperator.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "pytorch-operator.name" . }}
+  namespace: {{ template "pytorch-operator.namespace" . }}
+  labels: {{ include "pytorch-operator.labels" . | nindent 4 }}
+  {{- with .Values.pytorchoperator.serviceAccountAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "pytorch-operator.name" . }}-admin
+  labels: {{ include "pytorch-operator.labels" . | nindent 4 }}
+rules: []
+aggregationRule:
+  clusterRoleSelectors:
+  - matchLabels:
+      rbac.authorization.kubeflow.org/aggregate-to-kubeflow-pytorchjobs-admin: "true"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "pytorch-operator.name" . }}-edit
+  labels: {{ include "pytorch-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - pytorchjobs
+  - pytorchjobs/status
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - delete
+  - deletecollection
+  - patch
+  - update
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "pytorch-operator.name" . }}-view
+  labels: {{ include "pytorch-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - pytorchjobs
+  - pytorchjobs/status
+  verbs:
+  - get
+  - list
+  - watch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "pytorch-operator.name" . }}
+  labels: {{ include "pytorch-operator.labels" . | nindent 4 }}
+rules:
+- apiGroups:
+  - kubeflow.org
+  resources:
+  - pytorchjobs
+  - pytorchjobs/status
+  verbs:
+  - '*'
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - '*'
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - services
+  - endpoints
+  - events
+  verbs:
+  - '*'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "pytorch-operator.name" . }}
+  labels: {{ include "pytorch-operator.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "pytorch-operator.name" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "pytorch-operator.name" . }}
+  namespace: {{ template "pytorch-operator.namespace" . }}
+{{- end }}

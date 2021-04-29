@@ -1,0 +1,11 @@
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "datacatalog.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "datacatalog.labels" . | nindent 4 }}
+  {{- with .Values.datacatalog.serviceAccountAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
