@@ -10,7 +10,6 @@ Synopsis
 
 
 
-Updates launchplan metadata.
 Following command updates the description on the launchplan.
 ::
 

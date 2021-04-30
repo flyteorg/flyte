@@ -10,18 +10,17 @@ Synopsis
 
 
 
-Updates task metadata.
 Following command updates the description on the task.
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --description "Merge sort example"
 
-Archiving task named entity would is not supported and would throw an error.
+Archiving task named entity is not supported and would throw an error.
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --archive
 
-Activating workflow named entity would be a noop as archiving is not possible.
+Activating task named entity would be a noop as archiving is not possible.
 ::
 
  flytectl update  task -d development -p flytectldemo core.advanced.run_merge_sort.merge --activate

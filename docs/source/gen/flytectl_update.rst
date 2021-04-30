@@ -76,5 +76,5 @@ SEE ALSO
 * :doc:`flytectl_update_launchplan` 	 - Updates launch plan metadata
 * :doc:`flytectl_update_project` 	 - Updates project resources
 * :doc:`flytectl_update_task` 	 - Updates task metadata
-* :doc:`flytectl_update_workflow` 	 - Updates launch plan metadata
+* :doc:`flytectl_update_workflow` 	 - Updates workflow metadata
 

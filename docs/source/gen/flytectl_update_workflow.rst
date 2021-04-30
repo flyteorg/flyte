@@ -3,14 +3,13 @@
 flytectl update workflow
 ------------------------
 
-Updates launch plan metadata
+Updates workflow metadata
 
 Synopsis
 ~~~~~~~~
 
 
 
-Updates workflow metadata.
 Following command updates the description on the workflow.
 ::
 
@@ -21,7 +20,7 @@ Archiving workflow named entity would cause this to disapper from flyteconsole U
 
  flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --archive
 
-Activating workflow named entity would unarchive it.
+Activating workflow named entity
 ::
 
  flytectl update workflow -p flytectldemo -d development  core.advanced.run_merge_sort.merge_sort --activate
