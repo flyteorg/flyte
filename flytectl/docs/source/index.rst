@@ -19,6 +19,12 @@ Configure
 =========
 Flytectl allows configuring using a YAML file or pass every configuration value
 on command-line. The follow configuration is useful to setup.
+Place this in $HOME/.flyte directory with name config.yaml.
+This file is searched in
+1] $HOME/.flyte
+2] currDir from where you run flytectl
+3] /etc/flyte/config
+4] You can pass it commandline using --config <config-file-path>
 
 Basic Configuration
 --------------------
