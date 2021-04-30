@@ -54,6 +54,11 @@
 Meet Flyte
 ==========
 
+.. raw:: html
+
+   <p style="color: #808080; font-weight: 350; font-size: 25px; padding: 0 10% 0 10%; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale </p>
+
+
 Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
 Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
