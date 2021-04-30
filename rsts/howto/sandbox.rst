@@ -154,4 +154,4 @@ Deploy Flyte Sandbox environment to a shared kubernetes cluster
 
 The goal here is to deploy to an existing Kubernetes cluster - within one namespace only. This would allow multiple Flyte clusters to run within one K8s cluster.
 
-.. caution:: coming soon!
+.. NOTE:: coming soon!

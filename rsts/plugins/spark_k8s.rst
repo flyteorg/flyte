@@ -11,7 +11,7 @@ Flyte has an optional plugin that makes it possible to run `Apache Spark <https:
 This makes it extremely easy to run your pyspark (coming soon scala/java) code as a task. The plugin creates a new virtual cluster for the spark execution dynamically and Flyte will manage the execution, auto-scaling
 for the spark job.
 
-.. caution::
+.. NOTE::
 
    This has been tested at scale and more than 100k Spark Jobs run through Flyte at Lyft. This still needs a large capacity on Kubernetes and careful configuration.
    We recommend using Multi-cluster mode - :ref:`howto-multi-cluster`, and enabling :ref:`howto-resource-quota` for large and extremely frequent Spark Jobs.
