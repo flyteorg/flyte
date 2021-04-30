@@ -29,4 +29,4 @@ jobs:
           registry: ghcr.io
           build_extra_args: "--compress=true --build-arg=tag=ghcr.io/${{ github.repository_owner }}/flytecookbook:pima_diabetes-${{ github.sha }}"
           context: ./cookbook/case_studies
-          dockerfile: pima_diabetes/Dockerfile
+          dockerfile: ml_training/pima_diabetes/Dockerfile

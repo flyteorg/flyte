@@ -31,60 +31,59 @@ author = "Flyte"
 release = re.sub("^v", "", os.popen("git describe").read().strip())
 
 
-class CustomSorter(FileNameSortKey):
-    """
-    Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
-    """
+# class CustomSorter(FileNameSortKey):
+#     """
+#     Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
+#     """
 
-    CUSTOM_FILE_SORT_ORDER = [
-        # Basic
-        "task.py",
-        "hello_world.py",
-        "basic_workflow.py",
-        "lp.py",
-        "task_cache.py",
-        "files.py",
-        "folders.py",
-        "mocking.py",
-        "diabetes.py",
-        # Intermediate
-        "schema.py",
-        "typed_schema.py",
-        "subworkflows.py",
-        "dataframe_passing.py",
-        "dynamics.py",
-        "hive.py",
-        "pyspark_pi.py",
-        "custom_objects.py",
-        "run_conditions.py",
-        "raw_container.py",
-        "map_task.py"
-        # Advanced
-        "run_merge_sort.py",
-        "custom_task_plugin.py",
-        "run_custom_types.py",
-        # Remote Flyte
-        "multi_images.py",
-        "customizing_resources.py",
-        "lp_schedules.py",
-        "lp_notifications.py",
-        # Native Plugins
-        "pytorch_mnist.py",
-        # AWS Plugins
-        "sagemaker_builtin_algo_training.py",
-        "sagemaker_custom_training.py",
-    ]
+#     CUSTOM_FILE_SORT_ORDER = [
+#         # Basic
+#         "task.py",
+#         "basic_workflow.py",
+#         "lp.py",
+#         "task_cache.py",
+#         "files.py",
+#         "folders.py",
+#         # Intermediate
+#         "schema.py",
+#         "typed_schema.py",
+#         "subworkflows.py",
+#         "dataframe_passing.py",
+#         "dynamics.py",
+#         "hive.py",
+#         "pyspark_pi.py",
+#         "custom_objects.py",
+#         "run_conditions.py",
+#         "raw_container.py",
+#         "map_task.py"
+#         # Advanced
+#         "run_merge_sort.py",
+#         "custom_task_plugin.py",
+#         "run_custom_types.py",
+#         # Remote Flyte
+#         "multi_images.py",
+#         "customizing_resources.py",
+#         "lp_schedules.py",
+#         "lp_notifications.py",
+#         # Native Plugins
+#         "pytorch_mnist.py",
+#         # AWS Plugins
+#         "sagemaker_builtin_algo_training.py",
+#         "sagemaker_custom_training.py",
+#         # Testing
+#         "mocking.py",
+#     ]
 
-    def __call__(self, filename):
-        src_file = os.path.normpath(os.path.join(self.src_dir, filename))
-        if filename in self.CUSTOM_FILE_SORT_ORDER:
-            return f"{self.CUSTOM_FILE_SORT_ORDER.index(filename):03d}"
-        else:
-            logging.warning(
-                f"File {filename} not found in static ordering list, temporarily adding to the end"
-            )
-            self.CUSTOM_FILE_SORT_ORDER.append(src_file)
-            return f"{len(self.CUSTOM_FILE_SORT_ORDER)-1:03d}"
+#     def __call__(self, filename):
+#         src_file = os.path.normpath(os.path.join(self.src_dir, filename))
+#         if filename in self.CUSTOM_FILE_SORT_ORDER:
+#             return f"{self.CUSTOM_FILE_SORT_ORDER.index(filename):03d}"
+#         else:
+#             logging.warning(
+#                 f"File {filename} not found in static ordering list, temporarily adding to the end"
+#             )
+#             self.CUSTOM_FILE_SORT_ORDER.append(src_file)
+#             return f"{len(self.CUSTOM_FILE_SORT_ORDER)-1:03d}"
 
 
 # -- General configuration ---------------------------------------------------
@@ -130,8 +129,6 @@ master_doc = "index"
 pygments_style = "tango"
 pygments_dark_style = "native"
 
-html_css_files = ["custom.css"]
-
 html_context = {
     "home_page": "https://docs.flyte.org",
 }
@@ -163,39 +160,66 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
+html_favicon = "flyte_circle_gradient_1_4x4.png"
 html_logo = "flyte_circle_gradient_1_4x4.png"
 
 examples_dirs = [
-    "../core/basic",
-    "../core/intermediate",
-    "../core/advanced",
-    "../core/remote_flyte",
-    "../case_studies/pima_diabetes",
-    "../case_studies/house_price_prediction",
-    "../plugins/hive",
-    "../plugins/sagemaker_training",
-    "../plugins/k8s_spark",
-    "../plugins/kfpytorch",
-    "../plugins/pod/",
-    "../plugins/pandera/",
-    "../plugins/papermilltasks/",
-    "../plugins/sagemaker_pytorch/",
+    "../core/flyte_basics",
+    "../core/control_flow",
+    "../type_system",
+    "../case_studies/ml_training/pima_diabetes",
+    "../case_studies/ml_training/house_price_prediction",
+    "../testing",
+    "../core/containerization",
+    "../deployment/workflow",
+    "../deployment/cluster",
+    "../deployment/guides",
+    "../control_plane",
+    "../integrations/flytekit_plugins/sqllite3",
+    "../integrations/flytekit_plugins/papermilltasks",
+    "../integrations/flytekit_plugins/sqlalchemy",
+    "../integrations/flytekit_plugins/pandera",
+    "../integrations/kubernetes/pod",
+    "../integrations/kubernetes/k8s_spark",
+    "../integrations/kubernetes/kftensorflow",
+    "../integrations/kubernetes/kfpytorch",
+    "../integrations/aws/athena",
+    "../integrations/aws/sagemaker_training",
+    "../integrations/aws/sagemaker_pytorch",
+    "../integrations/gcp",
+    "../integrations/external_services/hive",
+    "../integrations/external_services/databricks",
+    "../integrations/external_services/snowflake",
+    "../core/extend_flyte",
 ]
 gallery_dirs = [
-    "auto_core_basic",
-    "auto_core_intermediate",
-    "auto_core_advanced",
-    "auto_core_remote_flyte",
-    "auto_case_studies_pima_diabetes",
-    "auto_case_studies_house_price_prediction",
-    "auto_plugins_hive",
-    "auto_plugins_sagemaker_training",
-    "auto_plugins_k8s_spark",
-    "auto_plugins_kfpytorch",
-    "auto_plugins_pod",
-    "auto_plugins_pandera",
-    "auto_plugins_papermilltasks",
-    "auto_plugins_sagemaker_pytorch",
+    "auto_core_flyte_basics",
+    "auto_core_control_flow",
+    "auto_type_system",
+    "auto_case_studies_ml_training_pima_diabetes",
+    "auto_case_studies_ml_training_house_price_prediction",
+    "auto_testing",
+    "auto_core_containerization",
+    "auto_deployment_workflow",
+    "auto_deployment_cluster",
+    "auto_deployment_guides",
+    "auto_control_plane",
+    "auto_integrations_flytekit_plugins_sqllite3",
+    "auto_integrations_flytekit_plugins_papermilltasks",
+    "auto_integrations_flytekit_plugins_sqlalchemy",
+    "auto_integrations_flytekit_plugins_pandera",
+    "auto_integrations_kubernetes_pod",
+    "auto_integrations_kubernetes_k8s_spark",
+    "auto_integrations_kubernetes_kftensorflow",
+    "auto_integrations_kubernetes_kfpytorch",
+    "auto_integrations_aws_athena",
+    "auto_integrations_aws_sagemaker_training",
+    "auto_integrations_aws_sagemaker_pytorch",
+    "auto_integrations_gcp",
+    "auto_integrations_external_services_hive",
+    "auto_integrations_external_services_databricks",
+    "auto_integrations_external_services_snowflake",
+    "auto_core_extend_flyte",
 ]
 
 # image_scrapers = ('matplotlib',)
@@ -206,26 +230,26 @@ min_reported_time = 0
 sphinx_gallery_conf = {
     "examples_dirs": examples_dirs,
     "gallery_dirs": gallery_dirs,
-    "subsection_order": ExplicitOrder(
-        [
-            "../core/basic",
-            "../core/intermediate",
-            "../core/advanced",
-            "../core/remote_flyte",
-            "../case_studies/pima_diabetes",
-            "../case_studies/house_price_prediction",
-            "../plugins/pod/",
-            "../plugins/k8s_spark",
-            "../plugins/pandera/",
-            "../plugins/papermilltasks/",
-            "../plugins/hive",
-            "../plugins/sagemaker_training",
-            "../plugins/kfpytorch",
-            "../plugins/sagemaker_pytorch/",
-        ]
-    ),
-    # specify the order of examples to be according to filename
-    "within_subsection_order": CustomSorter,
+    # "subsection_order": ExplicitOrder(
+    #     [
+    #         "../core/basic",
+    #         "../core/intermediate",
+    #         "../core/advanced",
+    #         "../core/remote_flyte",
+    #         "../case_studies/pima_diabetes",
+    #         "../case_studies/house_price_prediction",
+    #         "../testing",
+    #         "../plugins/pod/",
+    #         "../plugins/k8s_spark",
+    #         "../plugins/papermilltasks/",
+    #         "../plugins/hive",
+    #         "../plugins/sagemaker_training",
+    #         "../plugins/kfpytorch",
+    #         "../plugins/sagemaker_pytorch/",
+    #     ]
+    # ),
+    # # specify the order of examples to be according to filename
+    # "within_subsection_order": CustomSorter,
     "min_reported_time": min_reported_time,
     "filename_pattern": "/run_",
     "capture_repr": (),

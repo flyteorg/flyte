@@ -1,4 +1,4 @@
-furo
+git+git://github.com/flyteorg/furo@main
 pillow
 readthedocs-sphinx-search
 sphinx

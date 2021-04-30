@@ -28,5 +28,5 @@ jobs:
           push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--compress=true --build-arg=tag=ghcr.io/${{ github.repository_owner }}/flytecookbook:pandera-${{ github.sha }}"
-          context: ./cookbook/plugins
-          dockerfile: pandera/Dockerfile
+          context: ./cookbook/integrations
+          dockerfile: flytekit_plugins/pandera/Dockerfile

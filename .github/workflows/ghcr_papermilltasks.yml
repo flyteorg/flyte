@@ -28,5 +28,5 @@ jobs:
           push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--compress=true --build-arg=tag=ghcr.io/${{ github.repository_owner }}/flytecookbook:papermilltasks-${{ github.sha }}"
-          context: ./cookbook/plugins
-          dockerfile: papermilltasks/Dockerfile
+          context: ./cookbook/integrations
+          dockerfile: flytekit_plugins/papermilltasks/Dockerfile

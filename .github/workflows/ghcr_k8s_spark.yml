@@ -28,5 +28,5 @@ jobs:
           push_git_tag: true
           registry: ghcr.io
           build_extra_args: "--compress=true --build-arg=tag=ghcr.io/${{ github.repository_owner }}/flytecookbook:k8s_spark-${{ github.sha }}"
-          context: ./cookbook/plugins
-          dockerfile: k8s_spark/Dockerfile
+          context: ./cookbook/integrations
+          dockerfile: kubernetes/k8s_spark/Dockerfile
