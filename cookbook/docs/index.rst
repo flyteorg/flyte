@@ -20,7 +20,7 @@ Main Sections
    Getting Started <https://docs.flyte.org/en/latest/getting_started.html>
    User Guide <user_guide>
    Tutorials <tutorials>
-   Concepts <https://docs.flyte.org/en/latest/basics/flyte_ui.html>
+   Concepts <https://docs.flyte.org/en/latest/concepts/basics.html>
    API Reference <https://docs.flyte.org/en/latest/reference/index.html>
    Community <https://docs.flyte.org/en/latest/community/index.html>
 
