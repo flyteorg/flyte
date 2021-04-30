@@ -1,5 +1,5 @@
 # Install Flyte using Kustomize
-Flyte can be deployed to a kubernetes cluster using a generated deployment yaml file. This file is generated using [Kustomize](https://kubectl.docs.kubernetes.io/pages/reference/kustomize.html).
+Flyte can be deployed to a kubernetes cluster using a generated deployment yaml file. This file is generated using [Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/).
 Please refer to Kustomize documentation to see how it works.
 
 In brief, Kustomize allows composing a deployment yaml using multiple components. In Flyte all the core components are listed under [Base Components](./base). The Base components also consist of
