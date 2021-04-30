@@ -5,6 +5,6 @@
 How do I enable and configure resource manager?
 #################################################
 
-.. CAUTION::
+.. NOTE::
 
     Coming soon 🛠

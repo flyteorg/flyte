@@ -4,6 +4,6 @@
 How do I execute a workflow?
 ####################################
 
-.. CAUTION::
+.. NOTE::
 
     Coming soon 🛠
