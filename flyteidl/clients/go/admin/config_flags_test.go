@@ -213,7 +213,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vBool, err := cmdFlags.GetBool("useAuth"); err == nil {
-				assert.Equal(t, bool(defaultConfig.UseAuth), vBool)
+				assert.Equal(t, bool(defaultConfig.DeprecatedUseAuth), vBool)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -224,7 +224,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("useAuth", testValue)
 			if vBool, err := cmdFlags.GetBool("useAuth"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.UseAuth)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.DeprecatedUseAuth)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -301,7 +301,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("authorizationServerUrl"); err == nil {
-				assert.Equal(t, string(defaultConfig.AuthorizationServerURL), vString)
+				assert.Equal(t, string(defaultConfig.DeprecatedAuthorizationServerURL), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -312,7 +312,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("authorizationServerUrl", testValue)
 			if vString, err := cmdFlags.GetString("authorizationServerUrl"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthorizationServerURL)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DeprecatedAuthorizationServerURL)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -345,7 +345,7 @@ func TestConfig_SetFlags(t *testing.T) {
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if vString, err := cmdFlags.GetString("authorizationHeader"); err == nil {
-				assert.Equal(t, string(defaultConfig.AuthorizationHeader), vString)
+				assert.Equal(t, string(defaultConfig.DeprecatedAuthorizationHeader), vString)
 			} else {
 				assert.FailNow(t, err.Error())
 			}
@@ -356,7 +356,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("authorizationHeader", testValue)
 			if vString, err := cmdFlags.GetString("authorizationHeader"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AuthorizationHeader)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.DeprecatedAuthorizationHeader)
 
 			} else {
 				assert.FailNow(t, err.Error())

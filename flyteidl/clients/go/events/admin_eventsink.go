@@ -82,6 +82,16 @@ func (s *adminEventSink) Close() error {
 	return nil
 }
 
+func initializeAdminClientFromConfig(ctx context.Context) (client service.AdminServiceClient, err error) {
+	cfg := admin2.GetConfig(ctx)
+	clients, err := admin2.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
+	}
+
+	return clients.AdminClient(), nil
+}
+
 func ConstructEventSink(ctx context.Context, config *Config) (EventSink, error) {
 	switch config.Type {
 	case EventSinkLog:
@@ -89,10 +99,11 @@ func ConstructEventSink(ctx context.Context, config *Config) (EventSink, error) 
 	case EventSinkFile:
 		return NewFileSink(config.FilePath)
 	case EventSinkAdmin:
-		adminClient, err := admin2.InitializeAdminClientFromConfig(ctx)
+		adminClient, err := initializeAdminClientFromConfig(ctx)
 		if err != nil {
 			return nil, err
 		}
+
 		return NewAdminEventSink(ctx, adminClient, config)
 	default:
 		return NewStdoutSink()

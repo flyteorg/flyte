@@ -1,0 +1,73 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl/service/identity.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/me": {
+      "get": {
+        "summary": "Retrieves user information about the currently logged in user.",
+        "description": "Retrieves authenticated identity info.",
+        "operationId": "UserInfo",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceUserInfoResponse"
+            }
+          }
+        },
+        "tags": [
+          "IdentityService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "serviceUserInfoResponse": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "string",
+          "description": "Locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed\nby the Client."
+        },
+        "name": {
+          "type": "string",
+          "title": "Full name"
+        },
+        "preferred_username": {
+          "type": "string",
+          "title": "Shorthand name by which the End-User wishes to be referred to"
+        },
+        "given_name": {
+          "type": "string",
+          "title": "Given name(s) or first name(s)"
+        },
+        "family_name": {
+          "type": "string",
+          "title": "Surname(s) or last name(s)"
+        },
+        "email": {
+          "type": "string",
+          "title": "Preferred e-mail address"
+        },
+        "picture": {
+          "type": "string",
+          "title": "Profile picture URL"
+        }
+      },
+      "description": "See the OpenID Connect spec at https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse for more information."
+    }
+  }
+}

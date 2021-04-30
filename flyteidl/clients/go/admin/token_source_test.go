@@ -20,7 +20,7 @@ func (d DummyTestTokenSource) Token() (*oauth2.Token, error) {
 
 func TestNewTokenSource(t *testing.T) {
 	tokenSource := DummyTestTokenSource{}
-	flyteTokenSource := NewCustomHeaderTokenSource(tokenSource, "test")
+	flyteTokenSource := NewCustomHeaderTokenSource(tokenSource, true, "test")
 	metadata, err := flyteTokenSource.GetRequestMetadata(context.Background())
 	assert.NoError(t, err)
 	assert.Equal(t, "Bearer abc", metadata["test"])
