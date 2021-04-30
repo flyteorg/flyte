@@ -11,7 +11,7 @@ To use the flytekit aws sagemaker plugin simply run the following:
 
 .. prompt:: bash
 
-   pip install flytekitplugins-awssagemaker==0.16.0
+   pip install flytekitplugins-awssagemaker
 
 
 Builtin Algorithms
@@ -45,10 +45,45 @@ Before following this example, make sure that
 - `AWS SageMaker k8s operator <https://github.com/aws/amazon-sagemaker-operator-for-k8s>`_ is installed in your k8s cluster
 
 Creating a dockerfile for Sagemaker custom training [Required]
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. literalinclude:: ../Dockerfile
-    :language: dockerfile
-    :emphasize-lines: 22-24
+.. code-block:: docker
+    :emphasize-lines: 22-23
     :linenos:
-    :caption: Dockerfile for Sagemaker, similar to base dockerfile, but installs sagemaker-training and set training script
+
+    FROM python:3.8-buster
+    LABEL org.opencontainers.image.source https://github.com/flyteorg/flytesnacks
+    
+    WORKDIR /root
+    ENV LANG C.UTF-8
+    ENV LC_ALL C.UTF-8
+    ENV PYTHONPATH /root
+    
+    # Install the AWS cli separately to prevent issues with boto being written over
+    RUN pip install awscli
+    
+    # Setup a virtual environment
+    ENV VENV /opt/venv
+    # Virtual environment
+    RUN python3 -m venv ${VENV}
+    ENV PATH="${VENV}/bin:$PATH"
+    
+    # Install Python dependencies
+    COPY aws/sagemaker_training/requirements.txt /root
+    RUN pip install -r /root/requirements.txt
+    
+    # Setup Sagemaker entrypoints
+    ENV SAGEMAKER_PROGRAM /opt/venv/bin/flytekit_sagemaker_runner.py
+    
+    # Copy the makefile targets to expose on the container. This makes it easier to register.
+    COPY in_container.mk /root/Makefile
+    COPY aws/sagemaker_training/sandbox.config /root
+    
+    # Copy the actual code
+    COPY aws/sagemaker_training/ /root/sagemaker_training
+    
+    # This tag is supplied by the build script and will be used to determine the version
+    # when registering tasks, workflows, and launch plans
+    ARG tag
+    ENV FLYTE_INTERNAL_IMAGE $tag
+    

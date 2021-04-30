@@ -10,7 +10,7 @@ To use the flytekit hive plugin simply run the following:
 
 .. prompt:: bash
 
-    pip install flytekitplugins-hive==0.16.0
+    pip install flytekitplugins-hive
 
 No Need of a dockerfile
 ------------------------
