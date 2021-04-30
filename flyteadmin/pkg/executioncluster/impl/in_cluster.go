@@ -39,7 +39,7 @@ func NewInCluster(scope promutils.Scope, kubeConfig, master string) (interfaces.
 	if err != nil {
 		return nil, err
 	}
-	client, err := client.New(clientConfig, client.Options{})
+	kubeClient, err := client.New(clientConfig, client.Options{})
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func NewInCluster(scope promutils.Scope, kubeConfig, master string) (interfaces.
 	}
 	return &InCluster{
 		target: executioncluster.ExecutionTarget{
-			Client:        client,
+			Client:        kubeClient,
 			FlyteClient:   flyteClient,
 			DynamicClient: dynamicClient,
 			Config:        *clientConfig,

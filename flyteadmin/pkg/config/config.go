@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	config2 "github.com/flyteorg/flyteadmin/pkg/auth/config"
+	authConfig "github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flytestdlib/config"
 )
 
@@ -12,21 +12,22 @@ const SectionKey = "server"
 //go:generate pflags ServerConfig --default-var=defaultServerConfig
 
 type ServerConfig struct {
-	HTTPPort             int                     `json:"httpPort" pflag:",On which http port to serve admin"`
-	GrpcPort             int                     `json:"grpcPort" pflag:",On which grpc port to serve admin"`
-	GrpcServerReflection bool                    `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
-	KubeConfig           string                  `json:"kube-config" pflag:",Path to kubernetes client config file."`
-	Master               string                  `json:"master" pflag:",The address of the Kubernetes API server."`
-	Security             ServerSecurityOptions   `json:"security"`
-	ThirdPartyConfig     ThirdPartyConfigOptions `json:"thirdPartyConfig"`
+	HTTPPort             int                   `json:"httpPort" pflag:",On which http port to serve admin"`
+	GrpcPort             int                   `json:"grpcPort" pflag:",On which grpc port to serve admin"`
+	GrpcServerReflection bool                  `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
+	KubeConfig           string                `json:"kube-config" pflag:",Path to kubernetes client config file."`
+	Master               string                `json:"master" pflag:",The address of the Kubernetes API server."`
+	Security             ServerSecurityOptions `json:"security"`
+
+	// Deprecated: please use auth.AppAuth.ThirdPartyConfig instead.
+	DeprecatedThirdPartyConfig authConfig.ThirdPartyConfigOptions `json:"thirdPartyConfig" pflag:",Deprecated please use auth.appAuth.thirdPartyConfig instead."`
 }
 
 type ServerSecurityOptions struct {
-	Secure      bool                 `json:"secure"`
-	Ssl         SslOptions           `json:"ssl"`
-	UseAuth     bool                 `json:"useAuth"`
-	Oauth       config2.OAuthOptions `json:"oauth"`
-	AuditAccess bool                 `json:"auditAccess"`
+	Secure      bool       `json:"secure"`
+	Ssl         SslOptions `json:"ssl"`
+	UseAuth     bool       `json:"useAuth"`
+	AuditAccess bool       `json:"auditAccess"`
 
 	// These options are here to allow deployments where the Flyte UI (Console) is served from a different domain/port.
 	// Note that CORS only applies to Admin's API endpoints. The health check endpoint for instance is unaffected.
@@ -47,21 +48,13 @@ type SslOptions struct {
 }
 
 var defaultServerConfig = &ServerConfig{
-	Security: ServerSecurityOptions{
-		Oauth: config2.OAuthOptions{
-			// Please see the comments in this struct's definition for more information
-			HTTPAuthorizationHeader: "flyte-authorization",
-			GrpcAuthorizationHeader: "flyte-authorization",
-			// Default claims that should be supported by any OIdC server. Refer to https://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
-			// for a complete list.
-			Scopes: []string{
-				"openid",
-				"profile",
-			},
-		},
-	},
+	Security: ServerSecurityOptions{},
 }
 var serverConfig = config.MustRegisterSection(SectionKey, defaultServerConfig)
+
+func MustRegisterSubsection(key config.SectionKey, configSection config.Config) config.Section {
+	return serverConfig.MustRegisterSection(key, configSection)
+}
 
 func GetConfig() *ServerConfig {
 	return serverConfig.GetConfig().(*ServerConfig)
