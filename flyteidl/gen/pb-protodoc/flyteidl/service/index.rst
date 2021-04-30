@@ -11,3 +11,5 @@ service.
 	:name: servicetoc
 
 	admin.proto
+	auth.proto
+	identity.proto

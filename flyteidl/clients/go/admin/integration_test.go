@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"google.golang.org/grpc"
+
 	"golang.org/x/oauth2/clientcredentials"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -22,14 +24,14 @@ func TestLiveAdminClient(t *testing.T) {
 	u, err := url.Parse("dns:///flyte.lyft.net")
 	assert.NoError(t, err)
 	client := InitializeAdminClient(ctx, Config{
-		Endpoint:               config.URL{URL: *u},
-		UseInsecureConnection:  false,
-		UseAuth:                true,
-		ClientId:               "0oacmtueinpXk72Af1t7",
-		ClientSecretLocation:   "/Users/username/.ssh/admin/propeller_secret",
-		AuthorizationServerURL: "https://lyft.okta.com/oauth2/ausc5wmjw96cRKvTd1t7",
-		Scopes:                 []string{"svc"},
-		AuthorizationHeader:    "Flyte-Authorization",
+		Endpoint:                         config.URL{URL: *u},
+		UseInsecureConnection:            false,
+		UseAuth:                          true,
+		ClientID:                         "0oacmtueinpXk72Af1t7",
+		ClientSecretLocation:             "/Users/username/.ssh/admin/propeller_secret",
+		DeprecatedAuthorizationServerURL: "https://lyft.okta.com/oauth2/ausc5wmjw96cRKvTd1t7",
+		Scopes:                           []string{"svc"},
+		DeprecatedAuthorizationHeader:    "Flyte-Authorization",
 	})
 
 	resp, err := client.ListProjects(ctx, &admin.ProjectListRequest{})
@@ -40,21 +42,14 @@ func TestLiveAdminClient(t *testing.T) {
 	fmt.Printf("Response: %v\n", resp)
 }
 
-func TestGetTokenEndpoint(t *testing.T) {
-	ctx := context.Background()
-
-	endpoint, err := getTokenEndpointFromAuthServer(ctx, "https://flyte-staging.lyft.net")
-	assert.NoError(t, err)
-	assert.NotEmpty(t, endpoint)
-}
-
 func TestGetDialOption(t *testing.T) {
 	ctx := context.Background()
 
 	cfg := Config{
-		AuthorizationServerURL: "https://lyft.okta.com/oauth2/ausc5wmjw96cRKvTd1t7",
+		DeprecatedAuthorizationServerURL: "https://lyft.okta.com/oauth2/ausc5wmjw96cRKvTd1t7",
 	}
-	dialOption, err := getAuthenticationDialOption(ctx, cfg)
+
+	dialOption, err := getAuthenticationDialOption(ctx, cfg, []grpc.DialOption{})
 	assert.NoError(t, err)
 	assert.NotNil(t, dialOption)
 }
