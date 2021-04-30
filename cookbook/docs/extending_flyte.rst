@@ -134,5 +134,5 @@ How do I decide which path to take?
 Use the conclusion of the flow-chart to refer to the right doc
 ================================================================
 
-- :ref:`extend-plugin-flytekit-python`
+- :ref:`advanced_custom_task_plugin`
 - :ref:`extend-plugin-flyte-backend`

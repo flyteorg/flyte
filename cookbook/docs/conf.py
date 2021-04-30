@@ -31,59 +31,94 @@ author = "Flyte"
 release = re.sub("^v", "", os.popen("git describe").read().strip())
 
 
-# class CustomSorter(FileNameSortKey):
-#     """
-#     Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
-#     """
+class CustomSorter(FileNameSortKey):
+    """
+    Take a look at the code for the default sorter included in the sphinx_gallery to see how this works.
+    """
 
-#     CUSTOM_FILE_SORT_ORDER = [
-#         # Basic
-#         "task.py",
-#         "basic_workflow.py",
-#         "lp.py",
-#         "task_cache.py",
-#         "files.py",
-#         "folders.py",
-#         # Intermediate
-#         "schema.py",
-#         "typed_schema.py",
-#         "subworkflows.py",
-#         "dataframe_passing.py",
-#         "dynamics.py",
-#         "hive.py",
-#         "pyspark_pi.py",
-#         "custom_objects.py",
-#         "run_conditions.py",
-#         "raw_container.py",
-#         "map_task.py"
-#         # Advanced
-#         "run_merge_sort.py",
-#         "custom_task_plugin.py",
-#         "run_custom_types.py",
-#         # Remote Flyte
-#         "multi_images.py",
-#         "customizing_resources.py",
-#         "lp_schedules.py",
-#         "lp_notifications.py",
-#         # Native Plugins
-#         "pytorch_mnist.py",
-#         # AWS Plugins
-#         "sagemaker_builtin_algo_training.py",
-#         "sagemaker_custom_training.py",
-#         # Testing
-#         "mocking.py",
-#     ]
+    CUSTOM_FILE_SORT_ORDER = [
+        # Flyte Basics
+        "task.py",
+        "basic_workflow.py",
+        "imperative_wf_style.py",
+        "lp.py",
+        "task_cache.py",
+        "files.py",
+        "folders.py",
+        # Control Flow
+        "run_conditions.py"
+        "subworkflows.py",
+        "dynamics.py",
+        "map_task.py",
+        "run_merge_sort.py",
+        # Type System
+        "schema.py",
+        "typed_schema.py",
+        "custom_objects.py",
+        # Testing
+        "mocking.py",
+        # Containerization
+        "raw_container.py",
+        "multi_images.py",
+        "use_secrets.py",
+        "spot_instances.py",
+        "workflow_labels_annotations.py",
+        # Deployment
+        ## Workflow
+        "lp_schedules.py",
+        "customizing_resources.py",
+        "lp_notifications.py",
+        "fast_registration.py",
+        "multiple_k8s.py",
+        ## Cluster
+        "productionize_cluster.py",
+        "auth_setup.py",
+        "config_flyte_deploy.py",
+        "config_resource_mgr.py",
+        "monitoring.py",
+        "notifications.py",
+        "optimize_perf.py",
+        "access_cloud_resources.py",
+        ## Guides
+        "kubernetes.py",
+        "aws.py",
+        "gcp.py",
+        # Control Plane
+        "register_project.py",
+        "run_task.py",
+        "run_workflow.py",
+        # Integrations
+        ## Flytekit Plugins
+        "simple.py",
+        "basic_schema_example.py",
+        ## Kubernetes
+        "pod.py",
+        "pyspark_pi.py",
+        "dataframe_passing.py",
+        "pytorch_mnist.py",
+        ## AWS
+        "sagemaker_builtin_algo_training.py",
+        "sagemaker_custom_training.py",
+        "sagemaker_pytorch_distributed_training.py",
+        ## GCP
+        # TODO
+        ## External Services
+        "hive.py"
+        # Extending Flyte
+        "custom_task_plugin.py",
+        "run_custom_types.py",
+    ]
 
-#     def __call__(self, filename):
-#         src_file = os.path.normpath(os.path.join(self.src_dir, filename))
-#         if filename in self.CUSTOM_FILE_SORT_ORDER:
-#             return f"{self.CUSTOM_FILE_SORT_ORDER.index(filename):03d}"
-#         else:
-#             logging.warning(
-#                 f"File {filename} not found in static ordering list, temporarily adding to the end"
-#             )
-#             self.CUSTOM_FILE_SORT_ORDER.append(src_file)
-#             return f"{len(self.CUSTOM_FILE_SORT_ORDER)-1:03d}"
+    def __call__(self, filename):
+        src_file = os.path.normpath(os.path.join(self.src_dir, filename))
+        if filename in self.CUSTOM_FILE_SORT_ORDER:
+            return f"{self.CUSTOM_FILE_SORT_ORDER.index(filename):03d}"
+        else:
+            logging.warning(
+                f"File {filename} not found in static ordering list, temporarily adding to the end"
+            )
+            self.CUSTOM_FILE_SORT_ORDER.append(src_file)
+            return f"{len(self.CUSTOM_FILE_SORT_ORDER)-1:03d}"
 
 
 # -- General configuration ---------------------------------------------------
@@ -152,16 +187,12 @@ html_theme_options = {
     },
 }
 
-# html_sidebars = {
-#     "**": ["logo-text.html", "globaltoc.html", "localtoc.html", "searchbox.html"]
-# }
-
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 
-html_favicon = "flyte_circle_gradient_1_4x4.png"
-html_logo = "flyte_circle_gradient_1_4x4.png"
+html_favicon = "_static/flyte_circle_gradient_1_4x4.png"
+html_logo = "_static/flyte_circle_gradient_1_4x4.png"
 
 examples_dirs = [
     "../core/flyte_basics",
@@ -249,7 +280,7 @@ sphinx_gallery_conf = {
     #     ]
     # ),
     # # specify the order of examples to be according to filename
-    # "within_subsection_order": CustomSorter,
+    "within_subsection_order": CustomSorter,
     "min_reported_time": min_reported_time,
     "filename_pattern": "/run_",
     "capture_repr": (),
