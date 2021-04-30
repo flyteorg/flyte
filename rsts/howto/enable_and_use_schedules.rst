@@ -165,7 +165,7 @@ Workflow Executor
 -----------------
 Scheduled events which trigger need to be handled by the workflow executor, which subscribes to triggered events from the SQS queue you've configured above.
 
-.. CAUTION::
+.. NOTE::
 
    Failure to configure a workflow executor will result in all your scheduled events piling up silently without ever kicking off workflow executions.
 
