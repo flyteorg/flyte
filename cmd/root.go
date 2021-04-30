@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flytectl/cmd/register"
 	"github.com/flyteorg/flytectl/cmd/update"
 	"github.com/flyteorg/flytectl/cmd/version"
+	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	stdConfig "github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/config/viper"
@@ -26,6 +27,11 @@ var (
 	configAccessor = viper.NewAccessor(stdConfig.Options{StrictMode: true})
 )
 
+const (
+	configFileDir  = ".flyte"
+	configFileName = "config.yaml"
+)
+
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		PersistentPreRunE: initConfig,
@@ -36,7 +42,7 @@ func newRootCmd() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
-		"config file (default is $HOME/config.yaml)")
+		"config file (default is $HOME/.flyte/config.yaml)")
 
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
@@ -63,7 +69,7 @@ func newRootCmd() *cobra.Command {
 func initConfig(_ *cobra.Command, _ []string) error {
 	configAccessor = viper.NewAccessor(stdConfig.Options{
 		StrictMode:  true,
-		SearchPaths: []string{cfgFile},
+		SearchPaths: []string{cfgFile, f.FilePathJoin(f.UserHomeDir(), configFileDir, configFileName)},
 	})
 
 	err := configAccessor.UpdateConfig(context.TODO())
