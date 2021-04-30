@@ -6,7 +6,7 @@
 #
 alabaster==0.7.12
     # via sphinx
-babel==2.9.0
+babel==2.9.1
     # via sphinx
 beautifulsoup4==4.9.3
     # via
@@ -21,7 +21,7 @@ css-html-js-minify==2.5.5
     # via sphinx-material
 docutils==0.16
     # via sphinx
-furo==2021.3.20b30
+git+git://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
 idna==2.10
     # via requests
@@ -63,7 +63,7 @@ sphinx-material==0.0.32
     # via -r doc-requirements.in
 sphinx-prompt==1.4.0
     # via -r doc-requirements.in
-sphinx==3.5.3
+sphinx==3.5.4
     # via
     #   -r doc-requirements.in
     #   furo
