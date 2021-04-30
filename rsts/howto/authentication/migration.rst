@@ -60,7 +60,7 @@ From the flyte-cli side, you needed these two settings
 grpc-gateway library). **flyte-cli** uses this setting to talk to **/.well-known/oauth-authorization-server** to retrieve information regarding the auth endpoints.  Previously this redirected to the
 Okta Authorization Server's metadata endpoint. With this change, Admin now hosts its own (even if still using the external Authorization Service).
 
-After version `0.13.0 <https://github.com/flyteorg/flyte/tree/v0.13.0>`__ of the platfform, you can still use the IDP as the Authorization Server if you so choose. That configuration would become:
+After version `0.13.0 <https://github.com/flyteorg/flyte/tree/v0.13.0>`__ of the platfform, you can still use the IdP as the Authorization Server if you so choose. That configuration would become:
 
 .. code-block:: yaml
 
@@ -75,8 +75,13 @@ After version `0.13.0 <https://github.com/flyteorg/flyte/tree/v0.13.0>`__ of the
         allowedHeaders:
         - "Content-Type"
     auth:
-        # This should point at your public http Uri.
-        httpPublicUri: http://localhost:8088/
+        authorizedUris:
+            # This should point at your public http Uri.
+            - https://flyte.mycompany.com
+            # This will be used by internal services in the same namespace as flyteadmin
+            - http://flyteadmin:80
+            # This will be used by internal services in the same cluster but different namespaces
+            - http://flyteadmin.flyte.svc.cluster.local:80
         userAuth:
             openId:
                 # Put the URL of the OpenID Connect provider.
@@ -135,12 +140,12 @@ This can now be simplified to:
 
     admin:
       endpoint: dns:///mycompany.domain.com
-      # If you are using the built-in authorization server, you can delete these two lines:
+      # If you are using the built-in authorization server, you can delete the following two lines:
       clientId: flytepropeller
       clientSecretLocation: /etc/secrets/client_secret
 
 Specifically,
 
-* **useAuth** is deprecated. Auth requirement will be discovered through an anonymous admin discovery call.
+* **useAuth** is deprecated and will be removed in a future version. Auth requirement will be discovered through an anonymous admin discovery call.
 * **tokenUrl** and **scopes** will also be discovered through a metadata call.
 * **clientId** and **clientSecretLocation** have defaults that work out of the box with the built-in authorization server (e.g. if you setup Google OpenID Connect).

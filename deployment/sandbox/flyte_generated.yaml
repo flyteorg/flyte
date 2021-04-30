@@ -2163,7 +2163,9 @@ data:
       httpPort: 8088
       grpcPort: 8089
       security:
+        # Controls whether to serve requests over SSL/TLS.
         secure: false
+        # Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
         useAuth: false
         allowCors: true
         allowedOrigins:
@@ -2173,6 +2175,15 @@ data:
           - "Content-Type"
           - "flyte-authorization"
     auth:
+      authorizedUris:
+        # This should point at your public http Uri.
+        - https://localhost:30081
+        # This will be used by internal services in the same namespace as flyteadmin
+        - http://flyteadmin:80
+        # This will be used by internal services in the same cluster but different namespaces
+        - http://flyteadmin.flyte.svc.cluster.local:80
+
+      # Controls app authentication config
       appAuth:
         thirdPartyConfig:
           flyteClient:
@@ -2181,6 +2192,7 @@ data:
             scopes:
               - offline
               - all
+      # Controls user authentication
       userAuth:
         openId:
           baseUrl: https://accounts.google.com
@@ -2223,7 +2235,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-kg9mm798hc
+  name: flyte-admin-config-d8gthbmdg5
   namespace: flyte
 ---
 apiVersion: v1
@@ -2756,7 +2768,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.1
+        image: ghcr.io/flyteorg/datacatalog:v0.3.2
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -2774,7 +2786,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.1
+        image: ghcr.io/flyteorg/datacatalog:v0.3.2
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2831,7 +2843,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:6519864dab8db1c8f183aec34fb3d03f97c92c05
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.6
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -2885,7 +2897,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
+        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2938,7 +2950,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
+        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2954,7 +2966,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
+        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2968,7 +2980,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
+        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2988,7 +3000,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
+        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -3002,7 +3014,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-kg9mm798hc
+          name: flyte-admin-config-d8gthbmdg5
         name: config-volume
       - name: db-pass
         secret:
@@ -3078,7 +3090,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:6519864dab8db1c8f183aec34fb3d03f97c92c05
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.6
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -3397,7 +3409,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:fe739e7a7d13e954ea269a3ef1a077bc39077a1a
+            image: ghcr.io/flyteorg/flyteadmin:v0.5.0
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3414,7 +3426,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-kg9mm798hc
+              name: flyte-admin-config-d8gthbmdg5
             name: config-volume
           - name: db-pass
             secret:
@@ -3581,7 +3593,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:6519864dab8db1c8f183aec34fb3d03f97c92c05
+        image: ghcr.io/flyteorg/flytepropeller:v0.10.6
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:

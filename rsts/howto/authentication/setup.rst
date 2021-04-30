@@ -94,21 +94,12 @@ Follow the inline comments to make the necessary changes:
 .. code-block:: yaml
 
   server:
-    httpPort: 8088
-    grpcPort: 8089
-    grpcServerReflection: true
-    kube-config: /Users/haythamabuelfutuh/.kube/config
+    ...
     security:
       secure: false
       # 1. Enable Auth by turning useAuth to true
       useAuth: true
-      allowCors: true
-      allowedOrigins:
-        # Accepting all domains for Sandbox installation
-        - "*"
-      allowedHeaders:
-        - "Content-Type"
-        - "flyte-athorization"
+      ...
   auth:
     userAuth:
       openId:

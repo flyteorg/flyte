@@ -2,7 +2,9 @@ server:
   httpPort: 8088
   grpcPort: 8089
   security:
+    # Controls whether to serve requests over SSL/TLS.
     secure: false
+    # Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
     useAuth: false
     allowCors: true
     allowedOrigins:
@@ -12,6 +14,15 @@ server:
       - "Content-Type"
       - "flyte-authorization"
 auth:
+  authorizedUris:
+    # This should point at your public http Uri.
+    - https://localhost:30081
+    # This will be used by internal services in the same namespace as flyteadmin
+    - http://flyteadmin:80
+    # This will be used by internal services in the same cluster but different namespaces
+    - http://flyteadmin.flyte.svc.cluster.local:80
+
+  # Controls app authentication config
   appAuth:
     thirdPartyConfig:
       flyteClient:
@@ -20,6 +31,7 @@ auth:
         scopes:
           - offline
           - all
+  # Controls user authentication
   userAuth:
     openId:
       baseUrl: https://accounts.google.com
