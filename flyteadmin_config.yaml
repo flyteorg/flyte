@@ -6,32 +6,46 @@ server:
   httpPort: 8088
   grpcPort: 8089
   grpcServerReflection: true
+  kube-config: /Users/haythamabuelfutuh/kubeconfig/k3s/k3s.yaml
   security:
     secure: false
-    useAuth: false
+    useAuth: true
     allowCors: true
     allowedOrigins:
       # Accepting all domains for Sandbox installation
       - "*"
     allowedHeaders:
       - "Content-Type"
-    oauth:
-      clientId: yourclientid
-      clientSecretFile: "/path/to/oauth/secret"
-      authorizeUrl: "https://idp.com/oauth2/authorize"
-      tokenUrl: "https://idp.com/oauth2/token"
-      callbackUrl: "https://localhost:8088/callback"
-      cookieHashKeyFile: "/path/to/admin_cookie_hash_key"
-      cookieBlockKeyFile: "/path/to/admin_cookie_block_key"
-      redirectUrl: "/api/v1/projects"
-      claims:
-        iss: "https://idp.com"
-        aud: "api://default"
-      idpUserInfoEndpoint: "/v1/userinfo"
-  thirdPartyConfig:
-    flyteClient:
-      clientId: yourPublicAppClientId
-      redirectUri: yourRegisteredLoginRedirectUri
+# Okta OIdC only
+auth:
+  authorizedUris:
+    - https://efdf60eb2525.ngrok.io
+    - http://flyteadmin:80
+  userAuth:
+    openId:
+      # Put the URL of the OpenID Connect provider.
+      baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
+      scopes:
+        - profile
+        - openid
+        - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+      # Replace with the client id created for Flyte.
+      clientId: 0oakkheteNjCMERst5d6
+
+# Okta OIdC and OAuth2
+#auth:
+#  appAuth:
+#    authServerType: External
+#  userAuth:
+#    openId:
+#      # Put the URL of the OpenID Connect provider.
+#      baseUrl: https://dev-14186422.okta.com/oauth2/auskngnn7uBViQq6b5d6
+#      scopes:
+#        - profile
+#        - openid
+#        - offline_access # Uncomment if OIdC supports issuing refresh tokens.
+#      # Replace with the client id created for Flyte.
+#      clientId: 0oakkheteNjCMERst5d6
 flyteadmin:
   runScheduler: false
   roleNameKey: "iam.amazonaws.com/role"

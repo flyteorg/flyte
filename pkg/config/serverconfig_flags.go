@@ -28,15 +28,6 @@ func (ServerConfig) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
-func (ServerConfig) mustJsonMarshal(v interface{}) string {
-	raw, err := json.Marshal(v)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(raw)
-}
-
 func (ServerConfig) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -59,28 +50,12 @@ func (cfg ServerConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.ssl.certificateFile"), defaultServerConfig.Security.Ssl.CertificateFile, "")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.ssl.keyFile"), defaultServerConfig.Security.Ssl.KeyFile, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.useAuth"), defaultServerConfig.Security.UseAuth, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.clientId"), defaultServerConfig.Security.Oauth.ClientID, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.clientSecretFile"), defaultServerConfig.Security.Oauth.ClientSecretFile, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.baseUrl"), defaultServerConfig.Security.Oauth.BaseURL, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.authorizeUrl"), defaultServerConfig.Security.Oauth.AuthorizeURL, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.tokenUrl"), defaultServerConfig.Security.Oauth.TokenURL, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.callbackUrl"), defaultServerConfig.Security.Oauth.CallbackURL, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.claims.aud"), defaultServerConfig.Security.Oauth.Claims.Audience, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.claims.iss"), defaultServerConfig.Security.Oauth.Claims.Issuer, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.idpUserInfoEndpoint"), defaultServerConfig.Security.Oauth.IdpUserInfoEndpoint, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.cookieHashKeyFile"), defaultServerConfig.Security.Oauth.CookieHashKeyFile, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.cookieBlockKeyFile"), defaultServerConfig.Security.Oauth.CookieBlockKeyFile, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.redirectUrl"), defaultServerConfig.Security.Oauth.RedirectURL, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.httpAuthorizationHeader"), defaultServerConfig.Security.Oauth.HTTPAuthorizationHeader, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "security.oauth.grpcAuthorizationHeader"), defaultServerConfig.Security.Oauth.GrpcAuthorizationHeader, "")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.oauth.disableForHttp"), defaultServerConfig.Security.Oauth.DisableForHTTP, "")
-	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.oauth.disableForGrpc"), defaultServerConfig.Security.Oauth.DisableForGrpc, "")
-	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "security.oauth.scopes"), []string{}, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.auditAccess"), defaultServerConfig.Security.AuditAccess, "")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "security.allowCors"), defaultServerConfig.Security.AllowCors, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "security.allowedOrigins"), []string{}, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "security.allowedHeaders"), []string{}, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.clientId"), defaultServerConfig.ThirdPartyConfig.FlyteClientConfig.ClientID, "public identifier for the app which handles authorization for a Flyte deployment")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.redirectUri"), defaultServerConfig.ThirdPartyConfig.FlyteClientConfig.RedirectURI, "This is the callback uri registered with the app which handles authorization for a Flyte deployment")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.clientId"), defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.ClientID, "public identifier for the app which handles authorization for a Flyte deployment")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.redirectUri"), defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.RedirectURI, "This is the callback uri registered with the app which handles authorization for a Flyte deployment")
+	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "thirdPartyConfig.flyteClient.scopes"), []string{}, "Recommended scopes for the client to request.")
 	return cmdFlags
 }

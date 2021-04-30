@@ -14,8 +14,10 @@ require (
 	github.com/benbjohnson/clock v1.1.0
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/coreos/go-oidc v2.2.1+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/evanphx/json-patch v4.9.0+incompatible
-	github.com/flyteorg/flyteidl v0.18.38
+	github.com/flyteorg/flyteidl v0.18.40
+	github.com/flyteorg/flyteplugins v0.5.38
 	github.com/flyteorg/flytepropeller v0.7.8
 	github.com/flyteorg/flytestdlib v0.3.18
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
@@ -30,12 +32,15 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/gtank/cryptopasta v0.0.0-20170601214702-1f550f6f2f69
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jinzhu/gorm v1.9.16
+	github.com/lestrrat-go/jwx v1.1.6
 	github.com/lib/pq v1.10.0
 	github.com/magiconair/properties v1.8.4
-	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
 	github.com/mitchellh/mapstructure v1.4.1
+	github.com/ory/fosite v0.39.0
+	github.com/ory/x v0.0.162
 	github.com/pkg/errors v0.9.1
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
 	github.com/prometheus/client_golang v1.9.0
@@ -55,7 +60,6 @@ require (
 	google.golang.org/grpc/examples v0.0.0-20210315211313-1e7119b13689 // indirect
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/gormigrate.v1 v1.6.0
-	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	k8s.io/api v0.20.4
 	k8s.io/apimachinery v0.20.4
 	k8s.io/client-go v0.20.2

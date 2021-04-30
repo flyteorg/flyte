@@ -5,11 +5,13 @@ import (
 	"errors"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
 
 	"github.com/gogo/protobuf/jsonpb"
 
-	"github.com/flyteorg/flyteadmin/pkg/auth"
+	"github.com/flyteorg/flyteadmin/auth"
 
 	"github.com/flyteorg/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
@@ -263,7 +265,9 @@ func TestCreateExecution(t *testing.T) {
 	request.Spec.Metadata = &admin.ExecutionMetadata{
 		Principal: "unused - populated from authenticated context",
 	}
-	ctx := context.WithValue(context.Background(), auth.PrincipalContextKey, principal)
+
+	identity := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil)
+	ctx := identity.WithContext(context.Background())
 	response, err := execManager.CreateExecution(ctx, request, requestedAt)
 	assert.Nil(t, err)
 
@@ -1845,7 +1849,8 @@ func TestTerminateExecution(t *testing.T) {
 		})
 	execManager := NewExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockExecutor, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-	ctx := context.WithValue(context.Background(), auth.PrincipalContextKey, principal)
+	identity := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil)
+	ctx := identity.WithContext(context.Background())
 	resp, err := execManager.TerminateExecution(ctx, admin.ExecutionTerminateRequest{
 		Id: &core.WorkflowExecutionIdentifier{
 			Project: "project",

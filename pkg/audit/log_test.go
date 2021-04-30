@@ -22,6 +22,7 @@ func TestLogBuilderLog(t *testing.T) {
 		ClientIds:     []string{"12345"},
 		TokenIssuedAt: tokenIssuedAt,
 		ClientIP:      "192.0.2.1:25",
+		Subject:       "prince",
 	})
 	builder := NewLogBuilder().WithAuthenticatedCtx(ctx).WithRequest(
 		"my_method", map[string]string{
