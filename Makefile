@@ -1,3 +1,5 @@
+export REPOSITORY=flytesnacks
+
 .SILENT:
 
 # Flyte sandbox configuration variables
@@ -25,6 +27,10 @@ docker exec -it \
 	$(FLYTE_SANDBOX_NAME) \
 	$(1)
 endef
+
+.PHONY: update_boilerplate
+update_boilerplate:
+	@boilerplate/update.sh
 
 .PHONY: help
 help: ## show help message
