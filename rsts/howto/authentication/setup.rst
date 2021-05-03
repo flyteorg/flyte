@@ -55,7 +55,7 @@ KeyCloak OpenID Connect
 `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others). 
 KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for flyte.
 
-<TBD>
+.. caution:: Coming soon!
 
 Apply configuration
 -------------------
@@ -150,7 +150,7 @@ KeyCloak IdP
 `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others). 
 KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for flyte.
 
-<TBD>
+.. caution:: Coming soon!
 
 Apply Configurations
 --------------------
@@ -250,7 +250,7 @@ The following is a listing of the Flytekit configuration values we set in CI, al
 * ``export FLYTE_CREDENTIALS_AUTH_MODE=basic``
   This tells the SDK to use basic authentication. If not set, Flytekit will assume you want to use the standard OAuth based three-legged flow.
 * ``export FLYTE_CREDENTIALS_AUTHORIZATION_METADATA_KEY=text``
-  At Lyft, we set this to conform to this `header config <https://github.com/flyteorg/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go#L53>`_ on the Admin side.
+  At Lyft, the value is set to conform to this `header config <https://github.com/flyteorg/flyteadmin/blob/eaca2fb0e6018a2e261e9e2da8998906477cadb5/pkg/auth/config/config.go#L53>`_ on the Admin side.
 * ``export FLYTE_CREDENTIALS_SCOPE=text``
   When using basic authentication, you'll need to specify a scope to the IDP (instead of ``openid``, which is only for OAuth). Set that here.
 * ``export FLYTE_PLATFORM_AUTH=True``
