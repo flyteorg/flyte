@@ -46,7 +46,7 @@ func newRootCmd() *cobra.Command {
 
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
-	// Due to https://github.com/lyft/flyte/issues/341, project flag will have to be specified as
+	// Due to https://github.com/flyteorg/flyte/issues/341, project flag will have to be specified as
 	// --root.project, this adds a convenience on top to allow --project to be used
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Project), "project", "p", "", "Specifies the Flyte project.")
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Domain), "domain", "d", "", "Specifies the Flyte project's domain.")

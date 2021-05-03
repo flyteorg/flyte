@@ -67,11 +67,9 @@ func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 	if err != nil {
 		return err
 	}
+
 	if len(args) == 1 {
 		name := args[0]
-		if err != nil {
-			return err
-		}
 		logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
 		for _, v := range projects.Projects {
 			if v.Name == name {
@@ -84,6 +82,7 @@ func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		}
 		return nil
 	}
+
 	logger.Debugf(ctx, "Retrieved %v projects", len(projects.Projects))
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), projectColumns, ProjectToProtoMessages(projects.Projects)...)
 }
