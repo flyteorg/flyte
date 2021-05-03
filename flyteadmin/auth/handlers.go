@@ -133,7 +133,7 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 // the user authentication flow.
 func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		logger.Debugf(ctx, "Running callback handler...")
+		logger.Debugf(ctx, "Running callback handler... for RequestURI %v", request.RequestURI)
 		authorizationCode := request.FormValue(AuthorizationResponseCodeType)
 
 		err := VerifyCsrfCookie(ctx, request)
