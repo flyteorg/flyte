@@ -2119,20 +2119,20 @@ data:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         production:
-          - projectQuotaCpu:
-              value: "5"
-          - projectQuotaMemory:
-              value: "4000Mi"
+          projectQuotaCpu:
+            value: "5"
+          projectQuotaMemory:
+            value: "4000Mi"
         staging:
-          - projectQuotaCpu:
-              value: "2"
-          - projectQuotaMemory:
-              value: "3000Mi"
+          projectQuotaCpu:
+            value: "2"
+          projectQuotaMemory:
+            value: "3000Mi"
         development:
-          - projectQuotaCpu:
-              value: "4"
-          - projectQuotaMemory:
-              value: "3000Mi"
+          projectQuotaCpu:
+            value: "4"
+          projectQuotaMemory:
+            value: "3000Mi"
       refresh: 5m
   db.yaml: |
     database:
@@ -2219,7 +2219,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-9d5hddh7k7
+  name: flyte-admin-config-bcbm7cf8bf
   namespace: flyte
 ---
 apiVersion: v1
@@ -2997,7 +2997,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-9d5hddh7k7
+          name: flyte-admin-config-bcbm7cf8bf
         name: config-volume
       - name: db-pass
         secret:
@@ -3409,7 +3409,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-9d5hddh7k7
+              name: flyte-admin-config-bcbm7cf8bf
             name: config-volume
           - name: db-pass
             secret:
