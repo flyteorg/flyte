@@ -21,7 +21,7 @@ RUN python3 -m venv ${VENV}
 ENV PATH="${VENV}/bin:$PATH"
 
 # Install Python dependencies
-COPY kubernetes/k8s_spark/requirements.txt /root
+COPY k8s_spark/requirements.txt /root
 RUN pip install -r /root/requirements.txt
 
 RUN flytekit_install_spark3.sh
@@ -39,10 +39,10 @@ ENV PYSPARK_DRIVER_PYTHON ${VENV}/bin/python3
 
 # Copy the makefile targets to expose on the container. This makes it easier to register.
 COPY in_container.mk /root/Makefile
-COPY kubernetes/k8s_spark/sandbox.config /root
+COPY k8s_spark/sandbox.config /root
 
 # Copy the actual code
-COPY kubernetes/k8s_spark/ /root/k8s_spark
+COPY k8s_spark/ /root/k8s_spark
 
 # This tag is supplied by the build script and will be used to determine the version
 # when registering tasks, workflows, and launch plans

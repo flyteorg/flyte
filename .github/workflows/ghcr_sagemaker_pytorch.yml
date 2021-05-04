@@ -29,5 +29,5 @@ jobs:
           push_image_and_stages: ${{ github.event_name != 'pull_request' }}
           registry: ghcr.io
           build_extra_args: "--compress=true --build-arg=tag=ghcr.io/${{ github.repository_owner }}/flytecookbook:sagemaker_pytorch-${{ github.sha }}"
-          context: ./cookbook/integrations
-          dockerfile: aws/sagemaker_pytorch/Dockerfile
+          context: ./cookbook/integrations/aws/
+          dockerfile: sagemaker_pytorch/Dockerfile
