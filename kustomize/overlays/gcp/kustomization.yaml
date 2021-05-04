@@ -23,7 +23,7 @@ bases:
 images:
   # FlyteAdmin
   - name: flyteadmin # match images with this name
-    newTag: v0.5.0 # FLYTEADMIN_TAG override the tag
+    newTag: v0.5.3 # FLYTEADMIN_TAG override the tag
     newName: ghcr.io/flyteorg/flyteadmin # override the name
   # FlyteConsole
   - name: flyteconsole # match images with this name
