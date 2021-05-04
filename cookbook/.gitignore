@@ -1,5 +1,6 @@
 _build/
 _pb_output/
+release-snacks/*.tgz
 .bash_history
 .cache/
 .ipython/

@@ -72,3 +72,7 @@ all_clean: # Cleans build directories (e.g. _pb_output/)
 	$(MAKE) -C docs clean
 	$(MAKE) -C plugins all_clean
 	$(MAKE) -C case_studies all_clean
+
+.PHONY: archive
+archive: # archive directories (e.g. _pb_output/)
+	sh scripts/archive-all-example.sh

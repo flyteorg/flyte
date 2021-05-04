@@ -23,3 +23,97 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
           WITH_V: true
           DEFAULT_BUMP: patch
+  core-releaser:
+    name: Release Core example
+    runs-on: ubuntu-latest
+    needs: [bump-version]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-core/
+          key: release-snacks-core
+      - name: Generate Serialize proto
+        run: |
+          make -C cookbook/core serialize
+          mkdir -p cookbook/release-snacks
+          mkdir -p /tmp/release-snacks-core/
+          make -C cookbook archive
+          cp -r cookbook/release-snacks/* /tmp/release-snacks-core/
+  plugin-releaser:
+    name: Release Plugins example
+    runs-on: ubuntu-latest
+    needs: [bump-version]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-plugins/
+          key: release-snacks-plugins
+      - name: Generate Serialize proto
+        run: |
+          make -C cookbook/plugins all_serialize
+          mkdir -p cookbook/release-snacks
+          mkdir -p /tmp/release-snacks-plugins/
+          make -C cookbook archive
+          cp -r cookbook/release-snacks/* /tmp/release-snacks-plugins/
+  case_studies-releaser:
+    name: Release Case studies example
+    runs-on: ubuntu-latest
+    needs: [bump-version]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-case-studies/
+          key: release-snacks-case-studies
+      - name: Generate Serialize proto
+        run: |
+          make -C cookbook/case_studies all_serialize
+          mkdir -p cookbook/release-snacks
+          mkdir -p /tmp/release-snacks-case-studies/
+          make -C cookbook archive
+          cp -r cookbook/release-snacks/* /tmp/release-snacks-case-studies/
+  goreleaser:
+    name: Release Case studies example
+    runs-on: ubuntu-latest
+    needs: [core-releaser, case_studies-releaser, plugin-releaser]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-core/
+          key: release-snacks-core
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-case-studies/
+          key: release-snacks-case-studies
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-plugins/
+          key: release-snacks-plugins
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+          ref: ${{ steps.bump-version.outputs.tag }}
+      - name: Copy artifacts
+        run: |
+          mkdir -p cookbook/release-snacks
+          cp -r /tmp/release-snacks-core/* cookbook/release-snacks/
+          cp -r /tmp/release-snacks-case-studies/* cookbook/release-snacks/
+          cp -r /tmp/release-snacks-plugins/* cookbook/release-snacks/
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}

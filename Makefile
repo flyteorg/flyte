@@ -63,7 +63,7 @@ start: ## Start a local Flyte sandbox
 
 	$(call LOG,Registering examples from commit: latest)
 	REGISTRY=ghcr.io/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
-	
+
 	echo "Flyte is ready! Flyte UI is available at http://localhost:$(FLYTE_PROXY_PORT)/console."
 
 .PHONY: teardown
