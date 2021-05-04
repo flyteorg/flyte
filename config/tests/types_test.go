@@ -28,13 +28,19 @@ type OtherComponentConfig struct {
 }
 
 type Item struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	RandomValue string `json:"randomValue"`
 }
 
 type ItemArray struct {
 	Items     []Item `json:"items"`
 	OtherItem Item   `json:"otherItem"`
+}
+
+type ItemMap struct {
+	Items    map[string]Item            `json:"items"`
+	ItemsMap map[string]map[string]Item `json:"itemsMap"`
 }
 
 func (MyComponentConfig) GetPFlagSet(prefix string) *pflag.FlagSet {

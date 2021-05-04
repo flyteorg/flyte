@@ -331,6 +331,57 @@ func TestAccessor_UpdateConfig(t *testing.T) {
 			assert.Equal(t, "default_3", r.OtherItem.ID)
 		})
 
+		t.Run(fmt.Sprintf("[%v] Override default map config", provider(config.Options{}).ID()), func(t *testing.T) {
+			t.Run("Simple", func(t *testing.T) {
+				root := config.NewRootSection()
+				_, err := root.RegisterSection(MyComponentSectionKey, &ItemMap{
+					Items: map[string]Item{
+						"1": {
+							ID:   "default_1",
+							Name: "default_Name",
+						},
+						"2": {
+							ID:   "default_2",
+							Name: "default_2_Name",
+						},
+					},
+				})
+				assert.NoError(t, err)
+
+				v := provider(config.Options{
+					SearchPaths: []string{filepath.Join("testdata", "map_config.yaml")},
+					RootSection: root,
+				})
+
+				assert.NoError(t, v.UpdateConfig(context.TODO()))
+				r := root.GetSection(MyComponentSectionKey).GetConfig().(*ItemMap)
+				assert.Len(t, r.Items, 2)
+				assert.Equal(t, "abc", r.Items["1"].ID)
+			})
+
+			t.Run("NestedMaps", func(t *testing.T) {
+				root := config.NewRootSection()
+				_, err := root.RegisterSection(MyComponentSectionKey, &ItemMap{
+					ItemsMap: map[string]map[string]Item{},
+				})
+				assert.NoError(t, err)
+
+				v := provider(config.Options{
+					SearchPaths: []string{filepath.Join("testdata", "map_config_nested.yaml")},
+					RootSection: root,
+				})
+
+				assert.NoError(t, v.UpdateConfig(context.TODO()))
+				r := root.GetSection(MyComponentSectionKey).GetConfig().(*ItemMap)
+				assert.Len(t, r.ItemsMap, 2)
+				assert.Equal(t, "abc1", r.ItemsMap["itemA"]["itemAa"].ID)
+				assert.Equal(t, "hello world", r.ItemsMap["itemA"]["itemAa"].RandomValue)
+				assert.Equal(t, "abc2", r.ItemsMap["itemB"]["itemBa"].ID)
+				assert.Equal(t, "xyz1", r.ItemsMap["itemA"]["itemAb"].ID)
+				assert.Equal(t, "xyz2", r.ItemsMap["itemB"]["itemBb"].ID)
+			})
+		})
+
 		t.Run(fmt.Sprintf("[%v] Override in Env Var", provider(config.Options{}).ID()), func(t *testing.T) {
 			reg := config.NewRootSection()
 			_, err := reg.RegisterSection(MyComponentSectionKey, &MyComponentConfig{})

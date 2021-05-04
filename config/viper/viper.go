@@ -165,6 +165,34 @@ func canGetElement(t reflect.Kind) bool {
 	return exists
 }
 
+// sliceToMapHook allows the conversion from slices to maps. This is used as a hack due to the lack of support of case
+// sensitive keys in viper (see: https://github.com/spf13/viper#does-viper-support-case-sensitive-keys). The way we work
+// around that is by filling in fields that should be maps as slices in yaml config files. This hook then takes care of
+// reverting that process.
+func sliceToMapHook(f reflect.Kind, t reflect.Kind, data interface{}) (interface{}, error) {
+	// Only handle slice -> map conversion
+	if f == reflect.Slice && t == reflect.Map {
+		// this will be the target result
+		res := map[interface{}]interface{}{}
+		// It's safe to convert data into a slice since we did the type assertion above.
+		asSlice := data.([]interface{})
+		for _, item := range asSlice {
+			asMap, casted := item.(map[interface{}]interface{})
+			if !casted {
+				return data, nil
+			}
+
+			for key, value := range asMap {
+				res[key] = value
+			}
+		}
+
+		return res, nil
+	}
+
+	return data, nil
+}
+
 // This decoder hook tests types for json unmarshaling capability. If implemented, it uses json unmarshal to build the
 // object. Otherwise, it'll just pass on the original data.
 func jsonUnmarshallerHook(_, to reflect.Type, data interface{}) (interface{}, error) {
@@ -269,6 +297,7 @@ func defaultDecoderConfig(output interface{}, opts ...viperLib.DecoderConfigOpti
 			jsonUnmarshallerHook,
 			mapstructure.StringToTimeDurationHookFunc(),
 			mapstructure.StringToSliceHookFunc(","),
+			sliceToMapHook,
 		),
 		// Empty/zero fields before applying provided values. This avoids potentially undesired/unexpected merging logic.
 		ZeroFields: true,
