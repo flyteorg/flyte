@@ -19,7 +19,7 @@ Example Configurations
 **********************
 
 Here you can find canonical examples for how to set up some of the common IdPs to secure your flyte services. OpenID Connect enables users to authenticate, in the
-browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centerally managed 3rd party app access.
+browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centrally managed 3rd party app access.
 
 OpenID Connect
 ===============
@@ -60,7 +60,7 @@ KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorizatio
 Apply configuration
 -------------------
 
-1. Store the `client_secret` in a k8s secrt as follows:
+1. Store the `client_secret` in a k8s secret as follows:
 
 .. prompt:: bash
 
@@ -188,7 +188,7 @@ Apply Configurations
                 # - offline_access # Uncomment if OIdC supports issuing refresh tokens.
                 clientId: 0oakkheteNjCMERst5d6
 
-1. Store flyte propeller's `client_secret` in a k8s secrt as follows:
+1. Store flyte propeller's `client_secret` in a k8s secret as follows:
 
 .. prompt:: bash
 
