@@ -2154,18 +2154,21 @@ data:
       show-source: true
       level: 2
   server.yaml: |
-    security:
-      # Controls whether to serve requests over SSL/TLS.
-      secure: false
-      # Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
-      useAuth: false
-      allowCors: true
-      allowedOrigins:
-        # Accepting all domains for Sandbox installation
-        - "*"
-      allowedHeaders:
-        - "Content-Type"
-        - "flyte-authorization"
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      security:
+        # Controls whether to serve requests over SSL/TLS.
+        secure: false
+        # Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
+        useAuth: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+          - "flyte-authorization"
     auth:
       authorizedUris:
         # This should point at your public http Uri.
@@ -2219,7 +2222,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-62f6kk7htc
+  name: flyte-admin-config-7gmg5ffhdd
   namespace: flyte
 ---
 apiVersion: v1
@@ -2997,7 +3000,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-62f6kk7htc
+          name: flyte-admin-config-7gmg5ffhdd
         name: config-volume
       - name: db-pass
         secret:
@@ -3409,7 +3412,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-62f6kk7htc
+              name: flyte-admin-config-7gmg5ffhdd
             name: config-volume
           - name: db-pass
             secret:
