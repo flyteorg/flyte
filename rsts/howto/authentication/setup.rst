@@ -7,7 +7,7 @@ How to Set Up Authentication
 *****************
 IdP Configuration
 *****************
-Flyte Admin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting user's flow by redirecting to the IdP frequently.
+Flyte Admin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
 
 *************************
 Flyte Admin Configuration
@@ -18,13 +18,13 @@ Please refer to the `inline documentation <https://github.com/flyteorg/flyteadmi
 Example Configurations
 **********************
 
-Here you can find canonical examples for how to set up some of the common IdPs to secure your flyte services. OpenID Connect enables users to authenticate, in the
-browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centrally managed 3rd party app access.
+Below are listed some canonical examples of how to set up some of the common IdPs to secure your Fyte services. OpenID Connect enables users to authenticate, in the
+browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centrally managed third party app access.
 
 OpenID Connect
 ===============
 
-OpenID Connect allows users to authenticate to flyte in their browser using a familiar authentication provider (perhaps an organization-wide configured IdP).
+OpenID Connect allows users to authenticate to Flyte in their browser using a familiar authentication provider (perhaps an organization-wide configured IdP).
 Flyte supports connecting with external OIdC providers. Here are some examples for how to set these up:
 
 Google OpenID Connect
@@ -41,21 +41,19 @@ Okta OpenID Connect
 -------------------
 
 Okta supports OpenID Connect protocol and the creation of custom OAuth2 Authorization Servers, allowing it to act as both the user and apps IdP.
-It offers more detailed control on access policies, users' consent, and app management.
+It offers more detailed control on access policies, user consent, and app management.
 
 1. If you don't already have an Okta account, sign up for one `here <https://developer.okta.com/signup/>`__.
-2. Create an app (choose Web for the platform) and OpenID Connect for the sign on method.
+2. Create an app (choose Web for the platform) and OpenID Connect for the sign-on method.
 3. Add Login redirect URIs (e.g. http://localhost:30081/callback for sandbox or https://<your deployment url>/callback)
 4. OPTIONAL: Add logout redirect URIs (e.g. http://localhost:30081/logout for sandbox)
-5. Note down the Client ID and Client Secret
+5. Write down the Client ID and Client Secret
 
 KeyCloak OpenID Connect
 ------------------------
 
 `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others). 
-KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for flyte.
-
-.. caution:: Coming soon!
+KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for Flyte.
 
 Apply configuration
 -------------------
@@ -125,8 +123,7 @@ OAuth2 Authorization Server
 ===========================
 
 An OAuth2 Authorization Server allows external clients to request to authenticate and act on behalf of users (or as their own identities). Having 
-an OAuth2 Authorization Server enables flyte administrators control over which apps can be installed and what scopes (i.e. what privileges can they assume),
-they are allowed to request or be granted.
+an OAuth2 Authorization Server enables Flyte administrators control over which apps can be installed and what scopes they are allowed to request or be granted (i.e. what privileges can they assume).
 
 Flyte comes with a built-in authorization server that can be statically configured with a set of clients to request and act on behalf of the user.
 The default clients are defined `here <https://github.com/flyteorg/flyteadmin/pull/168/files#diff-1267ff8bd9146e1c0ff22a9e9d53cfc56d71c1d47fed9905f95ed4bddf930f8eR74-R100>`__ 
@@ -150,12 +147,10 @@ KeyCloak IdP
 `KeyCloak <https://www.keycloak.org/>`__ is an open source solution for authentication, it supports both OpenID Connect and OAuth2 protocols (among others). 
 KeyCloak can be configured to be both the OpenID Connect and OAuth2 Authorization Server provider for flyte.
 
-.. caution:: Coming soon!
-
 Apply Configurations
 --------------------
 
-1. It is possible to direct flyte admin to use an external authorization server. To do so, edit the same config map once more and follow these changes:
+1. It is possible to direct Flyte admin to use an external authorization server. To do so, edit the same config map once more and follow these changes:
 
 .. code-block:: yaml
 
