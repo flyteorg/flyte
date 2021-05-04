@@ -9,7 +9,7 @@ server:
   kube-config: /Users/haythamabuelfutuh/kubeconfig/k3s/k3s.yaml
   security:
     secure: false
-    useAuth: true
+    useAuth: false
     allowCors: true
     allowedOrigins:
       # Accepting all domains for Sandbox installation
@@ -19,7 +19,7 @@ server:
 # Okta OIdC only
 auth:
   authorizedUris:
-    - https://efdf60eb2525.ngrok.io
+    - https://localhost:8088
     - http://flyteadmin:80
   userAuth:
     openId:
@@ -34,6 +34,9 @@ auth:
 
 # Okta OIdC and OAuth2
 #auth:
+#  authorizedUris:
+#    - https://localhost:8088
+#    - http://flyteadmin:80
 #  appAuth:
 #    authServerType: External
 #  userAuth:
