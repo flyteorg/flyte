@@ -1,20 +1,20 @@
 .. _howto_authentication_migrate:
 
 ######################################################
-How to migrate your authentication config (pre 0.13.0)
+How to Migrate Your Authentication Config (pre 0.13.0)
 ######################################################
 
-Using Okta as an example, previously, you would've had something like the following.
+Using Okta as an example, you would have previously seen something like the following:
 
-On the Okta side, you'd have:
+On the Okta side:
 
 * An Application (OpenID Connect Web) for Flyte Admin itself (e.g. **0oal5rch46pVhCGF45d6**).
-* An Application (OpenID Native app) for flyte-cli/flytectl (e.g. **0oal62nxuD6OSFSRq5d6**).
+* An Application (OpenID Native app) for Flyte-cli/flytectl (e.g. **0oal62nxuD6OSFSRq5d6**).
 * These two applications would be assigned to the relevant users.
 * An Application (Web) for Flyte Propeller (e.g. **0abc5rch46pVhCGF9876**).
-* These applications would either use the default Authorization server, or you'd create a new one.
+* These applications would either use the default Authorization server, or you would create a new one.
 
-On the Admin side, you'd have the following configuration
+On the Admin side, you would have had the following configuration:
 
 .. code-block:: yaml
 
@@ -50,7 +50,7 @@ On the Admin side, you'd have the following configuration
             clientId: 0oal62nxuD6OSFSRq5d6
             redirectUri: http://localhost:12345/callback
 
-From the flyte-cli side, you needed these two settings
+From the Flyte-cli side, these two settings were needed:
 
 .. code-block:: bash
 
@@ -60,7 +60,7 @@ From the flyte-cli side, you needed these two settings
 grpc-gateway library). **flyte-cli** uses this setting to talk to **/.well-known/oauth-authorization-server** to retrieve information regarding the auth endpoints.  Previously this redirected to the
 Okta Authorization Server's metadata endpoint. With this change, Admin now hosts its own (even if still using the external Authorization Service).
 
-After version `0.13.0 <https://github.com/flyteorg/flyte/tree/v0.13.0>`__ of the platform, you can still use the IdP as the Authorization Server if you so choose. That configuration would become:
+After version `0.13.0 <https://github.com/flyteorg/flyte/tree/v0.13.0>`__ of the platform, you can still use the IdP as the Authorization Server if you so choose. That configuration would now become:
 
 .. code-block:: yaml
 
@@ -105,8 +105,8 @@ After version `0.13.0 <https://github.com/flyteorg/flyte/tree/v0.13.0>`__ of the
 
 Specifically,
 
-* The original **oauth** section has been moved two levels higher into its own section and renamed **auth** but enabling/disabling of authentication remains in the old place.
-* Secrets by default will now be looked up in **/etc/secrets**. Use the following command to generate them.
+* The original **oauth** section has been moved two levels higher into its own section and renamed **auth** but enabling/disabling of authentication remains in the old location.
+* Secrets by default will now be looked up in **/etc/secrets**. Use the following command to generate them:
 
 .. code-block:: bash
 
@@ -121,7 +121,7 @@ This will generate the new cookie hash/block keys, as well as other secrets Admi
 * The **thirdPartyConfig** has been moved to **appAuth** as well.
 * **redirectUrl** has been defaulted to **/console**. If that's the value you want, then you no longer need this setting.
 
-From propeller side, you might have a configuration section that looks like this:
+From Propeller side, you might have a configuration section that looks like this:
 
 .. code-block:: yaml
 
