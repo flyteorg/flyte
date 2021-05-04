@@ -2118,21 +2118,21 @@ data:
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
-        production:
-          projectQuotaCpu:
-            value: "5"
-          projectQuotaMemory:
-            value: "4000Mi"
-        staging:
-          projectQuotaCpu:
-            value: "2"
-          projectQuotaMemory:
-            value: "3000Mi"
-        development:
-          projectQuotaCpu:
-            value: "4"
-          projectQuotaMemory:
-            value: "3000Mi"
+        - production:
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+        - staging:
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+        - development:
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
       refresh: 5m
   db.yaml: |
     database:
@@ -2219,7 +2219,7 @@ data:
         gpu: 1
 kind: ConfigMap
 metadata:
-  name: flyte-admin-config-bcbm7cf8bf
+  name: flyte-admin-config-62f6kk7htc
   namespace: flyte
 ---
 apiVersion: v1
@@ -2880,7 +2880,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
+        image: ghcr.io/flyteorg/flyteadmin:0d00127c439e6612209a2fb5cdceaae215071f15
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -2933,7 +2933,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
+        image: ghcr.io/flyteorg/flyteadmin:0d00127c439e6612209a2fb5cdceaae215071f15
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -2949,7 +2949,7 @@ spec:
         - seed-projects
         - flytesnacks
         - flyteexamples
-        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
+        image: ghcr.io/flyteorg/flyteadmin:0d00127c439e6612209a2fb5cdceaae215071f15
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -2963,7 +2963,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
+        image: ghcr.io/flyteorg/flyteadmin:0d00127c439e6612209a2fb5cdceaae215071f15
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -2983,7 +2983,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flyteadmin:v0.5.0
+        image: ghcr.io/flyteorg/flyteadmin:0d00127c439e6612209a2fb5cdceaae215071f15
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -2997,7 +2997,7 @@ spec:
       - emptyDir: {}
         name: shared-data
       - configMap:
-          name: flyte-admin-config-bcbm7cf8bf
+          name: flyte-admin-config-62f6kk7htc
         name: config-volume
       - name: db-pass
         secret:
@@ -3392,7 +3392,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: ghcr.io/flyteorg/flyteadmin:v0.5.0
+            image: ghcr.io/flyteorg/flyteadmin:0d00127c439e6612209a2fb5cdceaae215071f15
             imagePullPolicy: IfNotPresent
             name: sync-cluster-resources
             volumeMounts:
@@ -3409,7 +3409,7 @@ spec:
               name: clusterresource-template-dtg8ff28mt
             name: resource-templates
           - configMap:
-              name: flyte-admin-config-bcbm7cf8bf
+              name: flyte-admin-config-62f6kk7htc
             name: config-volume
           - name: db-pass
             secret:
