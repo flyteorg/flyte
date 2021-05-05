@@ -27,7 +27,7 @@ Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workfl
   <img src="https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic" alt="Commit Activity" />
   <img src="https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic" alt="Commits since Last Release" />
   <img src="https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic" alt="GitHub Milestones Completed" />
-  <img src="https://img.shields.io/github/milestones/progress-percent/lyft/flyte/11?style=plastic" alt="GitHub Next Milestone Percentage" />
+  <img src="https://img.shields.io/github/milestones/progress-percent/lyft/flyte/14?style=plastic" alt="GitHub Next Milestone Percentage" />
   <a href="https://flyte.rtfd.io">
     <img src="https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic" alt="Docs" />
   </a>
@@ -227,8 +227,7 @@ Here are the resources that would help you get a better understanding of Flyte.
 
 ### Blog Posts
 
-1.  [Introducing Flyte: A Cloud Native Machine Learning and Data Processing Platform](https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59)
-2.  [Building a Gateway to Flyte](https://eng.lyft.com/building-a-gateway-to-flyte-474b451b32c8)
+[Blog site](https://blog.flyte.org/)
 
 ### Podcasts
 
