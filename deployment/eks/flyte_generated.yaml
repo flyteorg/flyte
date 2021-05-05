@@ -8829,7 +8829,7 @@ spec:
         - mountPath: /etc/db
           name: db-pass
       - args:
-        - flyteadmin --config=etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
+        - flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth
         command:
         - /bin/sh
         - -c
