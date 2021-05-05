@@ -1,3 +1,4 @@
 resources:
-- deployment.yaml
-- service.yaml
+  - auth_secret.yaml
+  - deployment.yaml
+  - service.yaml
