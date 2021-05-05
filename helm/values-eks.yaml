@@ -1,4 +1,3 @@
-
 #
 # FLYTEADMIN
 #
@@ -159,8 +158,6 @@ minio:
 contour:
   enabled: false
 
-
-
 #
 # COMMON
 #
@@ -197,7 +194,6 @@ common:
       stringData:
         # -- If using plain text you can provide the password here
         pass.txt: awesomesauce
-
 
 # -----------------------------------------------------
 # Core dependencies that should be configured for Flyte to work on any platform
@@ -244,10 +240,10 @@ configmap:
         allowedHeaders:
           - "Content-Type"
 
-    task_type_whitelist:
-      spark:
-        - project: flytetester
-        - project: spark-workflows
+  task_type_whitelist:
+    spark:
+      - project: flytetester
+      - project: spark-workflows
 
   task_resource_defaults:
     task_resources:
@@ -288,9 +284,9 @@ configmap:
           - k8s-array
           - pytorch
           - athena
-#          - sagemaker_hyperparameter_tuning
-#          - sagemaker_custom_training
-#          - sagemaker_training
+        #          - sagemaker_hyperparameter_tuning
+        #          - sagemaker_custom_training
+        #          - sagemaker_training
         default-for-task-types:
           container: container
           sidecar: sidecar
@@ -298,8 +294,8 @@ configmap:
           container_array: k8s-array
           pytorch: pytorch
           hive: athena
-#          sagemaker_custom_training_task: sagemaker_custom_training
-#          sagemaker_custom_training_job_task: sagemaker_custom_training
+  #          sagemaker_custom_training_task: sagemaker_custom_training
+  #          sagemaker_custom_training_job_task: sagemaker_custom_training
 
   logger:
     logger:
@@ -319,7 +315,6 @@ configmap:
         cloudwatch-region: <AWS_REGION>
         # -- cloudwatch log-group
         cloudwatch-log-group: <LOG_GROUP_NAME>
-
 
 # ----------------------------------------------------------------
 # Optional Modules
@@ -348,35 +343,63 @@ workflow_scheduler:
         reconnectAttempts: 10
         reconnectDelaySeconds: 30
 
-
 # --
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-    enabled: false
-    config:
-       notifications:
-         type: aws
-         region: us-east-2
-         publisher:
-           topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
-         processor:
-           queueName: flyte-notifications-queue
-           accountId: <ACCOUNT-NUMBER>
-         emailer:
-           subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
-           sender:  "flyte@example.com"
-           body: |
-             Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
-             Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-             {{ error }}
-
+  enabled: false
+  config:
+    notifications:
+      type: aws
+      region: us-east-2
+      publisher:
+        topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
+      processor:
+        queueName: flyte-notifications-queue
+        accountId: <ACCOUNT-NUMBER>
+      emailer:
+        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+        sender: "flyte@example.com"
+        body: |
+          Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+          Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+          {{ error }}
 
 # -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
 # cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
+  # -- Configmap for ClusterResource parameters
+  config:
+    # -- ClusterResource parameters
+    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
+    cluster_resources:
+      templatePath: "/etc/flyte/clusterresource/templates"
+      customData:
+        - production:
+            - defaultIamRole:
+                value: "none"
+            - projectQuotaCpu:
+                value: "5"
+            - projectQuotaMemory:
+                value: "4000Mi"
+        - staging:
+            - defaultIamRole:
+                value: "none"
+            - projectQuotaCpu:
+                value: "2"
+            - projectQuotaMemory:
+                value: "3000Mi"
+        - development:
+            - defaultIamRole:
+                value: "none"
+            - projectQuotaCpu:
+                value: "4"
+            - projectQuotaMemory:
+                value: "3000Mi"
+      refresh: 5m
+
   templates:
     # -- Template for namespaces resources
     - key: aa_namespace
@@ -388,6 +411,17 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
+
+    # -- Patch default service account
+    - key: aab_default_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: default
+          namespace: {{ namespace }}
+          annotations:
+            eks.amazonaws.com/role-arn: {{ defaultIamRole }}
 
     - key: ab_project_resource_quota
       value: |
@@ -455,6 +489,8 @@ cluster_resource_manager:
         metadata:
           name: spark
           namespace: {{ namespace }}
+          annotations:
+            eks.amazonaws.com/role-arn: {{ defaultIamRole }}
 
     # -- Template for spark role binding
     - key: af_spark_role_binding
@@ -507,7 +543,6 @@ pytorchoperator:
 tf_operator:
   enabled: false
 
-
 # -----------------
 # -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
 # Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
@@ -518,8 +553,6 @@ sagemaker:
       sagemaker:
         roleArn: arn:aws:iam::<ACCOUNT_NUMBER>:role/<ROLE_FOR_SAGEMAKER>
         region: us-east-2
-
-
 # ---------------------------
 # Flink jobs using the Flink Operator
 #
