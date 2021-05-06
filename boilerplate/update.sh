@@ -10,7 +10,7 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 OUT="$(mktemp -d)"
-trap "rm -fr $OUT" EXIT
+trap 'rm -fr $OUT' EXIT
 
 git clone git@github.com:flyteorg/boilerplate.git "${OUT}"
 
@@ -30,12 +30,12 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 
 if [ -z "$REPOSITORY" ]; then
-  echo '$REPOSITORY is required to run this script'
+  echo "$REPOSITORY is required to run this script"
   echo "See $README for more details."
   exit 1
 fi
 
-while read directory junk; do
+while read -r directory junk; do
   # Skip comment lines (which can have leading whitespace)
   if [[ "$directory" == '#'* ]]; then
     continue
@@ -63,8 +63,8 @@ while read directory junk; do
   echo "$directory is configured in update.cfg."
   echo "-----------------------------------------------------------------------------------"
   echo "syncing files from source."
-  rm -rf "${DIR}/${directory}"
-  mkdir -p $(dirname "${DIR}/${directory}")
+  rm -rf "${DIR:?}/${directory}"
+  mkdir -p "$(dirname "${DIR}"/"${directory}")"
   cp -r "$dir_path" "${DIR}/${directory}"
   if [ -f "${DIR}/${directory}/update.sh" ]; then
     echo "executing ${DIR}/${directory}/update.sh"

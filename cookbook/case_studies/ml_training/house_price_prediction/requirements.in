@@ -1,4 +1,4 @@
--r ../../common/requirements-common.in
+-r ../../../common/requirements-common.in
 xgboost
 joblib
 sklearn

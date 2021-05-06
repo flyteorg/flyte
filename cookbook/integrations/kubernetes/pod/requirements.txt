@@ -6,7 +6,7 @@
 #
 attrs==20.3.0
     # via scantree
-cachetools==4.2.1
+cachetools==4.2.2
     # via google-auth
 certifi==2020.12.5
     # via
@@ -16,13 +16,13 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.8
+croniter==1.0.12
     # via flytekit
 cycler==0.10.0
     # via matplotlib
-dataclasses-json==0.5.2
+dataclasses-json==0.5.3
     # via flytekit
-decorator==4.4.2
+decorator==5.0.7
     # via retry
 deprecated==1.2.12
     # via flytekit
@@ -30,25 +30,23 @@ dirhash==0.2.1
     # via flytekit
 docker-image-py==0.1.10
     # via flytekit
-flyteidl==0.18.25
+flyteidl==0.18.41
     # via flytekit
-flytekit==0.17.0b0
+flytekit==0.18.0
     # via
-    #   -r ../../common/requirements-common.in
+    #   -r ../../../common/requirements-common.in
     #   flytekitplugins-pod
-flytekitplugins-pod==0.16.0
+flytekitplugins-pod==0.18.0
     # via -r requirements.in
-future==0.18.2
-    # via croniter
-google-auth==1.28.0
+google-auth==1.30.0
     # via kubernetes
-grpcio==1.36.1
+grpcio==1.37.1
     # via flytekit
 idna==2.10
     # via requests
-importlib-metadata==3.7.3
+importlib-metadata==4.0.1
     # via keyring
-keyring==23.0.0
+keyring==23.0.1
     # via flytekit
 kiwisolver==1.3.1
     # via matplotlib
@@ -56,32 +54,30 @@ kubernetes==12.0.1
     # via flytekitplugins-pod
 marshmallow-enum==1.5.1
     # via dataclasses-json
-marshmallow==3.10.0
+marshmallow==3.11.1
     # via
     #   dataclasses-json
     #   marshmallow-enum
-matplotlib==3.3.4
-    # via -r ../../common/requirements-common.in
+matplotlib==3.4.1
+    # via -r ../../../common/requirements-common.in
 mypy-extensions==0.4.3
     # via typing-inspect
 natsort==7.1.1
-    # via
-    #   croniter
-    #   flytekit
-numpy==1.20.1
+    # via flytekit
+numpy==1.20.2
     # via
     #   matplotlib
     #   pandas
     #   pyarrow
 oauthlib==3.1.0
     # via requests-oauthlib
-pandas==1.2.3
+pandas==1.2.4
     # via flytekit
 pathspec==0.8.1
     # via scantree
-pillow==8.1.2
+pillow==8.2.0
     # via matplotlib
-protobuf==3.15.6
+protobuf==3.15.8
     # via
     #   flyteidl
     #   flytekit
@@ -112,7 +108,7 @@ pytz==2018.4
     #   pandas
 pyyaml==5.4.1
     # via kubernetes
-regex==2021.3.17
+regex==2021.4.4
     # via docker-image-py
 requests-oauthlib==1.3.0
     # via kubernetes
@@ -122,7 +118,7 @@ requests==2.25.1
     #   kubernetes
     #   requests-oauthlib
     #   responses
-responses==0.13.1
+responses==0.13.3
     # via flytekit
 retry==0.9.2
     # via flytekit
@@ -130,7 +126,7 @@ rsa==4.7.2
     # via google-auth
 scantree==0.0.1
     # via dirhash
-six==1.15.0
+six==1.16.0
     # via
     #   cycler
     #   flytekit
@@ -148,7 +144,7 @@ statsd==3.3.0
     # via flytekit
 stringcase==1.2.0
     # via dataclasses-json
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via typing-inspect
 typing-inspect==0.6.0
     # via dataclasses-json
@@ -158,11 +154,11 @@ urllib3==1.25.11
     #   kubernetes
     #   requests
     #   responses
-websocket-client==0.58.0
+websocket-client==0.59.0
     # via kubernetes
 wheel==0.36.2
     # via
-    #   -r ../../common/requirements-common.in
+    #   -r ../../../common/requirements-common.in
     #   flytekit
 wrapt==1.12.1
     # via

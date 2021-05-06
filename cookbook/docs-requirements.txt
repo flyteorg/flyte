@@ -43,7 +43,7 @@ packaging==20.9
     # via sphinx
 pillow==8.2.0
     # via -r docs-requirements.in
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   sphinx
     #   sphinx-prompt
@@ -57,7 +57,7 @@ readthedocs-sphinx-search==0.1.0
     # via -r docs-requirements.in
 requests==2.25.1
     # via sphinx
-six==1.15.0
+six==1.16.0
     # via
     #   astroid
     #   sphinx-code-include

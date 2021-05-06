@@ -1,2 +1,2 @@
--r ../../common/requirements-common.in
+-r ../../../common/requirements-common.in
 flytekitplugins-papermill>=0.16.0

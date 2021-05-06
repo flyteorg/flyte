@@ -12,13 +12,13 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.11
+croniter==1.0.12
     # via flytekit
 cycler==0.10.0
     # via matplotlib
-dataclasses-json==0.5.2
+dataclasses-json==0.5.3
     # via flytekit
-decorator==5.0.6
+decorator==5.0.7
     # via retry
 deprecated==1.2.12
     # via flytekit
@@ -26,19 +26,19 @@ dirhash==0.2.1
     # via flytekit
 docker-image-py==0.1.10
     # via flytekit
-flyteidl==0.18.32
+flyteidl==0.18.41
     # via flytekit
-flytekit==0.17.0
+flytekit==0.18.0
     # via
-    #   -r ../../common/requirements-common.in
+    #   -r ../../../common/requirements-common.in
     #   flytekitplugins-pandera
-flytekitplugins-pandera==0.17.0
+flytekitplugins-pandera==0.18.0
     # via -r requirements.in
-grpcio==1.37.0
+grpcio==1.37.1
     # via flytekit
 idna==2.10
     # via requests
-importlib-metadata==3.10.0
+importlib-metadata==4.0.1
     # via keyring
 keyring==23.0.1
     # via flytekit
@@ -51,7 +51,7 @@ marshmallow==3.11.1
     #   dataclasses-json
     #   marshmallow-enum
 matplotlib==3.4.1
-    # via -r ../../common/requirements-common.in
+    # via -r ../../../common/requirements-common.in
 mypy-extensions==0.4.3
     # via typing-inspect
 natsort==7.1.1
@@ -64,7 +64,7 @@ numpy==1.20.2
     #   pyarrow
 packaging==20.9
     # via pandera
-pandas==1.2.3
+pandas==1.2.4
     # via
     #   flytekit
     #   pandera
@@ -106,13 +106,13 @@ requests==2.25.1
     # via
     #   flytekit
     #   responses
-responses==0.13.2
+responses==0.13.3
     # via flytekit
 retry==0.9.2
     # via flytekit
 scantree==0.0.1
     # via dirhash
-six==1.15.0
+six==1.16.0
     # via
     #   cycler
     #   flytekit
@@ -127,7 +127,7 @@ statsd==3.3.0
     # via flytekit
 stringcase==1.2.0
     # via dataclasses-json
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via typing-inspect
 typing-inspect==0.6.0
     # via
@@ -140,7 +140,7 @@ urllib3==1.25.11
     #   responses
 wheel==0.36.2
     # via
-    #   -r ../../common/requirements-common.in
+    #   -r ../../../common/requirements-common.in
     #   flytekit
 wrapt==1.12.1
     # via

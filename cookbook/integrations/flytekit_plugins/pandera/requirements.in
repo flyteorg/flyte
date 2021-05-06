@@ -1,3 +1,3 @@
--r ../../common/requirements-common.in
+-r ../../../common/requirements-common.in
 pandera>=0.6.3
 flytekitplugins-pandera>=0.16.0

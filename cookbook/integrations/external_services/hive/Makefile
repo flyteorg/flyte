@@ -1,5 +1,6 @@
 PREFIX=hive
 include ../../../common/Makefile
+include ../../../common/leaf.mk
 
 .PHONY: docker_build
 docker_build: ;
