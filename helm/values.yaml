@@ -105,7 +105,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.10.4
+    tag: v0.10.7
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -625,17 +625,17 @@ cluster_resource_manager:
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
-        production:
+        - production:
           - projectQuotaCpu:
               value: "5"
           - projectQuotaMemory:
               value: "4000Mi"
-        staging:
+        - staging:
           - projectQuotaCpu:
               value: "2"
           - projectQuotaMemory:
               value: "3000Mi"
-        development:
+        - development:
           - projectQuotaCpu:
               value: "4"
           - projectQuotaMemory:
