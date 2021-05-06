@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	restclient "k8s.io/client-go/rest"
@@ -113,8 +115,14 @@ type Config struct {
 	RemoteClusterConfig  ClusterConfig     `json:"remoteClusterConfig" pflag:"-,Configuration of remote K8s cluster for array jobs"`
 	NodeSelector         map[string]string `json:"node-selector" pflag:"-,Defines a set of node selector labels to add to the pod."`
 	Tolerations          []v1.Toleration   `json:"tolerations"  pflag:"-,Tolerations to be applied for k8s-array pods"`
+	NamespaceTemplate    string            `json:"namespaceTemplate"  pflag:"-,Namespace pattern to spawn array-jobs in. Defaults to parent namespace if not set"`
 	OutputAssembler      workqueue.Config
 	ErrorAssembler       workqueue.Config
+	LogConfig            LogConfig `json:"logs" pflag:",Config for log links for k8s array jobs."`
+}
+
+type LogConfig struct {
+	Config logs.LogConfig `json:"config" pflag:",Defines the log config for k8s logs."`
 }
 
 func GetConfig() *Config {

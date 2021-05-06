@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"regexp"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
@@ -19,6 +20,8 @@ import (
 
 const PodKind = "pod"
 
+var namespaceRegex = regexp.MustCompile("(?i){{.namespace}}(?i)")
+
 type arrayTaskContext struct {
 	core.TaskExecutionContext
 	arrayInputReader io.InputReader
@@ -29,9 +32,23 @@ func (a *arrayTaskContext) InputReader() io.InputReader {
 	return a.arrayInputReader
 }
 
+func GetNamespaceForExecution(tCtx core.TaskExecutionContext, namespaceTemplate string) string {
+
+	// Default to parent namespace
+	namespace := tCtx.TaskExecutionMetadata().GetNamespace()
+	if namespaceTemplate != "" {
+		if namespaceRegex.MatchString(namespaceTemplate) {
+			namespace = namespaceRegex.ReplaceAllString(namespaceTemplate, namespace)
+		} else {
+			namespace = namespaceTemplate
+		}
+	}
+	return namespace
+}
+
 // Note that Name is not set on the result object.
 // It's up to the caller to set the Name before creating the object in K8s.
-func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionContext) (
+func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionContext, namespaceTemplate string) (
 	podTemplate v1.Pod, job *idlPlugins.ArrayJob, err error) {
 
 	// Check that the taskTemplate is valid
@@ -71,7 +88,7 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			// Note that name is missing here
-			Namespace:       tCtx.TaskExecutionMetadata().GetNamespace(),
+			Namespace:       GetNamespaceForExecution(tCtx, namespaceTemplate),
 			Labels:          tCtx.TaskExecutionMetadata().GetLabels(),
 			Annotations:     tCtx.TaskExecutionMetadata().GetAnnotations(),
 			OwnerReferences: []metav1.OwnerReference{tCtx.TaskExecutionMetadata().GetOwnerReference()},
