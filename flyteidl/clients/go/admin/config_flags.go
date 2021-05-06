@@ -53,5 +53,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authorizationServerUrl"), defaultConfig.DeprecatedAuthorizationServerURL, "This is the URL to your IdP's authorization server. It'll default to Endpoint")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "tokenUrl"), defaultConfig.TokenURL, "OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "authorizationHeader"), defaultConfig.DeprecatedAuthorizationHeader, "Custom metadata header to pass JWT")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "pkceConfig.timeout"), defaultConfig.PkceConfig.BrowserSessionTimeout.String(), "")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "pkceConfig.refreshTime"), defaultConfig.PkceConfig.TokenRefreshGracePeriod.String(), "")
 	return cmdFlags
 }
