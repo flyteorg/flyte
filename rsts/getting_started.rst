@@ -48,8 +48,9 @@ Steps
   
     - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
     - Prune the images and volumes. 
+    - Given there's less than 10% free disk space, Kubernetes by default throws the disk pressure error.
 
-3. Take a minute to explore Flyte Console through the provided URL.
+1. Take a minute to explore Flyte Console through the provided URL.
 
 .. image:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
     :alt: A quick visual tour for launching your first Workflow.
