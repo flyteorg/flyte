@@ -52,7 +52,7 @@ These tasks are useful because
 *************************
 Using a Task
 *************************
-Take a look at the example PR where we moved the built-in SQLite3 task from the old style of writing a task to the new one.
+Take a look at the `example PR <https://github.com/flyteorg/flytekit/pull/470>`__ where we moved the built-in SQLite3 task from the old style of writing a task to the new one.
 From the user's perspective, not much changes. You still just
 
 #. Install whatever Python library contains the task type definition (for SQLite3, it's bundled into flytekit itself, but usually this will not be the case).
@@ -62,29 +62,46 @@ From the user's perspective, not much changes. You still just
 Writing a Task
 ***************************
 There's three components to writing one of these new tasks.
-* A Dockerfile - this is what is run when any user runs your task. It'll likely contain flytekit, Python, and your task extension code.
 * Your task extension code, which consists of 1) a class for the Task and 2) a class for the Executor.
+* A Dockerfile - this is what is run when any user runs your task. It'll likely contain flytekit, Python, and your task extension code.
 
-Image
-=======
-
+The `aforementioned PR <https://github.com/flyteorg/flytekit/pull/470>`__ where we migrate the SQLite3 task should be used to follow along the below.
 
 Python Library
 ================
 
 Task
 -------
+Authors creating new tasks of this type will need to create a subclass of the ``PythonCustomizedContainerTask`` class.
 
+Specifically, you'll need to customize these three arguments to the parent class constructor:
+
+* ``container_image`` This is the container image that will run when the user's invocation of the task is run on a Flyte platform.
+* ``executor_type`` This should be the Python class that subclasses the ``ShimTaskExecutor``.
+* ``task_type`` All types have a task type. This is just a string which the Flyte engine uses to determine which plugin to use when running a task. Anything that doesn't have an explicit match for will default to the container plugin (which is correct in this case). So you can call this anything, just not anything that's already taken by something else (like "spark" or something).
+
+Referring to the SQLite3 example ::
+
+    container_image="ghcr.io/flyteorg/flytekit-py37:v0.18.1",
+    executor_type=SQLite3TaskExecutor,
+    task_type="sqlite3",
+
+Note that the container is special in this case - because the definition of the Python classes themselves is bundled in flytekit, we just use the flytekit image.
+
+Additionally, you will need to override the ``get_custom`` function. Keep in mind that the execution behavior of the task needs to be completely determined by the serialized form of the task (that is, the serialized ``TaskTemplate``). This function is how you can do that, as it's stored and inserted into the `custom field <https://github.com/flyteorg/flyteidl/blob/7302971c064b6061a148f2bee79f673bc8cf30ee/protos/flyteidl/core/tasks.proto#L114>`__ of the template. Keep the total size of the task template reasonably small though.
 
 Executor
 --------
+The ``ShimTaskExecutor`` is an abstract class that you will need to subclass and override the ``execute_from_model`` function for. This function is where all the business logic for your task should go, and it will be called in both local workflow execution and at platform-run-time execution.
 
+The signature of this execute function is different from the ``execute`` functions of most other tasks since here, all the business logic, the entirety of how the task is run, is determined from the ``TaskTemplate``
 
+Image
+=======
+This is the custom image that you supplied in the ``PythonCustomizedContainerTask`` subclass. Out of the box, these tasks will run a command that looks like the following when the container is run by Flyte ::
 
+    pyflyte-execute --inputs s3://inputs.pb --output-prefix s3://outputs --raw-output-data-prefix s3://user-data --resolver flytekit.core.python_customized_container_task.default_task_template_resolver -- {{.taskTemplatePath}} path.to.your.executor.subclass
 
+This means that your Docker image will need to have Python and flytekit installed. The Python interpreter that is run by the container should be able to find your custom executor class at that ``path.to.your.executor.subclass`` import path.
 
-
-
-
-
-
+Feel free to take a look at the flytekit Dockerfile as well.
