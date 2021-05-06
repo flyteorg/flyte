@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
+
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 
@@ -57,6 +59,12 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	// initialized with number of sub tasks.
 	if len(currentState.GetArrayStatus().Detailed.GetItems()) == 0 {
 		currentState.ArrayStatus = *newArrayStatus
+	}
+
+	logPlugin, err := logs.InitializeLogPlugins(&config.LogConfig.Config)
+	if err != nil {
+		logger.Errorf(ctx, "Error initializing LogPlugins: [%s]", err)
+		return currentState, logLinks, subTaskIDs, err
 	}
 
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
@@ -113,7 +121,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 		}
 
 		var monitorResult MonitorResult
-		monitorResult, err = task.Monitor(ctx, tCtx, kubeClient, dataStore, outputPrefix, baseOutputDataSandbox)
+		monitorResult, err = task.Monitor(ctx, tCtx, kubeClient, dataStore, outputPrefix, baseOutputDataSandbox, logPlugin)
 		logLinks = task.LogLinks
 		subTaskIDs = task.SubTaskIDs
 
@@ -157,7 +165,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	return newState, logLinks, subTaskIDs, nil
 }
 
-func CheckPodStatus(ctx context.Context, client core.KubeClient, name k8sTypes.NamespacedName) (
+func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8sTypes.NamespacedName, index int, retryAttempt uint32, logPlugin tasklog.Plugin) (
 	info core.PhaseInfo, err error) {
 
 	pod := &v1.Pod{
@@ -192,11 +200,19 @@ func CheckPodStatus(ctx context.Context, client core.KubeClient, name k8sTypes.N
 	}
 
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
-		taskLogs, err := logs.GetLogsForContainerInPod(ctx, pod, 0, " (User)")
-		if err != nil {
-			return core.PhaseInfoUndefined, err
+
+		if logPlugin != nil {
+			o, err := logPlugin.GetTaskLogs(tasklog.Input{
+				PodName:   pod.Name,
+				Namespace: pod.Namespace,
+				LogName:   fmt.Sprintf(" #%d-%d", index, retryAttempt),
+			})
+
+			if err != nil {
+				return core.PhaseInfoUndefined, err
+			}
+			taskInfo.Logs = o.TaskLogs
 		}
-		taskInfo.Logs = taskLogs
 	}
 	switch pod.Status.Phase {
 	case v1.PodSucceeded:

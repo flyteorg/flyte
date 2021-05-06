@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+
 	core2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -93,6 +97,15 @@ func getMockTaskExecutionContext(ctx context.Context) *mocks.TaskExecutionContex
 	return tCtx
 }
 
+func TestGetNamespaceForExecution(t *testing.T) {
+	ctx := context.Background()
+	tCtx := getMockTaskExecutionContext(ctx)
+
+	assert.Equal(t, GetNamespaceForExecution(tCtx, ""), tCtx.TaskExecutionMetadata().GetNamespace())
+	assert.Equal(t, GetNamespaceForExecution(tCtx, "abcd"), "abcd")
+	assert.Equal(t, GetNamespaceForExecution(tCtx, "a-{{.namespace}}-b"), fmt.Sprintf("a-%s-b", tCtx.TaskExecutionMetadata().GetNamespace()))
+}
+
 func testSubTaskIDs(t *testing.T, actual []*string) {
 	var expected = make([]*string, 5)
 	for i := 0; i < len(expected); i++ {
@@ -113,16 +126,54 @@ func TestCheckSubTasksState(t *testing.T) {
 	tCtx.OnResourceManager().Return(&resourceManager)
 
 	t.Run("Happy case", func(t *testing.T) {
-		config := Config{MaxArrayJobSize: 100}
-		newState, _, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
+		config := Config{
+			MaxArrayJobSize:      100,
+			MaxErrorStringLength: 200,
+			NamespaceTemplate:    "a-{{.namespace}}-b",
+			OutputAssembler: workqueue.Config{
+				Workers:            2,
+				MaxRetries:         0,
+				IndexCacheMaxItems: 100,
+			},
+			ErrorAssembler: workqueue.Config{
+				Workers:            2,
+				MaxRetries:         0,
+				IndexCacheMaxItems: 100,
+			},
+			LogConfig: LogConfig{
+				Config: logs.LogConfig{
+					IsCloudwatchEnabled:   true,
+					CloudwatchTemplateURI: "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.{{ .podName }};streamFilter=typeLogStreamPrefix",
+					IsKubernetesEnabled:   true,
+					KubernetesTemplateURI: "k8s/log/{{.namespace}}/{{.podName}}/pod?namespace={{.namespace}}",
+				}},
+		}
+		cacheIndexes := bitarray.NewBitSet(5)
+		cacheIndexes.Set(0)
+		cacheIndexes.Set(1)
+		cacheIndexes.Set(2)
+		cacheIndexes.Set(3)
+		cacheIndexes.Set(4)
+
+		newState, logLinks, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
 			ExecutionArraySize:   5,
 			OriginalArraySize:    10,
 			OriginalMinSuccesses: 5,
+			IndexesToCache:       cacheIndexes,
 		})
 
 		assert.Nil(t, err)
-		//assert.NotEmpty(t, logLinks)
+		assert.NotEmpty(t, logLinks)
+		assert.Equal(t, 10, len(logLinks))
+		for i := 0; i < 10; i = i + 2 {
+			assert.Equal(t, fmt.Sprintf("Kubernetes Logs #%d-0 (PhaseRunning)", i/2), logLinks[i].Name)
+			assert.Equal(t, fmt.Sprintf("k8s/log/a-n-b/notfound-%d/pod?namespace=a-n-b", i/2), logLinks[i].Uri)
+
+			assert.Equal(t, fmt.Sprintf("Cloudwatch Logs #%d-0 (PhaseRunning)", i/2), logLinks[i+1].Name)
+			assert.Equal(t, fmt.Sprintf("https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logStream:group=/kubernetes/flyte;prefix=var.log.containers.notfound-%d;streamFilter=typeLogStreamPrefix", i/2), logLinks[i+1].Uri)
+		}
+
 		p, _ := newState.GetPhase()
 		assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), p.String())
 		resourceManager.AssertNumberOfCalls(t, "AllocateResource", 0)
@@ -177,11 +228,13 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 			},
 		}
 
+		cacheIndexes := bitarray.NewBitSet(5)
 		newState, _, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
 			ExecutionArraySize:   5,
 			OriginalArraySize:    10,
 			OriginalMinSuccesses: 5,
+			IndexesToCache:       cacheIndexes,
 			ArrayStatus: arraystatus.ArrayStatus{
 				Detailed: arrayCore.NewPhasesCompactArray(uint(5)),
 			},

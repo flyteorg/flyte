@@ -2,8 +2,11 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
@@ -49,7 +52,7 @@ const (
 )
 
 func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient) (LaunchResult, error) {
-	podTemplate, _, err := FlyteArrayJobToK8sPodTemplate(ctx, tCtx)
+	podTemplate, _, err := FlyteArrayJobToK8sPodTemplate(ctx, tCtx, t.Config.NamespaceTemplate)
 	if err != nil {
 		return LaunchError, errors2.Wrapf(ErrBuildPodTemplate, err, "Failed to convert task template to a pod template for a task")
 	}
@@ -129,20 +132,31 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	return LaunchSuccess, nil
 }
 
-func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference) (MonitorResult, error) {
+func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference,
+	logPlugin tasklog.Plugin) (MonitorResult, error) {
 	indexStr := strconv.Itoa(t.ChildIdx)
 	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 	t.SubTaskIDs = append(t.SubTaskIDs, &podName)
-	phaseInfo, err := CheckPodStatus(ctx, kubeClient,
+
+	// Use original-index for log-name/links
+	originalIdx := arrayCore.CalculateOriginalIndex(t.ChildIdx, t.State.GetIndexesToCache())
+	phaseInfo, err := FetchPodStatusAndLogs(ctx, kubeClient,
 		k8sTypes.NamespacedName{
 			Name:      podName,
-			Namespace: tCtx.TaskExecutionMetadata().GetNamespace(),
-		})
+			Namespace: GetNamespaceForExecution(tCtx, t.Config.NamespaceTemplate),
+		},
+		originalIdx,
+		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt,
+		logPlugin)
 	if err != nil {
 		return MonitorError, errors2.Wrapf(ErrCheckPodStatus, err, "Failed to check pod status.")
 	}
 
 	if phaseInfo.Info() != nil {
+		// Append sub-job status in Log Name for viz.
+		for _, log := range phaseInfo.Info().Logs {
+			log.Name += fmt.Sprintf(" (%s)", phaseInfo.Phase().String())
+		}
 		t.LogLinks = append(t.LogLinks, phaseInfo.Info().Logs...)
 	}
 
@@ -152,7 +166,6 @@ func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kube
 
 	actualPhase := phaseInfo.Phase()
 	if phaseInfo.Phase().IsSuccess() {
-		originalIdx := arrayCore.CalculateOriginalIndex(t.ChildIdx, t.State.GetIndexesToCache())
 		actualPhase, err = array.CheckTaskOutput(ctx, dataStore, outputPrefix, baseOutputDataSandbox, t.ChildIdx, originalIdx)
 		if err != nil {
 			return MonitorError, err
@@ -175,7 +188,7 @@ func (t Task) Abort(ctx context.Context, tCtx core.TaskExecutionContext, kubeCli
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
-			Namespace: tCtx.TaskExecutionMetadata().GetNamespace(),
+			Namespace: GetNamespaceForExecution(tCtx, t.Config.NamespaceTemplate),
 		},
 	}
 
