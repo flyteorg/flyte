@@ -3661,6 +3661,20 @@ spec:
           service:
             name: flyteadmin
             port:
+              number: 81
+        path: /flyteidl.service.AuthMetadataService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
+              number: 81
+        path: /flyteidl.service.IdentityService
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyteadmin
+            port:
               number: 87
         path: /openapi
         pathType: ImplementationSpecific
