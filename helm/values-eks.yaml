@@ -240,11 +240,6 @@ configmap:
         allowedHeaders:
           - "Content-Type"
 
-  task_type_whitelist:
-    spark:
-      - project: flytetester
-      - project: spark-workflows
-
   task_resource_defaults:
     task_resources:
       defaults:
@@ -370,36 +365,6 @@ workflow_notifications:
 cluster_resource_manager:
   # -- Enables the Cluster resource manager component
   enabled: true
-  # -- Configmap for ClusterResource parameters
-  config:
-    # -- ClusterResource parameters
-    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
-    cluster_resources:
-      templatePath: "/etc/flyte/clusterresource/templates"
-      customData:
-        - production:
-            - defaultIamRole:
-                value: "none"
-            - projectQuotaCpu:
-                value: "5"
-            - projectQuotaMemory:
-                value: "4000Mi"
-        - staging:
-            - defaultIamRole:
-                value: "none"
-            - projectQuotaCpu:
-                value: "2"
-            - projectQuotaMemory:
-                value: "3000Mi"
-        - development:
-            - defaultIamRole:
-                value: "none"
-            - projectQuotaCpu:
-                value: "4"
-            - projectQuotaMemory:
-                value: "3000Mi"
-      refresh: 5m
-
   templates:
     # -- Template for namespaces resources
     - key: aa_namespace
