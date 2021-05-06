@@ -60,6 +60,10 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyte-pod-webhook.name" -}}
+flyte-pod-webhook
+{{- end -}}
+
 
 {{- define "flyteconsole.name" -}}
 flyteconsole
