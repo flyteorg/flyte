@@ -1,6 +1,6 @@
 # We use devel because plugins_sagemaker-training needs gcc to build
 # TODO get rid of plugins_sagemaker-training
-FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-devel
+FROM python:3.8-slim-buster
 LABEL org.opencontainers.image.source https://github.com/flyteorg/flytesnacks
 
 WORKDIR /root
@@ -10,6 +10,12 @@ ENV PYTHONPATH /root
 
 # Install the AWS cli separately to prevent issues with boto being written over
 RUN pip install awscli
+
+# Install gcc , g++ and make
+RUN echo 'deb http://deb.debian.org/debian testing main' >> /etc/apt/sources.list \
+    && apt-get update && apt-get install --no-install-recommends -y gcc g++
+RUN echo 'installing make' \
+    && apt-get install make
 
 ENV VENV /opt/venv
 # Virtual environment
