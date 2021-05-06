@@ -363,4 +363,48 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_pkceConfig.timeout", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("pkceConfig.timeout"); err == nil {
+				assert.Equal(t, string(defaultConfig.PkceConfig.BrowserSessionTimeout.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.PkceConfig.BrowserSessionTimeout.String()
+
+			cmdFlags.Set("pkceConfig.timeout", testValue)
+			if vString, err := cmdFlags.GetString("pkceConfig.timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.PkceConfig.BrowserSessionTimeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_pkceConfig.refreshTime", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vString, err := cmdFlags.GetString("pkceConfig.refreshTime"); err == nil {
+				assert.Equal(t, string(defaultConfig.PkceConfig.TokenRefreshGracePeriod.String()), vString)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.PkceConfig.TokenRefreshGracePeriod.String()
+
+			cmdFlags.Set("pkceConfig.refreshTime", testValue)
+			if vString, err := cmdFlags.GetString("pkceConfig.refreshTime"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.PkceConfig.TokenRefreshGracePeriod)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
