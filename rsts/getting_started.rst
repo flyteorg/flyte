@@ -28,7 +28,28 @@ Steps
 
   make start
 
-3. Take a minute to explore Flyte Console through the provided URL.
+.. note::
+  - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
+  - If ``make start`` results in a timeout issue:
+     .. code-block:: bash
+
+       Starting Flyte sandbox
+       Waiting for Flyte to become ready...
+       Error from server (NotFound): deployments.apps "datacatalog" not found
+       Error from server (NotFound): deployments.apps "flyteadmin" not found
+       Error from server (NotFound): deployments.apps "flyteconsole" not found
+       Error from server (NotFound): deployments.apps "flytepropeller" not found
+       Timed out while waiting for the Flyte deployment to start
+     
+     You can run ``make teardown`` followed by the ``make start`` command.
+  - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses -- run the command ``docker exec flyte-sandbox kubectl get po -A``.
+  - If you think a pod's crashing by any chance, describe the pod by running the command ``docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte``. This gives a detailed overview of the pod's status.
+  - If Kubernetes reports a disk pressure issue:
+  
+    - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
+    - Prune the images and volumes. 
+
+1. Take a minute to explore Flyte Console through the provided URL.
 
 .. image:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
     :alt: A quick visual tour for launching your first Workflow.
@@ -79,6 +100,9 @@ Steps
 .. prompt:: bash
 
   REGISTRY=ghcr.io/flyteorg make fast_register
+
+.. note::
+   If the images are to be re-built, run ``make register`` command.
 
 9. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
 
