@@ -7,7 +7,7 @@ Flytekit Plugins
    :maxdepth: -1
    :caption: Contents
 
-   auto_integrations_flytekit_plugins_sqllite3/index
-   auto_integrations_flytekit_plugins_sqlalchemy/index
-   auto_integrations_flytekit_plugins_papermilltasks/index
-   auto_integrations_flytekit_plugins_pandera/index
+   auto/integrations/flytekit_plugins/sqllite3/index
+   auto/integrations/flytekit_plugins/sqlalchemy/index
+   auto/integrations/flytekit_plugins/papermilltasks/index
+   auto/integrations/flytekit_plugins/pandera/index

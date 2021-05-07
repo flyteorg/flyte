@@ -6,6 +6,6 @@ External Services
     :maxdepth: -1
     :caption: Contents
 
-    auto_integrations_external_services_hive/index
-    auto_integrations_external_services_databricks/index
-    auto_integrations_external_services_snowflake/index
+    auto/integrations/external_services/hive/index
+    auto/integrations/external_services/databricks/index
+    auto/integrations/external_services/snowflake/index

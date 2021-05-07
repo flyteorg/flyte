@@ -29,13 +29,13 @@ the `getting started <https://docs.flyte.org/en/latest/getting_started.html>`__ 
    :hidden:
 
    Introduction <self>
-   Flyte Basics <auto_core_flyte_basics/index>
-   Control Flow <auto_core_control_flow/index>
-   Type System <auto_type_system/index>
-   Testing <auto_testing/index>
-   Containerization <auto_core_containerization/index>
+   Flyte Basics <auto/core/flyte_basics/index>
+   Control Flow <auto/core/control_flow/index>
+   Type System <auto/type_system/index>
+   Testing <auto/testing/index>
+   Containerization <auto/core/containerization/index>
    deployment
-   Control Plane <auto_control_plane/index>
+   Control Plane <auto/control_plane/index>
    integrations 
    Extending flyte <extending_flyte>
 

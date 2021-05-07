@@ -10,8 +10,8 @@ When & How to Extend Flyte
     :hidden:
  
     extend_flyte_introduction
-    auto_core_extend_flyte/custom_task_plugin
-    auto_core_extend_flyte/run_custom_types
+    auto/core/extend_flyte/custom_task_plugin
+    auto/core/extend_flyte/run_custom_types
     extend_flyte_backend_plugins
 
 .. NOTE:: These docs are still work in progress. Please read through and if you have any questions don't shy away from either filing a github issue or ping us in the Slack channel. The community loves plugins and would love to help you in any way.

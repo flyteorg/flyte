@@ -6,6 +6,6 @@ Deployment
     :maxdepth: -1
     :caption: Deployment
  
-    Workflow Deployment <auto_deployment_workflow/index>
-    Cluster Deployment <auto_deployment_cluster/index>
-    Deployment Guides <auto_deployment_guides/index>
+    Workflow Deployment <auto/deployment/workflow/index>
+    Cluster Deployment <auto/deployment/cluster/index>
+    Deployment Guides <auto/deployment/guides/index>

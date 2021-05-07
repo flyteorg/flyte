@@ -9,4 +9,5 @@ release-snacks/*.tgz
 ._rsts/
 *.zip
 auto_*/
+docs/auto/*
 docs/_rsts/

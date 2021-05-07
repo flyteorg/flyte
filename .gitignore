@@ -17,8 +17,6 @@ _build/
 .vim/
 ._rsts/
 *.zip
-auto_*/
-docs/_rsts/
 .sandbox/bin/
 .sandbox/data/
 .vscode/
