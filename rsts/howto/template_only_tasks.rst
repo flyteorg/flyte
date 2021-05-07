@@ -22,7 +22,7 @@ Normal Function Tasks
 Most tasks that are in the cookbook and other Flyte introductory material are basic Python function tasks. That is, they are created by decorating a Python function with the ``@task`` decorator. Please see the basic Task concept doc for more details. With the decorator in place, the process is
 
 #. At serialization time, a Docker container image is required. The assumption is that this Docker image has the task code.
-#. The task is serialized into a ``TaskTemplate``. This template contains instructions to the container on how to reconstitute the task.
+#. The task is serialized into a :std:ref:`api_msg_flyteidl.core.tasktemplate`. This template contains instructions to the container on how to reconstitute the task.
 #. When Flyte runs the task, the container from step 1. is launched, and the instructions from step 2. recreate a Python object representing the task, using the user code in the container.
 #. The task object is run.
 
