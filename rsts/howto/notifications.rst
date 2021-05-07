@@ -30,7 +30,7 @@ For example
     # This launch plan triggers email notifications when the workflow execution it triggered reaches the phase `SUCCEEDED`.
     my_notifiying_lp = LaunchPlan.create(
         "my_notifiying_lp",
-        my_workflow_defintiion,
+        my_workflow_definition,
         default_inputs={"a": 4},
         notifications=[
             Email(
@@ -41,7 +41,7 @@ For example
     )
 
 
-See detailed usage examples in the :std:ref:`cookbook <cookbook:Getting notifications on workflow termination>`
+See detailed usage examples in the :std:ref:`User Guide <cookbook:sphx_glr_auto_deployment_workflow_lp_notifications.py>`
 
 Notifications can be combined with schedules to automatically alert you when a scheduled job succeeds or fails.
 
