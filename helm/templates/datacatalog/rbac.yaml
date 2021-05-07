@@ -10,4 +10,7 @@ metadata:
   {{- with .Values.datacatalog.serviceAccount.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
+{{- with .Values.datacatalog.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ toYaml . | nindent 4 }}
+{{- end}}
 {{- end }}
