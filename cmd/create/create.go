@@ -2,6 +2,7 @@ package create
 
 import (
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
+
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +17,7 @@ Example create.
 `
 )
 
-// CreateCommand will return create command
+// RemoteCreateCommand will return create flyte resource commands
 func RemoteCreateCommand() *cobra.Command {
 	createCmd := &cobra.Command{
 		Use:   "create",

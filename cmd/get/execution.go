@@ -3,13 +3,12 @@ package get
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/printer"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
 )
 
 const (
@@ -69,7 +68,7 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 	var executions []*admin.Execution
 	if len(args) > 0 {
 		name := args[0]
-		execution, err := DefaultFetcher.FetchExecution(ctx, name, config.GetConfig().Project, config.GetConfig().Domain, cmdCtx)
+		execution, err := cmdCtx.AdminFetcherExt().FetchExecution(ctx, name, config.GetConfig().Project, config.GetConfig().Domain)
 		if err != nil {
 			return err
 		}
@@ -88,7 +87,8 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		executions = executionList.Executions
 	}
 	logger.Infof(ctx, "Retrieved %v executions", len(executions))
-	err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns, ExecutionToProtoMessages(executions)...)
+	err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
+		ExecutionToProtoMessages(executions)...)
 	if err != nil {
 		return err
 	}

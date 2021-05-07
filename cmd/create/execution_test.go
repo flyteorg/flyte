@@ -175,7 +175,7 @@ func TestCreateLaunchPlanExecutionFunc(t *testing.T) {
 	err = createExecutionCommand(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)
-	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
+	tearDownAndVerify(t, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e" `)
 }
 
 func TestCreateRelaunchExecutionFunc(t *testing.T) {

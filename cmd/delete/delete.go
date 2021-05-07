@@ -25,7 +25,8 @@ func RemoteDeleteCommand() *cobra.Command {
 		Long:  deleteCmdLong,
 	}
 	terminateResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"execution": {CmdFunc: terminateExecutionFunc, Aliases: []string{"executions"}, Short: execCmdShort, Long: execCmdLong},
+		"execution": {CmdFunc: terminateExecutionFunc, Aliases: []string{"executions"}, Short: execCmdShort,
+			Long: execCmdLong},
 	}
 	cmdcore.AddCommands(deleteCmd, terminateResourcesFuncs)
 	return deleteCmd

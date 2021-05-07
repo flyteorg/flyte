@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/adminutils"
+	"github.com/flyteorg/flytectl/pkg/ext"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -109,7 +110,7 @@ func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 		name := args[0]
 		var tasks []*admin.Task
 		var err error
-		if tasks, err = FetchTaskForName(ctx, name, project, domain, cmdCtx); err != nil {
+		if tasks, err = FetchTaskForName(ctx, cmdCtx.AdminFetcherExt(), name, project, domain); err != nil {
 			return err
 		}
 		logger.Debugf(ctx, "Retrieved Task", tasks)
@@ -121,4 +122,36 @@ func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 	}
 	logger.Debugf(ctx, "Retrieved %v Task", len(tasks))
 	return taskPrinter.Print(config.GetConfig().MustOutputFormat(), entityColumns, adminutils.NamedEntityToProtoMessage(tasks)...)
+}
+
+// FetchTaskForName Reads the task config to drive fetching the correct tasks.
+func FetchTaskForName(ctx context.Context, fetcher ext.AdminFetcherExtInterface, name, project, domain string) ([]*admin.Task, error) {
+	var tasks []*admin.Task
+	var err error
+	var task *admin.Task
+	if taskConfig.Latest {
+		if task, err = fetcher.FetchTaskLatestVersion(ctx, name, project, domain); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	} else if taskConfig.Version != "" {
+		if task, err = fetcher.FetchTaskVersion(ctx, name, taskConfig.Version, project, domain); err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, task)
+	} else {
+		tasks, err = fetcher.FetchAllVerOfTask(ctx, name, project, domain)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if taskConfig.ExecFile != "" {
+		// There would be atleast one task object when code reaches here and hence the length assertion is not required.
+		task = tasks[0]
+		// Only write the first task from the tasks object.
+		if err = CreateAndWriteExecConfigForTask(task, taskConfig.ExecFile); err != nil {
+			return nil, err
+		}
+	}
+	return tasks, nil
 }

@@ -11,6 +11,7 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flytectl/pkg/ext"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 
 	"github.com/stretchr/testify/assert"
@@ -26,6 +27,7 @@ var (
 	Err           error
 	Ctx           context.Context
 	MockClient    *mocks.AdminServiceClient
+	FetcherExt    ext.AdminFetcherExtInterface
 	mockOutStream io.Writer
 	CmdCtx        cmdCore.CommandContext
 	stdOut        *os.File
@@ -57,6 +59,10 @@ func TearDownAndVerify(t *testing.T, expectedLog string) {
 	os.Stderr = stderr
 	var buf bytes.Buffer
 	if _, err := io.Copy(&buf, reader); err == nil {
-		assert.Equal(t, strings.Trim(expectedLog, "\n "), strings.Trim(buf.String(), "\n "))
+		assert.Equal(t, santizeString(expectedLog), santizeString(buf.String()))
 	}
+}
+
+func santizeString(str string) string {
+	return strings.Trim(strings.ReplaceAll(strings.ReplaceAll(str, "\n", ""), "\t", ""), " \t")
 }
