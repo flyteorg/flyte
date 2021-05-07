@@ -1,3 +1,36 @@
+{{- define "grpcRoutes" -}}
+# NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
+- path: /flyteidl.service.AdminService
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.AdminService/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.AuthMetadataService
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.AuthMetadataService/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.IdentityService
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+- path: /flyteidl.service.IdentityService/*
+  pathType: ImplementationSpecific
+  backend:
+    serviceName: flyteadmin
+    servicePort: 81
+{{- end }}
 {{- if .Values.common.ingress.enabled }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
@@ -69,6 +102,11 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
+          - path: /.well-known
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: flyteadmin
+              servicePort: 80
           - path: /.well-known/*
             pathType: ImplementationSpecific
             backend:
@@ -120,37 +158,7 @@ spec:
               serviceName: flyteadmin
               servicePort: 80
           {{- if not .Values.common.ingress.separateGrpcIngress }}
-          # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
-          - path: /flyteidl.service.AdminService
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.AdminService/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.AuthMetadataService
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.AuthMetadataService/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.IdentityService
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.IdentityService/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
+          {{- include "grpcRoutes" . | nindent 10 -}}
           {{- end }}
       {{- with .Values.common.ingress.host }}
       host: {{ . }}
@@ -190,37 +198,7 @@ spec:
             path: /*
             pathType: ImplementationSpecific
           {{- end }}
-          # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
-          - path: /flyteidl.service.AdminService
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.AdminService/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.AuthMetadataService
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.AuthMetadataService/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.IdentityService
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
-          - path: /flyteidl.service.IdentityService/*
-            pathType: ImplementationSpecific
-            backend:
-              serviceName: flyteadmin
-              servicePort: 81
+          {{- include "grpcRoutes" . | nindent 10 -}}
       {{- with .Values.common.ingress.host }}
       host: {{ . }}
       {{- end }}

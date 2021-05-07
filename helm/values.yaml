@@ -427,9 +427,17 @@ configmap:
       httpPort: 8088
       grpcPort: 8089
       security:
+        # -- Controls whether to serve requests over SSL/TLS.
         secure: false
+        # -- Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
         useAuth: false
         allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+          - "flyte-authorization"
     # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
@@ -441,7 +449,34 @@ configmap:
       eventVersion: 1
       testing:
         host: http://flyteadmin
-  
+    # -- Authentication configuration
+    auth:
+      authorizedUris:
+        # This should point at your public http Uri.
+        - https://localhost:30081
+        # This will be used by internal services in the same namespace as flyteadmin
+        - http://flyteadmin:80
+        # This will be used by internal services in the same cluster but different namespaces
+        - http://flyteadmin.flyte.svc.cluster.local:80
+
+      # Controls app authentication config
+      appAuth:
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: https://localhost:53593/callback
+            scopes:
+              - offline
+              - all
+      # Controls user authentication
+      userAuth:
+        openId:
+          baseUrl: https://accounts.google.com
+          scopes:
+            - profile
+            - openid
+          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+
   # -- Datacatalog server config
   datacatalogServer:
     datacatalog:
@@ -477,6 +512,8 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
 
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
@@ -566,6 +603,13 @@ configmap:
     logger:
       show-source: true
       level: 4
+
+  remoteData:
+    remoteData:
+      region: "us-east-1"
+      scheme: "local"
+      signedUrls:
+        durationMinutes: 3
 
   # -- Resource manager configuration
   resource_manager:
