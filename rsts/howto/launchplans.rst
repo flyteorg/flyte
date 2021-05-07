@@ -13,7 +13,7 @@ When to use launchplans?
 - I want to share my workflow to another user but also make sure that some inputs can be overridden if needed.
 - I want to share my workflow with another user but make sure that some inputs are never changed.
 
-For preliminary examples on using launch plans in code, check out the canonical :std:ref:`cookbook <cookbook:launch_plans>` examples.
+For preliminary examples on using launch plans in code, check out the canonical :std:ref:`User Guide <cookbook:sphx_glr_auto_core_flyte_basics_lp.py>` examples.
 
 Partial Inputs for Launchplans
 ==============================
