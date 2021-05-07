@@ -117,25 +117,25 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
 - Memoization and Lineage tracking
 - Workflow features:
-  - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_remote_flyte/lp_schedules.html)**, trigger using a programmatic API, or on-demand
+  - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/workflow/lp_schedules.html)**, trigger using a programmatic API, or on-demand
   - Parallel step execution
-  - Extensible backend to add [customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_advanced/custom_task_plugin.html) experience (with simplified user experience)
-  - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/run_conditions.html)**
-  - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/subworkflows.html)** (a workflow can be embeded within one node of the top level workflow)
+  - Extensible backend to add **[customized plugin](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/extend_flyte/custom_task_plugin.html)** experience (with simplified user experience)
+  - **[Branching](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/run_conditions.html)**
+  - Inline **[subworkflows](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/subworkflows.html)** (a workflow can be embeded within one node of the top level workflow)
   - Distributed **remote child workflows** (a remote workflow can be triggered and statically verified at compile time)
-  - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
-  - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/dynamics.html)** creation and execution with runtime type safety
+  - **[Array Tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html)** (map a function over a large dataset -- ensures controlled execution of thousands of containers)
+  - **[Dynamic workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html)** creation and execution with runtime type safety
   - Container side [plugins](https://docs.flyte.org/projects/cookbook/en/latest/plugins.html) with first class support in Python
   - _PreAlpha_: Arbitrary flytekit-less containers supported ([RawContainer](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/raw_container.html))
-- Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto_core_basic/task_cache.html)** of pipelines via:
+- Guaranteed **[reproducibility](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html)** of pipelines via:
   - Versioned data, code and models
   - Automatically tracked executions
   - Declarative pipelines
 - **Multi cloud support** (AWS, GCP and others)
 - Extensible core, modularized, and deep observability
 - Automated notifications to Slack, Email, and Pagerduty
-- [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_pod/index.html)
-- Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_hive/index.html)**, etc.
+- [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
+- Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
 - Snappy Console
 - Python CLI and Golang CLI (flytectl)
 - Written in **Golang** and optimized for large running jobs' performance
@@ -150,17 +150,17 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 ## 🔌 Available Plugins
 
 - Containers
-- [K8s Pods](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_pod/index.html)
+- [K8s Pods](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - AWS Batch Arrays
 - K8s Pod Arrays
-- K8s Spark (native [Pyspark](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_k8s_spark/index.html) and Java/Scala)
+- K8s Spark (native [Pyspark](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html) and Java/Scala)
 - AWS Athena
-- [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_hive/index.html)
+- [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)
 - Presto Queries
-- Distributed Pytorch (K8s Native) -- [Pytorch Operator](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_kfpytorch/index.html)
-- Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto_plugins_sagemaker_training/sagemaker_custom_training.html))
-- Distributed Tensorflow (K8s Native) - TFOperator
-- Papermill notebook execution ([Python](https://github.com/lyft/flytekit/tree/master/plugins/papermill) and Spark)
+- Distributed Pytorch (K8s Native) -- [Pytorch Operator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kfpytorch/index.html)
+- Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_custom_training.html))
+- Distributed Tensorflow (K8s Native) - [TFOperator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kftensorflow/index.html)
+- Papermill notebook execution ([Python](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/papermilltasks/index.html) and Spark)
 - Type safe and data checking for Pandas dataframe using Pandera
 
 ### In Queue
