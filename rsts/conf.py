@@ -18,6 +18,7 @@
 
 import sphinx.application
 import sphinx.errors
+import sphinx_fontawesome
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
 # -- Project information -----------------------------------------------------
@@ -60,6 +61,7 @@ extensions = [
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     "sphinx_search.extension",
+    "sphinx_fontawesome",
 ]
 
 extlinks = {
@@ -120,6 +122,13 @@ html_theme_options = {
         "color-brand-primary": "#9D68E4",
         "color-brand-content": "#9D68E4",
     },
+    # custom flyteorg furo theme options
+    "github_repo": "flytesnacks",
+    "github_username": "flyteorg",
+    "github_commit": "master",
+    "docs_path": "cookbook/docs",  # path to documentation source
+    "sphinx_gallery_src_dir": "cookbook",  # path to directory of sphinx gallery source files relative to repo root
+    "sphinx_gallery_dest_dir": "auto",  # path to root directory containing auto-generated sphinx gallery examples
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
