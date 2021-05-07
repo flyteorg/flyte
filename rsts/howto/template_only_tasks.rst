@@ -19,7 +19,7 @@ Process Differences
 Normal Function Tasks
 ---------------------
 
-Most tasks that are in the cookbook and other Flyte introductory material are basic Python function tasks. That is, they are created by decorating a Python function with the ``@task`` decorator. Please see the basic Task concept doc for more details. With the decorator in place, the process is
+Most tasks that are in the cookbook and other Flyte introductory material are basic Python function tasks. That is, they are created by decorating a Python function with the :py:function:flytekit.task decorator. Please see the basic Task concept doc for more details. With the decorator in place, the process is
 
 #. At serialization time, a Docker container image is required. The assumption is that this Docker image has the task code.
 #. The task is serialized into a :std:ref:`api_msg_flyteidl.core.tasktemplate`. This template contains instructions to the container on how to reconstitute the task.
