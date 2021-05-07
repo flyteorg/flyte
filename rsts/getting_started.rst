@@ -28,28 +28,6 @@ Steps
 
   make start
 
-.. note::
-  - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
-  - If ``make start`` results in a timeout issue:
-     .. code-block:: bash
-
-       Starting Flyte sandbox
-       Waiting for Flyte to become ready...
-       Error from server (NotFound): deployments.apps "datacatalog" not found
-       Error from server (NotFound): deployments.apps "flyteadmin" not found
-       Error from server (NotFound): deployments.apps "flyteconsole" not found
-       Error from server (NotFound): deployments.apps "flytepropeller" not found
-       Timed out while waiting for the Flyte deployment to start
-     
-     You can run ``make teardown`` followed by the ``make start`` command.
-  - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses -- run the command ``docker exec flyte-sandbox kubectl get po -A``.
-  - If you think a pod's crashing by any chance, describe the pod by running the command ``docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte``. This gives a detailed overview of the pod's status.
-  - If Kubernetes reports a disk pressure issue:
-  
-    - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
-    - Prune the images and volumes. 
-    - Given there's less than 10% free disk space, Kubernetes by default throws the disk pressure error.
-
 3. Take a minute to explore Flyte Console through the provided URL.
 
 .. image:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
