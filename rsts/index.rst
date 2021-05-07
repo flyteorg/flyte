@@ -56,7 +56,7 @@ Meet Flyte
 
 .. raw:: html
 
-   <p style="color: #808080; font-weight: 350; font-size: 25px; padding: 0 10% 0 10%; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale </p>
+   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale </p>
 
 
 Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.

@@ -48,7 +48,7 @@ You can optionally configure the Plugin as per the - `backend Config Structure <
 
 Spark in Flytekit
 ========================
-For a more complete example refer to :std:ref:`Cookbook Spark Plugin <sphx_glr_auto_plugins_k8s_spark>`
+For a more complete example refer to the :std:ref:`User Guide <cookbook:sphx_glr_auto_integrations_kubernetes_k8s_spark>`
 
 #. Ensure you have ``flytekit>=0.16.0``
 #. Enable Spark in backend, following the previous section.
