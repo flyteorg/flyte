@@ -1,0 +1,42 @@
+{{- if .Values.cluster_resource_manager.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: syncresources
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+spec:
+  schedule: '*/1 * * * *'
+  jobTemplate:
+    spec:
+      template:
+        {{- with .Values.flyteadmin.podAnnotations }}
+        metadata:
+          annotations: {{ toYaml . | nindent 12 }}
+        {{- end }}
+        spec:
+          containers:
+          - command:
+            - flyteadmin
+            - --config
+            - {{ .Values.flyteadmin.configPath }}
+            - clusterresource
+            - sync
+            image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
+            imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
+            name: sync-cluster-resources
+            volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 12 }}
+            - mountPath: /etc/flyte/clusterresource/templates
+              name: resource-templates
+            - mountPath: /etc/flyte/config
+              name: config-volume
+          restartPolicy: OnFailure
+          serviceAccountName: flyteadmin
+          volumes: {{- include "databaseSecret.volume" . | nindent 10 }}
+          - configMap:
+              name: clusterresource-template
+            name: resource-templates
+          - configMap:
+              name: flyte-admin-config
+            name: config-volume
+  {{- end }}

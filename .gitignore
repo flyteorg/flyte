@@ -16,3 +16,5 @@ docs/searchindex.js
 docs/
 release/
 __pycache__/
+/helm/charts/
+Chart.lock

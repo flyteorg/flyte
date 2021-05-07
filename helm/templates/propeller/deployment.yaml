@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flytepropeller.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flytepropeller.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.flytepropeller.replicaCount }}
+  selector:
+    matchLabels: {{ include "flytepropeller.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flytepropeller.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels: {{ include "flytepropeller.labels" . | nindent 8 }}
+    spec:
+      containers:
+      - command:
+        - flytepropeller
+        - --config
+        - {{ .Values.flytepropeller.configPath }}
+        {{- with .Values.flytepropeller.extraArgs }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+        imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
+        name: flytepropeller
+        ports:
+        - containerPort: 10254
+        resources: {{ toYaml .Values.flytepropeller.resources | nindent 10 }}
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/flyte/config
+          - name: auth
+            mountPath: /etc/secrets/
+      serviceAccountName: {{ template "flytepropeller.name" . }}
+      volumes:
+      - configMap:
+          name: flyte-propeller-config
+        name: config-volume
+      - name: auth
+        secret:
+          secretName: flyte-propeller-auth
+      {{- with .Values.flytepropeller.nodeSelector }}
+      nodeSelector: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytepropeller.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.flytepropeller.tolerations }}
+      tolerations: {{ toYaml . | nindent 8 }}
+      {{- end }}

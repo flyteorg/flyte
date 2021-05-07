@@ -1,0 +1,523 @@
+#
+# FLYTEADMIN
+#
+
+flyteadmin:
+  replicaCount: 2
+  # -- IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
+  serviceAccount:
+    # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
+    # you can change the name of this role
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+
+  resources:
+    limits:
+      ephemeral-storage: 200Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 200Mi
+      memory: 200Mi
+
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO alter domain
+      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
+
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flyteadmin
+          topologyKey: kubernetes.io/hostname
+
+#
+# DATACATALOG
+#
+
+datacatalog:
+  replicaCount: 2
+  serviceAccount:
+    # -- If the service account is created by you, make this false
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+  resources:
+    limits:
+      cpu: 500m
+      ephemeral-storage: 200Mi
+    requests:
+      cpu: 50m
+      ephemeral-storage: 200Mi
+      memory: 200Mi
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: datacatalog
+          topologyKey: kubernetes.io/hostname
+
+#
+# FLYTEPROPELLER
+#
+
+flytepropeller:
+  replicaCount: 2
+  serviceAccount:
+    # -- If the service account is created by you, make this false
+    create: false
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
+  resources:
+    limits:
+      cpu: 1
+      ephemeral-storage: 1Gi
+      memory: 2Gi
+    requests:
+      cpu: 1
+      ephemeral-storage: 1Gi
+      memory: 2Gi
+  cacheSizeMbs: 1024
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flytepropeller
+          topologyKey: kubernetes.io/hostname
+
+#
+# FLYTECONSOLE
+#
+
+flyteconsole:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: 250m
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "600"
+      # TODO alter domain
+      external-dns.alpha.kubernetes.io/hostname: "flyte.example.com"
+    type: LoadBalancer
+    loadBalancerSourceRanges:
+      # TODO change source ip range if desired
+      - 0.0.0.0/0
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: flyteconsole
+          topologyKey: kubernetes.io/hostname
+
+#
+# REDIS
+#
+
+redis:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 250Mi
+
+#
+# POSTGRES
+#
+
+postgres:
+  enabled: false
+
+#
+# MINIO
+#
+
+minio:
+  enabled: false
+
+#
+# CONTOUR
+#
+
+contour:
+  enabled: false
+
+#
+# COMMON
+#
+
+common:
+  ingress:
+    host: flyte.example.com
+    albSSLRedirect: true
+    separateGrpcIngress: true
+    annotations:
+      # -- aws-load-balancer-controller v2.1 or higher is required - https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.1/
+      # For EKS if using [ALB](https://kubernetes-sigs.github.io/aws-load-balancer-controller/guide/ingress/annotations/), these annotations are set
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/tags: service_instance=production
+      alb.ingress.kubernetes.io/scheme: internet-facing
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:<ACCOUNT_NUMBER>:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+      # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)
+      alb.ingress.kubernetes.io/group.name: flyte
+  databaseSecret:
+    name: db-pass
+    secretManifest:
+      # -- Leave it empty if your secret already exists
+      # Else you can create your own secret object. You can use Kubernetes secrets, else you can configure external secrets
+      # For external secrets please install Necessary dependencies, like, of your choice
+      # - https://github.com/hashicorp/vault
+      # - https://github.com/godaddy/kubernetes-external-secrets
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: db-pass
+      type: Opaque
+      stringData:
+        # -- If using plain text you can provide the password here
+        pass.txt: awesomesauce
+
+# -----------------------------------------------------
+# Core dependencies that should be configured for Flyte to work on any platform
+# Specifically 2 - Storage (s3, gcs etc), Production RDBMS - Aurora, CloudSQL etc
+# ------------------------------------------------------
+#
+# STORAGE SETTINGS
+#
+
+storage:
+  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
+  type: s3
+  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  bucketName: <BUCKET_NAME>
+  s3:
+    region: <AWS_REGION>
+
+db:
+  database:
+    port: 5432
+    # -- Create a user called flyte
+    username: flyte
+    host: <RDS_HOST_DNS>
+    # -- Create a DB called flyteadmin (OR change the name here)
+    dbname: flyteadmin
+    passwordPath: /etc/db/pass.txt
+
+#
+# CONFIGMAPS
+#
+
+configmap:
+  server:
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      security:
+        secure: false
+        useAuth: false
+        allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+
+  task_resource_defaults:
+    task_resources:
+      defaults:
+        cpu: 1000m
+        memory: 1000Mi
+        storage: 1000Mi
+      limits:
+        storage: 2000Mi
+
+  core:
+    propeller:
+      rawoutput-prefix: s3://s3-bucket-for-flyte/
+      workers: 40
+      gc-interval: 12h
+      max-workflow-retries: 50
+      kube-client-config:
+        qps: 100
+        burst: 25
+        timeout: 30s
+      queue:
+        sub-queue:
+          type: bucket
+          rate: 100
+          capacity: 1000
+
+  enabled_plugins:
+    # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
+    tasks:
+      # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
+      task-plugins:
+        # -- [Enabled Plugins](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
+        # plugins
+        enabled-plugins:
+          - container
+          - sidecar
+          - spark
+          - k8s-array
+          - pytorch
+          - athena
+        #          - sagemaker_hyperparameter_tuning
+        #          - sagemaker_custom_training
+        #          - sagemaker_training
+        default-for-task-types:
+          container: container
+          sidecar: sidecar
+          spark: spark
+          container_array: k8s-array
+          pytorch: pytorch
+          hive: athena
+  #          sagemaker_custom_training_task: sagemaker_custom_training
+  #          sagemaker_custom_training_job_task: sagemaker_custom_training
+
+  logger:
+    logger:
+      level: 5
+
+  # -- Section that configures how the Task logs are displayed on the UI. This has to be changed based on your actual logging provider.
+  # Refer to [structure](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/logs#LogConfig) to understand how to configure various
+  # logging engines
+  task_logs:
+    plugins:
+      logs:
+        kubernetes-enabled: false
+        # -- One option is to enable cloudwatch logging for EKS, update the region and log group accordingly
+        # You can even disable this
+        cloudwatch-enabled: true
+        # -- region where logs are hosted
+        cloudwatch-region: <AWS_REGION>
+        # -- cloudwatch log-group
+        cloudwatch-log-group: <LOG_GROUP_NAME>
+
+# ----------------------------------------------------------------
+# Optional Modules
+# Flyte built extensions that enable various additional features in Flyte.
+# All these features are optional, but are critical to run certain features
+# ------------------------------------------------------------------------
+
+# -- # Flyte uses a cloud hosted Cron scheduler to run workflows on a schedule. The following module is optional. Without,
+# this module, you will not have scheduled launchplans/workflows.
+workflow_scheduler:
+  enabled: false
+  config:
+    scheduler:
+      # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
+      eventScheduler:
+        scheme: aws
+        region: us-east-2
+        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:us-east-2:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
+        scheduleNamePrefix: flyte
+      workflowExecutor:
+        scheme: aws
+        region: us-east-2
+        scheduleQueueName: flyte-helm-test-cron-scheduler-queue
+        accountId: <ACCOUNT_NUMBER>
+        reconnectAttempts: 10
+        reconnectDelaySeconds: 30
+
+# --
+# Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
+# various events in their workflows
+workflow_notifications:
+  enabled: false
+  config:
+    notifications:
+      type: aws
+      region: us-east-2
+      publisher:
+        topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
+      processor:
+        queueName: flyte-notifications-queue
+        accountId: <ACCOUNT-NUMBER>
+      emailer:
+        subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+        sender: "flyte@example.com"
+        body: |
+          Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+          Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+          {{ error }}
+
+# -- Configuration for the Cluster resource manager component. This is an optional component, that enables automatic
+# cluster configuration. This is useful to set default quotas, manage namespaces etc that map to a project/domain
+cluster_resource_manager:
+  # -- Enables the Cluster resource manager component
+  enabled: true
+  templates:
+    # -- Template for namespaces resources
+    - key: aa_namespace
+      value: |
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: {{ namespace }}
+        spec:
+          finalizers:
+          - kubernetes
+
+    # -- Patch default service account
+    - key: aab_default_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: default
+          namespace: {{ namespace }}
+          annotations:
+            eks.amazonaws.com/role-arn: {{ defaultIamRole }}
+
+    - key: ab_project_resource_quota
+      value: |
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: project-quota
+          namespace: {{ namespace }}
+        spec:
+          hard:
+            limits.cpu: {{ projectQuotaCpu }}
+            limits.memory: {{ projectQuotaMemory }}
+
+    # -- Template copilot configuration
+    - key: ac_project_copilot_dataconfig
+      value: |
+        kind: ConfigMap
+        apiVersion: v1
+        metadata:
+          name: flyte-data-config
+          namespace: {{ namespace }}
+        data:
+          config.yaml: |
+            storage:
+              type: s3
+              container: <BUCKET_NAME>
+              connection:
+                auth-type: iam
+                region: <AWS_REGION>
+              enable-multicontainer: true
+
+    # -- Template for spark role
+    - key: ad_spark_role
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: Role
+        metadata:
+          name: spark-role
+          namespace: {{ namespace }}
+        rules:
+        - apiGroups:
+          - ""
+          resources:
+          - pods
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - services
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          resources:
+          - configmaps
+          verbs:
+          - '*'
+
+    # -- Template for spark SA
+    - key: ae_spark_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: spark
+          namespace: {{ namespace }}
+          annotations:
+            eks.amazonaws.com/role-arn: {{ defaultIamRole }}
+
+    # -- Template for spark role binding
+    - key: af_spark_role_binding
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1beta1
+        kind: RoleBinding
+        metadata:
+          name: spark-role-binding
+          namespace: {{ namespace }}
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: Role
+          name: spark-role
+        subjects:
+        - kind: ServiceAccount
+          name: spark
+          namespace: {{ namespace }}
+
+#
+# SPARKOPERATOR
+#
+
+sparkoperator:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+#
+# PYTORCHOPERATOR
+#
+
+pytorchoperator:
+  enabled: true
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 1000Mi
+    requests:
+      cpu: 50m
+      memory: 250Mi
+
+# ----------------------
+# -- Distributed tensorflow training using the TF-Operator. This can be installed as explained [here](https://github.com/kubeflow/tf-operator)
+# There is no helm chart maintained and hence it might need an independent installation
+tf_operator:
+  enabled: false
+
+# -----------------
+# -- Training on AWS Sagemaker using AWS Sagemaker operator. To actually install the operator, please follow instructions [here](https://github.com/aws/amazon-sagemaker-operator-for-k8s/tree/master/hack/charts/installer/rolebased)
+# Use the config section here to just enable sagemaker plugin in Flyte, after you have installed the operator using the information
+sagemaker:
+  enabled: false
+  plugin_config:
+    plugins:
+      sagemaker:
+        roleArn: arn:aws:iam::<ACCOUNT_NUMBER>:role/<ROLE_FOR_SAGEMAKER>
+        region: us-east-2
+# ---------------------------
+# Flink jobs using the Flink Operator
+#

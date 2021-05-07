@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+  {{- with .Values.flyteadmin.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.flyteadmin.service.type}}
+  type: {{ . }}
+  {{- end }}
+  {{- with .Values.flyteadmin.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{ . }}
+  {{- end }}
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8088
+    - name: grpc
+      port: 81
+      protocol: TCP
+      targetPort: 8089
+    - name: redoc
+      protocol: TCP
+      port: 87
+      targetPort: 8087
+    - name: http-metrics
+      protocol: TCP
+      port: 10254
+  selector: {{ include "flyteadmin.selectorLabels" . | nindent 4 }}
