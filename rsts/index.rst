@@ -33,6 +33,7 @@
    Join the Community <community/index>
    community/contribute
    community/roadmap
+   community/troubleshoot
 
 .. toctree::
    :caption: API Reference
