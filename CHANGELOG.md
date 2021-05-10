@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](http://github.com/lyft/flyteconsole/compare/v0.19.7...v0.20.0) (2021-05-10)
+
+
+### Features
+
+* Release username filtering and dep updates ([#166](http://github.com/lyft/flyteconsole/issues/166)) ([7e3b692](http://github.com/lyft/flyteconsole/commit/7e3b6923535394be15c657c83107d808fe9d1a4e))
+
 ## [0.19.7](http://github.com/lyft/flyteconsole/compare/v0.19.6...v0.19.7) (2021-03-16)
 
 
