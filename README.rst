@@ -37,7 +37,7 @@ Quickstart
 
      docker run --rm --privileged -p 30081:30081 -p 30082:30082 -p 30084:30084 ghcr.io/flyteorg/flyte-sandbox
 
-#. Now Export 2 env variables
+#. Now Export these 2 env variables
 
    .. code:: bash
 
