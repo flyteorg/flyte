@@ -56,8 +56,8 @@ def generate_pod_spec_for_task():
     secondary_container.resources = resources
 
     shared_volume_mount = V1VolumeMount(name="shared-data", mount_path="/data",)
-    secondary_container.volumeMounts = [shared_volume_mount]
-    primary_container.volumeMounts = [shared_volume_mount]
+    secondary_container.volume_mounts = [shared_volume_mount]
+    primary_container.volume_mounts = [shared_volume_mount]
 
     pod_spec = V1PodSpec(
         containers=[primary_container, secondary_container],
