@@ -38,8 +38,9 @@ eg:  content of tra.yaml
 
 .. code-block:: yaml
 
-	domain: development
-	project: flytectldemo
+	Domain: development
+	Project: flytectldemo
+	Workflow: ""
 	defaults:
 	  cpu: "1"
 	  memory: 150Mi
@@ -72,10 +73,11 @@ func getTaskResourceAttributes(ctx context.Context, args []string, cmdCtx cmdCor
 		workflowAttr, err := cmdCtx.AdminFetcherExt().FetchWorkflowAttributes(ctx,
 			project, domain, workflowName, admin.MatchableResource_TASK_RESOURCE)
 		if err != nil {
+			taskResourceAttrFileConfig.DumpTaskResourceAttr(ctx, fileName)
 			return err
 		}
 		if workflowAttr.GetAttributes() == nil || workflowAttr.GetAttributes().GetMatchingAttributes() == nil {
-			return fmt.Errorf("attribute doesn't exist")
+			return fmt.Errorf("invalid matching attribute returned with nil data")
 		}
 		// Update the shadow config with the fetched taskResourceAttribute which can then be written to a file which can then be called for an update.
 		taskResourceAttrFileConfig.TaskResourceAttributes = workflowAttr.GetAttributes().GetMatchingAttributes().GetTaskResourceAttributes()
@@ -84,10 +86,11 @@ func getTaskResourceAttributes(ctx context.Context, args []string, cmdCtx cmdCor
 		projectDomainAttr, err := cmdCtx.AdminFetcherExt().FetchProjectDomainAttributes(ctx,
 			project, domain, admin.MatchableResource_TASK_RESOURCE)
 		if err != nil {
+			taskResourceAttrFileConfig.DumpTaskResourceAttr(ctx, fileName)
 			return err
 		}
 		if projectDomainAttr.GetAttributes() == nil || projectDomainAttr.GetAttributes().GetMatchingAttributes() == nil {
-			return fmt.Errorf("attribute doesn't exist")
+			return fmt.Errorf("invalid matching attribute returned with nil data")
 		}
 		// Update the shadow config with the fetched taskResourceAttribute which can then be written to a file which can then be called for an update.
 		taskResourceAttrFileConfig.TaskResourceAttributes = projectDomainAttr.GetAttributes().GetMatchingAttributes().GetTaskResourceAttributes()

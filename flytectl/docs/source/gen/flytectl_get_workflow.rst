@@ -13,13 +13,25 @@ Synopsis
 Retrieves all the workflows within project and domain.(workflow,workflows can be used interchangeably in these commands)
 ::
 
- bin/flytectl get workflow -p flytesnacks -d development
+ flytectl get workflow -p flytesnacks -d development
 
 Retrieves workflow by name within project and domain.
 
 ::
 
- bin/flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet
+ flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet
+
+Retrieves latest version of workflow by name within project and domain.
+
+::
+
+ flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet --latest
+
+Retrieves particular version of workflow by name within project and domain.
+
+::
+
+ flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet --version v2
 
 Retrieves workflow by filters. 
 ::
@@ -30,13 +42,13 @@ Retrieves all the workflow within project and domain in yaml format.
 
 ::
 
- bin/flytectl get workflow -p flytesnacks -d development -o yaml
+ flytectl get workflow -p flytesnacks -d development -o yaml
 
 Retrieves all the workflow within project and domain in json format.
 
 ::
 
- bin/flytectl get workflow -p flytesnacks -d development -o json
+ flytectl get workflow -p flytesnacks -d development -o json
 
 Usage
 
@@ -50,7 +62,9 @@ Options
 
 ::
 
-  -h, --help   help for workflow
+  -h, --help             help for workflow
+      --latest            flag to indicate to fetch the latest version,  version flag will be ignored in this case
+      --version string   version of the workflow to be fetched.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

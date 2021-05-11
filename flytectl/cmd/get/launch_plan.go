@@ -28,6 +28,19 @@ Retrieves launch plan by name within project and domain.
 
  flytectl get launchplan -p flytesnacks -d development core.basic.lp.go_greet
 
+
+Retrieves latest version of task by name within project and domain.
+
+::
+
+ flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --latest
+
+Retrieves particular version of launchplan by name within project and domain.
+
+::
+
+ flytectl get launchplan -p flytesnacks -d development  core.basic.lp.go_greet --version v2
+
 Retrieves launchplan by filters.
 ::
 

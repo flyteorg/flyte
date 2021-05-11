@@ -133,6 +133,47 @@ func (_m *AdminFetcherExtInterface) FetchAllVerOfTask(ctx context.Context, name 
 	return r0, r1
 }
 
+type AdminFetcherExtInterface_FetchAllVerOfWorkflow struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchAllVerOfWorkflow) Return(_a0 []*admin.Workflow, _a1 error) *AdminFetcherExtInterface_FetchAllVerOfWorkflow {
+	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchAllVerOfWorkflow(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchAllVerOfWorkflow {
+	c := _m.On("FetchAllVerOfWorkflow", ctx, name, project, domain)
+	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchAllVerOfWorkflowMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchAllVerOfWorkflow {
+	c := _m.On("FetchAllVerOfWorkflow", matchers...)
+	return &AdminFetcherExtInterface_FetchAllVerOfWorkflow{Call: c}
+}
+
+// FetchAllVerOfWorkflow provides a mock function with given fields: ctx, name, project, domain
+func (_m *AdminFetcherExtInterface) FetchAllVerOfWorkflow(ctx context.Context, name string, project string, domain string) ([]*admin.Workflow, error) {
+	ret := _m.Called(ctx, name, project, domain)
+
+	var r0 []*admin.Workflow
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) []*admin.Workflow); ok {
+		r0 = rf(ctx, name, project, domain)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*admin.Workflow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, name, project, domain)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminFetcherExtInterface_FetchExecution struct {
 	*mock.Call
 }
@@ -413,6 +454,88 @@ func (_m *AdminFetcherExtInterface) FetchWorkflowAttributes(ctx context.Context,
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, admin.MatchableResource) error); ok {
 		r1 = rf(ctx, project, domain, name, rsType)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminFetcherExtInterface_FetchWorkflowLatestVersion struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchWorkflowLatestVersion) Return(_a0 *admin.Workflow, _a1 error) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
+	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
+	c := _m.On("FetchWorkflowLatestVersion", ctx, name, project, domain)
+	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowLatestVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchWorkflowLatestVersion {
+	c := _m.On("FetchWorkflowLatestVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchWorkflowLatestVersion{Call: c}
+}
+
+// FetchWorkflowLatestVersion provides a mock function with given fields: ctx, name, project, domain
+func (_m *AdminFetcherExtInterface) FetchWorkflowLatestVersion(ctx context.Context, name string, project string, domain string) (*admin.Workflow, error) {
+	ret := _m.Called(ctx, name, project, domain)
+
+	var r0 *admin.Workflow
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *admin.Workflow); ok {
+		r0 = rf(ctx, name, project, domain)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.Workflow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, name, project, domain)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminFetcherExtInterface_FetchWorkflowVersion struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchWorkflowVersion) Return(_a0 *admin.Workflow, _a1 error) *AdminFetcherExtInterface_FetchWorkflowVersion {
+	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowVersion(ctx context.Context, name string, version string, project string, domain string) *AdminFetcherExtInterface_FetchWorkflowVersion {
+	c := _m.On("FetchWorkflowVersion", ctx, name, version, project, domain)
+	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowVersionMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchWorkflowVersion {
+	c := _m.On("FetchWorkflowVersion", matchers...)
+	return &AdminFetcherExtInterface_FetchWorkflowVersion{Call: c}
+}
+
+// FetchWorkflowVersion provides a mock function with given fields: ctx, name, version, project, domain
+func (_m *AdminFetcherExtInterface) FetchWorkflowVersion(ctx context.Context, name string, version string, project string, domain string) (*admin.Workflow, error) {
+	ret := _m.Called(ctx, name, version, project, domain)
+
+	var r0 *admin.Workflow
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string) *admin.Workflow); ok {
+		r0 = rf(ctx, name, version, project, domain)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.Workflow)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
+		r1 = rf(ctx, name, version, project, domain)
 	} else {
 		r1 = ret.Error(1)
 	}
