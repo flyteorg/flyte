@@ -50,4 +50,4 @@ stats:
 
 .PHONY: prepare_artifacts
 prepare_artifacts:
-	bash script/prepare_artifacts.sh
+	bash script/prepare_artifacts.shhi this is a test
