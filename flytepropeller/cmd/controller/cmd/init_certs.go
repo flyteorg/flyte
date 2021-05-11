@@ -5,8 +5,6 @@ import (
 	"context"
 	cryptorand "crypto/rand"
 
-	"github.com/flyteorg/flyteidl/clients/go/events/errors"
-
 	"github.com/flyteorg/flytestdlib/logger"
 	kubeErrors "k8s.io/apimachinery/pkg/api/errors"
 
@@ -119,8 +117,12 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhook.Con
 	}
 
 	_, err := secretsClient.Create(ctx, secret, v12.CreateOptions{})
+	if err == nil {
+		logger.Infof(ctx, "Created secret [%v]", cfg.SecretName)
+		return nil
+	}
 
-	if errors.IsAlreadyExists(err) {
+	if kubeErrors.IsAlreadyExists(err) {
 		logger.Infof(ctx, "A secret already exists with the same name. Validating.")
 		s, err := secretsClient.Get(ctx, cfg.SecretName, v12.GetOptions{})
 		if err != nil {
@@ -142,8 +144,10 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhook.Con
 
 		if requiresUpdate {
 			logger.Infof(ctx, "The existing secret is missing one or more keys.")
-			secret.Annotations["flyteLastUpdate"] = "system-updated"
-			secret.Annotations["flyteUpdatedAt"] = time.Now().String()
+			secret.Annotations = map[string]string{
+				"flyteLastUpdate": "system-updated",
+				"flyteUpdatedAt":  time.Now().String(),
+			}
 
 			_, err = secretsClient.Update(ctx, secret, v12.UpdateOptions{})
 			if err != nil && kubeErrors.IsConflict(err) {
@@ -156,8 +160,6 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhook.Con
 
 		return nil
 	}
-
-	logger.Infof(ctx, "Created secret [%v]", cfg.SecretName)
 
 	return err
 }
