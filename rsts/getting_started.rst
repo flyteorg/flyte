@@ -80,6 +80,9 @@ Steps
 
   REGISTRY=ghcr.io/flyteorg make fast_register
 
+.. note::
+   If the images are to be re-built, run ``make register`` command.
+
 9. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
 
 10. Give it a minute and once it's done, check out "Inputs/Outputs" on the top right corner to see your updated greeting.
