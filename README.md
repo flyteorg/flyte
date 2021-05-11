@@ -139,13 +139,14 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - Snappy Console
 - Python CLI and Golang CLI (flytectl)
 - Written in **Golang** and optimized for large running jobs' performance
+- [Grafana templates](https://grafana.com/orgs/flyte) (user/system observability)
 
 ### In Progress
 
-- Grafana templates (user/system observability)
-- Helm chart for Flyte
-- Performance optimization
-- Flink-K8s
+- Helm chart for Flyte (coming soon - June)
+- Flink-K8s (coming soon - June)
+- One click deploy to AWS
+- Reactive pipelines & Events
 
 ## 🔌 Available Plugins
 
@@ -162,11 +163,10 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - Distributed Tensorflow (K8s Native) - [TFOperator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kftensorflow/index.html)
 - Papermill notebook execution ([Python](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/papermilltasks/index.html) and Spark)
 - Type safe and data checking for Pandas dataframe using Pandera
+- Versioned datastores using DoltHub and Dolt
+- Use SQLAlchemy to query any relational database 
+- Build your own plugins that use library containers
 
-### In Queue
-
-- Reactive pipelines
-- A lot more integrations!
 
 <html>
 <h2 id="component-repos"> 
