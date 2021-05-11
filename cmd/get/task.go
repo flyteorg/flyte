@@ -28,6 +28,18 @@ Retrieves task by name within project and domain.
 
  bin/flytectl task -p flytesnacks -d development core.basic.lp.greet
 
+Retrieves latest version of task by name within project and domain.
+
+::
+
+ flytectl get task -p flytesnacks -d development  core.basic.lp.greet --latest
+
+Retrieves particular version of task by name within project and domain.
+
+::
+
+ flytectl get workflow -p flytesnacks -d development  core.basic.lp.greet --version v2
+
 Retrieves project by filters.
 ::
 

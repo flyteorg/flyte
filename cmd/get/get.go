@@ -33,7 +33,7 @@ func CreateGetCommand() *cobra.Command {
 		"task": {CmdFunc: getTaskFunc, Aliases: []string{"tasks"}, Short: taskShort,
 			Long: taskLong, PFlagProvider: taskConfig},
 		"workflow": {CmdFunc: getWorkflowFunc, Aliases: []string{"workflows"}, Short: workflowShort,
-			Long: workflowLong},
+			Long: workflowLong, PFlagProvider: subcommand.DefaultWorklfowConfig},
 		"launchplan": {CmdFunc: getLaunchPlanFunc, Aliases: []string{"launchplans"}, Short: launchPlanShort,
 			Long: launchPlanLong, PFlagProvider: launchPlanConfig},
 		"execution": {CmdFunc: getExecutionFunc, Aliases: []string{"executions"}, Short: executionShort,
