@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flytectl/cmd/config"
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -17,8 +18,9 @@ import (
 // This function needs to be called after testutils.Steup()
 func createExecutionSetup() {
 	ctx = testutils.Ctx
-	cmdCtx = testutils.CmdCtx
 	mockClient = testutils.MockClient
+	// TODO: migrate to new command context from testutils
+	cmdCtx = cmdCore.NewCommandContext(mockClient, testutils.MockOutStream)
 	sortedListLiteralType := core.Variable{
 		Type: &core.LiteralType{
 			Type: &core.LiteralType_CollectionType{

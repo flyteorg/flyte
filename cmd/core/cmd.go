@@ -28,11 +28,12 @@ type CommandEntry struct {
 func AddCommands(rootCmd *cobra.Command, cmdFuncs map[string]CommandEntry) {
 	for resource, cmdEntry := range cmdFuncs {
 		cmd := &cobra.Command{
-			Use:     resource,
-			Short:   cmdEntry.Short,
-			Long:    cmdEntry.Long,
-			Aliases: cmdEntry.Aliases,
-			RunE:    generateCommandFunc(cmdEntry),
+			Use:          resource,
+			Short:        cmdEntry.Short,
+			Long:         cmdEntry.Long,
+			Aliases:      cmdEntry.Aliases,
+			RunE:         generateCommandFunc(cmdEntry),
+			SilenceUsage: true,
 		}
 		if cmdEntry.PFlagProvider != nil {
 			cmd.Flags().AddFlagSet(cmdEntry.PFlagProvider.GetPFlagSet(""))

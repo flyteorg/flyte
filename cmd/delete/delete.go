@@ -1,6 +1,7 @@
 package delete
 
 import (
+	"github.com/flyteorg/flytectl/cmd/config/subcommand"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
@@ -27,6 +28,9 @@ func RemoteDeleteCommand() *cobra.Command {
 	terminateResourcesFuncs := map[string]cmdcore.CommandEntry{
 		"execution": {CmdFunc: terminateExecutionFunc, Aliases: []string{"executions"}, Short: execCmdShort,
 			Long: execCmdLong},
+		"task-resource-attribute": {CmdFunc: deleteTaskResourceAttributes, Aliases: []string{"task-resource-attributes"},
+			Short: taskResourceAttributesShort,
+			Long:  taskResourceAttributesLong, PFlagProvider: subcommand.DefaultTaskResourceDelConfig, ProjectDomainNotRequired: true},
 	}
 	cmdcore.AddCommands(deleteCmd, terminateResourcesFuncs)
 	return deleteCmd

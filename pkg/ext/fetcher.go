@@ -34,6 +34,12 @@ type AdminFetcherExtInterface interface {
 
 	// FetchTaskVersion fetches particular version of task in a  project, domain
 	FetchTaskVersion(ctx context.Context, name, version, project, domain string) (*admin.Task, error)
+
+	// FetchWorkflowAttributes fetches workflow attributes particular resource type in a  project, domain and workflow
+	FetchWorkflowAttributes(ctx context.Context, project, domain, name string, rsType admin.MatchableResource) (*admin.WorkflowAttributesGetResponse, error)
+
+	// FetchProjectDomainAttributes fetches project domain attributes particular resource type in a  project, domain
+	FetchProjectDomainAttributes(ctx context.Context, project, domain string, rsType admin.MatchableResource) (*admin.ProjectDomainAttributesGetResponse, error)
 }
 
 // AdminFetcherExtClient is used for interacting with extended features used for fetching data from admin service

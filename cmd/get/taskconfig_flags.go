@@ -40,7 +40,7 @@ func (TaskConfig) mustMarshalJSON(v json.Marshaler) string {
 // GetPFlagSet will return strongly types pflags for all fields in TaskConfig and its nested types. The format of the
 // flags is json-name.json-sub-name... etc.
 func (cfg TaskConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
-	cmdFlags := pflag.NewFlagSet("TaskConfig", pflag.ExitOnError)
+	cmdFlags := pflag.NewFlagSet("TaskResourceAttrConfig", pflag.ExitOnError)
 	cmdFlags.StringVar(&(taskConfig.ExecFile), fmt.Sprintf("%v%v", prefix, "execFile"), taskConfig.ExecFile, "execution file name to be used for generating execution spec of a single task.")
 	cmdFlags.StringVar(&(taskConfig.Version), fmt.Sprintf("%v%v", prefix, "version"), taskConfig.Version, "version of the task to be fetched.")
 	cmdFlags.BoolVar(&(taskConfig.Latest), fmt.Sprintf("%v%v", prefix, "latest"), taskConfig.Latest, "flag to indicate to fetch the latest version, version flag will be ignored in this case")

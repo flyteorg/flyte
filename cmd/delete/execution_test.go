@@ -1,13 +1,11 @@
 package delete
 
 import (
-	"context"
 	"errors"
-	"io"
 	"testing"
 
-	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flytectl/cmd/config"
+	"github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
@@ -15,68 +13,64 @@ import (
 )
 
 var (
-	ctx  context.Context
-	args []string
+	args                  []string
+	terminateExecRequests []*admin.ExecutionTerminateRequest
 )
 
-func setup() {
-	ctx = context.Background()
-	args = []string{}
+func terminateExecutionSetup() {
+	ctx = testutils.Ctx
+	cmdCtx = testutils.CmdCtx
+	mockClient = testutils.MockClient
+	args = append(args, "exec1", "exec2")
+	terminateExecRequests = []*admin.ExecutionTerminateRequest{
+		{Id: &core.WorkflowExecutionIdentifier{
+			Name:    "exec1",
+			Project: config.GetConfig().Project,
+			Domain:  config.GetConfig().Domain,
+		}},
+		{Id: &core.WorkflowExecutionIdentifier{
+			Name:    "exec2",
+			Project: config.GetConfig().Project,
+			Domain:  config.GetConfig().Domain,
+		}},
+	}
 }
 
 func TestTerminateExecutionFunc(t *testing.T) {
 	setup()
-	args = append(args, "exec1", "exec2")
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-	terminateExecRequests := []*admin.ExecutionTerminateRequest{
-		{Id: &core.WorkflowExecutionIdentifier{Name: "exec1"}},
-		{Id: &core.WorkflowExecutionIdentifier{Name: "exec2"}},
-	}
+	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
 	mockClient.OnTerminateExecutionMatch(ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
 	mockClient.OnTerminateExecutionMatch(ctx, terminateExecRequests[1]).Return(terminateExecResponse, nil)
-	err := terminateExecutionFunc(ctx, args, cmdCtx)
+	err = terminateExecutionFunc(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "TerminateExecution", ctx, terminateExecRequests[0])
 	mockClient.AssertCalled(t, "TerminateExecution", ctx, terminateExecRequests[1])
+	tearDownAndVerify(t, "")
 }
 
 func TestTerminateExecutionFuncWithError(t *testing.T) {
 	setup()
-	args = append(args, "exec1", "exec2")
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-	terminateExecRequests := []*admin.ExecutionTerminateRequest{
-		{Id: &core.WorkflowExecutionIdentifier{Name: "exec1"}},
-		{Id: &core.WorkflowExecutionIdentifier{Name: "exec2"}},
-	}
+	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
 	mockClient.OnTerminateExecutionMatch(ctx, terminateExecRequests[0]).Return(nil, errors.New("failed to terminate"))
 	mockClient.OnTerminateExecutionMatch(ctx, terminateExecRequests[1]).Return(terminateExecResponse, nil)
-	err := terminateExecutionFunc(ctx, args, cmdCtx)
+	err = terminateExecutionFunc(ctx, args, cmdCtx)
 	assert.Equal(t, errors.New("failed to terminate"), err)
 	mockClient.AssertCalled(t, "TerminateExecution", ctx, terminateExecRequests[0])
 	mockClient.AssertNotCalled(t, "TerminateExecution", ctx, terminateExecRequests[1])
+	tearDownAndVerify(t, "")
 }
 
 func TestTerminateExecutionFuncWithPartialSuccess(t *testing.T) {
 	setup()
-	args = append(args, "exec1", "exec2")
-	mockClient := new(mocks.AdminServiceClient)
-	mockOutStream := new(io.Writer)
-	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
-	terminateExecRequests := []*admin.ExecutionTerminateRequest{
-		{Id: &core.WorkflowExecutionIdentifier{Name: "exec1"}},
-		{Id: &core.WorkflowExecutionIdentifier{Name: "exec2"}},
-	}
+	terminateExecutionSetup()
 	terminateExecResponse := &admin.ExecutionTerminateResponse{}
 	mockClient.OnTerminateExecutionMatch(ctx, terminateExecRequests[0]).Return(terminateExecResponse, nil)
 	mockClient.OnTerminateExecutionMatch(ctx, terminateExecRequests[1]).Return(nil, errors.New("failed to terminate"))
-	err := terminateExecutionFunc(ctx, args, cmdCtx)
+	err = terminateExecutionFunc(ctx, args, cmdCtx)
 	assert.Equal(t, errors.New("failed to terminate"), err)
 	mockClient.AssertCalled(t, "TerminateExecution", ctx, terminateExecRequests[0])
 	mockClient.AssertCalled(t, "TerminateExecution", ctx, terminateExecRequests[1])
+	tearDownAndVerify(t, "")
 }
