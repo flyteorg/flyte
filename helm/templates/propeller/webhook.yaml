@@ -1,0 +1,158 @@
+{{- if .Values.webhook.enabled }}
+# Create an empty secret that the first propeller pod will populate
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-pod-webhook
+  namespace: {{ template "flyte.namespace" . }}
+type: Opaque
+---
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+    app: {{ template "flyte-pod-webhook.name" . }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "flyte-pod-webhook.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "flyte-pod-webhook.name" . }}
+        app.kubernetes.io/name: {{ template "flyte-pod-webhook.name" . }}
+        app.kubernetes.io/version: {{ .Values.flytepropeller.image.tag }}
+      annotations:
+        configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
+        {{- with .Values.flyteadmin.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
+{{- if .Values.webhook.enabled }}
+      initContainers:
+      - name: generate-secrets
+        image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+        imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
+        command:
+          - flytepropeller
+        args:
+          - webhook
+          - init-certs
+          - --config
+          - /etc/flyte/config/*.yaml
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/flyte/config      
+{{- end }}
+      containers:
+        - name: webhook
+          image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+          imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
+          command:
+            - flytepropeller
+          args:
+            - webhook
+            - --config
+            - /etc/flyte/config/*.yaml
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+              readOnly: true
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: config-volume
+          configMap:
+            name: flyte-propeller-config
+        - name: webhook-certs
+          secret:
+            secretName: flyte-pod-webhook
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  {{- with .Values.webhook.service.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: {{ template "flyte-pod-webhook.name" . }}
+  ports:
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 9443
+---
+# Create a ClusterRole for the webhook
+# https://kubernetes.io/docs/admin/authorization/rbac/
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+rules:
+  - apiGroups:
+      - "*"
+    resources:
+      - mutatingwebhookconfigurations
+      - secrets
+      - pods
+    verbs:
+      - get
+      - create
+      - update
+      - patch
+---
+{{- if .Values.webhook.serviceAccount.create }}
+# Create a Service Account for webhook
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  {{- with .Values.webhook.serviceAccount.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end}}
+{{- end }}
+---
+# Create a binding from Role -> ServiceAccount
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ template "flyte-pod-webhook.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "flyte-pod-webhook.name" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "flyte-pod-webhook.name" . }}
+    namespace: {{ template "flyte.namespace" . }}
+{{- end }}
