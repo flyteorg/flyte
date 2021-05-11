@@ -1,3 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flyte-propeller-auth
+  namespace: {{ template "flyte.namespace" . }}
+type: Opaque
+stringData:
+  client_secret: foobar
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
