@@ -105,7 +105,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.10.7
+    tag: v0.10.9
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
