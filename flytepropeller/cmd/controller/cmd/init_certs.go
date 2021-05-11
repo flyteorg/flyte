@@ -5,8 +5,10 @@ import (
 	"context"
 	cryptorand "crypto/rand"
 
+	"github.com/flyteorg/flyteidl/clients/go/events/errors"
+
 	"github.com/flyteorg/flytestdlib/logger"
-	"k8s.io/apimachinery/pkg/api/errors"
+	kubeErrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 
@@ -100,23 +102,58 @@ func runCertsCmd(ctx context.Context, propellerCfg *config.Config, cfg *webhook.
 
 func createWebhookSecret(ctx context.Context, namespace string, cfg *webhook.Config, certs webhookCerts, secretsClient v1.SecretInterface) error {
 	isImmutable := true
-	_, err := secretsClient.Create(ctx, &corev1.Secret{
+	secretData := map[string][]byte{
+		CaCertKey:            certs.CaPEM.Bytes(),
+		ServerCertKey:        certs.ServerPEM.Bytes(),
+		ServerCertPrivateKey: certs.PrivateKeyPEM.Bytes(),
+	}
+
+	secret := &corev1.Secret{
 		ObjectMeta: v12.ObjectMeta{
 			Name:      cfg.SecretName,
 			Namespace: namespace,
 		},
-		Type: corev1.SecretTypeOpaque,
-		Data: map[string][]byte{
-			CaCertKey:            certs.CaPEM.Bytes(),
-			ServerCertKey:        certs.ServerPEM.Bytes(),
-			ServerCertPrivateKey: certs.PrivateKeyPEM.Bytes(),
-		},
+		Type:      corev1.SecretTypeOpaque,
+		Data:      secretData,
 		Immutable: &isImmutable,
-	}, v12.CreateOptions{})
+	}
+
+	_, err := secretsClient.Create(ctx, secret, v12.CreateOptions{})
 
 	if errors.IsAlreadyExists(err) {
-		// TODO: Maybe get the secret and validate it has all the required keys?
-		logger.Infof(ctx, "A secret already exists with the same name. Ignoring creating secret.")
+		logger.Infof(ctx, "A secret already exists with the same name. Validating.")
+		s, err := secretsClient.Get(ctx, cfg.SecretName, v12.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		// If ServerCertKey or ServerCertPrivateKey are missing, update
+		requiresUpdate := false
+		for key := range secretData {
+			if key == CaCertKey {
+				continue
+			}
+
+			if _, exists := s.Data[key]; !exists {
+				requiresUpdate = true
+				break
+			}
+		}
+
+		if requiresUpdate {
+			logger.Infof(ctx, "The existing secret is missing one or more keys.")
+			secret.Annotations["flyteLastUpdate"] = "system-updated"
+			secret.Annotations["flyteUpdatedAt"] = time.Now().String()
+
+			_, err = secretsClient.Update(ctx, secret, v12.UpdateOptions{})
+			if err != nil && kubeErrors.IsConflict(err) {
+				logger.Infof(ctx, "Another instance of flyteadmin has updated the same secret. Ignoring this update")
+				err = nil
+			}
+
+			return err
+		}
+
 		return nil
 	}
 
