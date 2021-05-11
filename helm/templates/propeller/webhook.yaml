@@ -1,43 +1,11 @@
 {{- if .Values.webhook.enabled }}
-apiVersion: batch/v1
-kind: Job
+# Create an empty secret that the first propeller pod will populate
+apiVersion: v1
+kind: Secret
 metadata:
-  name: {{ template "flyte-pod-webhook.name" . }}-secret
+  name: flyte-pod-webhook
   namespace: {{ template "flyte.namespace" . }}
-spec:
-  backoffLimit: 3
-  ttlSecondsAfterFinished: 0
-  template:
-    spec:
-      serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
-      restartPolicy: Never
-      containers:
-        - name: webhook
-          image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
-          imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
-          command:
-            - flytepropeller
-          args:
-            - webhook
-            - init-certs
-            - --config
-            - /etc/flyte/config/*.yaml
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          volumeMounts:
-            - name: config-volume
-              mountPath: /etc/flyte/config
-      volumes:
-        - name: config-volume
-          configMap:
-            name: flyte-propeller-config
+type: Opaque
 ---
 # Create the actual deployment
 apiVersion: apps/v1
@@ -64,6 +32,31 @@ spec:
         {{- end }}
     spec:
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
+{{- if .Values.webhook.enabled }}
+      initContainers:
+      - name: generate-secrets
+        image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
+        imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
+        command:
+          - flytepropeller
+        args:
+          - webhook
+          - init-certs
+          - --config
+          - /etc/flyte/config/*.yaml
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        volumeMounts:
+          - name: config-volume
+            mountPath: /etc/flyte/config      
+{{- end }}
       containers:
         - name: webhook
           image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
@@ -96,7 +89,7 @@ spec:
             name: flyte-propeller-config
         - name: webhook-certs
           secret:
-            secretName: {{ template "flyte-pod-webhook.name" . }}
+            secretName: flyte-pod-webhook
 ---
 # Service
 apiVersion: v1

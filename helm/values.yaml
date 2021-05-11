@@ -105,7 +105,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.10.9
+    tag: v0.10.10
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -176,7 +176,7 @@ flyteconsole:
 
 webhook:
   # -- enable or disable secrets webhook
-  enabled: false
+  enabled: true
   # -- Configuration for service accounts for the webhook
   serviceAccount:
     # -- Should a service account be created for the webhook
