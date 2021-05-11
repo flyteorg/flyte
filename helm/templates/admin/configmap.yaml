@@ -17,6 +17,9 @@ data:
 {{- with .Values.configmap.server }}
   server.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
+{{- with .Values.configmap.remoteData }}
+  remoteData.yaml: | {{ toYaml . | nindent 4 }}
+{{- end }}
   storage.yaml: | {{ include "storage" . | nindent 4 }}
 {{- with .Values.configmap.task_resource_defaults }}
   task_resource_defaults.yaml: | {{ toYaml . | nindent 4 }}

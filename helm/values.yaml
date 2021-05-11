@@ -105,7 +105,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.10.4
+    tag: v0.10.9
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -147,7 +147,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: ghcr.io/flyteorg/flyteconsole
-    tag: v0.19.7
+    tag: v0.20.0
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -445,9 +445,17 @@ configmap:
       httpPort: 8088
       grpcPort: 8089
       security:
+        # -- Controls whether to serve requests over SSL/TLS.
         secure: false
+        # -- Controls whether to enforce authentication. Follow the guide in https://docs.flyte.org/ on how to setup authentication.
         useAuth: false
         allowCors: true
+        allowedOrigins:
+          # Accepting all domains for Sandbox installation
+          - "*"
+        allowedHeaders:
+          - "Content-Type"
+          - "flyte-authorization"
     # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
     flyteadmin:
       roleNameKey: "iam.amazonaws.com/role"
@@ -459,7 +467,34 @@ configmap:
       eventVersion: 1
       testing:
         host: http://flyteadmin
-  
+    # -- Authentication configuration
+    auth:
+      authorizedUris:
+        # This should point at your public http Uri.
+        - https://localhost:30081
+        # This will be used by internal services in the same namespace as flyteadmin
+        - http://flyteadmin:80
+        # This will be used by internal services in the same cluster but different namespaces
+        - http://flyteadmin.flyte.svc.cluster.local:80
+
+      # Controls app authentication config
+      appAuth:
+        thirdPartyConfig:
+          flyteClient:
+            clientId: flytectl
+            redirectUri: https://localhost:53593/callback
+            scopes:
+              - offline
+              - all
+      # Controls user authentication
+      userAuth:
+        openId:
+          baseUrl: https://accounts.google.com
+          scopes:
+            - profile
+            - openid
+          clientId: 657465813211-6eog7ek7li5k7i7fvgv2921075063hpe.apps.googleusercontent.com
+
   # -- Datacatalog server config
   datacatalogServer:
     datacatalog:
@@ -495,6 +530,8 @@ configmap:
     admin:
       endpoint: flyteadmin:81
       insecure: true
+      clientId: flytepropeller
+      clientSecretLocation: /etc/secrets/client_secret
 
   # -- Catalog Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/catalog#Config)
   # Additional advanced Catalog configuration [here](https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/catalog#Config)
@@ -588,6 +625,13 @@ configmap:
       show-source: true
       level: 4
 
+  remoteData:
+    remoteData:
+      region: "us-east-1"
+      scheme: "local"
+      signedUrls:
+        durationMinutes: 3
+
   # -- Resource manager configuration
   resource_manager:
     # -- resource manager configuration
@@ -646,17 +690,17 @@ cluster_resource_manager:
     cluster_resources:
       templatePath: "/etc/flyte/clusterresource/templates"
       customData:
-        production:
+        - production:
           - projectQuotaCpu:
               value: "5"
           - projectQuotaMemory:
               value: "4000Mi"
-        staging:
+        - staging:
           - projectQuotaCpu:
               value: "2"
           - projectQuotaMemory:
               value: "3000Mi"
-        development:
+        - development:
           - projectQuotaCpu:
               value: "4"
           - projectQuotaMemory:
