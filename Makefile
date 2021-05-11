@@ -43,8 +43,8 @@ ifeq ($(shell docker ps -f name=$(FLYTE_SANDBOX_NAME) --format={.ID}),)
 	$(error Cluster has not been started! Use 'make start' to start a cluster)
 endif
 
-.PHONY: start
-start: ## Start a local Flyte sandbox
+.PHONY: setup
+setup:
 	$(call LOG,Starting Flyte sandbox)
 	docker run -d --rm --privileged --name $(FLYTE_SANDBOX_NAME) \
 		-e SANDBOX=1 \
@@ -58,9 +58,14 @@ start: ## Start a local Flyte sandbox
 		-p $(K8S_DASHBOARD_PROXY_PORT):30082 \
 		-p $(MINIO_PROXY_PORT):30084 \
 		ghcr.io/flyteorg/flyte-sandbox:dind > /dev/null
-	
+
+.PHONY: wait
+wait:
 	$(call RUN_IN_SANDBOX, wait-for-flyte.sh)
 
+## Start a local Flyte sandbox
+.PHONY: start
+start: setup wait
 	$(call LOG,Registering examples from commit: latest)
 	REGISTRY=ghcr.io/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
 

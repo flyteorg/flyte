@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  pull_request:
+    branches:
+      - master
+
+defaults:
+  run:
+    # https://github.com/actions/runner/issues/241#issuecomment-577360161
+    shell: 'script -q -e -c "bash {0}"'
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - run: docker pull ghcr.io/flyteorg/flyte-sandbox:dind
+      - name: setup sandbox
+        run: make setup
+      - name: wait for sandbox
+        run: |
+          n=0
+          until [ "$n" -ge 5 ]; do
+            echo "try $n"
+            make wait && break
+            n=$((n+1))
+            sleep 1
+          done
+      - name: fast register
+        run: REGISTRY=ghcr.io/flyteorg VERSION=latest make fast_register
