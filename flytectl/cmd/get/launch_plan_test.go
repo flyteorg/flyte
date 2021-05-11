@@ -5,7 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -26,9 +27,10 @@ var (
 )
 
 func getLaunchPlanSetup() {
-	ctx = testutils.Ctx
-	cmdCtx = testutils.CmdCtx
-	mockClient = testutils.MockClient
+	ctx = u.Ctx
+	mockClient = u.MockClient
+	// TODO: migrate to new command context from testutils
+	cmdCtx = cmdCore.NewCommandContext(mockClient, u.MockOutStream)
 	argsLp = []string{"launchplan1"}
 	parameterMap := map[string]*core.Parameter{
 		"numbers": {

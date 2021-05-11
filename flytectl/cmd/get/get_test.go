@@ -37,7 +37,7 @@ func TestCreateGetCommand(t *testing.T) {
 	assert.Equal(t, getCommand.Use, "get")
 	assert.Equal(t, getCommand.Short, "Used for fetching various flyte resources including tasks/workflows/launchplans/executions/project.")
 	fmt.Println(getCommand.Commands())
-	assert.Equal(t, len(getCommand.Commands()), 5)
+	assert.Equal(t, len(getCommand.Commands()), 6)
 	cmdNouns := getCommand.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
@@ -55,7 +55,11 @@ func TestCreateGetCommand(t *testing.T) {
 	assert.Equal(t, cmdNouns[3].Use, "task")
 	assert.Equal(t, cmdNouns[3].Aliases, []string{"tasks"})
 	assert.Equal(t, cmdNouns[3].Short, "Gets task resources")
-	assert.Equal(t, cmdNouns[4].Use, "workflow")
-	assert.Equal(t, cmdNouns[4].Aliases, []string{"workflows"})
-	assert.Equal(t, cmdNouns[4].Short, "Gets workflow resources")
+	assert.Equal(t, cmdNouns[4].Use, "task-resource-attribute")
+	assert.Equal(t, cmdNouns[4].Aliases, []string{"task-resource-attributes"})
+	assert.Equal(t, cmdNouns[4].Short, taskResourceAttributesShort)
+	assert.Equal(t, cmdNouns[4].Long, taskResourceAttributesLong)
+	assert.Equal(t, cmdNouns[5].Use, "workflow")
+	assert.Equal(t, cmdNouns[5].Aliases, []string{"workflows"})
+	assert.Equal(t, cmdNouns[5].Short, "Gets workflow resources")
 }

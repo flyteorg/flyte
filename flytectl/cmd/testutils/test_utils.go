@@ -11,7 +11,7 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/ext"
+	extMocks "github.com/flyteorg/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 
 	"github.com/stretchr/testify/assert"
@@ -27,8 +27,10 @@ var (
 	Err           error
 	Ctx           context.Context
 	MockClient    *mocks.AdminServiceClient
-	FetcherExt    ext.AdminFetcherExtInterface
-	mockOutStream io.Writer
+	FetcherExt    *extMocks.AdminFetcherExtInterface
+	UpdaterExt    *extMocks.AdminUpdaterExtInterface
+	DeleterExt    *extMocks.AdminDeleterExtInterface
+	MockOutStream io.Writer
 	CmdCtx        cmdCore.CommandContext
 	stdOut        *os.File
 	stderr        *os.File
@@ -46,13 +48,20 @@ func Setup() {
 	os.Stderr = writer
 	log.SetOutput(writer)
 	MockClient = new(mocks.AdminServiceClient)
-	mockOutStream = writer
-	CmdCtx = cmdCore.NewCommandContext(MockClient, mockOutStream)
+	FetcherExt = new(extMocks.AdminFetcherExtInterface)
+	UpdaterExt = new(extMocks.AdminUpdaterExtInterface)
+	DeleterExt = new(extMocks.AdminDeleterExtInterface)
+	FetcherExt.OnAdminServiceClient().Return(MockClient)
+	UpdaterExt.OnAdminServiceClient().Return(MockClient)
+	DeleterExt.OnAdminServiceClient().Return(MockClient)
+	MockOutStream = writer
+	CmdCtx = cmdCore.NewCommandContextWithExt(MockClient, FetcherExt, UpdaterExt, DeleterExt, MockOutStream)
 	config.GetConfig().Project = projectValue
 	config.GetConfig().Domain = domainValue
 	config.GetConfig().Output = output
 }
 
+// TearDownAndVerify TODO: Change this to verify log lines from context
 func TearDownAndVerify(t *testing.T, expectedLog string) {
 	writer.Close()
 	os.Stdout = stdOut

@@ -256,6 +256,47 @@ func (_m *AdminFetcherExtInterface) FetchLPVersion(ctx context.Context, name str
 	return r0, r1
 }
 
+type AdminFetcherExtInterface_FetchProjectDomainAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchProjectDomainAttributes) Return(_a0 *admin.ProjectDomainAttributesGetResponse, _a1 error) *AdminFetcherExtInterface_FetchProjectDomainAttributes {
+	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchProjectDomainAttributes(ctx context.Context, project string, domain string, rsType admin.MatchableResource) *AdminFetcherExtInterface_FetchProjectDomainAttributes {
+	c := _m.On("FetchProjectDomainAttributes", ctx, project, domain, rsType)
+	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchProjectDomainAttributesMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchProjectDomainAttributes {
+	c := _m.On("FetchProjectDomainAttributes", matchers...)
+	return &AdminFetcherExtInterface_FetchProjectDomainAttributes{Call: c}
+}
+
+// FetchProjectDomainAttributes provides a mock function with given fields: ctx, project, domain, rsType
+func (_m *AdminFetcherExtInterface) FetchProjectDomainAttributes(ctx context.Context, project string, domain string, rsType admin.MatchableResource) (*admin.ProjectDomainAttributesGetResponse, error) {
+	ret := _m.Called(ctx, project, domain, rsType)
+
+	var r0 *admin.ProjectDomainAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, admin.MatchableResource) *admin.ProjectDomainAttributesGetResponse); ok {
+		r0 = rf(ctx, project, domain, rsType)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ProjectDomainAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, admin.MatchableResource) error); ok {
+		r1 = rf(ctx, project, domain, rsType)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminFetcherExtInterface_FetchTaskLatestVersion struct {
 	*mock.Call
 }
@@ -331,6 +372,47 @@ func (_m *AdminFetcherExtInterface) FetchTaskVersion(ctx context.Context, name s
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
 		r1 = rf(ctx, name, version, project, domain)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminFetcherExtInterface_FetchWorkflowAttributes struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchWorkflowAttributes) Return(_a0 *admin.WorkflowAttributesGetResponse, _a1 error) *AdminFetcherExtInterface_FetchWorkflowAttributes {
+	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowAttributes(ctx context.Context, project string, domain string, name string, rsType admin.MatchableResource) *AdminFetcherExtInterface_FetchWorkflowAttributes {
+	c := _m.On("FetchWorkflowAttributes", ctx, project, domain, name, rsType)
+	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchWorkflowAttributesMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchWorkflowAttributes {
+	c := _m.On("FetchWorkflowAttributes", matchers...)
+	return &AdminFetcherExtInterface_FetchWorkflowAttributes{Call: c}
+}
+
+// FetchWorkflowAttributes provides a mock function with given fields: ctx, project, domain, name, rsType
+func (_m *AdminFetcherExtInterface) FetchWorkflowAttributes(ctx context.Context, project string, domain string, name string, rsType admin.MatchableResource) (*admin.WorkflowAttributesGetResponse, error) {
+	ret := _m.Called(ctx, project, domain, name, rsType)
+
+	var r0 *admin.WorkflowAttributesGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, admin.MatchableResource) *admin.WorkflowAttributesGetResponse); ok {
+		r0 = rf(ctx, project, domain, name, rsType)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowAttributesGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, admin.MatchableResource) error); ok {
+		r1 = rf(ctx, project, domain, name, rsType)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -1,6 +1,7 @@
 package get
 
 import (
+	"github.com/flyteorg/flytectl/cmd/config/subcommand"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/spf13/cobra"
@@ -37,6 +38,9 @@ func CreateGetCommand() *cobra.Command {
 			Long: launchPlanLong, PFlagProvider: launchPlanConfig},
 		"execution": {CmdFunc: getExecutionFunc, Aliases: []string{"executions"}, Short: executionShort,
 			Long: executionLong},
+		"task-resource-attribute": {CmdFunc: getTaskResourceAttributes, Aliases: []string{"task-resource-attributes"},
+			Short: taskResourceAttributesShort,
+			Long:  taskResourceAttributesLong, PFlagProvider: subcommand.DefaultTaskResourceFetchConfig},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)

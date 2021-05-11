@@ -1,0 +1,5 @@
+InvalidDomain: development
+InvalidProject: flytectldemo
+InvalidWorkflow: ""
+cpu: "1"
+memory: 150Mi
