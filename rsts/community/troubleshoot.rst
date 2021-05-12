@@ -25,8 +25,18 @@ Here are a couple of techniques we believe would help you jump out of the pandor
          Timed out while waiting for the Flyte deployment to start
        
        You can run ``make teardown`` followed by the ``make start`` command.
-    - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses -- run the command ``docker exec flyte-sandbox kubectl get po -A``.
-    - If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command ``docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte``. This gives a detailed overview of the pod's status.
+
+    - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses by run this command  
+
+      .. code-block:: bash
+
+       docker exec flyte-sandbox kubectl get po -A
+    - If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command which gives detailed overview of pod's status
+
+      .. code-block:: bash
+
+       docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte 
+
     - If Kubernetes reports a disk pressure issue: (node.kubernetes.io/disk-pressure)
     
       - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
