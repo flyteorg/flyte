@@ -28,6 +28,9 @@ Steps
 
   make start
 
+.. tip::
+  In case make start throws any error please refer to the troubleshooting guide here `Troubleshoot <https://docs.flyte.org/en/latest/community/troubleshoot.html>`__
+    
 3. Take a minute to explore Flyte Console through the provided URL.
 
 .. image:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
