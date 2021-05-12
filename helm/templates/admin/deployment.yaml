@@ -42,7 +42,7 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: run-migrations
-          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
         - command:
@@ -57,7 +57,7 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: seed-projects
-          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
         {{- if .Values.cluster_resource_manager.enabled }}
@@ -70,7 +70,7 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
-          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
+          volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
           - mountPath: /etc/flyte/config
@@ -136,7 +136,7 @@ spec:
             cpu: "0.1"
             memory: 200Mi
       serviceAccountName: {{ template "flyteadmin.name" . }}
-      volumes: {{- include "databaseSecret.volume" . | nindent 6 }}
+      volumes: {{- include "databaseSecret.volume" . | nindent 8 }}
         - emptyDir: {}
           name: shared-data
         - configMap:

@@ -51,3 +51,11 @@ stats:
 .PHONY: prepare_artifacts
 prepare_artifacts:
 	bash script/prepare_artifacts.sh
+
+.PHONY: helm_install
+helm_install:
+	helm install flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace
+
+.PHONY: helm_upgrade
+helm_upgrade:
+	helm upgrade flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace
