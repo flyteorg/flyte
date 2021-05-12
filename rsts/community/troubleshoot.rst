@@ -26,8 +26,8 @@ Here are a couple of techniques we believe would help you jump out of the pandor
        
        You can run ``make teardown`` followed by the ``make start`` command.
     - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses -- run the command ``docker exec flyte-sandbox kubectl get po -A``.
-    - If you think a pod's crashing by any chance, describe the pod by running the command ``docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte``. This gives a detailed overview of the pod's status.
-    - If Kubernetes reports a disk pressure issue:
+    - If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command ``docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte``. This gives a detailed overview of the pod's status.
+    - If Kubernetes reports a disk pressure issue: (node.kubernetes.io/disk-pressure)
     
       - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
       - Prune the images and volumes. 
