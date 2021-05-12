@@ -29,7 +29,7 @@ Steps
   make start
 
 .. tip::
-  In case make start throws any error please refer to the troubleshooting guide here ``community/troubleshoot``
+  In case make start throws any error please refer to the troubleshooting guide here `Troubleshoot https://docs.flyte.org/en/latest/community/troubleshoot.html`
     
 3. Take a minute to explore Flyte Console through the provided URL.
 
