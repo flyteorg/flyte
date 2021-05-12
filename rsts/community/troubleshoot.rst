@@ -28,12 +28,12 @@ Here are a couple of techniques we believe would help you jump out of the pandor
 
     - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses by run this command  
 
-      .. code-block:: bash
+      ::
 
        docker exec flyte-sandbox kubectl get po -A
     - If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command which gives detailed overview of pod's status
 
-      .. code-block:: bash
+      ::
 
        docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte 
 
