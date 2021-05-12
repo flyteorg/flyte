@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workflow and pipelines</b> platform optimized for large scale processing and machine learning written in Golang
+  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b> and <b>ML processes</b> at scale 
 </p>
 
 <p align="center">
@@ -61,10 +61,18 @@ Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workfl
 Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
 a history of all executions and provides an intuitive UI, CLI and REST/gRPC API to interact with the computation.
 
-Flyte is more than a workflow engine -- it provides `workflow` as a core concept and a single unit of execution called `task` as a top level concept. Multiple tasks arranged in a data
+Flyte is more than a workflow engine -- it uses a `workflow` as a core concept and a `task` (a single unit of execution) as a top level concept. Multiple tasks arranged in a data
 producer-consumer order create a workflow.
 
 `Workflows` and `Tasks` can be written in any language, with out of the box support for [Python](https://github.com/flyteorg/flytekit), [Java and Scala](https://github.com/spotify/flytekit-java).
+
+
+## ⏳ Five Reasons to Use Flyte
+- Kubernetes-Native Workflow Automation Platform
+- Ergonomic SDK's in Python, Java & Scala
+- Versioned & Auditable
+- Reproducible Pipelines
+- Strong Data Typing
 
 <html>
 <h2 id="quickstart"> 
@@ -80,7 +88,7 @@ With [docker installed](https://docs.docker.com/get-docker/), run the following 
 
 This creates a local Flyte sandbox. Once the sandbox is ready, you should see the following message: `Flyte is ready! Flyte UI is available at http://localhost:30081/console`.
 
-Go ahead and visit http://localhost:30081/console to view the Flyte dashboard.
+Visit http://localhost:30081/console to view the Flyte dashboard.
 
 Here's a quick visual tour of the console.
 
@@ -104,18 +112,22 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </html>
 
 - Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
-- Enables **collaboration across your organization**, as in:
-  - Execute distributed data pipelines/workflows
-  - Reuse tasks across projects, users, and workflows
-  - Backtrace to a specified workflow
-  - Compare results of training workflows over time and across pipelines
-  - Share workflows and tasks across your teams
-- **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- start locally and scale to the cloud instantly
+- A data aware platform
+- Enables **collaboration across your organization** by:
+  - Executing distributed data pipelines/workflows
+  - Reusing tasks across projects, users, and workflows
+  - Making it easy to stitch together workflows from different teams and domain experts
+  - Backtracing to a specified workflow
+  - Comparing results of training workflows over time and across pipelines
+  - Sharing workflows and tasks across your teams
+  - Simplifying the complexity of multi-step, multi-owner workflows
+- **[Quick registration](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
 - **Centralized Inventory** constituting Tasks, Workflows and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
-- **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output; thus, illegal construction of pipelines fails during declaration rather than at runtime
-- Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
+- **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output, so illegal construction of pipelines fails during declaration rather than at runtime
+- Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps, etc.
 - Memoization and Lineage tracking
+- Provides logging and observability
 - Workflow features:
   - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/workflow/lp_schedules.html)**, trigger using a programmatic API, or on-demand
   - Parallel step execution
@@ -133,19 +145,21 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
   - Declarative pipelines
 - **Multi cloud support** (AWS, GCP and others)
 - Extensible core, modularized, and deep observability
+- No single point of failure and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
 - [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
 - Snappy Console
 - Python CLI and Golang CLI (flytectl)
 - Written in **Golang** and optimized for large running jobs' performance
+- [Grafana templates](https://grafana.com/orgs/flyte) (user/system observability)
 
 ### In Progress
 
-- Grafana templates (user/system observability)
-- Helm chart for Flyte
-- Performance optimization
-- Flink-K8s
+- Helm chart for Flyte (coming soon - June)
+- Flink-K8s (coming soon - June)
+- One click deploy to AWS
+- Reactive pipelines & Events
 
 ## 🔌 Available Plugins
 
@@ -158,15 +172,14 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)
 - Presto Queries
 - Distributed Pytorch (K8s Native) -- [Pytorch Operator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kfpytorch/index.html)
-- Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_custom_training.html))
-- Distributed Tensorflow (K8s Native) - [TFOperator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kftensorflow/index.html)
+- Sagemaker ([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_custom_training.html))
+- Distributed Tensorflow (K8s Native) -- [TFOperator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kftensorflow/index.html)
 - Papermill notebook execution ([Python](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/papermilltasks/index.html) and Spark)
-- Type safe and data checking for Pandas dataframe using Pandera
+- [Type safe and data checking for Pandas dataframe](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/pandera/index.html) using Pandera
+- Versioned datastores using DoltHub and Dolt
+- Use SQLAlchemy to query any relational database 
+- Build your own plugins that use library containers
 
-### In Queue
-
-- Reactive pipelines
-- A lot more integrations!
 
 <html>
 <h2 id="component-repos"> 
@@ -202,16 +215,18 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </h2>
 </html>
 
-Here are the resources that would help you get a better understanding of Flyte.
+Here are some resources to help you learn more about Flyte.
 
 ### Communication Channels
 
 - [Slack Org](https://forms.gle/UVuek9WfBoweiqcJA)
-- [Email list](https://groups.google.com/a/flyte.org/g/users)
+- [Email list](https://groups.google.com/u/0/a/flyte.org/g/users)
+- [Twitter](https://twitter.com/flyteorg) 
+- [LinkedIn Discussion Group](https://www.linkedin.com/groups/13962256/)
 
 ### Biweekly Community Sync
 
-- 📣 **Flyte OSS Community Sync** happens every alternate Tuesday, 9am-10am PDT ([Checkout the events calendar & subscribe](https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles)). Here's the [zoom link](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
+- 📣 **Flyte OSS Community Sync** happens every other Tuesday, 9am-10am PDT ([Checkout the events calendar](https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles)). Here's the [zoom link](https://us04web.zoom.us/j/71298741279?pwd=TDR1RUppQmxGaDRFdzBOa2lHN1dsZz09).
 - Meeting notes and backlog of topics are captured in [doc](https://docs.google.com/document/d/1Jb6eOPOzvTaHjtPEVy7OR2O5qK1MhEs3vv56DX2dacM/edit#heading=h.c5ha25xc546e).
 - If you'd like to revisit any community sync meeting that has happened, you can access the [video recordings](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ).
 
@@ -228,7 +243,7 @@ Here are the resources that would help you get a better understanding of Flyte.
 
 ### Blog Posts
 
-[Blog site](https://blog.flyte.org/)
+[Flyte blog site](https://blog.flyte.org/)
 
 ### Podcasts
 
