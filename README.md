@@ -54,12 +54,15 @@
   <a href="#component-repos">Components</a>
 </h3>
 
-<ul align="center" style="list-style-type:none; font-size: 17px; margin: 30px 0 30px 0;">
-  <li>Kubernetes-Native Workflow Automation Platform</li>
-  <li>Ergonomic SDK's in Python, Java & Scala</li>
-  <li>Versioned & Auditable</li>
-  <li>Reproducible Pipelines</li>
-  <li>Strong Data Typing</li>
+<h3><b>Five Reasons to Use Flyte<b></h3>
+<ul>
+  <h3>
+    <li>Kubernetes-Native Workflow Automation Platform</li>
+    <li>Ergonomic SDK's in Python, Java & Scala</li>
+    <li>Versioned & Auditable</li>
+    <li>Reproducible Pipelines</li>
+    <li>Strong Data Typing</li>
+  </h3>
 </ul>
 
 </html>
