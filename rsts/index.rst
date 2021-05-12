@@ -3,12 +3,45 @@
 .. toctree::
    :maxdepth: 1
    :name: mainsections
+   :titlesonly:
    :hidden:
 
    getting_started
-   Tutorials <https://flytecookbook.readthedocs.io>
-   reference/index
+   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
+   Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
+   Concepts <concepts/basics>
+   API Reference <reference/index>
    community/index
+
+.. toctree::
+   :caption: Concepts
+   :maxdepth: -1
+   :name: divedeeptoc
+   :hidden:
+
+   concepts/basics
+   concepts/core
+   concepts/control_plane
+   concepts/execution_time
+
+.. toctree::
+   :caption: Community
+   :maxdepth: -1
+   :name: roadmaptoc
+   :hidden:
+
+   Join the Community <community/index>
+   community/contribute
+   community/roadmap
+   community/troubleshoot
+
+.. toctree::
+   :caption: API Reference
+   :maxdepth: -1
+   :name: apireference
+   :hidden:
+
+   References <reference/index>
 
 .. toctree::
    :caption: How-Tos
@@ -18,32 +51,18 @@
 
    plugins/index
    howto/index
-
-.. toctree::
-   :caption: Deep Dive
-   :maxdepth: 1
-   :name: divedeeptoc
-   :hidden:
-
-   dive_deep/index
-
-.. toctree::
-   :caption: Developers
-   :maxdepth: 1
-   :name: roadmaptoc
-   :hidden:
-
-   Join the Community <community/index>
-   community/docs
-   community/roadmap
-   community/compare
-
+   
 Meet Flyte
 ==========
 
+.. raw:: html
+
+   <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;"> The workflow automation platform for complex, mission-critical data and ML processes at scale </p>
+
+
 Flyte is an open-source, container-native, structured programming and distributed processing platform. It enables highly concurrent, scalable and maintainable workflows for machine learning and data processing.
 
-Created at `Lyft <https://www.lyft.com/>`__, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
+Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freenome and many others, Flyte provides first class support for Python, Java, and Scala, and is built directly on Kubernetes for all the benefits containerization provides: portability, scalability, and reliability.
 
 The core unit of execution in Flyte is the ``task``, which you can easily write with the Flytekit Python SDK:
 
@@ -93,6 +112,8 @@ Who's Using Flyte?
 ------------------
 
 At `Lyft <https://eng.lyft.com/introducing-flyte-cloud-native-machine-learning-and-data-processing-platform-fb2bb3046a59>`__, Flyte has served production model training and data processing for over four years, becoming the de-facto platform for the Pricing, Locations, ETA, Mapping teams, Growth, Autonomous and other teams.
+
+For the most current list of Flyte's deployments, please click `here <https://github.com/flyteorg/flyte#%EF%B8%8F-current-deployments>`_.
 
 Next Steps
 ----------

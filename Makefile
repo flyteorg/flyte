@@ -1,10 +1,20 @@
+export REPOSITORY=flyte
+
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
 
+.PHONY: update_boilerplate
+update_boilerplate:
+	@boilerplate/update.sh
+
 .PHONY: kustomize
-kustomize:
+kustomize: 
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
+
+.PHONY: release_automation
+release_automation:
+	bash script/release.sh
 
 .PHONY: deploy_sandbox
 deploy_sandbox:
@@ -37,3 +47,7 @@ stats:
 	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller_dashboard.py
 	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin_dashboard.py
 	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser_dashboard.py
+
+.PHONY: prepare_artifacts
+prepare_artifacts:
+	bash script/prepare_artifacts.sh

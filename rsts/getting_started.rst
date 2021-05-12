@@ -3,72 +3,107 @@
 Getting started
 ---------------
 
-.. rubric:: Estimated time: 3 minutes
+.. rubric:: Estimated time to complete: 3 minutes.
 
 Prerequisites
-#############
+***************
 
 Make sure you have `docker installed <https://docs.docker.com/get-docker/>`__ and `git <https://git-scm.com/>`__ installed, then install flytekit:
 
-.. prompt:: bash
+Steps
+*****
 
-   pip install flytekit
-
-Clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo to create our own git repository called ``flyteexamples``:
-
-.. prompt:: bash
-
-   git clone git@github.com:flyteorg/flytekit-python-template.git flyteexamples
-   cd flyteexamples
-
-
-Write Your First Flyte Workflow
-###############################
-
-
-Let's take a look at the example workflow in `myapp/workflows/example.py <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py>`__:
-
-.. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/main/myapp/workflows/example.py
-   :language: python
-
-As you can see, a Flyte :std:doc:`task <generated/flytekit.task>` is the most basic unit of work in Flyte,
-and you can compose multiple tasks into a :std:doc:`workflow <generated/flytekit.workflow>`. Try running and
-modifying the ``example.py`` script locally.
-
-Start a Local Flyte Backend
-###########################
-
-Once you're happy with the ``example.py`` script, run the following command in your terminal:
+1. First install the python Flytekit SDK and clone the ``flytesnacks`` repo:
 
 .. prompt:: bash
 
-   docker run --rm --privileged -p 30081:30081 -p 30082:30082 -p 30084:30084 ghcr.io/flyteorg/flyte-sandbox
+  pip install --pre flytekit
+  git clone git@github.com:flyteorg/flytesnacks.git flytesnacks
+  cd flytesnacks
 
-When you see the message ``Flyte is ready!``, your local sandbox should be ready on http://localhost:30081/console.
-
-Register Your Workflows
-###########################
-
-Now we're ready to ship your code to the Flyte backend by running the following command:
+2. The repo comes with some useful Make targets to make your experimentation workflow easier. Run ``make help`` to get the supported commands.
+   Let's start a sandbox cluster:
 
 .. prompt:: bash
 
-   FLYTE_AWS_ENDPOINT=http://localhost:30084/ FLYTE_AWS_ACCESS_KEY_ID=minio FLYTE_AWS_SECRET_ACCESS_KEY=miniostorage make fast_register
+  make start
 
-Run Your Workflows
-##################
+.. tip::
+  In case make start throws any error please refer to the troubleshooting guide here `Troubleshoot <https://docs.flyte.org/en/latest/community/troubleshoot.html>`__
+    
+3. Take a minute to explore Flyte Console through the provided URL.
 
-To run a workflow, go to http://localhost:30081/console/projects/flyteexamples/workflows and then follow these steps:
+.. image:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
+    :alt: A quick visual tour for launching your first Workflow.
 
-1. Select the ``hello_world`` workflow
-2. Click the **Launch Workflow** button in the upper right corner
-3. Update the ``name`` input argument
-4. Proceed to **Launch** to trigger an execution
+4. Open ``hello_world.py`` in your favorite editor.
 
-.. rubric:: 🎉 Congratulations, you just ran your first Flyte workflow 🎉
+.. code-block::
 
+  cookbook/core/basic/hello_world.py
 
-Next Steps: Tutorials
-#####################
+5. Add ``name: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Then update the body of ``say_hello`` to consume that argument.
 
-To experience the full capabilities of Flyte, try out the `Flytekit Tutorials <https://flytecookbook.readthedocs.io/en/latest/>`__ 🛫
+.. tip::
+
+  .. code-block:: python
+
+    @task
+    def say_hello(name: str) -> str:
+        return f"hello world, {name}"
+
+.. tip::
+
+  .. code-block:: python
+
+    @workflow
+    def my_wf(name: str) -> str:
+        res = say_hello(name=name)
+        return res
+
+6. Update the simple test at the bottom of the file to pass in a name. E.g.
+
+.. tip::
+
+  .. code-block:: python
+
+    print(f"Running my_wf(name='adam') {my_wf(name='adam')}")
+
+7. When you run this file locally, it should output ``hello world, adam``. Run this command in your terminal:
+
+.. prompt:: bash
+
+  python cookbook/core/basic/hello_world.py
+
+*Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
+
+8. Run:
+
+.. prompt:: bash
+
+  REGISTRY=ghcr.io/flyteorg make fast_register
+
+.. note::
+   If the images are to be re-built, run ``make register`` command.
+
+9. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
+
+10. Give it a minute and once it's done, check out "Inputs/Outputs" on the top right corner to see your updated greeting.
+
+.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/exercise.gif
+    :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
+
+.. admonition:: Recap
+
+  You have successfully:
+
+  1. Run a flyte sandbox cluster,
+  2. Run a flyte workflow locally,
+  3. Run a flyte workflow on a cluster.
+
+  .. rubric:: 🎉 Congratulations, you just ran your first Flyte workflow 🎉
+
+  Next Steps: User Guide
+  #######################
+  
+  To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__ 🛫

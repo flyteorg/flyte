@@ -7,7 +7,7 @@ How do I create/register a new project?
 Using flytectl
 ---------------
 
-.. CAUTION::
+.. NOTE::
 
   Coming soon 🛠
 
@@ -27,6 +27,6 @@ If you refresh your console you'll see your new project appear!
 FlyteAdmin API reference
 -------------------------
 
-.. CAUTION::
+.. NOTE::
 
   Coming soon 🛠

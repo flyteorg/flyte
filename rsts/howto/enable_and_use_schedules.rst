@@ -98,7 +98,7 @@ assigned to the ``triggered_time`` input you could define the following launch p
         fixed_inputs={"an_input": 3},
     )
 
-Please see a more complete example in the :std:ref:`cookbook <cookbook:Scheduling workflow executions with launch plans>`.
+Please see a more complete example in the :std:ref:`User Guide <cookbook:sphx_glr_auto_deployment_workflow_lp_schedules.py>`.
 
 Activating a schedule
 =====================
@@ -165,7 +165,7 @@ Workflow Executor
 -----------------
 Scheduled events which trigger need to be handled by the workflow executor, which subscribes to triggered events from the SQS queue you've configured above.
 
-.. CAUTION::
+.. NOTE::
 
    Failure to configure a workflow executor will result in all your scheduled events piling up silently without ever kicking off workflow executions.
 
