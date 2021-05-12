@@ -242,7 +242,7 @@ todo_include_todos = True
 
 # -- Options for Sphix issues extension --------------------------------------
 
-# GitHub repo
+# GitHub repos
 issues_github_path = "flyteorg/flyte"
 
 # equivalent to
