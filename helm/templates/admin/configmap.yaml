@@ -14,7 +14,7 @@ data:
 {{- with .Values.configmap.logger }}
   logger.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-{{- with .Values.configmap.server }}
+{{- with .Values.configmap.adminServer }}
   server.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- with .Values.configmap.remoteData }}
