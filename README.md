@@ -8,7 +8,7 @@
 </h1>
 
 <p align="center">
-Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workflow and pipelines</b> platform optimized for large scale processing and machine learning written in Golang
+  Flyte is a <b>workflow automation</b> platform for <b>complex</b>, <b>mission-critical data</b> and <b>ML processes</b> at scale 
 </p>
 
 <p align="center">
@@ -54,7 +54,21 @@ Flyte is a <b>production-grade</b>, <b>container-native</b>, <b>type-safe workfl
   <a href="#component-repos">Components</a>
 </h3>
 
+<ul align="center" style="list-style-type:none; font-size: 17px; margin: 30px 0 30px 0;">
+  <li>Kubernetes-Native Workflow Automation Platform</li>
+  <li>Ergonomic SDK's in Python, Java & Scala</li>
+  <li>Versioned & Auditable</li>
+  <li>Reproducible Pipelines</li>
+  <li>Strong Data Typing</li>
+</ul>
+
 </html>
+
+<!-- - Kubernetes-native workflow automation platform
+- Ergonomic SDK's in Python, Java & Scala
+- Versioning and Data Lineage included out-of-the-box
+- Reproducible Pipelines
+- Strong Data Typing  -->
 
 ## 💥 Introduction
 
@@ -104,18 +118,22 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </html>
 
 - Used at _Scale_ in production by **500+** users at Lyft with more than **1 million** executions and **40+ million** container executions per month
+- A data aware platform
 - Enables **collaboration across your organization**, as in:
   - Execute distributed data pipelines/workflows
   - Reuse tasks across projects, users, and workflows
+  - Makes it easy to stitch together workflows from different teams and domain experts
   - Backtrace to a specified workflow
   - Compare results of training workflows over time and across pipelines
   - Share workflows and tasks across your teams
-- **[Quick registration](https://docs.flyte.org/projects/cookbook/en/latest/tutorial.html)** -- start locally and scale to the cloud instantly
+  - Simplifies the complexity of multi-step, multi-owner workflows
+- **[Quick registration](https://docs.flyte.org/en/latest/getting_started.html)** -- start locally and scale to the cloud instantly
 - **Centralized Inventory** constituting Tasks, Workflows and Executions
 - **gRPC / REST** interface to define and execute tasks and workflows
 - **Type safe** construction of pipelines -- each task has an interface which is characterized by its input and output; thus, illegal construction of pipelines fails during declaration rather than at runtime
-- Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/core.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
+- Supports multiple **[data types](https://docs.flyte.org/projects/cookbook/en/latest/auto/type_system/index.html)** for machine learning and data processing pipelines, such as Blobs (images, arbitrary files), Directories, Schema (columnar structured data), collections, maps etc.
 - Memoization and Lineage tracking
+- Provides logging and observability
 - Workflow features:
   - Start with one task, convert to a pipeline, attach **[multiple schedules](https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/workflow/lp_schedules.html)**, trigger using a programmatic API, or on-demand
   - Parallel step execution
@@ -133,6 +151,7 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
   - Declarative pipelines
 - **Multi cloud support** (AWS, GCP and others)
 - Extensible core, modularized, and deep observability
+- No single point of failure and is resilient by design
 - Automated notifications to Slack, Email, and Pagerduty
 - [Multi K8s cluster support](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/pod/index.html)
 - Out of the box support to run **[Spark jobs on K8s](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/k8s_spark/index.html)**, **[Hive queries](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)**, etc.
@@ -159,10 +178,10 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 - [Qubole Hive](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/index.html)
 - Presto Queries
 - Distributed Pytorch (K8s Native) -- [Pytorch Operator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kfpytorch/index.html)
-- Sagemaker([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_custom_training.html))
-- Distributed Tensorflow (K8s Native) - [TFOperator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kftensorflow/index.html)
+- Sagemaker ([builtin algorithms](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_builtin_algo_training.html) & [custom models](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/aws/sagemaker_training/sagemaker_custom_training.html))
+- Distributed Tensorflow (K8s Native) -- [TFOperator](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/kftensorflow/index.html)
 - Papermill notebook execution ([Python](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/papermilltasks/index.html) and Spark)
-- Type safe and data checking for Pandas dataframe using Pandera
+- [Type safe and data checking for Pandas dataframe](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/flytekit_plugins/pandera/index.html) using Pandera
 - Versioned datastores using DoltHub and Dolt
 - Use SQLAlchemy to query any relational database 
 - Build your own plugins that use library containers
