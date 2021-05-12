@@ -226,7 +226,7 @@ db:
 #
 
 configmap:
-  server:
+  adminServer:
     server:
       httpPort: 8088
       grpcPort: 8089
