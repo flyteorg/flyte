@@ -64,12 +64,6 @@
 
 </html>
 
-<!-- - Kubernetes-native workflow automation platform
-- Ergonomic SDK's in Python, Java & Scala
-- Versioning and Data Lineage included out-of-the-box
-- Reproducible Pipelines
-- Strong Data Typing  -->
-
 ## 💥 Introduction
 
 Flyte is a structured programming and distributed processing platform that enables highly concurrent, scalable and maintainable workflows for `Machine Learning` and `Data Processing`. It is a fabric that connects disparate computation backends using a type safe data dependency graph. It records all changes to a pipeline, making it possible to rewind time. It also stores
