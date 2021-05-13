@@ -2,6 +2,7 @@ package ext
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -14,7 +15,13 @@ func (a *AdminFetcherExtClient) FetchWorkflowAttributes(ctx context.Context, pro
 		Workflow:     name,
 		ResourceType: rsType,
 	})
-	return workflowAttr, err
+	if err != nil {
+		return nil, err
+	}
+	if workflowAttr.GetAttributes() == nil || workflowAttr.GetAttributes().GetMatchingAttributes() == nil {
+		return nil, fmt.Errorf("attribute doesn't exist")
+	}
+	return workflowAttr, nil
 }
 
 func (a *AdminFetcherExtClient) FetchProjectDomainAttributes(ctx context.Context, project, domain string,
@@ -25,5 +32,11 @@ func (a *AdminFetcherExtClient) FetchProjectDomainAttributes(ctx context.Context
 			Domain:       domain,
 			ResourceType: rsType,
 		})
-	return projectDomainAttr, err
+	if err != nil {
+		return nil, err
+	}
+	if projectDomainAttr.GetAttributes() == nil || projectDomainAttr.GetAttributes().GetMatchingAttributes() == nil {
+		return nil, fmt.Errorf("attribute doesn't exist")
+	}
+	return projectDomainAttr, nil
 }

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
@@ -17,7 +17,8 @@ func deleteTaskResourceAttributeSetup() {
 	ctx = u.Ctx
 	cmdCtx = u.CmdCtx
 	mockClient = u.MockClient
-	subcommand.DefaultTaskResourceDelConfig = &subcommand.TaskResourceAttrDeleteConfig{}
+	taskresourceattribute.DefaultDelConfig = &taskresourceattribute.AttrDeleteConfig{}
+	args = []string{}
 }
 
 func TestDeleteTaskResourceAttributes(t *testing.T) {
@@ -25,7 +26,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = ""
+		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		// No args implying project domain attribute deletion
 		u.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
@@ -50,7 +51,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = "testdata/valid_project_domain_task_attribute.yaml"
+		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/valid_project_domain_task_attribute.yaml"
 		// No args implying project domain attribute deletion
 		u.DeleterExt.OnDeleteProjectDomainAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything).Return(nil)
@@ -63,7 +64,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = ""
+		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
 		u.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
@@ -77,7 +78,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = ""
+		taskresourceattribute.DefaultDelConfig.AttrFile = ""
 		args := []string{"workflow1"}
 		u.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(fmt.Errorf("failed to delete workflow attribute"))
@@ -92,7 +93,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = "testdata/valid_workflow_task_attribute.yaml"
+		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/valid_workflow_task_attribute.yaml"
 		// No args implying project domain attribute deletion
 		u.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
@@ -106,7 +107,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = "testdata/non-existent"
+		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/non-existent"
 		// No args implying project domain attribute deletion
 		u.DeleterExt.OnDeleteWorkflowAttributesMatch(mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(nil)
@@ -120,7 +121,7 @@ func TestDeleteTaskResourceAttributes(t *testing.T) {
 		setup()
 		deleteTaskResourceAttributeSetup()
 		// Empty attribute file
-		subcommand.DefaultTaskResourceDelConfig.AttrFile = "testdata/invalid_task_attribute.yaml"
+		taskresourceattribute.DefaultDelConfig.AttrFile = "testdata/invalid_attribute.yaml"
 		// No args implying project domain attribute deletion
 		err = deleteTaskResourceAttributes(ctx, args, cmdCtx)
 		assert.NotNil(t, err)

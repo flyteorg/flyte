@@ -35,15 +35,14 @@ eg:  content of tra.yaml
 
 .. code-block:: yaml
 
-	Domain: development
-	Project: flytectldemo
-	Workflow: ""
+	domain: development
+	project: flytectldemo
 	defaults:
-	  cpu: "1"
-	  memory: 150Mi
+		cpu: "1"
+		memory: "150Mi"
 	limits:
-	  cpu: "2"
-	  memory: 450Mi
+		cpu: "2"
+		memory: "450Mi"
 
 Usage
 

@@ -10,7 +10,7 @@ Synopsis
 
 
 
-Updates task  resource attributes for given project,domain combination or additionally with workflow name.
+Updates task  resource attributes for given project and domain combination or additionally with workflow name.
 
 Updating the task resource attribute is only available from a generated file. See the get section for generating this file.
 Here the command updates takes the input for task resource attributes from the config file tra.yaml
@@ -18,34 +18,33 @@ eg:  content of tra.yaml
 
 .. code-block:: yaml
 
-	Domain: development
-	Project: flytectldemo
-	Workflow: ""
+	domain: development
+	project: flytectldemo
 	defaults:
-	  cpu: "1"
-	  memory: 150Mi
+		cpu: "1"
+		memory: "150Mi"
 	limits:
-	  cpu: "2"
-	  memory: 450Mi
+		cpu: "2"
+		memory: "450Mi"
 
 ::
 
  flytectl update task-resource-attribute -attrFile tra.yaml
 
-Updating task resource attribute for project and domain  and workflow combination. This will take precedence over any other
+Updating task resource attribute for project and domain and workflow combination. This will take precedence over any other
 resource attribute defined at project domain level.
 Update the resource attributes for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo , development domain
 .. code-block:: yaml
 
-	Domain: development
-	Project: flytectldemo
-	Workflow: core.control_flow.run_merge_sort.merge_sort
+	domain: development
+	project: flytectldemo
+	workflow: core.control_flow.run_merge_sort.merge_sort
 	defaults:
-	  cpu: "1"
-	  memory: 150Mi
+		cpu: "1"
+		memory: "150Mi"
 	limits:
-	  cpu: "2"
-	  memory: 450Mi
+		cpu: "2"
+		memory: "450Mi"
 
 ::
 

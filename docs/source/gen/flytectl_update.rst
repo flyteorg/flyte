@@ -73,6 +73,7 @@ SEE ALSO
 ~~~~~~~~
 
 * :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`flytectl_update_cluster-resource-attribute` 	 - Updates matchable resources of cluster attributes
 * :doc:`flytectl_update_launchplan` 	 - Updates launch plan metadata
 * :doc:`flytectl_update_project` 	 - Updates project resources
 * :doc:`flytectl_update_task` 	 - Updates task metadata

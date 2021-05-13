@@ -71,6 +71,7 @@ SEE ALSO
 ~~~~~~~~
 
 * :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`flytectl_delete_cluster-resource-attribute` 	 - Deletes matchable resources of cluster attributes
 * :doc:`flytectl_delete_execution` 	 - Terminate/Delete execution resources.
 * :doc:`flytectl_delete_task-resource-attribute` 	 - Deletes matchable resources of task attributes
 
