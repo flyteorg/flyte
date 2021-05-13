@@ -3,7 +3,7 @@ package get
 import (
 	"context"
 
-	"github.com/flyteorg/flytectl/cmd/config/subcommand"
+	workflowconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
 	"github.com/flyteorg/flytectl/pkg/ext"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
@@ -108,13 +108,13 @@ func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterf
 	var workflows []*admin.Workflow
 	var workflow *admin.Workflow
 	var err error
-	if subcommand.DefaultWorklfowConfig.Latest {
+	if workflowconfig.DefaultConfig.Latest {
 		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain); err != nil {
 			return nil, err
 		}
 		workflows = append(workflows, workflow)
-	} else if subcommand.DefaultWorklfowConfig.Version != "" {
-		if workflow, err = fetcher.FetchWorkflowVersion(ctx, name, subcommand.DefaultWorklfowConfig.Version, project, domain); err != nil {
+	} else if workflowconfig.DefaultConfig.Version != "" {
+		if workflow, err = fetcher.FetchWorkflowVersion(ctx, name, workflowconfig.DefaultConfig.Version, project, domain); err != nil {
 			return nil, err
 		}
 		workflows = append(workflows, workflow)

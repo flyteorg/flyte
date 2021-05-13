@@ -71,6 +71,7 @@ SEE ALSO
 ~~~~~~~~
 
 * :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`flytectl_get_cluster-resource-attribute` 	 - Gets matchable resources of cluster resource attributes
 * :doc:`flytectl_get_execution` 	 - Gets execution resources
 * :doc:`flytectl_get_launchplan` 	 - Gets launch plan resources
 * :doc:`flytectl_get_project` 	 - Gets project resources

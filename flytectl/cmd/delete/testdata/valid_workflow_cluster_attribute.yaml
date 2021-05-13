@@ -1,0 +1,6 @@
+Domain: development
+Project: flytectldemo
+Workflow: core.control_flow.run_merge_sort.merge_sort
+attributes:
+  "foo": "bar"
+  "buzz": "lightyear"

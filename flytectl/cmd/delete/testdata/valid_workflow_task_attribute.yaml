@@ -1,6 +1,6 @@
-Domain: development
-Project: flytectldemo
-Workflow: core.control_flow.run_merge_sort.merge_sort
+domain: development
+project: flytectldemo
+workflow: core.control_flow.run_merge_sort.merge_sort
 defaults:
   cpu: "2"
   memory: 250Mi

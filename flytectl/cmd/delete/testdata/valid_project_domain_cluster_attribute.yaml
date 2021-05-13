@@ -1,0 +1,5 @@
+domain: development
+project: flytectldemo
+attributes:
+  "foo": "bar"
+  "buzz": "lightyear"

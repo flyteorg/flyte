@@ -1,6 +1,5 @@
-Domain: development
-Project: flytectldemo
-Workflow: ""
+domain: development
+project: flytectldemo
 defaults:
   cpu: "1"
   memory: 150Mi

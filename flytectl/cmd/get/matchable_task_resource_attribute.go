@@ -2,10 +2,10 @@ package get
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/flyteorg/flytectl/cmd/config"
-	"github.com/flyteorg/flytectl/cmd/config/subcommand"
+	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -38,15 +38,14 @@ eg:  content of tra.yaml
 
 .. code-block:: yaml
 
-	Domain: development
-	Project: flytectldemo
-	Workflow: ""
+	domain: development
+	project: flytectldemo
 	defaults:
-	  cpu: "1"
-	  memory: 150Mi
+		cpu: "1"
+		memory: "150Mi"
 	limits:
-	  cpu: "2"
-	  memory: 450Mi
+		cpu: "2"
+		memory: "450Mi"
 
 Usage
 `
@@ -64,38 +63,19 @@ func getTaskResourceAttributes(ctx context.Context, args []string, cmdCtx cmdCor
 		workflowName = args[0]
 	}
 	// Construct a shadow config for TaskResourceAttribute. The shadow config is not using ProjectDomainAttribute/Workflowattribute directly inorder to simplify the inputs.
-	taskResourceAttrFileConfig := subcommand.TaskResourceAttrFileConfig{Project: project, Domain: domain, Workflow: workflowName}
+	taskResourceAttrFileConfig := taskresourceattribute.TaskResourceAttrFileConfig{Project: project, Domain: domain, Workflow: workflowName}
 	// Get the attribute file name from the command line config
-	fileName := subcommand.DefaultTaskResourceFetchConfig.AttrFile
+	fileName := taskresourceattribute.DefaultFetchConfig.AttrFile
 
-	if len(workflowName) > 0 {
-		// Fetch the workflow attribute from the admin
-		workflowAttr, err := cmdCtx.AdminFetcherExt().FetchWorkflowAttributes(ctx,
-			project, domain, workflowName, admin.MatchableResource_TASK_RESOURCE)
-		if err != nil {
-			taskResourceAttrFileConfig.DumpTaskResourceAttr(ctx, fileName)
-			return err
-		}
-		if workflowAttr.GetAttributes() == nil || workflowAttr.GetAttributes().GetMatchingAttributes() == nil {
-			return fmt.Errorf("invalid matching attribute returned with nil data")
-		}
-		// Update the shadow config with the fetched taskResourceAttribute which can then be written to a file which can then be called for an update.
-		taskResourceAttrFileConfig.TaskResourceAttributes = workflowAttr.GetAttributes().GetMatchingAttributes().GetTaskResourceAttributes()
-	} else {
-		// Fetch the project domain attribute from the admin
-		projectDomainAttr, err := cmdCtx.AdminFetcherExt().FetchProjectDomainAttributes(ctx,
-			project, domain, admin.MatchableResource_TASK_RESOURCE)
-		if err != nil {
-			taskResourceAttrFileConfig.DumpTaskResourceAttr(ctx, fileName)
-			return err
-		}
-		if projectDomainAttr.GetAttributes() == nil || projectDomainAttr.GetAttributes().GetMatchingAttributes() == nil {
-			return fmt.Errorf("invalid matching attribute returned with nil data")
-		}
-		// Update the shadow config with the fetched taskResourceAttribute which can then be written to a file which can then be called for an update.
-		taskResourceAttrFileConfig.TaskResourceAttributes = projectDomainAttr.GetAttributes().GetMatchingAttributes().GetTaskResourceAttributes()
+	// Updates the taskResourceAttrFileConfig with the fetched matchable attribute
+	if err := FetchAndUnDecorateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminFetcherExt(),
+		&taskResourceAttrFileConfig, admin.MatchableResource_TASK_RESOURCE); err != nil {
+		return err
 	}
+
 	// Write the config to the file which can be used for update
-	taskResourceAttrFileConfig.DumpTaskResourceAttr(ctx, fileName)
+	if err := sconfig.DumpTaskResourceAttr(taskResourceAttrFileConfig, fileName); err != nil {
+		return err
+	}
 	return nil
 }
