@@ -76,6 +76,9 @@ Running the following, will make it so that when Admin fills in cluster resource
     --attributes projectQuotaCpu 1000 --attributes projectQuotaMemory 5000Gi
 
 
+Similarly this can be done through `flytectl update cluster-resource-attribute <https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_update_cluster-resource-attribute.html>`__
+
+
 These values will in turn be used to fill in the template fields, for example:
 
 .. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml
