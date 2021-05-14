@@ -1,0 +1,7 @@
+domain: development
+project: flytectldemo
+tags:
+  - foo
+  - bar
+  - buzz
+  - lightyear

@@ -76,16 +76,16 @@ func TestUpdateTaskResourceAttributes(t *testing.T) {
 	t.Run("non existent file", func(t *testing.T) {
 		setup()
 		updateTaskResourceAttributeSetup()
-		taskresourceattribute.DefaultUpdateConfig.AttrFile = "testdata/non-existent-filel"
+		taskresourceattribute.DefaultUpdateConfig.AttrFile = testDataNonExistentFile
 		err = updateTaskResourceAttributesFunc(ctx, nil, cmdCtx)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("unable to read from testdata/non-existent-filel yaml file"), err)
+		assert.Equal(t, fmt.Errorf("unable to read from testdata/non-existent-file yaml file"), err)
 		tearDownAndVerify(t, ``)
 	})
 	t.Run("invalid update file", func(t *testing.T) {
 		setup()
 		updateTaskResourceAttributeSetup()
-		taskresourceattribute.DefaultUpdateConfig.AttrFile = "testdata/invalid_attribute.yaml"
+		taskresourceattribute.DefaultUpdateConfig.AttrFile = testDataInvalidAttrFile
 		err = updateTaskResourceAttributesFunc(ctx, nil, cmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\""), err)
