@@ -19,8 +19,9 @@ Here the command delete cluster resource attributes for  project flytectldemo an
  flytectl delete cluster-resource-attribute -p flytectldemo -d development 
 
 
-Deleting cluster resource attribute using config file which was used for creating it.
+Deletes cluster resource attribute using config file which was used for creating it.
 Here the command deletes cluster resource attributes from the config file cra.yaml
+Attributes are optional in the file as they are unread during the delete command but can be kept as the same file can be used for get, update or delete 
 eg:  content of cra.yaml which will use the project domain and workflow name for deleting the resource
 
 ::
@@ -30,13 +31,13 @@ eg:  content of cra.yaml which will use the project domain and workflow name for
 
 .. code-block:: yaml
 	
-	domain: development
-	project: flytectldemo
-	attributes:
-		foo: "bar"
-		buzz: "lightyear"
+    domain: development
+    project: flytectldemo
+    attributes:
+      foo: "bar"
+      buzz: "lightyear"
 
-Deleting cluster resource attribute for a workflow
+Deletes cluster resource attribute for a workflow
 Here the command deletes cluster resource attributes for a workflow
 
 ::

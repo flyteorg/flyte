@@ -21,11 +21,24 @@ Here the command get task resource attributes for  project flytectldemo and deve
 
  flytectl get task-resource-attribute -p flytectldemo -d development 
 
-eg : O/P
+eg : output from the command
 
 .. code-block:: json
 
- {"Project":"flytectldemo","Domain":"development","Workflow":"","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"450Mi"}}
+ {"project":"flytectldemo","domain":"development","workflow":"","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"450Mi"}}
+
+Retrieves task resource attribute for project and domain and workflow
+Here the command get task resource attributes for  project flytectldemo ,development domain and workflow core.control_flow.run_merge_sort.merge_sort
+::
+
+ flytectl get task-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+
+eg : output from the command
+
+.. code-block:: json
+
+ {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"450Mi"}}
+
 
 Writing the task resource attribute to a file. If there are no task resource attributes a file would be written with basic data populated.
 Here the command gets task resource attributes and writes the config file to tra.yaml
@@ -38,14 +51,14 @@ eg:  content of tra.yaml
 
 .. code-block:: yaml
 
-	domain: development
-	project: flytectldemo
-	defaults:
-		cpu: "1"
-		memory: "150Mi"
-	limits:
-		cpu: "2"
-		memory: "450Mi"
+    domain: development
+    project: flytectldemo
+    defaults:
+      cpu: "1"
+      memory: "150Mi"
+    limits:
+      cpu: "2"
+      memory: "450Mi"
 
 Usage
 `

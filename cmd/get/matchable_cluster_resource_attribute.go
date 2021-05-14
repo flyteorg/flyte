@@ -21,28 +21,40 @@ Here the command get cluster resource attributes for  project flytectldemo and d
 
  flytectl get cluster-resource-attribute -p flytectldemo -d development 
 
-eg : O/P
+eg : output from the command
 
 .. code-block:: json
 
  {"project":"flytectldemo","domain":"development","attributes":{"buzz":"lightyear","foo":"bar"}}
 
+Retrieves cluster resource attribute for project and domain and workflow
+Here the command get cluster resource attributes for  project flytectldemo ,development domain and workflow core.control_flow.run_merge_sort.merge_sort
+::
+
+ flytectl get cluster-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort
+
+eg : output from the command
+
+.. code-block:: json
+
+ {"project":"flytectldemo","domain":"development","workflow":"core.control_flow.run_merge_sort.merge_sort","attributes":{"buzz":"lightyear","foo":"bar"}}
+
 Writing the cluster resource attribute to a file. If there are no cluster resource attributes , command would return an error.
-Here the command gets task resource attributes and writes the config file to tra.yaml
-eg:  content of tra.yaml
+Here the command gets task resource attributes and writes the config file to cra.yaml
+eg:  content of cra.yaml
 
 ::
 
- flytectl get task-resource-attribute --attrFile tra.yaml
+ flytectl get task-resource-attribute --attrFile cra.yaml
 
 
 .. code-block:: yaml
 
-	domain: development
-	project: flytectldemo
-	attributes:
-	  foo: "bar"
-	  buzz: "lightyear"
+    domain: development
+    project: flytectldemo
+    attributes:
+      foo: "bar"
+      buzz: "lightyear"
 
 Usage
 `

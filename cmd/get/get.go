@@ -2,6 +2,7 @@ package get
 
 import (
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionqueueattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
@@ -46,6 +47,9 @@ func CreateGetCommand() *cobra.Command {
 		"cluster-resource-attribute": {CmdFunc: getClusterResourceAttributes, Aliases: []string{"cluster-resource-attributes"},
 			Short: clusterResourceAttributesShort,
 			Long:  clusterResourceAttributesLong, PFlagProvider: clusterresourceattribute.DefaultFetchConfig},
+		"execution-queue-attribute": {CmdFunc: getExecutionQueueAttributes, Aliases: []string{"execution-queue-attributes"},
+			Short: executionQueueAttributesShort,
+			Long:  executionQueueAttributesLong, PFlagProvider: executionqueueattribute.DefaultFetchConfig},
 	}
 
 	cmdcore.AddCommands(getCmd, getResourcesFuncs)
