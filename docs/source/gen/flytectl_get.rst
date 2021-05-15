@@ -13,7 +13,7 @@ Synopsis
 Example get projects.
 ::
 
- bin/flytectl get project
+ flytectl get project
 
 
 Options
@@ -73,8 +73,10 @@ SEE ALSO
 * :doc:`flytectl` 	 - flyetcl CLI tool
 * :doc:`flytectl_get_cluster-resource-attribute` 	 - Gets matchable resources of cluster resource attributes
 * :doc:`flytectl_get_execution` 	 - Gets execution resources
+* :doc:`flytectl_get_execution-cluster-label` 	 - Gets matchable resources of execution cluster label
 * :doc:`flytectl_get_execution-queue-attribute` 	 - Gets matchable resources of execution queue attributes
 * :doc:`flytectl_get_launchplan` 	 - Gets launch plan resources
+* :doc:`flytectl_get_plugin-override` 	 - Gets matchable resources of plugin override
 * :doc:`flytectl_get_project` 	 - Gets project resources
 * :doc:`flytectl_get_task` 	 - Gets task resources
 * :doc:`flytectl_get_task-resource-attribute` 	 - Gets matchable resources of task attributes

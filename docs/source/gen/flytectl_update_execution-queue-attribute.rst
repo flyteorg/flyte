@@ -35,7 +35,7 @@ eg:  content of era.yaml
 
 Updating execution queue attribute for project and domain and workflow combination. This will take precedence over any other
 execution queue attribute defined at project domain level.
-Update the execution queue attributes for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo , development domain
+Update the execution queue attributes for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo, development domain
 
 .. code-block:: yaml
 

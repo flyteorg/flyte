@@ -28,7 +28,7 @@ eg : output from the command
  {"project":"flytectldemo","domain":"development","attributes":{"buzz":"lightyear","foo":"bar"}}
 
 Retrieves cluster resource attribute for project and domain and workflow
-Here the command get cluster resource attributes for  project flytectldemo ,development domain and workflow core.control_flow.run_merge_sort.merge_sort
+Here the command get cluster resource attributes for  project flytectldemo, development domain and workflow core.control_flow.run_merge_sort.merge_sort
 ::
 
  flytectl get cluster-resource-attribute -p flytectldemo -d development core.control_flow.run_merge_sort.merge_sort

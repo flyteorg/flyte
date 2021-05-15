@@ -41,7 +41,7 @@ eg:  content of tra.yaml which will use the project domain and workflow name for
       memory: "450Mi"
 
 Deletes task resource attribute for a workflow
-Here the command deletes task resource attributes for a workflow
+Here the command deletes task resource attributes for a workflow core.control_flow.run_merge_sort.merge_sort
 
 ::
 

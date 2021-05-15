@@ -41,7 +41,7 @@ eg:  content of cra.yaml which will use the project domain and workflow name for
       buzz: "lightyear"
 
 Deletes cluster resource attribute for a workflow
-Here the command deletes cluster resource attributes for a workflow
+Here the command deletes cluster resource attributes for a workflow core.control_flow.run_merge_sort.merge_sort
 
 ::
 
