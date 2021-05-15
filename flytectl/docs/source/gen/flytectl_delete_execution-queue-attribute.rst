@@ -40,7 +40,7 @@ eg:  content of era.yaml which will use the project domain and workflow name for
       - lightyear
 
 Deletes execution queue attribute for a workflow
-Here the command deletes the execution queue attributes for a workflow
+Here the command deletes the execution queue attributes for a workflow core.control_flow.run_merge_sort.merge_sort
 
 ::
 

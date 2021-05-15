@@ -33,7 +33,7 @@ resource attribute defined at project domain level.
 Also this will completely overwrite any existing custom project and domain and workflow combination attributes.
 Would be preferable to do get and generate an attribute file if there is an existing attribute already set and then update it to have new values
 Refer to get cluster-resource-attribute section on how to generate this file
-Update the cluster resource attributes for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo , development domain
+Update the cluster resource attributes for workflow core.control_flow.run_merge_sort.merge_sort in flytectldemo, development domain
 
 .. code-block:: yaml
 

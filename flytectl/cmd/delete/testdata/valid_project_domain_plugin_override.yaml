@@ -1,0 +1,8 @@
+domain: development
+project: flytectldemo
+overrides:
+  - task_type: python_task
+    plugin_id:
+      - plugin_override1
+      - plugin_override2
+    missing_plugin_behavior: 1 # 0 : FAIL , 1: DEFAULT

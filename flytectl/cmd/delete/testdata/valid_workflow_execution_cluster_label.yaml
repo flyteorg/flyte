@@ -1,0 +1,4 @@
+domain: development
+project: flytectldemo
+workflow: core.control_flow.run_merge_sort.merge_sort
+value: foo
