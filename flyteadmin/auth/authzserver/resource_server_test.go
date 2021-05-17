@@ -118,6 +118,7 @@ func Test_getJwksForIssuer(t *testing.T) {
 	type args struct {
 		ctx           context.Context
 		issuerBaseURL url.URL
+		customMetaURL url.URL
 	}
 	tests := []struct {
 		name    string
@@ -129,7 +130,7 @@ func Test_getJwksForIssuer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getJwksForIssuer(tt.args.ctx, tt.args.issuerBaseURL)
+			got, err := getJwksForIssuer(tt.args.ctx, tt.args.issuerBaseURL, tt.args.customMetaURL)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getJwksForIssuer() error = %v, wantErr %v", err, tt.wantErr)
 				return

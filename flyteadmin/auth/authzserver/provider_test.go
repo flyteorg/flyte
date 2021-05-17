@@ -216,12 +216,12 @@ func TestProvider_ValidateAccessToken(t *testing.T) {
 
 func Test_verifyClaims(t *testing.T) {
 	t.Run("Empty claims, fail", func(t *testing.T) {
-		_, err := verifyClaims("https://myserver", map[string]interface{}{})
+		_, err := verifyClaims(sets.NewString("https://myserver"), map[string]interface{}{})
 		assert.Error(t, err)
 	})
 
 	t.Run("All filled", func(t *testing.T) {
-		identityCtx, err := verifyClaims("https://myserver", map[string]interface{}{
+		identityCtx, err := verifyClaims(sets.NewString("https://myserver"), map[string]interface{}{
 			"aud": []string{"https://myserver"},
 			"user_info": map[string]interface{}{
 				"preferred_name": "John Doe",

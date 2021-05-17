@@ -10,11 +10,11 @@ import (
 	"net/url"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flytestdlib/config"
 
 	"github.com/coreos/go-oidc"
-	"github.com/flyteorg/flyteadmin/auth"
-
 	authConfig "github.com/flyteorg/flyteadmin/auth/config"
 	"github.com/flyteorg/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
@@ -24,6 +24,7 @@ import (
 // ResourceServer authorizes access requests issued by an external Authorization Server.
 type ResourceServer struct {
 	signatureVerifier oidc.KeySet
+	allowedAudience   []string
 }
 
 func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudience, tokenStr string) (interfaces.IdentityContext, error) {
@@ -37,7 +38,7 @@ func (r ResourceServer) ValidateAccessToken(ctx context.Context, expectedAudienc
 		return nil, fmt.Errorf("failed to unmarshal user info claim into UserInfo type. Error: %w", err)
 	}
 
-	return verifyClaims(expectedAudience, claimsRaw)
+	return verifyClaims(sets.NewString(append(r.allowedAudience, expectedAudience)...), claimsRaw)
 }
 
 func doRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
@@ -61,14 +62,15 @@ func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
 	return fmt.Errorf("expected Content-Type = application/json, got %q: %v", ct, err)
 }
 
-func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL) (oidc.KeySet, error) {
-	u, err := url.Parse(auth.OAuth2MetadataEndpoint)
-	if err != nil {
-		return nil, err
+func getJwksForIssuer(ctx context.Context, issuerBaseURL url.URL, customMetadataURL url.URL) (keySet oidc.KeySet, err error) {
+	issuerBaseURL.Path = strings.TrimSuffix(issuerBaseURL.Path, "/") + "/"
+	var wellKnown *url.URL
+	if len(customMetadataURL.String()) > 0 {
+		wellKnown = issuerBaseURL.ResolveReference(&customMetadataURL)
+	} else {
+		wellKnown = issuerBaseURL.ResolveReference(oauth2MetadataEndpoint)
 	}
 
-	issuerBaseURL.Path = strings.TrimSuffix(issuerBaseURL.Path, "/") + "/"
-	wellKnown := issuerBaseURL.ResolveReference(u)
 	req, err := http.NewRequest(http.MethodGet, wellKnown.String(), nil)
 	if err != nil {
 		return nil, err
@@ -106,12 +108,13 @@ func NewOAuth2ResourceServer(ctx context.Context, cfg authConfig.ExternalAuthori
 		u = fallbackBaseURL
 	}
 
-	verifier, err := getJwksForIssuer(ctx, u.URL)
+	verifier, err := getJwksForIssuer(ctx, u.URL, cfg.MetadataEndpointURL.URL)
 	if err != nil {
 		return ResourceServer{}, err
 	}
 
 	return ResourceServer{
 		signatureVerifier: verifier,
+		allowedAudience:   cfg.AllowedAudience,
 	}, nil
 }

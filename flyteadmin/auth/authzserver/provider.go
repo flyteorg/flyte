@@ -128,16 +128,16 @@ func (p Provider) ValidateAccessToken(ctx context.Context, expectedAudience, tok
 	}
 
 	claimsRaw := parsedToken.Claims.(jwtgo.MapClaims)
-	return verifyClaims(expectedAudience, claimsRaw)
+	return verifyClaims(sets.NewString(expectedAudience), claimsRaw)
 }
 
-func verifyClaims(expectedAudience string, claimsRaw map[string]interface{}) (interfaces.IdentityContext, error) {
+func verifyClaims(expectedAudience sets.String, claimsRaw map[string]interface{}) (interfaces.IdentityContext, error) {
 	claims := jwtx.ParseMapStringInterfaceClaims(claimsRaw)
 	if len(claims.Audience) != 1 {
 		return nil, fmt.Errorf("expected exactly one granted audience. found [%v]", len(claims.Audience))
 	}
 
-	if claims.Audience[0] != expectedAudience {
+	if !expectedAudience.Has(claims.Audience[0]) {
 		return nil, fmt.Errorf("invalid audience [%v]", claims.Audience[0])
 	}
 
@@ -162,6 +162,12 @@ func verifyClaims(expectedAudience string, claimsRaw map[string]interface{}) (in
 	scopes := sets.NewString()
 	if scopesClaim, found := claimsRaw[ScopeClaim]; found {
 		scopes = sets.NewString(interfaceSliceToStringSlice(scopesClaim.([]interface{}))...)
+	}
+
+	// If this is a user-only access token with no scopes defined then add `all` scope by default because it's equivalent
+	// to having a user's login cookie or an ID Token as means of accessing the service.
+	if len(clientID) == 0 && scopes.Len() == 0 {
+		scopes.Insert(auth.ScopeAll)
 	}
 
 	return auth.NewIdentityContext(claims.Audience[0], claims.Subject, clientID, claims.IssuedAt, scopes, userInfo), nil
