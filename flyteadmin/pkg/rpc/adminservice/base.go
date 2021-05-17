@@ -51,7 +51,7 @@ func (m *AdminService) interceptPanic(ctx context.Context, request proto.Message
 	}
 
 	m.Metrics.PanicCounter.Inc()
-	logger.Fatalf(ctx, "panic-ed for request: [%+v] with err: %v", request, err)
+	logger.Fatalf(ctx, "panic-ed for request: [%+v] with err: %v with Stack: %v", request, err, string(debug.Stack()))
 }
 
 const defaultRetries = 3
