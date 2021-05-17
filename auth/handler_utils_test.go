@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"net/http"
+
 	"testing"
 
 	config2 "github.com/flyteorg/flytestdlib/config"
@@ -53,5 +54,22 @@ func TestGetPublicURL(t *testing.T) {
 		assert.NoError(t, err)
 		u := GetPublicURL(context.Background(), req, &config.Config{})
 		assert.Equal(t, "https://abc", u.String())
+	})
+
+	t.Run("Matching testing setup but with ssl", func(t *testing.T) {
+		// req has https so that it's not a scheme match with the list below
+		req, err := http.NewRequest(http.MethodPost, "https://localhost:30081", nil)
+
+		assert.NoError(t, err)
+		u := GetPublicURL(context.Background(), req, &config.Config{
+			AuthorizedURIs: []config2.URL{
+				{URL: *config.MustParseURL("http://flyteadmin:80")},
+				{URL: *config.MustParseURL("http://localhost:30081")},
+				{URL: *config.MustParseURL("http://localhost:8089")},
+				{URL: *config.MustParseURL("http://localhost:8088")},
+				{URL: *config.MustParseURL("http://flyteadmin.flyte.svc.cluster.local:80")},
+			},
+		})
+		assert.Equal(t, "http://localhost:30081", u.String())
 	})
 }

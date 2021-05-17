@@ -173,7 +173,9 @@ type AuthorizationServer struct {
 type ExternalAuthorizationServer struct {
 	// BaseURL should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/
 	// If not provided, the OpenID.BaseURL will be assumed instead.
-	BaseURL config.URL `json:"baseUrl" pflag:",This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/"`
+	BaseURL             config.URL `json:"baseUrl" pflag:",This should be the base url of the authorization server that you are trying to hit. With Okta for instance, it will look something like https://company.okta.com/oauth2/abcdef123456789/"`
+	AllowedAudience     []string   `json:"allowedAudience" pflag:",Optional: A list of allowed audiences. If not provided, the audience is expected to be the public Uri of the service."`
+	MetadataEndpointURL config.URL `json:"metadataUrl" pflag:",Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'"`
 }
 
 // OAuth2Options defines settings for app auth.

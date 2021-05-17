@@ -22,7 +22,7 @@ var (
 	authorizeRelativeURL         = config.MustParseURL("/oauth2/authorize")
 	authorizeCallbackRelativeURL = config.MustParseURL("/oauth2/authorize_callback")
 	jsonWebKeysURL               = config.MustParseURL("/oauth2/jwks")
-	oauth2MetadataEndpoint       = config.MustParseURL("/" + auth.OAuth2MetadataEndpoint)
+	oauth2MetadataEndpoint       = config.MustParseURL(auth.OAuth2MetadataEndpoint)
 )
 
 // GetJSONWebKeysEndpoint serves requests to the jwks endpoint.
