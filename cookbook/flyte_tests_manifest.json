@@ -7,65 +7,65 @@
       "exit_message": ""
     }
   },{
-    "name": "Plugin-hive",
+    "name": "integrations-hive",
     "priority": "P1",
-    "path": "plugins/hive",
+    "path": "integrations/external_services/hive",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-pod",
+    "name": "integrations-k8s-spark",
     "priority": "P1",
-    "path": "plugins/pod",
+    "path": "integrations/kubernetes/k8s_spark",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-k8s-spark",
+    "name": "integrations-kfpytorch",
     "priority": "P1",
-    "path": "plugins/k8s_spark",
+    "path": "integrations/kubernetes/kfpytorch",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-kfpytorch",
+    "name": "integrations-pod",
     "priority": "P1",
-    "path": "plugins/kfpytorch",
+    "path": "integrations/kubernetes/pod",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-pandera",
+    "name": "integrations-pandera",
     "priority": "P1",
-    "path": "plugins/pandera",
+    "path": "integrations/flytekit_plugins/pandera",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-papermilltasks",
+    "name": "integrations-papermilltasks",
     "priority": "P1",
-    "path": "plugins/papermilltasks",
+    "path": "integrations/flytekit_plugins/papermilltasks",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-sagemaker-pytorch",
+    "name": "integrations-sagemaker-pytorch",
     "priority": "P1",
-    "path": "plugins/sagemaker_pytorch",
+    "path": "integrations/aws/sagemaker_pytorch",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
     }
   },{
-    "name": "plugins-sagemaker-training",
+    "name": "integrations-sagemaker-training",
     "priority": "P1",
-    "path": "plugins/sagemaker_training",
+    "path": "integrations/aws/sagemaker_training",
     "exitCondition": {
       "exit_success": true,
         "exit_message": ""
@@ -81,7 +81,7 @@
  },{
    "name": "case-studies-pima-diabetes",
    "priority": "P2",
-   "path": "case_studies/pima-diabetes",
+   "path": "case_studies/ml_training/pima-diabetes",
    "exitCondition": {
      "exit_success": true,
      "exit_message": ""

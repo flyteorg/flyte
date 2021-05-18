@@ -38,12 +38,11 @@ jobs:
       - name: Generate Serialize proto
         run: |
           make -C cookbook/core serialize
-          mkdir -p cookbook/release-snacks
-          mkdir -p /tmp/release-snacks-core/
+          mkdir -p cookbook/release-snacks /tmp/release-snacks-core/
           make -C cookbook archive
           cp -r cookbook/release-snacks/* /tmp/release-snacks-core/
-  plugin-releaser:
-    name: Release Plugins example
+  integrations-releaser:
+    name: Release Integrations example
     runs-on: ubuntu-latest
     needs: [bump-version]
     steps:
@@ -52,15 +51,14 @@ jobs:
           fetch-depth: "0"
       - uses: actions/cache@v1
         with:
-          path: /tmp/release-snacks-plugins/
+          path: /tmp/release-snacks-integrations/
           key: release-snacks-plugins
       - name: Generate Serialize proto
         run: |
-          make -C cookbook/plugins all_serialize
-          mkdir -p cookbook/release-snacks
-          mkdir -p /tmp/release-snacks-plugins/
+          make -C cookbook/integrations serialize
+          mkdir -p cookbook/release-snacks /tmp/release-snacks-integrations/
           make -C cookbook archive
-          cp -r cookbook/release-snacks/* /tmp/release-snacks-plugins/
+          cp -r cookbook/release-snacks/* /tmp/release-snacks-integrations/
   case_studies-releaser:
     name: Release Case studies example
     runs-on: ubuntu-latest
@@ -75,15 +73,14 @@ jobs:
           key: release-snacks-case-studies
       - name: Generate Serialize proto
         run: |
-          make -C cookbook/case_studies all_serialize
-          mkdir -p cookbook/release-snacks
-          mkdir -p /tmp/release-snacks-case-studies/
+          make -C cookbook/case_studies serialize
+          mkdir -p cookbook/release-snacks /tmp/release-snacks-case-studies/
           make -C cookbook archive
           cp -r cookbook/release-snacks/* /tmp/release-snacks-case-studies/
   goreleaser:
     name: Release Case studies example
     runs-on: ubuntu-latest
-    needs: [core-releaser, case_studies-releaser, plugin-releaser]
+    needs: [core-releaser, case_studies-releaser, integrations-releaser]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -98,7 +95,7 @@ jobs:
           key: release-snacks-case-studies
       - uses: actions/cache@v1
         with:
-          path: /tmp/release-snacks-plugins/
+          path: /tmp/release-snacks-integrations/
           key: release-snacks-plugins
       - uses: actions/checkout@v2
         with:
@@ -109,7 +106,7 @@ jobs:
           mkdir -p cookbook/release-snacks
           cp -r /tmp/release-snacks-core/* cookbook/release-snacks/
           cp -r /tmp/release-snacks-case-studies/* cookbook/release-snacks/
-          cp -r /tmp/release-snacks-plugins/* cookbook/release-snacks/
+          cp -r /tmp/release-snacks-integrations/* cookbook/release-snacks/
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
