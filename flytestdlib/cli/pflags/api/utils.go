@@ -24,6 +24,10 @@ func isJSONUnmarshaler(t types.Type) bool {
 	return implementsAnyOfMethods(t, "UnmarshalJSON")
 }
 
+func isJSONMarshaler(t types.Type) bool {
+	return implementsAnyOfMethods(t, "MarshalJSON")
+}
+
 func isStringer(t types.Type) bool {
 	return implementsAnyOfMethods(t, "String")
 }

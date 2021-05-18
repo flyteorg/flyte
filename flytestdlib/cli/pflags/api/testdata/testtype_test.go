@@ -84,7 +84,7 @@ func testDecodeJson_TestType(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_TestType(val, result))
 }
 
-func testDecodeSlice_TestType(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_TestType(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_TestType(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestTestType_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_str", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("str"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StringValue), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_bl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("bl"); err == nil {
-				assert.Equal(t, bool(DefaultTestType.BoolValue), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_nested.i", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("nested.i"); err == nil {
-				assert.Equal(t, int(DefaultTestType.NestedType.IntValue), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,21 +142,13 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_ints", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vIntSlice, err := cmdFlags.GetIntSlice("ints"); err == nil {
-				assert.Equal(t, []int([]int{12, 1}), vIntSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_TestType([]int{12, 1}, ",")
 
 			cmdFlags.Set("ints", testValue)
 			if vIntSlice, err := cmdFlags.GetIntSlice("ints"); err == nil {
-				testDecodeSlice_TestType(t, join_TestType(vIntSlice, ","), &actual.IntArray)
+				testDecodeRaw_TestType(t, join_TestType(vIntSlice, ","), &actual.IntArray)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -188,21 +156,13 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_strs", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("strs"); err == nil {
-				assert.Equal(t, []string([]string{"12", "1"}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_TestType([]string{"12", "1"}, ",")
 
 			cmdFlags.Set("strs", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("strs"); err == nil {
-				testDecodeSlice_TestType(t, join_TestType(vStringSlice, ","), &actual.StringArray)
+				testDecodeRaw_TestType(t, join_TestType(vStringSlice, ","), &actual.StringArray)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -210,21 +170,13 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_complexArr", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("complexArr"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1,1"
 
 			cmdFlags.Set("complexArr", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("complexArr"); err == nil {
-				testDecodeSlice_TestType(t, vStringSlice, &actual.ComplexJSONArray)
+				testDecodeRaw_TestType(t, vStringSlice, &actual.ComplexJSONArray)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -232,17 +184,9 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_c", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("c"); err == nil {
-				assert.Equal(t, string(DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON)), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON)
+			testValue := DefaultTestType.mustJsonMarshal(DefaultTestType.StringToJSON)
 
 			cmdFlags.Set("c", testValue)
 			if vString, err := cmdFlags.GetString("c"); err == nil {
@@ -254,14 +198,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.type", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.type"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.Type), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -276,14 +212,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.connection.endpoint", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.connection.endpoint"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.Endpoint.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultTestType.StorageConfig.Connection.Endpoint.String()
@@ -298,14 +226,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.connection.auth-type", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.connection.auth-type"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.AuthType), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -320,14 +240,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.connection.access-key", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.connection.access-key"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.AccessKey), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -342,14 +254,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.connection.secret-key", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.connection.secret-key"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.SecretKey), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -364,14 +268,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.connection.region", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.connection.region"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.Connection.Region), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -386,14 +282,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.connection.disable-ssl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("storage.connection.disable-ssl"); err == nil {
-				assert.Equal(t, bool(DefaultTestType.StorageConfig.Connection.DisableSSL), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -408,14 +296,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.container", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.container"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.InitContainer), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -430,14 +310,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.enable-multicontainer", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("storage.enable-multicontainer"); err == nil {
-				assert.Equal(t, bool(DefaultTestType.StorageConfig.MultiContainerEnabled), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -452,14 +324,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.cache.max_size_mbs", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("storage.cache.max_size_mbs"); err == nil {
-				assert.Equal(t, int(DefaultTestType.StorageConfig.Cache.MaxSizeMegabytes), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -474,14 +338,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.cache.target_gc_percent", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("storage.cache.target_gc_percent"); err == nil {
-				assert.Equal(t, int(DefaultTestType.StorageConfig.Cache.TargetGCPercent), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -496,14 +352,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.limits.maxDownloadMBs", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt64, err := cmdFlags.GetInt64("storage.limits.maxDownloadMBs"); err == nil {
-				assert.Equal(t, int64(DefaultTestType.StorageConfig.Limits.GetLimitMegabytes), vInt64)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -518,14 +366,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_storage.defaultHttpClient.timeout", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("storage.defaultHttpClient.timeout"); err == nil {
-				assert.Equal(t, string(DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String()
@@ -540,14 +380,6 @@ func TestTestType_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_i", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("i"); err == nil {
-				assert.Equal(t, int(DefaultTestType.elemValueOrNil(DefaultTestType.IntValue).(int)), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -555,6 +387,20 @@ func TestTestType_SetFlags(t *testing.T) {
 			cmdFlags.Set("i", testValue)
 			if vInt, err := cmdFlags.GetInt("i"); err == nil {
 				testDecodeJson_TestType(t, fmt.Sprintf("%v", vInt), &actual.IntValue)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_m", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "a=1,b=2"
+
+			cmdFlags.Set("m", testValue)
+			if vStringToString, err := cmdFlags.GetStringToString("m"); err == nil {
+				testDecodeRaw_TestType(t, vStringToString, &actual.StringMap)
 
 			} else {
 				assert.FailNow(t, err.Error())
