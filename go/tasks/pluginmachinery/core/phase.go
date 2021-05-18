@@ -152,9 +152,16 @@ func PhaseInfoNotReady(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-// Return in the case the plugin is not ready to start
+// Deprecated: Please use PhaseInfoWaitingForResourcesInfo instead
 func PhaseInfoWaitingForResources(t time.Time, version uint32, reason string) PhaseInfo {
 	pi := phaseInfo(PhaseWaitingForResources, version, nil, &TaskInfo{OccurredAt: &t})
+	pi.reason = reason
+	return pi
+}
+
+// Return in the case the plugin is not ready to start
+func PhaseInfoWaitingForResourcesInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+	pi := phaseInfo(PhaseWaitingForResources, version, nil, info)
 	pi.reason = reason
 	return pi
 }
