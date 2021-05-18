@@ -44,6 +44,15 @@ func ({{ .Name }}) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func ({{ .Name }}) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+    if err != nil {
+        panic(err)
+    }
+
+    return string(raw)
+}
+
 func ({{ .Name }}) mustMarshalJSON(v json.Marshaler) string {
     raw, err := v.MarshalJSON()
     if err != nil {
@@ -58,7 +67,11 @@ func ({{ .Name }}) mustMarshalJSON(v json.Marshaler) string {
 func (cfg {{ .Name }}) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("{{ .Name }}", pflag.ExitOnError)
 	{{- range .Fields }}
+	{{- if .ShouldBindDefault }}
+	cmdFlags.{{ .FlagMethodName }}Var(&{{ .DefaultValue }}, fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .DefaultValue }}, {{ .UsageString }})
+	{{- else }}
 	cmdFlags.{{ .FlagMethodName }}(fmt.Sprintf("%v%v", prefix, "{{ .Name }}"), {{ .DefaultValue }}, {{ .UsageString }})
+	{{- end }}
 	{{- end }}
 	return cmdFlags
 }
@@ -154,7 +167,7 @@ func testDecodeJson_{{ .Name }}(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_{{ .Name }}(val, result))
 }
 
-func testDecodeSlice_{{ .Name }}(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_{{ .Name }}(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_{{ .Name }}(vStringSlice, result))
 }
 
@@ -172,6 +185,7 @@ func Test{{ .Name }}_SetFlags(t *testing.T) {
 	{{ $ParentName := .Name }}
 	{{- range .Fields }}
 	t.Run("Test_{{ .Name }}", func(t *testing.T) { {{ $varName := print "v" .FlagMethodName }}
+		{{- if .ShouldTestDefault }}
 		t.Run("DefaultValue", func(t *testing.T) {
 			// Test that default value is set properly
 			if {{ $varName }}, err := cmdFlags.Get{{ .FlagMethodName }}("{{ .Name }}"); err == nil {
@@ -180,17 +194,18 @@ func Test{{ .Name }}_SetFlags(t *testing.T) {
 				assert.FailNow(t, err.Error())
 			}
 		})
+		{{- end }}
 
 		t.Run("Override", func(t *testing.T) {
 			{{ if eq .TestStrategy "Json" }}testValue := {{ .TestValue }}
-			{{ else if eq .TestStrategy "SliceRaw" }}testValue := {{ .TestValue }}
+			{{ else if eq .TestStrategy "Raw" }}testValue := {{ .TestValue }}
 			{{ else }}testValue := join_{{ $ParentName }}({{ .TestValue }}, ",")
 			{{ end }}
 			cmdFlags.Set("{{ .Name }}", testValue)
 			if {{ $varName }}, err := cmdFlags.Get{{ .FlagMethodName }}("{{ .Name }}"); err == nil {
 				{{ if eq .TestStrategy "Json" }}testDecodeJson_{{ $ParentName }}(t, fmt.Sprintf("%v", {{ print "v" .FlagMethodName }}), &actual.{{ .GoName }})
-				{{ else if eq .TestStrategy "SliceRaw" }}testDecodeSlice_{{ $ParentName }}(t, {{ print "v" .FlagMethodName }}, &actual.{{ .GoName }})
-				{{ else }}testDecodeSlice_{{ $ParentName }}(t, join_{{ $ParentName }}({{ print "v" .FlagMethodName }}, ","), &actual.{{ .GoName }})
+				{{ else if eq .TestStrategy "Raw" }}testDecodeRaw_{{ $ParentName }}(t, {{ print "v" .FlagMethodName }}, &actual.{{ .GoName }})
+				{{ else }}testDecodeRaw_{{ $ParentName }}(t, join_{{ $ParentName }}({{ print "v" .FlagMethodName }}, ","), &actual.{{ .GoName }})
 				{{ end }}
 			} else {
 				assert.FailNow(t, err.Error())

@@ -28,6 +28,15 @@ func (TestType) elemValueOrNil(v interface{}) interface{} {
 	return v
 }
 
+func (TestType) mustJsonMarshal(v interface{}) string {
+	raw, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(raw)
+}
+
 func (TestType) mustMarshalJSON(v json.Marshaler) string {
 	raw, err := v.MarshalJSON()
 	if err != nil {
@@ -47,7 +56,7 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.IntSlice(fmt.Sprintf("%v%v", prefix, "ints"), []int{12, 1}, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "strs"), []string{"12", "1"}, "")
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "complexArr"), []string{}, "")
-	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "c"), DefaultTestType.mustMarshalJSON(DefaultTestType.StringToJSON), "I'm a complex type but can be converted from string.")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "c"), DefaultTestType.mustJsonMarshal(DefaultTestType.StringToJSON), "I'm a complex type but can be converted from string.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.type"), DefaultTestType.StorageConfig.Type, "Sets the type of storage to configure [s3/minio/local/mem/stow].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.endpoint"), DefaultTestType.StorageConfig.Connection.Endpoint.String(), "URL for storage client to connect to.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.connection.auth-type"), DefaultTestType.StorageConfig.Connection.AuthType, "Auth Type to use [iam, accesskey].")
@@ -62,5 +71,6 @@ func (cfg TestType) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "storage.limits.maxDownloadMBs"), DefaultTestType.StorageConfig.Limits.GetLimitMegabytes, "Maximum allowed download size (in MBs) per call.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "storage.defaultHttpClient.timeout"), DefaultTestType.StorageConfig.DefaultHTTPClient.Timeout.String(), "Sets time out on the http client.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "i"), DefaultTestType.elemValueOrNil(DefaultTestType.IntValue).(int), "")
+	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "m"), DefaultTestType.StringMap, "I'm a map of strings")
 	return cmdFlags
 }
