@@ -121,6 +121,8 @@ func TestCheckSubTasksState(t *testing.T) {
 	tCtx := getMockTaskExecutionContext(ctx)
 	kubeClient := mocks.KubeClient{}
 	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+
 	resourceManager := mocks.ResourceManager{}
 	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusExhausted, nil)
 	tCtx.OnResourceManager().Return(&resourceManager)
@@ -213,6 +215,8 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 	tCtx := getMockTaskExecutionContext(ctx)
 	kubeClient := mocks.KubeClient{}
 	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+
 	resourceManager := mocks.ResourceManager{}
 
 	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
@@ -264,12 +268,14 @@ func TestCheckSubTasksStateResourceGranted(t *testing.T) {
 			arrayStatus.Detailed.SetItem(childIdx, bitarray.Item(core.PhaseSuccess))
 
 		}
+		cacheIndexes := bitarray.NewBitSet(5)
 		newState, _, subTaskIDs, err := LaunchAndCheckSubTasksState(ctx, tCtx, &kubeClient, &config, nil, "/prefix/", "/prefix-sand/", &arrayCore.State{
 			CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
 			ExecutionArraySize:   5,
 			OriginalArraySize:    10,
 			OriginalMinSuccesses: 5,
 			ArrayStatus:          *arrayStatus,
+			IndexesToCache:       cacheIndexes,
 		})
 
 		assert.Nil(t, err)

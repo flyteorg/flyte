@@ -200,7 +200,7 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 		phaseInfo = core.PhaseInfoRunning(version, nowTaskInfo)
 
 	case PhaseWaitingForResources:
-		phaseInfo = core.PhaseInfoWaitingForResources(t, version, state.GetReason())
+		phaseInfo = core.PhaseInfoWaitingForResourcesInfo(t, version, state.GetReason(), nowTaskInfo)
 
 	case PhaseCheckingSubTaskExecutions:
 		// For future Running core.Phases, we have to make sure we don't use an earlier Admin version number,

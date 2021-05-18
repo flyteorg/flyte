@@ -2,15 +2,16 @@ package k8s
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"strings"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
@@ -27,7 +28,6 @@ import (
 )
 
 type Task struct {
-	LogLinks         []*idlCore.TaskLog
 	State            *arrayCore.State
 	NewArrayStatus   *arraystatus.ArrayStatus
 	Config           *Config
@@ -111,21 +111,35 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 		return LaunchWaiting, nil
 	}
 
-	err = kubeClient.GetClient().Create(ctx, pod)
-	if err != nil && !k8serrors.IsAlreadyExists(err) {
-		if k8serrors.IsForbidden(err) {
-			if strings.Contains(err.Error(), "exceeded quota") {
-				// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
-				logger.Infof(ctx, "Failed to launch  job, resource quota exceeded. Err: %v", err)
-				t.State = t.State.SetPhase(arrayCore.PhaseWaitingForResources, 0).SetReason("Not enough resources to launch job")
-			} else {
-				t.State = t.State.SetPhase(arrayCore.PhaseRetryableFailure, 0).SetReason("Failed to launch job.")
+	// Check for existing pods to prevent unnecessary Resource-Quota usage: https://github.com/kubernetes/kubernetes/issues/76787
+	existingPod := &corev1.Pod{}
+	err = kubeClient.GetCache().Get(ctx, client.ObjectKey{
+		Namespace: pod.GetNamespace(),
+		Name:      pod.GetName(),
+	}, existingPod)
+
+	if err != nil && k8serrors.IsNotFound(err) {
+		// Attempt creating non-existing pod.
+		err = kubeClient.GetClient().Create(ctx, pod)
+		if err != nil && !k8serrors.IsAlreadyExists(err) {
+			if k8serrors.IsForbidden(err) {
+				if strings.Contains(err.Error(), "exceeded quota") {
+					// TODO: Quota errors are retried forever, it would be good to have support for backoff strategy.
+					logger.Infof(ctx, "Failed to launch  job, resource quota exceeded. Err: %v", err)
+					t.State = t.State.SetPhase(arrayCore.PhaseWaitingForResources, 0).SetReason("Not enough resources to launch job")
+				} else {
+					t.State = t.State.SetPhase(arrayCore.PhaseRetryableFailure, 0).SetReason("Failed to launch job.")
+				}
+
+				t.State = t.State.SetReason(err.Error())
+				return LaunchReturnState, nil
 			}
 
-			t.State = t.State.SetReason(err.Error())
-			return LaunchReturnState, nil
+			return LaunchError, errors2.Wrapf(ErrSubmitJob, err, "Failed to submit job.")
 		}
-
+	} else if err != nil {
+		// Another error returned.
+		logger.Error(ctx, err)
 		return LaunchError, errors2.Wrapf(ErrSubmitJob, err, "Failed to submit job.")
 	}
 
@@ -133,10 +147,11 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 }
 
 func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, dataStore *storage.DataStore, outputPrefix, baseOutputDataSandbox storage.DataReference,
-	logPlugin tasklog.Plugin) (MonitorResult, error) {
+	logPlugin tasklog.Plugin) (MonitorResult, []*idlCore.TaskLog, error) {
 	indexStr := strconv.Itoa(t.ChildIdx)
 	podName := formatSubTaskName(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), indexStr)
 	t.SubTaskIDs = append(t.SubTaskIDs, &podName)
+	var loglinks []*idlCore.TaskLog
 
 	// Use original-index for log-name/links
 	originalIdx := arrayCore.CalculateOriginalIndex(t.ChildIdx, t.State.GetIndexesToCache())
@@ -149,15 +164,11 @@ func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt,
 		logPlugin)
 	if err != nil {
-		return MonitorError, errors2.Wrapf(ErrCheckPodStatus, err, "Failed to check pod status.")
+		return MonitorError, loglinks, errors2.Wrapf(ErrCheckPodStatus, err, "Failed to check pod status.")
 	}
 
 	if phaseInfo.Info() != nil {
-		// Append sub-job status in Log Name for viz.
-		for _, log := range phaseInfo.Info().Logs {
-			log.Name += fmt.Sprintf(" (%s)", phaseInfo.Phase().String())
-		}
-		t.LogLinks = append(t.LogLinks, phaseInfo.Info().Logs...)
+		loglinks = phaseInfo.Info().Logs
 	}
 
 	if phaseInfo.Err() != nil {
@@ -168,14 +179,14 @@ func (t *Task) Monitor(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	if phaseInfo.Phase().IsSuccess() {
 		actualPhase, err = array.CheckTaskOutput(ctx, dataStore, outputPrefix, baseOutputDataSandbox, t.ChildIdx, originalIdx)
 		if err != nil {
-			return MonitorError, err
+			return MonitorError, loglinks, err
 		}
 	}
 
 	t.NewArrayStatus.Detailed.SetItem(t.ChildIdx, bitarray.Item(actualPhase))
 	t.NewArrayStatus.Summary.Inc(actualPhase)
 
-	return MonitorSuccess, nil
+	return MonitorSuccess, loglinks, nil
 }
 
 func (t Task) Abort(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient) error {
