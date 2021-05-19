@@ -25,13 +25,13 @@ func ApplyPagination(paginationOpts *datacatalog.PaginationOptions, input *model
 		if len(strings.Trim(paginationOpts.Token, " ")) == 0 {
 			offset = common.DefaultPageOffset
 		} else {
-			parsedOffset, err := strconv.ParseUint(paginationOpts.Token, 10, 32)
+			parsedOffset, err := strconv.ParseInt(paginationOpts.Token, 10, 32)
 			if err != nil {
 				return errors.NewDataCatalogErrorf(codes.InvalidArgument, "Invalid token %v", offset)
 			}
-			offset = uint32(parsedOffset)
+			offset = int(parsedOffset)
 		}
-		limit = paginationOpts.Limit
+		limit = int(paginationOpts.Limit)
 		sortKey = paginationOpts.SortKey
 		sortOrder = paginationOpts.SortOrder
 	}

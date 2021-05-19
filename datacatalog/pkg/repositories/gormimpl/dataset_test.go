@@ -1,9 +1,9 @@
 package gormimpl
 
 import (
-	"testing"
-
 	"context"
+	"testing"
+	"time"
 
 	mocket "github.com/Selvatico/go-mocket"
 	"google.golang.org/grpc/codes"
@@ -39,6 +39,11 @@ func getTestDataset() models.Dataset {
 		PartitionKeys: []models.PartitionKey{
 			{Name: "key1"},
 			{Name: "key2"},
+		},
+		BaseModel: models.BaseModel{
+			CreatedAt: time.Unix(111, 0),
+			UpdatedAt: time.Unix(111, 0),
+			DeletedAt: nil,
 		},
 	}
 }
@@ -82,7 +87,7 @@ func TestCreateDatasetNoPartitions(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES (?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			assert.EqualValues(t, dataset.Project, values[3].Value)
 			assert.EqualValues(t, dataset.Name, values[4].Value)
@@ -110,7 +115,7 @@ func TestCreateDataset(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES (?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			assert.EqualValues(t, dataset.Project, values[3].Value)
 			assert.EqualValues(t, dataset.Name, values[4].Value)
@@ -119,17 +124,14 @@ func TestCreateDataset(t *testing.T) {
 			assert.EqualValues(t, dataset.SerializedMetadata, values[7].Value)
 			datasetCreated = true
 		},
-	)
+	).WithReply([]map[string]interface{}{{"dataset_uuid": getDatasetUUID()}})
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "uuid" FROM "datasets"  WHERE (project = testProject) AND (name = testName) AND (domain = testDomain) AND (version = testVersion)`).WithReply([]map[string]interface{}{{"uuid": getDatasetUUID()}})
-
-	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "partition_keys" ("created_at","updated_at","deleted_at","dataset_uuid","name") VALUES (?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "partition_keys" ("created_at","updated_at","deleted_at","dataset_uuid","name") VALUES ($1,$2,$3,$4,$5),($6,$7,$8,$9,$10) ON CONFLICT ("dataset_uuid","name") DO UPDATE SET "dataset_uuid"="excluded"."dataset_uuid"`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			assert.EqualValues(t, getDatasetUUID(), values[3].Value)
 			assert.EqualValues(t, dataset.PartitionKeys[insertKeyQueryNum].Name, values[4].Value)
-			insertKeyQueryNum++
+			insertKeyQueryNum += 2 // batch insertion
 		},
 	)
 
@@ -157,7 +159,7 @@ func TestGetDataset(t *testing.T) {
 	GlobalMock.Logging = true
 
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."project" = testProject) AND ("datasets"."name" = testName) AND ("datasets"."domain" = testDomain) AND ("datasets"."version" = testVersion)) ORDER BY "datasets"."project" ASC LIMIT 1`).WithReply(expectedDatasetResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets" WHERE "datasets"."project" = $1 AND "datasets"."name" = $2 AND "datasets"."domain" = $3 AND "datasets"."version" = $4 ORDER BY "datasets"."created_at" LIMIT 1`).WithReply(expectedDatasetResponse)
 
 	expectedPartitionKeyResponse := make([]map[string]interface{}, 0)
 	samplePartitionKey := make(map[string]interface{})
@@ -165,7 +167,7 @@ func TestGetDataset(t *testing.T) {
 	samplePartitionKey["dataset_uuid"] = getDatasetUUID()
 	expectedPartitionKeyResponse = append(expectedPartitionKeyResponse, samplePartitionKey, samplePartitionKey)
 
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid))) ORDER BY partition_keys.created_at ASC,"partition_keys"."dataset_uuid" ASC`).WithReply(expectedPartitionKeyResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys" WHERE "partition_keys"."dataset_uuid" = $1 ORDER BY partition_keys.created_at ASC`).WithReply(expectedPartitionKeyResponse)
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.NoError(t, err)
@@ -196,7 +198,7 @@ func TestGetDatasetWithUUID(t *testing.T) {
 	GlobalMock.Logging = true
 
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."uuid" = test-uuid)) ORDER BY "datasets"."project" ASC LIMIT 1`).WithReply(expectedResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets" WHERE "datasets"."uuid" = $1 ORDER BY "datasets"."created_at" LIMIT 1%!(EXTRA string=test-uuid)`).WithReply(expectedResponse)
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
@@ -235,7 +237,7 @@ func TestCreateDatasetAlreadyExists(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES (?,?,?,?,?,?,?,?)`).WithError(
+		`INSERT INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`).WithError(
 		getAlreadyExistsErr(),
 	)
 
@@ -256,10 +258,10 @@ func TestListDatasets(t *testing.T) {
 	expectedDatasetDBResponse := getDBDatasetResponse(dataset)
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL LIMIT 10 OFFSET 0`).WithReply(expectedDatasetDBResponse)
+		`SELECT * FROM "datasets" LIMIT 10`).WithReply(expectedDatasetDBResponse)
 
 	expectedPartitionKeyResponse := getDBPartitionKeysResponse([]models.Dataset{dataset})
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid)))`).WithReply(expectedPartitionKeyResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys" WHERE "partition_keys"."dataset_uuid" = $1`).WithReply(expectedPartitionKeyResponse)
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	listInput := models.ListModelsInput{
 		Limit: 10,
@@ -284,10 +286,10 @@ func TestListDatasetWithFilter(t *testing.T) {
 	expectedDatasetDBResponse := getDBDatasetResponse(dataset)
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND ((datasets.project = p) AND (datasets.domain = d)) ORDER BY datasets.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedDatasetDBResponse)
+		`SELECT * FROM "datasets" WHERE datasets.project = $1 AND datasets.domain = $2 ORDER BY datasets.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedDatasetDBResponse)
 
 	expectedPartitionKeyResponse := getDBPartitionKeysResponse([]models.Dataset{dataset})
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys"  WHERE "partition_keys"."deleted_at" IS NULL AND (("dataset_uuid" IN (test-uuid)))`).WithReply(expectedPartitionKeyResponse)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys" WHERE "partition_keys"."dataset_uuid" = $1%!(EXTRA string=test-uuid)`).WithReply(expectedPartitionKeyResponse)
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	listInput := models.ListModelsInput{

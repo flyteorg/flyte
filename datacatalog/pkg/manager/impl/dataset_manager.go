@@ -182,7 +182,7 @@ func (dm *datasetManager) ListDatasets(ctx context.Context, request *datacatalog
 		return nil, errors.NewCollectedErrors(codes.Internal, transformerErrs)
 	}
 
-	token := strconv.Itoa(int(listInput.Offset) + len(datasetList))
+	token := strconv.Itoa(listInput.Offset + len(datasetList))
 
 	logger.Debugf(ctx, "Listed %v matching datasets successfully", len(datasetList))
 	dm.systemMetrics.listSuccessCounter.Inc(ctx)

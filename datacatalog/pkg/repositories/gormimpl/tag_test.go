@@ -3,6 +3,8 @@ package gormimpl
 import (
 	"testing"
 
+	"gorm.io/gorm"
+
 	"context"
 
 	mocket "github.com/Selvatico/go-mocket"
@@ -51,7 +53,7 @@ func TestCreateTag(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id","dataset_uuid") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id","dataset_uuid") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			tagCreated = true
 		},
@@ -71,15 +73,15 @@ func TestGetTag(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tags"  WHERE "tags"."deleted_at" IS NULL AND (("tags"."dataset_project" = testProject) AND ("tags"."dataset_name" = testName) AND ("tags"."dataset_domain" = testDomain) AND ("tags"."dataset_version" = testVersion) AND ("tags"."tag_name" = test-tag)) ORDER BY tags.created_at DESC,"tags"."dataset_project" ASC LIMIT 1`).WithReply(getDBTagResponse(artifact))
+		`SELECT * FROM "tags" WHERE "tags"."dataset_project" = $1 AND "tags"."dataset_name" = $2 AND "tags"."dataset_domain" = $3 AND "tags"."dataset_version" = $4 AND "tags"."tag_name" = $5 ORDER BY tags.created_at DESC,"tags"."created_at" LIMIT 1%!!(string=test-tag)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(getDBTagResponse(artifact))
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(getDBArtifactResponse(artifact))
+		`SELECT * FROM "artifacts" WHERE ("artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(getDBArtifactResponse(artifact))
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(getDBArtifactDataResponse(artifact))
+		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(getDBArtifactDataResponse(artifact))
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123))) ORDER BY partitions.created_at ASC,"partitions"."dataset_uuid" ASC`).WithReply(getDBPartitionResponse(artifact))
+		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(getDBPartitionResponse(artifact))
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tags"  WHERE "tags"."deleted_at" IS NULL AND ((("artifact_id","dataset_uuid") IN ((123,test-uuid))))`).WithReply(getDBTagResponse(artifact))
+		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(getDBTagResponse(artifact))
 	getInput := models.TagKey{
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
@@ -98,13 +100,38 @@ func TestGetTag(t *testing.T) {
 	assert.Len(t, response.Artifact.Tags, 1)
 }
 
+func TestTagNotFound(t *testing.T) {
+	artifact := getTestArtifact()
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(
+		`SELECT * FROM "tags" WHERE "tags"."dataset_project" = $1 AND "tags"."dataset_name" = $2 AND "tags"."dataset_domain" = $3 AND "tags"."dataset_version" = $4 AND "tags"."tag_name" = $5 ORDER BY tags.created_at DESC,"tags"."created_at" LIMIT 1%!!(string=test-tag)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithError(
+		gorm.ErrRecordNotFound,
+	)
+	getInput := models.TagKey{
+		DatasetProject: artifact.DatasetProject,
+		DatasetDomain:  artifact.DatasetDomain,
+		DatasetName:    artifact.DatasetName,
+		DatasetVersion: artifact.DatasetVersion,
+		TagName:        "test-tag",
+	}
+
+	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
+	_, err := tagRepo.Get(context.Background(), getInput)
+	assert.Error(t, err)
+	assert.Equal(t, "missing entity of type Tag with identifier ", err.Error())
+}
+
 func TestTagAlreadyExists(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id","dataset_uuid") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithError(
+		`INSERT INTO "tags" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","tag_name","artifact_id","dataset_uuid") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithError(
 		getAlreadyExistsErr(),
 	)
 

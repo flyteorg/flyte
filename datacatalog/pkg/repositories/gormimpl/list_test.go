@@ -20,13 +20,12 @@ func TestApplyFilter(t *testing.T) {
 	validInputApply := false
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "artifacts".* FROM "artifacts"`).WithCallback(
+		`SELECT "artifacts"."created_at","artifacts"."updated_at","artifacts"."deleted_at","artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id","artifacts"."dataset_uuid","artifacts"."serialized_metadata" FROM "artifacts"`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			// separate the regex matching because the joins reorder on different test runs
 			validInputApply = strings.Contains(s, `JOIN tags tags1 ON artifacts.artifact_id = tags1.artifact_id`) &&
 				strings.Contains(s, `JOIN partitions partitions0 ON artifacts.artifact_id = partitions0.artifact_id`) &&
-				strings.Contains(s, `WHERE "artifacts"."deleted_at" IS NULL AND `+
-					`((partitions0.key1 = val1) AND (partitions0.key2 = val2) AND (tags1.tag_name = special)) `+
+				strings.Contains(s, `WHERE partitions0.key1 = $1 AND partitions0.key2 = $2 AND tags1.tag_name = $3 `+
 					`ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10`)
 		})
 
@@ -67,7 +66,7 @@ func TestApplyFilterEmpty(t *testing.T) {
 	validInputApply := false
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL LIMIT 10 OFFSET 10`).WithCallback(
+		`SELECT * FROM "artifacts" LIMIT 10 OFFSET 10`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			// separate the regex matching because the joins reorder on different test runs
 			validInputApply = true
@@ -83,4 +82,12 @@ func TestApplyFilterEmpty(t *testing.T) {
 
 	tx.Find(models.Artifact{})
 	assert.True(t, validInputApply)
+}
+
+func TestGetTableErr(t *testing.T) {
+	testDB := utils.GetDbForTest(t)
+
+	tableName, err := getTableName(testDB, "")
+	assert.Error(t, err)
+	assert.Equal(t, "", tableName)
 }

@@ -17,7 +17,7 @@ func TestCreateDB(t *testing.T) {
 
 	checkExists := false
 	GlobalMock.NewMock().WithQuery(
-		`SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = testDB)`).WithCallback(
+		`SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = $1)%!(EXTRA string=testDB)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			checkExists = true
 		},
@@ -51,7 +51,7 @@ func TestDBAlreadyExists(t *testing.T) {
 
 	checkExists := false
 	GlobalMock.NewMock().WithQuery(
-		`SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = testDB)`).WithCallback(
+		`SELECT EXISTS(SELECT datname FROM pg_catalog.pg_database WHERE datname = $1)%!(EXTRA string=testDB)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			checkExists = true
 		},

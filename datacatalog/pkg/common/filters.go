@@ -2,8 +2,8 @@ package common
 
 // Common constants and types for Filtering
 const (
-	DefaultPageOffset = uint32(0)
-	MaxPageLimit      = uint32(50)
+	DefaultPageOffset = 0
+	MaxPageLimit      = 50
 )
 
 // Common Entity types that can be used on any filters

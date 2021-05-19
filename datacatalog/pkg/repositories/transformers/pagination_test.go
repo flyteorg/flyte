@@ -33,7 +33,7 @@ func TestCorrectPagination(t *testing.T) {
 		SortOrder: datacatalog.PaginationOptions_DESCENDING,
 	}, listModelsInput)
 	assert.NoError(t, err)
-	assert.Equal(t, uint32(50), listModelsInput.Limit)
-	assert.Equal(t, uint32(100), listModelsInput.Offset)
+	assert.Equal(t, 50, listModelsInput.Limit)
+	assert.Equal(t, 100, listModelsInput.Offset)
 	assert.Equal(t, "artifacts.created_at desc", listModelsInput.SortParameter.GetDBOrderExpression("artifacts"))
 }

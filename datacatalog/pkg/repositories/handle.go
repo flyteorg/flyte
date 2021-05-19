@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type DBHandle struct {
@@ -24,6 +24,9 @@ func NewDBHandle(dbConfigValues config.DbConfig, catalogScope promutils.Scope) (
 		User:         dbConfigValues.User,
 		Password:     dbConfigValues.Password,
 		ExtraOptions: dbConfigValues.ExtraOptions,
+		BaseConfig: config.BaseConfig{
+			DisableForeignKeyConstraintWhenMigrating: true,
+		},
 	}
 
 	//TODO: abstract away the type of db we are connecting to
@@ -65,19 +68,34 @@ func (h *DBHandle) CreateDB(dbName string) error {
 	return nil
 }
 
-func (h *DBHandle) Migrate() {
-	if h.db.Dialect().GetName() == config.Postgres {
-		logger.Infof(context.TODO(), "Creating postgres extension uuid-ossp if it does not exist")
+func (h *DBHandle) Migrate(ctx context.Context) error {
+	if h.db.Config.Dialector.Name() == config.Postgres {
+		logger.Infof(ctx, "Creating postgres extension uuid-ossp if it does not exist")
 		h.db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 	}
-	h.db.AutoMigrate(&models.Dataset{})
-	h.db.AutoMigrate(&models.Artifact{})
-	h.db.AutoMigrate(&models.ArtifactData{})
-	h.db.AutoMigrate(&models.Tag{})
-	h.db.AutoMigrate(&models.PartitionKey{})
-	h.db.AutoMigrate(&models.Partition{})
-}
+	if err := h.db.AutoMigrate(&models.Dataset{}); err != nil {
+		return err
+	}
 
-func (h *DBHandle) Close() error {
-	return h.db.Close()
+	if err := h.db.Debug().AutoMigrate(&models.Artifact{}); err != nil {
+		return err
+	}
+
+	if err := h.db.AutoMigrate(&models.ArtifactData{}); err != nil {
+		return err
+	}
+
+	if err := h.db.AutoMigrate(&models.Tag{}); err != nil {
+		return err
+	}
+
+	if err := h.db.AutoMigrate(&models.PartitionKey{}); err != nil {
+		return err
+	}
+
+	if err := h.db.AutoMigrate(&models.Partition{}); err != nil {
+		return err
+	}
+
+	return nil
 }
