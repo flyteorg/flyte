@@ -1,4 +1,0 @@
-"""
-Using Multiple Kubernetes Clusters
-------------------------------------
-"""
