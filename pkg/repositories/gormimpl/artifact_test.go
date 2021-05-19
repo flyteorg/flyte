@@ -117,21 +117,22 @@ func TestCreateArtifact(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			artifactCreated = true
 		},
 	)
 
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "artifact_data" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","name","location") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "artifact_data" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","name","location") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10),($11,$12,$13,$14,$15,$16,$17,$18,$19,$20) ON CONFLICT ("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","name") DO UPDATE SET "dataset_project"="excluded"."dataset_project","dataset_name"="excluded"."dataset_name","dataset_domain"="excluded"."dataset_domain","dataset_version"="excluded"."dataset_version","artifact_id"="excluded"."artifact_id"`).WithCallback(
 		func(s string, values []driver.NamedValue) {
-			numArtifactDataCreated++
+			// Batch insert
+			numArtifactDataCreated += 2
 		},
 	)
 
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "partitions" ("created_at","updated_at","deleted_at","dataset_uuid","key","value","artifact_id") VALUES (?,?,?,?,?,?,?)`).WithCallback(
+		`INSERT INTO "partitions" ("created_at","updated_at","deleted_at","dataset_uuid","key","value","artifact_id") VALUES ($1,$2,$3,$4,$5,$6,$7) ON CONFLICT ("dataset_uuid","key","value","artifact_id") DO UPDATE SET "artifact_id"="excluded"."artifact_id"`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			numPartitionsCreated++
 		},
@@ -175,13 +176,13 @@ func TestGetArtifact(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND (("artifacts"."dataset_project" = testProject) AND ("artifacts"."dataset_name" = testName) AND ("artifacts"."dataset_domain" = testDomain) AND ("artifacts"."dataset_version" = testVersion) AND ("artifacts"."artifact_id" = 123)) ORDER BY artifacts.created_at DESC,"artifacts"."dataset_project" ASC LIMIT 1`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE "artifacts"."dataset_project" = $1 AND "artifacts"."dataset_name" = $2 AND "artifacts"."dataset_domain" = $3 AND "artifacts"."dataset_version" = $4 AND "artifacts"."artifact_id" = $5 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123)))) ORDER BY "artifact_data"."dataset_project" ASC`).WithReply(expectedArtifactDataResponse)
+		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123))) ORDER BY partitions.created_at ASC,"partitions"."dataset_uuid" ASC`).WithReply(expectedPartitionResponse)
+		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tags"  WHERE "tags"."deleted_at" IS NULL AND ((("artifact_id","dataset_uuid") IN ((123,test-uuid)))) ORDER BY "tags"."dataset_project" ASC`).WithReply(expectedTagResponse)
+		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
 	getInput := models.ArtifactKey{
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
@@ -217,13 +218,13 @@ func TestGetArtifactByID(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND (("artifacts"."artifact_id" = 123)) ORDER BY artifacts.created_at DESC,"artifacts"."dataset_project" ASC LIMIT 1`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE "artifacts"."artifact_id" = $1 ORDER BY artifacts.created_at DESC,"artifacts"."created_at" LIMIT 1%!(EXTRA string=123)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123)))) ORDER BY "artifact_data"."dataset_project" ASC`).WithReply(expectedArtifactDataResponse)
+		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123))) ORDER BY partitions.created_at ASC,"partitions"."dataset_uuid" ASC`).WithReply(expectedPartitionResponse)
+		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tags"  WHERE "tags"."deleted_at" IS NULL AND ((("artifact_id","dataset_uuid") IN ((123,test-uuid)))) ORDER BY "tags"."dataset_project" ASC`).WithReply(expectedTagResponse)
+		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
 	getInput := models.ArtifactKey{
 		ArtifactID: artifact.ArtifactID,
 	}
@@ -265,7 +266,7 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`INSERT  INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES (?,?,?,?,?,?,?,?,?,?)`).WithError(
+		`INSERT INTO "artifacts" ("created_at","updated_at","deleted_at","dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id","dataset_uuid","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithError(
 		getAlreadyExistsErr(),
 	)
 
@@ -289,13 +290,13 @@ func TestListArtifactsWithPartition(t *testing.T) {
 	expectedPartitionResponse := getDBPartitionResponse(artifact)
 	expectedTagResponse := getDBTagResponse(artifact)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "artifacts".* FROM "artifacts" JOIN partitions partitions0 ON artifacts.artifact_id = partitions0.artifact_id WHERE "artifacts"."deleted_at" IS NULL AND ((partitions0.key = val1) AND (partitions0.val = val2) AND (artifacts.dataset_uuid = test-uuid)) ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10`).WithReply(expectedArtifactResponse)
+		`SELECT "artifacts"."created_at","artifacts"."updated_at","artifacts"."deleted_at","artifacts"."dataset_project","artifacts"."dataset_name","artifacts"."dataset_domain","artifacts"."dataset_version","artifacts"."artifact_id","artifacts"."dataset_uuid","artifacts"."serialized_metadata" FROM "artifacts" JOIN partitions partitions0 ON artifacts.artifact_id = partitions0.artifact_id WHERE partitions0.key = $1 AND partitions0.val = $2 AND artifacts.dataset_uuid = $3 ORDER BY artifacts.created_at desc LIMIT 10 OFFSET 10%!!(string=test-uuid)!(string=val2)(EXTRA string=val1)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
+		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123))) ORDER BY partitions.created_at ASC`).WithReply(expectedPartitionResponse)
+		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tags"  WHERE "tags"."deleted_at" IS NULL AND ((("artifact_id","dataset_uuid") IN ((123,test-uuid))))`).WithReply(expectedTagResponse)
+		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	listInput := models.ListModelsInput{
@@ -333,11 +334,11 @@ func TestListArtifactsNoPartitions(t *testing.T) {
 	expectedPartitionResponse := make([]map[string]interface{}, 0)
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifacts"  WHERE "artifacts"."deleted_at" IS NULL AND ((artifacts.dataset_uuid = test-uuid)) LIMIT 10 OFFSET 10`).WithReply(expectedArtifactResponse)
+		`SELECT * FROM "artifacts" WHERE artifacts.dataset_uuid = $1 LIMIT 10 OFFSET 10%!(EXTRA string=test-uuid)`).WithReply(expectedArtifactResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "artifact_data"  WHERE "artifact_data"."deleted_at" IS NULL AND ((("dataset_project","dataset_name","dataset_domain","dataset_version","artifact_id") IN ((testProject,testName,testDomain,testVersion,123))))`).WithReply(expectedArtifactDataResponse)
+		`SELECT * FROM "artifact_data" WHERE ("artifact_data"."dataset_project","artifact_data"."dataset_name","artifact_data"."dataset_domain","artifact_data"."dataset_version","artifact_data"."artifact_id") IN (($1,$2,$3,$4,$5))%!!(string=123)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithReply(expectedArtifactDataResponse)
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "partitions"  WHERE "partitions"."deleted_at" IS NULL AND (("artifact_id" IN (123)))`).WithReply(expectedPartitionResponse)
+		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	listInput := models.ListModelsInput{

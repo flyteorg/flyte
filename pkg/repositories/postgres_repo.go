@@ -5,7 +5,7 @@ import (
 	"github.com/flyteorg/datacatalog/pkg/repositories/gormimpl"
 	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type PostgresRepo struct {

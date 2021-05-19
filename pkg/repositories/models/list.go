@@ -7,9 +7,9 @@ type ListModelsInput struct {
 	// The filters for the list
 	ModelFilters []ModelFilter
 	// The number of models to list
-	Limit uint32
+	Limit int
 	// The token to offset results by
-	Offset uint32
+	Offset int
 	// Parameter to sort by
 	SortParameter SortParameter
 }

@@ -9,7 +9,6 @@ import (
 
 	"context"
 
-	_ "github.com/jinzhu/gorm/dialects/postgres" // Required to import database driver.
 	"github.com/spf13/cobra"
 )
 
@@ -73,7 +72,10 @@ var migrateCmd = &cobra.Command{
 		logger.Infof(ctx, "Created DB connection.")
 
 		// 	TODO: checkpoints for migrations
-		dbHandle.Migrate()
+		if err := dbHandle.Migrate(ctx); err != nil {
+			logger.Errorf(ctx, "Failed to migrate. err: %v", err)
+			panic(err)
+		}
 		logger.Infof(ctx, "Ran DB migration successfully.")
 	},
 }

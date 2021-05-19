@@ -3,14 +3,15 @@ package gormimpl
 import (
 	"context"
 
+	idl_datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+
 	"github.com/flyteorg/datacatalog/pkg/common"
 	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	idl_datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type dataSetRepo struct {
@@ -51,15 +52,16 @@ func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dat
 
 	if result.Error != nil {
 		logger.Debugf(ctx, "Unable to find Dataset: [%+v], err: %v", in, result.Error)
+
+		if result.Error.Error() == gorm.ErrRecordNotFound.Error() {
+			return models.Dataset{}, errors.GetMissingEntityError("Dataset", &idl_datacatalog.DatasetID{
+				Project: in.Project,
+				Domain:  in.Domain,
+				Name:    in.Name,
+				Version: in.Version,
+			})
+		}
 		return models.Dataset{}, h.errorTransformer.ToDataCatalogError(result.Error)
-	}
-	if result.RecordNotFound() {
-		return models.Dataset{}, errors.GetMissingEntityError("Dataset", &idl_datacatalog.DatasetID{
-			Project: in.Project,
-			Domain:  in.Domain,
-			Name:    in.Name,
-			Version: in.Version,
-		})
 	}
 
 	return ds, nil

@@ -40,6 +40,7 @@ func (p *ApplicationConfigurationProvider) GetDbConfig() dbconfig.DbConfig {
 		}
 		password = string(passwordVal)
 	}
+
 	return dbconfig.DbConfig{
 		Host:         dbConfigSection.Host,
 		Port:         dbConfigSection.Port,
@@ -47,6 +48,7 @@ func (p *ApplicationConfigurationProvider) GetDbConfig() dbconfig.DbConfig {
 		User:         dbConfigSection.User,
 		Password:     password,
 		ExtraOptions: dbConfigSection.ExtraOptions,
+		BaseConfig:   dbconfig.BaseConfig{LogLevel: dbConfigSection.LogLevel},
 	}
 }
 

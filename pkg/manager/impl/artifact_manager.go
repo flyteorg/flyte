@@ -276,7 +276,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 		artifact.Data = artifactDataList
 	}
 
-	token := strconv.Itoa(int(listInput.Offset) + len(artifactsList))
+	token := strconv.Itoa(listInput.Offset + len(artifactsList))
 
 	logger.Debugf(ctx, "Listed %v matching artifacts successfully", len(artifactsList))
 	m.systemMetrics.listSuccessCounter.Inc(ctx)
