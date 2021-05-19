@@ -26,9 +26,9 @@ The State diagram above illustrates the various states through which a Workflow 
 A Workflow always starts in the Ready State and ends either in Failed, Succeeded or Aborted state.
 Any system error within a state causes a retry on that state. These retries are capped by system retries and will eventually lead to an Aborted state.
 
-Every transition between states is recorded in Flyteadmin using :std:ref:`gen/pb-protodoc/flyteidl/event/event.proto:flyteidl.event.workflowexecutionevent`
+Every transition between states is recorded in Flyteadmin using :std:ref:`workflowexecutionevent protos/docs/event/event:workflowexecutionevent`
 
-The phases in the above state diagram are captured in the Admin database as specified here :std:ref:`api_enum_flyteidl.core.workflowexecution.phase` and are sent as part of the Execution Event.
+The phases in the above state diagram are captured in the Admin database as specified here :std:ref:`workflowexecution.phase protos/docs/core/core:workflowexecution.phase` and are sent as part of the Execution Event.
 
 The state machine specification for the illustration can be found `here <https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoic3RhdGVEaWFncmFtLXYyXG4gICAgWypdIC0tPiBBYm9ydGVkIDogT24gc3lzdGVtIGVycm9ycyBtb3JlIHRoYW4gdGhyZXNob2xkXG4gICAgWypdIC0tPiBSZWFkeVxuICAgIFJlYWR5IC0tPiBSdW5uaW5nIDogV3JpdGUgaW5wdXRzIHRvIHdvcmtmbG93XG4gICAgUnVubmluZyAtLT4gUnVubmluZyA6IE9uIHN5c3RlbSBlcnJvclxuICAgIFJ1bm5pbmcgLS0-IFN1Y2NlZWRpbmcgOiBPbiBhbGwgTm9kZXMgU3VjY2Vzc1xuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRlZCA6IE9uIHN1Y2Nlc3NmdWwgZXZlbnQgc2VuZCB0byBBZG1pblxuICAgIFN1Y2NlZWRpbmcgLS0-IFN1Y2NlZWRpbmcgOiBPbiBzeXN0ZW0gZXJyb3JcbiAgICBSZWFkeSAtLT4gRmFpbGluZyA6IE9uIHByZWNvbmRpdGlvbiBmYWlsdXJlXG4gICAgUnVubmluZyAtLT4gRmFpbGluZyA6IE9uIGFueSBOb2RlIEZhaWx1cmVcbiAgICBSZWFkeSAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgUnVubmluZyAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgU3VjY2VlZGluZyAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG5cbiAgICBGYWlsaW5nIC0tPiBIYW5kbGVGYWlsdXJlTm9kZSA6IElmIEZhaWx1cmUgbm9kZSBleGlzdHNcbiAgICBGYWlsaW5nIC0tPiBBYm9ydGVkIDogT24gdXNlciBpbml0aWF0ZWQgYWJvcnRcbiAgICBIYW5kbGVGYWlsdXJlTm9kZSAtLT4gRmFpbGVkIDogT24gY29tcGxldGluZyBmYWlsdXJlIG5vZGVcbiAgICBIYW5kbGVGYWlsdXJlTm9kZSAtLT4gQWJvcnRlZCA6IE9uIHVzZXIgaW5pdGlhdGVkIGFib3J0XG4gICAgRmFpbGluZyAtLT4gRmFpbGVkIDogT24gc3VjY2Vzc2Z1bCBzZW5kIG9mIEZhaWx1cmUgbm9kZVxuICAgICIsIm1lcm1haWQiOnt9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ>`_
 
@@ -47,15 +47,15 @@ Once a Workflow enters a ``Running`` state, it triggers the phantom ``start node
 Nodes can be of different types, as follows, but all the nodes traverse through the same transitions
 
 #. Start Node - Only exists during the execution and is not modeled in the core spec
-#. :std:ref:`gen/pb-protodoc/flyteidl/core/workflow.proto:flyteidl.core.tasknode`
-#. :std:ref:`gen/pb-protodoc/flyteidl/core/workflow.proto:flyteidl.core.branchnode`
-#. :std:ref:`gen/pb-protodoc/flyteidl/core/workflow.proto:flyteidl.core.workflownode`
+#. :std:ref:`tasknode protos/docs/core/core:tasknode`
+#. :std:ref:`branchnode protos/docs/core/core:branchnode `
+#. :std:ref:`workflownode protos/docs/core/core:workflownode`
 #. Dynamic node - which is just a task node that does not return outputs, but a dynamic workflow. When the task runs, it stays in a `RUNNING` state. Once the task completes and Flyte starts executing the dynamic workflow, the overarching node that contains both the original task and the dynamic workflow enters `DYNAMIC_RUNNING` state.
 #. End Node - only exists during the execution and is not modeled in the core spec
 
-Every transition between states is recorded in Flyteadmin using :std:ref:`gen/pb-protodoc/flyteidl/event/event.proto:flyteidl.event.nodeexecutionevent`
+Every transition between states is recorded in Flyteadmin using :std:ref:`nodeexecutionevent protos/docs/event/event:nodeexecutionevent`
 
-Every NodeExecutionEvent can have one of the :std:ref:`api_enum_flyteidl.core.nodeexecution.phase`
+Every NodeExecutionEvent can have one of the :std:ref:`nodeexecution.phase protos/docs/core/core:nodeexecution.phase`
 
 .. note:: TODO add explanation for each phase
 
@@ -69,9 +69,9 @@ Task States
 
 The State diagram above illustrates the various states through which a Task transitions.
 
-Every transition between states is recorded in Flyteadmin using :std:ref:`gen/pb-protodoc/flyteidl/event/event.proto:flyteidl.event.taskexecutionevent`
+Every transition between states is recorded in Flyteadmin using :std:ref:`taskexecutionevent protos/docs/event/event:taskexecutionevent`
 
-Every TaskExecutionEvent can have one of the :std:ref:`api_enum_flyteidl.core.taskexecution.phase`
+Every TaskExecutionEvent can have one of the :std:ref:`taskexecution.phase protos/docs/core/core:taskexecution.phase`
 
 .. note:: TODO add explanation for each phase
 
