@@ -6,6 +6,10 @@ rsts:
 html:
 	sphinx-build -n -b html . _build && sphinx-build -n -b doctest . _build
 
+.PHONY: linkcheck
+linkcheck:
+	sphinx-build -n -b linkcheck . _build
+
 .PHONY: clean
 clean:
 	rm -rf _build
