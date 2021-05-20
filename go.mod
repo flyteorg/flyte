@@ -19,7 +19,8 @@ require (
 	github.com/flyteorg/flyteidl v0.18.40
 	github.com/flyteorg/flyteplugins v0.5.38
 	github.com/flyteorg/flytepropeller v0.7.8
-	github.com/flyteorg/flytestdlib v0.3.20
+	github.com/flyteorg/flytestdlib v0.3.22
+	github.com/ghodss/yaml v1.0.0
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
