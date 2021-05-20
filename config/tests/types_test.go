@@ -25,6 +25,7 @@ type OtherComponentConfig struct {
 	IntValue                int             `json:"int-val"`
 	StringArray             []string        `json:"strings"`
 	StringArrayWithDefaults []string        `json:"strings-def"`
+	MyByteArray             []byte          `json:"myByteArray"`
 }
 
 type Item struct {
