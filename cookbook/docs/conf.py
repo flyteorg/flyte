@@ -6,17 +6,18 @@
 
 # -- Path setup --------------------------------------------------------------
 
-import logging
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+import glob
+import logging
 import os
 import re
+import shutil
 import sys
 
-from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
+from sphinx_gallery.sorting import FileNameSortKey
 
 sys.path.insert(0, os.path.abspath("../"))
 
@@ -46,7 +47,7 @@ class CustomSorter(FileNameSortKey):
         "files.py",
         "folders.py",
         # Control Flow
-        "run_conditions.py"
+        "run_conditions.py",
         "subworkflows.py",
         "dynamics.py",
         "map_task.py",
@@ -68,7 +69,6 @@ class CustomSorter(FileNameSortKey):
         "lp_schedules.py",
         "customizing_resources.py",
         "lp_notifications.py",
-        "fast_registration.py",
         "multiple_k8s.py",
         ## Cluster
         "productionize_cluster.py",
@@ -107,6 +107,11 @@ class CustomSorter(FileNameSortKey):
         # Extending Flyte
         "custom_task_plugin.py",
         "run_custom_types.py",
+        ## Tutorials
+        # ML Training
+        "diabetes.py",
+        "house_price_predictor.py",
+        "multiregion_house_price_predictor.py",
     ]
 
     def __call__(self, filename):
@@ -304,6 +309,20 @@ sphinx_gallery_conf = {
     # 'use_jupyter_lab': True,
     # },
 }
+
+for i in range(len(sphinx_gallery_conf["examples_dirs"])):
+    gallery_dir = sphinx_gallery_conf["gallery_dirs"][i]
+    source_dir = sphinx_gallery_conf["examples_dirs"][i]
+    # Create gallery dirs if it doesn't exist
+    try:
+        os.makedirs(gallery_dir)
+    except OSError:
+        pass
+
+    # Copy rst files from source dir to gallery dir
+    for f in glob.glob(os.path.join(source_dir, "*.rst")):
+        if "README" not in f:
+            shutil.copy(f, gallery_dir)
 
 # intersphinx configuration
 intersphinx_mapping = {
