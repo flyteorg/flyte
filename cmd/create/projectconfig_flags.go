@@ -50,10 +50,10 @@ func (ProjectConfig) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg ProjectConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("ProjectConfig", pflag.ExitOnError)
-	cmdFlags.StringVar(&(projectConfig.ID), fmt.Sprintf("%v%v", prefix, "id"), *new(string), "id for the project specified as argument.")
-	cmdFlags.StringVar(&(projectConfig.Name), fmt.Sprintf("%v%v", prefix, "name"), *new(string), "name for the project specified as argument.")
-	cmdFlags.StringVar(&(projectConfig.File), fmt.Sprintf("%v%v", prefix, "file"), *new(string), "file for the project definition.")
-	cmdFlags.StringVar(&(projectConfig.Description), fmt.Sprintf("%v%v", prefix, "description"), *new(string), "description for the project specified as argument.")
-	cmdFlags.StringToStringVar(&(projectConfig.Labels), fmt.Sprintf("%v%v", prefix, "labels"), map[string]string{}, "labels for the project specified as argument.")
+	cmdFlags.StringVar(&projectConfig.ID, fmt.Sprintf("%v%v", prefix, "id"), projectConfig.ID, "id for the project specified as argument.")
+	cmdFlags.StringVar(&projectConfig.Name, fmt.Sprintf("%v%v", prefix, "name"), projectConfig.Name, "name for the project specified as argument.")
+	cmdFlags.StringVar(&projectConfig.File, fmt.Sprintf("%v%v", prefix, "file"), projectConfig.File, "file for the project definition.")
+	cmdFlags.StringVar(&projectConfig.Description, fmt.Sprintf("%v%v", prefix, "description"), projectConfig.Description, "description for the project specified as argument.")
+	cmdFlags.StringToStringVar(&projectConfig.Labels, fmt.Sprintf("%v%v", prefix, "labels"), projectConfig.Labels, "labels for the project specified as argument.")
 	return cmdFlags
 }
