@@ -1,6 +1,6 @@
 """
-Scheduling Workflow Executions With Launch Plans
-------------------------------------------------
+Scheduling Workflows
+--------------------
 
 For background on launch plans, refer to :any:`launch_plans`.
 
