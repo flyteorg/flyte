@@ -23,9 +23,9 @@ We will try to understand the components of a backend plugin using an example pl
 
 Interface specification
 ------------------------
-Usually Flyte extensions need information that is not covered by a :std:ref:`Flyte TaskTemplate <api_msg_flyteidl.core.tasktemplate>`. The TaskTemplate consists of a
-the interface, task_type identifier, some metadata and other fields. An important field to note here is - :std:ref:`api_field_flyteidl.core.tasktemplate.custom`. The custom field is essentially an unstructured JSON.
-This makes it possible to extend a task-template beyond the default supported targets -- :std:ref:`api_field_flyteidl.core.tasktemplate.container` (WIP, sql etc).
+Usually Flyte extensions need information that is not covered by a :std:ref:`Flyte TaskTemplate <protos/docs/core/core:tasktemplate>`. The TaskTemplate consists of a
+the interface, task_type identifier, some metadata and other fields. An important field to note here is - :std:ref:`custom <protos/docs/core/core:tasktemplate>`. The custom field is essentially an unstructured JSON.
+This makes it possible to extend a task-template beyond the default supported targets -- :std:ref:`container <protos/docs/core/core:tasktemplate>` (WIP, sql etc).
 
 The motivation of the Custom field, is to marshal a JSON structure that specifies information beyond what a regular TaskTemplate can capture. The actual structure of the JSON is known only to the implemented backend-plugin and the SDK components. The core Flyte platform, does not understand of look into the specifics of this structure.
 It is highly recommended to use an interface definition lanugage like Protobuf, OpenAPISpec etc to declare specify the structure of the JSON. From here, on we refer to this as the ``Plugin Specification``.
