@@ -29,5 +29,5 @@ This specification is used to generate client stubs for `FlyteKit <https://flyte
    :hidden:
 
    Overview <self>
-   gen/pb-protodoc/flyteidl/index
+   protos/index
    developing
