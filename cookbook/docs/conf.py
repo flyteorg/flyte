@@ -17,6 +17,7 @@ import re
 import shutil
 import sys
 
+from sphinx.errors import ConfigError
 from sphinx_gallery.sorting import FileNameSortKey
 
 sys.path.insert(0, os.path.abspath("../"))
@@ -145,6 +146,7 @@ extensions = [
     "sphinx-prompt",
     "sphinx_copybutton",
     "sphinx_search.extension",
+    "sphinxext.remoteliteralinclude",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -310,6 +312,9 @@ sphinx_gallery_conf = {
     # },
 }
 
+if len(examples_dirs) != len(gallery_dirs):
+    raise ConfigError("examples_dirs and gallery_dirs aren't of the same length")
+
 for i in range(len(sphinx_gallery_conf["examples_dirs"])):
     gallery_dir = sphinx_gallery_conf["gallery_dirs"][i]
     source_dir = sphinx_gallery_conf["examples_dirs"][i]
@@ -338,4 +343,5 @@ intersphinx_mapping = {
     # Uncomment for local development and change to your username
     # "flytekit": ("/Users/ytong/go/src/github.com/lyft/flytekit/docs/build/html", None),
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
+    "flytectl": ("https://docs.flyte.org/projects/flytectl/en/latest/", None),
 }
