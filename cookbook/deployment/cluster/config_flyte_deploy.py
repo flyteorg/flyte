@@ -1,3 +1,4 @@
+"""
 #################################
 Configuring Your Flyte Deployment
 #################################
@@ -190,3 +191,5 @@ To get the matchable resources of :ref:`execution queue attributes <flytectl_get
 To get the global state of the world, list all endpoints. For example, visit ``protocol://<host>/api/v1/matchable_attributes?resource_type=2``.
 
 The resource type enum (int) is defined in the :ref:`Matchable Resource <protos/docs/admin/admin:matchableresource>`.
+
+"""

@@ -1,3 +1,4 @@
+"""
 #################
 Fast Registration
 #################
@@ -82,3 +83,5 @@ Or, from within your container:
  Step 7 is not required.
 
 8. Open the Flyte UI and launch the latest version of your workflow (under the domain you fast-registered above). It should run with your new code!
+
+"""

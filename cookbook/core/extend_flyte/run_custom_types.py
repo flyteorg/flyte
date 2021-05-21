@@ -1,8 +1,8 @@
 """
 .. _advanced_custom_types:
 
-How to write/use your custom types in a task?
------------------------------------------------
+Writing Custom Types
+--------------------
 
 Flyte is a strongly typed framework for authoring tasks and workflows. But, there are situations when the existing set
 of types do not directly work. This is true with any programming language. This is when the languages support higher

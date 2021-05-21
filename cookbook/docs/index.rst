@@ -36,8 +36,8 @@ the `getting started <https://docs.flyte.org/en/latest/getting_started.html>`__ 
    Containerization <auto/core/containerization/index>
    deployment
    Control Plane <auto/control_plane/index>
-   integrations 
-   Extending flyte <extending_flyte>
+   integrations
+   Extending flyte <auto/core/extend_flyte/index>
 
 .. toctree::
    :maxdepth: -1

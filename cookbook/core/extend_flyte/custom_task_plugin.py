@@ -1,7 +1,7 @@
 """
 .. _advanced_custom_task_plugin:
 
-How to write your own flytekit task plugins?
+Writing Custom Flytekit Task Plugins
 ----------------------------------------------
 
 Flytekit is designed to be extremely extensible. You can add new task-types that are useful only for your use-cases.
