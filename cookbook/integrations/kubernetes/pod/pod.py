@@ -1,13 +1,15 @@
 """
-Pod plugin example
---------------------------
+Pod Example
+-----------
 
 Pod tasks can be used anytime you need to bring up multiple containers within a single task. They expose a fully
 modifable kubernetes `pod spec
 <https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#podspec-v1-core>`_ you can use to customize
 your task execution runtime.
 
-All you need to use Pod tasks are to 1) define a pod spec and 2) specify the primary container name
+All you need to do to use Pod tasks are:
+1. define a pod spec, and 
+2. specify the primary container name.
 The primary container is the driver for the flyte task execution for example, producing inputs and outputs.
 """
 
@@ -72,9 +74,8 @@ def generate_pod_spec_for_task():
 
 
 # %%
-# Although Pod tasks for the most part allow you to customize kubernetes container attributes
-# you can still use flyte directives to specify resources and even the image. The default image built for
-# flyte tasks will get used unless you specify the `container_image` task attribute.
+# Although Pod tasks for the most part allow you to customize kubernetes container attributes, you can still use flyte directives to specify resources and even the image. The default image built for
+# flyte tasks will be used unless you specify the `container_image` task attribute.
 @task(
     task_config=Pod(
         pod_spec=generate_pod_spec_for_task(), primary_container_name="primary"
