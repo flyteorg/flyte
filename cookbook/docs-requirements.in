@@ -8,5 +8,6 @@ sphinx-prompt
 sphinx-code-include
 sphinx-autoapi
 sphinx-copybutton
+sphinxext-remoteliteralinclude
 docutils==0.16
 astroid==2.4.2
