@@ -4,7 +4,7 @@
 Adding customizable resources
 #############################
 
-For background on customizable resources, see :ref:`howto-managing-customizable-resources`. As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values. Examples of such resources include execution clusters, task resource defaults, and `more <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`__.
+For background on customizable resources, see :ref:`howto-managing-customizable-resources`. As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values. Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <protos/docs/admin/admin:matchableresource>`.
 
 
 Example
@@ -16,7 +16,7 @@ Now one of your user teams comes to you and wants to ensure that their critical 
 
 Flyte IDL
 ^^^^^^^^^
-You'll want to introduce a new `matchable attribute <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`__, including a unique enum value and proto message definition. For example
+You'll want to introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>`, including a unique enum value and proto message definition. For example
 
 ::      
 

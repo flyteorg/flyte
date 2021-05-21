@@ -25,7 +25,7 @@ Please see the :ref:`divedeep-projects` document for more information on project
 - Determining how workflow executions get assigned to clusters in a multi-cluster Flyte deployment.
 
 The proto definition is the definitive source of which
-`matchable attributes <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto>`_
+`matchable attributes <protos/docs/admin/admin:flyteidl/admin/matchable_resource.proto>`
 can be customized.
 
 Each of the four above settings are discussed below. Eventually all of these customizations will be overridable using
@@ -182,4 +182,4 @@ E.g. `https://example.com/api/v1/project_domain_attributes/widgetmodels/producti
 
 To get the global state of the world, use the list all endpoint, e.g. `https://example.com/api/v1/matchable_attributes?resource_type=2 <https://example.com/api/v1/matchable_attributes?resource_type=2>`__.
 
-The resource type enum (int) is defined in the `proto <https://github.com/flyteorg/flyteidl/blob/ba13965bcfbf7e7bfce40664800aaf1f2a1088a1/protos/flyteidl/admin/matchable_resource.proto#L8,L20>`__.
+The resource type enum (int) is defined in the :std:ref:`matchableresource <protos/docs/admin/admin:matchableresource>`.

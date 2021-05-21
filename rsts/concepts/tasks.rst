@@ -37,8 +37,8 @@ In abstract, a task in the system is characterized by:
 4. *Optional* Task interface definition
 
    In order for tasks to exchange data with each other, a task can define a signature (much like a function/method
-   signature in programming languages). A task interface defines the input and output variables - :std:ref:`flyteidl:api_field_flyteidl.core.variablemap.variables`
-   as well as their types :std:ref:`flyteidl:api_msg_flyteidl.core.literaltype`.
+   signature in programming languages). A task interface defines the input and output variables - :std:ref:`variablesentry protos/docs/core/core:variablemap.variablesentry`
+   as well as their types :std:ref:`literaltype protos/docs/core/core:literaltype`.
 
 Requirements
 ------------
