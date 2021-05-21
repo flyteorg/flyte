@@ -13,3 +13,4 @@ gen/pb_python/flyteidl.egg-info/
 docs/build/
 
 .vscode/
+tmp/

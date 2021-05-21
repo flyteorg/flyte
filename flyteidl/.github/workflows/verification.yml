@@ -101,20 +101,6 @@ jobs:
       - name: Proto-Datacatalog-Java
         run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l java
 
-      # Docs
-      - name: Docs-Service
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/service -l protodoc
-      - name: Docs-Admin
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/admin -l protodoc
-      - name: Docs-Core
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/core -l protodoc
-      - name: Docs-Event
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/event -l protodoc
-      - name: Docs-Plugins
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/plugins -l protodoc
-      - name: Docs-Datacatalog
-        run: python3 /usr/local/bin/entrypoint.py -i ./protos -d protos/flyteidl/datacatalog -l protodoc
-
       - uses: actions/upload-artifact@master
         with:
           name: generated
