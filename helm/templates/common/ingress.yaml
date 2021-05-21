@@ -191,13 +191,13 @@ spec:
   rules:
     - http:
         paths:
-          {{- if .Values.common.ingress.albSSLRedirect }}
-          - backend:
-              serviceName: ssl-redirect
-              servicePort: use-annotation
-            path: /*
-            pathType: ImplementationSpecific
-          {{- end }}
+          # {{- if .Values.common.ingress.albSSLRedirect }}
+          # - backend:
+          #     serviceName: ssl-redirect
+          #     servicePort: use-annotation
+          #   path: /*
+          #   pathType: ImplementationSpecific
+          # {{- end }}
           {{- include "grpcRoutes" . | nindent 10 -}}
       {{- with .Values.common.ingress.host }}
       host: {{ . }}
