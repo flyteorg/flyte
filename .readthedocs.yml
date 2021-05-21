@@ -14,3 +14,5 @@ python:
   version: 3.8
   install:
     - requirements: cookbook/dev-requirements.txt
+    - requirements: cookbook/docs-requirements.txt
+    

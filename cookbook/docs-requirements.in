@@ -11,3 +11,5 @@ sphinx-copybutton
 sphinxext-remoteliteralinclude
 docutils==0.16
 astroid==2.4.2
+matplotlib
+flytekit
