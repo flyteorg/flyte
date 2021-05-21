@@ -17,10 +17,14 @@ certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
+commonmark==0.9.1
+    # via recommonmark
 css-html-js-minify==2.5.5
     # via sphinx-material
 docutils==0.16
-    # via sphinx
+    # via
+    #   recommonmark
+    #   sphinx
 git+git://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
 idna==2.10
@@ -31,6 +35,8 @@ jinja2==2.11.3
     # via sphinx
 lxml==4.6.3
     # via sphinx-material
+markdown==3.3.4
+    # via sphinx-markdown-tables
 markupsafe==1.1.1
     # via jinja2
 packaging==20.9
@@ -47,6 +53,8 @@ pytz==2021.1
     # via babel
 readthedocs-sphinx-search==0.1.0
     # via -r doc-requirements.in
+recommonmark==0.7.1
+    # via -r doc-requirements.in
 requests==2.25.1
     # via sphinx
 six==1.15.0
@@ -59,6 +67,8 @@ sphinx-code-include==1.1.1
     # via -r doc-requirements.in
 sphinx-copybutton==0.3.1
     # via -r doc-requirements.in
+sphinx-markdown-tables==0.0.15
+    # via -r doc-requirements.in
 sphinx-material==0.0.32
     # via -r doc-requirements.in
 sphinx-prompt==1.4.0
@@ -67,6 +77,7 @@ sphinx==3.5.4
     # via
     #   -r doc-requirements.in
     #   furo
+    #   recommonmark
     #   sphinx-code-include
     #   sphinx-copybutton
     #   sphinx-material

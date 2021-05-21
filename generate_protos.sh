@@ -24,12 +24,48 @@ do
 done
 
 # Docs generated
-docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/service -l protodoc
-docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/admin -l protodoc
-docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/core -l protodoc
-docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/event -l protodoc
-docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/plugins -l protodoc
-docker run --rm -u $(id -u):$(id -g) -e REPO_BLOB_SHA=master -e PROJECT_ANNOTATION_PREFIX=flyte.interface -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/datacatalog -l protodoc
+
+# Get list of proto files in core directory
+core_proto_files=`ls protos/flyteidl/core/*.proto |xargs`
+# Remove any currently generated file
+ls -d protos/docs/core/* | grep -v index.rst | xargs rm
+# Use the list to generate the MD files required for sphinx conversion
+docker run --rm -v $(pwd)/protos/docs/core:/out -v  $(pwd)/protos:/protos pseudomuto/protoc-gen-doc --doc_opt=markdown,core.md -I=protos `echo $core_proto_files`
+
+# Get list of proto files in admin directory
+admin_proto_files=`ls protos/flyteidl/admin/*.proto |xargs`
+# Remove any currently generated file
+ls -d protos/docs/admin/* | grep -v index.rst | xargs rm
+# Use the list to generate the MD files required for sphinx conversion
+docker run --rm -v $(pwd)/protos/docs/admin:/out -v  $(pwd)/protos:/protos pseudomuto/protoc-gen-doc --doc_opt=markdown,admin.md -I=protos `echo $admin_proto_files`
+
+# Get list of proto files in datacatlog directory
+datacatalog_proto_files=`ls protos/flyteidl/datacatalog/*.proto |xargs`
+# Remove any currently generated file
+ls -d protos/docs/datacatalog/* | grep -v index.rst | xargs rm
+# Use the list to generate the MD files required for sphinx conversion
+docker run --rm -v $(pwd)/protos/docs/datacatalog:/out -v  $(pwd)/protos:/protos pseudomuto/protoc-gen-doc --doc_opt=markdown,datacatalog.md -I=protos `echo $datacatalog_proto_files`
+
+# Get list of proto files in event directory
+event_proto_files=`ls protos/flyteidl/event/*.proto |xargs`
+# Remove any currently generated file
+ls -d protos/docs/event/* | grep -v index.rst | xargs rm
+# Use the list to generate the MD files required for sphinx conversion
+docker run --rm -v $(pwd)/protos/docs/event:/out -v  $(pwd)/protos:/protos pseudomuto/protoc-gen-doc --doc_opt=markdown,event.md -I=protos `echo $event_proto_files`
+
+# Get list of proto files in plugins directory.
+plugins_proto_files=`ls protos/flyteidl/plugins/*.proto | xargs`
+# Remove any currently generated file
+ls -d protos/docs/plugins/* |grep -v index.rst| xargs rm
+# Use the list to generate the MD files required for sphinx conversion
+docker run --rm -v $(pwd)/protos/docs/plugins:/out -v $(pwd)/protos:/protos -v $(pwd)/tmp/doc_gen_deps/:/usr/local/include/doc_gen_deps pseudomuto/protoc-gen-doc --doc_opt=markdown,plugins.md -I=protos -I=/usr/local/include/doc_gen_deps `echo $plugins_proto_files`
+
+# Get list of proto files in service directory.
+service_proto_files=`ls protos/flyteidl/service/*.proto | xargs`
+# Remove any currently generated file
+ls -d protos/docs/service/* |grep -v index.rst| xargs rm
+# Use the list to generate the MD files required for sphinx conversion
+docker run --rm -v $(pwd)/protos/docs/service:/out -v $(pwd)/protos:/protos -v $(pwd)/tmp/doc_gen_deps/:/usr/local/include/doc_gen_deps pseudomuto/protoc-gen-doc --doc_opt=markdown,service.md -I=protos -I=/usr/local/include/doc_gen_deps `echo $service_proto_files`
 
 # Generate binary data from OpenAPI 2 file
 docker run --rm -u $(id -u):$(id -g) -v $DIR/gen/pb-go/flyteidl/service:/service --entrypoint go-bindata $LYFT_IMAGE -pkg service -o /service/openapi.go -prefix /service/ -modtime 1562572800 /service/admin.swagger.json
