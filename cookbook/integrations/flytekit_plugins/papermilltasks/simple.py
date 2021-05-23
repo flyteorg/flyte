@@ -26,7 +26,7 @@ from flytekitplugins.papermill import NotebookTask
 # .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/papermilltasks/outputs.png
 #     :alt: Example of "parameters tag" added to the cell with input variables
 #
-# #. Now in a python file, you have to create a new task at the ``module`` level. Refer to :py:class:`NotebookTask`
+# #. Now in a python file, you have to create a new task at the ``module`` level.
 #    The example task is shown below
 nb = NotebookTask(
     name="simple-nb",

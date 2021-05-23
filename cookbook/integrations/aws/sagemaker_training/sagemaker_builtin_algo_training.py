@@ -8,10 +8,8 @@ perform Hyper parameter optimization using Sagemaker HPO
 Defining a XGBoost Training job
 --------------------------------
 We will create a job that will train an XGBoost model using the prebuilt algorithms @Sagemaker.
-Refer to `Sagemaker XGBoost docs here <https://docs.aws.amazon.com/sagemaker/latest/dg/xgboost.html>`_
+Refer to `Sagemaker XGBoost docs here <https://docs.aws.amazon.com/sagemaker/latest/dg/xgboost.html>`_.
 To understand more about XGBoost refer `here <https://xgboost.readthedocs.io/en/latest/>`_.
-To dive deeper into the Flytekit API refer to
-`docs <https://lyft.github.io/flyte/flytekit/flytekit.common.tasks.sagemaker.html?highlight=sagemaker#module-flytekit.common.tasks.sagemaker>`_
 """
 import typing
 

@@ -6,21 +6,57 @@ Locally, Flytekit relies on the Python interpreter to execute both tasks and wor
 To leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run
 on any Kubernetes cluster - a local cluster like `kind <https://kind.sigs.k8s.io/>`__, in a cloud environment or on-prem.
 
-Please refer to the `Installing Flyte <https://lyft.github.io/flyte/administrator/install/index.html>`__ for details on getting started with a Flyte installation.
-
+Please refer to the :doc:`Getting Started <flyte:getting_started>` for details on getting started with the Flyte installation.
 
 1. First commit your changes. Some of the steps below default to referencing the git sha.
-1. Run `make serialize`. This will build the image tagged with just `flytecookbook:<sha>`, no registry will be prefixed. See the image building section below for additional information.
+2. Run `make serialize`. This will build the image tagged with just `flytecookbook:<sha>`, no registry will be prefixed. See the image building section below for additional information.
 
 Build your Dockerfile
 ^^^^^^^^^^^^^^^^^^^^^^
 The first step of this process is building a container image that holds your code.
 
-.. literalinclude:: ../../Dockerfile
-    :language: dockerfile
-    :emphasize-lines: 1
-    :linenos:
+.. code-block:: docker
+   :emphasize-lines: 1
+   :linenos:
 
+   FROM python:3.8-slim-buster
+   LABEL org.opencontainers.image.source https://github.com/flyteorg/flytesnacks
+
+   WORKDIR /root
+   ENV VENV /opt/venv
+   ENV LANG C.UTF-8
+   ENV LC_ALL C.UTF-8
+   ENV PYTHONPATH /root
+
+   # This is necessary for opencv to work
+   RUN apt-get update && apt-get install -y libsm6 libxext6 libxrender-dev ffmpeg build-essential
+
+   # Install the AWS cli separately to prevent issues with boto being written over
+   RUN pip3 install awscli
+
+   ENV VENV /opt/venv
+   # Virtual environment
+   RUN python3 -m venv ${VENV}
+   ENV PATH="${VENV}/bin:$PATH"
+
+   # Install Python dependencies
+   COPY core/requirements.txt /root
+   RUN pip install -r /root/requirements.txt
+
+   # Copy the makefile targets to expose on the container. This makes it easier to register
+   COPY in_container.mk /root/Makefile
+   COPY core/sandbox.config /root
+
+   # Copy the actual code
+   COPY core /root/core
+
+   # This tag is supplied by the build script and will be used to determine the version
+   # when registering tasks, workflows, and launch plans
+   ARG tag
+   ENV FLYTE_INTERNAL_IMAGE $tag
+
+.. note::
+   ``core`` is the directory being considered in the above Dockerfile.
 
 Serialize your workflows and tasks
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -50,7 +86,7 @@ In-container serialization
 Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigourous, serialization should be done within the container for the following reasons.
 
 1. It ensures that the versions of all libraries used at execution time on the Flyte platform, are the same that are used during serialization.
-1. Since serialization runs part of flytekit, it helps ensure that your container is set up correctly.
+2. Since serialization runs part of flytekit, it helps ensure that your container is set up correctly.
 
 Take a look at this make target to see how it's done.
 .. code-block::

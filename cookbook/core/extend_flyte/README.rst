@@ -20,7 +20,7 @@ Case 1: I want to use my special Types - e.g. my own DataFrame format
 Flyte, just like a programming language has a core type-system, but just like most languages, this type system can be extended by allowing users to add ``User defined Data types``.
 A User defined data type can be something that Flyte does not really understand, but is extremely useful for a users specific needs. For example it can be a custom user structure or a grouping of images in a specific encoding.
 
-Flytekit natively supports handling of structured data like User defined structures like DataClasses using JSON as the representation format. An example of this is available in FlyteCookbook - :std:doc:`auto_core_intermediate/custom_objects`.
+Flytekit natively supports handling of structured data like User defined structures like DataClasses using JSON as the representation format. An example of this is available in FlyteCookbook - :std:doc:`auto/type_system/custom_objects`.
 
 For types that are not simply representable as JSON documents, Flytekit allows users to extends Flyte's type system and implement these types in Python. The user has to essentially implement a :py:class:`flytekit.extend.TypeTransformer` class to enable translation of the type from Users type to flyte understood types. As an example,
 instead of using :py:class:`pandas.DataFrame` directly, you may want to use `Pandera <https://pandera.readthedocs.io/en/stable/>`_ to perform validation of an input or output dataframe. an example can be found `here <https://github.com/flyteorg/flytekit/blob/master/plugins/tests/pandera/test_wf.py#L9>`_.

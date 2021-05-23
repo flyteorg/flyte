@@ -55,7 +55,7 @@ def create_spark_df() -> my_schema:
 # The task ``sum_of_all_ages`` receives a parameter of type :any:`df_my_schema_definition`. It is important to note that there is no
 # expectation that the schema is a pandas dataframe or a spark dataframe, but just a generic schema object. The Flytekit schema object
 # can be read into multiple formats using the ``open()`` method. Default conversion is to :py:class:`pandas.DataFrame`
-# Refer to :py:class:`flytekit.FlyteSchema` for more details
+# Refer to :py:class:`flytekit.types.schema.FlyteSchema` for more details
 #
 @task(cache_version="1")
 def sum_of_all_ages(s: my_schema) -> int:

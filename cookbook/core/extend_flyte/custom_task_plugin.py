@@ -45,7 +45,7 @@ from flytekit.extend import Interface, PythonTask, context_manager
 # Plugin Structure
 # ^^^^^^^^^^^^^^^^^
 # As illustrated above to achieve this structure we need to create a Class called  ``WaitForObjectStoreFile``, which
-# derives from :py:class:`flytekit.core.PythonFunctionTask` as follows.
+# derives from :py:class:`flytekit.PythonFunctionTask` as follows.
 #
 class WaitForObjectStoreFile(PythonTask):
     """

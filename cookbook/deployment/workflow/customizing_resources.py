@@ -17,7 +17,7 @@ Flytekit makes it possible to specify these requirements declaratively and close
 # Requests are treated as hints which are used to schedule tasks on nodes with available resources, whereas limits
 # are hard constraints.
 #
-# For either a request or limit, refer to the :py:class:`flytekit:flytekit.Resource` documentation.
+# For either a request or limit, refer to the :py:class:`flytekit:flytekit.Resources` documentation.
 #
 # The following attributes can be specified for a ``Resource``.
 #

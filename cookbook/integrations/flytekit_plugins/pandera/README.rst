@@ -2,7 +2,7 @@ Pandera: Type Annotations for Pandas DataFrames
 ===============================================
 
 Flytekit python natively supports :ref:`many data types <flytekit_to_flyte_type_mapping>`,
-including a :ref:`FlyteSchema <sphx_glr_auto_core_intermediate_typed_schema.py>` type for
+including a :ref:`FlyteSchema <typed_schema>` type for
 type-annotating pandas dataframes. The flytekit pandera plugin provides an alternative for
 defining dataframe schemas by integrating with `pandera <https://pandera.readthedocs.io/en/stable/>`_,
 which is a runtime data validation tool for pandas dataframes.

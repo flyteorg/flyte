@@ -31,7 +31,7 @@ def coalesce(b: typing.List[str]) -> str:
 
 
 # %%
-# To use a map task in your workflow, use the :py:func:`flytekit:flytekit.map_task` function and pass in an individual
+# To use a map task in your workflow, use the :py:func:`flytekit:flytekit.core.map_task` function and pass in an individual
 # task to be repeated across a collection of inputs. In this case the type of a, ``typing.List[int]`` is a list of the
 # input type defined for ``a_mappable_task``.
 @workflow
