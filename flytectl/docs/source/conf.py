@@ -42,6 +42,7 @@ extensions = [
     "sphinx-prompt",
     "sphinx_copybutton",
     "sphinx_search.extension",
+    "sphinx_fontawesome",
 ]
 
 # build the templated autosummary files
@@ -98,6 +99,11 @@ html_theme_options = {
         "color-brand-primary": "#9D68E4",
         "color-brand-content": "#9D68E4",
     },
+    # custom flyteorg furo theme options
+    "github_repo": "flytectl",
+    "github_username": "flyteorg",
+    "github_commit": "master",
+    "docs_path": "docs/source",  # path to documentation source
 }
 
 html_context = {
