@@ -36,7 +36,7 @@ data:
   resource_manager.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- if .Values.sparkoperator.enabled }}
-{{- with .Values.configmap.spark }}
+{{- with .Values.sparkoperator.plugin_config }}
   spark.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
 {{- end }}
