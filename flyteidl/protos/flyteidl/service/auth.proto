@@ -4,19 +4,6 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
-import "flyteidl/admin/project.proto";
-import "flyteidl/admin/project_domain_attributes.proto";
-import "flyteidl/admin/task.proto";
-import "flyteidl/admin/workflow.proto";
-import "flyteidl/admin/workflow_attributes.proto";
-import "flyteidl/admin/launch_plan.proto";
-import "flyteidl/admin/event.proto";
-import "flyteidl/admin/execution.proto";
-import "flyteidl/admin/matchable_resource.proto";
-import "flyteidl/admin/node_execution.proto";
-import "flyteidl/admin/task_execution.proto";
-import "flyteidl/admin/version.proto";
-import "flyteidl/admin/common.proto";
 import "protoc-gen-swagger/options/annotations.proto";
 
 message OAuth2MetadataRequest {}
@@ -35,10 +22,10 @@ message OAuth2MetadataResponse {
     // URL of the authorization server's token endpoint [RFC6749].
     string token_endpoint = 3;
 
-    // Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+    // Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
     repeated string response_types_supported = 4;
 
-    // JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+    // JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
     repeated string scopes_supported = 5;
 
     // JSON array containing a list of client authentication methods supported by this token endpoint.

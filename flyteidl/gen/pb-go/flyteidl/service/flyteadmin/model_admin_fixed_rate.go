@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Option for schedules run at a certain frequency, e.g. every 2 minutes.
+// Option for schedules run at a certain frequency e.g. every 2 minutes.
 type AdminFixedRate struct {
 	Value int64 `json:"value,omitempty"`
 	Unit *AdminFixedRateUnit `json:"unit,omitempty"`

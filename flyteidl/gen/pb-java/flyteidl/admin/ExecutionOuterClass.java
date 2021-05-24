@@ -11867,18 +11867,10 @@ public final class ExecutionOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <pre>
-     * [(validate.rules).enum.defined_only = true];
-     * </pre>
-     *
      * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
      */
     int getModeValue();
     /**
-     * <pre>
-     * [(validate.rules).enum.defined_only = true];
-     * </pre>
-     *
      * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
      */
     flyteidl.admin.ExecutionOuterClass.ExecutionMetadata.ExecutionMode getMode();
@@ -11907,7 +11899,7 @@ public final class ExecutionOuterClass {
 
     /**
      * <pre>
-     * Indicates the "nestedness" of this execution.
+     * Indicates the nestedness of this execution.
      * If a user launches a workflow execution, the default nesting is 0.
      * If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =&gt; 1
      * Generally, if workflow at nesting level k launches a workflow then the child workflow will have
@@ -12343,20 +12335,12 @@ public final class ExecutionOuterClass {
     public static final int MODE_FIELD_NUMBER = 1;
     private int mode_;
     /**
-     * <pre>
-     * [(validate.rules).enum.defined_only = true];
-     * </pre>
-     *
      * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
      */
     public int getModeValue() {
       return mode_;
     }
     /**
-     * <pre>
-     * [(validate.rules).enum.defined_only = true];
-     * </pre>
-     *
      * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
      */
     public flyteidl.admin.ExecutionOuterClass.ExecutionMetadata.ExecutionMode getMode() {
@@ -12415,7 +12399,7 @@ public final class ExecutionOuterClass {
     private int nesting_;
     /**
      * <pre>
-     * Indicates the "nestedness" of this execution.
+     * Indicates the nestedness of this execution.
      * If a user launches a workflow execution, the default nesting is 0.
      * If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =&gt; 1
      * Generally, if workflow at nesting level k launches a workflow then the child workflow will have
@@ -13028,20 +13012,12 @@ public final class ExecutionOuterClass {
 
       private int mode_ = 0;
       /**
-       * <pre>
-       * [(validate.rules).enum.defined_only = true];
-       * </pre>
-       *
        * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
        */
       public int getModeValue() {
         return mode_;
       }
       /**
-       * <pre>
-       * [(validate.rules).enum.defined_only = true];
-       * </pre>
-       *
        * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
        */
       public Builder setModeValue(int value) {
@@ -13050,10 +13026,6 @@ public final class ExecutionOuterClass {
         return this;
       }
       /**
-       * <pre>
-       * [(validate.rules).enum.defined_only = true];
-       * </pre>
-       *
        * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
        */
       public flyteidl.admin.ExecutionOuterClass.ExecutionMetadata.ExecutionMode getMode() {
@@ -13062,10 +13034,6 @@ public final class ExecutionOuterClass {
         return result == null ? flyteidl.admin.ExecutionOuterClass.ExecutionMetadata.ExecutionMode.UNRECOGNIZED : result;
       }
       /**
-       * <pre>
-       * [(validate.rules).enum.defined_only = true];
-       * </pre>
-       *
        * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
        */
       public Builder setMode(flyteidl.admin.ExecutionOuterClass.ExecutionMetadata.ExecutionMode value) {
@@ -13078,10 +13046,6 @@ public final class ExecutionOuterClass {
         return this;
       }
       /**
-       * <pre>
-       * [(validate.rules).enum.defined_only = true];
-       * </pre>
-       *
        * <code>.flyteidl.admin.ExecutionMetadata.ExecutionMode mode = 1;</code>
        */
       public Builder clearMode() {
@@ -13193,7 +13157,7 @@ public final class ExecutionOuterClass {
       private int nesting_ ;
       /**
        * <pre>
-       * Indicates the "nestedness" of this execution.
+       * Indicates the nestedness of this execution.
        * If a user launches a workflow execution, the default nesting is 0.
        * If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =&gt; 1
        * Generally, if workflow at nesting level k launches a workflow then the child workflow will have
@@ -13207,7 +13171,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Indicates the "nestedness" of this execution.
+       * Indicates the nestedness of this execution.
        * If a user launches a workflow execution, the default nesting is 0.
        * If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =&gt; 1
        * Generally, if workflow at nesting level k launches a workflow then the child workflow will have
@@ -13224,7 +13188,7 @@ public final class ExecutionOuterClass {
       }
       /**
        * <pre>
-       * Indicates the "nestedness" of this execution.
+       * Indicates the nestedness of this execution.
        * If a user launches a workflow execution, the default nesting is 0.
        * If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =&gt; 1
        * Generally, if workflow at nesting level k launches a workflow then the child workflow will have

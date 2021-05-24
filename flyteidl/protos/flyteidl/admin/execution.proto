@@ -171,14 +171,14 @@ message ExecutionMetadata {
         // This execution was triggered by another execution.
         CHILD_WORKFLOW = 4;
     }
-    ExecutionMode mode = 1; // [(validate.rules).enum.defined_only = true];
+    ExecutionMode mode = 1;
 
     // Identifier of the entity that triggered this execution.
     // For systems using back-end authentication any value set here will be discarded in favor of the
     // authenticated user context.
     string principal = 2;
 
-    // Indicates the "nestedness" of this execution.
+    // Indicates the nestedness of this execution.
     // If a user launches a workflow execution, the default nesting is 0.
     // If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1
     // Generally, if workflow at nesting level k launches a workflow then the child workflow will have

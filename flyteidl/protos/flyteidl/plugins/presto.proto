@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package flyteidl.plugins;
 
-import "flyteidl/core/tasks.proto";
-
 option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // This message works with the 'presto' task type in the SDK and is the object that will be in the 'custom' field

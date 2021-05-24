@@ -489,7 +489,7 @@ public final class Auth {
 
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -498,7 +498,7 @@ public final class Auth {
         getResponseTypesSupportedList();
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -506,7 +506,7 @@ public final class Auth {
     int getResponseTypesSupportedCount();
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -514,7 +514,7 @@ public final class Auth {
     java.lang.String getResponseTypesSupported(int index);
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -524,7 +524,7 @@ public final class Auth {
 
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -533,7 +533,7 @@ public final class Auth {
         getScopesSupportedList();
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -541,7 +541,7 @@ public final class Auth {
     int getScopesSupportedCount();
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -549,7 +549,7 @@ public final class Auth {
     java.lang.String getScopesSupported(int index);
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -990,7 +990,7 @@ public final class Auth {
     private com.google.protobuf.LazyStringList responseTypesSupported_;
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -1001,7 +1001,7 @@ public final class Auth {
     }
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -1011,7 +1011,7 @@ public final class Auth {
     }
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -1021,7 +1021,7 @@ public final class Auth {
     }
     /**
      * <pre>
-     * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+     * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string response_types_supported = 4;</code>
@@ -1035,7 +1035,7 @@ public final class Auth {
     private com.google.protobuf.LazyStringList scopesSupported_;
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -1046,7 +1046,7 @@ public final class Auth {
     }
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -1056,7 +1056,7 @@ public final class Auth {
     }
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -1066,7 +1066,7 @@ public final class Auth {
     }
     /**
      * <pre>
-     * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+     * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
      * </pre>
      *
      * <code>repeated string scopes_supported = 5;</code>
@@ -2077,7 +2077,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2088,7 +2088,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2098,7 +2098,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2108,7 +2108,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2119,7 +2119,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2136,7 +2136,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2153,7 +2153,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2168,7 +2168,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2181,7 +2181,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * Array containing a list of the OAuth 2.0 "response_type" values that this authorization server supports.
+       * Array containing a list of the OAuth 2.0 response_type values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string response_types_supported = 4;</code>
@@ -2207,7 +2207,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2218,7 +2218,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2228,7 +2228,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2238,7 +2238,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2249,7 +2249,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2266,7 +2266,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2283,7 +2283,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2298,7 +2298,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -2311,7 +2311,7 @@ public final class Auth {
       }
       /**
        * <pre>
-       * JSON array containing a list of the OAuth 2.0 [RFC6749] "scope" values that this authorization server supports.
+       * JSON array containing a list of the OAuth 2.0 [RFC6749] scope values that this authorization server supports.
        * </pre>
        *
        * <code>repeated string scopes_supported = 5;</code>
@@ -4524,46 +4524,35 @@ public final class Auth {
   static {
     java.lang.String[] descriptorData = {
       "\n\033flyteidl/service/auth.proto\022\020flyteidl." +
-      "service\032\034google/api/annotations.proto\032\034f" +
-      "lyteidl/admin/project.proto\032.flyteidl/ad" +
-      "min/project_domain_attributes.proto\032\031fly" +
-      "teidl/admin/task.proto\032\035flyteidl/admin/w" +
-      "orkflow.proto\032(flyteidl/admin/workflow_a" +
-      "ttributes.proto\032 flyteidl/admin/launch_p" +
-      "lan.proto\032\032flyteidl/admin/event.proto\032\036f" +
-      "lyteidl/admin/execution.proto\032\'flyteidl/" +
-      "admin/matchable_resource.proto\032#flyteidl" +
-      "/admin/node_execution.proto\032#flyteidl/ad" +
-      "min/task_execution.proto\032\034flyteidl/admin" +
-      "/version.proto\032\033flyteidl/admin/common.pr" +
-      "oto\032,protoc-gen-swagger/options/annotati" +
-      "ons.proto\"\027\n\025OAuth2MetadataRequest\"\246\002\n\026O" +
-      "Auth2MetadataResponse\022\016\n\006issuer\030\001 \001(\t\022\036\n" +
-      "\026authorization_endpoint\030\002 \001(\t\022\026\n\016token_e" +
-      "ndpoint\030\003 \001(\t\022 \n\030response_types_supporte" +
-      "d\030\004 \003(\t\022\030\n\020scopes_supported\030\005 \003(\t\022-\n%tok" +
-      "en_endpoint_auth_methods_supported\030\006 \003(\t" +
-      "\022\020\n\010jwks_uri\030\007 \001(\t\022(\n code_challenge_met" +
-      "hods_supported\030\010 \003(\t\022\035\n\025grant_types_supp" +
-      "orted\030\t \003(\t\"\037\n\035PublicClientAuthConfigReq" +
-      "uest\"}\n\036PublicClientAuthConfigResponse\022\021" +
-      "\n\tclient_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022" +
-      "\016\n\006scopes\030\003 \003(\t\022\"\n\032authorization_metadat" +
-      "a_key\030\004 \001(\t2\374\003\n\023AuthMetadataService\022\365\001\n\021" +
-      "GetOAuth2Metadata\022\'.flyteidl.service.OAu" +
-      "th2MetadataRequest\032(.flyteidl.service.OA" +
-      "uth2MetadataResponse\"\214\001\202\323\344\223\002)\022\'/.well-kn" +
-      "own/oauth-authorization-server\222AZ\032XRetri" +
-      "eves OAuth2 authorization server metadat" +
-      "a. This endpoint is anonymously accessib" +
-      "le.\022\354\001\n\025GetPublicClientConfig\022/.flyteidl" +
-      ".service.PublicClientAuthConfigRequest\0320" +
-      ".flyteidl.service.PublicClientAuthConfig" +
-      "Response\"p\202\323\344\223\002\031\022\027/config/v1/flyte_clien" +
-      "t\222AN\032LRetrieves public flyte client info" +
-      ". This endpoint is anonymously accessibl" +
-      "e.B9Z7github.com/flyteorg/flyteidl/gen/p" +
-      "b-go/flyteidl/serviceb\006proto3"
+      "service\032\034google/api/annotations.proto\032,p" +
+      "rotoc-gen-swagger/options/annotations.pr" +
+      "oto\"\027\n\025OAuth2MetadataRequest\"\246\002\n\026OAuth2M" +
+      "etadataResponse\022\016\n\006issuer\030\001 \001(\t\022\036\n\026autho" +
+      "rization_endpoint\030\002 \001(\t\022\026\n\016token_endpoin" +
+      "t\030\003 \001(\t\022 \n\030response_types_supported\030\004 \003(" +
+      "\t\022\030\n\020scopes_supported\030\005 \003(\t\022-\n%token_end" +
+      "point_auth_methods_supported\030\006 \003(\t\022\020\n\010jw" +
+      "ks_uri\030\007 \001(\t\022(\n code_challenge_methods_s" +
+      "upported\030\010 \003(\t\022\035\n\025grant_types_supported\030" +
+      "\t \003(\t\"\037\n\035PublicClientAuthConfigRequest\"}" +
+      "\n\036PublicClientAuthConfigResponse\022\021\n\tclie" +
+      "nt_id\030\001 \001(\t\022\024\n\014redirect_uri\030\002 \001(\t\022\016\n\006sco" +
+      "pes\030\003 \003(\t\022\"\n\032authorization_metadata_key\030" +
+      "\004 \001(\t2\374\003\n\023AuthMetadataService\022\365\001\n\021GetOAu" +
+      "th2Metadata\022\'.flyteidl.service.OAuth2Met" +
+      "adataRequest\032(.flyteidl.service.OAuth2Me" +
+      "tadataResponse\"\214\001\202\323\344\223\002)\022\'/.well-known/oa" +
+      "uth-authorization-server\222AZ\032XRetrieves O" +
+      "Auth2 authorization server metadata. Thi" +
+      "s endpoint is anonymously accessible.\022\354\001" +
+      "\n\025GetPublicClientConfig\022/.flyteidl.servi" +
+      "ce.PublicClientAuthConfigRequest\0320.flyte" +
+      "idl.service.PublicClientAuthConfigRespon" +
+      "se\"p\202\323\344\223\002\031\022\027/config/v1/flyte_client\222AN\032L" +
+      "Retrieves public flyte client info. This" +
+      " endpoint is anonymously accessible.B9Z7" +
+      "github.com/flyteorg/flyteidl/gen/pb-go/f" +
+      "lyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4577,19 +4566,6 @@ public final class Auth {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           com.google.api.AnnotationsProto.getDescriptor(),
-          flyteidl.admin.ProjectOuterClass.getDescriptor(),
-          flyteidl.admin.ProjectDomainAttributesOuterClass.getDescriptor(),
-          flyteidl.admin.TaskOuterClass.getDescriptor(),
-          flyteidl.admin.WorkflowOuterClass.getDescriptor(),
-          flyteidl.admin.WorkflowAttributesOuterClass.getDescriptor(),
-          flyteidl.admin.LaunchPlanOuterClass.getDescriptor(),
-          flyteidl.admin.Event.getDescriptor(),
-          flyteidl.admin.ExecutionOuterClass.getDescriptor(),
-          flyteidl.admin.MatchableResourceOuterClass.getDescriptor(),
-          flyteidl.admin.NodeExecutionOuterClass.getDescriptor(),
-          flyteidl.admin.TaskExecutionOuterClass.getDescriptor(),
-          flyteidl.admin.VersionOuterClass.getDescriptor(),
-          flyteidl.admin.Common.getDescriptor(),
           grpc.gateway.protoc_gen_swagger.options.Annotations.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_service_OAuth2MetadataRequest_descriptor =
@@ -4623,19 +4599,6 @@ public final class Auth {
     com.google.protobuf.Descriptors.FileDescriptor
         .internalUpdateFileDescriptor(descriptor, registry);
     com.google.api.AnnotationsProto.getDescriptor();
-    flyteidl.admin.ProjectOuterClass.getDescriptor();
-    flyteidl.admin.ProjectDomainAttributesOuterClass.getDescriptor();
-    flyteidl.admin.TaskOuterClass.getDescriptor();
-    flyteidl.admin.WorkflowOuterClass.getDescriptor();
-    flyteidl.admin.WorkflowAttributesOuterClass.getDescriptor();
-    flyteidl.admin.LaunchPlanOuterClass.getDescriptor();
-    flyteidl.admin.Event.getDescriptor();
-    flyteidl.admin.ExecutionOuterClass.getDescriptor();
-    flyteidl.admin.MatchableResourceOuterClass.getDescriptor();
-    flyteidl.admin.NodeExecutionOuterClass.getDescriptor();
-    flyteidl.admin.TaskExecutionOuterClass.getDescriptor();
-    flyteidl.admin.VersionOuterClass.getDescriptor();
-    flyteidl.admin.Common.getDescriptor();
     grpc.gateway.protoc_gen_swagger.options.Annotations.getDescriptor();
   }
 

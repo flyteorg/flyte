@@ -413,67 +413,65 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto[] =
   "\n\'flyteidl/admin/matchable_resource.prot"
-  "o\022\016flyteidl.admin\032\033flyteidl/admin/common"
-  ".proto\032\035flyteidl/core/execution.proto\"M\n"
-  "\020TaskResourceSpec\022\013\n\003cpu\030\001 \001(\t\022\013\n\003gpu\030\002 "
-  "\001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007storage\030\004 \001(\t\"~\n\026"
-  "TaskResourceAttributes\0222\n\010defaults\030\001 \001(\013"
-  "2 .flyteidl.admin.TaskResourceSpec\0220\n\006li"
-  "mits\030\002 \001(\0132 .flyteidl.admin.TaskResource"
-  "Spec\"\235\001\n\031ClusterResourceAttributes\022M\n\nat"
-  "tributes\030\001 \003(\01329.flyteidl.admin.ClusterR"
-  "esourceAttributes.AttributesEntry\0321\n\017Att"
-  "ributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t"
-  ":\0028\001\"(\n\030ExecutionQueueAttributes\022\014\n\004tags"
-  "\030\001 \003(\t\"&\n\025ExecutionClusterLabel\022\r\n\005value"
-  "\030\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\ttask_type\030\001"
-  " \001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027missing_plugi"
-  "n_behavior\030\004 \001(\01624.flyteidl.admin.Plugin"
-  "Override.MissingPluginBehavior\"2\n\025Missin"
-  "gPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013USE_DEFAULT"
-  "\020\001\"D\n\017PluginOverrides\0221\n\toverrides\030\001 \003(\013"
-  "2\036.flyteidl.admin.PluginOverride\"\322\003\n\022Mat"
-  "chingAttributes\022J\n\030task_resource_attribu"
-  "tes\030\001 \001(\0132&.flyteidl.admin.TaskResourceA"
-  "ttributesH\000\022P\n\033cluster_resource_attribut"
-  "es\030\002 \001(\0132).flyteidl.admin.ClusterResourc"
-  "eAttributesH\000\022N\n\032execution_queue_attribu"
-  "tes\030\003 \001(\0132(.flyteidl.admin.ExecutionQueu"
-  "eAttributesH\000\022H\n\027execution_cluster_label"
-  "\030\004 \001(\0132%.flyteidl.admin.ExecutionCluster"
-  "LabelH\000\022=\n\022quality_of_service\030\005 \001(\0132\037.fl"
-  "yteidl.core.QualityOfServiceH\000\022;\n\020plugin"
-  "_overrides\030\006 \001(\0132\037.flyteidl.admin.Plugin"
-  "OverridesH\000B\010\n\006target\"\242\001\n MatchableAttri"
-  "butesConfiguration\0226\n\nattributes\030\001 \001(\0132\""
-  ".flyteidl.admin.MatchingAttributes\022\016\n\006do"
-  "main\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020\n\010workflow\030"
-  "\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n\036ListMatcha"
-  "bleAttributesRequest\0228\n\rresource_type\030\001 "
-  "\001(\0162!.flyteidl.admin.MatchableResource\"k"
-  "\n\037ListMatchableAttributesResponse\022H\n\016con"
-  "figurations\030\001 \003(\01320.flyteidl.admin.Match"
-  "ableAttributesConfiguration*\251\001\n\021Matchabl"
-  "eResource\022\021\n\rTASK_RESOURCE\020\000\022\024\n\020CLUSTER_"
-  "RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE\020\002\022\033\n\027EXECU"
-  "TION_CLUSTER_LABEL\020\003\022$\n QUALITY_OF_SERVI"
-  "CE_SPECIFICATION\020\004\022\023\n\017PLUGIN_OVERRIDE\020\005B"
-  "7Z5github.com/flyteorg/flyteidl/gen/pb-g"
-  "o/flyteidl/adminb\006proto3"
+  "o\022\016flyteidl.admin\032\035flyteidl/core/executi"
+  "on.proto\"M\n\020TaskResourceSpec\022\013\n\003cpu\030\001 \001("
+  "\t\022\013\n\003gpu\030\002 \001(\t\022\016\n\006memory\030\003 \001(\t\022\017\n\007storag"
+  "e\030\004 \001(\t\"~\n\026TaskResourceAttributes\0222\n\010def"
+  "aults\030\001 \001(\0132 .flyteidl.admin.TaskResourc"
+  "eSpec\0220\n\006limits\030\002 \001(\0132 .flyteidl.admin.T"
+  "askResourceSpec\"\235\001\n\031ClusterResourceAttri"
+  "butes\022M\n\nattributes\030\001 \003(\01329.flyteidl.adm"
+  "in.ClusterResourceAttributes.AttributesE"
+  "ntry\0321\n\017AttributesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005"
+  "value\030\002 \001(\t:\0028\001\"(\n\030ExecutionQueueAttribu"
+  "tes\022\014\n\004tags\030\001 \003(\t\"&\n\025ExecutionClusterLab"
+  "el\022\r\n\005value\030\001 \001(\t\"\301\001\n\016PluginOverride\022\021\n\t"
+  "task_type\030\001 \001(\t\022\021\n\tplugin_id\030\002 \003(\t\022U\n\027mi"
+  "ssing_plugin_behavior\030\004 \001(\01624.flyteidl.a"
+  "dmin.PluginOverride.MissingPluginBehavio"
+  "r\"2\n\025MissingPluginBehavior\022\010\n\004FAIL\020\000\022\017\n\013"
+  "USE_DEFAULT\020\001\"D\n\017PluginOverrides\0221\n\tover"
+  "rides\030\001 \003(\0132\036.flyteidl.admin.PluginOverr"
+  "ide\"\322\003\n\022MatchingAttributes\022J\n\030task_resou"
+  "rce_attributes\030\001 \001(\0132&.flyteidl.admin.Ta"
+  "skResourceAttributesH\000\022P\n\033cluster_resour"
+  "ce_attributes\030\002 \001(\0132).flyteidl.admin.Clu"
+  "sterResourceAttributesH\000\022N\n\032execution_qu"
+  "eue_attributes\030\003 \001(\0132(.flyteidl.admin.Ex"
+  "ecutionQueueAttributesH\000\022H\n\027execution_cl"
+  "uster_label\030\004 \001(\0132%.flyteidl.admin.Execu"
+  "tionClusterLabelH\000\022=\n\022quality_of_service"
+  "\030\005 \001(\0132\037.flyteidl.core.QualityOfServiceH"
+  "\000\022;\n\020plugin_overrides\030\006 \001(\0132\037.flyteidl.a"
+  "dmin.PluginOverridesH\000B\010\n\006target\"\242\001\n Mat"
+  "chableAttributesConfiguration\0226\n\nattribu"
+  "tes\030\001 \001(\0132\".flyteidl.admin.MatchingAttri"
+  "butes\022\016\n\006domain\030\002 \001(\t\022\017\n\007project\030\003 \001(\t\022\020"
+  "\n\010workflow\030\004 \001(\t\022\023\n\013launch_plan\030\005 \001(\t\"Z\n"
+  "\036ListMatchableAttributesRequest\0228\n\rresou"
+  "rce_type\030\001 \001(\0162!.flyteidl.admin.Matchabl"
+  "eResource\"k\n\037ListMatchableAttributesResp"
+  "onse\022H\n\016configurations\030\001 \003(\01320.flyteidl."
+  "admin.MatchableAttributesConfiguration*\251"
+  "\001\n\021MatchableResource\022\021\n\rTASK_RESOURCE\020\000\022"
+  "\024\n\020CLUSTER_RESOURCE\020\001\022\023\n\017EXECUTION_QUEUE"
+  "\020\002\022\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n QUALI"
+  "TY_OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLUGIN_"
+  "OVERRIDE\020\005B7Z5github.com/flyteorg/flytei"
+  "dl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fmatchable_5fresource_2eproto,
-  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 1904,
+  "flyteidl/admin/matchable_resource.proto", &assign_descriptors_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, 1875,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fmatchable_5fresource_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
   {
-    ::AddDescriptors_flyteidl_2fadmin_2fcommon_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, deps, 2);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fadmin_2fmatchable_5fresource_2eproto, deps, 1);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.

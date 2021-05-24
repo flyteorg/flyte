@@ -999,11 +999,11 @@ public final class Presto {
   static {
     java.lang.String[] descriptorData = {
       "\n\035flyteidl/plugins/presto.proto\022\020flyteid" +
-      "l.plugins\032\031flyteidl/core/tasks.proto\"X\n\013" +
-      "PrestoQuery\022\025\n\rrouting_group\030\001 \001(\t\022\017\n\007ca" +
-      "talog\030\002 \001(\t\022\016\n\006schema\030\003 \001(\t\022\021\n\tstatement" +
-      "\030\004 \001(\tB9Z7github.com/flyteorg/flyteidl/g" +
-      "en/pb-go/flyteidl/pluginsb\006proto3"
+      "l.plugins\"X\n\013PrestoQuery\022\025\n\rrouting_grou" +
+      "p\030\001 \001(\t\022\017\n\007catalog\030\002 \001(\t\022\016\n\006schema\030\003 \001(\t" +
+      "\022\021\n\tstatement\030\004 \001(\tB9Z7github.com/flyteo" +
+      "rg/flyteidl/gen/pb-go/flyteidl/pluginsb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1016,7 +1016,6 @@ public final class Presto {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          flyteidl.core.Tasks.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_plugins_PrestoQuery_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -1024,7 +1023,6 @@ public final class Presto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_PrestoQuery_descriptor,
         new java.lang.String[] { "RoutingGroup", "Catalog", "Schema", "Statement", });
-    flyteidl.core.Tasks.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

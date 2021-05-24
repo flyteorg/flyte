@@ -32,19 +32,6 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "google/api/annotations.pb.h"
-#include "flyteidl/admin/project.pb.h"
-#include "flyteidl/admin/project_domain_attributes.pb.h"
-#include "flyteidl/admin/task.pb.h"
-#include "flyteidl/admin/workflow.pb.h"
-#include "flyteidl/admin/workflow_attributes.pb.h"
-#include "flyteidl/admin/launch_plan.pb.h"
-#include "flyteidl/admin/event.pb.h"
-#include "flyteidl/admin/execution.pb.h"
-#include "flyteidl/admin/matchable_resource.pb.h"
-#include "flyteidl/admin/node_execution.pb.h"
-#include "flyteidl/admin/task_execution.pb.h"
-#include "flyteidl/admin/version.pb.h"
-#include "flyteidl/admin/common.pb.h"
 #include "protoc-gen-swagger/options/annotations.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
