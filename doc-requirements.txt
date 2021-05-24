@@ -27,21 +27,21 @@ idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
-jinja2==2.11.3
+jinja2==3.0.1
     # via sphinx
 lxml==4.6.3
     # via sphinx-material
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
 packaging==20.9
     # via sphinx
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   sphinx
     #   sphinx-prompt
 pyparsing==2.4.7
     # via packaging
-python-slugify[unidecode]==4.0.1
+python-slugify[unidecode]==5.0.2
     # via sphinx-material
 pytz==2021.1
     # via babel
@@ -49,7 +49,7 @@ readthedocs-sphinx-search==0.1.0
     # via -r doc-requirements.in
 requests==2.25.1
     # via sphinx
-six==1.15.0
+six==1.16.0
     # via sphinx-code-include
 snowballstemmer==2.1.0
     # via sphinx
@@ -58,6 +58,8 @@ soupsieve==2.2.1
 sphinx-code-include==1.1.1
     # via -r doc-requirements.in
 sphinx-copybutton==0.3.1
+    # via -r doc-requirements.in
+sphinx-fontawesome==0.0.6
     # via -r doc-requirements.in
 sphinx-material==0.0.32
     # via -r doc-requirements.in
@@ -69,19 +71,20 @@ sphinx==3.5.4
     #   furo
     #   sphinx-code-include
     #   sphinx-copybutton
+    #   sphinx-fontawesome
     #   sphinx-material
     #   sphinx-prompt
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 text-unidecode==1.3
     # via python-slugify
