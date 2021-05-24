@@ -3248,7 +3248,7 @@
         "nesting": {
           "type": "integer",
           "format": "int64",
-          "description": "Indicates the \"nestedness\" of this execution.\nIf a user launches a workflow execution, the default nesting is 0.\nIf this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =\u003e 1\nGenerally, if workflow at nesting level k launches a workflow then the child workflow will have\nnesting = k + 1."
+          "description": "Indicates the nestedness of this execution.\nIf a user launches a workflow execution, the default nesting is 0.\nIf this execution further launches a workflow (child workflow), the nesting level is incremented by 0 =\u003e 1\nGenerally, if workflow at nesting level k launches a workflow then the child workflow will have\nnesting = k + 1."
         },
         "scheduled_at": {
           "type": "string",
@@ -3371,7 +3371,7 @@
           "$ref": "#/definitions/adminFixedRateUnit"
         }
       },
-      "description": "Option for schedules run at a certain frequency, e.g. every 2 minutes."
+      "description": "Option for schedules run at a certain frequency e.g. every 2 minutes."
     },
     "adminFixedRateUnit": {
       "type": "string",
@@ -3905,8 +3905,7 @@
           "description": "A list of phases to which users can associate the notifications to."
         },
         "email": {
-          "$ref": "#/definitions/adminEmailNotification",
-          "title": "option (validate.required) = true;"
+          "$ref": "#/definitions/adminEmailNotification"
         },
         "pager_duty": {
           "$ref": "#/definitions/adminPagerDutyNotification"
@@ -4102,7 +4101,7 @@
       "properties": {
         "cron_expression": {
           "type": "string",
-          "title": "Uses AWS syntax: \"Minutes Hours Day-of-month Month Day-of-week Year\"\ne.g. for a schedule that runs every 15 minutes: \"0/15 * * * ? *\""
+          "title": "Uses AWS syntax: Minutes Hours Day-of-month Month Day-of-week Year\ne.g. for a schedule that runs every 15 minutes: 0/15 * * * ? *"
         },
         "rate": {
           "$ref": "#/definitions/adminFixedRate"

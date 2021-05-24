@@ -13,7 +13,6 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl.core import tasks_pb2 as flyteidl_dot_core_dot_tasks__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -21,9 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.plugins',
   syntax='proto3',
   serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n\x1d\x66lyteidl/plugins/qubole.proto\x12\x10\x66lyteidl.plugins\x1a\x19\x66lyteidl/core/tasks.proto\"C\n\tHiveQuery\x12\r\n\x05query\x18\x01 \x01(\t\x12\x13\n\x0btimeout_sec\x18\x02 \x01(\r\x12\x12\n\nretryCount\x18\x03 \x01(\r\"C\n\x13HiveQueryCollection\x12,\n\x07queries\x18\x02 \x03(\x0b\x32\x1b.flyteidl.plugins.HiveQuery\"\xa5\x01\n\rQuboleHiveJob\x12\x15\n\rcluster_label\x18\x01 \x01(\t\x12\x43\n\x10query_collection\x18\x02 \x01(\x0b\x32%.flyteidl.plugins.HiveQueryCollectionB\x02\x18\x01\x12\x0c\n\x04tags\x18\x03 \x03(\t\x12*\n\x05query\x18\x04 \x01(\x0b\x32\x1b.flyteidl.plugins.HiveQueryB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
-  ,
-  dependencies=[flyteidl_dot_core_dot_tasks__pb2.DESCRIPTOR,])
+  serialized_pb=_b('\n\x1d\x66lyteidl/plugins/qubole.proto\x12\x10\x66lyteidl.plugins\"C\n\tHiveQuery\x12\r\n\x05query\x18\x01 \x01(\t\x12\x13\n\x0btimeout_sec\x18\x02 \x01(\r\x12\x12\n\nretryCount\x18\x03 \x01(\r\"C\n\x13HiveQueryCollection\x12,\n\x07queries\x18\x02 \x03(\x0b\x32\x1b.flyteidl.plugins.HiveQuery\"\xa5\x01\n\rQuboleHiveJob\x12\x15\n\rcluster_label\x18\x01 \x01(\t\x12\x43\n\x10query_collection\x18\x02 \x01(\x0b\x32%.flyteidl.plugins.HiveQueryCollectionB\x02\x18\x01\x12\x0c\n\x04tags\x18\x03 \x03(\t\x12*\n\x05query\x18\x04 \x01(\x0b\x32\x1b.flyteidl.plugins.HiveQueryB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+)
 
 
 
@@ -68,8 +66,8 @@ _HIVEQUERY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=78,
-  serialized_end=145,
+  serialized_start=51,
+  serialized_end=118,
 )
 
 
@@ -99,8 +97,8 @@ _HIVEQUERYCOLLECTION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=147,
-  serialized_end=214,
+  serialized_start=120,
+  serialized_end=187,
 )
 
 
@@ -151,8 +149,8 @@ _QUBOLEHIVEJOB = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=217,
-  serialized_end=382,
+  serialized_start=190,
+  serialized_end=355,
 )
 
 _HIVEQUERYCOLLECTION.fields_by_name['queries'].message_type = _HIVEQUERY

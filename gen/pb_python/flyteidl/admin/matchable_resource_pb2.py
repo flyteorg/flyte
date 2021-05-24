@@ -14,7 +14,6 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl.admin import common_pb2 as flyteidl_dot_admin_dot_common__pb2
 from flyteidl.core import execution_pb2 as flyteidl_dot_core_dot_execution__pb2
 
 
@@ -23,9 +22,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.admin',
   syntax='proto3',
   serialized_options=_b('Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin'),
-  serialized_pb=_b('\n\'flyteidl/admin/matchable_resource.proto\x12\x0e\x66lyteidl.admin\x1a\x1b\x66lyteidl/admin/common.proto\x1a\x1d\x66lyteidl/core/execution.proto\"M\n\x10TaskResourceSpec\x12\x0b\n\x03\x63pu\x18\x01 \x01(\t\x12\x0b\n\x03gpu\x18\x02 \x01(\t\x12\x0e\n\x06memory\x18\x03 \x01(\t\x12\x0f\n\x07storage\x18\x04 \x01(\t\"~\n\x16TaskResourceAttributes\x12\x32\n\x08\x64\x65\x66\x61ults\x18\x01 \x01(\x0b\x32 .flyteidl.admin.TaskResourceSpec\x12\x30\n\x06limits\x18\x02 \x01(\x0b\x32 .flyteidl.admin.TaskResourceSpec\"\x9d\x01\n\x19\x43lusterResourceAttributes\x12M\n\nattributes\x18\x01 \x03(\x0b\x32\x39.flyteidl.admin.ClusterResourceAttributes.AttributesEntry\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"(\n\x18\x45xecutionQueueAttributes\x12\x0c\n\x04tags\x18\x01 \x03(\t\"&\n\x15\x45xecutionClusterLabel\x12\r\n\x05value\x18\x01 \x01(\t\"\xc1\x01\n\x0ePluginOverride\x12\x11\n\ttask_type\x18\x01 \x01(\t\x12\x11\n\tplugin_id\x18\x02 \x03(\t\x12U\n\x17missing_plugin_behavior\x18\x04 \x01(\x0e\x32\x34.flyteidl.admin.PluginOverride.MissingPluginBehavior\"2\n\x15MissingPluginBehavior\x12\x08\n\x04\x46\x41IL\x10\x00\x12\x0f\n\x0bUSE_DEFAULT\x10\x01\"D\n\x0fPluginOverrides\x12\x31\n\toverrides\x18\x01 \x03(\x0b\x32\x1e.flyteidl.admin.PluginOverride\"\xd2\x03\n\x12MatchingAttributes\x12J\n\x18task_resource_attributes\x18\x01 \x01(\x0b\x32&.flyteidl.admin.TaskResourceAttributesH\x00\x12P\n\x1b\x63luster_resource_attributes\x18\x02 \x01(\x0b\x32).flyteidl.admin.ClusterResourceAttributesH\x00\x12N\n\x1a\x65xecution_queue_attributes\x18\x03 \x01(\x0b\x32(.flyteidl.admin.ExecutionQueueAttributesH\x00\x12H\n\x17\x65xecution_cluster_label\x18\x04 \x01(\x0b\x32%.flyteidl.admin.ExecutionClusterLabelH\x00\x12=\n\x12quality_of_service\x18\x05 \x01(\x0b\x32\x1f.flyteidl.core.QualityOfServiceH\x00\x12;\n\x10plugin_overrides\x18\x06 \x01(\x0b\x32\x1f.flyteidl.admin.PluginOverridesH\x00\x42\x08\n\x06target\"\xa2\x01\n MatchableAttributesConfiguration\x12\x36\n\nattributes\x18\x01 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0f\n\x07project\x18\x03 \x01(\t\x12\x10\n\x08workflow\x18\x04 \x01(\t\x12\x13\n\x0blaunch_plan\x18\x05 \x01(\t\"Z\n\x1eListMatchableAttributesRequest\x12\x38\n\rresource_type\x18\x01 \x01(\x0e\x32!.flyteidl.admin.MatchableResource\"k\n\x1fListMatchableAttributesResponse\x12H\n\x0e\x63onfigurations\x18\x01 \x03(\x0b\x32\x30.flyteidl.admin.MatchableAttributesConfiguration*\xa9\x01\n\x11MatchableResource\x12\x11\n\rTASK_RESOURCE\x10\x00\x12\x14\n\x10\x43LUSTER_RESOURCE\x10\x01\x12\x13\n\x0f\x45XECUTION_QUEUE\x10\x02\x12\x1b\n\x17\x45XECUTION_CLUSTER_LABEL\x10\x03\x12$\n QUALITY_OF_SERVICE_SPECIFICATION\x10\x04\x12\x13\n\x0fPLUGIN_OVERRIDE\x10\x05\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
+  serialized_pb=_b('\n\'flyteidl/admin/matchable_resource.proto\x12\x0e\x66lyteidl.admin\x1a\x1d\x66lyteidl/core/execution.proto\"M\n\x10TaskResourceSpec\x12\x0b\n\x03\x63pu\x18\x01 \x01(\t\x12\x0b\n\x03gpu\x18\x02 \x01(\t\x12\x0e\n\x06memory\x18\x03 \x01(\t\x12\x0f\n\x07storage\x18\x04 \x01(\t\"~\n\x16TaskResourceAttributes\x12\x32\n\x08\x64\x65\x66\x61ults\x18\x01 \x01(\x0b\x32 .flyteidl.admin.TaskResourceSpec\x12\x30\n\x06limits\x18\x02 \x01(\x0b\x32 .flyteidl.admin.TaskResourceSpec\"\x9d\x01\n\x19\x43lusterResourceAttributes\x12M\n\nattributes\x18\x01 \x03(\x0b\x32\x39.flyteidl.admin.ClusterResourceAttributes.AttributesEntry\x1a\x31\n\x0f\x41ttributesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"(\n\x18\x45xecutionQueueAttributes\x12\x0c\n\x04tags\x18\x01 \x03(\t\"&\n\x15\x45xecutionClusterLabel\x12\r\n\x05value\x18\x01 \x01(\t\"\xc1\x01\n\x0ePluginOverride\x12\x11\n\ttask_type\x18\x01 \x01(\t\x12\x11\n\tplugin_id\x18\x02 \x03(\t\x12U\n\x17missing_plugin_behavior\x18\x04 \x01(\x0e\x32\x34.flyteidl.admin.PluginOverride.MissingPluginBehavior\"2\n\x15MissingPluginBehavior\x12\x08\n\x04\x46\x41IL\x10\x00\x12\x0f\n\x0bUSE_DEFAULT\x10\x01\"D\n\x0fPluginOverrides\x12\x31\n\toverrides\x18\x01 \x03(\x0b\x32\x1e.flyteidl.admin.PluginOverride\"\xd2\x03\n\x12MatchingAttributes\x12J\n\x18task_resource_attributes\x18\x01 \x01(\x0b\x32&.flyteidl.admin.TaskResourceAttributesH\x00\x12P\n\x1b\x63luster_resource_attributes\x18\x02 \x01(\x0b\x32).flyteidl.admin.ClusterResourceAttributesH\x00\x12N\n\x1a\x65xecution_queue_attributes\x18\x03 \x01(\x0b\x32(.flyteidl.admin.ExecutionQueueAttributesH\x00\x12H\n\x17\x65xecution_cluster_label\x18\x04 \x01(\x0b\x32%.flyteidl.admin.ExecutionClusterLabelH\x00\x12=\n\x12quality_of_service\x18\x05 \x01(\x0b\x32\x1f.flyteidl.core.QualityOfServiceH\x00\x12;\n\x10plugin_overrides\x18\x06 \x01(\x0b\x32\x1f.flyteidl.admin.PluginOverridesH\x00\x42\x08\n\x06target\"\xa2\x01\n MatchableAttributesConfiguration\x12\x36\n\nattributes\x18\x01 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributes\x12\x0e\n\x06\x64omain\x18\x02 \x01(\t\x12\x0f\n\x07project\x18\x03 \x01(\t\x12\x10\n\x08workflow\x18\x04 \x01(\t\x12\x13\n\x0blaunch_plan\x18\x05 \x01(\t\"Z\n\x1eListMatchableAttributesRequest\x12\x38\n\rresource_type\x18\x01 \x01(\x0e\x32!.flyteidl.admin.MatchableResource\"k\n\x1fListMatchableAttributesResponse\x12H\n\x0e\x63onfigurations\x18\x01 \x03(\x0b\x32\x30.flyteidl.admin.MatchableAttributesConfiguration*\xa9\x01\n\x11MatchableResource\x12\x11\n\rTASK_RESOURCE\x10\x00\x12\x14\n\x10\x43LUSTER_RESOURCE\x10\x01\x12\x13\n\x0f\x45XECUTION_QUEUE\x10\x02\x12\x1b\n\x17\x45XECUTION_CLUSTER_LABEL\x10\x03\x12$\n QUALITY_OF_SERVICE_SPECIFICATION\x10\x04\x12\x13\n\x0fPLUGIN_OVERRIDE\x10\x05\x42\x37Z5github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/adminb\x06proto3')
   ,
-  dependencies=[flyteidl_dot_admin_dot_common__pb2.DESCRIPTOR,flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,])
+  dependencies=[flyteidl_dot_core_dot_execution__pb2.DESCRIPTOR,])
 
 _MATCHABLERESOURCE = _descriptor.EnumDescriptor(
   name='MatchableResource',
@@ -60,8 +59,8 @@ _MATCHABLERESOURCE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1670,
-  serialized_end=1839,
+  serialized_start=1641,
+  serialized_end=1810,
 )
 _sym_db.RegisterEnumDescriptor(_MATCHABLERESOURCE)
 
@@ -91,8 +90,8 @@ _PLUGINOVERRIDE_MISSINGPLUGINBEHAVIOR = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=712,
-  serialized_end=762,
+  serialized_start=683,
+  serialized_end=733,
 )
 _sym_db.RegisterEnumDescriptor(_PLUGINOVERRIDE_MISSINGPLUGINBEHAVIOR)
 
@@ -144,8 +143,8 @@ _TASKRESOURCESPEC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=119,
-  serialized_end=196,
+  serialized_start=90,
+  serialized_end=167,
 )
 
 
@@ -182,8 +181,8 @@ _TASKRESOURCEATTRIBUTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=198,
-  serialized_end=324,
+  serialized_start=169,
+  serialized_end=295,
 )
 
 
@@ -220,8 +219,8 @@ _CLUSTERRESOURCEATTRIBUTES_ATTRIBUTESENTRY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=435,
-  serialized_end=484,
+  serialized_start=406,
+  serialized_end=455,
 )
 
 _CLUSTERRESOURCEATTRIBUTES = _descriptor.Descriptor(
@@ -250,8 +249,8 @@ _CLUSTERRESOURCEATTRIBUTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=327,
-  serialized_end=484,
+  serialized_start=298,
+  serialized_end=455,
 )
 
 
@@ -281,8 +280,8 @@ _EXECUTIONQUEUEATTRIBUTES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=486,
-  serialized_end=526,
+  serialized_start=457,
+  serialized_end=497,
 )
 
 
@@ -312,8 +311,8 @@ _EXECUTIONCLUSTERLABEL = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=528,
-  serialized_end=566,
+  serialized_start=499,
+  serialized_end=537,
 )
 
 
@@ -358,8 +357,8 @@ _PLUGINOVERRIDE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=569,
-  serialized_end=762,
+  serialized_start=540,
+  serialized_end=733,
 )
 
 
@@ -389,8 +388,8 @@ _PLUGINOVERRIDES = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=764,
-  serialized_end=832,
+  serialized_start=735,
+  serialized_end=803,
 )
 
 
@@ -458,8 +457,8 @@ _MATCHINGATTRIBUTES = _descriptor.Descriptor(
       name='target', full_name='flyteidl.admin.MatchingAttributes.target',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=835,
-  serialized_end=1301,
+  serialized_start=806,
+  serialized_end=1272,
 )
 
 
@@ -517,8 +516,8 @@ _MATCHABLEATTRIBUTESCONFIGURATION = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1304,
-  serialized_end=1466,
+  serialized_start=1275,
+  serialized_end=1437,
 )
 
 
@@ -548,8 +547,8 @@ _LISTMATCHABLEATTRIBUTESREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1468,
-  serialized_end=1558,
+  serialized_start=1439,
+  serialized_end=1529,
 )
 
 
@@ -579,8 +578,8 @@ _LISTMATCHABLEATTRIBUTESRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1560,
-  serialized_end=1667,
+  serialized_start=1531,
+  serialized_end=1638,
 )
 
 _TASKRESOURCEATTRIBUTES.fields_by_name['defaults'].message_type = _TASKRESOURCESPEC

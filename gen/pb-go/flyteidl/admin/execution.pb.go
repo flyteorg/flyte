@@ -759,7 +759,7 @@ type ExecutionMetadata struct {
 	// For systems using back-end authentication any value set here will be discarded in favor of the
 	// authenticated user context.
 	Principal string `protobuf:"bytes,2,opt,name=principal,proto3" json:"principal,omitempty"`
-	// Indicates the "nestedness" of this execution.
+	// Indicates the nestedness of this execution.
 	// If a user launches a workflow execution, the default nesting is 0.
 	// If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1
 	// Generally, if workflow at nesting level k launches a workflow then the child workflow will have

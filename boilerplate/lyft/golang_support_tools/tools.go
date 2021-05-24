@@ -7,4 +7,5 @@ import (
 	_ "github.com/lyft/flytestdlib/cli/pflags"
 	_ "github.com/vektra/mockery/cmd/mockery"
 	_ "github.com/alvaroloes/enumer"
+	_ "github.com/pseudomuto/protoc-gen-doc"
 )

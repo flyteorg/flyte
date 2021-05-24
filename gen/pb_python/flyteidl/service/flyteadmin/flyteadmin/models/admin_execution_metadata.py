@@ -130,7 +130,7 @@ class AdminExecutionMetadata(object):
     def nesting(self):
         """Gets the nesting of this AdminExecutionMetadata.  # noqa: E501
 
-        Indicates the \"nestedness\" of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1.  # noqa: E501
+        Indicates the nestedness of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1.  # noqa: E501
 
         :return: The nesting of this AdminExecutionMetadata.  # noqa: E501
         :rtype: int
@@ -141,7 +141,7 @@ class AdminExecutionMetadata(object):
     def nesting(self, nesting):
         """Sets the nesting of this AdminExecutionMetadata.
 
-        Indicates the \"nestedness\" of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1.  # noqa: E501
+        Indicates the nestedness of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1.  # noqa: E501
 
         :param nesting: The nesting of this AdminExecutionMetadata.  # noqa: E501
         :type: int
