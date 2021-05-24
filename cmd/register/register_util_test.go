@@ -10,26 +10,36 @@ import (
 	"strings"
 	"testing"
 
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	u "github.com/flyteorg/flytectl/cmd/testutils"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-type MockClient struct {
+type MockHTTPClient struct {
 	DoFunc func(req *http.Request) (*http.Response, error)
 }
 
-func (m *MockClient) Do(req *http.Request) (*http.Response, error) {
+func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
 	return GetDoFunc(req)
 }
 
 var (
-	ctx       context.Context
-	args      []string
-	GetDoFunc func(req *http.Request) (*http.Response, error)
+	ctx             context.Context
+	mockAdminClient *mocks.AdminServiceClient
+	cmdCtx          cmdCore.CommandContext
+	args            []string
+	GetDoFunc       func(req *http.Request) (*http.Response, error)
 )
 
-func setup() {
-	ctx = context.Background()
-	Client = &MockClient{}
+var setup = u.Setup
+
+func registerFilesSetup() {
+	httpClient = &MockHTTPClient{}
 	validTar, err := os.Open("testdata/valid-register.tar")
 	if err != nil {
 		fmt.Printf("unexpected error: %v", err)
@@ -41,10 +51,14 @@ func setup() {
 	GetDoFunc = func(*http.Request) (*http.Response, error) {
 		return response, nil
 	}
+	ctx = u.Ctx
+	mockAdminClient = u.MockClient
+	cmdCtx = cmdCore.NewCommandContext(mockAdminClient, u.MockOutStream)
 }
 
 func TestGetSortedFileList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = false
 	args = []string{"file2", "file1"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -56,6 +70,7 @@ func TestGetSortedFileList(t *testing.T) {
 
 func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"testdata/valid-parent-folder-register.tar"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -72,6 +87,7 @@ func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
 
 func TestGetSortedArchivedFileList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"testdata/valid-register.tar"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -88,6 +104,7 @@ func TestGetSortedArchivedFileList(t *testing.T) {
 
 func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"testdata/valid-unordered-register.tar"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -104,6 +121,7 @@ func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
 
 func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"testdata/invalid.tar"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -116,6 +134,7 @@ func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
 
 func TestGetSortedArchivedTgzList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"testdata/valid-register.tgz"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -144,6 +163,7 @@ func TestGetSortedArchivedCorruptedTgzFileList(t *testing.T) {
 
 func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"testdata/invalid-extension-register.zip"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -169,6 +189,7 @@ func TestGetSortedArchivedFileThroughInvalidHttpList(t *testing.T) {
 
 func TestGetSortedArchivedFileThroughValidHttpList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"http://dummyhost:80/testdata/valid-register.tar"}
 	fileList, tmpDir, err := getSortedFileList(ctx, args)
@@ -185,6 +206,7 @@ func TestGetSortedArchivedFileThroughValidHttpList(t *testing.T) {
 
 func TestGetSortedArchivedFileThroughValidHttpWithNullContextList(t *testing.T) {
 	setup()
+	registerFilesSetup()
 	filesConfig.Archive = true
 	args = []string{"http://dummyhost:80/testdata/valid-register.tar"}
 	ctx = nil
@@ -195,4 +217,65 @@ func TestGetSortedArchivedFileThroughValidHttpWithNullContextList(t *testing.T) 
 	assert.Equal(t, errors.New("net/http: nil Context"), err)
 	// Clean up the temp directory.
 	assert.Nil(t, os.RemoveAll(tmpDir), "unable to delete temp dir %v", tmpDir)
+}
+
+func TestRegisterFile(t *testing.T) {
+	t.Run("Successful run", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
+		var registerResults []Result
+		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		assert.Equal(t, 1, len(results))
+		assert.Nil(t, err)
+	})
+	t.Run("Non existent file", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		args = []string{"testdata/non-existent.pb"}
+		var registerResults []Result
+		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		assert.Equal(t, 1, len(results))
+		assert.Equal(t, "Failed", results[0].Status)
+		assert.Equal(t, "Error reading file due to open testdata/non-existent.pb: no such file or directory", results[0].Info)
+		assert.NotNil(t, err)
+	})
+	t.Run("unmarhal failure", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		args = []string{"testdata/valid-register.tar"}
+		var registerResults []Result
+		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		assert.Equal(t, 1, len(results))
+		assert.Equal(t, "Failed", results[0].Status)
+		assert.Equal(t, "Error unmarshalling file due to failed unmarshalling file testdata/valid-register.tar", results[0].Info)
+		assert.NotNil(t, err)
+	})
+	t.Run("AlreadyExists", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+			status.Error(codes.AlreadyExists, "AlreadyExists"))
+		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
+		var registerResults []Result
+		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		assert.Equal(t, 1, len(results))
+		assert.Equal(t, "Success", results[0].Status)
+		assert.Equal(t, "AlreadyExists", results[0].Info)
+		assert.Nil(t, err)
+	})
+	t.Run("Registration Error", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil,
+			status.Error(codes.InvalidArgument, "Invalid"))
+		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
+		var registerResults []Result
+		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		assert.Equal(t, 1, len(results))
+		assert.Equal(t, "Failed", results[0].Status)
+		assert.Equal(t, "Error registering file due to rpc error: code = InvalidArgument desc = Invalid", results[0].Info)
+		assert.NotNil(t, err)
+	})
 }
