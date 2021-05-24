@@ -11,7 +11,7 @@
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
    |book| API Reference <reference/index>
-   |hands-helping| community/index
+   |hands-helping| Community <community/index>
 
 .. toctree::
    :caption: Concepts
