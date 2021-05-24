@@ -1,13 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"context"
+	"os"
 
 	"github.com/flyteorg/flytectl/cmd"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func main() {
 	if err := cmd.ExecuteCmd(); err != nil {
-		fmt.Printf("error: %v\n", err)
+		logger.Error(context.TODO(), err)
+		os.Exit(1)
 	}
 }

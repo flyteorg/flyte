@@ -23,6 +23,8 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 const registrationProjectPattern = "{{ registration.project }}"
@@ -40,10 +42,10 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-var Client HTTPClient
+var httpClient HTTPClient
 
 func init() {
-	Client = &http.Client{}
+	httpClient = &http.Client{}
 }
 
 var projectColumns = []printer.Column{
@@ -214,7 +216,7 @@ func DownloadFileFromHTTP(ctx context.Context, ref storage.DataReference) (io.Re
 	if err != nil {
 		return nil, err
 	}
-	resp, err := Client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -320,7 +322,13 @@ func registerFile(ctx context.Context, fileName string, registerResults []Result
 	}
 	logger.Debugf(ctx, "Hydrated spec : %v", getJSONSpec(spec))
 	if err := register(ctx, spec, cmdCtx); err != nil {
-		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error registering file due to %v", err)}
+		// If error is AlreadyExists then dont consider this to be an error but just a warning state
+		if grpcError := status.Code(err); grpcError == codes.AlreadyExists {
+			registerResult = Result{Name: fileName, Status: "Success", Info: fmt.Sprintf("%v", grpcError.String())}
+			err = nil
+		} else {
+			registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error registering file due to %v", err)}
+		}
 		registerResults = append(registerResults, registerResult)
 		return registerResults, err
 	}

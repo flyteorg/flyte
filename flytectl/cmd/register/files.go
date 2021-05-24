@@ -94,5 +94,5 @@ func registerFromFilesFunc(ctx context.Context, args []string, cmdCtx cmdCore.Co
 			logger.Errorf(ctx, "unable to delete temp dir %v due to %v", tmpDir, _err)
 		}
 	}
-	return nil
+	return _err
 }
