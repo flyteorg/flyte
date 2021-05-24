@@ -1,2 +1,2 @@
-include ../common/Makefile
-include ../common/parent.mk
+include ../../common/Makefile
+include ../../common/parent.mk
