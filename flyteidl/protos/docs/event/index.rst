@@ -18,6 +18,8 @@ Flyte External Eventing - Event Egress
 This refers to the interface for all the event messages exiting from the Flyte
 **control plane** and delivered on the configured pubsub channel.
 
+`Event raw proto <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/event/event.proto>`__
+
 .. toctree::
 	:maxdepth: 1
 	:caption: event

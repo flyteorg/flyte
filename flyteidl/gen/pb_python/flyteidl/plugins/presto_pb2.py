@@ -13,7 +13,6 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl.core import tasks_pb2 as flyteidl_dot_core_dot_tasks__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -21,9 +20,8 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.plugins',
   syntax='proto3',
   serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n\x1d\x66lyteidl/plugins/presto.proto\x12\x10\x66lyteidl.plugins\x1a\x19\x66lyteidl/core/tasks.proto\"X\n\x0bPrestoQuery\x12\x15\n\rrouting_group\x18\x01 \x01(\t\x12\x0f\n\x07\x63\x61talog\x18\x02 \x01(\t\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12\x11\n\tstatement\x18\x04 \x01(\tB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
-  ,
-  dependencies=[flyteidl_dot_core_dot_tasks__pb2.DESCRIPTOR,])
+  serialized_pb=_b('\n\x1d\x66lyteidl/plugins/presto.proto\x12\x10\x66lyteidl.plugins\"X\n\x0bPrestoQuery\x12\x15\n\rrouting_group\x18\x01 \x01(\t\x12\x0f\n\x07\x63\x61talog\x18\x02 \x01(\t\x12\x0e\n\x06schema\x18\x03 \x01(\t\x12\x11\n\tstatement\x18\x04 \x01(\tB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+)
 
 
 
@@ -75,8 +73,8 @@ _PRESTOQUERY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=78,
-  serialized_end=166,
+  serialized_start=51,
+  serialized_end=139,
 )
 
 DESCRIPTOR.message_types_by_name['PrestoQuery'] = _PRESTOQUERY

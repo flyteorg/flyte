@@ -2650,17 +2650,16 @@ public final class Qubole {
   static {
     java.lang.String[] descriptorData = {
       "\n\035flyteidl/plugins/qubole.proto\022\020flyteid" +
-      "l.plugins\032\031flyteidl/core/tasks.proto\"C\n\t" +
-      "HiveQuery\022\r\n\005query\030\001 \001(\t\022\023\n\013timeout_sec\030" +
-      "\002 \001(\r\022\022\n\nretryCount\030\003 \001(\r\"C\n\023HiveQueryCo" +
-      "llection\022,\n\007queries\030\002 \003(\0132\033.flyteidl.plu" +
-      "gins.HiveQuery\"\245\001\n\rQuboleHiveJob\022\025\n\rclus" +
-      "ter_label\030\001 \001(\t\022C\n\020query_collection\030\002 \001(" +
-      "\0132%.flyteidl.plugins.HiveQueryCollection" +
-      "B\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query\030\004 \001(\0132\033.flyt" +
-      "eidl.plugins.HiveQueryB9Z7github.com/fly" +
-      "teorg/flyteidl/gen/pb-go/flyteidl/plugin" +
-      "sb\006proto3"
+      "l.plugins\"C\n\tHiveQuery\022\r\n\005query\030\001 \001(\t\022\023\n" +
+      "\013timeout_sec\030\002 \001(\r\022\022\n\nretryCount\030\003 \001(\r\"C" +
+      "\n\023HiveQueryCollection\022,\n\007queries\030\002 \003(\0132\033" +
+      ".flyteidl.plugins.HiveQuery\"\245\001\n\rQuboleHi" +
+      "veJob\022\025\n\rcluster_label\030\001 \001(\t\022C\n\020query_co" +
+      "llection\030\002 \001(\0132%.flyteidl.plugins.HiveQu" +
+      "eryCollectionB\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query" +
+      "\030\004 \001(\0132\033.flyteidl.plugins.HiveQueryB9Z7g" +
+      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
+      "yteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2673,7 +2672,6 @@ public final class Qubole {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          flyteidl.core.Tasks.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_plugins_HiveQuery_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -2693,7 +2691,6 @@ public final class Qubole {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_QuboleHiveJob_descriptor,
         new java.lang.String[] { "ClusterLabel", "QueryCollection", "Tags", "Query", });
-    flyteidl.core.Tasks.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

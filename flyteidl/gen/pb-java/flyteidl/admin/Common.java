@@ -15167,26 +15167,14 @@ public final class Common {
     int getPhasesValue(int index);
 
     /**
-     * <pre>
-     * option (validate.required) = true;
-     * </pre>
-     *
      * <code>.flyteidl.admin.EmailNotification email = 2;</code>
      */
     boolean hasEmail();
     /**
-     * <pre>
-     * option (validate.required) = true;
-     * </pre>
-     *
      * <code>.flyteidl.admin.EmailNotification email = 2;</code>
      */
     flyteidl.admin.Common.EmailNotification getEmail();
     /**
-     * <pre>
-     * option (validate.required) = true;
-     * </pre>
-     *
      * <code>.flyteidl.admin.EmailNotification email = 2;</code>
      */
     flyteidl.admin.Common.EmailNotificationOrBuilder getEmailOrBuilder();
@@ -15474,20 +15462,12 @@ public final class Common {
 
     public static final int EMAIL_FIELD_NUMBER = 2;
     /**
-     * <pre>
-     * option (validate.required) = true;
-     * </pre>
-     *
      * <code>.flyteidl.admin.EmailNotification email = 2;</code>
      */
     public boolean hasEmail() {
       return typeCase_ == 2;
     }
     /**
-     * <pre>
-     * option (validate.required) = true;
-     * </pre>
-     *
      * <code>.flyteidl.admin.EmailNotification email = 2;</code>
      */
     public flyteidl.admin.Common.EmailNotification getEmail() {
@@ -15497,10 +15477,6 @@ public final class Common {
       return flyteidl.admin.Common.EmailNotification.getDefaultInstance();
     }
     /**
-     * <pre>
-     * option (validate.required) = true;
-     * </pre>
-     *
      * <code>.flyteidl.admin.EmailNotification email = 2;</code>
      */
     public flyteidl.admin.Common.EmailNotificationOrBuilder getEmailOrBuilder() {
@@ -16178,20 +16154,12 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.EmailNotification, flyteidl.admin.Common.EmailNotification.Builder, flyteidl.admin.Common.EmailNotificationOrBuilder> emailBuilder_;
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public boolean hasEmail() {
         return typeCase_ == 2;
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public flyteidl.admin.Common.EmailNotification getEmail() {
@@ -16208,10 +16176,6 @@ public final class Common {
         }
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public Builder setEmail(flyteidl.admin.Common.EmailNotification value) {
@@ -16228,10 +16192,6 @@ public final class Common {
         return this;
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public Builder setEmail(
@@ -16246,10 +16206,6 @@ public final class Common {
         return this;
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public Builder mergeEmail(flyteidl.admin.Common.EmailNotification value) {
@@ -16272,10 +16228,6 @@ public final class Common {
         return this;
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public Builder clearEmail() {
@@ -16295,20 +16247,12 @@ public final class Common {
         return this;
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public flyteidl.admin.Common.EmailNotification.Builder getEmailBuilder() {
         return getEmailFieldBuilder().getBuilder();
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       public flyteidl.admin.Common.EmailNotificationOrBuilder getEmailOrBuilder() {
@@ -16322,10 +16266,6 @@ public final class Common {
         }
       }
       /**
-       * <pre>
-       * option (validate.required) = true;
-       * </pre>
-       *
        * <code>.flyteidl.admin.EmailNotification email = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<

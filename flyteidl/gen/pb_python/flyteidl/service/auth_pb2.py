@@ -14,19 +14,6 @@ _sym_db = _symbol_database.Default()
 
 
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
-from flyteidl.admin import project_pb2 as flyteidl_dot_admin_dot_project__pb2
-from flyteidl.admin import project_domain_attributes_pb2 as flyteidl_dot_admin_dot_project__domain__attributes__pb2
-from flyteidl.admin import task_pb2 as flyteidl_dot_admin_dot_task__pb2
-from flyteidl.admin import workflow_pb2 as flyteidl_dot_admin_dot_workflow__pb2
-from flyteidl.admin import workflow_attributes_pb2 as flyteidl_dot_admin_dot_workflow__attributes__pb2
-from flyteidl.admin import launch_plan_pb2 as flyteidl_dot_admin_dot_launch__plan__pb2
-from flyteidl.admin import event_pb2 as flyteidl_dot_admin_dot_event__pb2
-from flyteidl.admin import execution_pb2 as flyteidl_dot_admin_dot_execution__pb2
-from flyteidl.admin import matchable_resource_pb2 as flyteidl_dot_admin_dot_matchable__resource__pb2
-from flyteidl.admin import node_execution_pb2 as flyteidl_dot_admin_dot_node__execution__pb2
-from flyteidl.admin import task_execution_pb2 as flyteidl_dot_admin_dot_task__execution__pb2
-from flyteidl.admin import version_pb2 as flyteidl_dot_admin_dot_version__pb2
-from flyteidl.admin import common_pb2 as flyteidl_dot_admin_dot_common__pb2
 from protoc_gen_swagger.options import annotations_pb2 as protoc__gen__swagger_dot_options_dot_annotations__pb2
 
 
@@ -35,9 +22,9 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.service',
   syntax='proto3',
   serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service'),
-  serialized_pb=_b('\n\x1b\x66lyteidl/service/auth.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a\x1c\x66lyteidl/admin/project.proto\x1a.flyteidl/admin/project_domain_attributes.proto\x1a\x19\x66lyteidl/admin/task.proto\x1a\x1d\x66lyteidl/admin/workflow.proto\x1a(flyteidl/admin/workflow_attributes.proto\x1a flyteidl/admin/launch_plan.proto\x1a\x1a\x66lyteidl/admin/event.proto\x1a\x1e\x66lyteidl/admin/execution.proto\x1a\'flyteidl/admin/matchable_resource.proto\x1a#flyteidl/admin/node_execution.proto\x1a#flyteidl/admin/task_execution.proto\x1a\x1c\x66lyteidl/admin/version.proto\x1a\x1b\x66lyteidl/admin/common.proto\x1a,protoc-gen-swagger/options/annotations.proto\"\x17\n\x15OAuth2MetadataRequest\"\xa6\x02\n\x16OAuth2MetadataResponse\x12\x0e\n\x06issuer\x18\x01 \x01(\t\x12\x1e\n\x16\x61uthorization_endpoint\x18\x02 \x01(\t\x12\x16\n\x0etoken_endpoint\x18\x03 \x01(\t\x12 \n\x18response_types_supported\x18\x04 \x03(\t\x12\x18\n\x10scopes_supported\x18\x05 \x03(\t\x12-\n%token_endpoint_auth_methods_supported\x18\x06 \x03(\t\x12\x10\n\x08jwks_uri\x18\x07 \x01(\t\x12(\n code_challenge_methods_supported\x18\x08 \x03(\t\x12\x1d\n\x15grant_types_supported\x18\t \x03(\t\"\x1f\n\x1dPublicClientAuthConfigRequest\"}\n\x1ePublicClientAuthConfigResponse\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x14\n\x0credirect_uri\x18\x02 \x01(\t\x12\x0e\n\x06scopes\x18\x03 \x03(\t\x12\"\n\x1a\x61uthorization_metadata_key\x18\x04 \x01(\t2\xfc\x03\n\x13\x41uthMetadataService\x12\xf5\x01\n\x11GetOAuth2Metadata\x12\'.flyteidl.service.OAuth2MetadataRequest\x1a(.flyteidl.service.OAuth2MetadataResponse\"\x8c\x01\x82\xd3\xe4\x93\x02)\x12\'/.well-known/oauth-authorization-server\x92\x41Z\x1aXRetrieves OAuth2 authorization server metadata. This endpoint is anonymously accessible.\x12\xec\x01\n\x15GetPublicClientConfig\x12/.flyteidl.service.PublicClientAuthConfigRequest\x1a\x30.flyteidl.service.PublicClientAuthConfigResponse\"p\x82\xd3\xe4\x93\x02\x19\x12\x17/config/v1/flyte_client\x92\x41N\x1aLRetrieves public flyte client info. This endpoint is anonymously accessible.B9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/serviceb\x06proto3')
+  serialized_pb=_b('\n\x1b\x66lyteidl/service/auth.proto\x12\x10\x66lyteidl.service\x1a\x1cgoogle/api/annotations.proto\x1a,protoc-gen-swagger/options/annotations.proto\"\x17\n\x15OAuth2MetadataRequest\"\xa6\x02\n\x16OAuth2MetadataResponse\x12\x0e\n\x06issuer\x18\x01 \x01(\t\x12\x1e\n\x16\x61uthorization_endpoint\x18\x02 \x01(\t\x12\x16\n\x0etoken_endpoint\x18\x03 \x01(\t\x12 \n\x18response_types_supported\x18\x04 \x03(\t\x12\x18\n\x10scopes_supported\x18\x05 \x03(\t\x12-\n%token_endpoint_auth_methods_supported\x18\x06 \x03(\t\x12\x10\n\x08jwks_uri\x18\x07 \x01(\t\x12(\n code_challenge_methods_supported\x18\x08 \x03(\t\x12\x1d\n\x15grant_types_supported\x18\t \x03(\t\"\x1f\n\x1dPublicClientAuthConfigRequest\"}\n\x1ePublicClientAuthConfigResponse\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x14\n\x0credirect_uri\x18\x02 \x01(\t\x12\x0e\n\x06scopes\x18\x03 \x03(\t\x12\"\n\x1a\x61uthorization_metadata_key\x18\x04 \x01(\t2\xfc\x03\n\x13\x41uthMetadataService\x12\xf5\x01\n\x11GetOAuth2Metadata\x12\'.flyteidl.service.OAuth2MetadataRequest\x1a(.flyteidl.service.OAuth2MetadataResponse\"\x8c\x01\x82\xd3\xe4\x93\x02)\x12\'/.well-known/oauth-authorization-server\x92\x41Z\x1aXRetrieves OAuth2 authorization server metadata. This endpoint is anonymously accessible.\x12\xec\x01\n\x15GetPublicClientConfig\x12/.flyteidl.service.PublicClientAuthConfigRequest\x1a\x30.flyteidl.service.PublicClientAuthConfigResponse\"p\x82\xd3\xe4\x93\x02\x19\x12\x17/config/v1/flyte_client\x92\x41N\x1aLRetrieves public flyte client info. This endpoint is anonymously accessible.B9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/serviceb\x06proto3')
   ,
-  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_project__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_project__domain__attributes__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_task__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_workflow__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_workflow__attributes__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_launch__plan__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_event__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_execution__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_matchable__resource__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_node__execution__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_task__execution__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_version__pb2.DESCRIPTOR,flyteidl_dot_admin_dot_common__pb2.DESCRIPTOR,protoc__gen__swagger_dot_options_dot_annotations__pb2.DESCRIPTOR,])
+  dependencies=[google_dot_api_dot_annotations__pb2.DESCRIPTOR,protoc__gen__swagger_dot_options_dot_annotations__pb2.DESCRIPTOR,])
 
 
 
@@ -61,8 +48,8 @@ _OAUTH2METADATAREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=571,
-  serialized_end=594,
+  serialized_start=125,
+  serialized_end=148,
 )
 
 
@@ -148,8 +135,8 @@ _OAUTH2METADATARESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=597,
-  serialized_end=891,
+  serialized_start=151,
+  serialized_end=445,
 )
 
 
@@ -172,8 +159,8 @@ _PUBLICCLIENTAUTHCONFIGREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=893,
-  serialized_end=924,
+  serialized_start=447,
+  serialized_end=478,
 )
 
 
@@ -224,8 +211,8 @@ _PUBLICCLIENTAUTHCONFIGRESPONSE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=926,
-  serialized_end=1051,
+  serialized_start=480,
+  serialized_end=605,
 )
 
 DESCRIPTOR.message_types_by_name['OAuth2MetadataRequest'] = _OAUTH2METADATAREQUEST
@@ -271,8 +258,8 @@ _AUTHMETADATASERVICE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=1054,
-  serialized_end=1562,
+  serialized_start=608,
+  serialized_end=1116,
   methods=[
   _descriptor.MethodDescriptor(
     name='GetOAuth2Metadata',

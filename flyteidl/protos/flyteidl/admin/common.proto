@@ -5,16 +5,15 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
-// import "validate/validate.proto";
 
 // Encapsulation of fields that identifies a Flyte resource.
 // A resource can internally have multiple versions.
 message NamedEntityIdentifier {
     // Name of the project the resource belongs to.
-    string project = 1;  // [(validate.rules).string.min_bytes = 1];
+    string project = 1;
     // Name of the domain the resource belongs to.
     // A domain can be considered as a subset within a specific project.
-    string domain = 2;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 2;
     // User provided value for the resource.
     // The combination of project + domain + name uniquely identifies the resource.
     // +optional - in certain contexts - like 'List API', 'Launch plans'
@@ -69,9 +68,9 @@ message Sort {
 // Represents a request structure to list identifiers.
 message NamedEntityIdentifierListRequest {
     // Name of the project that contains the identifiers.
-    string project = 1;  // [(validate.rules).string.min_bytes = 1];
+    string project = 1;
     // Name of the domain the identifiers belongs to within the project.
-    string domain = 2;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 2;
     // Indicates the number of resources to be returned.
     uint32 limit = 3;
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -92,9 +91,9 @@ message NamedEntityIdentifierListRequest {
 message NamedEntityListRequest {
     flyteidl.core.ResourceType resource_type = 1;
     // Name of the project that contains the identifiers.
-    string project = 2;  // [(validate.rules).string.min_bytes = 1];
+    string project = 2;
     // Name of the domain the identifiers belongs to within the project.
-    string domain = 3;  // [(validate.rules).string.min_bytes = 1];
+    string domain = 3;
     // Indicates the number of resources to be returned.
     uint32 limit = 4;
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -182,17 +181,17 @@ message ResourceListRequest {
 
 message EmailNotification {
     // The list of email addresses recipients for this notification.
-    repeated string recipients_email = 1;  // [(validate.rules).repeated = {min_items: 1, unique: true, items: {string: {email: true}}}];
+    repeated string recipients_email = 1;
 }
 
 message PagerDutyNotification {
     // Currently, PagerDuty notifications leverage email to trigger a notification.
-    repeated string recipients_email = 1;  // [(validate.rules).repeated = {min_items: 1, unique: true, items: {string: {email: true}}}];
+    repeated string recipients_email = 1;
 }
 
 message SlackNotification {
     // Currently, Slack notifications leverage email to trigger a notification.
-    repeated string recipients_email = 1;  // [(validate.rules).repeated = {min_items: 1, unique: true, items: {string: {email: true}}}];
+    repeated string recipients_email = 1;
 
 }
 
@@ -204,7 +203,6 @@ message Notification {
     repeated core.WorkflowExecution.Phase phases = 1;
 
     oneof type {
-        // option (validate.required) = true;
         EmailNotification email = 2;
         PagerDutyNotification pager_duty = 3;
         SlackNotification slack = 4;
