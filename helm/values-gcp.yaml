@@ -4,7 +4,7 @@
 
 common:
   databaseSecret: {}
-  ingress:
+  ingress: {}
 
 # -----------------------------------------------------
 # Core dependencies that should be configured for Flyte to work on any platform

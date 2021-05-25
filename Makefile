@@ -12,6 +12,10 @@ update_boilerplate:
 kustomize: 
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 
+.PHONY: helm
+helm: 
+	bash script/generate_helm.sh
+
 .PHONY: release_automation
 release_automation:
 	bash script/release.sh
