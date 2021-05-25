@@ -81,6 +81,9 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 		var err error
 		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
 			sub, err = gizmoAWS.NewSubscriber(sqsConfig)
+			if err != nil {
+				logger.Warnf(context.TODO(), "Failed to initialize new gizmo aws subscriber with config [%+v] and err: %v", sqsConfig, err)
+			}
 			return err
 		})
 

@@ -322,6 +322,9 @@ func NewWorkflowExecutor(
 	var err error
 	err = async.Retry(maxReconnectAttempts, reconnectDelay, func() error {
 		subscriber, err = aws.NewSubscriber(config)
+		if err != nil {
+			logger.Warnf(context.TODO(), "Failed to initialize new gizmo aws subscriber with config: [%+v] and err: %v", config, err)
+		}
 		return err
 	})
 
