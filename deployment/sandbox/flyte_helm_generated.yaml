@@ -176,15 +176,15 @@ metadata:
   name: kubernetes-dashboard-key-holder
 type: Opaque
 ---
-# Source: flyte/templates/admin/deployment.yaml
+# Source: flyte/templates/admin/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
   name: flyte-admin-auth
-  namespace: flyte
+  namespace: default
 type: Opaque
 ---
-# Source: flyte/templates/propeller/deployment.yaml
+# Source: flyte/templates/propeller/secret-auth.yaml
 apiVersion: v1
 kind: Secret
 metadata:
@@ -3301,7 +3301,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.4"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -3317,7 +3317,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.4"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -3330,7 +3330,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.4"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -3340,7 +3340,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.4"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -3361,7 +3361,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "ghcr.io/flyteorg/flyteadmin:v0.5.4"
+        image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -3816,7 +3816,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "ghcr.io/flyteorg/flyteadmin:v0.5.4"
+            image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
