@@ -68,6 +68,9 @@ func NewWorkflowScheduler(cfg WorkflowSchedulerConfig) WorkflowScheduler {
 		err = async.Retry(cfg.SchedulerConfig.ReconnectAttempts,
 			time.Duration(cfg.SchedulerConfig.ReconnectDelaySeconds)*time.Second, func() error {
 				sess, err = session.NewSession(awsConfig)
+				if err != nil {
+					logger.Warnf(context.TODO(), "Failed to initialize new event scheduler with aws config: [%+v] and err: %v", awsConfig, err)
+				}
 				return err
 			})
 
