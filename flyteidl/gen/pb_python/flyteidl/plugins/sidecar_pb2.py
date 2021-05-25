@@ -21,12 +21,86 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.plugins',
   syntax='proto3',
   serialized_options=_b('Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins'),
-  serialized_pb=_b('\n\x1e\x66lyteidl/plugins/sidecar.proto\x12\x10\x66lyteidl.plugins\x1a\"k8s.io/api/core/v1/generated.proto\"[\n\nSidecarJob\x12-\n\x08pod_spec\x18\x01 \x01(\x0b\x32\x1b.k8s.io.api.core.v1.PodSpec\x12\x1e\n\x16primary_container_name\x18\x02 \x01(\tB9Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
+  serialized_pb=_b('\n\x1e\x66lyteidl/plugins/sidecar.proto\x12\x10\x66lyteidl.plugins\x1a\"k8s.io/api/core/v1/generated.proto\"\xbc\x02\n\nSidecarJob\x12-\n\x08pod_spec\x18\x01 \x01(\x0b\x32\x1b.k8s.io.api.core.v1.PodSpec\x12\x1e\n\x16primary_container_name\x18\x02 \x01(\t\x12\x42\n\x0b\x61nnotations\x18\x03 \x03(\x0b\x32-.flyteidl.plugins.SidecarJob.AnnotationsEntry\x12\x38\n\x06labels\x18\x04 \x03(\x0b\x32(.flyteidl.plugins.SidecarJob.LabelsEntry\x1a\x32\n\x10\x41nnotationsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a-\n\x0bLabelsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x42\x39Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/pluginsb\x06proto3')
   ,
   dependencies=[k8s_dot_io_dot_api_dot_core_dot_v1_dot_generated__pb2.DESCRIPTOR,])
 
 
 
+
+_SIDECARJOB_ANNOTATIONSENTRY = _descriptor.Descriptor(
+  name='AnnotationsEntry',
+  full_name='flyteidl.plugins.SidecarJob.AnnotationsEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='flyteidl.plugins.SidecarJob.AnnotationsEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='flyteidl.plugins.SidecarJob.AnnotationsEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=_b('8\001'),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=308,
+  serialized_end=358,
+)
+
+_SIDECARJOB_LABELSENTRY = _descriptor.Descriptor(
+  name='LabelsEntry',
+  full_name='flyteidl.plugins.SidecarJob.LabelsEntry',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='flyteidl.plugins.SidecarJob.LabelsEntry.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='flyteidl.plugins.SidecarJob.LabelsEntry.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=_b('8\001'),
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=360,
+  serialized_end=405,
+)
 
 _SIDECARJOB = _descriptor.Descriptor(
   name='SidecarJob',
@@ -49,10 +123,24 @@ _SIDECARJOB = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='annotations', full_name='flyteidl.plugins.SidecarJob.annotations', index=2,
+      number=3, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='labels', full_name='flyteidl.plugins.SidecarJob.labels', index=3,
+      number=4, type=11, cpp_type=10, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
-  nested_types=[],
+  nested_types=[_SIDECARJOB_ANNOTATIONSENTRY, _SIDECARJOB_LABELSENTRY, ],
   enum_types=[
   ],
   serialized_options=None,
@@ -61,21 +149,43 @@ _SIDECARJOB = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=88,
-  serialized_end=179,
+  serialized_start=89,
+  serialized_end=405,
 )
 
+_SIDECARJOB_ANNOTATIONSENTRY.containing_type = _SIDECARJOB
+_SIDECARJOB_LABELSENTRY.containing_type = _SIDECARJOB
 _SIDECARJOB.fields_by_name['pod_spec'].message_type = k8s_dot_io_dot_api_dot_core_dot_v1_dot_generated__pb2._PODSPEC
+_SIDECARJOB.fields_by_name['annotations'].message_type = _SIDECARJOB_ANNOTATIONSENTRY
+_SIDECARJOB.fields_by_name['labels'].message_type = _SIDECARJOB_LABELSENTRY
 DESCRIPTOR.message_types_by_name['SidecarJob'] = _SIDECARJOB
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 SidecarJob = _reflection.GeneratedProtocolMessageType('SidecarJob', (_message.Message,), dict(
+
+  AnnotationsEntry = _reflection.GeneratedProtocolMessageType('AnnotationsEntry', (_message.Message,), dict(
+    DESCRIPTOR = _SIDECARJOB_ANNOTATIONSENTRY,
+    __module__ = 'flyteidl.plugins.sidecar_pb2'
+    # @@protoc_insertion_point(class_scope:flyteidl.plugins.SidecarJob.AnnotationsEntry)
+    ))
+  ,
+
+  LabelsEntry = _reflection.GeneratedProtocolMessageType('LabelsEntry', (_message.Message,), dict(
+    DESCRIPTOR = _SIDECARJOB_LABELSENTRY,
+    __module__ = 'flyteidl.plugins.sidecar_pb2'
+    # @@protoc_insertion_point(class_scope:flyteidl.plugins.SidecarJob.LabelsEntry)
+    ))
+  ,
   DESCRIPTOR = _SIDECARJOB,
   __module__ = 'flyteidl.plugins.sidecar_pb2'
   # @@protoc_insertion_point(class_scope:flyteidl.plugins.SidecarJob)
   ))
 _sym_db.RegisterMessage(SidecarJob)
+_sym_db.RegisterMessage(SidecarJob.AnnotationsEntry)
+_sym_db.RegisterMessage(SidecarJob.LabelsEntry)
 
 
 DESCRIPTOR._options = None
+_SIDECARJOB_ANNOTATIONSENTRY._options = None
+_SIDECARJOB_LABELSENTRY._options = None
 # @@protoc_insertion_point(module_scope)

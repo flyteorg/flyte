@@ -55,6 +55,10 @@ func (m *SidecarJob) Validate() error {
 
 	// no validation rules for PrimaryContainerName
 
+	// no validation rules for Annotations
+
+	// no validation rules for Labels
+
 	return nil
 }
 
