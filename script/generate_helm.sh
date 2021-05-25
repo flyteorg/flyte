@@ -9,7 +9,7 @@ DEPLOYMENT=${1:-sandbox eks gcp}
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 for deployment in ${DEPLOYMENT}; do
-    helm template flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml --dependency-update > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
 
 # This section is used by GitHub workflow to ensure that the generation step was run
