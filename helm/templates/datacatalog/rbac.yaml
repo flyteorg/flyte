@@ -11,6 +11,6 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 {{- with .Values.datacatalog.serviceAccount.imagePullSecrets }}
-imagePullSecrets: {{ toYaml . | nindent 4 }}
-{{- end}}
+imagePullSecrets: {{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}

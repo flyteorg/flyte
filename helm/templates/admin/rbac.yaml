@@ -9,10 +9,10 @@ metadata:
   labels: {{ include "flyteadmin.labels" . | nindent 4 }}
   {{- with .Values.flyteadmin.serviceAccount.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
-  {{- end}}
+  {{- end }}
 {{- with .Values.flyteadmin.serviceAccount.imagePullSecrets }}
-imagePullSecrets: {{ toYaml . | nindent 4 }}
-{{- end}}
+imagePullSecrets: {{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 
 ---
