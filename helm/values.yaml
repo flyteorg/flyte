@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: ghcr.io/flyteorg/flyteadmin
-    tag: v0.5.4
+    tag: v0.5.7
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
