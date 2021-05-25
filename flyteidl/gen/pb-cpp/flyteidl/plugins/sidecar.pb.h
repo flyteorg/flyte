@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "k8s.io/api/core/v1/generated.pb.h"
 // @@protoc_insertion_point(includes)
@@ -42,7 +45,7 @@ struct TableStruct_flyteidl_2fplugins_2fsidecar_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[1]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -54,17 +57,73 @@ namespace plugins {
 class SidecarJob;
 class SidecarJobDefaultTypeInternal;
 extern SidecarJobDefaultTypeInternal _SidecarJob_default_instance_;
+class SidecarJob_AnnotationsEntry_DoNotUse;
+class SidecarJob_AnnotationsEntry_DoNotUseDefaultTypeInternal;
+extern SidecarJob_AnnotationsEntry_DoNotUseDefaultTypeInternal _SidecarJob_AnnotationsEntry_DoNotUse_default_instance_;
+class SidecarJob_LabelsEntry_DoNotUse;
+class SidecarJob_LabelsEntry_DoNotUseDefaultTypeInternal;
+extern SidecarJob_LabelsEntry_DoNotUseDefaultTypeInternal _SidecarJob_LabelsEntry_DoNotUse_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::plugins::SidecarJob* Arena::CreateMaybeMessage<::flyteidl::plugins::SidecarJob>(Arena*);
+template<> ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse>(Arena*);
+template<> ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
 namespace plugins {
 
 // ===================================================================
+
+class SidecarJob_AnnotationsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<SidecarJob_AnnotationsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<SidecarJob_AnnotationsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > SuperType;
+  SidecarJob_AnnotationsEntry_DoNotUse();
+  SidecarJob_AnnotationsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const SidecarJob_AnnotationsEntry_DoNotUse& other);
+  static const SidecarJob_AnnotationsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SidecarJob_AnnotationsEntry_DoNotUse*>(&_SidecarJob_AnnotationsEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
+class SidecarJob_LabelsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<SidecarJob_LabelsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<SidecarJob_LabelsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > SuperType;
+  SidecarJob_LabelsEntry_DoNotUse();
+  SidecarJob_LabelsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const SidecarJob_LabelsEntry_DoNotUse& other);
+  static const SidecarJob_LabelsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const SidecarJob_LabelsEntry_DoNotUse*>(&_SidecarJob_LabelsEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
 
 class SidecarJob final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.plugins.SidecarJob) */ {
@@ -104,7 +163,7 @@ class SidecarJob final :
                &_SidecarJob_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    2;
 
   void Swap(SidecarJob* other);
   friend void swap(SidecarJob& a, SidecarJob& b) {
@@ -159,7 +218,26 @@ class SidecarJob final :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
+
+  // map<string, string> annotations = 3;
+  int annotations_size() const;
+  void clear_annotations();
+  static const int kAnnotationsFieldNumber = 3;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      annotations() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_annotations();
+
+  // map<string, string> labels = 4;
+  int labels_size() const;
+  void clear_labels();
+  static const int kLabelsFieldNumber = 4;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      labels() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_labels();
 
   // string primary_container_name = 2;
   void clear_primary_container_name();
@@ -189,6 +267,18 @@ class SidecarJob final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::MapField<
+      SidecarJob_AnnotationsEntry_DoNotUse,
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > annotations_;
+  ::google::protobuf::internal::MapField<
+      SidecarJob_LabelsEntry_DoNotUse,
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > labels_;
   ::google::protobuf::internal::ArenaStringPtr primary_container_name_;
   ::k8s::io::api::core::v1::PodSpec* pod_spec_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -203,6 +293,10 @@ class SidecarJob final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // SidecarJob
 
 // .k8s.io.api.core.v1.PodSpec pod_spec = 1;
@@ -303,9 +397,49 @@ inline void SidecarJob::set_allocated_primary_container_name(::std::string* prim
   // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.SidecarJob.primary_container_name)
 }
 
+// map<string, string> annotations = 3;
+inline int SidecarJob::annotations_size() const {
+  return annotations_.size();
+}
+inline void SidecarJob::clear_annotations() {
+  annotations_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+SidecarJob::annotations() const {
+  // @@protoc_insertion_point(field_map:flyteidl.plugins.SidecarJob.annotations)
+  return annotations_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+SidecarJob::mutable_annotations() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.plugins.SidecarJob.annotations)
+  return annotations_.MutableMap();
+}
+
+// map<string, string> labels = 4;
+inline int SidecarJob::labels_size() const {
+  return labels_.size();
+}
+inline void SidecarJob::clear_labels() {
+  labels_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+SidecarJob::labels() const {
+  // @@protoc_insertion_point(field_map:flyteidl.plugins.SidecarJob.labels)
+  return labels_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+SidecarJob::mutable_labels() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.plugins.SidecarJob.labels)
+  return labels_.MutableMap();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

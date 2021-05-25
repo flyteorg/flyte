@@ -16,15 +16,51 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fsidecar_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_SidecarJob_AnnotationsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fsidecar_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_SidecarJob_LabelsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_k8s_2eio_2fapi_2fcore_2fv1_2fgenerated_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_PodSpec_k8s_2eio_2fapi_2fcore_2fv1_2fgenerated_2eproto;
 namespace flyteidl {
 namespace plugins {
+class SidecarJob_AnnotationsEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<SidecarJob_AnnotationsEntry_DoNotUse> _instance;
+} _SidecarJob_AnnotationsEntry_DoNotUse_default_instance_;
+class SidecarJob_LabelsEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<SidecarJob_LabelsEntry_DoNotUse> _instance;
+} _SidecarJob_LabelsEntry_DoNotUse_default_instance_;
 class SidecarJobDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<SidecarJob> _instance;
 } _SidecarJob_default_instance_;
 }  // namespace plugins
 }  // namespace flyteidl
+static void InitDefaultsSidecarJob_AnnotationsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::plugins::_SidecarJob_AnnotationsEntry_DoNotUse_default_instance_;
+    new (ptr) ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse();
+  }
+  ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_SidecarJob_AnnotationsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSidecarJob_AnnotationsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto}, {}};
+
+static void InitDefaultsSidecarJob_LabelsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::plugins::_SidecarJob_LabelsEntry_DoNotUse_default_instance_;
+    new (ptr) ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse();
+  }
+  ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_SidecarJob_LabelsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsSidecarJob_LabelsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto}, {}};
+
 static void InitDefaultsSidecarJob_flyteidl_2fplugins_2fsidecar_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -36,19 +72,41 @@ static void InitDefaultsSidecarJob_flyteidl_2fplugins_2fsidecar_2eproto() {
   ::flyteidl::plugins::SidecarJob::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_SidecarJob_flyteidl_2fplugins_2fsidecar_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsSidecarJob_flyteidl_2fplugins_2fsidecar_2eproto}, {
-      &scc_info_PodSpec_k8s_2eio_2fapi_2fcore_2fv1_2fgenerated_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<3> scc_info_SidecarJob_flyteidl_2fplugins_2fsidecar_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsSidecarJob_flyteidl_2fplugins_2fsidecar_2eproto}, {
+      &scc_info_PodSpec_k8s_2eio_2fapi_2fcore_2fv1_2fgenerated_2eproto.base,
+      &scc_info_SidecarJob_AnnotationsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto.base,
+      &scc_info_SidecarJob_LabelsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fplugins_2fsidecar_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_SidecarJob_AnnotationsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_SidecarJob_LabelsEntry_DoNotUse_flyteidl_2fplugins_2fsidecar_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_SidecarJob_flyteidl_2fplugins_2fsidecar_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fsidecar_2eproto[1];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fsidecar_2eproto[3];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fplugins_2fsidecar_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2fsidecar_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fsidecar_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse, value_),
+  0,
+  1,
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse, value_),
+  0,
+  1,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -56,34 +114,45 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fsidecar_2eprot
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob, pod_spec_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob, primary_container_name_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob, annotations_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::SidecarJob, labels_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, -1, sizeof(::flyteidl::plugins::SidecarJob)},
+  { 0, 7, sizeof(::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse)},
+  { 9, 16, sizeof(::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse)},
+  { 18, -1, sizeof(::flyteidl::plugins::SidecarJob)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_SidecarJob_AnnotationsEntry_DoNotUse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_SidecarJob_LabelsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::_SidecarJob_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto = {
   {}, AddDescriptors_flyteidl_2fplugins_2fsidecar_2eproto, "flyteidl/plugins/sidecar.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fplugins_2fsidecar_2eproto::offsets,
-  file_level_metadata_flyteidl_2fplugins_2fsidecar_2eproto, 1, file_level_enum_descriptors_flyteidl_2fplugins_2fsidecar_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fsidecar_2eproto,
+  file_level_metadata_flyteidl_2fplugins_2fsidecar_2eproto, 3, file_level_enum_descriptors_flyteidl_2fplugins_2fsidecar_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fsidecar_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fplugins_2fsidecar_2eproto[] =
   "\n\036flyteidl/plugins/sidecar.proto\022\020flytei"
   "dl.plugins\032\"k8s.io/api/core/v1/generated"
-  ".proto\"[\n\nSidecarJob\022-\n\010pod_spec\030\001 \001(\0132\033"
-  ".k8s.io.api.core.v1.PodSpec\022\036\n\026primary_c"
-  "ontainer_name\030\002 \001(\tB9Z7github.com/flyteo"
-  "rg/flyteidl/gen/pb-go/flyteidl/pluginsb\006"
-  "proto3"
+  ".proto\"\274\002\n\nSidecarJob\022-\n\010pod_spec\030\001 \001(\0132"
+  "\033.k8s.io.api.core.v1.PodSpec\022\036\n\026primary_"
+  "container_name\030\002 \001(\t\022B\n\013annotations\030\003 \003("
+  "\0132-.flyteidl.plugins.SidecarJob.Annotati"
+  "onsEntry\0228\n\006labels\030\004 \003(\0132(.flyteidl.plug"
+  "ins.SidecarJob.LabelsEntry\0322\n\020Annotation"
+  "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032-"
+  "\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001("
+  "\t:\0028\001B9Z7github.com/flyteorg/flyteidl/ge"
+  "n/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fsidecar_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fsidecar_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fsidecar_2eproto,
-  "flyteidl/plugins/sidecar.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto, 246,
+  "flyteidl/plugins/sidecar.proto", &assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto, 472,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fsidecar_2eproto() {
@@ -98,6 +167,88 @@ void AddDescriptors_flyteidl_2fplugins_2fsidecar_2eproto() {
 static bool dynamic_init_dummy_flyteidl_2fplugins_2fsidecar_2eproto = []() { AddDescriptors_flyteidl_2fplugins_2fsidecar_2eproto(); return true; }();
 namespace flyteidl {
 namespace plugins {
+
+// ===================================================================
+
+SidecarJob_AnnotationsEntry_DoNotUse::SidecarJob_AnnotationsEntry_DoNotUse() {}
+SidecarJob_AnnotationsEntry_DoNotUse::SidecarJob_AnnotationsEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
+void SidecarJob_AnnotationsEntry_DoNotUse::MergeFrom(const SidecarJob_AnnotationsEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata SidecarJob_AnnotationsEntry_DoNotUse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fsidecar_2eproto[0];
+}
+void SidecarJob_AnnotationsEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool SidecarJob_AnnotationsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      SidecarJob_AnnotationsEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SidecarJob.AnnotationsEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SidecarJob.AnnotationsEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+
+// ===================================================================
+
+SidecarJob_LabelsEntry_DoNotUse::SidecarJob_LabelsEntry_DoNotUse() {}
+SidecarJob_LabelsEntry_DoNotUse::SidecarJob_LabelsEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
+void SidecarJob_LabelsEntry_DoNotUse::MergeFrom(const SidecarJob_LabelsEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata SidecarJob_LabelsEntry_DoNotUse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fsidecar_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fsidecar_2eproto[1];
+}
+void SidecarJob_LabelsEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool SidecarJob_LabelsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      SidecarJob_LabelsEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SidecarJob.LabelsEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.SidecarJob.LabelsEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
 
 // ===================================================================
 
@@ -123,6 +274,8 @@ void SidecarJob::clear_pod_spec() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int SidecarJob::kPodSpecFieldNumber;
 const int SidecarJob::kPrimaryContainerNameFieldNumber;
+const int SidecarJob::kAnnotationsFieldNumber;
+const int SidecarJob::kLabelsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 SidecarJob::SidecarJob()
@@ -134,6 +287,8 @@ SidecarJob::SidecarJob(const SidecarJob& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  annotations_.MergeFrom(from.annotations_);
+  labels_.MergeFrom(from.labels_);
   primary_container_name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.primary_container_name().size() > 0) {
     primary_container_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.primary_container_name_);
@@ -178,6 +333,8 @@ void SidecarJob::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  annotations_.Clear();
+  labels_.Clear();
   primary_container_name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && pod_spec_ != nullptr) {
     delete pod_spec_;
@@ -226,6 +383,44 @@ const char* SidecarJob::_InternalParse(const char* begin, const char* end, void*
         GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
         ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
         ptr += size;
+        break;
+      }
+      // map<string, string> annotations = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->annotations_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
+        break;
+      }
+      // map<string, string> labels = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->labels_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
         break;
       }
       default: {
@@ -288,6 +483,58 @@ bool SidecarJob::MergePartialFromCodedStream(
         break;
       }
 
+      // map<string, string> annotations = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          SidecarJob_AnnotationsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              SidecarJob_AnnotationsEntry_DoNotUse,
+              ::std::string, ::std::string,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&annotations_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.SidecarJob.AnnotationsEntry.key"));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.value().data(), static_cast<int>(parser.value().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.SidecarJob.AnnotationsEntry.value"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // map<string, string> labels = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          SidecarJob_LabelsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              SidecarJob_LabelsEntry_DoNotUse,
+              ::std::string, ::std::string,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&labels_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.SidecarJob.LabelsEntry.key"));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.value().data(), static_cast<int>(parser.value().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.SidecarJob.LabelsEntry.value"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -331,6 +578,104 @@ void SidecarJob::SerializeWithCachedSizes(
       2, this->primary_container_name(), output);
   }
 
+  // map<string, string> annotations = 3;
+  if (!this->annotations().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.AnnotationsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.AnnotationsEntry.value");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->annotations().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->annotations().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->annotations().begin();
+          it != this->annotations().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<SidecarJob_AnnotationsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(annotations_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(3, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<SidecarJob_AnnotationsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->annotations().begin();
+          it != this->annotations().end(); ++it) {
+        entry.reset(annotations_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(3, *entry, output);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
+  // map<string, string> labels = 4;
+  if (!this->labels().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.LabelsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.LabelsEntry.value");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->labels().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->labels().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->labels().begin();
+          it != this->labels().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<SidecarJob_LabelsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(labels_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(4, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<SidecarJob_LabelsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->labels().begin();
+          it != this->labels().end(); ++it) {
+        entry.reset(labels_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(4, *entry, output);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -362,6 +707,104 @@ void SidecarJob::SerializeWithCachedSizes(
         2, this->primary_container_name(), target);
   }
 
+  // map<string, string> annotations = 3;
+  if (!this->annotations().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.AnnotationsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.AnnotationsEntry.value");
+      }
+    };
+
+    if (false &&
+        this->annotations().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->annotations().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->annotations().begin();
+          it != this->annotations().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<SidecarJob_AnnotationsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(annotations_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(3, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<SidecarJob_AnnotationsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->annotations().begin();
+          it != this->annotations().end(); ++it) {
+        entry.reset(annotations_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(3, *entry, target);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
+  // map<string, string> labels = 4;
+  if (!this->labels().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.LabelsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.SidecarJob.LabelsEntry.value");
+      }
+    };
+
+    if (false &&
+        this->labels().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->labels().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->labels().begin();
+          it != this->labels().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<SidecarJob_LabelsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(labels_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(4, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<SidecarJob_LabelsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->labels().begin();
+          it != this->labels().end(); ++it) {
+        entry.reset(labels_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(4, *entry, target);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -382,6 +825,34 @@ size_t SidecarJob::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // map<string, string> annotations = 3;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->annotations_size());
+  {
+    ::std::unique_ptr<SidecarJob_AnnotationsEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+        it = this->annotations().begin();
+        it != this->annotations().end(); ++it) {
+      entry.reset(annotations_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
+  }
+
+  // map<string, string> labels = 4;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->labels_size());
+  {
+    ::std::unique_ptr<SidecarJob_LabelsEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+        it = this->labels().begin();
+        it != this->labels().end(); ++it) {
+      entry.reset(labels_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
+  }
 
   // string primary_container_name = 2;
   if (this->primary_container_name().size() > 0) {
@@ -424,6 +895,8 @@ void SidecarJob::MergeFrom(const SidecarJob& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  annotations_.MergeFrom(from.annotations_);
+  labels_.MergeFrom(from.labels_);
   if (from.primary_container_name().size() > 0) {
 
     primary_container_name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.primary_container_name_);
@@ -458,6 +931,8 @@ void SidecarJob::Swap(SidecarJob* other) {
 void SidecarJob::InternalSwap(SidecarJob* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  annotations_.Swap(&other->annotations_);
+  labels_.Swap(&other->labels_);
   primary_container_name_.Swap(&other->primary_container_name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(pod_spec_, other->pod_spec_);
@@ -474,6 +949,12 @@ void SidecarJob::InternalSwap(SidecarJob* other) {
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::SidecarJob_AnnotationsEntry_DoNotUse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::SidecarJob_LabelsEntry_DoNotUse >(arena);
+}
 template<> PROTOBUF_NOINLINE ::flyteidl::plugins::SidecarJob* Arena::CreateMaybeMessage< ::flyteidl::plugins::SidecarJob >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::plugins::SidecarJob >(arena);
 }
