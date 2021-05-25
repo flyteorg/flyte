@@ -11,8 +11,8 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end}}
 {{- with .Values.flytepropeller.serviceAccount.imagePullSecrets }}
-imagePullSecrets: {{ toYaml . | nindent 4 }}
-{{- end}}
+imagePullSecrets: {{ toYaml . | nindent 2 }}
+{{- end }}
 {{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
