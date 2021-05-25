@@ -40,6 +40,114 @@ public final class Sidecar {
      */
     com.google.protobuf.ByteString
         getPrimaryContainerNameBytes();
+
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+    int getAnnotationsCount();
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+    boolean containsAnnotations(
+        java.lang.String key);
+    /**
+     * Use {@link #getAnnotationsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getAnnotations();
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getAnnotationsMap();
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+
+    java.lang.String getAnnotationsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+
+    java.lang.String getAnnotationsOrThrow(
+        java.lang.String key);
+
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+    int getLabelsCount();
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+    boolean containsLabels(
+        java.lang.String key);
+    /**
+     * Use {@link #getLabelsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getLabels();
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getLabelsMap();
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+
+    java.lang.String getLabelsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+
+    java.lang.String getLabelsOrThrow(
+        java.lang.String key);
   }
   /**
    * <pre>
@@ -106,6 +214,32 @@ public final class Sidecar {
               primaryContainerName_ = s;
               break;
             }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+                annotations_ = com.google.protobuf.MapField.newMapField(
+                    AnnotationsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000004;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              annotations__ = input.readMessage(
+                  AnnotationsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              annotations_.getMutableMap().put(
+                  annotations__.getKey(), annotations__.getValue());
+              break;
+            }
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
+                labels_ = com.google.protobuf.MapField.newMapField(
+                    LabelsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000008;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              labels__ = input.readMessage(
+                  LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              labels_.getMutableMap().put(
+                  labels__.getKey(), labels__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -130,6 +264,20 @@ public final class Sidecar {
       return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 3:
+          return internalGetAnnotations();
+        case 4:
+          return internalGetLabels();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -138,6 +286,7 @@ public final class Sidecar {
               flyteidl.plugins.Sidecar.SidecarJob.class, flyteidl.plugins.Sidecar.SidecarJob.Builder.class);
     }
 
+    private int bitField0_;
     public static final int POD_SPEC_FIELD_NUMBER = 1;
     private k8s.io.api.core.v1.Generated.PodSpec podSpec_;
     /**
@@ -193,6 +342,190 @@ public final class Sidecar {
       }
     }
 
+    public static final int ANNOTATIONS_FIELD_NUMBER = 3;
+    private static final class AnnotationsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_AnnotationsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> annotations_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetAnnotations() {
+      if (annotations_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            AnnotationsDefaultEntryHolder.defaultEntry);
+      }
+      return annotations_;
+    }
+
+    public int getAnnotationsCount() {
+      return internalGetAnnotations().getMap().size();
+    }
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+
+    public boolean containsAnnotations(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetAnnotations().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getAnnotationsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getAnnotations() {
+      return getAnnotationsMap();
+    }
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getAnnotationsMap() {
+      return internalGetAnnotations().getMap();
+    }
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+
+    public java.lang.String getAnnotationsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetAnnotations().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Pod annotations
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 3;</code>
+     */
+
+    public java.lang.String getAnnotationsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetAnnotations().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public static final int LABELS_FIELD_NUMBER = 4;
+    private static final class LabelsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_LabelsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> labels_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetLabels() {
+      if (labels_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            LabelsDefaultEntryHolder.defaultEntry);
+      }
+      return labels_;
+    }
+
+    public int getLabelsCount() {
+      return internalGetLabels().getMap().size();
+    }
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+
+    public boolean containsLabels(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetLabels().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getLabelsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getLabels() {
+      return getLabelsMap();
+    }
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
+      return internalGetLabels().getMap();
+    }
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+
+    public java.lang.String getLabelsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetLabels().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Pod labels
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 4;</code>
+     */
+
+    public java.lang.String getLabelsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetLabels().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -213,6 +546,18 @@ public final class Sidecar {
       if (!getPrimaryContainerNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, primaryContainerName_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetAnnotations(),
+          AnnotationsDefaultEntryHolder.defaultEntry,
+          3);
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetLabels(),
+          LabelsDefaultEntryHolder.defaultEntry,
+          4);
       unknownFields.writeTo(output);
     }
 
@@ -228,6 +573,26 @@ public final class Sidecar {
       }
       if (!getPrimaryContainerNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, primaryContainerName_);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetAnnotations().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        annotations__ = AnnotationsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(3, annotations__);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetLabels().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        labels__ = LabelsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(4, labels__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -251,6 +616,10 @@ public final class Sidecar {
       }
       if (!getPrimaryContainerName()
           .equals(other.getPrimaryContainerName())) return false;
+      if (!internalGetAnnotations().equals(
+          other.internalGetAnnotations())) return false;
+      if (!internalGetLabels().equals(
+          other.internalGetLabels())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -268,6 +637,14 @@ public final class Sidecar {
       }
       hash = (37 * hash) + PRIMARY_CONTAINER_NAME_FIELD_NUMBER;
       hash = (53 * hash) + getPrimaryContainerName().hashCode();
+      if (!internalGetAnnotations().getMap().isEmpty()) {
+        hash = (37 * hash) + ANNOTATIONS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetAnnotations().hashCode();
+      }
+      if (!internalGetLabels().getMap().isEmpty()) {
+        hash = (37 * hash) + LABELS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetLabels().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -381,6 +758,32 @@ public final class Sidecar {
         return flyteidl.plugins.Sidecar.internal_static_flyteidl_plugins_SidecarJob_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 3:
+            return internalGetAnnotations();
+          case 4:
+            return internalGetLabels();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 3:
+            return internalGetMutableAnnotations();
+          case 4:
+            return internalGetMutableLabels();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -415,6 +818,8 @@ public final class Sidecar {
         }
         primaryContainerName_ = "";
 
+        internalGetMutableAnnotations().clear();
+        internalGetMutableLabels().clear();
         return this;
       }
 
@@ -441,12 +846,19 @@ public final class Sidecar {
       @java.lang.Override
       public flyteidl.plugins.Sidecar.SidecarJob buildPartial() {
         flyteidl.plugins.Sidecar.SidecarJob result = new flyteidl.plugins.Sidecar.SidecarJob(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (podSpecBuilder_ == null) {
           result.podSpec_ = podSpec_;
         } else {
           result.podSpec_ = podSpecBuilder_.build();
         }
         result.primaryContainerName_ = primaryContainerName_;
+        result.annotations_ = internalGetAnnotations();
+        result.annotations_.makeImmutable();
+        result.labels_ = internalGetLabels();
+        result.labels_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -502,6 +914,10 @@ public final class Sidecar {
           primaryContainerName_ = other.primaryContainerName_;
           onChanged();
         }
+        internalGetMutableAnnotations().mergeFrom(
+            other.internalGetAnnotations());
+        internalGetMutableLabels().mergeFrom(
+            other.internalGetLabels());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -530,6 +946,7 @@ public final class Sidecar {
         }
         return this;
       }
+      private int bitField0_;
 
       private k8s.io.api.core.v1.Generated.PodSpec podSpec_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -716,6 +1133,308 @@ public final class Sidecar {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> annotations_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetAnnotations() {
+        if (annotations_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              AnnotationsDefaultEntryHolder.defaultEntry);
+        }
+        return annotations_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableAnnotations() {
+        onChanged();;
+        if (annotations_ == null) {
+          annotations_ = com.google.protobuf.MapField.newMapField(
+              AnnotationsDefaultEntryHolder.defaultEntry);
+        }
+        if (!annotations_.isMutable()) {
+          annotations_ = annotations_.copy();
+        }
+        return annotations_;
+      }
+
+      public int getAnnotationsCount() {
+        return internalGetAnnotations().getMap().size();
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+
+      public boolean containsAnnotations(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetAnnotations().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getAnnotationsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getAnnotations() {
+        return getAnnotationsMap();
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getAnnotationsMap() {
+        return internalGetAnnotations().getMap();
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+
+      public java.lang.String getAnnotationsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetAnnotations().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+
+      public java.lang.String getAnnotationsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetAnnotations().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearAnnotations() {
+        internalGetMutableAnnotations().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+
+      public Builder removeAnnotations(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableAnnotations().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableAnnotations() {
+        return internalGetMutableAnnotations().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+      public Builder putAnnotations(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableAnnotations().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Pod annotations
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 3;</code>
+       */
+
+      public Builder putAllAnnotations(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableAnnotations().getMutableMap()
+            .putAll(values);
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> labels_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetLabels() {
+        if (labels_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              LabelsDefaultEntryHolder.defaultEntry);
+        }
+        return labels_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableLabels() {
+        onChanged();;
+        if (labels_ == null) {
+          labels_ = com.google.protobuf.MapField.newMapField(
+              LabelsDefaultEntryHolder.defaultEntry);
+        }
+        if (!labels_.isMutable()) {
+          labels_ = labels_.copy();
+        }
+        return labels_;
+      }
+
+      public int getLabelsCount() {
+        return internalGetLabels().getMap().size();
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+
+      public boolean containsLabels(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetLabels().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getLabelsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getLabels() {
+        return getLabelsMap();
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
+        return internalGetLabels().getMap();
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+
+      public java.lang.String getLabelsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetLabels().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+
+      public java.lang.String getLabelsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetLabels().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearLabels() {
+        internalGetMutableLabels().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+
+      public Builder removeLabels(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableLabels().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableLabels() {
+        return internalGetMutableLabels().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+      public Builder putLabels(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableLabels().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Pod labels
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 4;</code>
+       */
+
+      public Builder putAllLabels(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableLabels().getMutableMap()
+            .putAll(values);
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -774,6 +1493,16 @@ public final class Sidecar {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_plugins_SidecarJob_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_plugins_SidecarJob_AnnotationsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_plugins_SidecarJob_AnnotationsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_plugins_SidecarJob_LabelsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_plugins_SidecarJob_LabelsEntry_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -785,11 +1514,16 @@ public final class Sidecar {
     java.lang.String[] descriptorData = {
       "\n\036flyteidl/plugins/sidecar.proto\022\020flytei" +
       "dl.plugins\032\"k8s.io/api/core/v1/generated" +
-      ".proto\"[\n\nSidecarJob\022-\n\010pod_spec\030\001 \001(\0132\033" +
-      ".k8s.io.api.core.v1.PodSpec\022\036\n\026primary_c" +
-      "ontainer_name\030\002 \001(\tB9Z7github.com/flyteo" +
-      "rg/flyteidl/gen/pb-go/flyteidl/pluginsb\006" +
-      "proto3"
+      ".proto\"\274\002\n\nSidecarJob\022-\n\010pod_spec\030\001 \001(\0132" +
+      "\033.k8s.io.api.core.v1.PodSpec\022\036\n\026primary_" +
+      "container_name\030\002 \001(\t\022B\n\013annotations\030\003 \003(" +
+      "\0132-.flyteidl.plugins.SidecarJob.Annotati" +
+      "onsEntry\0228\n\006labels\030\004 \003(\0132(.flyteidl.plug" +
+      "ins.SidecarJob.LabelsEntry\0322\n\020Annotation" +
+      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032-" +
+      "\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(" +
+      "\t:\0028\001B9Z7github.com/flyteorg/flyteidl/ge" +
+      "n/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -809,7 +1543,19 @@ public final class Sidecar {
     internal_static_flyteidl_plugins_SidecarJob_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_SidecarJob_descriptor,
-        new java.lang.String[] { "PodSpec", "PrimaryContainerName", });
+        new java.lang.String[] { "PodSpec", "PrimaryContainerName", "Annotations", "Labels", });
+    internal_static_flyteidl_plugins_SidecarJob_AnnotationsEntry_descriptor =
+      internal_static_flyteidl_plugins_SidecarJob_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_plugins_SidecarJob_AnnotationsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_plugins_SidecarJob_AnnotationsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_flyteidl_plugins_SidecarJob_LabelsEntry_descriptor =
+      internal_static_flyteidl_plugins_SidecarJob_descriptor.getNestedTypes().get(1);
+    internal_static_flyteidl_plugins_SidecarJob_LabelsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_plugins_SidecarJob_LabelsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     k8s.io.api.core.v1.Generated.getDescriptor();
   }
 
