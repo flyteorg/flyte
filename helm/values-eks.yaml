@@ -400,24 +400,6 @@ cluster_resource_manager:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
 
-    # -- Template copilot configuration
-    - key: ac_project_copilot_dataconfig
-      value: |
-        kind: ConfigMap
-        apiVersion: v1
-        metadata:
-          name: flyte-data-config
-          namespace: {{ namespace }}
-        data:
-          config.yaml: |
-            storage:
-              type: s3
-              container: <BUCKET_NAME>
-              connection:
-                auth-type: iam
-                region: <AWS_REGION>
-              enable-multicontainer: true
-
     # -- Template for spark role
     - key: ad_spark_role
       value: |

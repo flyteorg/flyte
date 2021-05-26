@@ -283,7 +283,7 @@ data:
         limits.cpu: {{ projectQuotaCpu }}
         limits.memory: {{ projectQuotaMemory }}
     
-  ac_project_copilot_dataconfig.yaml: | 
+  zz_copilot_config.yaml: | 
     kind: ConfigMap
     apiVersion: v1
     metadata:
@@ -292,15 +292,15 @@ data:
     data:
       config.yaml: |
         storage:
+          type: minio
+          container: "my-s3-bucket"
           connection:
             access-key: minio
             auth-type: accesskey
+            secret-key: miniostorage
             disable-ssl: true
             endpoint: http://minio.flyte.svc.cluster.local:9000
             region: us-east-1
-            secret-key: miniostorage
-          type: minio
-          container: my-s3-bucket
           enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
