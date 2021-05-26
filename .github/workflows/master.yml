@@ -113,4 +113,4 @@ jobs:
           version: latest
           args: release --rm-dist
         env:
-          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
