@@ -159,6 +159,8 @@ templates_path = ["_templates"]
 
 html_static_path = ["_static"]
 
+html_css_files = ["sphx_gallery_autogen.css"]
+
 # generate autosummary even if no references
 autosummary_generate = True
 
@@ -324,12 +326,53 @@ if len(examples_dirs) != len(gallery_dirs):
 # The main one is the the gallery's entrypoint is a README.rst file and the rest
 # of the files are *.py files that are auto-converted to .rst files. This makes
 # sure that the only rst files in the example directories are README.rst
+hide_download_page_ids = []
+
+def hide_example_page(file_handler):
+    """Heuristic that determines whether example file contains python code."""
+    example_content = file_handler.read().strip()
+
+    no_percent_comments = True
+    no_imports = True
+
+    for line in example_content.split("\n"):
+        if line.startswith(r"# %%"):
+            no_percent_comments = False
+        if line.startswith("import"):
+            no_imports = False
+
+    return example_content.startswith('"""') and example_content.endswith('"""') and no_percent_comments and no_imports
+
 for source_dir in sphinx_gallery_conf["examples_dirs"]:
     for f in Path(source_dir).glob("*.rst"):
         if f.name != "README.rst":
             raise ValueError(
                 f"non-README.rst file {f} not permitted in sphinx gallery directories"
             )
+
+    # we want to hide the download example button in pages that don't actually contain python code.
+    for f in Path(source_dir).glob("*.py"):
+        with f.open() as fh:
+            if hide_example_page(fh):
+                page_id = str(f).replace("..", "auto").replace("/", "-").replace(".", "-").replace("_", "-")
+                hide_download_page_ids.append(f"sphx-glr-download-{page_id}")
+
+SPHX_GALLERY_CSS_TEMPLATE = \
+"""
+{hide_download_page_ids} {{
+    height: 0px;
+    visibility: hidden;
+}}
+"""
+
+with Path("_static/sphx_gallery_autogen.css").open("w") as f:
+    f.write(
+        SPHX_GALLERY_CSS_TEMPLATE.format(
+            hide_download_page_ids=",\n".join(
+                f"#{x}" for x in hide_download_page_ids
+            )
+        )
+    )
 
 # intersphinx configuration
 intersphinx_mapping = {
