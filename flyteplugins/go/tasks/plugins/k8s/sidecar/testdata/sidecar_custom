@@ -44,5 +44,11 @@
 		    "value": "my toleration value"
         }]
 	},
-	"primaryContainerName": "a container"
+	"primaryContainerName": "a container",
+	"annotations": {
+	    "a1": "a1"
+	},
+	"labels": {
+	    "b1": "b1"
+	}
 }
