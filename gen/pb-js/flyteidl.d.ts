@@ -4146,6 +4146,9 @@ export namespace flyteidl {
             /** TaskTemplate container */
             container?: (flyteidl.core.IContainer|null);
 
+            /** TaskTemplate k8sPod */
+            k8sPod?: (flyteidl.core.IK8sPod|null);
+
             /** TaskTemplate taskTypeVersion */
             taskTypeVersion?: (number|null);
 
@@ -4183,6 +4186,9 @@ export namespace flyteidl {
             /** TaskTemplate container. */
             public container?: (flyteidl.core.IContainer|null);
 
+            /** TaskTemplate k8sPod. */
+            public k8sPod?: (flyteidl.core.IK8sPod|null);
+
             /** TaskTemplate taskTypeVersion. */
             public taskTypeVersion: number;
 
@@ -4193,7 +4199,7 @@ export namespace flyteidl {
             public config: { [k: string]: string };
 
             /** TaskTemplate target. */
-            public target?: "container";
+            public target?: ("container"|"k8sPod");
 
             /**
              * Creates a new TaskTemplate instance using the specified properties.
@@ -4533,6 +4539,122 @@ export namespace flyteidl {
                 YAML = 1,
                 PROTO = 2
             }
+        }
+
+        /** Properties of a K8sPod. */
+        interface IK8sPod {
+
+            /** K8sPod metadata */
+            metadata?: (flyteidl.core.IK8sObjectMetadata|null);
+
+            /** K8sPod podSpec */
+            podSpec?: (google.protobuf.IStruct|null);
+        }
+
+        /** Represents a K8sPod. */
+        class K8sPod implements IK8sPod {
+
+            /**
+             * Constructs a new K8sPod.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IK8sPod);
+
+            /** K8sPod metadata. */
+            public metadata?: (flyteidl.core.IK8sObjectMetadata|null);
+
+            /** K8sPod podSpec. */
+            public podSpec?: (google.protobuf.IStruct|null);
+
+            /**
+             * Creates a new K8sPod instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns K8sPod instance
+             */
+            public static create(properties?: flyteidl.core.IK8sPod): flyteidl.core.K8sPod;
+
+            /**
+             * Encodes the specified K8sPod message. Does not implicitly {@link flyteidl.core.K8sPod.verify|verify} messages.
+             * @param message K8sPod message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IK8sPod, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a K8sPod message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns K8sPod
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.K8sPod;
+
+            /**
+             * Verifies a K8sPod message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a K8sObjectMetadata. */
+        interface IK8sObjectMetadata {
+
+            /** K8sObjectMetadata labels */
+            labels?: ({ [k: string]: string }|null);
+
+            /** K8sObjectMetadata annotations */
+            annotations?: ({ [k: string]: string }|null);
+        }
+
+        /** Represents a K8sObjectMetadata. */
+        class K8sObjectMetadata implements IK8sObjectMetadata {
+
+            /**
+             * Constructs a new K8sObjectMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IK8sObjectMetadata);
+
+            /** K8sObjectMetadata labels. */
+            public labels: { [k: string]: string };
+
+            /** K8sObjectMetadata annotations. */
+            public annotations: { [k: string]: string };
+
+            /**
+             * Creates a new K8sObjectMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns K8sObjectMetadata instance
+             */
+            public static create(properties?: flyteidl.core.IK8sObjectMetadata): flyteidl.core.K8sObjectMetadata;
+
+            /**
+             * Encodes the specified K8sObjectMetadata message. Does not implicitly {@link flyteidl.core.K8sObjectMetadata.verify|verify} messages.
+             * @param message K8sObjectMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IK8sObjectMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a K8sObjectMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns K8sObjectMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.K8sObjectMetadata;
+
+            /**
+             * Verifies a K8sObjectMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
         }
 
         /** Properties of a Secret. */

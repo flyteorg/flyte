@@ -259,6 +259,8 @@ Class | Method | HTTP request | Description
  - [CoreIdentity](docs/CoreIdentity.md)
  - [CoreIfBlock](docs/CoreIfBlock.md)
  - [CoreIfElseBlock](docs/CoreIfElseBlock.md)
+ - [CoreK8sObjectMetadata](docs/CoreK8sObjectMetadata.md)
+ - [CoreK8sPod](docs/CoreK8sPod.md)
  - [CoreKeyValuePair](docs/CoreKeyValuePair.md)
  - [CoreLiteral](docs/CoreLiteral.md)
  - [CoreLiteralCollection](docs/CoreLiteralCollection.md)
