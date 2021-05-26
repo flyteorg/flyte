@@ -5197,6 +5197,19 @@ public final class Tasks {
     flyteidl.core.Tasks.ContainerOrBuilder getContainerOrBuilder();
 
     /**
+     * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+     */
+    boolean hasK8SPod();
+    /**
+     * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+     */
+    flyteidl.core.Tasks.K8sPod getK8SPod();
+    /**
+     * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+     */
+    flyteidl.core.Tasks.K8sPodOrBuilder getK8SPodOrBuilder();
+
+    /**
      * <pre>
      * This can be used to customize task handling at execution time for the same task type.
      * </pre>
@@ -5432,16 +5445,30 @@ public final class Tasks {
               break;
             }
             case 130: {
-              if (!((mutable_bitField0_ & 0x00000100) != 0)) {
+              if (!((mutable_bitField0_ & 0x00000200) != 0)) {
                 config_ = com.google.protobuf.MapField.newMapField(
                     ConfigDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000100;
+                mutable_bitField0_ |= 0x00000200;
               }
               com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
               config__ = input.readMessage(
                   ConfigDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               config_.getMutableMap().put(
                   config__.getKey(), config__.getValue());
+              break;
+            }
+            case 138: {
+              flyteidl.core.Tasks.K8sPod.Builder subBuilder = null;
+              if (targetCase_ == 17) {
+                subBuilder = ((flyteidl.core.Tasks.K8sPod) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.core.Tasks.K8sPod.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Tasks.K8sPod) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 17;
               break;
             }
             default: {
@@ -5494,6 +5521,7 @@ public final class Tasks {
     public enum TargetCase
         implements com.google.protobuf.Internal.EnumLite {
       CONTAINER(6),
+      K8S_POD(17),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -5510,6 +5538,7 @@ public final class Tasks {
       public static TargetCase forNumber(int value) {
         switch (value) {
           case 6: return CONTAINER;
+          case 17: return K8S_POD;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -5732,6 +5761,32 @@ public final class Tasks {
       return flyteidl.core.Tasks.Container.getDefaultInstance();
     }
 
+    public static final int K8S_POD_FIELD_NUMBER = 17;
+    /**
+     * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+     */
+    public boolean hasK8SPod() {
+      return targetCase_ == 17;
+    }
+    /**
+     * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+     */
+    public flyteidl.core.Tasks.K8sPod getK8SPod() {
+      if (targetCase_ == 17) {
+         return (flyteidl.core.Tasks.K8sPod) target_;
+      }
+      return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+     */
+    public flyteidl.core.Tasks.K8sPodOrBuilder getK8SPodOrBuilder() {
+      if (targetCase_ == 17) {
+         return (flyteidl.core.Tasks.K8sPod) target_;
+      }
+      return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+    }
+
     public static final int TASK_TYPE_VERSION_FIELD_NUMBER = 7;
     private int taskTypeVersion_;
     /**
@@ -5922,6 +5977,9 @@ public final class Tasks {
           internalGetConfig(),
           ConfigDefaultEntryHolder.defaultEntry,
           16);
+      if (targetCase_ == 17) {
+        output.writeMessage(17, (flyteidl.core.Tasks.K8sPod) target_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5971,6 +6029,10 @@ public final class Tasks {
             .build();
         size += com.google.protobuf.CodedOutputStream
             .computeMessageSize(16, config__);
+      }
+      if (targetCase_ == 17) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, (flyteidl.core.Tasks.K8sPod) target_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6024,6 +6086,10 @@ public final class Tasks {
           if (!getContainer()
               .equals(other.getContainer())) return false;
           break;
+        case 17:
+          if (!getK8SPod()
+              .equals(other.getK8SPod())) return false;
+          break;
         case 0:
         default:
       }
@@ -6070,6 +6136,10 @@ public final class Tasks {
         case 6:
           hash = (37 * hash) + CONTAINER_FIELD_NUMBER;
           hash = (53 * hash) + getContainer().hashCode();
+          break;
+        case 17:
+          hash = (37 * hash) + K8S_POD_FIELD_NUMBER;
+          hash = (53 * hash) + getK8SPod().hashCode();
           break;
         case 0:
         default:
@@ -6327,6 +6397,13 @@ public final class Tasks {
             result.target_ = containerBuilder_.build();
           }
         }
+        if (targetCase_ == 17) {
+          if (k8SPodBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = k8SPodBuilder_.build();
+          }
+        }
         result.taskTypeVersion_ = taskTypeVersion_;
         if (securityContextBuilder_ == null) {
           result.securityContext_ = securityContext_;
@@ -6412,6 +6489,10 @@ public final class Tasks {
         switch (other.getTargetCase()) {
           case CONTAINER: {
             mergeContainer(other.getContainer());
+            break;
+          }
+          case K8S_POD: {
+            mergeK8SPod(other.getK8SPod());
             break;
           }
           case TARGET_NOT_SET: {
@@ -7317,6 +7398,142 @@ public final class Tasks {
         targetCase_ = 6;
         onChanged();;
         return containerBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder> k8SPodBuilder_;
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public boolean hasK8SPod() {
+        return targetCase_ == 17;
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public flyteidl.core.Tasks.K8sPod getK8SPod() {
+        if (k8SPodBuilder_ == null) {
+          if (targetCase_ == 17) {
+            return (flyteidl.core.Tasks.K8sPod) target_;
+          }
+          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+        } else {
+          if (targetCase_ == 17) {
+            return k8SPodBuilder_.getMessage();
+          }
+          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public Builder setK8SPod(flyteidl.core.Tasks.K8sPod value) {
+        if (k8SPodBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          k8SPodBuilder_.setMessage(value);
+        }
+        targetCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public Builder setK8SPod(
+          flyteidl.core.Tasks.K8sPod.Builder builderForValue) {
+        if (k8SPodBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          k8SPodBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public Builder mergeK8SPod(flyteidl.core.Tasks.K8sPod value) {
+        if (k8SPodBuilder_ == null) {
+          if (targetCase_ == 17 &&
+              target_ != flyteidl.core.Tasks.K8sPod.getDefaultInstance()) {
+            target_ = flyteidl.core.Tasks.K8sPod.newBuilder((flyteidl.core.Tasks.K8sPod) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 17) {
+            k8SPodBuilder_.mergeFrom(value);
+          }
+          k8SPodBuilder_.setMessage(value);
+        }
+        targetCase_ = 17;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public Builder clearK8SPod() {
+        if (k8SPodBuilder_ == null) {
+          if (targetCase_ == 17) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 17) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          k8SPodBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public flyteidl.core.Tasks.K8sPod.Builder getK8SPodBuilder() {
+        return getK8SPodFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      public flyteidl.core.Tasks.K8sPodOrBuilder getK8SPodOrBuilder() {
+        if ((targetCase_ == 17) && (k8SPodBuilder_ != null)) {
+          return k8SPodBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 17) {
+            return (flyteidl.core.Tasks.K8sPod) target_;
+          }
+          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.K8sPod k8s_pod = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder> 
+          getK8SPodFieldBuilder() {
+        if (k8SPodBuilder_ == null) {
+          if (!(targetCase_ == 17)) {
+            target_ = flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+          }
+          k8SPodBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder>(
+                  (flyteidl.core.Tasks.K8sPod) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 17;
+        onChanged();;
+        return k8SPodBuilder_;
       }
 
       private int taskTypeVersion_ ;
@@ -13839,6 +14056,2115 @@ public final class Tasks {
 
   }
 
+  public interface K8sPodOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.K8sPod)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Contains additional metadata for building a kubernetes pod.
+     * </pre>
+     *
+     * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+     */
+    boolean hasMetadata();
+    /**
+     * <pre>
+     * Contains additional metadata for building a kubernetes pod.
+     * </pre>
+     *
+     * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+     */
+    flyteidl.core.Tasks.K8sObjectMetadata getMetadata();
+    /**
+     * <pre>
+     * Contains additional metadata for building a kubernetes pod.
+     * </pre>
+     *
+     * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+     */
+    flyteidl.core.Tasks.K8sObjectMetadataOrBuilder getMetadataOrBuilder();
+
+    /**
+     * <pre>
+     * Defines the primary pod spec created when a task is executed.
+     * This should be a JSON-marshalled pod spec, which can be defined in 
+     * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+     * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct pod_spec = 2;</code>
+     */
+    boolean hasPodSpec();
+    /**
+     * <pre>
+     * Defines the primary pod spec created when a task is executed.
+     * This should be a JSON-marshalled pod spec, which can be defined in 
+     * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+     * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct pod_spec = 2;</code>
+     */
+    com.google.protobuf.Struct getPodSpec();
+    /**
+     * <pre>
+     * Defines the primary pod spec created when a task is executed.
+     * This should be a JSON-marshalled pod spec, which can be defined in 
+     * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+     * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct pod_spec = 2;</code>
+     */
+    com.google.protobuf.StructOrBuilder getPodSpecOrBuilder();
+  }
+  /**
+   * <pre>
+   * Defines a pod spec and additional pod metadata that is created when a task is executed.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.K8sPod}
+   */
+  public  static final class K8sPod extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.K8sPod)
+      K8sPodOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use K8sPod.newBuilder() to construct.
+    private K8sPod(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private K8sPod() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private K8sPod(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Tasks.K8sObjectMetadata.Builder subBuilder = null;
+              if (metadata_ != null) {
+                subBuilder = metadata_.toBuilder();
+              }
+              metadata_ = input.readMessage(flyteidl.core.Tasks.K8sObjectMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(metadata_);
+                metadata_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Struct.Builder subBuilder = null;
+              if (podSpec_ != null) {
+                subBuilder = podSpec_.toBuilder();
+              }
+              podSpec_ = input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(podSpec_);
+                podSpec_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sPod_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sPod_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.K8sPod.class, flyteidl.core.Tasks.K8sPod.Builder.class);
+    }
+
+    public static final int METADATA_FIELD_NUMBER = 1;
+    private flyteidl.core.Tasks.K8sObjectMetadata metadata_;
+    /**
+     * <pre>
+     * Contains additional metadata for building a kubernetes pod.
+     * </pre>
+     *
+     * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+     */
+    public boolean hasMetadata() {
+      return metadata_ != null;
+    }
+    /**
+     * <pre>
+     * Contains additional metadata for building a kubernetes pod.
+     * </pre>
+     *
+     * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+     */
+    public flyteidl.core.Tasks.K8sObjectMetadata getMetadata() {
+      return metadata_ == null ? flyteidl.core.Tasks.K8sObjectMetadata.getDefaultInstance() : metadata_;
+    }
+    /**
+     * <pre>
+     * Contains additional metadata for building a kubernetes pod.
+     * </pre>
+     *
+     * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+     */
+    public flyteidl.core.Tasks.K8sObjectMetadataOrBuilder getMetadataOrBuilder() {
+      return getMetadata();
+    }
+
+    public static final int POD_SPEC_FIELD_NUMBER = 2;
+    private com.google.protobuf.Struct podSpec_;
+    /**
+     * <pre>
+     * Defines the primary pod spec created when a task is executed.
+     * This should be a JSON-marshalled pod spec, which can be defined in 
+     * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+     * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct pod_spec = 2;</code>
+     */
+    public boolean hasPodSpec() {
+      return podSpec_ != null;
+    }
+    /**
+     * <pre>
+     * Defines the primary pod spec created when a task is executed.
+     * This should be a JSON-marshalled pod spec, which can be defined in 
+     * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+     * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct pod_spec = 2;</code>
+     */
+    public com.google.protobuf.Struct getPodSpec() {
+      return podSpec_ == null ? com.google.protobuf.Struct.getDefaultInstance() : podSpec_;
+    }
+    /**
+     * <pre>
+     * Defines the primary pod spec created when a task is executed.
+     * This should be a JSON-marshalled pod spec, which can be defined in 
+     * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+     * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct pod_spec = 2;</code>
+     */
+    public com.google.protobuf.StructOrBuilder getPodSpecOrBuilder() {
+      return getPodSpec();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (metadata_ != null) {
+        output.writeMessage(1, getMetadata());
+      }
+      if (podSpec_ != null) {
+        output.writeMessage(2, getPodSpec());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (metadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getMetadata());
+      }
+      if (podSpec_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getPodSpec());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.K8sPod)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.K8sPod other = (flyteidl.core.Tasks.K8sPod) obj;
+
+      if (hasMetadata() != other.hasMetadata()) return false;
+      if (hasMetadata()) {
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
+      }
+      if (hasPodSpec() != other.hasPodSpec()) return false;
+      if (hasPodSpec()) {
+        if (!getPodSpec()
+            .equals(other.getPodSpec())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasMetadata()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadata().hashCode();
+      }
+      if (hasPodSpec()) {
+        hash = (37 * hash) + POD_SPEC_FIELD_NUMBER;
+        hash = (53 * hash) + getPodSpec().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.K8sPod parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.K8sPod prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Defines a pod spec and additional pod metadata that is created when a task is executed.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.K8sPod}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.K8sPod)
+        flyteidl.core.Tasks.K8sPodOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sPod_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sPod_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.K8sPod.class, flyteidl.core.Tasks.K8sPod.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.K8sPod.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
+        if (podSpecBuilder_ == null) {
+          podSpec_ = null;
+        } else {
+          podSpec_ = null;
+          podSpecBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sPod_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.K8sPod getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.K8sPod build() {
+        flyteidl.core.Tasks.K8sPod result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.K8sPod buildPartial() {
+        flyteidl.core.Tasks.K8sPod result = new flyteidl.core.Tasks.K8sPod(this);
+        if (metadataBuilder_ == null) {
+          result.metadata_ = metadata_;
+        } else {
+          result.metadata_ = metadataBuilder_.build();
+        }
+        if (podSpecBuilder_ == null) {
+          result.podSpec_ = podSpec_;
+        } else {
+          result.podSpec_ = podSpecBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.K8sPod) {
+          return mergeFrom((flyteidl.core.Tasks.K8sPod)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.K8sPod other) {
+        if (other == flyteidl.core.Tasks.K8sPod.getDefaultInstance()) return this;
+        if (other.hasMetadata()) {
+          mergeMetadata(other.getMetadata());
+        }
+        if (other.hasPodSpec()) {
+          mergePodSpec(other.getPodSpec());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.K8sPod parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.K8sPod) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Tasks.K8sObjectMetadata metadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.K8sObjectMetadata, flyteidl.core.Tasks.K8sObjectMetadata.Builder, flyteidl.core.Tasks.K8sObjectMetadataOrBuilder> metadataBuilder_;
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public boolean hasMetadata() {
+        return metadataBuilder_ != null || metadata_ != null;
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public flyteidl.core.Tasks.K8sObjectMetadata getMetadata() {
+        if (metadataBuilder_ == null) {
+          return metadata_ == null ? flyteidl.core.Tasks.K8sObjectMetadata.getDefaultInstance() : metadata_;
+        } else {
+          return metadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public Builder setMetadata(flyteidl.core.Tasks.K8sObjectMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          metadata_ = value;
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public Builder setMetadata(
+          flyteidl.core.Tasks.K8sObjectMetadata.Builder builderForValue) {
+        if (metadataBuilder_ == null) {
+          metadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public Builder mergeMetadata(flyteidl.core.Tasks.K8sObjectMetadata value) {
+        if (metadataBuilder_ == null) {
+          if (metadata_ != null) {
+            metadata_ =
+              flyteidl.core.Tasks.K8sObjectMetadata.newBuilder(metadata_).mergeFrom(value).buildPartial();
+          } else {
+            metadata_ = value;
+          }
+          onChanged();
+        } else {
+          metadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public Builder clearMetadata() {
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+          onChanged();
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public flyteidl.core.Tasks.K8sObjectMetadata.Builder getMetadataBuilder() {
+        
+        onChanged();
+        return getMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      public flyteidl.core.Tasks.K8sObjectMetadataOrBuilder getMetadataOrBuilder() {
+        if (metadataBuilder_ != null) {
+          return metadataBuilder_.getMessageOrBuilder();
+        } else {
+          return metadata_ == null ?
+              flyteidl.core.Tasks.K8sObjectMetadata.getDefaultInstance() : metadata_;
+        }
+      }
+      /**
+       * <pre>
+       * Contains additional metadata for building a kubernetes pod.
+       * </pre>
+       *
+       * <code>.flyteidl.core.K8sObjectMetadata metadata = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.K8sObjectMetadata, flyteidl.core.Tasks.K8sObjectMetadata.Builder, flyteidl.core.Tasks.K8sObjectMetadataOrBuilder> 
+          getMetadataFieldBuilder() {
+        if (metadataBuilder_ == null) {
+          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.K8sObjectMetadata, flyteidl.core.Tasks.K8sObjectMetadata.Builder, flyteidl.core.Tasks.K8sObjectMetadataOrBuilder>(
+                  getMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          metadata_ = null;
+        }
+        return metadataBuilder_;
+      }
+
+      private com.google.protobuf.Struct podSpec_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> podSpecBuilder_;
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public boolean hasPodSpec() {
+        return podSpecBuilder_ != null || podSpec_ != null;
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public com.google.protobuf.Struct getPodSpec() {
+        if (podSpecBuilder_ == null) {
+          return podSpec_ == null ? com.google.protobuf.Struct.getDefaultInstance() : podSpec_;
+        } else {
+          return podSpecBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public Builder setPodSpec(com.google.protobuf.Struct value) {
+        if (podSpecBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          podSpec_ = value;
+          onChanged();
+        } else {
+          podSpecBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public Builder setPodSpec(
+          com.google.protobuf.Struct.Builder builderForValue) {
+        if (podSpecBuilder_ == null) {
+          podSpec_ = builderForValue.build();
+          onChanged();
+        } else {
+          podSpecBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public Builder mergePodSpec(com.google.protobuf.Struct value) {
+        if (podSpecBuilder_ == null) {
+          if (podSpec_ != null) {
+            podSpec_ =
+              com.google.protobuf.Struct.newBuilder(podSpec_).mergeFrom(value).buildPartial();
+          } else {
+            podSpec_ = value;
+          }
+          onChanged();
+        } else {
+          podSpecBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public Builder clearPodSpec() {
+        if (podSpecBuilder_ == null) {
+          podSpec_ = null;
+          onChanged();
+        } else {
+          podSpec_ = null;
+          podSpecBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public com.google.protobuf.Struct.Builder getPodSpecBuilder() {
+        
+        onChanged();
+        return getPodSpecFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      public com.google.protobuf.StructOrBuilder getPodSpecOrBuilder() {
+        if (podSpecBuilder_ != null) {
+          return podSpecBuilder_.getMessageOrBuilder();
+        } else {
+          return podSpec_ == null ?
+              com.google.protobuf.Struct.getDefaultInstance() : podSpec_;
+        }
+      }
+      /**
+       * <pre>
+       * Defines the primary pod spec created when a task is executed.
+       * This should be a JSON-marshalled pod spec, which can be defined in 
+       * - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+       * - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct pod_spec = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> 
+          getPodSpecFieldBuilder() {
+        if (podSpecBuilder_ == null) {
+          podSpecBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder>(
+                  getPodSpec(),
+                  getParentForChildren(),
+                  isClean());
+          podSpec_ = null;
+        }
+        return podSpecBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.K8sPod)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.K8sPod)
+    private static final flyteidl.core.Tasks.K8sPod DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.K8sPod();
+    }
+
+    public static flyteidl.core.Tasks.K8sPod getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<K8sPod>
+        PARSER = new com.google.protobuf.AbstractParser<K8sPod>() {
+      @java.lang.Override
+      public K8sPod parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new K8sPod(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<K8sPod> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<K8sPod> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.K8sPod getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface K8sObjectMetadataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.K8sObjectMetadata)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+    int getLabelsCount();
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+    boolean containsLabels(
+        java.lang.String key);
+    /**
+     * Use {@link #getLabelsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getLabels();
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getLabelsMap();
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+
+    java.lang.String getLabelsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+
+    java.lang.String getLabelsOrThrow(
+        java.lang.String key);
+
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+    int getAnnotationsCount();
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+    boolean containsAnnotations(
+        java.lang.String key);
+    /**
+     * Use {@link #getAnnotationsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getAnnotations();
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getAnnotationsMap();
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+
+    java.lang.String getAnnotationsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+
+    java.lang.String getAnnotationsOrThrow(
+        java.lang.String key);
+  }
+  /**
+   * <pre>
+   * Metadata for building a kubernetes object when a task is executed.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.K8sObjectMetadata}
+   */
+  public  static final class K8sObjectMetadata extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.K8sObjectMetadata)
+      K8sObjectMetadataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use K8sObjectMetadata.newBuilder() to construct.
+    private K8sObjectMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private K8sObjectMetadata() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private K8sObjectMetadata(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                labels_ = com.google.protobuf.MapField.newMapField(
+                    LabelsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000001;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              labels__ = input.readMessage(
+                  LabelsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              labels_.getMutableMap().put(
+                  labels__.getKey(), labels__.getValue());
+              break;
+            }
+            case 18: {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                annotations_ = com.google.protobuf.MapField.newMapField(
+                    AnnotationsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000002;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              annotations__ = input.readMessage(
+                  AnnotationsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              annotations_.getMutableMap().put(
+                  annotations__.getKey(), annotations__.getValue());
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_descriptor;
+    }
+
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 1:
+          return internalGetLabels();
+        case 2:
+          return internalGetAnnotations();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.K8sObjectMetadata.class, flyteidl.core.Tasks.K8sObjectMetadata.Builder.class);
+    }
+
+    public static final int LABELS_FIELD_NUMBER = 1;
+    private static final class LabelsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_LabelsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> labels_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetLabels() {
+      if (labels_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            LabelsDefaultEntryHolder.defaultEntry);
+      }
+      return labels_;
+    }
+
+    public int getLabelsCount() {
+      return internalGetLabels().getMap().size();
+    }
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+
+    public boolean containsLabels(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetLabels().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getLabelsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getLabels() {
+      return getLabelsMap();
+    }
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
+      return internalGetLabels().getMap();
+    }
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+
+    public java.lang.String getLabelsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetLabels().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Optional labels to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; labels = 1;</code>
+     */
+
+    public java.lang.String getLabelsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetLabels().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    public static final int ANNOTATIONS_FIELD_NUMBER = 2;
+    private static final class AnnotationsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> annotations_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetAnnotations() {
+      if (annotations_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            AnnotationsDefaultEntryHolder.defaultEntry);
+      }
+      return annotations_;
+    }
+
+    public int getAnnotationsCount() {
+      return internalGetAnnotations().getMap().size();
+    }
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+
+    public boolean containsAnnotations(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetAnnotations().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getAnnotationsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getAnnotations() {
+      return getAnnotationsMap();
+    }
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getAnnotationsMap() {
+      return internalGetAnnotations().getMap();
+    }
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+
+    public java.lang.String getAnnotationsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetAnnotations().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Optional annotations to add to the pod definition.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; annotations = 2;</code>
+     */
+
+    public java.lang.String getAnnotationsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetAnnotations().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetLabels(),
+          LabelsDefaultEntryHolder.defaultEntry,
+          1);
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetAnnotations(),
+          AnnotationsDefaultEntryHolder.defaultEntry,
+          2);
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetLabels().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        labels__ = LabelsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(1, labels__);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetAnnotations().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        annotations__ = AnnotationsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(2, annotations__);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.K8sObjectMetadata)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.K8sObjectMetadata other = (flyteidl.core.Tasks.K8sObjectMetadata) obj;
+
+      if (!internalGetLabels().equals(
+          other.internalGetLabels())) return false;
+      if (!internalGetAnnotations().equals(
+          other.internalGetAnnotations())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (!internalGetLabels().getMap().isEmpty()) {
+        hash = (37 * hash) + LABELS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetLabels().hashCode();
+      }
+      if (!internalGetAnnotations().getMap().isEmpty()) {
+        hash = (37 * hash) + ANNOTATIONS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetAnnotations().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.K8sObjectMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.K8sObjectMetadata prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Metadata for building a kubernetes object when a task is executed.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.K8sObjectMetadata}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.K8sObjectMetadata)
+        flyteidl.core.Tasks.K8sObjectMetadataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_descriptor;
+      }
+
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 1:
+            return internalGetLabels();
+          case 2:
+            return internalGetAnnotations();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 1:
+            return internalGetMutableLabels();
+          case 2:
+            return internalGetMutableAnnotations();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.K8sObjectMetadata.class, flyteidl.core.Tasks.K8sObjectMetadata.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.K8sObjectMetadata.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        internalGetMutableLabels().clear();
+        internalGetMutableAnnotations().clear();
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_K8sObjectMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.K8sObjectMetadata getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.K8sObjectMetadata.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.K8sObjectMetadata build() {
+        flyteidl.core.Tasks.K8sObjectMetadata result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.K8sObjectMetadata buildPartial() {
+        flyteidl.core.Tasks.K8sObjectMetadata result = new flyteidl.core.Tasks.K8sObjectMetadata(this);
+        int from_bitField0_ = bitField0_;
+        result.labels_ = internalGetLabels();
+        result.labels_.makeImmutable();
+        result.annotations_ = internalGetAnnotations();
+        result.annotations_.makeImmutable();
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.K8sObjectMetadata) {
+          return mergeFrom((flyteidl.core.Tasks.K8sObjectMetadata)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.K8sObjectMetadata other) {
+        if (other == flyteidl.core.Tasks.K8sObjectMetadata.getDefaultInstance()) return this;
+        internalGetMutableLabels().mergeFrom(
+            other.internalGetLabels());
+        internalGetMutableAnnotations().mergeFrom(
+            other.internalGetAnnotations());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.K8sObjectMetadata parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.K8sObjectMetadata) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> labels_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetLabels() {
+        if (labels_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              LabelsDefaultEntryHolder.defaultEntry);
+        }
+        return labels_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableLabels() {
+        onChanged();;
+        if (labels_ == null) {
+          labels_ = com.google.protobuf.MapField.newMapField(
+              LabelsDefaultEntryHolder.defaultEntry);
+        }
+        if (!labels_.isMutable()) {
+          labels_ = labels_.copy();
+        }
+        return labels_;
+      }
+
+      public int getLabelsCount() {
+        return internalGetLabels().getMap().size();
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+
+      public boolean containsLabels(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetLabels().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getLabelsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getLabels() {
+        return getLabelsMap();
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getLabelsMap() {
+        return internalGetLabels().getMap();
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+
+      public java.lang.String getLabelsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetLabels().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+
+      public java.lang.String getLabelsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetLabels().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearLabels() {
+        internalGetMutableLabels().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+
+      public Builder removeLabels(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableLabels().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableLabels() {
+        return internalGetMutableLabels().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+      public Builder putLabels(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableLabels().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional labels to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; labels = 1;</code>
+       */
+
+      public Builder putAllLabels(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableLabels().getMutableMap()
+            .putAll(values);
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> annotations_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetAnnotations() {
+        if (annotations_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              AnnotationsDefaultEntryHolder.defaultEntry);
+        }
+        return annotations_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableAnnotations() {
+        onChanged();;
+        if (annotations_ == null) {
+          annotations_ = com.google.protobuf.MapField.newMapField(
+              AnnotationsDefaultEntryHolder.defaultEntry);
+        }
+        if (!annotations_.isMutable()) {
+          annotations_ = annotations_.copy();
+        }
+        return annotations_;
+      }
+
+      public int getAnnotationsCount() {
+        return internalGetAnnotations().getMap().size();
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+
+      public boolean containsAnnotations(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetAnnotations().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getAnnotationsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getAnnotations() {
+        return getAnnotationsMap();
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getAnnotationsMap() {
+        return internalGetAnnotations().getMap();
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+
+      public java.lang.String getAnnotationsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetAnnotations().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+
+      public java.lang.String getAnnotationsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetAnnotations().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearAnnotations() {
+        internalGetMutableAnnotations().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+
+      public Builder removeAnnotations(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableAnnotations().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableAnnotations() {
+        return internalGetMutableAnnotations().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+      public Builder putAnnotations(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableAnnotations().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional annotations to add to the pod definition.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; annotations = 2;</code>
+       */
+
+      public Builder putAllAnnotations(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableAnnotations().getMutableMap()
+            .putAll(values);
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.K8sObjectMetadata)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.K8sObjectMetadata)
+    private static final flyteidl.core.Tasks.K8sObjectMetadata DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.K8sObjectMetadata();
+    }
+
+    public static flyteidl.core.Tasks.K8sObjectMetadata getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<K8sObjectMetadata>
+        PARSER = new com.google.protobuf.AbstractParser<K8sObjectMetadata>() {
+      @java.lang.Override
+      public K8sObjectMetadata parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new K8sObjectMetadata(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<K8sObjectMetadata> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<K8sObjectMetadata> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.K8sObjectMetadata getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Resources_descriptor;
   private static final 
@@ -13889,6 +16215,26 @@ public final class Tasks {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_K8sPod_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_K8sPod_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_K8sObjectMetadata_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_K8sObjectMetadata_LabelsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_K8sObjectMetadata_LabelsEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -13921,42 +16267,52 @@ public final class Tasks {
       "retries\030\005 \001(\0132\034.flyteidl.core.RetryStrat" +
       "egy\022\031\n\021discovery_version\030\006 \001(\t\022 \n\030deprec" +
       "ated_error_message\030\007 \001(\t\022\027\n\rinterruptibl" +
-      "e\030\010 \001(\010H\000B\025\n\023interruptible_value\"\303\003\n\014Tas" +
+      "e\030\010 \001(\010H\000B\025\n\023interruptible_value\"\355\003\n\014Tas" +
       "kTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Id" +
       "entifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001(\013" +
       "2\033.flyteidl.core.TaskMetadata\0220\n\tinterfa" +
       "ce\030\004 \001(\0132\035.flyteidl.core.TypedInterface\022" +
       "\'\n\006custom\030\005 \001(\0132\027.google.protobuf.Struct" +
       "\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Cont" +
-      "ainerH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020se" +
-      "curity_context\030\010 \001(\0132\036.flyteidl.core.Sec" +
-      "urityContext\0227\n\006config\030\020 \003(\0132\'.flyteidl." +
-      "core.TaskTemplate.ConfigEntry\032-\n\013ConfigE" +
-      "ntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006" +
-      "target\"\'\n\rContainerPort\022\026\n\016container_por" +
-      "t\030\001 \001(\r\"\245\002\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007" +
-      "command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources" +
-      "\030\004 \001(\0132\030.flyteidl.core.Resources\022(\n\003env\030" +
-      "\005 \003(\0132\033.flyteidl.core.KeyValuePair\022/\n\006co" +
-      "nfig\030\006 \003(\0132\033.flyteidl.core.KeyValuePairB" +
-      "\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Conta" +
-      "inerPort\0225\n\013data_config\030\t \001(\0132 .flyteidl" +
-      ".core.DataLoadingConfig\"\233\002\n\nIOStrategy\022=" +
-      "\n\rdownload_mode\030\001 \001(\0162&.flyteidl.core.IO" +
-      "Strategy.DownloadMode\0229\n\013upload_mode\030\002 \001" +
-      "(\0162$.flyteidl.core.IOStrategy.UploadMode" +
-      "\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017" +
-      "DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E" +
-      "\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLO" +
-      "AD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021DataLo" +
-      "adingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninput_pa" +
-      "th\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006format\030" +
-      "\004 \001(\01621.flyteidl.core.DataLoadingConfig." +
-      "LiteralMapFormat\022.\n\013io_strategy\030\005 \001(\0132\031." +
-      "flyteidl.core.IOStrategy\"1\n\020LiteralMapFo" +
-      "rmat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002B6Z4g" +
-      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
-      "yteidl/coreb\006proto3"
+      "ainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.flyteidl.core" +
+      ".K8sPodH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020" +
+      "security_context\030\010 \001(\0132\036.flyteidl.core.S" +
+      "ecurityContext\0227\n\006config\030\020 \003(\0132\'.flyteid" +
+      "l.core.TaskTemplate.ConfigEntry\032-\n\013Confi" +
+      "gEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010" +
+      "\n\006target\"\'\n\rContainerPort\022\026\n\016container_p" +
+      "ort\030\001 \001(\r\"\245\002\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017" +
+      "\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresourc" +
+      "es\030\004 \001(\0132\030.flyteidl.core.Resources\022(\n\003en" +
+      "v\030\005 \003(\0132\033.flyteidl.core.KeyValuePair\022/\n\006" +
+      "config\030\006 \003(\0132\033.flyteidl.core.KeyValuePai" +
+      "rB\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Con" +
+      "tainerPort\0225\n\013data_config\030\t \001(\0132 .flytei" +
+      "dl.core.DataLoadingConfig\"\233\002\n\nIOStrategy" +
+      "\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl.core." +
+      "IOStrategy.DownloadMode\0229\n\013upload_mode\030\002" +
+      " \001(\0162$.flyteidl.core.IOStrategy.UploadMo" +
+      "de\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000\022\023" +
+      "\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002" +
+      "\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UP" +
+      "LOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021Data" +
+      "LoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninput_" +
+      "path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006forma" +
+      "t\030\004 \001(\01621.flyteidl.core.DataLoadingConfi" +
+      "g.LiteralMapFormat\022.\n\013io_strategy\030\005 \001(\0132" +
+      "\031.flyteidl.core.IOStrategy\"1\n\020LiteralMap" +
+      "Format\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n" +
+      "\006K8sPod\0222\n\010metadata\030\001 \001(\0132 .flyteidl.cor" +
+      "e.K8sObjectMetadata\022)\n\010pod_spec\030\002 \001(\0132\027." +
+      "google.protobuf.Struct\"\374\001\n\021K8sObjectMeta" +
+      "data\022<\n\006labels\030\001 \003(\0132,.flyteidl.core.K8s" +
+      "ObjectMetadata.LabelsEntry\022F\n\013annotation" +
+      "s\030\002 \003(\01321.flyteidl.core.K8sObjectMetadat" +
+      "a.AnnotationsEntry\032-\n\013LabelsEntry\022\013\n\003key" +
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020Annotations" +
+      "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B6Z" +
+      "4github.com/flyteorg/flyteidl/gen/pb-go/" +
+      "flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14005,7 +16361,7 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskTemplate_descriptor,
-        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "TaskTypeVersion", "SecurityContext", "Config", "Target", });
+        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "K8SPod", "TaskTypeVersion", "SecurityContext", "Config", "Target", });
     internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor =
       internal_static_flyteidl_core_TaskTemplate_descriptor.getNestedTypes().get(0);
     internal_static_flyteidl_core_TaskTemplate_ConfigEntry_fieldAccessorTable = new
@@ -14036,6 +16392,30 @@ public final class Tasks {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_DataLoadingConfig_descriptor,
         new java.lang.String[] { "Enabled", "InputPath", "OutputPath", "Format", "IoStrategy", });
+    internal_static_flyteidl_core_K8sPod_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_flyteidl_core_K8sPod_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_K8sPod_descriptor,
+        new java.lang.String[] { "Metadata", "PodSpec", });
+    internal_static_flyteidl_core_K8sObjectMetadata_descriptor =
+      getDescriptor().getMessageTypes().get(9);
+    internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_K8sObjectMetadata_descriptor,
+        new java.lang.String[] { "Labels", "Annotations", });
+    internal_static_flyteidl_core_K8sObjectMetadata_LabelsEntry_descriptor =
+      internal_static_flyteidl_core_K8sObjectMetadata_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_core_K8sObjectMetadata_LabelsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_K8sObjectMetadata_LabelsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
+    internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor =
+      internal_static_flyteidl_core_K8sObjectMetadata_descriptor.getNestedTypes().get(1);
+    internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
     flyteidl.core.Literals.getDescriptor();

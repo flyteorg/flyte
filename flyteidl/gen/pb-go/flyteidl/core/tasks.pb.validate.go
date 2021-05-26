@@ -387,6 +387,18 @@ func (m *TaskTemplate) Validate() error {
 			}
 		}
 
+	case *TaskTemplate_K8SPod:
+
+		if v, ok := interface{}(m.GetK8SPod()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskTemplateValidationError{
+					field:  "K8SPod",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil
@@ -796,6 +808,161 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DataLoadingConfigValidationError{}
+
+// Validate checks the field values on K8SPod with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *K8SPod) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return K8SPodValidationError{
+				field:  "Metadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetPodSpec()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return K8SPodValidationError{
+				field:  "PodSpec",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// K8SPodValidationError is the validation error returned by K8SPod.Validate if
+// the designated constraints aren't met.
+type K8SPodValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e K8SPodValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e K8SPodValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e K8SPodValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e K8SPodValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e K8SPodValidationError) ErrorName() string { return "K8SPodValidationError" }
+
+// Error satisfies the builtin error interface
+func (e K8SPodValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sK8SPod.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = K8SPodValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = K8SPodValidationError{}
+
+// Validate checks the field values on K8SObjectMetadata with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *K8SObjectMetadata) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Labels
+
+	// no validation rules for Annotations
+
+	return nil
+}
+
+// K8SObjectMetadataValidationError is the validation error returned by
+// K8SObjectMetadata.Validate if the designated constraints aren't met.
+type K8SObjectMetadataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e K8SObjectMetadataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e K8SObjectMetadataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e K8SObjectMetadataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e K8SObjectMetadataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e K8SObjectMetadataValidationError) ErrorName() string {
+	return "K8SObjectMetadataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e K8SObjectMetadataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sK8SObjectMetadata.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = K8SObjectMetadataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = K8SObjectMetadataValidationError{}
 
 // Validate checks the field values on Resources_ResourceEntry with the rules
 // defined in the proto definition for this message. If any rules are

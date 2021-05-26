@@ -153,6 +153,8 @@ from flyteadmin.models.core_identifier import CoreIdentifier
 from flyteadmin.models.core_identity import CoreIdentity
 from flyteadmin.models.core_if_block import CoreIfBlock
 from flyteadmin.models.core_if_else_block import CoreIfElseBlock
+from flyteadmin.models.core_k8s_object_metadata import CoreK8sObjectMetadata
+from flyteadmin.models.core_k8s_pod import CoreK8sPod
 from flyteadmin.models.core_key_value_pair import CoreKeyValuePair
 from flyteadmin.models.core_literal import CoreLiteral
 from flyteadmin.models.core_literal_collection import CoreLiteralCollection
