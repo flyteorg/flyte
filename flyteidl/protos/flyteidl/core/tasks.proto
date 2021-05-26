@@ -118,6 +118,7 @@ message TaskTemplate {
     // handlers.
     oneof target {
         Container container = 6;
+        K8sPod k8s_pod = 17;
     }
 
     // This can be used to customize task handling at execution time for the same task type.
@@ -237,4 +238,26 @@ message DataLoadingConfig {
     // This format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding
     LiteralMapFormat format = 4;
     IOStrategy io_strategy = 5;
+}
+
+// Defines a pod spec and additional pod metadata that is created when a task is executed.
+message K8sPod {
+   // Contains additional metadata for building a kubernetes pod.
+   K8sObjectMetadata metadata = 1;
+
+   // Defines the primary pod spec created when a task is executed.
+   // This should be a JSON-marshalled pod spec, which can be defined in 
+   // - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+   // - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+   google.protobuf.Struct pod_spec = 2;
+}
+
+// Metadata for building a kubernetes object when a task is executed.
+message K8sObjectMetadata {
+
+  // Optional labels to add to the pod definition.
+  map<string, string> labels = 1;
+
+  // Optional annotations to add to the pod definition.
+  map<string, string> annotations = 2;
 }

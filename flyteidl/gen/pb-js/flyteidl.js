@@ -9851,6 +9851,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.ITypedInterface|null} ["interface"] TaskTemplate interface
              * @property {google.protobuf.IStruct|null} [custom] TaskTemplate custom
              * @property {flyteidl.core.IContainer|null} [container] TaskTemplate container
+             * @property {flyteidl.core.IK8sPod|null} [k8sPod] TaskTemplate k8sPod
              * @property {number|null} [taskTypeVersion] TaskTemplate taskTypeVersion
              * @property {flyteidl.core.ISecurityContext|null} [securityContext] TaskTemplate securityContext
              * @property {Object.<string,string>|null} [config] TaskTemplate config
@@ -9921,6 +9922,14 @@ export const flyteidl = $root.flyteidl = (() => {
             TaskTemplate.prototype.container = null;
 
             /**
+             * TaskTemplate k8sPod.
+             * @member {flyteidl.core.IK8sPod|null|undefined} k8sPod
+             * @memberof flyteidl.core.TaskTemplate
+             * @instance
+             */
+            TaskTemplate.prototype.k8sPod = null;
+
+            /**
              * TaskTemplate taskTypeVersion.
              * @member {number} taskTypeVersion
              * @memberof flyteidl.core.TaskTemplate
@@ -9949,12 +9958,12 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * TaskTemplate target.
-             * @member {"container"|undefined} target
+             * @member {"container"|"k8sPod"|undefined} target
              * @memberof flyteidl.core.TaskTemplate
              * @instance
              */
             Object.defineProperty(TaskTemplate.prototype, "target", {
-                get: $util.oneOfGetter($oneOfFields = ["container"]),
+                get: $util.oneOfGetter($oneOfFields = ["container", "k8sPod"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -10001,6 +10010,8 @@ export const flyteidl = $root.flyteidl = (() => {
                 if (message.config != null && message.hasOwnProperty("config"))
                     for (let keys = Object.keys(message.config), i = 0; i < keys.length; ++i)
                         writer.uint32(/* id 16, wireType 2 =*/130).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.config[keys[i]]).ldelim();
+                if (message.k8sPod != null && message.hasOwnProperty("k8sPod"))
+                    $root.flyteidl.core.K8sPod.encode(message.k8sPod, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
                 return writer;
             };
 
@@ -10039,6 +10050,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 6:
                         message.container = $root.flyteidl.core.Container.decode(reader, reader.uint32());
+                        break;
+                    case 17:
+                        message.k8sPod = $root.flyteidl.core.K8sPod.decode(reader, reader.uint32());
                         break;
                     case 7:
                         message.taskTypeVersion = reader.int32();
@@ -10103,6 +10117,16 @@ export const flyteidl = $root.flyteidl = (() => {
                         let error = $root.flyteidl.core.Container.verify(message.container);
                         if (error)
                             return "container." + error;
+                    }
+                }
+                if (message.k8sPod != null && message.hasOwnProperty("k8sPod")) {
+                    if (properties.target === 1)
+                        return "target: multiple values";
+                    properties.target = 1;
+                    {
+                        let error = $root.flyteidl.core.K8sPod.verify(message.k8sPod);
+                        if (error)
+                            return "k8sPod." + error;
                     }
                 }
                 if (message.taskTypeVersion != null && message.hasOwnProperty("taskTypeVersion"))
@@ -10887,6 +10911,288 @@ export const flyteidl = $root.flyteidl = (() => {
             })();
 
             return DataLoadingConfig;
+        })();
+
+        core.K8sPod = (function() {
+
+            /**
+             * Properties of a K8sPod.
+             * @memberof flyteidl.core
+             * @interface IK8sPod
+             * @property {flyteidl.core.IK8sObjectMetadata|null} [metadata] K8sPod metadata
+             * @property {google.protobuf.IStruct|null} [podSpec] K8sPod podSpec
+             */
+
+            /**
+             * Constructs a new K8sPod.
+             * @memberof flyteidl.core
+             * @classdesc Represents a K8sPod.
+             * @implements IK8sPod
+             * @constructor
+             * @param {flyteidl.core.IK8sPod=} [properties] Properties to set
+             */
+            function K8sPod(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * K8sPod metadata.
+             * @member {flyteidl.core.IK8sObjectMetadata|null|undefined} metadata
+             * @memberof flyteidl.core.K8sPod
+             * @instance
+             */
+            K8sPod.prototype.metadata = null;
+
+            /**
+             * K8sPod podSpec.
+             * @member {google.protobuf.IStruct|null|undefined} podSpec
+             * @memberof flyteidl.core.K8sPod
+             * @instance
+             */
+            K8sPod.prototype.podSpec = null;
+
+            /**
+             * Creates a new K8sPod instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.K8sPod
+             * @static
+             * @param {flyteidl.core.IK8sPod=} [properties] Properties to set
+             * @returns {flyteidl.core.K8sPod} K8sPod instance
+             */
+            K8sPod.create = function create(properties) {
+                return new K8sPod(properties);
+            };
+
+            /**
+             * Encodes the specified K8sPod message. Does not implicitly {@link flyteidl.core.K8sPod.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.K8sPod
+             * @static
+             * @param {flyteidl.core.IK8sPod} message K8sPod message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            K8sPod.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.metadata != null && message.hasOwnProperty("metadata"))
+                    $root.flyteidl.core.K8sObjectMetadata.encode(message.metadata, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.podSpec != null && message.hasOwnProperty("podSpec"))
+                    $root.google.protobuf.Struct.encode(message.podSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a K8sPod message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.K8sPod
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.K8sPod} K8sPod
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            K8sPod.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.K8sPod();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.metadata = $root.flyteidl.core.K8sObjectMetadata.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.podSpec = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a K8sPod message.
+             * @function verify
+             * @memberof flyteidl.core.K8sPod
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            K8sPod.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.metadata != null && message.hasOwnProperty("metadata")) {
+                    let error = $root.flyteidl.core.K8sObjectMetadata.verify(message.metadata);
+                    if (error)
+                        return "metadata." + error;
+                }
+                if (message.podSpec != null && message.hasOwnProperty("podSpec")) {
+                    let error = $root.google.protobuf.Struct.verify(message.podSpec);
+                    if (error)
+                        return "podSpec." + error;
+                }
+                return null;
+            };
+
+            return K8sPod;
+        })();
+
+        core.K8sObjectMetadata = (function() {
+
+            /**
+             * Properties of a K8sObjectMetadata.
+             * @memberof flyteidl.core
+             * @interface IK8sObjectMetadata
+             * @property {Object.<string,string>|null} [labels] K8sObjectMetadata labels
+             * @property {Object.<string,string>|null} [annotations] K8sObjectMetadata annotations
+             */
+
+            /**
+             * Constructs a new K8sObjectMetadata.
+             * @memberof flyteidl.core
+             * @classdesc Represents a K8sObjectMetadata.
+             * @implements IK8sObjectMetadata
+             * @constructor
+             * @param {flyteidl.core.IK8sObjectMetadata=} [properties] Properties to set
+             */
+            function K8sObjectMetadata(properties) {
+                this.labels = {};
+                this.annotations = {};
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * K8sObjectMetadata labels.
+             * @member {Object.<string,string>} labels
+             * @memberof flyteidl.core.K8sObjectMetadata
+             * @instance
+             */
+            K8sObjectMetadata.prototype.labels = $util.emptyObject;
+
+            /**
+             * K8sObjectMetadata annotations.
+             * @member {Object.<string,string>} annotations
+             * @memberof flyteidl.core.K8sObjectMetadata
+             * @instance
+             */
+            K8sObjectMetadata.prototype.annotations = $util.emptyObject;
+
+            /**
+             * Creates a new K8sObjectMetadata instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.K8sObjectMetadata
+             * @static
+             * @param {flyteidl.core.IK8sObjectMetadata=} [properties] Properties to set
+             * @returns {flyteidl.core.K8sObjectMetadata} K8sObjectMetadata instance
+             */
+            K8sObjectMetadata.create = function create(properties) {
+                return new K8sObjectMetadata(properties);
+            };
+
+            /**
+             * Encodes the specified K8sObjectMetadata message. Does not implicitly {@link flyteidl.core.K8sObjectMetadata.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.K8sObjectMetadata
+             * @static
+             * @param {flyteidl.core.IK8sObjectMetadata} message K8sObjectMetadata message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            K8sObjectMetadata.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.labels != null && message.hasOwnProperty("labels"))
+                    for (let keys = Object.keys(message.labels), i = 0; i < keys.length; ++i)
+                        writer.uint32(/* id 1, wireType 2 =*/10).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.labels[keys[i]]).ldelim();
+                if (message.annotations != null && message.hasOwnProperty("annotations"))
+                    for (let keys = Object.keys(message.annotations), i = 0; i < keys.length; ++i)
+                        writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.annotations[keys[i]]).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a K8sObjectMetadata message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.K8sObjectMetadata
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.K8sObjectMetadata} K8sObjectMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            K8sObjectMetadata.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.K8sObjectMetadata(), key;
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        reader.skip().pos++;
+                        if (message.labels === $util.emptyObject)
+                            message.labels = {};
+                        key = reader.string();
+                        reader.pos++;
+                        message.labels[key] = reader.string();
+                        break;
+                    case 2:
+                        reader.skip().pos++;
+                        if (message.annotations === $util.emptyObject)
+                            message.annotations = {};
+                        key = reader.string();
+                        reader.pos++;
+                        message.annotations[key] = reader.string();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a K8sObjectMetadata message.
+             * @function verify
+             * @memberof flyteidl.core.K8sObjectMetadata
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            K8sObjectMetadata.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.labels != null && message.hasOwnProperty("labels")) {
+                    if (!$util.isObject(message.labels))
+                        return "labels: object expected";
+                    let key = Object.keys(message.labels);
+                    for (let i = 0; i < key.length; ++i)
+                        if (!$util.isString(message.labels[key[i]]))
+                            return "labels: string{k:string} expected";
+                }
+                if (message.annotations != null && message.hasOwnProperty("annotations")) {
+                    if (!$util.isObject(message.annotations))
+                        return "annotations: object expected";
+                    let key = Object.keys(message.annotations);
+                    for (let i = 0; i < key.length; ++i)
+                        if (!$util.isString(message.annotations[key[i]]))
+                            return "annotations: string{k:string} expected";
+                }
+                return null;
+            };
+
+            return K8sObjectMetadata;
         })();
 
         core.Secret = (function() {

@@ -5090,6 +5090,40 @@
       },
       "description": "Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.\nIf no conditions were satisfied, the else_node or the error will execute."
     },
+    "coreK8sObjectMetadata": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional labels to add to the pod definition."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional annotations to add to the pod definition."
+        }
+      },
+      "description": "Metadata for building a kubernetes object when a task is executed."
+    },
+    "coreK8sPod": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/coreK8sObjectMetadata",
+          "description": "Contains additional metadata for building a kubernetes pod."
+        },
+        "pod_spec": {
+          "$ref": "#/definitions/protobufStruct",
+          "title": "Defines the primary pod spec created when a task is executed.\nThis should be a JSON-marshalled pod spec, which can be defined in \n- go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n- python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
+        }
+      },
+      "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
+    },
     "coreKeyValuePair": {
       "type": "object",
       "properties": {
@@ -5713,6 +5747,9 @@
         },
         "container": {
           "$ref": "#/definitions/coreContainer"
+        },
+        "k8s_pod": {
+          "$ref": "#/definitions/coreK8sPod"
         },
         "task_type_version": {
           "type": "integer",
