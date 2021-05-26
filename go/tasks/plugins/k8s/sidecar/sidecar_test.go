@@ -200,6 +200,7 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 	assert.EqualValues(t, map[string]string{
 		primaryContainerKey: "primary container",
 	}, res.GetAnnotations())
+	assert.EqualValues(t, map[string]string{}, res.GetLabels())
 
 	// Assert volumes & volume mounts are preserved
 	assert.Len(t, res.(*v1.Pod).Spec.Volumes, 1)
@@ -313,7 +314,12 @@ func TestBuildSidecarResource(t *testing.T) {
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
 		primaryContainerKey: "a container",
+		"a1":                "a1",
 	}, res.GetAnnotations())
+
+	assert.EqualValues(t, map[string]string{
+		"b1": "b1",
+	}, res.GetLabels())
 
 	// Assert volumes & volume mounts are preserved
 	assert.Len(t, res.(*v1.Pod).Spec.Volumes, 1)
@@ -336,6 +342,28 @@ func TestBuildSidecarResource(t *testing.T) {
 			t.Fatalf("unexpected toleration [%+v]", tol)
 		}
 	}
+}
+
+func TestBuildSidecarReosurceMissingAnnotationsAndLabels(t *testing.T) {
+	sideCarJob := sidecarJob{
+		PrimaryContainerName: "PrimaryContainer",
+		PodSpec: &v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "PrimaryContainer",
+				},
+			},
+		},
+	}
+
+	task := getSidecarTaskTemplateForTest(sideCarJob)
+
+	handler := &sidecarResourceHandler{}
+	taskCtx := getDummySidecarTaskContext(task, resourceRequirements)
+	resp, err := handler.BuildResource(context.TODO(), taskCtx)
+	assert.NoError(t, err)
+	assert.EqualValues(t, map[string]string{}, resp.GetLabels())
+	assert.EqualValues(t, map[string]string{"primary_container_name": "PrimaryContainer"}, resp.GetAnnotations())
 }
 
 func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
