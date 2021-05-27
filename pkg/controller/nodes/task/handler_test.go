@@ -213,6 +213,20 @@ func Test_task_Setup(t *testing.T) {
 			pluginIDs:       map[pluginCore.TaskType]string{corePluginType: corePluginType, corePluginDefaultType: corePluginDefaultType, k8sPluginType: k8sPluginType, k8sPluginDefaultType: k8sPluginDefaultType},
 			defaultPluginID: corePluginDefaultType,
 		}, false},
+		{"partial-default-task-types",
+			testPluginRegistry{
+				core: []pluginCore.PluginEntry{corePluginEntry},
+				k8s:  []pluginK8s.PluginEntry{k8sPluginEntry},
+			},
+			[]string{corePluginType, k8sPluginType},
+			map[string]string{corePluginType: corePluginType},
+			wantFields{
+				pluginIDs: map[pluginCore.TaskType]string{
+					corePluginType: corePluginType,
+					k8sPluginType:  k8sPluginType,
+				},
+			},
+			false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

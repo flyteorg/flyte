@@ -258,7 +258,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx handler.SetupContext) error {
 	// Read from the fallback task handler map for any remaining tasks without a defaultPlugins registered handler.
 	for taskType, registeredPlugins := range fallbackTaskHandlerMap {
 		if _, ok := t.defaultPlugins[taskType]; ok {
-			break
+			continue
 		}
 		if len(registeredPlugins) != 1 {
 			logger.Errorf(ctx, "Multiple plugins registered to handle task type: %s. ([%+v])", taskType, registeredPlugins)
