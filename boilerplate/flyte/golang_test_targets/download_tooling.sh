@@ -7,7 +7,7 @@
 # pins.  To facilitate this, we're maintaining two sets of go.mod/sum files - the second one only for tooling.  This is
 # the same approach that go 1.14 will take as well.
 # See:
-#   https://github.com/lyft/flyte/issues/129
+#   https://github.com/flyteorg/flyte/issues/129
 #   https://github.com/golang/go/issues/30515 for some background context
 #   https://github.com/go-modules-by-example/index/blob/5ec250b4b78114a55001bd7c9cb88f6e07270ea5/010_tools/README.md
 
@@ -17,14 +17,14 @@ set -e
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
   "github.com/vektra/mockery/cmd/mockery"
-  "github.com/lyft/flytestdlib/cli/pflags"
+  "github.com/flyteorg/flytestdlib/cli/pflags"
   "github.com/golangci/golangci-lint/cmd/golangci-lint"
   "github.com/alvaroloes/enumer"
 )
 
 tmp_dir=$(mktemp -d -t gotooling-XXX)
 echo "Using temp directory ${tmp_dir}"
-cp -R boilerplate/lyft/golang_support_tools/* $tmp_dir
+cp -R boilerplate/flyte/golang_support_tools/* $tmp_dir
 pushd "$tmp_dir"
 
 for tool in "${tools[@]}"
