@@ -24,7 +24,20 @@ Generating docs locally can be accomplished by running make gendocs from within 
 $ brew tap flyteorg/homebrew-tap
 $ brew install flytectl
 ```
+## Get Started 
 
+### Create a sandbox cluster 
+```bash
+$ docker run --rm --privileged -p 30081:30081 -p 30082:30082 -p 30084:30084 ghcr.io/flyteorg/flyte-sandbox
+```
+
+### Register your first workflow
+
+```bash
+# Run Core workflows 
+$ flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.89/flytesnacks-core.tgz -d development  -p flytesnacks --archive  
+# You can find all example at flytesnacks release page  https://github.com/flyteorg/flytesnacks/releases/tag/v0.2.89 
+```
 ## Contributing
 
 [Contribution guidelines for this project](docs/CONTRIBUTING.md)
