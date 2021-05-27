@@ -110,7 +110,8 @@ func buildFieldForMap(ctx context.Context, t *types.Map, name, goName, usage, de
 			emptyDefaultValue = fmt.Sprintf(`map[%v]%v{}`, k.Name(), v.Name())
 		} else {
 			// Value is not a basic type. Rely on json marshaling to unmarshal it
-			FlagMethodName = fmt.Sprintf("StringToString")
+			/* #nosec */
+			FlagMethodName = "StringToString"
 		}
 	}
 
