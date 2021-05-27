@@ -1605,15 +1605,9 @@ func (m *AuthRole) Validate() error {
 		return nil
 	}
 
-	switch m.Method.(type) {
+	// no validation rules for AssumableIamRole
 
-	case *AuthRole_AssumableIamRole:
-		// no validation rules for AssumableIamRole
-
-	case *AuthRole_KubernetesServiceAccount:
-		// no validation rules for KubernetesServiceAccount
-
-	}
+	// no validation rules for KubernetesServiceAccount
 
 	return nil
 }

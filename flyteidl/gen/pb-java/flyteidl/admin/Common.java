@@ -18886,31 +18886,46 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string assumable_iam_role = 1;</code>
      */
     java.lang.String getAssumableIamRole();
     /**
+     * <pre>
+     * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string assumable_iam_role = 1;</code>
      */
     com.google.protobuf.ByteString
         getAssumableIamRoleBytes();
 
     /**
+     * <pre>
+     * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string kubernetes_service_account = 2;</code>
      */
     java.lang.String getKubernetesServiceAccount();
     /**
+     * <pre>
+     * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string kubernetes_service_account = 2;</code>
      */
     com.google.protobuf.ByteString
         getKubernetesServiceAccountBytes();
-
-    public flyteidl.admin.Common.AuthRole.MethodCase getMethodCase();
   }
   /**
    * <pre>
-   * Defines permissions associated with executions.
-   * Deprecated, please use core.SecurityContext
+   * Defines permissions associated with executions created by this launch plan spec.
+   * Use either of these roles when they have permissions required by your workflow execution.
+   * Deprecated.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.AuthRole}
@@ -18925,6 +18940,8 @@ public final class Common {
       super(builder);
     }
     private AuthRole() {
+      assumableIamRole_ = "";
+      kubernetesServiceAccount_ = "";
     }
 
     @java.lang.Override
@@ -18953,14 +18970,14 @@ public final class Common {
               break;
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
-              methodCase_ = 1;
-              method_ = s;
+
+              assumableIamRole_ = s;
               break;
             }
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
-              methodCase_ = 2;
-              method_ = s;
+
+              kubernetesServiceAccount_ = s;
               break;
             }
             default: {
@@ -18995,81 +19012,42 @@ public final class Common {
               flyteidl.admin.Common.AuthRole.class, flyteidl.admin.Common.AuthRole.Builder.class);
     }
 
-    private int methodCase_ = 0;
-    private java.lang.Object method_;
-    public enum MethodCase
-        implements com.google.protobuf.Internal.EnumLite {
-      ASSUMABLE_IAM_ROLE(1),
-      KUBERNETES_SERVICE_ACCOUNT(2),
-      METHOD_NOT_SET(0);
-      private final int value;
-      private MethodCase(int value) {
-        this.value = value;
-      }
-      /**
-       * @deprecated Use {@link #forNumber(int)} instead.
-       */
-      @java.lang.Deprecated
-      public static MethodCase valueOf(int value) {
-        return forNumber(value);
-      }
-
-      public static MethodCase forNumber(int value) {
-        switch (value) {
-          case 1: return ASSUMABLE_IAM_ROLE;
-          case 2: return KUBERNETES_SERVICE_ACCOUNT;
-          case 0: return METHOD_NOT_SET;
-          default: return null;
-        }
-      }
-      public int getNumber() {
-        return this.value;
-      }
-    };
-
-    public MethodCase
-    getMethodCase() {
-      return MethodCase.forNumber(
-          methodCase_);
-    }
-
     public static final int ASSUMABLE_IAM_ROLE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object assumableIamRole_;
     /**
+     * <pre>
+     * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string assumable_iam_role = 1;</code>
      */
     public java.lang.String getAssumableIamRole() {
-      java.lang.Object ref = "";
-      if (methodCase_ == 1) {
-        ref = method_;
-      }
+      java.lang.Object ref = assumableIamRole_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (methodCase_ == 1) {
-          method_ = s;
-        }
+        assumableIamRole_ = s;
         return s;
       }
     }
     /**
+     * <pre>
+     * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string assumable_iam_role = 1;</code>
      */
     public com.google.protobuf.ByteString
         getAssumableIamRoleBytes() {
-      java.lang.Object ref = "";
-      if (methodCase_ == 1) {
-        ref = method_;
-      }
+      java.lang.Object ref = assumableIamRole_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        if (methodCase_ == 1) {
-          method_ = b;
-        }
+        assumableIamRole_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -19077,42 +19055,41 @@ public final class Common {
     }
 
     public static final int KUBERNETES_SERVICE_ACCOUNT_FIELD_NUMBER = 2;
+    private volatile java.lang.Object kubernetesServiceAccount_;
     /**
+     * <pre>
+     * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string kubernetes_service_account = 2;</code>
      */
     public java.lang.String getKubernetesServiceAccount() {
-      java.lang.Object ref = "";
-      if (methodCase_ == 2) {
-        ref = method_;
-      }
+      java.lang.Object ref = kubernetesServiceAccount_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (methodCase_ == 2) {
-          method_ = s;
-        }
+        kubernetesServiceAccount_ = s;
         return s;
       }
     }
     /**
+     * <pre>
+     * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+     * </pre>
+     *
      * <code>string kubernetes_service_account = 2;</code>
      */
     public com.google.protobuf.ByteString
         getKubernetesServiceAccountBytes() {
-      java.lang.Object ref = "";
-      if (methodCase_ == 2) {
-        ref = method_;
-      }
+      java.lang.Object ref = kubernetesServiceAccount_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        if (methodCase_ == 2) {
-          method_ = b;
-        }
+        kubernetesServiceAccount_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -19133,11 +19110,11 @@ public final class Common {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (methodCase_ == 1) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, method_);
+      if (!getAssumableIamRoleBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, assumableIamRole_);
       }
-      if (methodCase_ == 2) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, method_);
+      if (!getKubernetesServiceAccountBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, kubernetesServiceAccount_);
       }
       unknownFields.writeTo(output);
     }
@@ -19148,11 +19125,11 @@ public final class Common {
       if (size != -1) return size;
 
       size = 0;
-      if (methodCase_ == 1) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, method_);
+      if (!getAssumableIamRoleBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, assumableIamRole_);
       }
-      if (methodCase_ == 2) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, method_);
+      if (!getKubernetesServiceAccountBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, kubernetesServiceAccount_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -19169,19 +19146,10 @@ public final class Common {
       }
       flyteidl.admin.Common.AuthRole other = (flyteidl.admin.Common.AuthRole) obj;
 
-      if (!getMethodCase().equals(other.getMethodCase())) return false;
-      switch (methodCase_) {
-        case 1:
-          if (!getAssumableIamRole()
-              .equals(other.getAssumableIamRole())) return false;
-          break;
-        case 2:
-          if (!getKubernetesServiceAccount()
-              .equals(other.getKubernetesServiceAccount())) return false;
-          break;
-        case 0:
-        default:
-      }
+      if (!getAssumableIamRole()
+          .equals(other.getAssumableIamRole())) return false;
+      if (!getKubernetesServiceAccount()
+          .equals(other.getKubernetesServiceAccount())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -19193,18 +19161,10 @@ public final class Common {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      switch (methodCase_) {
-        case 1:
-          hash = (37 * hash) + ASSUMABLE_IAM_ROLE_FIELD_NUMBER;
-          hash = (53 * hash) + getAssumableIamRole().hashCode();
-          break;
-        case 2:
-          hash = (37 * hash) + KUBERNETES_SERVICE_ACCOUNT_FIELD_NUMBER;
-          hash = (53 * hash) + getKubernetesServiceAccount().hashCode();
-          break;
-        case 0:
-        default:
-      }
+      hash = (37 * hash) + ASSUMABLE_IAM_ROLE_FIELD_NUMBER;
+      hash = (53 * hash) + getAssumableIamRole().hashCode();
+      hash = (37 * hash) + KUBERNETES_SERVICE_ACCOUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getKubernetesServiceAccount().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -19302,8 +19262,9 @@ public final class Common {
     }
     /**
      * <pre>
-     * Defines permissions associated with executions.
-     * Deprecated, please use core.SecurityContext
+     * Defines permissions associated with executions created by this launch plan spec.
+     * Use either of these roles when they have permissions required by your workflow execution.
+     * Deprecated.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.AuthRole}
@@ -19343,8 +19304,10 @@ public final class Common {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        methodCase_ = 0;
-        method_ = null;
+        assumableIamRole_ = "";
+
+        kubernetesServiceAccount_ = "";
+
         return this;
       }
 
@@ -19371,13 +19334,8 @@ public final class Common {
       @java.lang.Override
       public flyteidl.admin.Common.AuthRole buildPartial() {
         flyteidl.admin.Common.AuthRole result = new flyteidl.admin.Common.AuthRole(this);
-        if (methodCase_ == 1) {
-          result.method_ = method_;
-        }
-        if (methodCase_ == 2) {
-          result.method_ = method_;
-        }
-        result.methodCase_ = methodCase_;
+        result.assumableIamRole_ = assumableIamRole_;
+        result.kubernetesServiceAccount_ = kubernetesServiceAccount_;
         onBuilt();
         return result;
       }
@@ -19426,22 +19384,13 @@ public final class Common {
 
       public Builder mergeFrom(flyteidl.admin.Common.AuthRole other) {
         if (other == flyteidl.admin.Common.AuthRole.getDefaultInstance()) return this;
-        switch (other.getMethodCase()) {
-          case ASSUMABLE_IAM_ROLE: {
-            methodCase_ = 1;
-            method_ = other.method_;
-            onChanged();
-            break;
-          }
-          case KUBERNETES_SERVICE_ACCOUNT: {
-            methodCase_ = 2;
-            method_ = other.method_;
-            onChanged();
-            break;
-          }
-          case METHOD_NOT_SET: {
-            break;
-          }
+        if (!other.getAssumableIamRole().isEmpty()) {
+          assumableIamRole_ = other.assumableIamRole_;
+          onChanged();
+        }
+        if (!other.getKubernetesServiceAccount().isEmpty()) {
+          kubernetesServiceAccount_ = other.kubernetesServiceAccount_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -19471,64 +19420,52 @@ public final class Common {
         }
         return this;
       }
-      private int methodCase_ = 0;
-      private java.lang.Object method_;
-      public MethodCase
-          getMethodCase() {
-        return MethodCase.forNumber(
-            methodCase_);
-      }
 
-      public Builder clearMethod() {
-        methodCase_ = 0;
-        method_ = null;
-        onChanged();
-        return this;
-      }
-
-
+      private java.lang.Object assumableIamRole_ = "";
       /**
+       * <pre>
+       * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string assumable_iam_role = 1;</code>
        */
       public java.lang.String getAssumableIamRole() {
-        java.lang.Object ref = "";
-        if (methodCase_ == 1) {
-          ref = method_;
-        }
+        java.lang.Object ref = assumableIamRole_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          if (methodCase_ == 1) {
-            method_ = s;
-          }
+          assumableIamRole_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
+       * <pre>
+       * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string assumable_iam_role = 1;</code>
        */
       public com.google.protobuf.ByteString
           getAssumableIamRoleBytes() {
-        java.lang.Object ref = "";
-        if (methodCase_ == 1) {
-          ref = method_;
-        }
+        java.lang.Object ref = assumableIamRole_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          if (methodCase_ == 1) {
-            method_ = b;
-          }
+          assumableIamRole_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
+       * <pre>
+       * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string assumable_iam_role = 1;</code>
        */
       public Builder setAssumableIamRole(
@@ -19536,23 +19473,29 @@ public final class Common {
         if (value == null) {
     throw new NullPointerException();
   }
-  methodCase_ = 1;
-        method_ = value;
+  
+        assumableIamRole_ = value;
         onChanged();
         return this;
       }
       /**
+       * <pre>
+       * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string assumable_iam_role = 1;</code>
        */
       public Builder clearAssumableIamRole() {
-        if (methodCase_ == 1) {
-          methodCase_ = 0;
-          method_ = null;
-          onChanged();
-        }
+        
+        assumableIamRole_ = getDefaultInstance().getAssumableIamRole();
+        onChanged();
         return this;
       }
       /**
+       * <pre>
+       * Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string assumable_iam_role = 1;</code>
        */
       public Builder setAssumableIamRoleBytes(
@@ -19561,54 +19504,57 @@ public final class Common {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        methodCase_ = 1;
-        method_ = value;
+        
+        assumableIamRole_ = value;
         onChanged();
         return this;
       }
 
+      private java.lang.Object kubernetesServiceAccount_ = "";
       /**
+       * <pre>
+       * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string kubernetes_service_account = 2;</code>
        */
       public java.lang.String getKubernetesServiceAccount() {
-        java.lang.Object ref = "";
-        if (methodCase_ == 2) {
-          ref = method_;
-        }
+        java.lang.Object ref = kubernetesServiceAccount_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          if (methodCase_ == 2) {
-            method_ = s;
-          }
+          kubernetesServiceAccount_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
+       * <pre>
+       * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string kubernetes_service_account = 2;</code>
        */
       public com.google.protobuf.ByteString
           getKubernetesServiceAccountBytes() {
-        java.lang.Object ref = "";
-        if (methodCase_ == 2) {
-          ref = method_;
-        }
+        java.lang.Object ref = kubernetesServiceAccount_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          if (methodCase_ == 2) {
-            method_ = b;
-          }
+          kubernetesServiceAccount_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
+       * <pre>
+       * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string kubernetes_service_account = 2;</code>
        */
       public Builder setKubernetesServiceAccount(
@@ -19616,23 +19562,29 @@ public final class Common {
         if (value == null) {
     throw new NullPointerException();
   }
-  methodCase_ = 2;
-        method_ = value;
+  
+        kubernetesServiceAccount_ = value;
         onChanged();
         return this;
       }
       /**
+       * <pre>
+       * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string kubernetes_service_account = 2;</code>
        */
       public Builder clearKubernetesServiceAccount() {
-        if (methodCase_ == 2) {
-          methodCase_ = 0;
-          method_ = null;
-          onChanged();
-        }
+        
+        kubernetesServiceAccount_ = getDefaultInstance().getKubernetesServiceAccount();
+        onChanged();
         return this;
       }
       /**
+       * <pre>
+       * Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+       * </pre>
+       *
        * <code>string kubernetes_service_account = 2;</code>
        */
       public Builder setKubernetesServiceAccountBytes(
@@ -19641,8 +19593,8 @@ public final class Common {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        methodCase_ = 2;
-        method_ = value;
+        
+        kubernetesServiceAccount_ = value;
         onChanged();
         return this;
       }
@@ -20490,14 +20442,14 @@ public final class Common {
       "8\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyt" +
       "eidl.admin.Annotations.ValuesEntry\032-\n\013Va" +
       "luesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028" +
-      "\001\"X\n\010AuthRole\022\034\n\022assumable_iam_role\030\001 \001(" +
-      "\tH\000\022$\n\032kubernetes_service_account\030\002 \001(\tH" +
-      "\000B\010\n\006method\"5\n\023RawOutputDataConfig\022\036\n\026ou" +
-      "tput_location_prefix\030\001 \001(\t*\\\n\020NamedEntit" +
-      "yState\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED" +
-      "_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002" +
-      "B7Z5github.com/flyteorg/flyteidl/gen/pb-" +
-      "go/flyteidl/adminb\006proto3"
+      "\001\"J\n\010AuthRole\022\032\n\022assumable_iam_role\030\001 \001(" +
+      "\t\022\"\n\032kubernetes_service_account\030\002 \001(\t\"5\n" +
+      "\023RawOutputDataConfig\022\036\n\026output_location_" +
+      "prefix\030\001 \001(\t*\\\n\020NamedEntityState\022\027\n\023NAME" +
+      "D_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIV" +
+      "ED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5github.com" +
+      "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad" +
+      "minb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20650,7 +20602,7 @@ public final class Common {
     internal_static_flyteidl_admin_AuthRole_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_AuthRole_descriptor,
-        new java.lang.String[] { "AssumableIamRole", "KubernetesServiceAccount", "Method", });
+        new java.lang.String[] { "AssumableIamRole", "KubernetesServiceAccount", });
     internal_static_flyteidl_admin_RawOutputDataConfig_descriptor =
       getDescriptor().getMessageTypes().get(21);
     internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable = new

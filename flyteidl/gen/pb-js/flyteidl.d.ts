@@ -7371,9 +7371,6 @@ export namespace flyteidl {
             /** AuthRole kubernetesServiceAccount. */
             public kubernetesServiceAccount: string;
 
-            /** AuthRole method. */
-            public method?: ("assumableIamRole"|"kubernetesServiceAccount");
-
             /**
              * Creates a new AuthRole instance using the specified properties.
              * @param [properties] Properties to set
