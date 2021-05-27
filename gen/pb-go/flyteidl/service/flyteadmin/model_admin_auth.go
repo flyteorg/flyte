@@ -9,8 +9,10 @@
 
 package flyteadmin
 
-// Defines permissions associated with executions created by this launch plan spec. Deprecated.
+// Defines permissions associated with executions created by this launch plan spec. Use either of these roles when they have permissions required by your workflow execution. Deprecated.
 type AdminAuth struct {
+	// Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
 	AssumableIamRole string `json:"assumable_iam_role,omitempty"`
+	// Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
 	KubernetesServiceAccount string `json:"kubernetes_service_account,omitempty"`
 }
