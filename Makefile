@@ -1,8 +1,9 @@
 export REPOSITORY=flytestdlib
-include boilerplate/lyft/golang_test_targets/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
 
 .PHONY: update_boilerplate
 update_boilerplate:
+	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
 
 # Generate golden files. Add test packages that generate golden files here.

@@ -113,12 +113,14 @@ func (w *weightedRandomListImpl) get(generator *rand.Rand) Comparable {
 
 // Returns a random entry based on the weights
 func (w *weightedRandomListImpl) Get() Comparable {
+	/* #nosec */
 	randGenerator := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	return w.get(randGenerator)
 }
 
 // For a given seed, the same entry will be returned all the time.
 func (w *weightedRandomListImpl) GetWithSeed(seed rand.Source) (Comparable, error) {
+	/* #nosec */
 	randGenerator := rand.New(seed)
 	return w.get(randGenerator), nil
 }
