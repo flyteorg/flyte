@@ -184,7 +184,7 @@ data:
       name: flyte-data-config
       namespace: {{ namespace }}
     data:
-      config.yaml: |
+      config.yaml: | 
         storage:
           type: s3
           container: "<BUCKET_NAME>"

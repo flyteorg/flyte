@@ -290,7 +290,7 @@ data:
       name: flyte-data-config
       namespace: {{ namespace }}
     data:
-      config.yaml: |
+      config.yaml: | 
         storage:
           type: minio
           container: "my-s3-bucket"

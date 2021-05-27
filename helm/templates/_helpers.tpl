@@ -164,7 +164,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 {{- end }}
 
-{{- define "storage" -}}
+{{- define "storage.base" -}}
 storage:
 {{- if eq .Values.storage.type "s3" }}
   type: s3
@@ -196,6 +196,10 @@ storage:
   {{ toYaml . | nindent 2 }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "storage" -}}
+{{ include "storage.base" .}}
   limits:
     maxDownloadMBs: 10
 {{- end }}
@@ -207,37 +211,6 @@ metadata:
   name: flyte-data-config
   namespace: {{`{{ namespace }}`}}
 data:
-  config.yaml: |
-    storage:
-{{- if eq .Values.storage.type "s3" }}
-      type: s3
-      container: {{ .Values.storage.bucketName | quote }}
-      connection:
-        auth-type: iam
-        region: {{ .Values.storage.s3.region }}
-{{- else if eq .Values.storage.type "gcs" }}
-      type: stow
-      stow:
-        kind: google
-        config:
-          json: ""
-          project_id: {{ .Values.storage.gcs.projectId }}
-          scopes: https://www.googleapis.com/auth/devstorage.read_write
-      container: {{ .Values.storage.bucketName | quote }}
-{{- else if eq .Values.storage.type "sandbox" }}
-      type: minio
-      container: {{ .Values.storage.bucketName | quote }}
-      connection:
-        access-key: minio
-        auth-type: accesskey
-        secret-key: miniostorage
-        disable-ssl: true
-        endpoint: http://minio.flyte.svc.cluster.local:9000
-        region: us-east-1
-{{- else if eq .Values.storage.type "custom" }}
-{{- with .Values.storage.custom -}}
-  {{ toYaml . | nindent 2 }}
-{{- end }}
-{{- end }}
+  config.yaml: | {{ include "storage.base" . | nindent 4 }}
       enable-multicontainer: true
 {{- end }}
