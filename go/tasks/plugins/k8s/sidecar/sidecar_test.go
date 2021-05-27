@@ -9,6 +9,8 @@ import (
 	"path"
 	"testing"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
 
 	"github.com/flyteorg/flytestdlib/storage"
@@ -115,8 +117,8 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	return taskCtx
 }
 
-func TestBuildSidecarResource_TaskType1(t *testing.T) {
-	podSpec := v1.PodSpec{
+func getPodSpec() v1.PodSpec {
+	return v1.PodSpec{
 		Containers: []v1.Container{
 			{
 				Name: "primary container",
@@ -153,6 +155,124 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 			},
 		},
 	}
+}
+
+func checkUserTolerations(t *testing.T, res client.Object) {
+	// Assert user-specified tolerations don't get overridden
+	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 1)
+	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
+		if tol.Key == "my toleration key" {
+			assert.Equal(t, tol.Value, "my toleration value")
+		} else {
+			t.Fatalf("unexpected toleration [%+v]", tol)
+		}
+	}
+}
+
+func TestBuildSidecarResource_TaskType2(t *testing.T) {
+	podSpec := getPodSpec()
+
+	b, err := json.Marshal(podSpec)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	structObj := &structpb.Struct{}
+	if err := json.Unmarshal(b, structObj); err != nil {
+		t.Fatal(err)
+	}
+
+	task := core.TaskTemplate{
+		TaskTypeVersion: 2,
+		Config: map[string]string{
+			primaryContainerKey: "primary container",
+		},
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				PodSpec: structObj,
+				Metadata: &core.K8SObjectMetadata{
+					Labels: map[string]string{
+						"label": "foo",
+					},
+					Annotations: map[string]string{
+						"anno": "bar",
+					},
+				},
+			},
+		},
+	}
+
+	tolGPU := v1.Toleration{
+		Key:      "flyte/gpu",
+		Value:    "dedicated",
+		Operator: v1.TolerationOpEqual,
+		Effect:   v1.TaintEffectNoSchedule,
+	}
+
+	tolStorage := v1.Toleration{
+		Key:      "storage",
+		Value:    "dedicated",
+		Operator: v1.TolerationOpExists,
+		Effect:   v1.TaintEffectNoSchedule,
+	}
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
+			v1.ResourceStorage: {tolStorage},
+			ResourceNvidiaGPU:  {tolGPU},
+		},
+		DefaultCPURequest:    "1024m",
+		DefaultMemoryRequest: "1024Mi",
+	}))
+	handler := &sidecarResourceHandler{}
+	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
+	res, err := handler.BuildResource(context.TODO(), taskCtx)
+	assert.Nil(t, err)
+	assert.EqualValues(t, map[string]string{
+		primaryContainerKey: "primary container",
+		"anno":              "bar",
+	}, res.GetAnnotations())
+	assert.EqualValues(t, map[string]string{
+		"label": "foo",
+	}, res.GetLabels())
+
+	// Assert volumes & volume mounts are preserved
+	assert.Len(t, res.(*v1.Pod).Spec.Volumes, 1)
+	assert.Equal(t, "dshm", res.(*v1.Pod).Spec.Volumes[0].Name)
+
+	assert.Len(t, res.(*v1.Pod).Spec.Containers[0].VolumeMounts, 1)
+	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
+	checkUserTolerations(t, res)
+
+}
+
+func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
+	task := core.TaskTemplate{
+		TaskTypeVersion: 2,
+		Config: map[string]string{
+			primaryContainerKey: "primary container",
+		},
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				Metadata: &core.K8SObjectMetadata{
+					Labels: map[string]string{
+						"label": "foo",
+					},
+					Annotations: map[string]string{
+						"anno": "bar",
+					},
+				},
+			},
+		},
+	}
+
+	handler := &sidecarResourceHandler{}
+	taskCtx := getDummySidecarTaskContext(&task, resourceRequirements)
+	_, err := handler.BuildResource(context.TODO(), taskCtx)
+	assert.EqualError(t, err, "[BadTaskSpecification] Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
+}
+
+func TestBuildSidecarResource_TaskType1(t *testing.T) {
+	podSpec := getPodSpec()
 
 	b, err := json.Marshal(podSpec)
 	if err != nil {
@@ -209,16 +329,7 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 	assert.Len(t, res.(*v1.Pod).Spec.Containers[0].VolumeMounts, 1)
 	assert.Equal(t, "volume mount", res.(*v1.Pod).Spec.Containers[0].VolumeMounts[0].Name)
 
-	// Assert user-specified tolerations don't get overridden
-	assert.Len(t, res.(*v1.Pod).Spec.Tolerations, 1)
-	for _, tol := range res.(*v1.Pod).Spec.Tolerations {
-		if tol.Key == "my toleration key" {
-			assert.Equal(t, tol.Value, "my toleration value")
-		} else {
-			t.Fatalf("unexpected toleration [%+v]", tol)
-		}
-	}
-
+	checkUserTolerations(t, res)
 }
 
 func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
