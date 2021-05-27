@@ -22206,20 +22206,6 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             Auth.prototype.kubernetesServiceAccount = "";
 
-            // OneOf field names bound to virtual getters and setters
-            let $oneOfFields;
-
-            /**
-             * Auth method.
-             * @member {"assumableIamRole"|"kubernetesServiceAccount"|undefined} method
-             * @memberof flyteidl.admin.Auth
-             * @instance
-             */
-            Object.defineProperty(Auth.prototype, "method", {
-                get: $util.oneOfGetter($oneOfFields = ["assumableIamRole", "kubernetesServiceAccount"]),
-                set: $util.oneOfSetter($oneOfFields)
-            });
-
             /**
              * Creates a new Auth instance using the specified properties.
              * @function create
@@ -22294,19 +22280,12 @@ export const flyteidl = $root.flyteidl = (() => {
             Auth.verify = function verify(message) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                let properties = {};
-                if (message.assumableIamRole != null && message.hasOwnProperty("assumableIamRole")) {
-                    properties.method = 1;
+                if (message.assumableIamRole != null && message.hasOwnProperty("assumableIamRole"))
                     if (!$util.isString(message.assumableIamRole))
                         return "assumableIamRole: string expected";
-                }
-                if (message.kubernetesServiceAccount != null && message.hasOwnProperty("kubernetesServiceAccount")) {
-                    if (properties.method === 1)
-                        return "method: multiple values";
-                    properties.method = 1;
+                if (message.kubernetesServiceAccount != null && message.hasOwnProperty("kubernetesServiceAccount"))
                     if (!$util.isString(message.kubernetesServiceAccount))
                         return "kubernetesServiceAccount: string expected";
-                }
                 return null;
             };
 

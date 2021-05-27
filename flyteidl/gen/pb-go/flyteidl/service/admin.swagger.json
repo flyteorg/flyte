@@ -3027,13 +3027,15 @@
       "type": "object",
       "properties": {
         "assumable_iam_role": {
-          "type": "string"
+          "type": "string",
+          "description": "Defines an optional iam role which will be used for tasks run in executions created with this launch plan."
         },
         "kubernetes_service_account": {
-          "type": "string"
+          "type": "string",
+          "description": "Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan."
         }
       },
-      "description": "Defines permissions associated with executions created by this launch plan spec.\nDeprecated."
+      "description": "Defines permissions associated with executions created by this launch plan spec.\nUse either of these roles when they have permissions required by your workflow execution.\nDeprecated."
     },
     "adminAuthRole": {
       "type": "object",

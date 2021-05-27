@@ -2693,10 +2693,15 @@ definitions:
     properties:
       assumable_iam_role:
         type: "string"
+        description: "Defines an optional iam role which will be used for tasks run\
+          \ in executions created with this launch plan."
       kubernetes_service_account:
         type: "string"
+        description: "Defines an optional kubernetes service account which will be\
+          \ used for tasks run in executions created with this launch plan."
     description: "Defines permissions associated with executions created by this launch\
-      \ plan spec.\nDeprecated."
+      \ plan spec.\nUse either of these roles when they have permissions required\
+      \ by your workflow execution.\nDeprecated."
     example:
       kubernetes_service_account: "kubernetes_service_account"
       assumable_iam_role: "assumable_iam_role"
