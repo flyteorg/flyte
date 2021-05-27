@@ -56,6 +56,7 @@ class AdminAuth(object):
     def assumable_iam_role(self):
         """Gets the assumable_iam_role of this AdminAuth.  # noqa: E501
 
+        Defines an optional iam role which will be used for tasks run in executions created with this launch plan.  # noqa: E501
 
         :return: The assumable_iam_role of this AdminAuth.  # noqa: E501
         :rtype: str
@@ -66,6 +67,7 @@ class AdminAuth(object):
     def assumable_iam_role(self, assumable_iam_role):
         """Sets the assumable_iam_role of this AdminAuth.
 
+        Defines an optional iam role which will be used for tasks run in executions created with this launch plan.  # noqa: E501
 
         :param assumable_iam_role: The assumable_iam_role of this AdminAuth.  # noqa: E501
         :type: str
@@ -77,6 +79,7 @@ class AdminAuth(object):
     def kubernetes_service_account(self):
         """Gets the kubernetes_service_account of this AdminAuth.  # noqa: E501
 
+        Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.  # noqa: E501
 
         :return: The kubernetes_service_account of this AdminAuth.  # noqa: E501
         :rtype: str
@@ -87,6 +90,7 @@ class AdminAuth(object):
     def kubernetes_service_account(self, kubernetes_service_account):
         """Sets the kubernetes_service_account of this AdminAuth.
 
+        Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.  # noqa: E501
 
         :param kubernetes_service_account: The kubernetes_service_account of this AdminAuth.  # noqa: E501
         :type: str
