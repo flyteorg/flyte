@@ -164,7 +164,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 {{- end }}
 
-{{- define "storage" -}}
+{{- define "storage.base" -}}
 storage:
 {{- if eq .Values.storage.type "s3" }}
   type: s3
@@ -196,6 +196,21 @@ storage:
   {{ toYaml . | nindent 2 }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+{{- define "storage" -}}
+{{ include "storage.base" .}}
   limits:
     maxDownloadMBs: 10
+{{- end }}
+
+{{- define "copilot.config" -}}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: flyte-data-config
+  namespace: {{`{{ namespace }}`}}
+data:
+  config.yaml: | {{ include "storage.base" . | nindent 4 }}
+      enable-multicontainer: true
 {{- end }}
