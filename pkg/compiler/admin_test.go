@@ -3,9 +3,9 @@ package compiler
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +24,7 @@ var inputs = core.ParameterMap{
 				Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 			},
 			Behavior: &core.Parameter_Default{
-				Default: utils.MustMakeLiteral("foo-value"),
+				Default: coreutils.MustMakeLiteral("foo-value"),
 			},
 		},
 	},

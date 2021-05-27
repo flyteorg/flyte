@@ -10,11 +10,11 @@ import (
 
 	"github.com/ghodss/yaml"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
@@ -230,8 +230,8 @@ func generateWorkflowWithInputs(t *testing.T) {
 	marshalGolden(t, &closure, "workflow_w_inputs")
 	sampleInputs := core.LiteralMap{
 		Literals: map[string]*core.Literal{
-			"x": utils.MustMakeLiteral(2),
-			"y": utils.MustMakeLiteral([]interface{}{"val1", "val2", "val3"}),
+			"x": coreutils.MustMakeLiteral(2),
+			"y": coreutils.MustMakeLiteral([]interface{}{"val1", "val2", "val3"}),
 		},
 	}
 

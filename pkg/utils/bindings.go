@@ -1,6 +1,9 @@
 package utils
 
-import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+import (
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+)
 
 func MakeBindingDataPromise(fromNode, fromVar string) *core.BindingData {
 	return &core.BindingData{
@@ -54,7 +57,7 @@ func MakeBindingDataMap(pairs ...Pair) *core.BindingData {
 }
 
 func MakePrimitiveBindingData(v interface{}) (*core.BindingData, error) {
-	p, err := MakePrimitive(v)
+	p, err := coreutils.MakePrimitive(v)
 	if err != nil {
 		return nil, err
 	}

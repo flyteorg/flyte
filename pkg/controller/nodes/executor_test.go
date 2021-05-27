@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	mocks3 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
@@ -34,7 +35,6 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	flyteassert "github.com/flyteorg/flytepropeller/pkg/utils/assert"
 )
 
@@ -54,8 +54,8 @@ func TestSetInputsForStartNode(t *testing.T) {
 	assert.NoError(t, err)
 	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
-			"x": utils.MustMakePrimitiveLiteral("hello"),
-			"y": utils.MustMakePrimitiveLiteral("blah"),
+			"x": coreutils.MustMakePrimitiveLiteral("hello"),
+			"y": coreutils.MustMakePrimitiveLiteral("blah"),
 		},
 	}
 

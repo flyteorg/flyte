@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/storage"
@@ -13,7 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 // Creates a ComparisonExpression, comparing 2 literals
@@ -33,8 +33,8 @@ func getComparisonExpression(lV interface{}, op core.ComparisonExpression_Operat
 	}
 	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
-			"x": utils.MustMakePrimitiveLiteral(lV),
-			"y": utils.MustMakePrimitiveLiteral(rV),
+			"x": coreutils.MustMakePrimitiveLiteral(lV),
+			"y": coreutils.MustMakePrimitiveLiteral(rV),
 		},
 	}
 	return exp, inputs
@@ -62,13 +62,13 @@ func TestEvaluateComparison(t *testing.T) {
 		exp := &core.ComparisonExpression{
 			LeftValue: &core.Operand{
 				Val: &core.Operand_Primitive{
-					Primitive: utils.MustMakePrimitive(1),
+					Primitive: coreutils.MustMakePrimitive(1),
 				},
 			},
 			Operator: core.ComparisonExpression_GT,
 			RightValue: &core.Operand{
 				Val: &core.Operand_Primitive{
-					Primitive: utils.MustMakePrimitive(2),
+					Primitive: coreutils.MustMakePrimitive(2),
 				},
 			},
 		}
@@ -81,7 +81,7 @@ func TestEvaluateComparison(t *testing.T) {
 		exp := &core.ComparisonExpression{
 			LeftValue: &core.Operand{
 				Val: &core.Operand_Primitive{
-					Primitive: utils.MustMakePrimitive(1),
+					Primitive: coreutils.MustMakePrimitive(1),
 				},
 			},
 			Operator: core.ComparisonExpression_GT,
@@ -93,7 +93,7 @@ func TestEvaluateComparison(t *testing.T) {
 		}
 		inputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"y": utils.MustMakePrimitiveLiteral(2),
+				"y": coreutils.MustMakePrimitiveLiteral(2),
 			},
 		}
 		v, err := EvaluateComparison(exp, inputs)
@@ -112,14 +112,14 @@ func TestEvaluateComparison(t *testing.T) {
 			Operator: core.ComparisonExpression_GT,
 			RightValue: &core.Operand{
 				Val: &core.Operand_Primitive{
-					Primitive: utils.MustMakePrimitive(2),
+					Primitive: coreutils.MustMakePrimitive(2),
 				},
 			},
 		}
 		inputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
-				"y": utils.MustMakePrimitiveLiteral(3),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
+				"y": coreutils.MustMakePrimitiveLiteral(3),
 			},
 		}
 		v, err := EvaluateComparison(exp, inputs)
@@ -147,7 +147,7 @@ func TestEvaluateComparison(t *testing.T) {
 		exp := &core.ComparisonExpression{
 			LeftValue: &core.Operand{
 				Val: &core.Operand_Primitive{
-					Primitive: utils.MustMakePrimitive(1),
+					Primitive: coreutils.MustMakePrimitive(1),
 				},
 			},
 			Operator: core.ComparisonExpression_GT,
@@ -178,7 +178,7 @@ func TestEvaluateComparison(t *testing.T) {
 			Operator: core.ComparisonExpression_GT,
 			RightValue: &core.Operand{
 				Val: &core.Operand_Primitive{
-					Primitive: utils.MustMakePrimitive(1),
+					Primitive: coreutils.MustMakePrimitive(1),
 				},
 			},
 		}
@@ -261,8 +261,8 @@ func TestEvaluateBooleanExpression(t *testing.T) {
 		}
 		outerInputs := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"a": utils.MustMakePrimitiveLiteral(5),
-				"b": utils.MustMakePrimitiveLiteral(4),
+				"a": coreutils.MustMakePrimitiveLiteral(5),
+				"b": coreutils.MustMakePrimitiveLiteral(4),
 			},
 		}
 

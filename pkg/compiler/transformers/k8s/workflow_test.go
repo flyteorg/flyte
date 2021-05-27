@@ -3,10 +3,10 @@ package k8s
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -149,9 +149,9 @@ func TestBuildFlyteWorkflow_withInputs(t *testing.T) {
 		},
 	}
 
-	intLiteral, err := utils.MakePrimitiveLiteral(123)
+	intLiteral, err := coreutils.MakePrimitiveLiteral(123)
 	assert.NoError(t, err)
-	stringLiteral, err := utils.MakePrimitiveLiteral("hello")
+	stringLiteral, err := coreutils.MakePrimitiveLiteral("hello")
 	assert.NoError(t, err)
 	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{

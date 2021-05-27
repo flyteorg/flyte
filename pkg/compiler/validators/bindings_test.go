@@ -3,15 +3,13 @@ package validators
 import (
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flytepropeller/pkg/utils"
-
-	"github.com/stretchr/testify/assert"
-
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
 	compilerErrors "github.com/flyteorg/flytepropeller/pkg/compiler/errors"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestValidateBindings(t *testing.T) {
@@ -52,18 +50,18 @@ func TestValidateBindings(t *testing.T) {
 		bindings := []*core.Binding{
 			{
 				Var:     "x",
-				Binding: LiteralToBinding(utils.MustMakeLiteral(5)),
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(5)),
 			},
 			{
 				Var:     "x",
-				Binding: LiteralToBinding(utils.MustMakeLiteral(5)),
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(5)),
 			},
 		}
 
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(utils.MustMakeLiteral(5)),
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
 				},
 			},
 		}
@@ -85,14 +83,14 @@ func TestValidateBindings(t *testing.T) {
 		bindings := []*core.Binding{
 			{
 				Var:     "x",
-				Binding: LiteralToBinding(utils.MustMakeLiteral([]interface{}{5})),
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral([]interface{}{5})),
 			},
 		}
 
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(utils.MustMakeLiteral([]interface{}{5})),
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral([]interface{}{5})),
 				},
 			},
 		}
@@ -113,7 +111,7 @@ func TestValidateBindings(t *testing.T) {
 		bindings := []*core.Binding{
 			{
 				Var: "x",
-				Binding: LiteralToBinding(utils.MustMakeLiteral(
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral(
 					map[string]interface{}{
 						"xy": 5,
 					})),
@@ -123,7 +121,7 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(utils.MustMakeLiteral(
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(
 						map[string]interface{}{
 							"xy": 5,
 						})),
@@ -161,7 +159,7 @@ func TestValidateBindings(t *testing.T) {
 			Outputs: &core.VariableMap{
 				Variables: map[string]*core.Variable{
 					"n2_out": {
-						Type: LiteralTypeForLiteral(utils.MustMakeLiteral(2)),
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(2)),
 					},
 				},
 			},
@@ -188,7 +186,7 @@ func TestValidateBindings(t *testing.T) {
 		vars := &core.VariableMap{
 			Variables: map[string]*core.Variable{
 				"x": {
-					Type: LiteralTypeForLiteral(utils.MustMakeLiteral(5)),
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
 				},
 			},
 		}
