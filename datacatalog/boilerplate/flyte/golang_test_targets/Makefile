@@ -1,12 +1,12 @@
 # WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
-# ONLY EDIT THIS FILE FROM WITHIN THE 'LYFT/BOILERPLATE' REPOSITORY:
+# ONLY EDIT THIS FILE FROM WITHIN THE 'FLYTEORG/BOILERPLATE' REPOSITORY:
 #
-# TO OPT OUT OF UPDATES, SEE https://github.com/lyft/boilerplate/blob/master/Readme.rst
+# TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
-	@boilerplate/lyft/golang_test_targets/download_tooling.sh
+	@boilerplate/flyte/golang_test_targets/download_tooling.sh
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
@@ -16,7 +16,7 @@ lint: download_tooling #lints the package for common code smells
 # skips 'vendor'
 .PHONY: goimports
 goimports:
-	@boilerplate/lyft/golang_test_targets/goimports
+	@boilerplate/flyte/golang_test_targets/goimports
 
 .PHONY: mod_download
 mod_download: #download dependencies (including test deps) for the package
