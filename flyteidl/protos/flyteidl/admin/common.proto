@@ -235,13 +235,15 @@ message Annotations {
     map<string, string> values = 1;
 }
 
-// Defines permissions associated with executions.
-// Deprecated, please use core.SecurityContext
+// Defines permissions associated with executions created by this launch plan spec.
+// Use either of these roles when they have permissions required by your workflow execution.
+// Deprecated.
 message AuthRole {
-    oneof method {
-        string assumable_iam_role = 1;
-        string kubernetes_service_account = 2;
-    }
+    // Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
+    string assumable_iam_role = 1;
+
+    // Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan.
+    string kubernetes_service_account = 2;
 }
 
 
