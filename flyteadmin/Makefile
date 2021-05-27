@@ -1,7 +1,7 @@
 export REPOSITORY=flyteadmin
-include boilerplate/lyft/docker_build/Makefile
-include boilerplate/lyft/golang_test_targets/Makefile
-include boilerplate/lyft/end2end/Makefile
+include boilerplate/flyte/docker_build/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
+include boilerplate/flyte/end2end/Makefile
 
 GIT_VERSION := $(shell git describe --always --tags)
 GIT_HASH := $(shell git rev-parse --short HEAD)
@@ -12,6 +12,7 @@ LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/versi
 
 .PHONY: update_boilerplate
 update_boilerplate:
+	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
 
 .PHONY: integration

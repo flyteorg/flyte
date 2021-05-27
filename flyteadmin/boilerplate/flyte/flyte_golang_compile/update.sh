@@ -9,6 +9,5 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
-# Clone the config.yml file
-echo "     - copying ${DIR}/config.yml to the root directory."
-cp "${DIR}"/config.yml "${DIR}"/../../.github/config.yml
+echo "     - generating ${DIR}/flyte_golang_compile.sh"
+sed -e "s/{{REPOSITORY}}/${REPOSITORY}/g" ${DIR}/flyte_golang_compile.Template > ${DIR}/flyte_golang_compile.sh
