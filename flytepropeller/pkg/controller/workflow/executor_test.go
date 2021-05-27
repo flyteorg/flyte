@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -46,7 +47,6 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 var (
@@ -84,7 +84,7 @@ func (f fakeRemoteWritePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskE
 			Literals: make(map[string]*core.Literal, len(outputVars)),
 		}
 		for k, v := range outputVars {
-			l, err := utils.MakeDefaultLiteralForType(v.Type)
+			l, err := coreutils.MakeDefaultLiteralForType(v.Type)
 			if f.enableAsserts && !assert.NoError(f.t, err) {
 				assert.FailNow(f.t, "Failed to create default output for node [%v] Type [%v]", tCtx.TaskExecutionMetadata().GetTaskExecutionID(), v.Type)
 			}

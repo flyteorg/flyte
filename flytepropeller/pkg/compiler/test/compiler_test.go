@@ -12,12 +12,12 @@ import (
 
 	"github.com/ghodss/yaml"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flytepropeller/pkg/visualize"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -34,7 +34,7 @@ func makeDefaultInputs(iface *core.TypedInterface) *core.LiteralMap {
 
 	res := make(map[string]*core.Literal, len(iface.GetInputs().Variables))
 	for inputName, inputVar := range iface.GetInputs().Variables {
-		val := utils.MustMakeDefaultLiteralForType(inputVar.Type)
+		val := coreutils.MustMakeDefaultLiteralForType(inputVar.Type)
 		res[inputName] = val
 	}
 
@@ -157,11 +157,11 @@ func TestDynamic(t *testing.T) {
 
 			inputs := map[string]interface{}{}
 			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
-				inputs[varName] = utils.MustMakeDefaultLiteralForType(v.Type)
+				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
 			}
 
 			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
-				utils.MustMakeLiteral(inputs).GetMap(),
+				coreutils.MustMakeLiteral(inputs).GetMap(),
 				&core.WorkflowExecutionIdentifier{
 					Project: "hello",
 					Domain:  "domain",
@@ -211,11 +211,11 @@ func TestBranches(t *testing.T) {
 
 			inputs := map[string]interface{}{}
 			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
-				inputs[varName] = utils.MustMakeDefaultLiteralForType(v.Type)
+				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
 			}
 
 			flyteWf, err := k8s.BuildFlyteWorkflow(compiledWfc,
-				utils.MustMakeLiteral(inputs).GetMap(),
+				coreutils.MustMakeLiteral(inputs).GetMap(),
 				&core.WorkflowExecutionIdentifier{
 					Project: "hello",
 					Domain:  "domain",

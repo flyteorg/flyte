@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flytestdlib/errors"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -253,7 +254,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 
 		op := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
 		err := mockStore.WriteProtobuf(ctx, uri, storage.Options{}, op)
@@ -297,7 +298,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 
 		op := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
 		mockLPExec.On("GetStatus",
@@ -456,7 +457,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 
 		op := &core.LiteralMap{
 			Literals: map[string]*core.Literal{
-				"x": utils.MustMakePrimitiveLiteral(1),
+				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
 		mockLPExec.On("GetStatus",

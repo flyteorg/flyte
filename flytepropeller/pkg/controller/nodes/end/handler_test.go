@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -21,7 +22,6 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	flyteassert "github.com/flyteorg/flytepropeller/pkg/utils/assert"
 )
 
@@ -66,8 +66,8 @@ func TestEndHandler_Handle(t *testing.T) {
 
 	inputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
-			"x": utils.MustMakePrimitiveLiteral("hello"),
-			"y": utils.MustMakePrimitiveLiteral("blah"),
+			"x": coreutils.MustMakePrimitiveLiteral("hello"),
+			"y": coreutils.MustMakePrimitiveLiteral("blah"),
 		},
 	}
 

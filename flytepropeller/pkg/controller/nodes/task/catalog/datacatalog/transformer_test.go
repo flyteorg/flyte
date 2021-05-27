@@ -6,12 +6,11 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 )
 
 // add test for raarranged Literal maps for input values
@@ -102,14 +101,14 @@ func TestVariableMapOrder(t *testing.T) {
 
 // Ensure the key order on the inputs generates the same tag
 func TestInputValueSorted(t *testing.T) {
-	literalMap, err := utils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
+	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
 	assert.NoError(t, err)
 
 	tag, err := GenerateArtifactTagName(context.TODO(), literalMap)
 	assert.NoError(t, err)
 	assert.Equal(t, "flyte_cached-GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", tag)
 
-	literalMap, err = utils.MakeLiteralMap(map[string]interface{}{"2": 2, "1": 1})
+	literalMap, err = coreutils.MakeLiteralMap(map[string]interface{}{"2": 2, "1": 1})
 	assert.NoError(t, err)
 
 	tagDupe, err := GenerateArtifactTagName(context.TODO(), literalMap)
