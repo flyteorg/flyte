@@ -1,10 +1,10 @@
 .. _howto_new_project:
 
-#########################################
-How do I create/register a new project?
-#########################################
+##########################
+Registering a New Project
+##########################
 
-Using flytectl
+Using Flytectl
 ---------------
 
 .. NOTE::
@@ -13,7 +13,7 @@ Using flytectl
 
 
 
-Using flyte-cli
+Using Flyte-cli
 ----------------
 
 After installing flytekit, you can using ``flyte-cli`` to register a project ::
@@ -24,7 +24,7 @@ After installing flytekit, you can using ``flyte-cli`` to register a project ::
 
 If you refresh your console you'll see your new project appear!
 
-FlyteAdmin API reference
+FlyteAdmin API Reference
 -------------------------
 
 .. NOTE::
