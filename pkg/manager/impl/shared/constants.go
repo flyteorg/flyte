@@ -34,5 +34,4 @@ const (
 	MatchingAttributes    = "matching_attributes"
 	// Parent of a node execution in the node executions table
 	ParentID = "parent_id"
-	AuthRole = "auth_role"
 )

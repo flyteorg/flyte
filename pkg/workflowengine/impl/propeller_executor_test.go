@@ -435,9 +435,7 @@ func TestAddPermissions(t *testing.T) {
 	propeller.addPermissions(admin.LaunchPlan{
 		Spec: &admin.LaunchPlanSpec{
 			Auth: &admin.Auth{
-				Method: &admin.Auth_AssumableIamRole{
-					AssumableIamRole: "rollie-pollie",
-				},
+				AssumableIamRole: "rollie-pollie",
 			},
 			Role: "ignore-me",
 		},
@@ -460,12 +458,13 @@ func TestAddPermissions(t *testing.T) {
 	propeller.addPermissions(admin.LaunchPlan{
 		Spec: &admin.LaunchPlanSpec{
 			Auth: &admin.Auth{
-				Method: &admin.Auth_KubernetesServiceAccount{
-					KubernetesServiceAccount: "service-account",
-				},
+				KubernetesServiceAccount: "service-account",
+				AssumableIamRole:         "rollie-pollie",
 			},
 		},
 	}, &flyteWf)
 	assert.Equal(t, "service-account", flyteWf.ServiceAccountName)
-	assert.Empty(t, flyteWf.Annotations)
+	assert.EqualValues(t, flyteWf.Annotations, map[string]string{
+		roleNameKey: "rollie-pollie",
+	})
 }
