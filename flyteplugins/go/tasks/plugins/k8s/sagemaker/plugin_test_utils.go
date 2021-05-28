@@ -1,6 +1,7 @@
 package sagemaker
 
 import (
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/pkg/errors"
 
@@ -153,10 +154,10 @@ func generateMockCustomTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTem
 			Literals: map[string]*flyteIdlCore.Literal{
 				"train":      generateMockBlobLiteral(trainBlobLoc),
 				"validation": generateMockBlobLiteral(validationBlobLoc),
-				"hp_int":     utils.MustMakeLiteral(1),
-				"hp_float":   utils.MustMakeLiteral(1.5),
-				"hp_bool":    utils.MustMakeLiteral(false),
-				"hp_string":  utils.MustMakeLiteral("a"),
+				"hp_int":     coreutils.MustMakeLiteral(1),
+				"hp_float":   coreutils.MustMakeLiteral(1.5),
+				"hp_bool":    coreutils.MustMakeLiteral(false),
+				"hp_string":  coreutils.MustMakeLiteral("a"),
 			},
 		}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
@@ -237,7 +238,7 @@ func generateMockTrainingJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate,
 			Literals: map[string]*flyteIdlCore.Literal{
 				"train":                  generateMockBlobLiteral(trainBlobLoc),
 				"validation":             generateMockBlobLiteral(validationBlobLoc),
-				"static_hyperparameters": utils.MakeGenericLiteral(shpStructObj),
+				"static_hyperparameters": coreutils.MakeGenericLiteral(shpStructObj),
 			},
 		}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
@@ -347,9 +348,9 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 			Literals: map[string]*flyteIdlCore.Literal{
 				"train":                            generateMockBlobLiteral(trainBlobLoc),
 				"validation":                       generateMockBlobLiteral(validationBlobLoc),
-				"static_hyperparameters":           utils.MakeGenericLiteral(shpStructObj),
-				"hyperparameter_tuning_job_config": utils.MakeBinaryLiteral(hpoJobConfigByteArray),
-				"a":                                utils.MakeGenericLiteral(intParamRange),
+				"static_hyperparameters":           coreutils.MakeGenericLiteral(shpStructObj),
+				"hyperparameter_tuning_job_config": coreutils.MakeBinaryLiteral(hpoJobConfigByteArray),
+				"a":                                coreutils.MakeGenericLiteral(intParamRange),
 			},
 		}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
