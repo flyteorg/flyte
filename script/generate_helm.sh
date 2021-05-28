@@ -2,15 +2,20 @@
 
 set -ex
 
-echo "Installing Helm"
+echo "Generating Helm"
 # All the values files to be built
 DEPLOYMENT=${1:-sandbox eks gcp}
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
+helm dep update ${DIR}/../helm/
+
 for deployment in ${DEPLOYMENT}; do
-    helm template flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml --dependency-update > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
+
+echo "Generating helm docs"
+helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
