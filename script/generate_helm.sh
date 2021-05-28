@@ -15,6 +15,11 @@ for deployment in ${DEPLOYMENT}; do
 done
 
 echo "Generating helm docs"
+if ! command -v helm-docs &> /dev/null
+then
+    GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs
+fi
+
 helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
