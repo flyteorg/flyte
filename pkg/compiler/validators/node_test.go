@@ -22,7 +22,7 @@ func TestValidateBranchNode(t *testing.T) {
 
 		wf := &mocks.WorkflowBuilder{}
 		errs := errors.NewCompileErrors()
-		_, _, ok := ValidateBranchNode(wf, n, false, errs)
+		_, ok := ValidateBranchNode(wf, n, false, errs)
 		assert.False(t, ok)
 		if !errs.HasErrors() {
 			assert.Error(t, errs)

@@ -277,7 +277,7 @@ func walkAndPrint(conns v1alpha1.Connections, ns map[v1alpha1.NodeID]*v1alpha1.N
 	for len(ds) > 0 {
 		sub := sets.NewString()
 		for _, x := range ds {
-			sub.Insert(conns.DownstreamEdges[x]...)
+			sub.Insert(conns.Downstream[x]...)
 			if !visited[x] {
 				s, ok := ns[x]
 				if ok {

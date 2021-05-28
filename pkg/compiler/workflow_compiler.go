@@ -108,27 +108,39 @@ func (w workflowBuilder) AddNode(n c.NodeBuilder, errs errors.CompileErrors) (no
 	return
 }
 
-func (w workflowBuilder) AddExecutionEdge(nodeFrom, nodeTo c.NodeID) {
-	if nodeFrom == "" {
-		nodeFrom = c.StartNodeID
+func (w workflowBuilder) AddUpstreamEdge(nodeProvider, nodeDependent c.NodeID) {
+	if nodeProvider == "" {
+		nodeProvider = c.StartNodeID
 	}
 
-	if _, found := w.downstreamNodes[nodeFrom]; !found {
-		w.downstreamNodes[nodeFrom] = sets.String{}
-		w.CoreWorkflow.Connections.Downstream[nodeFrom] = &core.ConnectionSet_IdList{}
-	}
-
-	if _, found := w.upstreamNodes[nodeTo]; !found {
-		w.upstreamNodes[nodeTo] = sets.String{}
-		w.CoreWorkflow.Connections.Upstream[nodeTo] = &core.ConnectionSet_IdList{
+	if _, found := w.upstreamNodes[nodeDependent]; !found {
+		w.upstreamNodes[nodeDependent] = sets.String{}
+		w.CoreWorkflow.Connections.Upstream[nodeDependent] = &core.ConnectionSet_IdList{
 			Ids: make([]string, 1),
 		}
 	}
 
-	w.downstreamNodes[nodeFrom].Insert(nodeTo)
-	w.upstreamNodes[nodeTo].Insert(nodeFrom)
-	w.CoreWorkflow.Connections.Downstream[nodeFrom].Ids = w.downstreamNodes[nodeFrom].List()
-	w.CoreWorkflow.Connections.Upstream[nodeTo].Ids = w.upstreamNodes[nodeTo].List()
+	w.upstreamNodes[nodeDependent].Insert(nodeProvider)
+	w.CoreWorkflow.Connections.Upstream[nodeDependent].Ids = w.upstreamNodes[nodeDependent].List()
+}
+
+func (w workflowBuilder) AddDownstreamEdge(nodeProvider, nodeDependent c.NodeID) {
+	if nodeProvider == "" {
+		nodeProvider = c.StartNodeID
+	}
+
+	if _, found := w.downstreamNodes[nodeProvider]; !found {
+		w.downstreamNodes[nodeProvider] = sets.String{}
+		w.CoreWorkflow.Connections.Downstream[nodeProvider] = &core.ConnectionSet_IdList{}
+	}
+
+	w.downstreamNodes[nodeProvider].Insert(nodeDependent)
+	w.CoreWorkflow.Connections.Downstream[nodeProvider].Ids = w.downstreamNodes[nodeProvider].List()
+}
+
+func (w workflowBuilder) AddExecutionEdge(nodeFrom, nodeTo c.NodeID) {
+	w.AddDownstreamEdge(nodeFrom, nodeTo)
+	w.AddUpstreamEdge(nodeFrom, nodeTo)
 }
 
 func (w workflowBuilder) AddEdges(n c.NodeBuilder, errs errors.CompileErrors) (ok bool) {
@@ -146,7 +158,7 @@ func (w workflowBuilder) AddEdges(n c.NodeBuilder, errs errors.CompileErrors) (o
 
 	// Add implicit Edges
 	_, ok = v.ValidateBindings(&w, n, n.GetInputs(), n.GetInterface().GetInputs(),
-		true /* validateParamTypes */, errs.NewScope())
+		true /* validateParamTypes */, v.EdgeDirectionBidirectional, errs.NewScope())
 	return
 }
 
@@ -209,7 +221,7 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		for _, n := range wf.Nodes {
 			if n.GetBranchNode() != nil {
 				if inputVars, ok := v.ValidateBindings(&wf, n, n.GetInputs(), n.GetInterface().GetInputs(),
-					false /* validateParamTypes */, errs.NewScope()); ok {
+					false /* validateParamTypes */, v.EdgeDirectionUpstream, errs.NewScope()); ok {
 					merge, err := v.UnionDistinctVariableMaps(n.GetInterface().Inputs.Variables, inputVars.Variables)
 					if err != nil {
 						errs.Collect(errors.NewWorkflowBuildError(err))
@@ -261,7 +273,8 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 	// Validate workflow outputs are bound
 	if _, wfIfaceOk := v.ValidateInterface(globalOutputNode.GetId(), globalOutputNode.GetInterface(), errs.NewScope()); wfIfaceOk {
 		v.ValidateBindings(&wf, globalOutputNode, globalOutputNode.GetInputs(),
-			globalOutputNode.GetInterface().GetInputs(), true /* validateParamTypes */, errs.NewScope())
+			globalOutputNode.GetInterface().GetInputs(), true, /* validateParamTypes */
+			v.EdgeDirectionBidirectional, errs.NewScope())
 	}
 
 	// Validate no cycles are detected.

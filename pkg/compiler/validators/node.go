@@ -53,13 +53,9 @@ func branchNodeIDFormatter(parentNodeID, thenNodeID string) string {
 	return fmt.Sprintf("%v-%v", parentNodeID, thenNodeID)
 }
 
-type EdgeInfo struct {
-	from string
-	to   string
-}
-
 func ValidateBranchNode(w c.WorkflowBuilder, n c.NodeBuilder, requireParamType bool, errs errors.CompileErrors) (
-	discoveredNodes []c.NodeBuilder, additionalEdges []EdgeInfo, ok bool) {
+	discoveredNodes []c.NodeBuilder, ok bool) {
+
 	cases := make([]*flyte.IfBlock, 0, len(n.GetBranchNode().IfElse.Other)+1)
 	if n.GetBranchNode().IfElse.Case == nil {
 		errs.Collect(errors.NewBranchNodeHasNoCondition(n.GetId()))
@@ -69,11 +65,10 @@ func ValidateBranchNode(w c.WorkflowBuilder, n c.NodeBuilder, requireParamType b
 
 	cases = append(cases, n.GetBranchNode().IfElse.Other...)
 	discoveredNodes = make([]c.NodeBuilder, 0, len(cases))
-	additionalEdges = make([]EdgeInfo, 0, len(cases))
 	subNodes := make([]c.NodeBuilder, 0, len(cases)+1)
 	for _, block := range cases {
 		// Validate condition
-		ValidateBooleanExpression(n, block.Condition, requireParamType, errs.NewScope())
+		ValidateBooleanExpression(w, n, block.Condition, requireParamType, errs.NewScope())
 
 		if block.GetThenNode() == nil {
 			errs.Collect(errors.NewBranchNodeNotSpecified(n.GetId()))
@@ -94,14 +89,10 @@ func ValidateBranchNode(w c.WorkflowBuilder, n c.NodeBuilder, requireParamType b
 		if ValidateNode(w, wrapperNode, requireParamType, errs.NewScope()) {
 			// Add to the global nodes to be able to reference it later
 			discoveredNodes = append(discoveredNodes, wrapperNode)
-			additionalEdges = append(additionalEdges, EdgeInfo{
-				from: n.GetId(),
-				to:   wrapperNode.GetId(),
-			})
 		}
 	}
 
-	return discoveredNodes, additionalEdges, !errs.HasErrors()
+	return discoveredNodes, !errs.HasErrors()
 }
 
 func validateNodeID(w c.WorkflowBuilder, nodeID string, errs errors.CompileErrors) (node c.NodeBuilder, ok bool) {
@@ -131,25 +122,12 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 
 	// Validate branch node conditions and inner nodes.
 	if n.GetBranchNode() != nil {
-		if nodes, edges, ok := ValidateBranchNode(w, n, validateConditionTypes, errs.NewScope()); ok {
+		if nodes, ok := ValidateBranchNode(w, n, validateConditionTypes, errs.NewScope()); ok {
 			renamedNodes := make(map[c.NodeID]c.NodeID, len(nodes))
 			for _, subNode := range nodes {
 				oldID := subNode.GetId()
 				subNode.SetID(branchNodeIDFormatter(n.GetId(), subNode.GetId()))
-				w.AddNode(subNode, errs)
 				renamedNodes[oldID] = subNode.GetId()
-			}
-
-			for _, edge := range edges {
-				if newID, found := renamedNodes[edge.from]; found {
-					edge.from = newID
-				}
-
-				if newID, found := renamedNodes[edge.to]; found {
-					edge.to = newID
-				}
-
-				w.AddExecutionEdge(edge.from, edge.to)
 			}
 		}
 	} else if workflowN := n.GetWorkflowNode(); workflowN != nil && workflowN.GetSubWorkflowRef() != nil {

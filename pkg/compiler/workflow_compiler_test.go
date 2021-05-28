@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
@@ -329,8 +331,10 @@ func TestComparisonExpression_MissingLeftRight(t *testing.T) {
 		},
 	}
 
+	w := &mocks.WorkflowBuilder{}
+
 	errs := errors.NewCompileErrors()
-	v.ValidateBooleanExpression(&nodeBuilder{flyteNode: &flyteNode{}}, bExpr, true, errs)
+	v.ValidateBooleanExpression(w, &nodeBuilder{flyteNode: &flyteNode{}}, bExpr, true, errs)
 	assert.Error(t, errs)
 	assert.Equal(t, 2, errs.ErrorCount())
 }
@@ -346,8 +350,9 @@ func TestComparisonExpression(t *testing.T) {
 		},
 	}
 
+	w := &mocks.WorkflowBuilder{}
 	errs := errors.NewCompileErrors()
-	v.ValidateBooleanExpression(&nodeBuilder{flyteNode: &flyteNode{}}, bExpr, true, errs)
+	v.ValidateBooleanExpression(w, &nodeBuilder{flyteNode: &flyteNode{}}, bExpr, true, errs)
 	assert.True(t, errs.HasErrors())
 	assert.Equal(t, 1, errs.ErrorCount())
 }
@@ -370,8 +375,9 @@ func TestBooleanExpression_BranchNodeHasNoCondition(t *testing.T) {
 		},
 	}
 
+	w := &mocks.WorkflowBuilder{}
 	errs := errors.NewCompileErrors()
-	v.ValidateBooleanExpression(&nodeBuilder{flyteNode: &flyteNode{}}, bExpr, true, errs)
+	v.ValidateBooleanExpression(w, &nodeBuilder{flyteNode: &flyteNode{}}, bExpr, true, errs)
 	assert.True(t, errs.HasErrors())
 	assert.Equal(t, 1, errs.ErrorCount())
 	for e := range *errs.Errors() {

@@ -102,8 +102,8 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		nCtx.OnDataStore().Return(dataStore)
 
 		endNodeStatus := &mocks2.ExecutableNodeStatus{}
-		endNodeStatus.OnGetDataDir().Return(storage.DataReference("end-node"))
-		endNodeStatus.OnGetOutputDir().Return(storage.DataReference("end-node"))
+		endNodeStatus.OnGetDataDir().Return("end-node")
+		endNodeStatus.OnGetOutputDir().Return("end-node")
 
 		subNs := &mocks2.ExecutableNodeStatus{}
 		subNs.On("SetDataDir", mock.Anything).Return()
@@ -363,7 +363,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		assert.NoError(t, err)
 		_, err = nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures_compiled.pb")
 		assert.NoError(t, err)
-		assert.NoError(t, nCtx.DataStore().WriteRaw(context.TODO(), storage.DataReference("/output-dir/futures_compiled.pb"), int64(len(rawDynamicWf)), storage.Options{}, bytes.NewReader(rawDynamicWf)))
+		assert.NoError(t, nCtx.DataStore().WriteRaw(context.TODO(), "/output-dir/futures_compiled.pb", int64(len(rawDynamicWf)), storage.Options{}, bytes.NewReader(rawDynamicWf)))
 
 		f, err := nCtx.DataStore().ConstructReference(ctx, nCtx.NodeStatus().GetOutputDir(), "futures.pb")
 		assert.NoError(t, err)
@@ -485,19 +485,19 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 
 		metadata := existsMetadata{}
 		composedPBStore := storageMocks.ComposedProtobufStore{}
-		composedPBStore.On("Head", mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb")).
+		composedPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb")).
 			Return(&metadata, nil)
 
 		djSpec := createDynamicJobSpecWithLaunchPlans()
-		composedPBStore.On("ReadProtobuf", mock.MatchedBy(func(ctx context.Context) bool { return true }),
+		composedPBStore.OnReadProtobufMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			storage.DataReference("s3://my-s3-bucket/foo/bar/futures.pb"), &core.DynamicJobSpec{}).Return(nil).Run(func(args mock.Arguments) {
 			djSpecPtr := args.Get(2).(*core.DynamicJobSpec)
 			*djSpecPtr = *djSpec
 		})
-		composedPBStore.On("WriteRaw",
+		composedPBStore.OnWriteRawMatch(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb"),
-			int64(1039),
+			int64(1169),
 			storage.Options{},
 			mock.MatchedBy(func(rdr *bytes.Reader) bool { return true })).Return(errors.New("foo"))
 
@@ -527,7 +527,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 			Domain:       "d",
 		}
 		mockLPLauncher := &mocks5.Reader{}
-		mockLPLauncher.OnGetLaunchPlanMatch(ctx, lpID).Return(&admin.LaunchPlan{
+		mockLPLauncher.OnGetLaunchPlanMatch(mock.Anything, mock.MatchedBy(func(id *core.Identifier) bool {
+			return lpID.Name == id.Name && lpID.Domain == id.Domain && lpID.Project == id.Project && lpID.ResourceType == id.ResourceType
+		})).Return(&admin.LaunchPlan{
 			Id: lpID,
 			Closure: &admin.LaunchPlanClosure{
 				ExpectedInputs: &core.ParameterMap{},

@@ -32,7 +32,7 @@ func validateOperand(node c.NodeBuilder, paramName string, operand *flyte.Operan
 	return literalType, !errs.HasErrors()
 }
 
-func ValidateBooleanExpression(node c.NodeBuilder, expr *flyte.BooleanExpression, requireParamType bool, errs errors.CompileErrors) (ok bool) {
+func ValidateBooleanExpression(w c.WorkflowBuilder, node c.NodeBuilder, expr *flyte.BooleanExpression, requireParamType bool, errs errors.CompileErrors) (ok bool) {
 	if expr == nil {
 		errs.Collect(errors.NewBranchNodeHasNoCondition(node.GetId()))
 	} else {
@@ -48,8 +48,8 @@ func ValidateBooleanExpression(node c.NodeBuilder, expr *flyte.BooleanExpression
 				}
 			}
 		} else if expr.GetConjunction() != nil {
-			ValidateBooleanExpression(node, expr.GetConjunction().LeftExpression, requireParamType, errs.NewScope())
-			ValidateBooleanExpression(node, expr.GetConjunction().RightExpression, requireParamType, errs.NewScope())
+			ValidateBooleanExpression(w, node, expr.GetConjunction().LeftExpression, requireParamType, errs.NewScope())
+			ValidateBooleanExpression(w, node, expr.GetConjunction().RightExpression, requireParamType, errs.NewScope())
 		} else {
 			errs.Collect(errors.NewValueRequiredErr(node.GetId(), "Expr"))
 		}

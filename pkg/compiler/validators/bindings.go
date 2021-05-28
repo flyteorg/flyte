@@ -99,8 +99,16 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 	return nil, nil, !errs.HasErrors()
 }
 
+type EdgeDirection uint8
+
+const (
+	EdgeDirectionBidirectional EdgeDirection = iota
+	EdgeDirectionDownstream
+	EdgeDirectionUpstream
+)
+
 func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Binding, params *flyte.VariableMap,
-	validateParamTypes bool, errs errors.CompileErrors) (resolved *flyte.VariableMap, ok bool) {
+	validateParamTypes bool, edgeDirection EdgeDirection, errs errors.CompileErrors) (resolved *flyte.VariableMap, ok bool) {
 
 	resolved = &flyte.VariableMap{
 		Variables: make(map[string]*flyte.Variable, len(bindings)),
@@ -127,7 +135,14 @@ func ValidateBindings(w c.WorkflowBuilder, node c.Node, bindings []*flyte.Bindin
 				param.Type, errs.NewScope()); bindingOk {
 				for _, upNode := range upstreamNodes {
 					// Add implicit Edges
-					w.AddExecutionEdge(upNode, node.GetId())
+					switch edgeDirection {
+					case EdgeDirectionBidirectional:
+						w.AddExecutionEdge(upNode, node.GetId())
+					case EdgeDirectionDownstream:
+						w.AddDownstreamEdge(upNode, node.GetId())
+					case EdgeDirectionUpstream:
+						w.AddUpstreamEdge(upNode, node.GetId())
+					}
 				}
 
 				resolved.Variables[binding.GetVar()] = &flyte.Variable{

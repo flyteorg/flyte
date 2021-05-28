@@ -187,10 +187,10 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseStartNodes(t *testing.T) {
 					v1alpha1.StartNodeID: startNode,
 				},
 				Connections: v1alpha1.Connections{
-					UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						defaultNodeID: {v1alpha1.StartNodeID},
 					},
-					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						v1alpha1.StartNodeID: {defaultNodeID},
 					},
 				},
@@ -293,7 +293,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 						v1alpha1.EndNodeID: n,
 					},
 					Connections: v1alpha1.Connections{
-						UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 							v1alpha1.EndNodeID: {v1alpha1.StartNodeID},
 						},
 					},
@@ -379,10 +379,10 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 						v1alpha1.EndNodeID: n,
 					},
 					Connections: v1alpha1.Connections{
-						UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 							v1alpha1.EndNodeID: {v1alpha1.StartNodeID},
 						},
-						DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+						Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 							v1alpha1.StartNodeID: {v1alpha1.EndNodeID},
 						},
 					},
@@ -514,10 +514,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 					v1alpha1.StartNodeID: startNode,
 				},
 				Connections: v1alpha1.Connections{
-					UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						defaultNodeID: {v1alpha1.StartNodeID},
 					},
-					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						v1alpha1.StartNodeID: {defaultNodeID},
 					},
 				},
@@ -536,7 +536,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		nodeN2 := "n2"
 		ctx := context.Background()
 		connections := &v1alpha1.Connections{
-			UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+			Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 				nodeN2: {nodeN0},
 			},
 		}
@@ -1020,10 +1020,10 @@ func TestNodeExecutor_RecursiveNodeHandler_NoDownstream(t *testing.T) {
 					v1alpha1.StartNodeID: startNode,
 				},
 				Connections: v1alpha1.Connections{
-					UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						defaultNodeID: {v1alpha1.StartNodeID},
 					},
-					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						v1alpha1.StartNodeID: {defaultNodeID},
 					},
 				},
@@ -1124,7 +1124,7 @@ func TestNodeExecutor_RecursiveNodeHandler_UpstreamNotReady(t *testing.T) {
 					defaultNodeID: n,
 				},
 				Connections: v1alpha1.Connections{
-					UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						defaultNodeID: {v1alpha1.StartNodeID},
 					},
 				},
@@ -1754,10 +1754,10 @@ func TestNodeExecutor_RecursiveNodeHandler_ParallelismLimit(t *testing.T) {
 					v1alpha1.StartNodeID: startNode,
 				},
 				Connections: v1alpha1.Connections{
-					UpstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Upstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						defaultNodeID: {v1alpha1.StartNodeID},
 					},
-					DownstreamEdges: map[v1alpha1.NodeID][]v1alpha1.NodeID{
+					Downstream: map[v1alpha1.NodeID][]v1alpha1.NodeID{
 						v1alpha1.StartNodeID: {defaultNodeID},
 					},
 				},

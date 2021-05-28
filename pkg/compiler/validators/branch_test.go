@@ -48,6 +48,7 @@ func Test_validateBranchInterface(t *testing.T) {
 	n2.OnGetCoreNode().Return(coreN2)
 	n2.OnGetTaskNode().Return(taskNode)
 	n2.On("SetInterface", mock.Anything)
+	n2.OnGetInputs().Return([]*core.Binding{})
 
 	task := &mocks.Task{}
 	task.OnGetInterface().Return(&core.TypedInterface{})
@@ -77,6 +78,8 @@ func Test_validateBranchInterface(t *testing.T) {
 			},
 		})
 
+		n.OnGetInputs().Return([]*core.Binding{})
+
 		_, ok := validateBranchInterface(wf, n, errs)
 		assert.True(t, ok)
 		if errs.HasErrors() {
@@ -87,6 +90,7 @@ func Test_validateBranchInterface(t *testing.T) {
 	t.Run("two conditions", func(t *testing.T) {
 		n := &mocks.NodeBuilder{}
 		n.OnGetId().Return("n1")
+		n.OnGetInputs().Return([]*core.Binding{})
 		n.OnGetBranchNode().Return(&core.BranchNode{
 			IfElse: &core.IfElseBlock{
 				Case: &core.IfBlock{

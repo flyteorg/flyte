@@ -16,6 +16,11 @@ type WorkflowBuilder struct {
 	mock.Mock
 }
 
+// AddDownstreamEdge provides a mock function with given fields: nodeProvider, nodeDependent
+func (_m *WorkflowBuilder) AddDownstreamEdge(nodeProvider string, nodeDependent string) {
+	_m.Called(nodeProvider, nodeDependent)
+}
+
 // AddExecutionEdge provides a mock function with given fields: nodeFrom, nodeTo
 func (_m *WorkflowBuilder) AddExecutionEdge(nodeFrom string, nodeTo string) {
 	_m.Called(nodeFrom, nodeTo)
@@ -60,6 +65,11 @@ func (_m *WorkflowBuilder) AddNode(n common.NodeBuilder, errs errors.CompileErro
 	}
 
 	return r0, r1
+}
+
+// AddUpstreamEdge provides a mock function with given fields: nodeProvider, nodeDependent
+func (_m *WorkflowBuilder) AddUpstreamEdge(nodeProvider string, nodeDependent string) {
+	_m.Called(nodeProvider, nodeDependent)
 }
 
 type WorkflowBuilder_GetCompiledSubWorkflow struct {

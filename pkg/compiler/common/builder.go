@@ -18,6 +18,8 @@ type WorkflowBuilder interface {
 	Workflow
 	StoreCompiledSubWorkflow(id WorkflowID, compiledWorkflow *core.CompiledWorkflow)
 	AddExecutionEdge(nodeFrom, nodeTo NodeID)
+	AddUpstreamEdge(nodeProvider, nodeDependent NodeID)
+	AddDownstreamEdge(nodeProvider, nodeDependent NodeID)
 	AddNode(n NodeBuilder, errs errors.CompileErrors) (node NodeBuilder, ok bool)
 	ValidateWorkflow(fg *core.CompiledWorkflow, errs errors.CompileErrors) (Workflow, bool)
 	NewNodeBuilder(n *core.Node) NodeBuilder

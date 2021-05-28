@@ -38,7 +38,9 @@ func (p PredicatePhase) String() string {
 	return "undefined"
 }
 
-func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.BaseNode) (PredicatePhase, error) {
+func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.BaseNode) (
+	PredicatePhase, error) {
+
 	nodeID := node.GetID()
 	if nodeID == v1alpha1.StartNodeID {
 		logger.Debugf(ctx, "Start Node id is assumed to be ready.")
@@ -66,6 +68,8 @@ func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.No
 				return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
 			}
 
+			// Deprecated: This if block will be removed in a future version. It's harmless (will be no-op) for newly
+			// compiled Workflows as sub-branch-nodes won't have an execution or code dependency on branch nodes.
 			// This only happens if current node is the child node of a branch node
 			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
 				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
@@ -115,6 +119,8 @@ func GetParentNodeMaxEndTime(ctx context.Context, dag executors.DAGStructure, nl
 				return zeroTime, errors.Errorf(errors.BadSpecificationError, nodeID, "Upstream node [%v] of node [%v] not defined", upstreamNodeID, nodeID)
 			}
 
+			// Deprecated: This if block will be removed in a future version. It's harmless (will be no-op) for newly
+			// compiled Workflows as sub-branch-nodes won't have an execution or code dependency on branch nodes.
 			// This only happens if current node is the child node of a branch node
 			if upstreamNode.GetBranchNode() == nil || upstreamNodeStatus.GetBranchStatus().GetPhase() != v1alpha1.BranchNodeSuccess {
 				logger.Debugf(ctx, "Branch sub node is expected to have parent branch node in succeeded state")
