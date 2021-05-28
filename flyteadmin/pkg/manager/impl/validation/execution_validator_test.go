@@ -65,22 +65,6 @@ func TestValidateExecInvalidProjectAndDomain(t *testing.T) {
 	assert.EqualError(t, err, "failed to validate that project [project] and domain [domain] are registered, err: [foo]")
 }
 
-func TestValidateSingleTaskExecution(t *testing.T) {
-	request := testutils.GetExecutionRequest()
-	request.Spec.LaunchPlan.ResourceType = core.ResourceType_TASK
-
-	err := ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
-	assert.EqualError(t, err, "missing auth_role")
-
-	request.Spec.AuthRole = &admin.AuthRole{
-		Method: &admin.AuthRole_KubernetesServiceAccount{
-			KubernetesServiceAccount: "foo",
-		},
-	}
-	err = ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
-	assert.Nil(t, err)
-}
-
 func TestGetExecutionInputs(t *testing.T) {
 	executionRequest := testutils.GetExecutionRequest()
 	lpRequest := testutils.GetLaunchPlanRequest()

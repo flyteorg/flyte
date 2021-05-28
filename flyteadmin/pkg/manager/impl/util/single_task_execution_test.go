@@ -223,7 +223,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	spec := admin.ExecutionSpec{
 		LaunchPlan: taskIdentifier,
 		AuthRole: &admin.AuthRole{
-			Method: &admin.AuthRole_AssumableIamRole{AssumableIamRole: "assumable_role"},
+			AssumableIamRole: "assumable_role",
 		},
 	}
 	launchPlan, err := CreateOrGetLaunchPlan(

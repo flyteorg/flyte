@@ -2877,9 +2877,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 				ResourceType: core.ResourceType_TASK,
 			},
 			AuthRole: &admin.AuthRole{
-				Method: &admin.AuthRole_KubernetesServiceAccount{
-					KubernetesServiceAccount: "foo",
-				},
+				KubernetesServiceAccount: "foo",
 			},
 		},
 		Inputs: &core.LiteralMap{

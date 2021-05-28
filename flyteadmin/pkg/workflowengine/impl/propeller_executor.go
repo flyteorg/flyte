@@ -79,7 +79,8 @@ func (c *FlytePropeller) addPermissions(launchPlan admin.LaunchPlan, flyteWf *v1
 	} else if len(launchPlan.GetSpec().GetRole()) > 0 {
 		// Although deprecated, older launch plans may reference the role field instead of the Auth AssumableIamRole.
 		role = launchPlan.GetSpec().GetRole()
-	} else if launchPlan.GetSpec().GetAuthRole() != nil && len(launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()) > 0 {
+	}
+	if launchPlan.GetSpec().GetAuthRole() != nil && len(launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()) > 0 {
 		flyteWf.ServiceAccountName = launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()
 	} else if launchPlan.GetSpec().GetAuth() != nil && len(launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount()) > 0 {
 		flyteWf.ServiceAccountName = launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount()
@@ -217,7 +218,8 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 			flyteWf.Annotations = map[string]string{}
 		}
 		flyteWf.Annotations[c.roleNameKey] = role
-	} else if input.Auth != nil && len(input.Auth.GetKubernetesServiceAccount()) > 0 {
+	}
+	if input.Auth != nil && len(input.Auth.GetKubernetesServiceAccount()) > 0 {
 		flyteWf.ServiceAccountName = input.Auth.GetKubernetesServiceAccount()
 	}
 
