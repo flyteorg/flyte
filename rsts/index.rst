@@ -6,12 +6,12 @@
    :titlesonly:
    :hidden:
 
-   getting_started
-   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
-   Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
-   Concepts <concepts/basics>
-   API Reference <reference/index>
-   community/index
+   |plane| Getting Started <getting_started>
+   |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
+   |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
+   |project-diagram| Concepts <concepts/basics>
+   |book| API Reference <reference/index>
+   |hands-helping| Community <community/index>
 
 .. toctree::
    :caption: Concepts

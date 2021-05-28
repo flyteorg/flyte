@@ -36,7 +36,7 @@ markupsafe==1.1.1
     # via jinja2
 packaging==20.9
     # via sphinx
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   sphinx
     #   sphinx-prompt
@@ -51,7 +51,7 @@ readthedocs-sphinx-search==0.1.0
     # via -r doc-requirements.in
 requests==2.25.1
     # via sphinx
-six==1.15.0
+six==1.16.0
     # via
     #   sphinx-code-include
     #   sphinxext-remoteliteralinclude
@@ -65,8 +65,13 @@ sphinx-code-include==1.1.1
     # via -r doc-requirements.in
 sphinx-copybutton==0.3.1
     # via -r doc-requirements.in
+sphinx-fontawesome==0.0.6
+    # via -r doc-requirements.in
+<<<<<<< HEAD
+=======
 sphinx-issues==1.2.0
     # via -r doc-requirements.in
+>>>>>>> master
 sphinx-prompt==1.4.0
     # via -r doc-requirements.in
 sphinx-tabs==2.1.0
@@ -78,6 +83,7 @@ sphinx==3.5.4
     #   sphinx-autoapi
     #   sphinx-code-include
     #   sphinx-copybutton
+    #   sphinx-fontawesome
     #   sphinx-issues
     #   sphinx-prompt
     #   sphinx-tabs
