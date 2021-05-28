@@ -1,22 +1,22 @@
 .. _howto_exec_single_task:
 
-####################################
-How do I execute a single task?
-####################################
+######################
+Running a Single Task
+######################
 
 
-What are single task executions?
+What Are Single Task Executions?
 ================================
 
 Tasks are the most atomic unit of execution in Flyte.  Although workflows are traditionally composed of multiple tasks with dependencies
-defined by shared inputs and outputs it can be helpful to execute a single task during the process of iterating on its definition.
-It can be tedious to write a new workflow definition every time you want to excecute a single task under development but single task
+defined by shared inputs and outputs, it can be helpful to execute a single task during the process of iterating on its definition.
+It can be tedious to write a new workflow definition every time you want to excecute a single task under development, but single task
 executions can be used to easily iterate on task logic.
 
-Launch a single task
-====================
+Launching a Single Task
+=======================
 
-After you've built an image with your updated task code, create an execution using launch:
+After building an image with your updated task code, create an execution using launch:
 
 .. code-block:: python
 
@@ -36,8 +36,8 @@ The type of ``my_single_task_execution`` is `SdkWorkflowExecution <https://githu
 and has the full set of methods and functionality available for conventional WorkflowExecutions.
 
 
-Fetch and launch a single task
-==============================
+Fetching and Launching a Single Task
+====================================
 
 Single task executions aren't limited to just tasks you've defined in your code. You can reference previously registered tasks and launch a single task execution like so:
 
@@ -51,8 +51,8 @@ Single task executions aren't limited to just tasks you've defined in your code.
      my_task_exec.wait_for_completion()
 
 
-Launch a single task from the commandline
-=========================================
+Launching a Single Task From the Commandline
+============================================
 
 Previously registered tasks can also be launched from the command-line using :ref:`flyte-cli <howto-flytecli>`
 
@@ -63,16 +63,15 @@ Previously registered tasks can also be launched from the command-line using :re
         other_input=123 more_input=qwerty
 
 
-Monitoring single task executions in the Flyte console
+Monitoring Single Task Executions in the Flyte Console
 ======================================================
 
-Single task executions don't yet have native support in the Flyte console but they're accessible using the same URLs as ordinary workflow executions.
+Single task executions don't have native support in the Flyte console yet, but they are accessible using the same URLs as ordinary workflow executions.
 
-For example, for a console hosted example.com you can visit ``example.com/console/projects/<my_project>/domains/<my_domain>/executions/<execution_name>`` to track the progress of
-your execution. Log links and status changes will be available as your execution progresses.
+For a console hosted example.com, visit ``example.com/console/projects/<my_project>/domains/<my_domain>/executions/<execution_name>`` to track the progress of your execution. Log links and status changes will be available as your execution progresses.
 
 
-Registering and launching a single task
+Registering and Launching a Single Task
 =======================================
 
 A certain category of tasks don't rely on custom containers with registered images to run. Therefore, you may find it convenient to use
