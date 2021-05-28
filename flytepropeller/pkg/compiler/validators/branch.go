@@ -28,7 +28,6 @@ func validateBranchInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs error
 		return
 	}
 
-	finalInputParameterNames := sets.NewString()
 	finalOutputParameterNames := sets.NewString()
 
 	var outputs map[string]*flyte.Variable
@@ -62,34 +61,40 @@ func validateBranchInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs error
 
 	for _, block := range cases {
 		n := w.NewNodeBuilder(block)
+		iface2, ok := ValidateUnderlyingInterface(w, n, errs.NewScope())
+
+		if !ok {
+			continue
+		}
+
+		ValidateBindings(w, n, n.GetInputs(), &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
+			false, EdgeDirectionUpstream, errs.NewScope())
+
+		// Clear out the Inputs. We do not care if the inputs of each of the underlying nodes
+		// match. We will pull the inputs needed for the underlying branch node at runtime.
+		iface2 = &flyte.TypedInterface{
+			Inputs:  &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
+			Outputs: iface2.Outputs,
+		}
+
 		if iface == nil {
-			// if this is the first node to validate, just assume all other nodes will match the interface
-			if iface, ok = ValidateUnderlyingInterface(w, n, errs.NewScope()); ok {
-				// Clear out the Inputs. We do not care if the inputs of each of the underlying nodes
-				// match. We will pull the inputs needed for the underlying branch node at runtime.
-				iface = &flyte.TypedInterface{
-					Inputs:  &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
-					Outputs: iface.Outputs,
-				}
-
-				outputs, outputsSet = buildVariablesIndex(iface.Outputs)
-				finalOutputParameterNames = finalOutputParameterNames.Union(outputsSet)
-			}
+			iface = iface2
+			outputs, outputsSet = buildVariablesIndex(iface.Outputs)
+			finalOutputParameterNames = finalOutputParameterNames.Union(outputsSet)
 		} else {
-			if iface2, ok2 := ValidateUnderlyingInterface(w, n, errs.NewScope()); ok2 {
-				iface2 = &flyte.TypedInterface{
-					Inputs:  &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
-					Outputs: iface2.Outputs,
-				}
-
-				validateIfaceMatch(n.GetId(), iface2, errs.NewScope())
-			}
+			validateIfaceMatch(n.GetId(), iface2, errs.NewScope())
 		}
 	}
 
+	// Discover inputs from bindings... these should include all the variables used in the conditional statements.
+	// When we come to validate the conditions themselves, we will look up these variables and fail if a variable is used
+	// in a condition but doesn't have a node input binding.
+	inputVarsFromBindings, _ := ValidateBindings(w, node, node.GetInputs(), &flyte.VariableMap{Variables: map[string]*flyte.Variable{}},
+		false, EdgeDirectionUpstream, errs.NewScope())
+
 	if !errs.HasErrors() && iface != nil {
 		iface = &flyte.TypedInterface{
-			Inputs:  filterVariables(iface.Inputs, finalInputParameterNames),
+			Inputs:  inputVarsFromBindings,
 			Outputs: filterVariables(iface.Outputs, finalOutputParameterNames),
 		}
 	} else {

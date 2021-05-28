@@ -14,7 +14,7 @@ import (
 func TestMarshalUnmarshal_Connections(t *testing.T) {
 	r, err := ioutil.ReadFile("testdata/connections.json")
 	assert.NoError(t, err)
-	o := v1alpha1.Connections{}
+	o := v1alpha1.DeprecatedConnections{}
 	err = json.Unmarshal(r, &o)
 	assert.NoError(t, err)
 	assert.Equal(t, map[v1alpha1.NodeID][]v1alpha1.NodeID{
@@ -42,10 +42,12 @@ func TestWorkflowSpec(t *testing.T) {
 	assert.NoError(t, err)
 	w := &v1alpha1.FlyteWorkflow{}
 	err = json.Unmarshal(j, w)
-	assert.NoError(t, err)
+	if !assert.NoError(t, err) {
+		t.FailNow()
+	}
+
 	assert.NotNil(t, w.WorkflowSpec)
 	assert.Nil(t, w.GetOnFailureNode())
-	assert.Equal(t, 7, len(w.Connections.DownstreamEdges))
-	assert.Equal(t, 8, len(w.Connections.UpstreamEdges))
-
+	assert.Equal(t, 7, len(w.GetConnections().Downstream))
+	assert.Equal(t, 8, len(w.GetConnections().Upstream))
 }

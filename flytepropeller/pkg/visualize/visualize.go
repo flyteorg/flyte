@@ -97,7 +97,7 @@ func WorkflowToGraphViz(g *v1alpha1.FlyteWorkflow) string {
 
 	for nodesToVisit := NewNodeNameQ(start.ID); nodesToVisit.HasNext(); {
 		node := nodesToVisit.Deque()
-		nodes, found := g.GetConnections().DownstreamEdges[node]
+		nodes, found := g.GetConnections().Downstream[node]
 		if found {
 			nodesToVisit.Enqueue(nodes...)
 

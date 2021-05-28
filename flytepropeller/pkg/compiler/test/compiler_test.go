@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-test/deep"
+
 	"github.com/ghodss/yaml"
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
@@ -184,6 +186,10 @@ func TestBranches(t *testing.T) {
 	errors.SetConfig(errors.Config{IncludeSource: true})
 	assert.NoError(t, filepath.Walk("testdata/branch", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
+			if filepath.Base(info.Name()) != "branch" {
+				return filepath.SkipDir
+			}
+
 			return nil
 		}
 
@@ -209,6 +215,29 @@ func TestBranches(t *testing.T) {
 				t.FailNow()
 			}
 
+			marshaler := jsonpb.Marshaler{}
+			rawStr, err := marshaler.MarshalToString(compiledWfc)
+			if !assert.NoError(t, err) {
+				t.Fail()
+			}
+
+			compiledFilePath := filepath.Join(filepath.Dir(path), "compiled", filepath.Base(path))
+			if *update {
+				err = ioutil.WriteFile(compiledFilePath, []byte(rawStr), os.ModePerm)
+				if !assert.NoError(t, err) {
+					t.Fail()
+				}
+			} else {
+				goldenRaw, err := ioutil.ReadFile(compiledFilePath)
+				if !assert.NoError(t, err) {
+					t.Fail()
+				}
+
+				if diff := deep.Equal(rawStr, string(goldenRaw)); diff != nil {
+					t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v", diff, rawStr, string(goldenRaw))
+				}
+			}
+
 			inputs := map[string]interface{}{}
 			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
 				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
@@ -226,6 +255,24 @@ func TestBranches(t *testing.T) {
 				raw, err := json.Marshal(flyteWf)
 				if assert.NoError(t, err) {
 					assert.NotEmpty(t, raw)
+				}
+
+				k8sObjectFilepath := filepath.Join(filepath.Dir(path), "k8s", filepath.Base(path))
+				if *update {
+					err = ioutil.WriteFile(k8sObjectFilepath, raw, os.ModePerm)
+					if !assert.NoError(t, err) {
+						t.Fail()
+					}
+				} else {
+					goldenRaw, err := ioutil.ReadFile(k8sObjectFilepath)
+					if !assert.NoError(t, err) {
+						t.Fail()
+					}
+
+					if diff := deep.Equal(string(raw), string(goldenRaw)); diff != nil {
+						t.Errorf("K8sObject() Diff = %v\r\n got = %v\r\n want = %v", diff, rawStr, string(goldenRaw))
+					}
+
 				}
 			}
 		})

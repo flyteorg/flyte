@@ -10,7 +10,7 @@ import (
 )
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
-func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) (*v1alpha1.NodeSpec, bool) {
+func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) ([]*v1alpha1.NodeSpec, bool) {
 	if n == nil {
 		errs.Collect(errors.NewValueRequiredErr("root", "node"))
 		return nil, !errs.HasErrors()
@@ -112,7 +112,12 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		}
 	case *core.Node_BranchNode:
 		nodeSpec.Kind = v1alpha1.NodeKindBranch
-		nodeSpec.BranchNode = buildBranchNodeSpec(n.GetBranchNode(), errs.NewScope())
+		b, ns := buildBranchNodeSpec(n.GetBranchNode(), tasks, errs.NewScope())
+		nodeSpec.BranchNode = b
+		// The reason why we create a separate list and then append the passed list to it is to maintain the actualNode
+		// as the first element in the list. That way list[0] will always be the first node
+		actualNode := []*v1alpha1.NodeSpec{nodeSpec}
+		return append(actualNode, ns...), !errs.HasErrors()
 	default:
 		if n.GetId() == v1alpha1.StartNodeID {
 			nodeSpec.Kind = v1alpha1.NodeKindStart
@@ -121,27 +126,40 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		}
 	}
 
-	return nodeSpec, !errs.HasErrors()
+	return []*v1alpha1.NodeSpec{nodeSpec}, !errs.HasErrors()
 }
 
-func buildIfBlockSpec(block *core.IfBlock, _ errors.CompileErrors) *v1alpha1.IfBlock {
+func buildIfBlockSpec(block *core.IfBlock, tasks []*core.CompiledTask, errs errors.CompileErrors) (*v1alpha1.IfBlock, []*v1alpha1.NodeSpec) {
+	nodeSpecs, ok := buildNodeSpec(block.ThenNode, tasks, errs)
+	if !ok {
+		return nil, []*v1alpha1.NodeSpec{}
+	}
 	return &v1alpha1.IfBlock{
 		Condition: v1alpha1.BooleanExpression{BooleanExpression: block.Condition},
 		ThenNode:  refStr(block.ThenNode.Id),
-	}
+	}, nodeSpecs
 }
 
-func buildBranchNodeSpec(branch *core.BranchNode, errs errors.CompileErrors) *v1alpha1.BranchNodeSpec {
+func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, errs errors.CompileErrors) (*v1alpha1.BranchNodeSpec, []*v1alpha1.NodeSpec) {
 	if branch == nil {
-		return nil
+		return nil, []*v1alpha1.NodeSpec{}
 	}
 
+	var childNodes []*v1alpha1.NodeSpec
+
+	branchNode, nodeSpecs := buildIfBlockSpec(branch.IfElse.Case, tasks, errs.NewScope())
 	res := &v1alpha1.BranchNodeSpec{
-		If: *buildIfBlockSpec(branch.IfElse.Case, errs.NewScope()),
+		If: *branchNode,
 	}
+	childNodes = append(childNodes, nodeSpecs...)
 
 	switch branch.IfElse.GetDefault().(type) {
 	case *core.IfElseBlock_ElseNode:
+		ns, ok := buildNodeSpec(branch.IfElse.GetElseNode(), tasks, errs)
+		if !ok {
+			return nil, []*v1alpha1.NodeSpec{}
+		}
+		childNodes = append(childNodes, ns...)
 		res.Else = refStr(branch.IfElse.GetElseNode().Id)
 	case *core.IfElseBlock_Error:
 		res.ElseFail = &v1alpha1.Error{Error: branch.IfElse.GetError()}
@@ -149,27 +167,32 @@ func buildBranchNodeSpec(branch *core.BranchNode, errs errors.CompileErrors) *v1
 
 	other := make([]*v1alpha1.IfBlock, 0, len(branch.IfElse.Other))
 	for _, block := range branch.IfElse.Other {
-		other = append(other, buildIfBlockSpec(block, errs.NewScope()))
+		b, ns := buildIfBlockSpec(block, tasks, errs.NewScope())
+		other = append(other, b)
+		childNodes = append(childNodes, ns...)
 	}
 
 	res.ElseIf = other
 
-	return res
+	return res, childNodes
 }
 
 func buildNodes(nodes []*core.Node, tasks []*core.CompiledTask, errs errors.CompileErrors) (map[common.NodeID]*v1alpha1.NodeSpec, bool) {
 	res := make(map[common.NodeID]*v1alpha1.NodeSpec, len(nodes))
-	for _, nodeBuidler := range nodes {
-		n, ok := buildNodeSpec(nodeBuidler, tasks, errs.NewScope())
+	for _, nodeBuilder := range nodes {
+		nodeSpecs, ok := buildNodeSpec(nodeBuilder, tasks, errs.NewScope())
 		if !ok {
 			return nil, ok
 		}
 
-		if _, exists := res[n.ID]; exists {
-			errs.Collect(errors.NewValueCollisionError(nodeBuidler.GetId(), "Id", n.ID))
-		}
+		for _, nref := range nodeSpecs {
+			n := nref
+			if _, exists := res[n.ID]; exists {
+				errs.Collect(errors.NewValueCollisionError(nodeBuilder.GetId(), "Id", n.ID))
+			}
 
-		res[n.ID] = n
+			res[n.ID] = n
+		}
 	}
 
 	return res, !errs.HasErrors()
