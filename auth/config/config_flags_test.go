@@ -84,7 +84,7 @@ func testDecodeJson_Config(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_Config(val, result))
 }
 
-func testDecodeSlice_Config(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_Config(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_Config(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_httpAuthorizationHeader", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("httpAuthorizationHeader"); err == nil {
-				assert.Equal(t, string(DefaultConfig.HTTPAuthorizationHeader), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_grpcAuthorizationHeader", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("grpcAuthorizationHeader"); err == nil {
-				assert.Equal(t, string(DefaultConfig.GrpcAuthorizationHeader), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_disableForHttp", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("disableForHttp"); err == nil {
-				assert.Equal(t, bool(DefaultConfig.DisableForHTTP), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_disableForGrpc", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("disableForGrpc"); err == nil {
-				assert.Equal(t, bool(DefaultConfig.DisableForGrpc), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,21 +156,13 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_authorizedUris", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("authorizedUris"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1,1"
 
 			cmdFlags.Set("authorizedUris", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("authorizedUris"); err == nil {
-				testDecodeSlice_Config(t, vStringSlice, &actual.AuthorizedURIs)
+				testDecodeRaw_Config(t, vStringSlice, &actual.AuthorizedURIs)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -210,14 +170,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.redirectUrl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.redirectUrl"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.RedirectURL.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.UserAuth.RedirectURL.String()
@@ -232,14 +184,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.openId.clientId", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.openId.clientId"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.OpenID.ClientID), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -254,14 +198,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.openId.clientSecretName", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.openId.clientSecretName"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.OpenID.ClientSecretName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -276,14 +212,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.openId.clientSecretFile", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.openId.clientSecretFile"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.OpenID.DeprecatedClientSecretFile), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -298,14 +226,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.openId.baseUrl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.openId.baseUrl"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.OpenID.BaseURL.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.UserAuth.OpenID.BaseURL.String()
@@ -320,21 +240,13 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.openId.scopes", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("userAuth.openId.scopes"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_Config("1,1", ",")
 
 			cmdFlags.Set("userAuth.openId.scopes", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("userAuth.openId.scopes"); err == nil {
-				testDecodeSlice_Config(t, join_Config(vStringSlice, ","), &actual.UserAuth.OpenID.Scopes)
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.UserAuth.OpenID.Scopes)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -342,14 +254,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.cookieHashKeySecretName", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.cookieHashKeySecretName"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.CookieHashKeySecretName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -364,14 +268,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_userAuth.cookieBlockKeySecretName", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("userAuth.cookieBlockKeySecretName"); err == nil {
-				assert.Equal(t, string(DefaultConfig.UserAuth.CookieBlockKeySecretName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -386,14 +282,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.issuer", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.issuer"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.Issuer), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -408,14 +296,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.accessTokenLifespan", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.accessTokenLifespan"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.AccessTokenLifespan.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.AppAuth.SelfAuthServer.AccessTokenLifespan.String()
@@ -430,14 +310,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.refreshTokenLifespan", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.refreshTokenLifespan"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.RefreshTokenLifespan.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.AppAuth.SelfAuthServer.RefreshTokenLifespan.String()
@@ -452,14 +324,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.authorizationCodeLifespan", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.authorizationCodeLifespan"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.AuthorizationCodeLifespan.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.AppAuth.SelfAuthServer.AuthorizationCodeLifespan.String()
@@ -474,14 +338,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.claimSymmetricEncryptionKeySecretName", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.claimSymmetricEncryptionKeySecretName"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.ClaimSymmetricEncryptionKeySecretName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -496,14 +352,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.tokenSigningRSAKeySecretName", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.tokenSigningRSAKeySecretName"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.TokenSigningRSAKeySecretName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -518,14 +366,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.selfAuthServer.oldTokenSigningRSAKeySecretName", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.selfAuthServer.oldTokenSigningRSAKeySecretName"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.SelfAuthServer.OldTokenSigningRSAKeySecretName), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -540,14 +380,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.externalAuthServer.baseUrl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.baseUrl"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.ExternalAuthServer.BaseURL.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.AppAuth.ExternalAuthServer.BaseURL.String()
@@ -562,21 +394,13 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.externalAuthServer.allowedAudience", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("appAuth.externalAuthServer.allowedAudience"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_Config("1,1", ",")
 
 			cmdFlags.Set("appAuth.externalAuthServer.allowedAudience", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("appAuth.externalAuthServer.allowedAudience"); err == nil {
-				testDecodeSlice_Config(t, join_Config(vStringSlice, ","), &actual.AppAuth.ExternalAuthServer.AllowedAudience)
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AppAuth.ExternalAuthServer.AllowedAudience)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -584,14 +408,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.externalAuthServer.metadataUrl", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.metadataUrl"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.ExternalAuthServer.MetadataEndpointURL.String()), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := DefaultConfig.AppAuth.ExternalAuthServer.MetadataEndpointURL.String()
@@ -606,14 +422,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.thirdPartyConfig.flyteClient.clientId", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.thirdPartyConfig.flyteClient.clientId"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.ClientID), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -628,14 +436,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.thirdPartyConfig.flyteClient.redirectUri", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("appAuth.thirdPartyConfig.flyteClient.redirectUri"); err == nil {
-				assert.Equal(t, string(DefaultConfig.AppAuth.ThirdParty.FlyteClientConfig.RedirectURI), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -650,21 +450,13 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_appAuth.thirdPartyConfig.flyteClient.scopes", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("appAuth.thirdPartyConfig.flyteClient.scopes"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_Config("1,1", ",")
 
 			cmdFlags.Set("appAuth.thirdPartyConfig.flyteClient.scopes", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("appAuth.thirdPartyConfig.flyteClient.scopes"); err == nil {
-				testDecodeSlice_Config(t, join_Config(vStringSlice, ","), &actual.AppAuth.ThirdParty.FlyteClientConfig.Scopes)
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.AppAuth.ThirdParty.FlyteClientConfig.Scopes)
 
 			} else {
 				assert.FailNow(t, err.Error())

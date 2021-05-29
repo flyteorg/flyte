@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/flyteorg/flyteadmin/pkg/async"
@@ -41,6 +42,17 @@ type EmailerConfig struct {
 }
 
 func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Scope) interfaces.Emailer {
+	// If an external email service is specified use that instead.
+	// TODO: Handling of this is messy, see https://github.com/flyteorg/flyte/issues/1063
+	if config.NotificationsEmailerConfig.EmailerConfig.ServiceName != "" {
+		switch config.NotificationsEmailerConfig.EmailerConfig.ServiceName {
+		case implementations.Sendgrid:
+			return implementations.NewSendGridEmailer(config, scope)
+		default:
+			panic(fmt.Errorf("No matching email implementation for %s", config.NotificationsEmailerConfig.EmailerConfig.ServiceName))
+		}
+	}
+
 	switch config.Type {
 	case common.AWS:
 		awsConfig := aws.NewConfig().WithRegion(config.Region).WithMaxRetries(maxRetries)
