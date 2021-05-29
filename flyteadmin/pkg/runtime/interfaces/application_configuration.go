@@ -138,8 +138,17 @@ type NotificationsProcessorConfig struct {
 	AccountID string `json:"accountId"`
 }
 
+type EmailServerConfig struct {
+	ServiceName string `json:"serviceName"`
+	// Only one of these should be set.
+	APIKeyEnvVar   string `json:"apiKeyEnvVar"`
+	APIKeyFilePath string `json:"apiKeyFilePath"`
+}
+
 // This section handles the configuration of notifications emails.
 type NotificationsEmailerConfig struct {
+	// For use with external email services (mailchimp/sendgrid)
+	EmailerConfig EmailServerConfig `json:"emailServerConfig"`
 	// The optionally templatized subject used in notification emails.
 	Subject string `json:"subject"`
 	// The optionally templatized sender used in notification emails.

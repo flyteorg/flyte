@@ -84,7 +84,7 @@ func testDecodeJson_ServerConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_ServerConfig(val, result))
 }
 
-func testDecodeSlice_ServerConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_ServerConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_ServerConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_httpPort", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("httpPort"); err == nil {
-				assert.Equal(t, int(defaultServerConfig.HTTPPort), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_grpcPort", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vInt, err := cmdFlags.GetInt("grpcPort"); err == nil {
-				assert.Equal(t, int(defaultServerConfig.GrpcPort), vInt)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_grpcServerReflection", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("grpcServerReflection"); err == nil {
-				assert.Equal(t, bool(defaultServerConfig.GrpcServerReflection), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -166,14 +142,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_kube-config", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("kube-config"); err == nil {
-				assert.Equal(t, string(defaultServerConfig.KubeConfig), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -188,14 +156,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_master", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("master"); err == nil {
-				assert.Equal(t, string(defaultServerConfig.Master), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -210,14 +170,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.secure", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("security.secure"); err == nil {
-				assert.Equal(t, bool(defaultServerConfig.Security.Secure), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -232,14 +184,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.ssl.certificateFile", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("security.ssl.certificateFile"); err == nil {
-				assert.Equal(t, string(defaultServerConfig.Security.Ssl.CertificateFile), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -254,14 +198,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.ssl.keyFile", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("security.ssl.keyFile"); err == nil {
-				assert.Equal(t, string(defaultServerConfig.Security.Ssl.KeyFile), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -276,14 +212,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.useAuth", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("security.useAuth"); err == nil {
-				assert.Equal(t, bool(defaultServerConfig.Security.UseAuth), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -298,14 +226,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.auditAccess", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("security.auditAccess"); err == nil {
-				assert.Equal(t, bool(defaultServerConfig.Security.AuditAccess), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -320,14 +240,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.allowCors", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("security.allowCors"); err == nil {
-				assert.Equal(t, bool(defaultServerConfig.Security.AllowCors), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -342,21 +254,13 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.allowedOrigins", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedOrigins"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_ServerConfig("1,1", ",")
 
 			cmdFlags.Set("security.allowedOrigins", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedOrigins"); err == nil {
-				testDecodeSlice_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.Security.AllowedOrigins)
+				testDecodeRaw_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.Security.AllowedOrigins)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -364,21 +268,13 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_security.allowedHeaders", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedHeaders"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_ServerConfig("1,1", ",")
 
 			cmdFlags.Set("security.allowedHeaders", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("security.allowedHeaders"); err == nil {
-				testDecodeSlice_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.Security.AllowedHeaders)
+				testDecodeRaw_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.Security.AllowedHeaders)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -386,14 +282,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_thirdPartyConfig.flyteClient.clientId", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("thirdPartyConfig.flyteClient.clientId"); err == nil {
-				assert.Equal(t, string(defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.ClientID), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -408,14 +296,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_thirdPartyConfig.flyteClient.redirectUri", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("thirdPartyConfig.flyteClient.redirectUri"); err == nil {
-				assert.Equal(t, string(defaultServerConfig.DeprecatedThirdPartyConfig.FlyteClientConfig.RedirectURI), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -430,21 +310,13 @@ func TestServerConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_thirdPartyConfig.flyteClient.scopes", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vStringSlice, err := cmdFlags.GetStringSlice("thirdPartyConfig.flyteClient.scopes"); err == nil {
-				assert.Equal(t, []string([]string{}), vStringSlice)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := join_ServerConfig("1,1", ",")
 
 			cmdFlags.Set("thirdPartyConfig.flyteClient.scopes", testValue)
 			if vStringSlice, err := cmdFlags.GetStringSlice("thirdPartyConfig.flyteClient.scopes"); err == nil {
-				testDecodeSlice_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.DeprecatedThirdPartyConfig.FlyteClientConfig.Scopes)
+				testDecodeRaw_ServerConfig(t, join_ServerConfig(vStringSlice, ","), &actual.DeprecatedThirdPartyConfig.FlyteClientConfig.Scopes)
 
 			} else {
 				assert.FailNow(t, err.Error())
