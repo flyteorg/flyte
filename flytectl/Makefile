@@ -1,5 +1,5 @@
 export REPOSITORY=flytectl
-include boilerplate/lyft/golang_test_targets/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
 
 GIT_VERSION := $(shell git describe --always --tags)
 GIT_HASH := $(shell git rev-parse --short HEAD)
@@ -25,6 +25,7 @@ compile_debug:
 
 .PHONY: update_boilerplate
 update_boilerplate:
+	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
 
 .PHONY: install-piptools
