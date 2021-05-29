@@ -1,0 +1,9 @@
+{{- if .Values.common.flyteNamespaceTemplate.enabled }}
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ template "flyte.namespace" . }}
+spec:
+  finalizers:
+  - kubernetes
+{{- end }}

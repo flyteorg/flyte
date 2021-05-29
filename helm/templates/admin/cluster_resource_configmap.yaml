@@ -1,0 +1,13 @@
+{{- if .Values.cluster_resource_manager.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: clusterresource-template
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteadmin.labels" . | nindent 4 }}
+data:
+{{- range .Values.cluster_resource_manager.templates }}
+  {{ .key }}.yaml: | {{ .value | nindent 4 }}
+{{- end }}
+  zz_copilot_config.yaml: | {{ include "copilot.config" . | nindent 4 }}
+{{- end }}

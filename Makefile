@@ -12,6 +12,10 @@ update_boilerplate:
 kustomize: 
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
 
+.PHONY: helm
+helm: 
+	bash script/generate_helm.sh
+
 .PHONY: release_automation
 release_automation:
 	bash script/release.sh
@@ -51,3 +55,11 @@ stats:
 .PHONY: prepare_artifacts
 prepare_artifacts:
 	bash script/prepare_artifacts.sh
+
+.PHONY: helm_install
+helm_install:
+	helm install flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace
+
+.PHONY: helm_upgrade
+helm_upgrade:
+	helm upgrade flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace

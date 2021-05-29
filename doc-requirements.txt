@@ -67,8 +67,11 @@ sphinx-copybutton==0.3.1
     # via -r doc-requirements.in
 sphinx-fontawesome==0.0.6
     # via -r doc-requirements.in
+<<<<<<< HEAD
+=======
 sphinx-issues==1.2.0
     # via -r doc-requirements.in
+>>>>>>> master
 sphinx-prompt==1.4.0
     # via -r doc-requirements.in
 sphinx-tabs==2.1.0
