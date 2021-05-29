@@ -20,7 +20,7 @@ then
     GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs
 fi
 
-helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
+~/go/bin/helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
