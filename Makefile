@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export REPOSITORY=flyteidl
-include boilerplate/lyft/golang_test_targets/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
@@ -9,6 +9,7 @@ endef
 
 .PHONY: update_boilerplate
 update_boilerplate:
+	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
 
 .PHONY: generate
