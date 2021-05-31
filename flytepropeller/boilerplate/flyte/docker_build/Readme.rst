@@ -11,13 +11,13 @@ If git head has a git tag, the Dockerhub image will also be tagged ``<IMAGE>:<GI
 
 **To Enable:**
 
-Add ``lyft/docker_build`` to your ``boilerplate/update.cfg`` file.
+Add ``flyteorg/docker_build`` to your ``boilerplate/update.cfg`` file.
 
-Add ``include boilerplate/lyft/docker_build/Makefile`` in your main ``Makefile`` _after_ your REPOSITORY environment variable
+Add ``include boilerplate/flyte/docker_build/Makefile`` in your main ``Makefile`` _after_ your REPOSITORY environment variable
 
 ::
 
     REPOSITORY=<myreponame>
-    include boilerplate/lyft/docker_build/Makefile
+    include boilerplate/flyte/docker_build/Makefile
 
 (this ensures the extra Make targets get included in your main Makefile)
