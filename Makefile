@@ -1,11 +1,12 @@
 export REPOSITORY=flytepropeller
-include boilerplate/lyft/docker_build/Makefile
-include boilerplate/lyft/golang_test_targets/Makefile
-include boilerplate/lyft/end2end/Makefile
+include boilerplate/flyte/docker_build/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
+include boilerplate/flyte/end2end/Makefile
 
 
 .PHONY: update_boilerplate
 update_boilerplate:
+	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
 	@boilerplate/update.sh
 
 .PHONY: linux_compile
