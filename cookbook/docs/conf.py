@@ -218,7 +218,7 @@ html_logo = "_static/flyte_circle_gradient_1_4x4.png"
 examples_dirs = [
     "../core/flyte_basics",
     "../core/control_flow",
-    "../type_system",
+    "../core/type_system",
     "../case_studies/ml_training/pima_diabetes",
     "../case_studies/ml_training/house_price_prediction",
     "../testing",
@@ -247,7 +247,7 @@ examples_dirs = [
 gallery_dirs = [
     "auto/core/flyte_basics",
     "auto/core/control_flow",
-    "auto/type_system",
+    "auto/core/type_system",
     "auto/case_studies/ml_training/pima_diabetes",
     "auto/case_studies/ml_training/house_price_prediction",
     "auto/testing",
