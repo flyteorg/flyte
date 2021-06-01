@@ -58,8 +58,8 @@ prepare_artifacts:
 
 .PHONY: helm_install
 helm_install:
-	helm install flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace
+	helm install flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace --namespace=flyte
 
 .PHONY: helm_upgrade
 helm_upgrade:
-	helm upgrade flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace
+	helm upgrade flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace --namespace=flyte
