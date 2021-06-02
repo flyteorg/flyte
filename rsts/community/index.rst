@@ -15,7 +15,9 @@ so please join us on:
 - Community Sync every other Tuesday, 9:00 AM PDT/PST. Please check out the `calendar <https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles>`_ and feel free to pop in! `Zoom link <https://zoom.us/s/93875115830?pwd=YWZWOHl1ODRRVjhjVkxSV0pmZkJaZz09#success>`_
 
 Although Slack is currently our primary discussion platform, we also have discussion boards on:
+
 - `GitHub <https://github.com/flyteorg/flyte/discussions/categories/q-a>`_, featuring a list of Q&As and How-to questions
+
 - `Flyte OSS LinkedIn Discussion Group <https://www.linkedin.com/groups/13962256/>`_   
 
 We love contributions, so please contribute to
