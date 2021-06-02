@@ -52,6 +52,7 @@ flyteadmin:
   tolerations: []
   # -- affinity for Flyteadmin deployment
   affinity: {}
+  secrets: {}
 
 #
 # DATACATALOG SETTINGS
