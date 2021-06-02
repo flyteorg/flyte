@@ -7,11 +7,11 @@
     "creationTimestamp": null,
     "labels": {
       "execution-id": "name",
-      "workflow-name": "recipes-02-intermediate-run-conditions-multiplier"
+      "workflow-name": "core-control-flow-run-conditions-so-nested"
     }
   },
   "spec": {
-    "id": "test_proj:test_domain:recipes.02_intermediate.run_conditions.multiplier",
+    "id": "test_proj:test_domain:core.control_flow.run_conditions.so_nested",
     "nodes": {
       "end-node": {
         "id": "end-node",
@@ -22,15 +22,15 @@
             "var": "o0",
             "binding": {
               "promise": {
-                "nodeId": "node-0",
+                "nodeId": "n0",
                 "var": "o0"
               }
             }
           }
         ]
       },
-      "node-0": {
-        "id": "node-0",
+      "n0": {
+        "id": "n0",
         "name": "fractions",
         "resources": {},
         "kind": "branch",
@@ -40,7 +40,7 @@
               "conjunction": {
                 "leftExpression": {
                   "comparison": {
-                    "operator": "GTE",
+                    "operator": "GT",
                     "leftValue": {
                       "var": ".my_input"
                     },
@@ -53,7 +53,7 @@
                 },
                 "rightExpression": {
                   "comparison": {
-                    "operator": "LTE",
+                    "operator": "LT",
                     "leftValue": {
                       "var": ".my_input"
                     },
@@ -66,9 +66,44 @@
                 }
               }
             },
-            "then": "node-0-branchn0"
+            "then": "n0-n0"
           },
-          "else": "node-0-branchn1"
+          "elseIf": [
+            {
+              "condition": {
+                "conjunction": {
+                  "leftExpression": {
+                    "comparison": {
+                      "operator": "GT",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 1
+                        }
+                      }
+                    }
+                  },
+                  "rightExpression": {
+                    "comparison": {
+                      "operator": "LT",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 10
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "then": "n0-n1"
+            }
+          ],
+          "else": "n0-n2"
         },
         "inputBindings": [
           {
@@ -86,12 +121,90 @@
         },
         "interruptible": false
       },
-      "node-0-branchn0": {
-        "id": "node-0-branchn0",
-        "name": "flytekit.annotated.python_function_task.recipes.02_intermediate.run_conditions.double",
+      "n0-n0": {
+        "id": "n0-n0",
+        "name": "inner_fractions",
+        "resources": {},
+        "kind": "branch",
+        "branch": {
+          "if": {
+            "condition": {
+              "comparison": {
+                "operator": "LT",
+                "leftValue": {
+                  "var": ".my_input"
+                },
+                "rightValue": {
+                  "primitive": {
+                    "floatValue": 0.5
+                  }
+                }
+              }
+            },
+            "then": "n0-n0-n0"
+          },
+          "elseIf": [
+            {
+              "condition": {
+                "conjunction": {
+                  "leftExpression": {
+                    "comparison": {
+                      "operator": "GT",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 0.5
+                        }
+                      }
+                    }
+                  },
+                  "rightExpression": {
+                    "comparison": {
+                      "operator": "LT",
+                      "leftValue": {
+                        "var": ".my_input"
+                      },
+                      "rightValue": {
+                        "primitive": {
+                          "floatValue": 0.7
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "then": "n0-n0-n1"
+            }
+          ],
+          "elseFail": {
+            "failedNodeId": "inner_fractions",
+            "message": "Only \u003c0.7 allowed"
+          }
+        },
+        "inputBindings": [
+          {
+            "var": ".my_input",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "n0-n0-n0": {
+        "id": "n0-n0-n0",
+        "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
         "resources": {},
         "kind": "task",
-        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"recipes.02_intermediate.run_conditions.double\" version:\"abc\" ",
+        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.double\" version:\"abc\" ",
         "inputBindings": [
           {
             "var": "n",
@@ -108,12 +221,56 @@
         },
         "interruptible": false
       },
-      "node-0-branchn1": {
-        "id": "node-0-branchn1",
-        "name": "flytekit.annotated.python_function_task.recipes.02_intermediate.run_conditions.square",
+      "n0-n0-n1": {
+        "id": "n0-n0-n1",
+        "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
         "resources": {},
         "kind": "task",
-        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"recipes.02_intermediate.run_conditions.square\" version:\"abc\" ",
+        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.square\" version:\"abc\" ",
+        "inputBindings": [
+          {
+            "var": "n",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "n0-n1": {
+        "id": "n0-n1",
+        "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
+        "resources": {},
+        "kind": "task",
+        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.square\" version:\"abc\" ",
+        "inputBindings": [
+          {
+            "var": "n",
+            "binding": {
+              "promise": {
+                "nodeId": "start-node",
+                "var": "my_input"
+              }
+            }
+          }
+        ],
+        "retry": {
+          "minAttempts": 1
+        },
+        "interruptible": false
+      },
+      "n0-n2": {
+        "id": "n0-n2",
+        "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
+        "resources": {},
+        "kind": "task",
+        "task": "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.double\" version:\"abc\" ",
         "inputBindings": [
           {
             "var": "n",
@@ -137,33 +294,42 @@
       }
     },
     "connections": {
-      "node-0": [
+      "n0": [
         "end-node"
       ],
       "start-node": [
-        "node-0"
+        "n0"
       ]
     },
     "edges": {
       "downstream": {
-        "node-0": [
+        "n0": [
           "end-node"
         ],
         "start-node": [
-          "node-0"
+          "n0"
         ]
       },
       "upstream": {
         "end-node": [
-          "node-0"
+          "n0"
         ],
-        "node-0": [
+        "n0": [
           "start-node"
         ],
-        "node-0-branchn0": [
+        "n0-n0": [
           "start-node"
         ],
-        "node-0-branchn1": [
+        "n0-n0-n0": [
+          "start-node"
+        ],
+        "n0-n0-n1": [
+          "start-node"
+        ],
+        "n0-n1": [
+          "start-node"
+        ],
+        "n0-n2": [
           "start-node"
         ]
       }
@@ -183,7 +349,7 @@
         "var": "o0",
         "binding": {
           "promise": {
-            "nodeId": "node-0",
+            "nodeId": "n0",
             "var": "o0"
           }
         }
@@ -203,12 +369,12 @@
   },
   "executionId": {},
   "tasks": {
-    "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"recipes.02_intermediate.run_conditions.double\" version:\"abc\" ": {
+    "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.double\" version:\"abc\" ": {
       "id": {
         "resourceType": "TASK",
         "project": "test_proj",
         "domain": "test_domain",
-        "name": "recipes.02_intermediate.run_conditions.double",
+        "name": "core.control_flow.run_conditions.double",
         "version": "abc"
       },
       "type": "python-task",
@@ -248,7 +414,7 @@
         "args": [
           "pyflyte-execute",
           "--task-module",
-          "recipes.02_intermediate.run_conditions",
+          "core.control_flow.run_conditions",
           "--task-name",
           "double",
           "--inputs",
@@ -275,12 +441,12 @@
         ]
       }
     },
-    "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"recipes.02_intermediate.run_conditions.square\" version:\"abc\" ": {
+    "resource_type:TASK project:\"test_proj\" domain:\"test_domain\" name:\"core.control_flow.run_conditions.square\" version:\"abc\" ": {
       "id": {
         "resourceType": "TASK",
         "project": "test_proj",
         "domain": "test_domain",
-        "name": "recipes.02_intermediate.run_conditions.square",
+        "name": "core.control_flow.run_conditions.square",
         "version": "abc"
       },
       "type": "python-task",
@@ -320,7 +486,7 @@
         "args": [
           "pyflyte-execute",
           "--task-module",
-          "recipes.02_intermediate.run_conditions",
+          "core.control_flow.run_conditions",
           "--task-name",
           "square",
           "--inputs",

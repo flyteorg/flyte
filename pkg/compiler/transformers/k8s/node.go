@@ -1,11 +1,14 @@
 package k8s
 
 import (
+	"strings"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/go-test/deep"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -187,8 +190,10 @@ func buildNodes(nodes []*core.Node, tasks []*core.CompiledTask, errs errors.Comp
 
 		for _, nref := range nodeSpecs {
 			n := nref
-			if _, exists := res[n.ID]; exists {
-				errs.Collect(errors.NewValueCollisionError(nodeBuilder.GetId(), "Id", n.ID))
+			if existingNode, exists := res[n.ID]; exists {
+				if diff := deep.Equal(existingNode, n); diff != nil {
+					errs.Collect(errors.NewValueCollisionError(nodeBuilder.GetId(), strings.Join(diff, "\r\n"), n.ID))
+				}
 			}
 
 			res[n.ID] = n

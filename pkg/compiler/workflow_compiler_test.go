@@ -390,7 +390,10 @@ func newNodeIDSet(nodeIDs ...common.NodeID) sets.String {
 }
 
 func TestValidateReachable(t *testing.T) {
-	graph := &workflowBuilder{}
+	graph := &workflowBuilder{
+		NodeBuilderIndex: common.NewNodeIndex(),
+	}
+
 	graph.downstreamNodes = map[string]sets.String{
 		v1alpha1.StartNodeID: newNodeIDSet("1"),
 		"1":                  newNodeIDSet("5", "2"),
@@ -400,7 +403,7 @@ func TestValidateReachable(t *testing.T) {
 	}
 
 	for range graph.downstreamNodes {
-		graph.Nodes = common.NewNodeIndex(graph.NewNodeBuilder(nil))
+		graph.Nodes = common.NewNodeIndex(graph.GetOrCreateNodeBuilder(nil))
 	}
 
 	errs := errors.NewCompileErrors()

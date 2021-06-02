@@ -11,6 +11,14 @@ const (
 	EndNodeID   = "end-node"
 )
 
+type EdgeDirection uint8
+
+const (
+	EdgeDirectionBidirectional EdgeDirection = iota
+	EdgeDirectionDownstream
+	EdgeDirectionUpstream
+)
+
 //go:generate mockery -all -output=mocks -case=underscore
 
 // A mutable workflow used during the build of the intermediate layer.
@@ -21,8 +29,9 @@ type WorkflowBuilder interface {
 	AddUpstreamEdge(nodeProvider, nodeDependent NodeID)
 	AddDownstreamEdge(nodeProvider, nodeDependent NodeID)
 	AddNode(n NodeBuilder, errs errors.CompileErrors) (node NodeBuilder, ok bool)
+	AddEdges(n NodeBuilder, edgeDirection EdgeDirection, errs errors.CompileErrors) (ok bool)
 	ValidateWorkflow(fg *core.CompiledWorkflow, errs errors.CompileErrors) (Workflow, bool)
-	NewNodeBuilder(n *core.Node) NodeBuilder
+	GetOrCreateNodeBuilder(n *core.Node) NodeBuilder
 }
 
 // A mutable node used during the build of the intermediate layer.

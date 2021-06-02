@@ -3,10 +3,10 @@
     "template": {
       "id": {
         "resourceType": "WORKFLOW",
-        "project": "project",
-        "domain": "domain",
-        "name": "test_serialization.my_wf",
-        "version": "version"
+        "project": "test_proj",
+        "domain": "test_domain",
+        "name": "core.control_flow.run_conditions.consume_outputs",
+        "version": "abc"
       },
       "metadata": {
 
@@ -14,21 +14,21 @@
       "interface": {
         "inputs": {
           "variables": {
-            "a": {
+            "my_input": {
               "type": {
-                "simple": "INTEGER"
+                "simple": "FLOAT"
               },
-              "description": "a"
+              "description": "my_input"
             }
           }
         },
         "outputs": {
           "variables": {
-            "out_0": {
+            "o0": {
               "type": {
-                "simple": "INTEGER"
+                "simple": "FLOAT"
               },
-              "description": "out_0"
+              "description": "o0"
             }
           }
         }
@@ -41,20 +41,39 @@
           "id": "end-node",
           "inputs": [
             {
-              "var": "out_0",
+              "var": "o0",
               "binding": {
                 "promise": {
-                  "nodeId": "node-2",
-                  "var": "out_0"
+                  "nodeId": "n2",
+                  "var": "o0"
                 }
               }
             }
           ]
         },
         {
-          "id": "node-0",
+          "id": "n0",
           "metadata": {
-            "name": "flytekit.annotated.task.test_serialization.t3",
+            "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.coin_toss",
+            "retries": {
+
+            },
+            "interruptible": false
+          },
+          "taskNode": {
+            "referenceId": {
+              "resourceType": "TASK",
+              "project": "test_proj",
+              "domain": "test_domain",
+              "name": "core.control_flow.run_conditions.coin_toss",
+              "version": "abc"
+            }
+          }
+        },
+        {
+          "id": "n1",
+          "metadata": {
+            "name": "double_or_square",
             "retries": {
 
             },
@@ -62,205 +81,147 @@
           },
           "inputs": [
             {
-              "var": "a",
+              "var": "n0.o0",
               "binding": {
                 "promise": {
-                  "nodeId": "start-node",
-                  "var": "a"
+                  "nodeId": "n0",
+                  "var": "o0"
                 }
               }
             }
+          ],
+          "upstreamNodeIds": [
+            "n0"
+          ],
+          "branchNode": {
+            "ifElse": {
+              "case": {
+                "condition": {
+                  "comparison": {
+                    "leftValue": {
+                      "var": "n0.o0"
+                    },
+                    "rightValue": {
+                      "primitive": {
+                        "boolean": true
+                      }
+                    }
+                  }
+                },
+                "thenNode": {
+                  "id": "n1-n0",
+                  "metadata": {
+                    "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
+                    "retries": {
+
+                    },
+                    "interruptible": false
+                  },
+                  "inputs": [
+                    {
+                      "var": "n",
+                      "binding": {
+                        "promise": {
+                          "nodeId": "start-node",
+                          "var": "my_input"
+                        }
+                      }
+                    }
+                  ],
+                  "taskNode": {
+                    "referenceId": {
+                      "resourceType": "TASK",
+                      "project": "test_proj",
+                      "domain": "test_domain",
+                      "name": "core.control_flow.run_conditions.square",
+                      "version": "abc"
+                    }
+                  }
+                }
+              },
+              "elseNode": {
+                "id": "n1-n1",
+                "metadata": {
+                  "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.sum_diff",
+                  "retries": {
+
+                  },
+                  "interruptible": false
+                },
+                "inputs": [
+                  {
+                    "var": "a",
+                    "binding": {
+                      "promise": {
+                        "nodeId": "start-node",
+                        "var": "my_input"
+                      }
+                    }
+                  },
+                  {
+                    "var": "b",
+                    "binding": {
+                      "promise": {
+                        "nodeId": "start-node",
+                        "var": "my_input"
+                      }
+                    }
+                  }
+                ],
+                "taskNode": {
+                  "referenceId": {
+                    "resourceType": "TASK",
+                    "project": "test_proj",
+                    "domain": "test_domain",
+                    "name": "core.control_flow.run_conditions.sum_diff",
+                    "version": "abc"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "id": "n2",
+          "metadata": {
+            "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
+            "retries": {
+
+            },
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": "n",
+              "binding": {
+                "promise": {
+                  "nodeId": "n1",
+                  "var": "o0"
+                }
+              }
+            }
+          ],
+          "upstreamNodeIds": [
+            "n1"
           ],
           "taskNode": {
             "referenceId": {
               "resourceType": "TASK",
-              "project": "project",
-              "domain": "domain",
-              "name": "test_serialization.t3",
-              "version": "version"
-            }
-          }
-        },
-        {
-          "id": "node-1",
-          "metadata": {
-            "name": "test1",
-            "retries": {
-
-            },
-            "interruptible": false
-          },
-          "inputs": [
-            {
-              "var": ".a",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "a"
-                }
-              }
-            },
-            {
-              "var": "node-0.out_0",
-              "binding": {
-                "promise": {
-                  "nodeId": "node-0",
-                  "var": "out_0"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [
-            "node-0"
-          ],
-          "branchNode": {
-            "ifElse": {
-              "case": {
-                "condition": {
-                  "comparison": {
-                    "leftValue": {
-                      "var": "node-0.out_0"
-                    },
-                    "rightValue": {
-                      "var": ".a"
-                    }
-                  }
-                },
-                "thenNode": {
-                  "id": "node-1-branchnode-0",
-                  "metadata": {
-                    "name": "flytekit.annotated.task.test_serialization.t3",
-                    "retries": {
-
-                    },
-                    "interruptible": false
-                  },
-                  "inputs": [
-                    {
-                      "var": "a",
-                      "binding": {
-                        "promise": {
-                          "nodeId": "node-0",
-                          "var": "out_0"
-                        }
-                      }
-                    }
-                  ],
-                  "upstreamNodeIds": [
-                    "node-0"
-                  ],
-                  "taskNode": {
-                    "referenceId": {
-                      "resourceType": "TASK",
-                      "project": "project",
-                      "domain": "domain",
-                      "name": "test_serialization.t3",
-                      "version": "version"
-                    }
-                  }
-                }
-              },
-              "error": {
-                "failedNodeId": "test1",
-                "message": "Unable to choose branch"
-              }
-            }
-          }
-        },
-        {
-          "id": "node-2",
-          "metadata": {
-            "name": "test2",
-            "retries": {
-
-            },
-            "interruptible": false
-          },
-          "inputs": [
-            {
-              "var": ".a",
-              "binding": {
-                "promise": {
-                  "nodeId": "start-node",
-                  "var": "a"
-                }
-              }
-            },
-            {
-              "var": "node-1.out_0",
-              "binding": {
-                "promise": {
-                  "nodeId": "node-1",
-                  "var": "out_0"
-                }
-              }
-            }
-          ],
-          "upstreamNodeIds": [
-            "node-1"
-          ],
-          "branchNode": {
-            "ifElse": {
-              "case": {
-                "condition": {
-                  "comparison": {
-                    "leftValue": {
-                      "var": "node-1.out_0"
-                    },
-                    "rightValue": {
-                      "var": ".a"
-                    }
-                  }
-                },
-                "thenNode": {
-                  "id": "node-2-branchnode-0",
-                  "metadata": {
-                    "name": "flytekit.annotated.task.test_serialization.t3",
-                    "retries": {
-
-                    },
-                    "interruptible": false
-                  },
-                  "inputs": [
-                    {
-                      "var": "a",
-                      "binding": {
-                        "promise": {
-                          "nodeId": "node-1",
-                          "var": "out_0"
-                        }
-                      }
-                    }
-                  ],
-                  "upstreamNodeIds": [
-                    "node-1"
-                  ],
-                  "taskNode": {
-                    "referenceId": {
-                      "resourceType": "TASK",
-                      "project": "project",
-                      "domain": "domain",
-                      "name": "test_serialization.t3",
-                      "version": "version"
-                    }
-                  }
-                }
-              },
-              "error": {
-                "failedNodeId": "test2",
-                "message": "Unable to choose a branch"
-              }
+              "project": "test_proj",
+              "domain": "test_domain",
+              "name": "core.control_flow.run_conditions.double",
+              "version": "abc"
             }
           }
         }
       ],
       "outputs": [
         {
-          "var": "out_0",
+          "var": "o0",
           "binding": {
             "promise": {
-              "nodeId": "node-2",
-              "var": "out_0"
+              "nodeId": "n2",
+              "var": "o0"
             }
           }
         }
@@ -271,62 +232,56 @@
     },
     "connections": {
       "downstream": {
-        "node-0": {
+        "n0": {
           "ids": [
-            "node-1",
-            "node-1-branchnode-0"
+            "n1"
           ]
         },
-        "node-1": {
+        "n1": {
           "ids": [
-            "node-2",
-            "node-2-branchnode-0"
+            "n2"
           ]
         },
-        "node-2": {
+        "n2": {
           "ids": [
             "end-node"
           ]
         },
         "start-node": {
           "ids": [
-            "node-0",
-            "node-1",
-            "node-2"
+            "n0"
           ]
         }
       },
       "upstream": {
         "end-node": {
           "ids": [
-            "node-2"
+            "n2"
           ]
         },
-        "node-0": {
+        "n0": {
           "ids": [
             "start-node"
           ]
         },
-        "node-1": {
+        "n1": {
           "ids": [
-            "node-0",
+            "n0"
+          ]
+        },
+        "n1-n0": {
+          "ids": [
             "start-node"
           ]
         },
-        "node-1-branchnode-0": {
+        "n1-n1": {
           "ids": [
-            "node-0"
-          ]
-        },
-        "node-2": {
-          "ids": [
-            "node-1",
             "start-node"
           ]
         },
-        "node-2-branchnode-0": {
+        "n2": {
           "ids": [
-            "node-1"
+            "n1"
           ]
         }
       }
@@ -337,16 +292,16 @@
       "template": {
         "id": {
           "resourceType": "TASK",
-          "project": "project",
-          "domain": "domain",
-          "name": "test_serialization.t1",
-          "version": "version"
+          "project": "test_proj",
+          "domain": "test_domain",
+          "name": "core.control_flow.run_conditions.double",
+          "version": "abc"
         },
         "type": "python-task",
         "metadata": {
           "runtime": {
             "type": "FLYTE_SDK",
-            "version": "1.2.3",
+            "version": "0.16.0",
             "flavor": "python"
           },
           "retries": {
@@ -356,27 +311,34 @@
         },
         "interface": {
           "inputs": {
-
+            "variables": {
+              "n": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
+            }
           },
           "outputs": {
             "variables": {
-              "out_0": {
+              "o0": {
                 "type": {
-                  "simple": "STRING"
+                  "simple": "FLOAT"
                 },
-                "description": "out_0"
+                "description": "o0"
               }
             }
           }
         },
         "container": {
-          "image": "image",
+          "image": "image:name",
           "args": [
             "pyflyte-execute",
             "--task-module",
-            "test_serialization",
+            "core.control_flow.run_conditions",
             "--task-name",
-            "t1",
+            "double",
             "--inputs",
             "{{.input}}",
             "--output-prefix",
@@ -408,87 +370,16 @@
       "template": {
         "id": {
           "resourceType": "TASK",
-          "project": "project",
-          "domain": "domain",
-          "name": "test_serialization.t2",
-          "version": "version"
+          "project": "test_proj",
+          "domain": "test_domain",
+          "name": "core.control_flow.run_conditions.sum_diff",
+          "version": "abc"
         },
         "type": "python-task",
         "metadata": {
           "runtime": {
             "type": "FLYTE_SDK",
-            "version": "1.2.3",
-            "flavor": "python"
-          },
-          "retries": {
-
-          },
-          "interruptible": false
-        },
-        "interface": {
-          "inputs": {
-
-          },
-          "outputs": {
-            "variables": {
-              "out_0": {
-                "type": {
-                  "simple": "STRING"
-                },
-                "description": "out_0"
-              }
-            }
-          }
-        },
-        "container": {
-          "image": "image",
-          "args": [
-            "pyflyte-execute",
-            "--task-module",
-            "test_serialization",
-            "--task-name",
-            "t2",
-            "--inputs",
-            "{{.input}}",
-            "--output-prefix",
-            "{{.outputPrefix}}",
-            "--raw-output-data-prefix",
-            "{{.rawOutputDataPrefix}}"
-          ],
-          "resources": {
-
-          },
-          "config": [
-            {
-              "key": "testKey1",
-              "value": "testValue1"
-            },
-            {
-              "key": "testKey2",
-              "value": "testValue2"
-            },
-            {
-              "key": "testKey3",
-              "value": "testValue3"
-            }
-          ]
-        }
-      }
-    },
-    {
-      "template": {
-        "id": {
-          "resourceType": "TASK",
-          "project": "project",
-          "domain": "domain",
-          "name": "test_serialization.t3",
-          "version": "version"
-        },
-        "type": "python-task",
-        "metadata": {
-          "runtime": {
-            "type": "FLYTE_SDK",
-            "version": "1.2.3",
+            "version": "0.16.0",
             "flavor": "python"
           },
           "retries": {
@@ -501,31 +392,192 @@
             "variables": {
               "a": {
                 "type": {
-                  "simple": "INTEGER"
+                  "simple": "FLOAT"
                 },
-                "description": "a"
+                "description": "n"
+              },
+              "b": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
               }
             }
           },
           "outputs": {
             "variables": {
-              "out_0": {
+              "o0": {
                 "type": {
-                  "simple": "INTEGER"
+                  "simple": "FLOAT"
                 },
-                "description": "out_0"
+                "description": "o0"
+              },
+              "o1": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o1"
               }
             }
           }
         },
         "container": {
-          "image": "image",
+          "image": "image:name",
           "args": [
             "pyflyte-execute",
             "--task-module",
-            "test_serialization",
+            "core.control_flow.run_conditions",
             "--task-name",
-            "t3",
+            "double",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}"
+          ],
+          "resources": {
+
+          },
+          "config": [
+            {
+              "key": "testKey1",
+              "value": "testValue1"
+            },
+            {
+              "key": "testKey2",
+              "value": "testValue2"
+            },
+            {
+              "key": "testKey3",
+              "value": "testValue3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "template": {
+        "id": {
+          "resourceType": "TASK",
+          "project": "test_proj",
+          "domain": "test_domain",
+          "name": "core.control_flow.run_conditions.coin_toss",
+          "version": "abc"
+        },
+        "type": "python-task",
+        "metadata": {
+          "runtime": {
+            "type": "FLYTE_SDK",
+            "version": "0.16.0",
+            "flavor": "python"
+          },
+          "retries": {
+
+          },
+          "interruptible": false
+        },
+        "interface": {
+          "inputs": {
+
+          },
+          "outputs": {
+            "variables": {
+              "o0": {
+                "type": {
+                  "simple": "BOOLEAN"
+                },
+                "description": "o0"
+              }
+            }
+          }
+        },
+        "container": {
+          "image": "image:name",
+          "args": [
+            "pyflyte-execute",
+            "--task-module",
+            "core.control_flow.run_conditions",
+            "--task-name",
+            "double",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}"
+          ],
+          "resources": {
+
+          },
+          "config": [
+            {
+              "key": "testKey1",
+              "value": "testValue1"
+            },
+            {
+              "key": "testKey2",
+              "value": "testValue2"
+            },
+            {
+              "key": "testKey3",
+              "value": "testValue3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "template": {
+        "id": {
+          "resourceType": "TASK",
+          "project": "test_proj",
+          "domain": "test_domain",
+          "name": "core.control_flow.run_conditions.square",
+          "version": "abc"
+        },
+        "type": "python-task",
+        "metadata": {
+          "runtime": {
+            "type": "FLYTE_SDK",
+            "version": "0.16.0",
+            "flavor": "python"
+          },
+          "retries": {
+
+          },
+          "interruptible": false
+        },
+        "interface": {
+          "inputs": {
+            "variables": {
+              "n": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "n"
+              }
+            }
+          },
+          "outputs": {
+            "variables": {
+              "o0": {
+                "type": {
+                  "simple": "FLOAT"
+                },
+                "description": "o0"
+              }
+            }
+          }
+        },
+        "container": {
+          "image": "image:name",
+          "args": [
+            "pyflyte-execute",
+            "--task-module",
+            "core.control_flow.run_conditions",
+            "--task-name",
+            "square",
             "--inputs",
             "{{.input}}",
             "--output-prefix",

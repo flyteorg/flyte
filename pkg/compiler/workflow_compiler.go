@@ -143,7 +143,7 @@ func (w workflowBuilder) AddExecutionEdge(nodeFrom, nodeTo c.NodeID) {
 	w.AddUpstreamEdge(nodeFrom, nodeTo)
 }
 
-func (w workflowBuilder) AddEdges(n c.NodeBuilder, errs errors.CompileErrors) (ok bool) {
+func (w workflowBuilder) AddEdges(n c.NodeBuilder, edgeDirection c.EdgeDirection, errs errors.CompileErrors) (ok bool) {
 	if n.GetInterface() == nil {
 		// If there were errors computing node's interface, don't add any edges and just bail.
 		return
@@ -158,7 +158,7 @@ func (w workflowBuilder) AddEdges(n c.NodeBuilder, errs errors.CompileErrors) (o
 
 	// Add implicit Edges
 	_, ok = v.ValidateBindings(&w, n, n.GetInputs(), n.GetInterface().GetInputs(),
-		true /* validateParamTypes */, v.EdgeDirectionBidirectional, errs.NewScope())
+		true /* validateParamTypes */, edgeDirection, errs.NewScope())
 	return
 }
 
@@ -192,11 +192,11 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		Upstream:   make(map[string]*core.ConnectionSet_IdList),
 	}
 
-	globalInputNode, _ := wf.AddNode(wf.NewNodeBuilder(startNode), errs)
+	globalInputNode, _ := wf.AddNode(wf.GetOrCreateNodeBuilder(startNode), errs)
 	globalInputNode.SetInterface(&core.TypedInterface{Outputs: wf.CoreWorkflow.Template.Interface.Inputs})
 
 	endNode := &core.Node{Id: c.EndNodeID}
-	globalOutputNode, _ := wf.AddNode(wf.NewNodeBuilder(endNode), errs)
+	globalOutputNode, _ := wf.AddNode(wf.GetOrCreateNodeBuilder(endNode), errs)
 	globalOutputNode.SetInterface(&core.TypedInterface{Inputs: wf.CoreWorkflow.Template.Interface.Outputs})
 	globalOutputNode.SetInputs(wf.CoreWorkflow.Template.Outputs)
 
@@ -208,30 +208,8 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 	// Add and validate all other nodes
 	for _, n := range checkpoint {
 		topLevelNodes.Insert(n.Id)
-		if node, addOk := wf.AddNode(wf.NewNodeBuilder(n), errs.NewScope()); addOk {
+		if node, addOk := wf.AddNode(wf.GetOrCreateNodeBuilder(n), errs.NewScope()); addOk {
 			v.ValidateNode(&wf, node, false /* validateConditionTypes */, errs.NewScope())
-		}
-	}
-
-	// At this point, all nodes except branch nodes have populated all their input and output interfaces,
-	// Because conditions in branch nodes do not carry type information with them for the variables involved (e.g.
-	// if x == y), we need to wait till all nodes have populated their interfaces before we can resolve x and y to their
-	// original types and then validate whether they are compatible for comparison.
-	if !errs.HasErrors() {
-		for _, n := range wf.Nodes {
-			if n.GetBranchNode() != nil {
-				if inputVars, ok := v.ValidateBindings(&wf, n, n.GetInputs(), n.GetInterface().GetInputs(),
-					false /* validateParamTypes */, v.EdgeDirectionUpstream, errs.NewScope()); ok {
-					merge, err := v.UnionDistinctVariableMaps(n.GetInterface().Inputs.Variables, inputVars.Variables)
-					if err != nil {
-						errs.Collect(errors.NewWorkflowBuildError(err))
-					}
-
-					n.GetInterface().Inputs = &core.VariableMap{Variables: merge}
-
-					v.ValidateBranchNode(&wf, n, true /* validateConditionTypes */, errs.NewScope())
-				}
-			}
 		}
 	}
 
@@ -241,7 +219,7 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 			continue
 		}
 
-		wf.AddEdges(n, errs.NewScope())
+		wf.AddEdges(n, c.EdgeDirectionBidirectional, errs.NewScope())
 	}
 
 	// Add execution edges for orphan nodes that don't have any inward/outward edges.
@@ -274,7 +252,7 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 	if _, wfIfaceOk := v.ValidateInterface(globalOutputNode.GetId(), globalOutputNode.GetInterface(), errs.NewScope()); wfIfaceOk {
 		v.ValidateBindings(&wf, globalOutputNode, globalOutputNode.GetInputs(),
 			globalOutputNode.GetInterface().GetInputs(), true, /* validateParamTypes */
-			v.EdgeDirectionBidirectional, errs.NewScope())
+			c.EdgeDirectionBidirectional, errs.NewScope())
 	}
 
 	// Validate no cycles are detected.
@@ -383,6 +361,7 @@ func newWorkflowBuilder(fg *flyteWorkflow, wfIndex c.WorkflowIndex, tasks c.Task
 		CoreWorkflow:            fg,
 		LaunchPlans:             map[string]c.InterfaceProvider{},
 		Nodes:                   c.NewNodeIndex(),
+		NodeBuilderIndex:        c.NewNodeIndex(),
 		Tasks:                   c.NewTaskIndex(),
 		downstreamNodes:         c.StringAdjacencyList{},
 		upstreamNodes:           c.StringAdjacencyList{},

@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/go-test/deep"
 
 	"github.com/ghodss/yaml"
@@ -182,6 +184,113 @@ func TestDynamic(t *testing.T) {
 	}))
 }
 
+func getAllSubNodeIDs(n *core.Node) sets.String {
+	res := sets.NewString()
+	if branchNode := n.GetBranchNode(); branchNode != nil {
+		thenNode := branchNode.IfElse.Case.ThenNode
+		if hasPromiseInputs(thenNode.GetInputs()) {
+			res.Insert(thenNode.GetId())
+		}
+
+		res = res.Union(getAllSubNodeIDs(thenNode))
+
+		for _, other := range branchNode.IfElse.Other {
+			if hasPromiseInputs(other.ThenNode.GetInputs()) {
+				res.Insert(other.ThenNode.GetId())
+			}
+
+			res = res.Union(getAllSubNodeIDs(other.ThenNode))
+		}
+
+		if elseNode := branchNode.IfElse.GetElseNode(); elseNode != nil {
+			if hasPromiseInputs(elseNode.GetInputs()) {
+				res.Insert(elseNode.GetId())
+			}
+
+			res = res.Union(getAllSubNodeIDs(elseNode))
+		}
+	}
+
+	// TODO: Support Sub workflow
+
+	return res
+}
+
+type nodePredicate func(n *core.Node) bool
+
+var hasPromiseNodePredicate = func(n *core.Node) bool {
+	return hasPromiseInputs(n.GetInputs())
+}
+
+var allNodesPredicate = func(n *core.Node) bool {
+	return true
+}
+
+func getAllMatchingNodes(wf *core.CompiledWorkflow, predicate nodePredicate) sets.String {
+	s := sets.NewString()
+	for _, n := range wf.Template.Nodes {
+		if predicate(n) {
+			s.Insert(n.GetId())
+		}
+
+		s = s.Union(getAllSubNodeIDs(n))
+	}
+
+	return s
+}
+
+func bindingHasPromiseInputs(binding *core.BindingData) bool {
+	switch v := binding.GetValue().(type) {
+	case *core.BindingData_Collection:
+		for _, d := range v.Collection.Bindings {
+			if bindingHasPromiseInputs(d) {
+				return true
+			}
+		}
+	case *core.BindingData_Map:
+		for _, d := range v.Map.Bindings {
+			if bindingHasPromiseInputs(d) {
+				return true
+			}
+		}
+	case *core.BindingData_Promise:
+		return true
+	}
+
+	return false
+}
+
+func hasPromiseInputs(bindings []*core.Binding) bool {
+	for _, b := range bindings {
+		if bindingHasPromiseInputs(b.Binding) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func assertNodeIDsInConnections(t testing.TB, nodeIDsWithDeps, allNodeIDs sets.String, connections *core.ConnectionSet) bool {
+	actualNodeIDs := sets.NewString()
+	for id, lst := range connections.Downstream {
+		actualNodeIDs.Insert(id)
+		actualNodeIDs.Insert(lst.Ids...)
+	}
+
+	for id, lst := range connections.Upstream {
+		actualNodeIDs.Insert(id)
+		actualNodeIDs.Insert(lst.Ids...)
+	}
+
+	notFoundInConnections := nodeIDsWithDeps.Difference(actualNodeIDs)
+	correct := assert.Empty(t, notFoundInConnections, "All nodes must appear in connections")
+
+	notFoundInNodes := actualNodeIDs.Difference(allNodeIDs)
+	correct = correct && assert.Empty(t, notFoundInNodes, "All connections must correspond to existing nodes")
+
+	return correct
+}
+
 func TestBranches(t *testing.T) {
 	errors.SetConfig(errors.Config{IncludeSource: true})
 	assert.NoError(t, filepath.Walk("testdata/branch", func(path string, info os.FileInfo, err error) error {
@@ -195,16 +304,36 @@ func TestBranches(t *testing.T) {
 
 		t.Run(path, func(t *testing.T) {
 			// If you want to debug a single use-case. Uncomment this line.
-			//if !strings.HasSuffix(path, "success_1.json") {
+			//if !strings.HasSuffix(path, "success_8_nested.json") {
 			//	t.SkipNow()
 			//}
 
 			raw, err := ioutil.ReadFile(path)
 			assert.NoError(t, err)
 			wf := &core.WorkflowClosure{}
-			err = jsonpb.UnmarshalString(string(raw), wf)
-			if !assert.NoError(t, err) {
-				t.FailNow()
+			if filepath.Ext(path) == ".json" {
+				err = jsonpb.UnmarshalString(string(raw), wf)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+			} else if filepath.Ext(path) == ".pb" {
+				err = proto.Unmarshal(raw, wf)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+
+				m := &jsonpb.Marshaler{
+					Indent: "  ",
+				}
+				raw, err := m.MarshalToString(wf)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
+
+				err = ioutil.WriteFile(strings.TrimSuffix(path, filepath.Ext(path))+".json", []byte(raw), os.ModePerm)
+				if !assert.NoError(t, err) {
+					t.FailNow()
+				}
 			}
 
 			t.Log("Compiling Workflow")
@@ -215,8 +344,10 @@ func TestBranches(t *testing.T) {
 				t.FailNow()
 			}
 
-			marshaler := jsonpb.Marshaler{}
-			rawStr, err := marshaler.MarshalToString(compiledWfc)
+			m := &jsonpb.Marshaler{
+				Indent: "  ",
+			}
+			rawStr, err := m.MarshalToString(compiledWfc)
 			if !assert.NoError(t, err) {
 				t.Fail()
 			}
@@ -238,6 +369,12 @@ func TestBranches(t *testing.T) {
 				}
 			}
 
+			allNodeIDs := getAllMatchingNodes(compiledWfc.Primary, allNodesPredicate)
+			nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.Primary, hasPromiseNodePredicate)
+			if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.Primary.Connections) {
+				t.FailNow()
+			}
+
 			inputs := map[string]interface{}{}
 			for varName, v := range compiledWfc.Primary.Template.Interface.Inputs.Variables {
 				inputs[varName] = coreutils.MustMakeDefaultLiteralForType(v.Type)
@@ -252,7 +389,7 @@ func TestBranches(t *testing.T) {
 				},
 				"namespace")
 			if assert.NoError(t, err) {
-				raw, err := json.Marshal(flyteWf)
+				raw, err := json.MarshalIndent(flyteWf, "", "  ")
 				if assert.NoError(t, err) {
 					assert.NotEmpty(t, raw)
 				}
