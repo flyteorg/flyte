@@ -1,7 +1,9 @@
 package register
 
 import (
+	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
+
 	"github.com/spf13/cobra"
 )
 
@@ -24,8 +26,8 @@ func RemoteRegisterCommand() *cobra.Command {
 		Long:  registercmdLong,
 	}
 	registerResourcesFuncs := map[string]cmdcore.CommandEntry{
-		"files": {CmdFunc: registerFromFilesFunc, Aliases: []string{"file"}, PFlagProvider: filesConfig, Short: registerFilesShort,
-			Long: registerFilesLong},
+		"files": {CmdFunc: registerFromFilesFunc, Aliases: []string{"file"}, PFlagProvider: rconfig.DefaultFilesConfig,
+			Short: registerFilesShort, Long: registerFilesLong},
 	}
 	cmdcore.AddCommands(registerCmd, registerResourcesFuncs)
 	return registerCmd

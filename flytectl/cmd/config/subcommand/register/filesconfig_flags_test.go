@@ -84,7 +84,7 @@ func testDecodeJson_FilesConfig(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_FilesConfig(val, result))
 }
 
-func testDecodeSlice_FilesConfig(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_FilesConfig(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_FilesConfig(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestFilesConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_version", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("version"); err == nil {
-				assert.Equal(t, "v1", vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestFilesConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_continueOnError", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("continueOnError"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -144,14 +128,6 @@ func TestFilesConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_archive", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("archive"); err == nil {
-				assert.Equal(t, bool(*new(bool)), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -159,6 +135,48 @@ func TestFilesConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("archive", testValue)
 			if vBool, err := cmdFlags.GetBool("archive"); err == nil {
 				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vBool), &actual.Archive)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_assumableIamRole", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("assumableIamRole", testValue)
+			if vString, err := cmdFlags.GetString("assumableIamRole"); err == nil {
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.AssumableIamRole)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_k8ServiceAccount", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("k8ServiceAccount", testValue)
+			if vString, err := cmdFlags.GetString("k8ServiceAccount"); err == nil {
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.K8ServiceAccount)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_outputLocationPrefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("outputLocationPrefix", testValue)
+			if vString, err := cmdFlags.GetString("outputLocationPrefix"); err == nil {
+				testDecodeJson_FilesConfig(t, fmt.Sprintf("%v", vString), &actual.OutputLocationPrefix)
 
 			} else {
 				assert.FailNow(t, err.Error())

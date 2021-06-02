@@ -52,6 +52,24 @@ Change the o/p format has not effect on registration. The O/p is currently avail
 
  bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -o yaml
 
+Override IamRole during registration.
+
+::
+
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -i "arn:aws:iam::123456789:role/dummy"
+
+Override Kubernetes service account during registration.
+
+::
+
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -k "kubernetes-service-account"
+
+Override Output location prefix during registration.
+
+::
+
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -l "s3://dummy/prefix"
+
 Usage
 
 
@@ -64,10 +82,13 @@ Options
 
 ::
 
-  -a, --archive           pass in archive file either an http link or local path.
-  -c, --continueOnError   continue on error when registering files.
-  -h, --help              help for files
-  -v, --version string    version of the entity to be registered with flyte. (default "v1")
+  -a, --archive                       pass in archive file either an http link or local path.
+  -i, --assumableIamRole string        Custom assumable iam auth role to register launch plans with.
+  -c, --continueOnError               continue on error when registering files.
+  -h, --help                          help for files
+  -k, --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
+  -l, --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
+  -v, --version string                version of the entity to be registered with flyte. (default "v1")
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -83,6 +104,8 @@ Options inherited from parent commands
       --admin.maxBackoffDelay string               Max delay for grpc backoff (default "8s")
       --admin.maxRetries int                       Max number of gRPC retries (default 4)
       --admin.perRetryTimeout string               gRPC per retry timeout (default "15s")
+      --admin.pkceConfig.refreshTime string         (default "5m0s")
+      --admin.pkceConfig.timeout string             (default "15s")
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.

@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flytectl/cmd/config"
+	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -84,7 +85,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Project:      config.GetConfig().Project,
 				Domain:       config.GetConfig().Domain,
 				Name:         launchPlan.Id.Name,
-				Version:      filesConfig.Version,
+				Version:      rconfig.DefaultFilesConfig.Version,
 			},
 			Spec: launchPlan.Spec,
 		})
@@ -97,7 +98,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Project:      config.GetConfig().Project,
 				Domain:       config.GetConfig().Domain,
 				Name:         workflowSpec.Template.Id.Name,
-				Version:      filesConfig.Version,
+				Version:      rconfig.DefaultFilesConfig.Version,
 			},
 			Spec: workflowSpec,
 		})
@@ -110,7 +111,7 @@ func register(ctx context.Context, message proto.Message, cmdCtx cmdCore.Command
 				Project:      config.GetConfig().Project,
 				Domain:       config.GetConfig().Domain,
 				Name:         taskSpec.Template.Id.Name,
-				Version:      filesConfig.Version,
+				Version:      rconfig.DefaultFilesConfig.Version,
 			},
 			Spec: taskSpec,
 		})
@@ -177,7 +178,24 @@ func hydrateIdentifier(identifier *core.Identifier) {
 		identifier.Domain = config.GetConfig().Domain
 	}
 	if identifier.Version == "" || identifier.Version == registrationVersionPattern {
-		identifier.Version = filesConfig.Version
+		identifier.Version = rconfig.DefaultFilesConfig.Version
+	}
+}
+
+func hydrateLaunchPlanSpec(lpSpec *admin.LaunchPlanSpec) {
+	assumableIamRole := len(rconfig.DefaultFilesConfig.AssumableIamRole) > 0
+	k8ServiceAcct := len(rconfig.DefaultFilesConfig.K8ServiceAccount) > 0
+	outputLocationPrefix := len(rconfig.DefaultFilesConfig.OutputLocationPrefix) > 0
+	if assumableIamRole || k8ServiceAcct {
+		lpSpec.AuthRole = &admin.AuthRole{
+			AssumableIamRole:         rconfig.DefaultFilesConfig.AssumableIamRole,
+			KubernetesServiceAccount: rconfig.DefaultFilesConfig.K8ServiceAccount,
+		}
+	}
+	if outputLocationPrefix {
+		lpSpec.RawOutputDataConfig = &admin.RawOutputDataConfig{
+			OutputLocationPrefix: rconfig.DefaultFilesConfig.OutputLocationPrefix,
+		}
 	}
 }
 
@@ -186,6 +204,7 @@ func hydrateSpec(message proto.Message) error {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
 		hydrateIdentifier(launchPlan.Spec.WorkflowId)
+		hydrateLaunchPlanSpec(launchPlan.Spec)
 	case *admin.WorkflowSpec:
 		workflowSpec := message.(*admin.WorkflowSpec)
 		for _, Noderef := range workflowSpec.Template.Nodes {
@@ -229,7 +248,7 @@ If the archive flag is on then download the archives to temp directory and extra
 The o/p of this function would be sorted list of the file locations.
 */
 func getSortedFileList(ctx context.Context, args []string) ([]string, string, error) {
-	if !filesConfig.Archive {
+	if !rconfig.DefaultFilesConfig.Archive {
 		/*
 		 * Sorting is required for non-archived case since its possible for the user to pass in a list of unordered
 		 * serialized protobuf files , but flyte expects them to be registered in topologically sorted order that it had
