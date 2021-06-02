@@ -72,8 +72,9 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 	t.Run("Invalid empty node", func(t *testing.T) {
 		wfBuilder := mocks.WorkflowBuilder{}
 		nodeBuilder := mocks.NodeBuilder{}
-		nodeBuilder.On("GetCoreNode").Return(&core.Node{})
-		nodeBuilder.On("GetId").Return("node_1")
+		nodeBuilder.OnGetCoreNode().Return(&core.Node{})
+		nodeBuilder.OnGetId().Return("node_1")
+		nodeBuilder.OnGetInterface().Return(nil)
 		errs := errors.NewCompileErrors()
 		iface, ifaceOk := ValidateUnderlyingInterface(&wfBuilder, &nodeBuilder, errs.NewScope())
 		assert.False(t, ifaceOk)
@@ -106,6 +107,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 				TaskNode: taskNode,
 			},
 		})
+		nodeBuilder.OnGetInterface().Return(nil)
 
 		nodeBuilder.On("GetTaskNode").Return(taskNode)
 		nodeBuilder.On("GetId").Return("node_1")
@@ -144,6 +146,7 @@ func TestValidateUnderlyingInterface(t *testing.T) {
 		nodeBuilder.On("GetId").Return("node_1")
 		nodeBuilder.On("SetInterface", mock.Anything).Return()
 		nodeBuilder.On("GetInputs").Return([]*core.Binding{})
+		nodeBuilder.OnGetInterface().Return(nil)
 
 		t.Run("Self", func(t *testing.T) {
 			errs := errors.NewCompileErrors()

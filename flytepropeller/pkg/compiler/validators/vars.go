@@ -4,7 +4,6 @@ import (
 	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func validateOutputVar(n c.NodeBuilder, paramName string, errs errors.CompileErrors) (
@@ -45,28 +44,6 @@ func validateVarType(nodeID c.NodeID, paramName string, param *flyte.Variable,
 	}
 
 	return !errs.HasErrors()
-}
-
-func validateVarsSetMatch(nodeID string, params1, params2 map[string]*flyte.Variable,
-	params1Set, params2Set sets.String, errs errors.CompileErrors) {
-	// Validate that parameters that exist in both interfaces have compatible types.
-	inBoth := params1Set.Intersection(params2Set)
-	for paramName := range inBoth {
-		if validateVarType(nodeID, paramName, params1[paramName], params2[paramName].Type, errs.NewScope()) {
-			validateVarType(nodeID, paramName, params2[paramName], params1[paramName].Type, errs.NewScope())
-		}
-	}
-
-	// All remaining params on either sides indicate errors
-	inLeftSide := params1Set.Difference(params2Set)
-	for range inLeftSide {
-		errs.Collect(errors.NewMismatchingInterfacesErr(nodeID, nodeID))
-	}
-
-	inRightSide := params2Set.Difference(params1Set)
-	for range inRightSide {
-		errs.Collect(errors.NewMismatchingInterfacesErr(nodeID, nodeID))
-	}
 }
 
 // Validate parameters have their required attributes set

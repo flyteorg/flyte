@@ -3,6 +3,8 @@ package validators
 import (
 	"testing"
 
+	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
+
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
@@ -19,7 +21,7 @@ func TestValidateBindings(t *testing.T) {
 		bindings := []*core.Binding{}
 		vars := &core.VariableMap{}
 		compileErrors := compilerErrors.NewCompileErrors()
-		resolved, ok := ValidateBindings(wf, n, bindings, vars, true, EdgeDirectionBidirectional, compileErrors)
+		resolved, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.True(t, ok)
 		assert.Empty(t, resolved.Variables)
 	})
@@ -35,7 +37,7 @@ func TestValidateBindings(t *testing.T) {
 		}
 		vars := &core.VariableMap{}
 		compileErrors := compilerErrors.NewCompileErrors()
-		_, ok := ValidateBindings(wf, n, bindings, vars, true, EdgeDirectionBidirectional, compileErrors)
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.False(t, ok)
 		if !compileErrors.HasErrors() {
 			assert.Error(t, compileErrors)
@@ -67,7 +69,7 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		compileErrors := compilerErrors.NewCompileErrors()
-		_, ok := ValidateBindings(wf, n, bindings, vars, true, EdgeDirectionBidirectional, compileErrors)
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.False(t, ok)
 		if !compileErrors.HasErrors() {
 			assert.Error(t, compileErrors)
@@ -96,7 +98,7 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		compileErrors := compilerErrors.NewCompileErrors()
-		_, ok := ValidateBindings(wf, n, bindings, vars, true, EdgeDirectionBidirectional, compileErrors)
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.True(t, ok)
 		if compileErrors.HasErrors() {
 			assert.NoError(t, compileErrors)
@@ -130,7 +132,7 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		compileErrors := compilerErrors.NewCompileErrors()
-		_, ok := ValidateBindings(wf, n, bindings, vars, true, EdgeDirectionBidirectional, compileErrors)
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.True(t, ok)
 		if compileErrors.HasErrors() {
 			assert.NoError(t, compileErrors)
@@ -192,7 +194,7 @@ func TestValidateBindings(t *testing.T) {
 		}
 
 		compileErrors := compilerErrors.NewCompileErrors()
-		_, ok := ValidateBindings(wf, n, bindings, vars, true, EdgeDirectionBidirectional, compileErrors)
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
 		assert.True(t, ok)
 		if compileErrors.HasErrors() {
 			assert.NoError(t, compileErrors)

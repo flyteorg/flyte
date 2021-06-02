@@ -73,13 +73,13 @@ func ValidateBranchNode(w c.WorkflowBuilder, n c.NodeBuilder, requireParamType b
 		if block.GetThenNode() == nil {
 			errs.Collect(errors.NewBranchNodeNotSpecified(n.GetId()))
 		} else {
-			wrapperNode := w.NewNodeBuilder(block.GetThenNode())
+			wrapperNode := w.GetOrCreateNodeBuilder(block.GetThenNode())
 			subNodes = append(subNodes, wrapperNode)
 		}
 	}
 
 	if elseNode := n.GetBranchNode().IfElse.GetElseNode(); elseNode != nil {
-		wrapperNode := w.NewNodeBuilder(elseNode)
+		wrapperNode := w.GetOrCreateNodeBuilder(elseNode)
 		subNodes = append(subNodes, wrapperNode)
 	} else if defaultElse := n.GetBranchNode().IfElse.GetDefault(); defaultElse == nil {
 		errs.Collect(errors.NewBranchNodeHasNoDefault(n.GetId()))
@@ -123,11 +123,8 @@ func ValidateNode(w c.WorkflowBuilder, n c.NodeBuilder, validateConditionTypes b
 	// Validate branch node conditions and inner nodes.
 	if n.GetBranchNode() != nil {
 		if nodes, ok := ValidateBranchNode(w, n, validateConditionTypes, errs.NewScope()); ok {
-			renamedNodes := make(map[c.NodeID]c.NodeID, len(nodes))
 			for _, subNode := range nodes {
-				oldID := subNode.GetId()
-				subNode.SetID(branchNodeIDFormatter(n.GetId(), subNode.GetId()))
-				renamedNodes[oldID] = subNode.GetId()
+				w.AddEdges(subNode, c.EdgeDirectionUpstream, errs.NewScope())
 			}
 		}
 	} else if workflowN := n.GetWorkflowNode(); workflowN != nil && workflowN.GetSubWorkflowRef() != nil {

@@ -44,7 +44,7 @@
               "var": "o0",
               "binding": {
                 "promise": {
-                  "nodeId": "branchnode-2",
+                  "nodeId": "n0",
                   "var": "o0"
                 }
               }
@@ -52,7 +52,7 @@
           ]
         },
         {
-          "id": "branchnode-2",
+          "id": "n0",
           "metadata": {
             "name": "fractions",
             "retries": {
@@ -105,7 +105,7 @@
                   }
                 },
                 "thenNode": {
-                  "id": "branchnode-2-branchbranchnode-1",
+                  "id": "n0-n0",
                   "metadata": {
                     "name": "inner_fractions",
                     "retries": {
@@ -141,7 +141,7 @@
                           }
                         },
                         "thenNode": {
-                          "id": "branchnode-2-branchbranchnode-1-branchbranchn0",
+                          "id": "n0-n0-n0",
                           "metadata": {
                             "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
                             "retries": {
@@ -171,9 +171,73 @@
                           }
                         }
                       },
+                      "other": [
+                        {
+                          "condition": {
+                            "conjunction": {
+                              "leftExpression": {
+                                "comparison": {
+                                  "operator": "GT",
+                                  "leftValue": {
+                                    "var": ".my_input"
+                                  },
+                                  "rightValue": {
+                                    "primitive": {
+                                      "floatValue": 0.5
+                                    }
+                                  }
+                                }
+                              },
+                              "rightExpression": {
+                                "comparison": {
+                                  "operator": "LT",
+                                  "leftValue": {
+                                    "var": ".my_input"
+                                  },
+                                  "rightValue": {
+                                    "primitive": {
+                                      "floatValue": 0.7
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "thenNode": {
+                            "id": "n0-n0-n1",
+                            "metadata": {
+                              "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
+                              "retries": {
+
+                              },
+                              "interruptible": false
+                            },
+                            "inputs": [
+                              {
+                                "var": "n",
+                                "binding": {
+                                  "promise": {
+                                    "nodeId": "start-node",
+                                    "var": "my_input"
+                                  }
+                                }
+                              }
+                            ],
+                            "taskNode": {
+                              "referenceId": {
+                                "resourceType": "TASK",
+                                "project": "test_proj",
+                                "domain": "test_domain",
+                                "name": "core.control_flow.run_conditions.square",
+                                "version": "abc"
+                              }
+                            }
+                          }
+                        }
+                      ],
                       "error": {
                         "failedNodeId": "inner_fractions",
-                        "message": "Only \u003c0.5 allowed"
+                        "message": "Only \u003c0.7 allowed"
                       }
                     }
                   }
@@ -212,7 +276,7 @@
                     }
                   },
                   "thenNode": {
-                    "id": "branchnode-2-branchn1",
+                    "id": "n0-n1",
                     "metadata": {
                       "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.square",
                       "retries": {
@@ -243,9 +307,35 @@
                   }
                 }
               ],
-              "error": {
-                "failedNodeId": "fractions",
-                "message": "The input must be between 0 and 10"
+              "elseNode": {
+                "id": "n0-n2",
+                "metadata": {
+                  "name": "flytekit.core.python_function_task.core.control_flow.run_conditions.double",
+                  "retries": {
+
+                  },
+                  "interruptible": false
+                },
+                "inputs": [
+                  {
+                    "var": "n",
+                    "binding": {
+                      "promise": {
+                        "nodeId": "start-node",
+                        "var": "my_input"
+                      }
+                    }
+                  }
+                ],
+                "taskNode": {
+                  "referenceId": {
+                    "resourceType": "TASK",
+                    "project": "test_proj",
+                    "domain": "test_domain",
+                    "name": "core.control_flow.run_conditions.double",
+                    "version": "abc"
+                  }
+                }
               }
             }
           }
@@ -256,7 +346,7 @@
           "var": "o0",
           "binding": {
             "promise": {
-              "nodeId": "branchnode-2",
+              "nodeId": "n0",
               "var": "o0"
             }
           }
@@ -268,41 +358,51 @@
     },
     "connections": {
       "downstream": {
-        "branchnode-2": {
+        "n0": {
           "ids": [
             "end-node"
           ]
         },
         "start-node": {
           "ids": [
-            "branchnode-2"
+            "n0"
           ]
         }
       },
       "upstream": {
-        "branchnode-2": {
-          "ids": [
-            "start-node"
-          ]
-        },
-        "branchnode-2-branchbranchnode-1": {
-          "ids": [
-            "start-node"
-          ]
-        },
-        "branchnode-2-branchbranchnode-1-branchbranchn0": {
-          "ids": [
-            "start-node"
-          ]
-        },
-        "branchnode-2-branchn1": {
-          "ids": [
-            "start-node"
-          ]
-        },
         "end-node": {
           "ids": [
-            "branchnode-2"
+            "n0"
+          ]
+        },
+        "n0": {
+          "ids": [
+            "start-node"
+          ]
+        },
+        "n0-n0": {
+          "ids": [
+            "start-node"
+          ]
+        },
+        "n0-n0-n0": {
+          "ids": [
+            "start-node"
+          ]
+        },
+        "n0-n0-n1": {
+          "ids": [
+            "start-node"
+          ]
+        },
+        "n0-n1": {
+          "ids": [
+            "start-node"
+          ]
+        },
+        "n0-n2": {
+          "ids": [
+            "start-node"
           ]
         }
       }

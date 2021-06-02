@@ -34,6 +34,10 @@ func ValidateInterface(nodeID c.NodeID, iface *core.TypedInterface, errs errors.
 
 // Validates underlying interface of a node and returns the effective Typed Interface.
 func ValidateUnderlyingInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs errors.CompileErrors) (iface *core.TypedInterface, ok bool) {
+	if node.GetInterface() != nil {
+		return node.GetInterface(), true
+	}
+
 	switch node.GetCoreNode().GetTarget().(type) {
 	case *core.Node_TaskNode:
 		if node.GetTaskNode().GetReferenceId() == nil {
