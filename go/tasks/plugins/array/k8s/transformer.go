@@ -4,6 +4,9 @@ import (
 	"context"
 	"regexp"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
@@ -81,6 +84,9 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		return v1.Pod{}, nil, err
 	}
 
+	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, tCtx.TaskExecutionMetadata().GetAnnotations())
+	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, tCtx.TaskExecutionMetadata().GetLabels())
+
 	return v1.Pod{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       PodKind,
@@ -89,8 +95,8 @@ func FlyteArrayJobToK8sPodTemplate(ctx context.Context, tCtx core.TaskExecutionC
 		ObjectMeta: metav1.ObjectMeta{
 			// Note that name is missing here
 			Namespace:       GetNamespaceForExecution(tCtx, namespaceTemplate),
-			Labels:          tCtx.TaskExecutionMetadata().GetLabels(),
-			Annotations:     tCtx.TaskExecutionMetadata().GetAnnotations(),
+			Labels:          labels,
+			Annotations:     annotations,
 			OwnerReferences: []metav1.OwnerReference{tCtx.TaskExecutionMetadata().GetOwnerReference()},
 		},
 		Spec: *podSpec,
