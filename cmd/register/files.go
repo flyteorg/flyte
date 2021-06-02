@@ -5,25 +5,11 @@ import (
 	"encoding/json"
 	"os"
 
+	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flytestdlib/logger"
 )
-
-//go:generate pflags FilesConfig
-var (
-	filesConfig = &FilesConfig{
-		Version:         "v1",
-		ContinueOnError: false,
-	}
-)
-
-// FilesConfig
-type FilesConfig struct {
-	Version         string `json:"version" pflag:",version of the entity to be registered with flyte."`
-	ContinueOnError bool   `json:"continueOnError" pflag:",continue on error when registering files."`
-	Archive         bool   `json:"archive" pflag:",pass in archive file either an http link or local path."`
-}
 
 const (
 	registerFilesShort = "Registers file resources"
@@ -70,6 +56,24 @@ Change the o/p format has not effect on registration. The O/p is currently avail
 
  bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -o yaml
 
+Override IamRole during registration.
+
+::
+
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -i "arn:aws:iam::123456789:role/dummy"
+
+Override Kubernetes service account during registration.
+
+::
+
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -k "kubernetes-service-account"
+
+Override Output location prefix during registration.
+
+::
+
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -l "s3://dummy/prefix"
+
 Usage
 `
 )
@@ -81,7 +85,7 @@ func registerFromFilesFunc(ctx context.Context, args []string, cmdCtx cmdCore.Co
 		return _err
 	}
 	logger.Infof(ctx, "Parsing files... Total(%v)", len(dataRefs))
-	fastFail := !filesConfig.ContinueOnError
+	fastFail := !rconfig.DefaultFilesConfig.ContinueOnError
 	var registerResults []Result
 	for i := 0; i < len(dataRefs) && !(fastFail && _err != nil); i++ {
 		registerResults, _err = registerFile(ctx, dataRefs[i], registerResults, cmdCtx)
