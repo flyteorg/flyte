@@ -18,3 +18,4 @@ release/
 __pycache__/
 /helm/charts/
 Chart.lock
+**/*.bak
