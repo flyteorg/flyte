@@ -243,6 +243,52 @@ or the task itself times out.
 
    "pod_spec", ":ref:`ref_k8s.io.api.core.v1.PodSpec`", "", ""
    "primary_container_name", ":ref:`ref_string`", "", ""
+   "annotations", ":ref:`ref_flyteidl.plugins.SidecarJob.AnnotationsEntry`", "repeated", "Pod annotations"
+   "labels", ":ref:`ref_flyteidl.plugins.SidecarJob.LabelsEntry`", "repeated", "Pod labels"
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.SidecarJob.AnnotationsEntry:
+
+SidecarJob.AnnotationsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: SidecarJob.AnnotationsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.plugins.SidecarJob.LabelsEntry:
+
+SidecarJob.LabelsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: SidecarJob.LabelsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
 
 
 
