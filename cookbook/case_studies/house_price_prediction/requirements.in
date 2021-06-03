@@ -1,6 +1,0 @@
--r ../../common/requirements-common.in
-xgboost
-joblib
-sklearn
-tabulate
-matplotlib
