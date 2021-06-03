@@ -3,13 +3,13 @@
 Troubleshooting Guide
 ---------------------
 
-.. admonition:: Why have we crafted this guide?
+.. admonition:: 
 
-    Let go of overthinking; peep into this page.
+Here are a couple of techniques we believe could help you sort out issues quickly.
 
-We've been working diligently to help users sort out issues. 
-
-Here are a couple of techniques we believe would help you jump out of the pandora box quickly! 
+#######################
+``Make Start`` Command
+#######################
 
 * If the issue is related to the ``make start`` command:
     - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
@@ -43,9 +43,30 @@ Here are a couple of techniques we believe would help you jump out of the pandor
       - Prune the images and volumes. 
       - Given there's less than 10% free disk space, Kubernetes, by default, throws the disk pressure error.
 
-.. NOTE::
 
-      More coming soon. Stay tuned 👀
+#######################################
+Using Flyte with Google Cloud Platform
+#######################################
+
+* Running examples results in tasks failing with 401 error
+
+ Steps:
+
+ #. Are you using Workload Identity, then you have to pass in the ServiceAccount when you create the launchplan.
+     - Refer to docs :ref:`howto-serviceaccounts`
+     - More information about WorkloadIdentity at https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+ #. If you are just using a simple Nodepool wide permissions then check the cluster's ServiceAccount for Storage permissions. Do they look fine?
+
+ #. If not, then start a dummy pod in the intended namespace and check for
+
+::
+
+    gcloud auth list
+
+
+.. note::
+
+    FlytePropeller uses Google Application credentials, but gsutil does not use these credentials
 
     
-If the issue is still bugging you, contact us on `Slack <http://flyte-org.slack.com/>`__. 
+If the issue persists, contact us on `Slack <http://flyte-org.slack.com/>`__. 
