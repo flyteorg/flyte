@@ -64,8 +64,9 @@ Annotations.ValuesEntry
 AuthRole
 ------------------------------------------------------------------
 
-Defines permissions associated with executions.
-Deprecated, please use core.SecurityContext
+Defines permissions associated with executions created by this launch plan spec.
+Use either of these roles when they have permissions required by your workflow execution.
+Deprecated.
 
 
 
@@ -73,8 +74,8 @@ Deprecated, please use core.SecurityContext
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "assumable_iam_role", ":ref:`ref_string`", "", ""
-   "kubernetes_service_account", ":ref:`ref_string`", "", ""
+   "assumable_iam_role", ":ref:`ref_string`", "", "Defines an optional iam role which will be used for tasks run in executions created with this launch plan."
+   "kubernetes_service_account", ":ref:`ref_string`", "", "Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan."
 
 
 
@@ -1262,6 +1263,7 @@ Auth
 ------------------------------------------------------------------
 
 Defines permissions associated with executions created by this launch plan spec.
+Use either of these roles when they have permissions required by your workflow execution.
 Deprecated.
 
 
@@ -1270,8 +1272,8 @@ Deprecated.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "assumable_iam_role", ":ref:`ref_string`", "", ""
-   "kubernetes_service_account", ":ref:`ref_string`", "", ""
+   "assumable_iam_role", ":ref:`ref_string`", "", "Defines an optional iam role which will be used for tasks run in executions created with this launch plan."
+   "kubernetes_service_account", ":ref:`ref_string`", "", "Defines an optional kubernetes service account which will be used for tasks run in executions created with this launch plan."
 
 
 

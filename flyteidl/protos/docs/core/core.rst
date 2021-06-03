@@ -1808,6 +1808,94 @@ Strategy to use when dealing with Blob, Schema, or multipart blob data (large da
 
 
 
+.. _ref_flyteidl.core.K8sObjectMetadata:
+
+K8sObjectMetadata
+------------------------------------------------------------------
+
+Metadata for building a kubernetes object when a task is executed.
+
+
+
+.. csv-table:: K8sObjectMetadata type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "labels", ":ref:`ref_flyteidl.core.K8sObjectMetadata.LabelsEntry`", "repeated", "Optional labels to add to the pod definition."
+   "annotations", ":ref:`ref_flyteidl.core.K8sObjectMetadata.AnnotationsEntry`", "repeated", "Optional annotations to add to the pod definition."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.K8sObjectMetadata.AnnotationsEntry:
+
+K8sObjectMetadata.AnnotationsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: K8sObjectMetadata.AnnotationsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.K8sObjectMetadata.LabelsEntry:
+
+K8sObjectMetadata.LabelsEntry
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: K8sObjectMetadata.LabelsEntry type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "key", ":ref:`ref_string`", "", ""
+   "value", ":ref:`ref_string`", "", ""
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.K8sPod:
+
+K8sPod
+------------------------------------------------------------------
+
+Defines a pod spec and additional pod metadata that is created when a task is executed.
+
+
+
+.. csv-table:: K8sPod type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "metadata", ":ref:`ref_flyteidl.core.K8sObjectMetadata`", "", "Contains additional metadata for building a kubernetes pod."
+   "pod_spec", ":ref:`ref_google.protobuf.Struct`", "", "Defines the primary pod spec created when a task is executed. This should be a JSON-marshalled pod spec, which can be defined in - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936 - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
+
+
+
+
+
+
+
 .. _ref_flyteidl.core.Resources:
 
 Resources
@@ -1923,6 +2011,7 @@ Tasks are registered as a first step in the system.
    "interface", ":ref:`ref_flyteidl.core.TypedInterface`", "", "A strongly typed interface for the task. This enables others to use this task within a workflow and gauarantees compile-time validation of the workflow to avoid costly runtime failures."
    "custom", ":ref:`ref_google.protobuf.Struct`", "", "Custom data about the task. This is extensible to allow various plugins in the system."
    "container", ":ref:`ref_flyteidl.core.Container`", "", ""
+   "k8s_pod", ":ref:`ref_flyteidl.core.K8sPod`", "", ""
    "task_type_version", ":ref:`ref_int32`", "", "This can be used to customize task handling at execution time for the same task type."
    "security_context", ":ref:`ref_flyteidl.core.SecurityContext`", "", "security_context encapsulates security attributes requested to run this task."
    "config", ":ref:`ref_flyteidl.core.TaskTemplate.ConfigEntry`", "repeated", "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system to use as required. reserve the field numbers 1 through 15 for very frequently occurring message elements"
@@ -2773,7 +2862,6 @@ Example 1: Compute Duration from two Timestamps in pseudo code.
     } else if (duration.seconds &gt; 0 &amp;&amp; duration.nanos &lt; 0) {
       duration.seconds -= 1;
       duration.nanos &#43;= 1000000000;
-
     }
 
 Example 2: Compute Timestamp from Timestamp &#43; Duration in pseudo code.
@@ -2791,7 +2879,6 @@ Example 2: Compute Timestamp from Timestamp &#43; Duration in pseudo code.
     } else if (end.nanos &gt;= 1000000000) {
       end.seconds &#43;= 1;
       end.nanos -= 1000000000;
-
     }
 
 Example 3: Compute Duration from datetime.timedelta in Python.
