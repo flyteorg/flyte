@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.20.1](http://github.com/lyft/flyteconsole/compare/v0.20.0...v0.20.1) (2021-06-03)
+
+
+### Bug Fixes
+
+* handle fullInputs for relaunch workflow ([#171](http://github.com/lyft/flyteconsole/issues/171)) ([8a4fd82](http://github.com/lyft/flyteconsole/commit/8a4fd82ba16def5460a92fddc9b79a46b02450a9))
+
 # [0.20.0](http://github.com/lyft/flyteconsole/compare/v0.19.7...v0.20.0) (2021-05-10)
 
 
