@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	eventWriterMocks "github.com/flyteorg/flyteadmin/pkg/async/events/mocks"
@@ -47,7 +49,6 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
@@ -477,7 +478,7 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 	request := testutils.GetExecutionRequest()
 	request.Inputs = &core.LiteralMap{
 		Literals: map[string]*core.Literal{
-			"foo-1": utils.MustMakeLiteral("foo-value-1"),
+			"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
 		},
 	}
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
@@ -559,10 +560,10 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 		if err := storageClient.ReadProtobuf(ctx, input.InputsURI, &inputs); err != nil {
 			return err
 		}
-		fooValue := utils.MustMakeLiteral("foo-value-1")
+		fooValue := coreutils.MustMakeLiteral("foo-value-1")
 		assert.Equal(t, 1, len(userInputs.Literals))
 		assert.EqualValues(t, userInputs.Literals["foo"], fooValue)
-		barValue := utils.MustMakeLiteral("bar-value")
+		barValue := coreutils.MustMakeLiteral("bar-value")
 		assert.Equal(t, len(inputs.Literals), 2)
 		assert.EqualValues(t, inputs.Literals["foo"], fooValue)
 		assert.EqualValues(t, inputs.Literals["bar"], barValue)
@@ -2271,7 +2272,7 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 	existingClosure := getLegacyClosure()
 	existingClosure.Phase = core.WorkflowExecution_RUNNING
 	existingClosure.StartedAt = startTimeProto
-	existingClosure.ComputedInputs.Literals["bar"] = utils.MustMakeLiteral("bar-value")
+	existingClosure.ComputedInputs.Literals["bar"] = coreutils.MustMakeLiteral("bar-value")
 	existingClosureBytes, _ := proto.Marshal(existingClosure)
 	executionGetFunc := makeLegacyExecutionGetFunc(t, existingClosureBytes, &startTime)
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
