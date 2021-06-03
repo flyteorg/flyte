@@ -10,11 +10,12 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -98,7 +99,7 @@ func getLaunchPlanCreateRequest(workflowIdentifier *core.Identifier) admin.Launc
 							Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 						},
 						Behavior: &core.Parameter_Default{
-							Default: utils.MustMakeLiteral("foo-value"),
+							Default: coreutils.MustMakeLiteral("foo-value"),
 						},
 					},
 				},

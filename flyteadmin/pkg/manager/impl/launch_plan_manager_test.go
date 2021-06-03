@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+
 	"github.com/flyteorg/flyteadmin/pkg/async/schedule/mocks"
 
 	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
@@ -27,7 +29,6 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
 	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
@@ -299,7 +300,7 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
 					},
 					Behavior: &core.Parameter_Default{
-						Default: utils.MustMakeLiteral("foo-value"),
+						Default: coreutils.MustMakeLiteral("foo-value"),
 					},
 				},
 			},
