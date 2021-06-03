@@ -73,7 +73,17 @@ export const fetchWorkflowExecutionInputs = async (
     if (execution.closure.computedInputs) {
         return execution.closure.computedInputs;
     }
-    const { inputs } = await getExecutionData(execution.id);
+    /** Note:
+     * getExecutionData will retun signed urls (`inputs`) as well as raw values
+     * (`fullInputs`) if input payload isn't too large.
+     *
+     * If a signed URL is returned `fullInputs` will be null; use `fullInputs`
+     * when available.
+     */
+    const { inputs, fullInputs } = await getExecutionData(execution.id);
+    if (fullInputs) {
+        return LiteralMap.create(fullInputs);
+    }
     if (
         !inputs.url ||
         !inputs.bytes ||

@@ -185,6 +185,44 @@ describe('RelaunchExecutionForm', () => {
         });
     });
 
+    describe('Launch form with full inputs', () => {
+        let values: LiteralValueMap;
+        beforeEach(() => {
+            workflowInputDefinitions = {
+                workflowSimpleString: mockSimpleVariables.simpleString,
+                workflowSimpleInteger: mockSimpleVariables.simpleInteger
+            };
+            workflow.closure!.compiledWorkflow!.primary.template.interface!.inputs = {
+                variables: workflowInputDefinitions
+            };
+            executionInputs = {
+                literals: {
+                    workflowSimpleString: primitiveLiteral({
+                        stringValue: simpleStringValue
+                    }),
+                    workflowSimpleInteger: primitiveLiteral({
+                        integer: simpleIntegerValue
+                    })
+                }
+            };
+            executionData.fullInputs = executionInputs;
+            execution.closure.computedInputs = executionInputs;
+            values = createValuesMap(workflowInputDefinitions, executionInputs);
+        });
+        it('correctly uses fullInputs when value is present and does not call getRemoteLiteralMap()', async () => {
+            delete execution.closure.computedInputs;
+            const { getByText } = renderForm();
+            await waitFor(() => getByText(mockContentString));
+            expect(mockGetExecutionData).toHaveBeenCalledWith(execution.id);
+            expect(mockGetRemoteLiteralMap).not.toHaveBeenCalled();
+            checkLaunchFormProps({
+                initialParameters: expect.objectContaining({
+                    values
+                })
+            });
+        });
+    });
+
     describe('with single task execution', () => {
         let values: LiteralValueMap;
         let authRole: Admin.IAuthRole;
