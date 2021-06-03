@@ -53,6 +53,8 @@ var executionColumns = []printer.Column{
 	{Header: "Phase", JSONPath: "$.closure.phase"},
 	{Header: "Started", JSONPath: "$.closure.startedAt"},
 	{Header: "Elapsed Time", JSONPath: "$.closure.duration"},
+	{Header: "Abort data", JSONPath: "$.closure.abortMetadata[\"cause\"]"},
+	{Header: "Error data", JSONPath: "$.closure.error[\"message\"]"},
 }
 
 func ExecutionToProtoMessages(l []*admin.Execution) []proto.Message {
