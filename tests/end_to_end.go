@@ -65,7 +65,7 @@ func BuildTaskTemplate() *idlCore.TaskTemplate {
 
 func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *idlCore.TaskTemplate,
 	inputs *idlCore.LiteralMap, expectedOutputs *idlCore.LiteralMap, expectedFailure *idlCore.ExecutionError,
-	iterationUpdate func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error) {
+	iterationUpdate func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error) pluginCore.PhaseInfo {
 
 	ctx := context.Background()
 
@@ -158,6 +158,11 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	tMeta.OnGetOverrides().Return(overrides)
 	tMeta.OnGetK8sServiceAccount().Return("s")
 	tMeta.OnGetNamespace().Return("fake-development")
+	tMeta.OnGetSecurityContext().Return(idlCore.SecurityContext{
+		RunAs: &idlCore.Identity{
+			K8SServiceAccount: "s",
+		},
+	})
 	tMeta.OnGetLabels().Return(map[string]string{})
 	tMeta.OnGetAnnotations().Return(map[string]string{})
 	tMeta.OnIsInterruptible().Return(true)
@@ -266,4 +271,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			t.Errorf("Expected != Actual. Diff: %v", diff)
 		}
 	}
+
+	return trns.Info()
 }

@@ -45,6 +45,10 @@ func (p *taskPluginRegistry) RegisterRemotePlugin(info webapi.PluginEntry) {
 	p.corePlugin = append(p.corePlugin, internalRemote.CreateRemotePlugin(info))
 }
 
+func CreateRemotePlugin(pluginEntry webapi.PluginEntry) core.PluginEntry {
+	return internalRemote.CreateRemotePlugin(pluginEntry)
+}
+
 // Use this method to register Kubernetes Plugins
 func (p *taskPluginRegistry) RegisterK8sPlugin(info k8s.PluginEntry) {
 	if info.ID == "" {
