@@ -1,5 +1,4 @@
-# Auto generated file
-# ---------------------------------------------------------------------
+# Auto generated file# ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
 # settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
@@ -63,7 +62,7 @@ datacatalog:
   image:
     # -- Docker image for Datacatalog deployment
     repository: ghcr.io/flyteorg/datacatalog
-    tag: v0.3.6
+    tag: v0.3.4
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
