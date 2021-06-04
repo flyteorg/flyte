@@ -12,8 +12,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/lyft/flyte/releases/latest">
-    <img src="https://img.shields.io/github/release/lyft/flyte.svg" alt="Current Release" />
+  <a href="https://github.com/flyteorg/flyte/releases/latest">
+    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg" alt="Current Release" />
   </a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml">
     <img src="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml/badge.svg" alt="Sandbox Build" />
@@ -24,10 +24,10 @@
   <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
     <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg" alt="License" />
   </a>
-  <img src="https://img.shields.io/github/commit-activity/w/lyft/flyte.svg?style=plastic" alt="Commit Activity" />
-  <img src="https://img.shields.io/github/commits-since/lyft/flyte/latest.svg?style=plastic" alt="Commits since Last Release" />
-  <img src="https://img.shields.io/github/milestones/closed/lyft/flyte?style=plastic" alt="GitHub Milestones Completed" />
-  <img src="https://img.shields.io/github/milestones/progress-percent/lyft/flyte/14?style=plastic" alt="GitHub Next Milestone Percentage" />
+  <img src="https://img.shields.io/github/commit-activity/w/flyteorg/flyte.svg?style=plastic" alt="Commit Activity" />
+  <img src="https://img.shields.io/github/commits-since/flyteorg/flyte/latest.svg?style=plastic" alt="Commits since Last Release" />
+  <img src="https://img.shields.io/github/milestones/closed/flyteorg/flyte?style=plastic" alt="GitHub Milestones Completed" />
+  <img src="https://img.shields.io/github/milestones/progress-percent/flyteorg/flyte/15?style=plastic" alt="GitHub Next Milestone Percentage" />
   <a href="https://flyte.rtfd.io">
     <img src="https://readthedocs.org/projects/flyte/badge/?version=latest&style=plastic" alt="Docs" />
   </a>
@@ -187,27 +187,27 @@ To dig deeper into Flyte, refer to the [Documentation](https://docs.flyte.org/en
 </h2>
 </html>
 
-| Repo                                                      | Language      | Purpose                                        | Status           |
-| --------------------------------------------------------- | ------------- | ---------------------------------------------- | ---------------- |
-| [flyte](https://github.com/lyft/flyte)                    | Kustomize,RST | deployment, documentation, issues              | Production-grade |
-| [flyteidl](https://github.com/lyft/flyteidl)              | Protobuf      | interface definitions                          | Production-grade |
-| [flytepropeller](https://github.com/lyft/flytepropeller)  | Go            | execution engine                               | Production-grade |
-| [flyteadmin](https://github.com/lyft/flyteadmin)          | Go            | control plane                                  | Production-grade |
-| [flytekit](https://github.com/lyft/flytekit)              | Python        | python SDK and tools                           | Production-grade |
-| [flyteconsole](https://github.com/lyft/flyteconsole)      | Typescript    | admin console                                  | Production-grade |
-| [datacatalog](https://github.com/lyft/datacatalog)        | Go            | manage input & output artifacts                | Production-grade |
-| [flyteplugins](https://github.com/lyft/flyteplugins)      | Go            | flyte plugins                                  | Production-grade |
-| [flytestdlib](https://github.com/lyft/flytestdlib)        | Go            | standard library                               | Production-grade |
-| [flytesnacks](https://github.com/lyft/flytesnacks)        | Python        | examples, tips, and tricks                     | Incubating       |
-| [flytekit-java](https://github.com/spotify/flytekit-java) | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
-| [flytectl](https://github.com/lyft/flytectl)              | Go            | A standalone Flyte CLI                         | Incomplete       |
+| Repo                                                          | Language      | Purpose                                        | Status           |
+| ------------------------------------------------------------- | ------------- | ---------------------------------------------- | ---------------- |
+| [flyte](https://github.com/flyteorg/flyte)                    | Kustomize,RST | deployment, documentation, issues              | Production-grade |
+| [flyteidl](https://github.com/flyteorg/flyteidl)              | Protobuf      | interface definitions                          | Production-grade |
+| [flytepropeller](https://github.com/flyteorg/flytepropeller)  | Go            | execution engine                               | Production-grade |
+| [flyteadmin](https://github.com/flyteorg/flyteadmin)          | Go            | control plane                                  | Production-grade |
+| [flytekit](https://github.com/flyteorg/flytekit)              | Python        | python SDK and tools                           | Production-grade |
+| [flyteconsole](https://github.com/flyteorg/flyteconsole)      | Typescript    | admin console                                  | Production-grade |
+| [datacatalog](https://github.com/flyteorg/datacatalog)        | Go            | manage input & output artifacts                | Production-grade |
+| [flyteplugins](https://github.com/flyteorg/flyteplugins)      | Go            | flyte plugins                                  | Production-grade |
+| [flytestdlib](https://github.com/flyteorg/flytestdlib)        | Go            | standard library                               | Production-grade |
+| [flytesnacks](https://github.com/flyteorg/flytesnacks)        | Python        | examples, tips, and tricks                     | Incubating       |
+| [flytekit-java](https://github.com/flyteorg/flytekit-java)    | Java/Scala    | Java & scala SDK for authoring Flyte workflows | Incubating       |
+| [flytectl](https://github.com/flyteorg/flytectl)              | Go            | A standalone Flyte CLI                         | Incomplete       |
 
 ## 🔩 Production K8s Operators
 
 | Repo                                                                  | Language | Purpose                |
 | --------------------------------------------------------------------- | -------- | ---------------------- |
 | [Spark](https://github.com/GoogleCloudPlatform/spark-on-k8s-operator) | Go       | Apache Spark batch     |
-| [Flink](https://github.com/lyft/flinkk8soperator)                     | Go       | Apache Flink streaming |
+| [Flink](https://github.com/flyteorg/flinkk8soperator)                     | Go       | Apache Flink streaming |
 
 <html>
 <h2 id="community--resources"> 
