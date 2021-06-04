@@ -18,6 +18,7 @@ helm:
 
 .PHONY: release_automation
 release_automation:
+	mkdir -p release
 	bash script/release.sh
 
 .PHONY: deploy_sandbox
