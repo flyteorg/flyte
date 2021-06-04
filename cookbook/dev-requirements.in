@@ -4,6 +4,7 @@
 -r ./integrations/kubernetes/kfpytorch/requirements.in
 -r ./integrations/aws/sagemaker_pytorch/requirements.in
 -r ./integrations/external_services/hive/requirements.in
+-r ./integrations/flytekit_plugins/dolt/requirements.in
 -r ./case_studies/ml_training/pima_diabetes/requirements.in
 -r ./docs-requirements.in
 

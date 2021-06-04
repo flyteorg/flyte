@@ -11,3 +11,4 @@ Flytekit Plugins
    auto/integrations/flytekit_plugins/sqlalchemy/index
    auto/integrations/flytekit_plugins/papermilltasks/index
    auto/integrations/flytekit_plugins/pandera/index
+   auto/integrations/flytekit_plugins/dolt/index

@@ -95,6 +95,8 @@ class CustomSorter(FileNameSortKey):
         ## Flytekit Plugins
         "simple.py",
         "basic_schema_example.py",
+        "branch_example.py",
+        "quickstart_example.py",
         ## Kubernetes
         "pod.py",
         "pyspark_pi.py",
@@ -231,6 +233,7 @@ examples_dirs = [
     "../integrations/flytekit_plugins/papermilltasks",
     "../integrations/flytekit_plugins/sqlalchemy",
     "../integrations/flytekit_plugins/pandera",
+    "../integrations/flytekit_plugins/dolt",
     "../integrations/kubernetes/pod",
     "../integrations/kubernetes/k8s_spark",
     "../integrations/kubernetes/kftensorflow",
@@ -260,6 +263,7 @@ gallery_dirs = [
     "auto/integrations/flytekit_plugins/papermilltasks",
     "auto/integrations/flytekit_plugins/sqlalchemy",
     "auto/integrations/flytekit_plugins/pandera",
+    "auto/integrations/flytekit_plugins/dolt",
     "auto/integrations/kubernetes/pod",
     "auto/integrations/kubernetes/k8s_spark",
     "auto/integrations/kubernetes/kftensorflow",
@@ -380,6 +384,7 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "pandera": ("https://pandera.readthedocs.io/en/stable/", None),
+    "dolt": ("https://docs.dolthub.com/", None),
     "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),

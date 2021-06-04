@@ -1,0 +1,2 @@
+-r ../../../common/requirements-common.in
+flytekitplugins.dolt>=0.18.0
