@@ -3,6 +3,7 @@
 set -ex
 
 echo "Generating Helm"
+helm version
 # All the values files to be built
 DEPLOYMENT=${1:-sandbox eks gcp}
 

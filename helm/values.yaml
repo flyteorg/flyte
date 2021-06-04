@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: ghcr.io/flyteorg/flyteadmin
-    tag: v0.5.12
+    tag: v0.6.0
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -109,7 +109,11 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
+<<<<<<< HEAD
     tag: v0.10.16
+=======
+    tag: v0.11.0
+>>>>>>> 3c21c29ffbd9238ef32317251acd9f26a952927c
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -152,7 +156,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: ghcr.io/flyteorg/flyteconsole
-    tag: v0.20.0
+    tag: v0.20.1
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
