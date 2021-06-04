@@ -20,13 +20,13 @@ Managing Python dependencies is hard. Flyte makes it easy to version and manage 
 to spark without needing to manage special spark clusters.
 
 Pros:
-------
+^^^^^
 #. Extremely easy to get started and get complete isolation between workloads
 #. Every job runs in isolation and has its own virtual cluster - no more nightmarish dependency management
 #. Flyte manages everything for you!
 
 Cons:
------
+^^^^^
 #. Short running, bursty jobs are not a great fit - because of the container overhead
 #. No interactive spark capabilities available with Flyte K8s spark, which is more suited for running, adhoc and/or scheduled jobs
 
