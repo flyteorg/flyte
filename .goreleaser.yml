@@ -8,7 +8,7 @@ release:
   draft: false
   prerelease: auto
   discussion_category_name: General
-  name_template: "{{.ProjectName}}-v{{.Version}}"
+  name_template: "Flyte v{{.Version}} milestone release"
   disable: false
   extra_files:
     - glob: ./release/*

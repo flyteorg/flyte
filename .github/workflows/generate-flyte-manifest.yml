@@ -1,4 +1,4 @@
-name: Publish flyte manifest file 
+name: Generate Flyte manifest
 
 on: 
   workflow_dispatch:

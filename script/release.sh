@@ -27,7 +27,7 @@ cp ./helm/.values-template.yaml ./helm/values.yaml
 
 # Restore template from backup and remove backup file
 cp ./helm/.values-template.yaml.bak ./helm/.values-template.yaml
-rm ./helm/.values-template.yaml.bak ./helm/.values-template.yaml
+rm ./helm/.values-template.yaml.bak 
 
 # Added comment on top 
 sed -i '1s/^/# Auto generated file/' helm/values.yaml
