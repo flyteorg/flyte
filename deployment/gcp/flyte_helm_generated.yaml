@@ -116,9 +116,10 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-admin-auth
+  name: flyte-admin-secrets
   namespace: default
 type: Opaque
+stringData:
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
 apiVersion: v1
@@ -3252,7 +3253,7 @@ spec:
           name: resource-templates
         - name: auth
           secret:
-            secretName: flyte-admin-auth
+            secretName: flyte-admin-secrets
 ---
 # Source: flyte/templates/console/deployment.yaml
 apiVersion: apps/v1
