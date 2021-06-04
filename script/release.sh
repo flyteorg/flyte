@@ -14,20 +14,20 @@ grep -rlZ "newTag:[^P]*# FLYTECONSOLE_TAG" ./kustomize/overlays | xargs -0 sed -
 grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -0 sed -i "s/newTag:[^P]*# FLYTEPROPELLER_TAG/newTag: ${FLYTEPROPELLER_TAG} # FLYTEPROPELLER_TAG/g"
 
 # Backup template
-cp ./helm/.helm-template.yaml ./helm/.helm-template.yaml.bak
+cp ./helm/.values-template.yaml ./helm/.values-template.yaml.bak
 
 # bump latest release of flyte component in helm
-sed -i "s,FLYTEADMIN_TAG,${FLYTEADMIN_TAG}," ./helm/.helm-template.yaml
-sed -i "s,DATACATALOG_TAG,${DATACATALOG_TAG}," ./helm/.helm-template.yaml
-sed -i "s,FLYTECONSOLE_TAG,${FLYTECONSOLE_TAG}," ./helm/.helm-template.yaml
-sed -i "s,FLYTEPROPELLER_TAG,${FLYTEPROPELLER_TAG}," ./helm/.helm-template.yaml
+sed -i "s,FLYTEADMIN_TAG,${FLYTEADMIN_TAG}," ./helm/.values-template.yaml
+sed -i "s,DATACATALOG_TAG,${DATACATALOG_TAG}," ./helm/.values-template.yaml
+sed -i "s,FLYTECONSOLE_TAG,${FLYTECONSOLE_TAG}," ./helm/.values-template.yaml
+sed -i "s,FLYTEPROPELLER_TAG,${FLYTEPROPELLER_TAG}," ./helm/.values-template.yaml
 
 # Copy updated value from helm-template to values.yaml
-cp ./helm/.helm-template.yaml ./helm/values.yaml
+cp ./helm/.values-template.yaml ./helm/values.yaml
 
 # Restore template from backup and remove backup file
-cp ./helm/.helm-template.yaml.bak ./helm/.helm-template.yaml
-rm ./helm/.helm-template.yaml.bak ./helm/.helm-template.yaml
+cp ./helm/.values-template.yaml.bak ./helm/.values-template.yaml
+rm ./helm/.values-template.yaml.bak ./helm/.values-template.yaml
 
 # Added comment on top 
 sed -i '1s/^/# Auto generated file/' helm/values.yaml
