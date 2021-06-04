@@ -54,6 +54,7 @@ stats:
 
 .PHONY: prepare_artifacts
 prepare_artifacts:
+	mkdir release
 	bash script/prepare_artifacts.sh
 
 .PHONY: helm_install
