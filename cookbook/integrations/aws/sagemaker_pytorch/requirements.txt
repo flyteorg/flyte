@@ -6,17 +6,17 @@
 #
 --find-links https://download.pytorch.org/whl/torch_stable.html
 
-attrs==20.3.0
+attrs==21.2.0
     # via scantree
 bcrypt==3.2.0
     # via paramiko
-boto3==1.17.67
+boto3==1.17.88
     # via sagemaker-training
-botocore==1.20.67
+botocore==1.20.88
     # via
     #   boto3
     #   s3transfer
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
 cffi==1.14.5
     # via
@@ -27,7 +27,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.12
+croniter==1.0.13
     # via flytekit
 cryptography==3.4.7
     # via paramiko
@@ -35,7 +35,7 @@ cycler==0.10.0
     # via matplotlib
 dataclasses-json==0.5.3
     # via flytekit
-decorator==5.0.7
+decorator==5.0.9
     # via retry
 deprecated==1.2.12
     # via flytekit
@@ -43,23 +43,23 @@ dirhash==0.2.1
     # via flytekit
 docker-image-py==0.1.10
     # via flytekit
-flyteidl==0.18.41
+flyteidl==0.18.53
     # via flytekit
-flytekit==0.18.0
+flytekit==0.19.1
     # via
     #   -r ../../../common/requirements-common.in
     #   flytekitplugins-awssagemaker
-flytekitplugins-awssagemaker==0.18.0
+flytekitplugins-awssagemaker==0.19.1
     # via -r requirements.in
 gevent==21.1.2
     # via sagemaker-training
-greenlet==1.0.0
+greenlet==1.1.0
     # via gevent
-grpcio==1.37.1
+grpcio==1.38.0
     # via flytekit
 idna==2.10
     # via requests
-importlib-metadata==4.0.1
+importlib-metadata==4.5.0
     # via keyring
 inotify_simple==1.2.1
     # via sagemaker-training
@@ -73,17 +73,17 @@ kiwisolver==1.3.1
     # via matplotlib
 marshmallow-enum==1.5.1
     # via dataclasses-json
-marshmallow==3.11.1
+marshmallow==3.12.1
     # via
     #   dataclasses-json
     #   marshmallow-enum
-matplotlib==3.4.1
+matplotlib==3.4.2
     # via -r ../../../common/requirements-common.in
 mypy-extensions==0.4.3
     # via typing-inspect
 natsort==7.1.1
     # via flytekit
-numpy==1.20.2
+numpy==1.20.3
     # via
     #   matplotlib
     #   pandas
@@ -99,7 +99,7 @@ pathspec==0.8.1
     # via scantree
 pillow==8.2.0
     # via matplotlib
-protobuf==3.15.8
+protobuf==3.17.2
     # via
     #   flyteidl
     #   flytekit
@@ -163,7 +163,7 @@ six==1.16.0
     #   retrying
     #   sagemaker-training
     #   scantree
-sortedcontainers==2.3.0
+sortedcontainers==2.4.0
     # via flytekit
 statsd==3.3.0
     # via flytekit
@@ -181,7 +181,7 @@ urllib3==1.25.11
     #   flytekit
     #   requests
     #   responses
-werkzeug==1.0.1
+werkzeug==2.0.1
     # via sagemaker-training
 wheel==0.36.2
     # via

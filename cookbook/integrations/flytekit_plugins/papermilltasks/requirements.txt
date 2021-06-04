@@ -14,17 +14,17 @@ appnope==0.1.2
     #   ipython
 async-generator==1.10
     # via nbclient
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   jsonschema
     #   scantree
 backcall==0.2.0
     # via ipython
-black==21.5b0
+black==21.5b2
     # via papermill
 bleach==3.3.0
     # via nbconvert
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
 chardet==4.0.0
     # via requests
@@ -33,13 +33,13 @@ click==7.1.2
     #   black
     #   flytekit
     #   papermill
-croniter==1.0.12
+croniter==1.0.13
     # via flytekit
 cycler==0.10.0
     # via matplotlib
 dataclasses-json==0.5.3
     # via flytekit
-decorator==5.0.7
+decorator==5.0.9
     # via
     #   ipython
     #   retry
@@ -55,31 +55,31 @@ entrypoints==0.3
     # via
     #   nbconvert
     #   papermill
-flyteidl==0.18.41
+flyteidl==0.18.53
     # via flytekit
-flytekit==0.18.0
+flytekit==0.19.1
     # via
     #   -r ../../../common/requirements-common.in
     #   flytekitplugins-papermill
-flytekitplugins-papermill==0.18.0
+flytekitplugins-papermill==0.19.1
     # via -r requirements.in
-grpcio==1.37.1
+grpcio==1.38.0
     # via flytekit
 idna==2.10
     # via requests
-importlib-metadata==4.0.1
+importlib-metadata==4.5.0
     # via keyring
-ipykernel==5.5.4
+ipykernel==5.5.5
     # via flytekitplugins-papermill
 ipython-genutils==0.2.0
     # via
     #   nbformat
     #   traitlets
-ipython==7.23.1
+ipython==7.24.1
     # via ipykernel
 jedi==0.18.0
     # via ipython
-jinja2==2.11.3
+jinja2==3.0.1
     # via nbconvert
 jsonschema==3.2.0
     # via nbformat
@@ -98,17 +98,17 @@ keyring==23.0.1
     # via flytekit
 kiwisolver==1.3.1
     # via matplotlib
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
 marshmallow-enum==1.5.1
     # via dataclasses-json
-marshmallow==3.11.1
+marshmallow==3.12.1
     # via
     #   dataclasses-json
     #   marshmallow-enum
 matplotlib-inline==0.1.2
     # via ipython
-matplotlib==3.4.1
+matplotlib==3.4.2
     # via -r ../../../common/requirements-common.in
 mistune==0.8.4
     # via nbconvert
@@ -131,7 +131,7 @@ nbformat==5.1.3
     #   papermill
 nest-asyncio==1.5.1
     # via nbclient
-numpy==1.20.2
+numpy==1.20.3
     # via
     #   matplotlib
     #   pandas
@@ -158,7 +158,7 @@ pillow==8.2.0
     # via matplotlib
 prompt-toolkit==3.0.18
     # via ipython
-protobuf==3.15.8
+protobuf==3.17.2
     # via
     #   flyteidl
     #   flytekit
@@ -194,7 +194,7 @@ pytz==2018.4
     #   pandas
 pyyaml==5.4.1
     # via papermill
-pyzmq==22.0.3
+pyzmq==22.1.0
     # via jupyter-client
 regex==2021.4.4
     # via
@@ -223,7 +223,7 @@ six==1.16.0
     #   responses
     #   scantree
     #   tenacity
-sortedcontainers==2.3.0
+sortedcontainers==2.4.0
     # via flytekit
 statsd==3.3.0
     # via flytekit
@@ -231,7 +231,7 @@ stringcase==1.2.0
     # via dataclasses-json
 tenacity==7.0.0
     # via papermill
-testpath==0.4.4
+testpath==0.5.0
     # via nbconvert
 textwrap3==0.9.2
     # via ansiwrap
@@ -241,7 +241,7 @@ tornado==6.1
     # via
     #   ipykernel
     #   jupyter-client
-tqdm==4.60.0
+tqdm==4.61.0
     # via papermill
 traitlets==5.0.5
     # via

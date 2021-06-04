@@ -4,6 +4,8 @@
 #
 #    /Library/Developer/CommandLineTools/usr/bin/make dev-requirements.txt
 #
+--find-links https://download.pytorch.org/whl/torch_stable.html
+
 absl-py==0.12.0
     # via
     #   tensorboard
@@ -20,7 +22,7 @@ astroid==2.4.2
     #   sphinx-autoapi
 astunparse==1.6.3
     # via tensorflow
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   black
     #   pytest
@@ -38,15 +40,15 @@ black==19.10b0
     # via
     #   -r dev-requirements.in
     #   flake8-black
-boto3==1.17.67
+boto3==1.17.87
     # via sagemaker-training
-botocore==1.20.67
+botocore==1.20.87
     # via
     #   boto3
     #   s3transfer
 cachetools==4.2.2
     # via google-auth
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   kubernetes
     #   requests
@@ -63,7 +65,7 @@ click==7.1.2
     #   flytekit
 coverage==5.5
     # via -r dev-requirements.in
-croniter==1.0.12
+croniter==1.0.13
     # via flytekit
 cryptography==3.4.7
     # via paramiko
@@ -71,7 +73,7 @@ cycler==0.10.0
     # via matplotlib
 dataclasses-json==0.5.3
     # via flytekit
-decorator==5.0.7
+decorator==5.0.9
     # via retry
 deprecated==1.2.12
     # via flytekit
@@ -90,18 +92,19 @@ flake8-black==0.2.1
     # via -r dev-requirements.in
 flake8-isort==4.0.0
     # via -r dev-requirements.in
-flake8==3.9.1
+flake8==3.9.2
     # via
     #   -r dev-requirements.in
     #   flake8-black
     #   flake8-isort
 flatbuffers==1.12
     # via tensorflow
-flyteidl==0.18.41
+flyteidl==0.18.53
     # via flytekit
-flytekit==0.18.0
+flytekit==0.19.1
     # via
     #   -r ./case_studies/ml_training/pima_diabetes/../../../common/requirements-common.in
+    #   -r ./docs-requirements.in
     #   -r ./integrations/aws/sagemaker_pytorch/../../../common/requirements-common.in
     #   -r ./integrations/aws/sagemaker_training/../../../common/requirements-common.in
     #   -r ./integrations/external_services/hive/../../../common/requirements-common.in
@@ -113,29 +116,29 @@ flytekit==0.18.0
     #   flytekitplugins-kfpytorch
     #   flytekitplugins-pod
     #   flytekitplugins-spark
-flytekitplugins-awssagemaker==0.18.0
+flytekitplugins-awssagemaker==0.19.1
     # via
     #   -r ./integrations/aws/sagemaker_pytorch/requirements.in
     #   -r ./integrations/aws/sagemaker_training/requirements.in
-flytekitplugins-hive==0.18.0
+flytekitplugins-hive==0.19.1
     # via -r ./integrations/external_services/hive/requirements.in
-flytekitplugins-kfpytorch==0.18.0
+flytekitplugins-kfpytorch==0.19.1
     # via -r ./integrations/kubernetes/kfpytorch/requirements.in
-flytekitplugins-pod==0.18.0
+flytekitplugins-pod==0.19.1
     # via -r ./integrations/kubernetes/pod/requirements.in
-flytekitplugins-spark==0.18.0
+flytekitplugins-spark==0.19.1
     # via -r ./integrations/kubernetes/k8s_spark/requirements.in
 git+git://github.com/flyteorg/furo@main
     # via -r ./docs-requirements.in
 future==0.18.2
     # via tensorflow-datasets
-gast==0.3.3
+gast==0.4.0
     # via tensorflow
 gevent==21.1.2
     # via sagemaker-training
 google-auth-oauthlib==0.4.4
     # via tensorboard
-google-auth==1.30.0
+google-auth==1.30.1
     # via
     #   google-auth-oauthlib
     #   kubernetes
@@ -144,22 +147,22 @@ google-pasta==0.2.0
     # via tensorflow
 googleapis-common-protos==1.53.0
     # via tensorflow-metadata
-greenlet==1.0.0
+greenlet==1.1.0
     # via gevent
-grpcio==1.32.0
+grpcio==1.34.1
     # via
     #   flytekit
     #   tensorboard
     #   tensorflow
-h5py==2.10.0
+h5py==3.1.0
     # via tensorflow
 idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.0.1
+importlib-metadata==4.5.0
     # via keyring
-importlib-resources==5.1.2
+importlib-resources==5.1.4
     # via tensorflow-datasets
 iniconfig==1.1.1
     # via pytest
@@ -169,7 +172,7 @@ isort==5.8.0
     # via
     #   -r dev-requirements.in
     #   flake8-isort
-jinja2==2.11.3
+jinja2==3.0.1
     # via
     #   sphinx
     #   sphinx-autoapi
@@ -181,30 +184,33 @@ joblib==1.0.1
     # via
     #   -r ./case_studies/ml_training/pima_diabetes/requirements.in
     #   scikit-learn
+keras-nightly==2.5.0.dev2021032900
+    # via tensorflow
 keras-preprocessing==1.1.2
     # via tensorflow
 keyring==23.0.1
     # via flytekit
 kiwisolver==1.3.1
     # via matplotlib
-kubernetes==12.0.1
+kubernetes==17.17.0
     # via flytekitplugins-pod
 lazy-object-proxy==1.4.3
     # via astroid
 markdown==3.3.4
     # via tensorboard
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
 marshmallow-enum==1.5.1
     # via dataclasses-json
-marshmallow==3.11.1
+marshmallow==3.12.1
     # via
     #   dataclasses-json
     #   marshmallow-enum
-matplotlib==3.4.1
+matplotlib==3.4.2
     # via
     #   -r ./case_studies/ml_training/pima_diabetes/../../../common/requirements-common.in
     #   -r ./case_studies/ml_training/pima_diabetes/requirements.in
+    #   -r ./docs-requirements.in
     #   -r ./integrations/aws/sagemaker_pytorch/../../../common/requirements-common.in
     #   -r ./integrations/aws/sagemaker_training/../../../common/requirements-common.in
     #   -r ./integrations/external_services/hive/../../../common/requirements-common.in
@@ -234,10 +240,8 @@ numpy==1.19.5
     #   tensorboardx
     #   tensorflow
     #   tensorflow-datasets
-    #   torch
-    #   torchvision
     #   xgboost
-oauthlib==3.1.0
+oauthlib==3.1.1
     # via requests-oauthlib
 opt-einsum==3.3.0
     # via tensorflow
@@ -257,12 +261,11 @@ pillow==8.2.0
     # via
     #   -r ./docs-requirements.in
     #   matplotlib
-    #   torchvision
 pluggy==0.13.1
     # via pytest
 promise==2.3
     # via tensorflow-datasets
-protobuf==3.15.8
+protobuf==3.17.2
     # via
     #   flyteidl
     #   flytekit
@@ -305,7 +308,7 @@ pyparsing==2.4.7
     # via
     #   matplotlib
     #   packaging
-pyspark==3.1.1
+pyspark==3.1.2
     # via
     #   -r ./integrations/kubernetes/k8s_spark/requirements.in
     #   flytekitplugins-spark
@@ -381,7 +384,6 @@ six==1.15.0
     #   google-auth
     #   google-pasta
     #   grpcio
-    #   h5py
     #   keras-preprocessing
     #   kubernetes
     #   promise
@@ -393,14 +395,14 @@ six==1.15.0
     #   sagemaker-training
     #   scantree
     #   sphinx-code-include
+    #   sphinxext-remoteliteralinclude
     #   tensorflow
     #   tensorflow-datasets
-    #   websocket-client
 sklearn==0.0
     # via -r ./case_studies/ml_training/pima_diabetes/requirements.in
 snowballstemmer==2.1.0
     # via sphinx
-sortedcontainers==2.3.0
+sortedcontainers==2.4.0
     # via flytekit
 soupsieve==2.2.1
     # via beautifulsoup4
@@ -409,6 +411,8 @@ sphinx-autoapi==1.8.1
 sphinx-code-include==1.1.1
     # via -r ./docs-requirements.in
 sphinx-copybutton==0.3.1
+    # via -r ./docs-requirements.in
+sphinx-fontawesome==0.0.6
     # via -r ./docs-requirements.in
 sphinx-gallery==0.9.0
     # via -r ./docs-requirements.in
@@ -423,21 +427,25 @@ sphinx==3.5.4
     #   sphinx-autoapi
     #   sphinx-code-include
     #   sphinx-copybutton
+    #   sphinx-fontawesome
     #   sphinx-gallery
     #   sphinx-prompt
     #   sphinx-rtd-theme
+    #   sphinxext-remoteliteralinclude
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
+sphinxext-remoteliteralinclude==0.2.0
+    # via -r ./docs-requirements.in
 statsd==3.3.0
     # via flytekit
 stringcase==1.2.0
@@ -454,13 +462,13 @@ tensorboardx==2.2
     # via
     #   -r ./integrations/aws/sagemaker_pytorch/requirements.in
     #   -r ./integrations/kubernetes/kfpytorch/requirements.in
-tensorflow-datasets==4.2.0
+tensorflow-datasets==4.3.0
     # via -r ./integrations/aws/sagemaker_training/requirements.in
-tensorflow-estimator==2.4.0
+tensorflow-estimator==2.5.0
     # via tensorflow
-tensorflow-metadata==0.30.0
+tensorflow-metadata==1.0.0
     # via tensorflow-datasets
-tensorflow==2.4.1
+tensorflow==2.5.0
     # via -r ./integrations/aws/sagemaker_training/requirements.in
 termcolor==1.1.0
     # via
@@ -474,23 +482,13 @@ toml==0.10.2
     # via
     #   black
     #   pytest
-torch==1.8.1
-    # via
-    #   -r ./integrations/aws/sagemaker_pytorch/requirements.in
-    #   -r ./integrations/kubernetes/kfpytorch/requirements.in
-    #   torchvision
-torchvision==0.9.1
-    # via
-    #   -r ./integrations/aws/sagemaker_pytorch/requirements.in
-    #   -r ./integrations/kubernetes/kfpytorch/requirements.in
-tqdm==4.60.0
+tqdm==4.61.0
     # via tensorflow-datasets
 typed-ast==1.4.3
     # via black
 typing-extensions==3.7.4.3
     # via
     #   tensorflow
-    #   torch
     #   typing-inspect
 typing-inspect==0.6.0
     # via dataclasses-json
@@ -503,9 +501,9 @@ urllib3==1.25.11
     #   kubernetes
     #   requests
     #   responses
-websocket-client==0.59.0
+websocket-client==1.0.1
     # via kubernetes
-werkzeug==1.0.1
+werkzeug==2.0.1
     # via
     #   sagemaker-training
     #   tensorboard
@@ -528,10 +526,12 @@ wrapt==1.12.1
     #   deprecated
     #   flytekit
     #   tensorflow
-xgboost==1.4.1
+xgboost==1.4.2
     # via -r ./case_studies/ml_training/pima_diabetes/requirements.in
 zipp==3.4.1
-    # via importlib-metadata
+    # via
+    #   importlib-metadata
+    #   importlib-resources
 zope.event==4.5.0
     # via gevent
 zope.interface==5.4.0
