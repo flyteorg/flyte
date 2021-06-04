@@ -1292,7 +1292,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.6.0"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -1309,7 +1309,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.6.0"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -1323,7 +1323,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.6.0"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -1334,7 +1334,7 @@ spec:
           - mountPath: /etc/flyte/config
             name: config-volume
         - name: generate-secrets
-          image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
+          image: "ghcr.io/flyteorg/flyteadmin:v0.6.0"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -1355,7 +1355,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
+        image: "ghcr.io/flyteorg/flyteadmin:v0.6.0"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -1451,7 +1451,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       containers:
-      - image: "ghcr.io/flyteorg/flyteconsole:v0.20.0"
+      - image: "ghcr.io/flyteorg/flyteconsole:v0.20.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteconsole
         envFrom:
@@ -1603,7 +1603,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: "ghcr.io/flyteorg/flytepropeller:v0.10.10"
+        image: "ghcr.io/flyteorg/flytepropeller:v0.11.0"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -1656,14 +1656,14 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v0.10.10
+        app.kubernetes.io/version: v0.11.0
       annotations:
         configChecksum: "73d82b14cc9e0ed31b4c5731396ec0a43727ceb7cf3c247c0e3c9023ce1cda2"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "ghcr.io/flyteorg/flytepropeller:v0.10.10"
+        image: "ghcr.io/flyteorg/flytepropeller:v0.11.0"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -1686,7 +1686,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "ghcr.io/flyteorg/flytepropeller:v0.10.10"
+          image: "ghcr.io/flyteorg/flytepropeller:v0.11.0"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -1868,7 +1868,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - sync
-            image: "ghcr.io/flyteorg/flyteadmin:v0.5.7"
+            image: "ghcr.io/flyteorg/flyteadmin:v0.6.0"
             imagePullPolicy: "IfNotPresent"
             name: sync-cluster-resources
             volumeMounts:
@@ -1898,7 +1898,8 @@ metadata:
   name: flyte
   namespace: default
   annotations: 
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
+      { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:<ACCOUNT_NUMBER>:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -2024,7 +2025,8 @@ metadata:
   name: flyte-grpc
   namespace: default
   annotations:
-    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
+      { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
     alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:<ACCOUNT_NUMBER>:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
