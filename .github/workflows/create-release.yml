@@ -35,6 +35,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist
+          args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
