@@ -8654,7 +8654,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.6
+        image: ghcr.io/flyteorg/datacatalog:v0.3.4
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -8677,7 +8677,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.6
+        image: ghcr.io/flyteorg/datacatalog:v0.3.4
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
