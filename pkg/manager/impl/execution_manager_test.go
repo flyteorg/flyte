@@ -5,6 +5,9 @@ import (
 	"errors"
 	"testing"
 
+	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	managerMocks "github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -2901,4 +2904,35 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	}, time.Now())
 
 	assert.NoError(t, err)
+}
+
+func TestGetExecutionConfig(t *testing.T) {
+	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager.GetResourceFunc = func(ctx context.Context,
+		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+			Project:      workflowIdentifier.Project,
+			Domain:       workflowIdentifier.Domain,
+			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+		})
+		return &managerInterfaces.ResourceResponse{
+			Attributes: &admin.MatchingAttributes{
+				Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
+					WorkflowExecutionConfig: &admin.WorkflowExecutionConfig{
+						MaxParallelism: 100,
+					},
+				},
+			},
+		}, nil
+	}
+
+	executionManager := ExecutionManager{
+		resourceManager: &resourceManager,
+	}
+	execConfig, err := executionManager.getExecutionConfig(context.TODO(), &admin.ExecutionCreateRequest{
+		Project: workflowIdentifier.Project,
+		Domain:  workflowIdentifier.Domain,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, execConfig.MaxParallelism, int32(100))
 }
