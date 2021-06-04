@@ -17,4 +17,5 @@ type AdminMatchingAttributes struct {
 	ExecutionClusterLabel *AdminExecutionClusterLabel `json:"execution_cluster_label,omitempty"`
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`
 	PluginOverrides *AdminPluginOverrides `json:"plugin_overrides,omitempty"`
+	WorkflowExecutionConfig *AdminWorkflowExecutionConfig `json:"workflow_execution_config,omitempty"`
 }

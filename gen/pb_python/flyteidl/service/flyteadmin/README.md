@@ -220,6 +220,7 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowClosure](docs/AdminWorkflowClosure.md)
  - [AdminWorkflowCreateRequest](docs/AdminWorkflowCreateRequest.md)
  - [AdminWorkflowCreateResponse](docs/AdminWorkflowCreateResponse.md)
+ - [AdminWorkflowExecutionConfig](docs/AdminWorkflowExecutionConfig.md)
  - [AdminWorkflowExecutionEventRequest](docs/AdminWorkflowExecutionEventRequest.md)
  - [AdminWorkflowExecutionEventResponse](docs/AdminWorkflowExecutionEventResponse.md)
  - [AdminWorkflowExecutionGetDataResponse](docs/AdminWorkflowExecutionGetDataResponse.md)

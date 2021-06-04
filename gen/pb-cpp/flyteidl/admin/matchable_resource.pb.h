@@ -46,7 +46,7 @@ struct TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[12]
+  static const ::google::protobuf::internal::ParseTable schema[13]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -91,6 +91,9 @@ extern TaskResourceAttributesDefaultTypeInternal _TaskResourceAttributes_default
 class TaskResourceSpec;
 class TaskResourceSpecDefaultTypeInternal;
 extern TaskResourceSpecDefaultTypeInternal _TaskResourceSpec_default_instance_;
+class WorkflowExecutionConfig;
+class WorkflowExecutionConfigDefaultTypeInternal;
+extern WorkflowExecutionConfigDefaultTypeInternal _WorkflowExecutionConfig_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace google {
@@ -107,6 +110,7 @@ template<> ::flyteidl::admin::PluginOverride* Arena::CreateMaybeMessage<::flytei
 template<> ::flyteidl::admin::PluginOverrides* Arena::CreateMaybeMessage<::flyteidl::admin::PluginOverrides>(Arena*);
 template<> ::flyteidl::admin::TaskResourceAttributes* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceAttributes>(Arena*);
 template<> ::flyteidl::admin::TaskResourceSpec* Arena::CreateMaybeMessage<::flyteidl::admin::TaskResourceSpec>(Arena*);
+template<> ::flyteidl::admin::WorkflowExecutionConfig* Arena::CreateMaybeMessage<::flyteidl::admin::WorkflowExecutionConfig>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -140,12 +144,13 @@ enum MatchableResource {
   EXECUTION_CLUSTER_LABEL = 3,
   QUALITY_OF_SERVICE_SPECIFICATION = 4,
   PLUGIN_OVERRIDE = 5,
+  WORKFLOW_EXECUTION_CONFIG = 6,
   MatchableResource_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
   MatchableResource_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
 };
 bool MatchableResource_IsValid(int value);
 const MatchableResource MatchableResource_MIN = TASK_RESOURCE;
-const MatchableResource MatchableResource_MAX = PLUGIN_OVERRIDE;
+const MatchableResource MatchableResource_MAX = WORKFLOW_EXECUTION_CONFIG;
 const int MatchableResource_ARRAYSIZE = MatchableResource_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* MatchableResource_descriptor();
@@ -1137,6 +1142,118 @@ class PluginOverrides final :
 };
 // -------------------------------------------------------------------
 
+class WorkflowExecutionConfig final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WorkflowExecutionConfig) */ {
+ public:
+  WorkflowExecutionConfig();
+  virtual ~WorkflowExecutionConfig();
+
+  WorkflowExecutionConfig(const WorkflowExecutionConfig& from);
+
+  inline WorkflowExecutionConfig& operator=(const WorkflowExecutionConfig& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  WorkflowExecutionConfig(WorkflowExecutionConfig&& from) noexcept
+    : WorkflowExecutionConfig() {
+    *this = ::std::move(from);
+  }
+
+  inline WorkflowExecutionConfig& operator=(WorkflowExecutionConfig&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const WorkflowExecutionConfig& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const WorkflowExecutionConfig* internal_default_instance() {
+    return reinterpret_cast<const WorkflowExecutionConfig*>(
+               &_WorkflowExecutionConfig_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  void Swap(WorkflowExecutionConfig* other);
+  friend void swap(WorkflowExecutionConfig& a, WorkflowExecutionConfig& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WorkflowExecutionConfig* New() const final {
+    return CreateMaybeMessage<WorkflowExecutionConfig>(nullptr);
+  }
+
+  WorkflowExecutionConfig* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<WorkflowExecutionConfig>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const WorkflowExecutionConfig& from);
+  void MergeFrom(const WorkflowExecutionConfig& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WorkflowExecutionConfig* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // int32 max_parallelism = 1;
+  void clear_max_parallelism();
+  static const int kMaxParallelismFieldNumber = 1;
+  ::google::protobuf::int32 max_parallelism() const;
+  void set_max_parallelism(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowExecutionConfig)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::int32 max_parallelism_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MatchingAttributes final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.MatchingAttributes) */ {
  public:
@@ -1176,6 +1293,7 @@ class MatchingAttributes final :
     kExecutionClusterLabel = 4,
     kQualityOfService = 5,
     kPluginOverrides = 6,
+    kWorkflowExecutionConfig = 7,
     TARGET_NOT_SET = 0,
   };
 
@@ -1185,7 +1303,7 @@ class MatchingAttributes final :
                &_MatchingAttributes_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(MatchingAttributes* other);
   friend void swap(MatchingAttributes& a, MatchingAttributes& b) {
@@ -1296,6 +1414,15 @@ class MatchingAttributes final :
   ::flyteidl::admin::PluginOverrides* mutable_plugin_overrides();
   void set_allocated_plugin_overrides(::flyteidl::admin::PluginOverrides* plugin_overrides);
 
+  // .flyteidl.admin.WorkflowExecutionConfig workflow_execution_config = 7;
+  bool has_workflow_execution_config() const;
+  void clear_workflow_execution_config();
+  static const int kWorkflowExecutionConfigFieldNumber = 7;
+  const ::flyteidl::admin::WorkflowExecutionConfig& workflow_execution_config() const;
+  ::flyteidl::admin::WorkflowExecutionConfig* release_workflow_execution_config();
+  ::flyteidl::admin::WorkflowExecutionConfig* mutable_workflow_execution_config();
+  void set_allocated_workflow_execution_config(::flyteidl::admin::WorkflowExecutionConfig* workflow_execution_config);
+
   void clear_target();
   TargetCase target_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.MatchingAttributes)
@@ -1307,6 +1434,7 @@ class MatchingAttributes final :
   void set_has_execution_cluster_label();
   void set_has_quality_of_service();
   void set_has_plugin_overrides();
+  void set_has_workflow_execution_config();
 
   inline bool has_target() const;
   inline void clear_has_target();
@@ -1320,6 +1448,7 @@ class MatchingAttributes final :
     ::flyteidl::admin::ExecutionClusterLabel* execution_cluster_label_;
     ::flyteidl::core::QualityOfService* quality_of_service_;
     ::flyteidl::admin::PluginOverrides* plugin_overrides_;
+    ::flyteidl::admin::WorkflowExecutionConfig* workflow_execution_config_;
   } target_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -1366,7 +1495,7 @@ class MatchableAttributesConfiguration final :
                &_MatchableAttributesConfiguration_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(MatchableAttributesConfiguration* other);
   friend void swap(MatchableAttributesConfiguration& a, MatchableAttributesConfiguration& b) {
@@ -1541,7 +1670,7 @@ class ListMatchableAttributesRequest final :
                &_ListMatchableAttributesRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(ListMatchableAttributesRequest* other);
   friend void swap(ListMatchableAttributesRequest& a, ListMatchableAttributesRequest& b) {
@@ -1653,7 +1782,7 @@ class ListMatchableAttributesResponse final :
                &_ListMatchableAttributesResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(ListMatchableAttributesResponse* other);
   friend void swap(ListMatchableAttributesResponse& a, ListMatchableAttributesResponse& b) {
@@ -2390,6 +2519,24 @@ PluginOverrides::overrides() const {
 
 // -------------------------------------------------------------------
 
+// WorkflowExecutionConfig
+
+// int32 max_parallelism = 1;
+inline void WorkflowExecutionConfig::clear_max_parallelism() {
+  max_parallelism_ = 0;
+}
+inline ::google::protobuf::int32 WorkflowExecutionConfig::max_parallelism() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.max_parallelism)
+  return max_parallelism_;
+}
+inline void WorkflowExecutionConfig::set_max_parallelism(::google::protobuf::int32 value) {
+  
+  max_parallelism_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowExecutionConfig.max_parallelism)
+}
+
+// -------------------------------------------------------------------
+
 // MatchingAttributes
 
 // .flyteidl.admin.TaskResourceAttributes task_resource_attributes = 1;
@@ -2630,6 +2777,47 @@ inline ::flyteidl::admin::PluginOverrides* MatchingAttributes::mutable_plugin_ov
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.plugin_overrides)
   return target_.plugin_overrides_;
+}
+
+// .flyteidl.admin.WorkflowExecutionConfig workflow_execution_config = 7;
+inline bool MatchingAttributes::has_workflow_execution_config() const {
+  return target_case() == kWorkflowExecutionConfig;
+}
+inline void MatchingAttributes::set_has_workflow_execution_config() {
+  _oneof_case_[0] = kWorkflowExecutionConfig;
+}
+inline void MatchingAttributes::clear_workflow_execution_config() {
+  if (has_workflow_execution_config()) {
+    delete target_.workflow_execution_config_;
+    clear_has_target();
+  }
+}
+inline ::flyteidl::admin::WorkflowExecutionConfig* MatchingAttributes::release_workflow_execution_config() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchingAttributes.workflow_execution_config)
+  if (has_workflow_execution_config()) {
+    clear_has_target();
+      ::flyteidl::admin::WorkflowExecutionConfig* temp = target_.workflow_execution_config_;
+    target_.workflow_execution_config_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::WorkflowExecutionConfig& MatchingAttributes::workflow_execution_config() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchingAttributes.workflow_execution_config)
+  return has_workflow_execution_config()
+      ? *target_.workflow_execution_config_
+      : *reinterpret_cast< ::flyteidl::admin::WorkflowExecutionConfig*>(&::flyteidl::admin::_WorkflowExecutionConfig_default_instance_);
+}
+inline ::flyteidl::admin::WorkflowExecutionConfig* MatchingAttributes::mutable_workflow_execution_config() {
+  if (!has_workflow_execution_config()) {
+    clear_target();
+    set_has_workflow_execution_config();
+    target_.workflow_execution_config_ = CreateMaybeMessage< ::flyteidl::admin::WorkflowExecutionConfig >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchingAttributes.workflow_execution_config)
+  return target_.workflow_execution_config_;
 }
 
 inline bool MatchingAttributes::has_target() const {
@@ -2963,6 +3151,8 @@ ListMatchableAttributesResponse::configurations() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

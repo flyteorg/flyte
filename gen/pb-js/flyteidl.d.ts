@@ -9991,7 +9991,8 @@ export namespace flyteidl {
             EXECUTION_QUEUE = 2,
             EXECUTION_CLUSTER_LABEL = 3,
             QUALITY_OF_SERVICE_SPECIFICATION = 4,
-            PLUGIN_OVERRIDE = 5
+            PLUGIN_OVERRIDE = 5,
+            WORKFLOW_EXECUTION_CONFIG = 6
         }
 
         /** Properties of a TaskResourceSpec. */
@@ -10403,6 +10404,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a WorkflowExecutionConfig. */
+        interface IWorkflowExecutionConfig {
+
+            /** WorkflowExecutionConfig maxParallelism */
+            maxParallelism?: (number|null);
+        }
+
+        /** Represents a WorkflowExecutionConfig. */
+        class WorkflowExecutionConfig implements IWorkflowExecutionConfig {
+
+            /**
+             * Constructs a new WorkflowExecutionConfig.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowExecutionConfig);
+
+            /** WorkflowExecutionConfig maxParallelism. */
+            public maxParallelism: number;
+
+            /**
+             * Creates a new WorkflowExecutionConfig instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowExecutionConfig instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowExecutionConfig): flyteidl.admin.WorkflowExecutionConfig;
+
+            /**
+             * Encodes the specified WorkflowExecutionConfig message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionConfig.verify|verify} messages.
+             * @param message WorkflowExecutionConfig message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowExecutionConfig, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowExecutionConfig message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowExecutionConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowExecutionConfig;
+
+            /**
+             * Verifies a WorkflowExecutionConfig message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a MatchingAttributes. */
         interface IMatchingAttributes {
 
@@ -10423,6 +10476,9 @@ export namespace flyteidl {
 
             /** MatchingAttributes pluginOverrides */
             pluginOverrides?: (flyteidl.admin.IPluginOverrides|null);
+
+            /** MatchingAttributes workflowExecutionConfig */
+            workflowExecutionConfig?: (flyteidl.admin.IWorkflowExecutionConfig|null);
         }
 
         /** Represents a MatchingAttributes. */
@@ -10452,8 +10508,11 @@ export namespace flyteidl {
             /** MatchingAttributes pluginOverrides. */
             public pluginOverrides?: (flyteidl.admin.IPluginOverrides|null);
 
+            /** MatchingAttributes workflowExecutionConfig. */
+            public workflowExecutionConfig?: (flyteidl.admin.IWorkflowExecutionConfig|null);
+
             /** MatchingAttributes target. */
-            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides");
+            public target?: ("taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig");
 
             /**
              * Creates a new MatchingAttributes instance using the specified properties.

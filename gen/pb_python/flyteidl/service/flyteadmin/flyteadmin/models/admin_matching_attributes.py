@@ -21,6 +21,7 @@ from flyteadmin.models.admin_execution_cluster_label import AdminExecutionCluste
 from flyteadmin.models.admin_execution_queue_attributes import AdminExecutionQueueAttributes  # noqa: F401,E501
 from flyteadmin.models.admin_plugin_overrides import AdminPluginOverrides  # noqa: F401,E501
 from flyteadmin.models.admin_task_resource_attributes import AdminTaskResourceAttributes  # noqa: F401,E501
+from flyteadmin.models.admin_workflow_execution_config import AdminWorkflowExecutionConfig  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
 
 
@@ -43,7 +44,8 @@ class AdminMatchingAttributes(object):
         'execution_queue_attributes': 'AdminExecutionQueueAttributes',
         'execution_cluster_label': 'AdminExecutionClusterLabel',
         'quality_of_service': 'CoreQualityOfService',
-        'plugin_overrides': 'AdminPluginOverrides'
+        'plugin_overrides': 'AdminPluginOverrides',
+        'workflow_execution_config': 'AdminWorkflowExecutionConfig'
     }
 
     attribute_map = {
@@ -52,10 +54,11 @@ class AdminMatchingAttributes(object):
         'execution_queue_attributes': 'execution_queue_attributes',
         'execution_cluster_label': 'execution_cluster_label',
         'quality_of_service': 'quality_of_service',
-        'plugin_overrides': 'plugin_overrides'
+        'plugin_overrides': 'plugin_overrides',
+        'workflow_execution_config': 'workflow_execution_config'
     }
 
-    def __init__(self, task_resource_attributes=None, cluster_resource_attributes=None, execution_queue_attributes=None, execution_cluster_label=None, quality_of_service=None, plugin_overrides=None):  # noqa: E501
+    def __init__(self, task_resource_attributes=None, cluster_resource_attributes=None, execution_queue_attributes=None, execution_cluster_label=None, quality_of_service=None, plugin_overrides=None, workflow_execution_config=None):  # noqa: E501
         """AdminMatchingAttributes - a model defined in Swagger"""  # noqa: E501
 
         self._task_resource_attributes = None
@@ -64,6 +67,7 @@ class AdminMatchingAttributes(object):
         self._execution_cluster_label = None
         self._quality_of_service = None
         self._plugin_overrides = None
+        self._workflow_execution_config = None
         self.discriminator = None
 
         if task_resource_attributes is not None:
@@ -78,6 +82,8 @@ class AdminMatchingAttributes(object):
             self.quality_of_service = quality_of_service
         if plugin_overrides is not None:
             self.plugin_overrides = plugin_overrides
+        if workflow_execution_config is not None:
+            self.workflow_execution_config = workflow_execution_config
 
     @property
     def task_resource_attributes(self):
@@ -204,6 +210,27 @@ class AdminMatchingAttributes(object):
         """
 
         self._plugin_overrides = plugin_overrides
+
+    @property
+    def workflow_execution_config(self):
+        """Gets the workflow_execution_config of this AdminMatchingAttributes.  # noqa: E501
+
+
+        :return: The workflow_execution_config of this AdminMatchingAttributes.  # noqa: E501
+        :rtype: AdminWorkflowExecutionConfig
+        """
+        return self._workflow_execution_config
+
+    @workflow_execution_config.setter
+    def workflow_execution_config(self, workflow_execution_config):
+        """Sets the workflow_execution_config of this AdminMatchingAttributes.
+
+
+        :param workflow_execution_config: The workflow_execution_config of this AdminMatchingAttributes.  # noqa: E501
+        :type: AdminWorkflowExecutionConfig
+        """
+
+        self._workflow_execution_config = workflow_execution_config
 
     def to_dict(self):
         """Returns the model properties as a dict"""
