@@ -610,7 +610,8 @@ data:
       logs:
         cloudwatch-enabled: false
         kubernetes-enabled: true
-        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+        kubernetes-template-uri: http://localhost:30082/#/log/{{ .namespace }}/{{ .podName
+          }}/pod?namespace={{ .namespace }}
 ---
 # Source: flyte/charts/contour/templates/00-crds.yaml
 apiVersion: apiextensions.k8s.io/v1
@@ -3667,7 +3668,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "911c7db31403549038457a5557608a310f4353ccf6e3fa5d0563e81740f11c1"
+        configChecksum: "40b91745f8ea319119ed33bae7a50a553bcedc78293bcc521e70ee4c1eb21cd"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -3732,7 +3733,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.11.0
       annotations:
-        configChecksum: "911c7db31403549038457a5557608a310f4353ccf6e3fa5d0563e81740f11c1"
+        configChecksum: "40b91745f8ea319119ed33bae7a50a553bcedc78293bcc521e70ee4c1eb21cd"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
