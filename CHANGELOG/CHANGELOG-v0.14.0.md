@@ -16,16 +16,15 @@
 
 ## Flytekit
  - Support for nested conditionals
- - Imperative model
  - DoltTable and Dolt plugins and integration
  - Better context management (ready for more work)
  - Support for pre-built container plugins in flytekit. this makes it possible
    to library plugins and users do not need to build containers
- - more control plane classes
- Coming soon: 
-     - Great expectations integration.i
-     - More use case driven examples in flytesnacks. 
-     - new sdk (stay tuned)
+ - More control plane class features
+ - See [full release notes](https://github.com/flyteorg/flytekit/releases/tag/v0.19.0)
+ Coming soon:
+     - Great Expectations integration
+     - More use case driven examples in flytesnacks
 
 ## flytectl
  - flytectl is ready for BETA. check it out - https://docs.flyte.org/projects/flytectl/en/latest/
