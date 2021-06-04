@@ -550,6 +550,75 @@ var _ interface {
 	ErrorName() string
 } = PluginOverridesValidationError{}
 
+// Validate checks the field values on WorkflowExecutionConfig with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WorkflowExecutionConfig) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for MaxParallelism
+
+	return nil
+}
+
+// WorkflowExecutionConfigValidationError is the validation error returned by
+// WorkflowExecutionConfig.Validate if the designated constraints aren't met.
+type WorkflowExecutionConfigValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowExecutionConfigValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowExecutionConfigValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowExecutionConfigValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowExecutionConfigValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowExecutionConfigValidationError) ErrorName() string {
+	return "WorkflowExecutionConfigValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowExecutionConfigValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowExecutionConfig.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowExecutionConfigValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowExecutionConfigValidationError{}
+
 // Validate checks the field values on MatchingAttributes with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -626,6 +695,18 @@ func (m *MatchingAttributes) Validate() error {
 			if err := v.Validate(); err != nil {
 				return MatchingAttributesValidationError{
 					field:  "PluginOverrides",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *MatchingAttributes_WorkflowExecutionConfig:
+
+		if v, ok := interface{}(m.GetWorkflowExecutionConfig()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MatchingAttributesValidationError{
+					field:  "WorkflowExecutionConfig",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
