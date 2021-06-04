@@ -19,6 +19,7 @@ type ExecuteWorkflowInput struct {
 	Annotations         map[string]string
 	QueueingBudget      time.Duration
 	TaskPluginOverrides []*admin.PluginOverride
+	ExecutionConfig     *admin.WorkflowExecutionConfig
 }
 
 type ExecuteTaskInput struct {
@@ -32,6 +33,7 @@ type ExecuteTaskInput struct {
 	Annotations         map[string]string
 	QueueingBudget      time.Duration
 	TaskPluginOverrides []*admin.PluginOverride
+	ExecutionConfig     *admin.WorkflowExecutionConfig
 }
 
 type TerminateWorkflowInput struct {

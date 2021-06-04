@@ -468,3 +468,31 @@ func TestAddPermissions(t *testing.T) {
 		roleNameKey: "rollie-pollie",
 	})
 }
+
+func TestAddExecutionOverrides(t *testing.T) {
+	t.Run("task plugin overrides", func(t *testing.T) {
+		overrides := []*admin.PluginOverride{
+			{
+				TaskType:              "taskType1",
+				PluginId:              []string{"Plugin1", "Plugin2"},
+				MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
+			},
+		}
+		workflow := &v1alpha1.FlyteWorkflow{}
+		addExecutionOverrides(overrides, nil, workflow)
+		assert.EqualValues(t, workflow.ExecutionConfig.TaskPluginImpls, map[string]v1alpha1.TaskPluginOverride{
+			"taskType1": {
+				PluginIDs:             []string{"Plugin1", "Plugin2"},
+				MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
+			},
+		})
+	})
+	t.Run("max parallelism", func(t *testing.T) {
+		workflowExecutionConfig := &admin.WorkflowExecutionConfig{
+			MaxParallelism: 100,
+		}
+		workflow := &v1alpha1.FlyteWorkflow{}
+		addExecutionOverrides(nil, workflowExecutionConfig, workflow)
+		assert.EqualValues(t, workflow.ExecutionConfig.MaxParallelism, uint32(100))
+	})
+}

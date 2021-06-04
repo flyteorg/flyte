@@ -93,12 +93,10 @@ func (c *FlytePropeller) addPermissions(launchPlan admin.LaunchPlan, flyteWf *v1
 	}
 }
 
-func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride, flyteWf *v1alpha1.FlyteWorkflow) {
+func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
+	workflowExecutionConfig *admin.WorkflowExecutionConfig, flyteWf *v1alpha1.FlyteWorkflow) {
 	executionConfig := v1alpha1.ExecutionConfig{
 		TaskPluginImpls: make(map[string]v1alpha1.TaskPluginOverride),
-	}
-	if len(taskPluginOverrides) == 0 {
-		return
 	}
 	for _, override := range taskPluginOverrides {
 		executionConfig.TaskPluginImpls[override.TaskType] = v1alpha1.TaskPluginOverride{
@@ -106,6 +104,9 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride, flyteWf 
 			MissingPluginBehavior: override.MissingPluginBehavior,
 		}
 
+	}
+	if workflowExecutionConfig != nil {
+		executionConfig.MaxParallelism = uint32(workflowExecutionConfig.MaxParallelism)
 	}
 	flyteWf.ExecutionConfig = executionConfig
 }
@@ -144,7 +145,7 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 		flyteWf.WorkflowMeta = &v1alpha1.WorkflowMeta{}
 	}
 	flyteWf.WorkflowMeta.EventVersion = c.eventVersion
-	addExecutionOverrides(input.TaskPluginOverrides, flyteWf)
+	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, flyteWf)
 
 	if input.Reference.Spec.RawOutputDataConfig != nil {
 		flyteWf.RawOutputDataConfig = v1alpha1.RawOutputDataConfig{
@@ -227,7 +228,7 @@ func (c *FlytePropeller) ExecuteTask(ctx context.Context, input interfaces.Execu
 	flyteWf.Labels = labels
 	annotations := addMapValues(input.Annotations, flyteWf.Annotations)
 	flyteWf.Annotations = annotations
-	addExecutionOverrides(input.TaskPluginOverrides, flyteWf)
+	addExecutionOverrides(input.TaskPluginOverrides, input.ExecutionConfig, flyteWf)
 
 	/*
 		TODO(katrogan): uncomment once propeller has updated the flyte workflow CRD.

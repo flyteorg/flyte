@@ -404,6 +404,24 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 	return parentNodeExecutionID, sourceExecutionID, nil
 }
 
+func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admin.ExecutionCreateRequest) (*admin.WorkflowExecutionConfig, error) {
+	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Project:      request.Project,
+		Domain:       request.Domain,
+		ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+	})
+	if err != nil {
+		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
+			logger.Errorf(ctx, "Failed to get workflow execution config overrides with error: %v", err)
+			return nil, err
+		}
+	}
+	if resource != nil && resource.Attributes.GetWorkflowExecutionConfig() != nil {
+		return resource.Attributes.GetWorkflowExecutionConfig(), nil
+	}
+	return nil, nil
+}
+
 func (m *ExecutionManager) launchSingleTaskExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
@@ -494,14 +512,19 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		logger.Errorf(ctx, "Failed to get quality of service for [%+v] with error: %v", workflowExecutionID, err)
 		return nil, nil, err
 	}
+	executionConfig, err := m.getExecutionConfig(ctx, &request)
+	if err != nil {
+		return nil, nil, err
+	}
 	executeTaskInputs := workflowengineInterfaces.ExecuteTaskInput{
-		ExecutionID:    &workflowExecutionID,
-		WfClosure:      *workflow.Closure.CompiledWorkflow,
-		Inputs:         request.Inputs,
-		ReferenceName:  taskIdentifier.Name,
-		AcceptedAt:     requestedAt,
-		Auth:           requestSpec.AuthRole,
-		QueueingBudget: qualityOfService.QueuingBudget,
+		ExecutionID:     &workflowExecutionID,
+		WfClosure:       *workflow.Closure.CompiledWorkflow,
+		Inputs:          request.Inputs,
+		ReferenceName:   taskIdentifier.Name,
+		AcceptedAt:      requestedAt,
+		Auth:            requestSpec.AuthRole,
+		QueueingBudget:  qualityOfService.QueuingBudget,
+		ExecutionConfig: executionConfig,
 	}
 	if requestSpec.Labels != nil {
 		executeTaskInputs.Labels = requestSpec.Labels.Values
@@ -661,15 +684,20 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Errorf(ctx, "Failed to get quality of service for [%+v] with error: %v", workflowExecutionID, err)
 		return nil, nil, err
 	}
+	executionConfig, err := m.getExecutionConfig(ctx, &request)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	// TODO: Reduce CRD size and use offloaded input URI to blob store instead.
 	executeWorkflowInputs := workflowengineInterfaces.ExecuteWorkflowInput{
-		ExecutionID:    &workflowExecutionID,
-		WfClosure:      *workflow.Closure.CompiledWorkflow,
-		Inputs:         executionInputs,
-		Reference:      *launchPlan,
-		AcceptedAt:     requestedAt,
-		QueueingBudget: qualityOfService.QueuingBudget,
+		ExecutionID:     &workflowExecutionID,
+		WfClosure:       *workflow.Closure.CompiledWorkflow,
+		Inputs:          executionInputs,
+		Reference:       *launchPlan,
+		AcceptedAt:      requestedAt,
+		QueueingBudget:  qualityOfService.QueuingBudget,
+		ExecutionConfig: executionConfig,
 	}
 	err = m.addLabelsAndAnnotations(request.Spec, &executeWorkflowInputs)
 	if err != nil {
