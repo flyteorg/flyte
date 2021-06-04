@@ -1144,7 +1144,7 @@
         "parameters": [
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1154,7 +1154,8 @@
               "EXECUTION_QUEUE",
               "EXECUTION_CLUSTER_LABEL",
               "QUALITY_OF_SERVICE_SPECIFICATION",
-              "PLUGIN_OVERRIDE"
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -1568,7 +1569,7 @@
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1578,7 +1579,8 @@
               "EXECUTION_QUEUE",
               "EXECUTION_CLUSTER_LABEL",
               "QUALITY_OF_SERVICE_SPECIFICATION",
-              "PLUGIN_OVERRIDE"
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -2363,7 +2365,7 @@
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.",
+            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2373,7 +2375,8 @@
               "EXECUTION_QUEUE",
               "EXECUTION_CLUSTER_LABEL",
               "QUALITY_OF_SERVICE_SPECIFICATION",
-              "PLUGIN_OVERRIDE"
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG"
             ],
             "default": "TASK_RESOURCE"
           }
@@ -3637,10 +3640,11 @@
         "EXECUTION_QUEUE",
         "EXECUTION_CLUSTER_LABEL",
         "QUALITY_OF_SERVICE_SPECIFICATION",
-        "PLUGIN_OVERRIDE"
+        "PLUGIN_OVERRIDE",
+        "WORKFLOW_EXECUTION_CONFIG"
       ],
       "default": "TASK_RESOURCE",
-      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type."
+      "description": "Defines a resource that can be configured by customizable Project-, ProjectDomain- or WorkflowAttributes\nbased on matching tags.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides."
     },
     "adminMatchingAttributes": {
       "type": "object",
@@ -3662,6 +3666,9 @@
         },
         "plugin_overrides": {
           "$ref": "#/definitions/adminPluginOverrides"
+        },
+        "workflow_execution_config": {
+          "$ref": "#/definitions/adminWorkflowExecutionConfig"
         }
       },
       "description": "Generic container for encapsulating all types of the above attributes messages."
@@ -4516,6 +4523,17 @@
     },
     "adminWorkflowCreateResponse": {
       "type": "object"
+    },
+    "adminWorkflowExecutionConfig": {
+      "type": "object",
+      "properties": {
+        "max_parallelism": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness."
+        }
+      },
+      "description": "Adds defaults for customizable workflow-execution specifications and overrides."
     },
     "adminWorkflowExecutionEventRequest": {
       "type": "object",

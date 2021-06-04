@@ -25,6 +25,9 @@ enum MatchableResource {
 
   // Selects configurable plugin implementation behavior for a given task type.
   PLUGIN_OVERRIDE = 5;
+
+  // Adds defaults for customizable workflow-execution specifications and overrides.
+  WORKFLOW_EXECUTION_CONFIG = 6;
 }
 
 message TaskResourceSpec {
@@ -86,6 +89,12 @@ message PluginOverrides {
   repeated PluginOverride overrides = 1;
 }
 
+// Adds defaults for customizable workflow-execution specifications and overrides.
+message WorkflowExecutionConfig {
+  // Can be used to control the number of parallel nodes to run within the workflow. This is useful to achieve fairness.
+  int32 max_parallelism = 1;
+}
+
 // Generic container for encapsulating all types of the above attributes messages.
 message MatchingAttributes {
   oneof target {
@@ -100,6 +109,8 @@ message MatchingAttributes {
     core.QualityOfService quality_of_service = 5;
 
     PluginOverrides plugin_overrides = 6;
+
+    WorkflowExecutionConfig workflow_execution_config = 7;
   }
 }
 

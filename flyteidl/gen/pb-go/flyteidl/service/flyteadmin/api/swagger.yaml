@@ -997,7 +997,8 @@ paths:
           \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
-          \ for a given task type."
+          \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
+          \ customizable workflow-execution specifications and overrides."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1008,6 +1009,7 @@ paths:
         - "EXECUTION_CLUSTER_LABEL"
         - "QUALITY_OF_SERVICE_SPECIFICATION"
         - "PLUGIN_OVERRIDE"
+        - "WORKFLOW_EXECUTION_CONFIG"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -1366,7 +1368,8 @@ paths:
           \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
-          \ for a given task type."
+          \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
+          \ customizable workflow-execution specifications and overrides."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1377,6 +1380,7 @@ paths:
         - "EXECUTION_CLUSTER_LABEL"
         - "QUALITY_OF_SERVICE_SPECIFICATION"
         - "PLUGIN_OVERRIDE"
+        - "WORKFLOW_EXECUTION_CONFIG"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -2069,7 +2073,8 @@ paths:
           \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
-          \ for a given task type."
+          \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
+          \ customizable workflow-execution specifications and overrides."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -2080,6 +2085,7 @@ paths:
         - "EXECUTION_CLUSTER_LABEL"
         - "QUALITY_OF_SERVICE_SPECIFICATION"
         - "PLUGIN_OVERRIDE"
+        - "WORKFLOW_EXECUTION_CONFIG"
         x-exportParamName: "ResourceType"
         x-optionalDataType: "String"
       responses:
@@ -5189,6 +5195,8 @@ definitions:
             tier: {}
             spec:
               queueing_budget: "queueing_budget"
+          workflow_execution_config:
+            max_parallelism: 0
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -5230,6 +5238,8 @@ definitions:
             tier: {}
             spec:
               queueing_budget: "queueing_budget"
+          workflow_execution_config:
+            max_parallelism: 0
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -5302,6 +5312,8 @@ definitions:
           tier: {}
           spec:
             queueing_budget: "queueing_budget"
+        workflow_execution_config:
+          max_parallelism: 0
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -5344,7 +5356,8 @@ definitions:
       \ Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
       \ Configures default quality of service when undefined in an execution spec.\n\
       \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for\
-      \ a given task type."
+      \ a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable\
+      \ workflow-execution specifications and overrides."
     enum:
     - "TASK_RESOURCE"
     - "CLUSTER_RESOURCE"
@@ -5352,6 +5365,7 @@ definitions:
     - "EXECUTION_CLUSTER_LABEL"
     - "QUALITY_OF_SERVICE_SPECIFICATION"
     - "PLUGIN_OVERRIDE"
+    - "WORKFLOW_EXECUTION_CONFIG"
     default: "TASK_RESOURCE"
   adminMatchingAttributes:
     type: "object"
@@ -5368,6 +5382,8 @@ definitions:
         $ref: "#/definitions/coreQualityOfService"
       plugin_overrides:
         $ref: "#/definitions/adminPluginOverrides"
+      workflow_execution_config:
+        $ref: "#/definitions/adminWorkflowExecutionConfig"
     description: "Generic container for encapsulating all types of the above attributes\
       \ messages."
     example:
@@ -5375,6 +5391,8 @@ definitions:
         tier: {}
         spec:
           queueing_budget: "queueing_budget"
+      workflow_execution_config:
+        max_parallelism: 0
       cluster_resource_attributes:
         attributes:
           key: "attributes"
@@ -8860,6 +8878,8 @@ definitions:
           tier: {}
           spec:
             queueing_budget: "queueing_budget"
+        workflow_execution_config:
+          max_parallelism: 0
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -8920,6 +8940,8 @@ definitions:
             tier: {}
             spec:
               queueing_budget: "queueing_budget"
+          workflow_execution_config:
+            max_parallelism: 0
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -13167,6 +13189,8 @@ definitions:
           tier: {}
           spec:
             queueing_budget: "queueing_budget"
+        workflow_execution_config:
+          max_parallelism: 0
         cluster_resource_attributes:
           attributes:
             key: "attributes"
@@ -13231,6 +13255,8 @@ definitions:
             tier: {}
             spec:
               queueing_budget: "queueing_budget"
+          workflow_execution_config:
+            max_parallelism: 0
           cluster_resource_attributes:
             attributes:
               key: "attributes"
@@ -16155,6 +16181,18 @@ definitions:
     description: "Represents a request structure to create a revision of a workflow."
   adminWorkflowCreateResponse:
     type: "object"
+  adminWorkflowExecutionConfig:
+    type: "object"
+    properties:
+      max_parallelism:
+        type: "integer"
+        format: "int32"
+        description: "Can be used to control the number of parallel nodes to run within\
+          \ the workflow. This is useful to achieve fairness."
+    description: "Adds defaults for customizable workflow-execution specifications\
+      \ and overrides."
+    example:
+      max_parallelism: 0
   adminWorkflowExecutionEventRequest:
     type: "object"
     properties:

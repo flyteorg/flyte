@@ -23917,6 +23917,7 @@ export const flyteidl = $root.flyteidl = (() => {
          * @property {number} EXECUTION_CLUSTER_LABEL=3 EXECUTION_CLUSTER_LABEL value
          * @property {number} QUALITY_OF_SERVICE_SPECIFICATION=4 QUALITY_OF_SERVICE_SPECIFICATION value
          * @property {number} PLUGIN_OVERRIDE=5 PLUGIN_OVERRIDE value
+         * @property {number} WORKFLOW_EXECUTION_CONFIG=6 WORKFLOW_EXECUTION_CONFIG value
          */
         admin.MatchableResource = (function() {
             const valuesById = {}, values = Object.create(valuesById);
@@ -23926,6 +23927,7 @@ export const flyteidl = $root.flyteidl = (() => {
             values[valuesById[3] = "EXECUTION_CLUSTER_LABEL"] = 3;
             values[valuesById[4] = "QUALITY_OF_SERVICE_SPECIFICATION"] = 4;
             values[valuesById[5] = "PLUGIN_OVERRIDE"] = 5;
+            values[valuesById[6] = "WORKFLOW_EXECUTION_CONFIG"] = 6;
             return values;
         })();
 
@@ -24862,6 +24864,116 @@ export const flyteidl = $root.flyteidl = (() => {
             return PluginOverrides;
         })();
 
+        admin.WorkflowExecutionConfig = (function() {
+
+            /**
+             * Properties of a WorkflowExecutionConfig.
+             * @memberof flyteidl.admin
+             * @interface IWorkflowExecutionConfig
+             * @property {number|null} [maxParallelism] WorkflowExecutionConfig maxParallelism
+             */
+
+            /**
+             * Constructs a new WorkflowExecutionConfig.
+             * @memberof flyteidl.admin
+             * @classdesc Represents a WorkflowExecutionConfig.
+             * @implements IWorkflowExecutionConfig
+             * @constructor
+             * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
+             */
+            function WorkflowExecutionConfig(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * WorkflowExecutionConfig maxParallelism.
+             * @member {number} maxParallelism
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @instance
+             */
+            WorkflowExecutionConfig.prototype.maxParallelism = 0;
+
+            /**
+             * Creates a new WorkflowExecutionConfig instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @static
+             * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
+             * @returns {flyteidl.admin.WorkflowExecutionConfig} WorkflowExecutionConfig instance
+             */
+            WorkflowExecutionConfig.create = function create(properties) {
+                return new WorkflowExecutionConfig(properties);
+            };
+
+            /**
+             * Encodes the specified WorkflowExecutionConfig message. Does not implicitly {@link flyteidl.admin.WorkflowExecutionConfig.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @static
+             * @param {flyteidl.admin.IWorkflowExecutionConfig} message WorkflowExecutionConfig message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            WorkflowExecutionConfig.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                    writer.uint32(/* id 1, wireType 0 =*/8).int32(message.maxParallelism);
+                return writer;
+            };
+
+            /**
+             * Decodes a WorkflowExecutionConfig message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.admin.WorkflowExecutionConfig} WorkflowExecutionConfig
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            WorkflowExecutionConfig.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowExecutionConfig();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.maxParallelism = reader.int32();
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a WorkflowExecutionConfig message.
+             * @function verify
+             * @memberof flyteidl.admin.WorkflowExecutionConfig
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            WorkflowExecutionConfig.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                    if (!$util.isInteger(message.maxParallelism))
+                        return "maxParallelism: integer expected";
+                return null;
+            };
+
+            return WorkflowExecutionConfig;
+        })();
+
         admin.MatchingAttributes = (function() {
 
             /**
@@ -24874,6 +24986,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.admin.IExecutionClusterLabel|null} [executionClusterLabel] MatchingAttributes executionClusterLabel
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] MatchingAttributes qualityOfService
              * @property {flyteidl.admin.IPluginOverrides|null} [pluginOverrides] MatchingAttributes pluginOverrides
+             * @property {flyteidl.admin.IWorkflowExecutionConfig|null} [workflowExecutionConfig] MatchingAttributes workflowExecutionConfig
              */
 
             /**
@@ -24939,17 +25052,25 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             MatchingAttributes.prototype.pluginOverrides = null;
 
+            /**
+             * MatchingAttributes workflowExecutionConfig.
+             * @member {flyteidl.admin.IWorkflowExecutionConfig|null|undefined} workflowExecutionConfig
+             * @memberof flyteidl.admin.MatchingAttributes
+             * @instance
+             */
+            MatchingAttributes.prototype.workflowExecutionConfig = null;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
             /**
              * MatchingAttributes target.
-             * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|undefined} target
+             * @member {"taskResourceAttributes"|"clusterResourceAttributes"|"executionQueueAttributes"|"executionClusterLabel"|"qualityOfService"|"pluginOverrides"|"workflowExecutionConfig"|undefined} target
              * @memberof flyteidl.admin.MatchingAttributes
              * @instance
              */
             Object.defineProperty(MatchingAttributes.prototype, "target", {
-                get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides"]),
+                get: $util.oneOfGetter($oneOfFields = ["taskResourceAttributes", "clusterResourceAttributes", "executionQueueAttributes", "executionClusterLabel", "qualityOfService", "pluginOverrides", "workflowExecutionConfig"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -24989,6 +25110,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 if (message.pluginOverrides != null && message.hasOwnProperty("pluginOverrides"))
                     $root.flyteidl.admin.PluginOverrides.encode(message.pluginOverrides, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig"))
+                    $root.flyteidl.admin.WorkflowExecutionConfig.encode(message.workflowExecutionConfig, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 return writer;
             };
 
@@ -25027,6 +25150,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 6:
                         message.pluginOverrides = $root.flyteidl.admin.PluginOverrides.decode(reader, reader.uint32());
+                        break;
+                    case 7:
+                        message.workflowExecutionConfig = $root.flyteidl.admin.WorkflowExecutionConfig.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -25104,6 +25230,16 @@ export const flyteidl = $root.flyteidl = (() => {
                         let error = $root.flyteidl.admin.PluginOverrides.verify(message.pluginOverrides);
                         if (error)
                             return "pluginOverrides." + error;
+                    }
+                }
+                if (message.workflowExecutionConfig != null && message.hasOwnProperty("workflowExecutionConfig")) {
+                    if (properties.target === 1)
+                        return "target: multiple values";
+                    properties.target = 1;
+                    {
+                        let error = $root.flyteidl.admin.WorkflowExecutionConfig.verify(message.workflowExecutionConfig);
+                        if (error)
+                            return "workflowExecutionConfig." + error;
                     }
                 }
                 return null;
@@ -25403,6 +25539,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         break;
                     }
                 return null;
@@ -29086,6 +29223,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         break;
                     }
                 return null;
@@ -29351,6 +29489,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         break;
                     }
                 return null;
@@ -33059,6 +33198,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         break;
                     }
                 return null;
@@ -33341,6 +33481,7 @@ export const flyteidl = $root.flyteidl = (() => {
                     case 3:
                     case 4:
                     case 5:
+                    case 6:
                         break;
                     }
                 return null;
