@@ -6,6 +6,9 @@ package coreutils
 import (
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -100,5 +103,58 @@ func TestFetchLiteral(t *testing.T) {
 		assert.NotNil(t, p.GetScalar())
 		_, err = ExtractFromLiteral(p)
 		assert.NotNil(t, err)
+	})
+
+	t.Run("Generic", func(t *testing.T) {
+		literalVal := map[string]interface{}{
+			"x": 1,
+			"y": "ystringvalue",
+		}
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		lit, err := MakeLiteralForType(literalType, literalVal)
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		fieldsMap := map[string]*structpb.Value{
+			"x": {
+				Kind: &structpb.Value_NumberValue{NumberValue: 1},
+			},
+			"y": {
+				Kind: &structpb.Value_StringValue{StringValue: "ystringvalue"},
+			},
+		}
+		expectedStructVal := &structpb.Struct{
+			Fields: fieldsMap,
+		}
+		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
+		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
+		for key, val := range expectedStructVal.Fields {
+			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		}
+	})
+
+	t.Run("Generic Passed As String", func(t *testing.T) {
+		literalVal := "{\"x\": 1,\"y\": \"ystringvalue\"}"
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRUCT}}
+		lit, err := MakeLiteralForType(literalType, literalVal)
+		assert.NoError(t, err)
+		extractedLiteralVal, err := ExtractFromLiteral(lit)
+		assert.NoError(t, err)
+		fieldsMap := map[string]*structpb.Value{
+			"x": {
+				Kind: &structpb.Value_NumberValue{NumberValue: 1},
+			},
+			"y": {
+				Kind: &structpb.Value_StringValue{StringValue: "ystringvalue"},
+			},
+		}
+		expectedStructVal := &structpb.Struct{
+			Fields: fieldsMap,
+		}
+		extractedStructValue := extractedLiteralVal.(*structpb.Struct)
+		assert.Equal(t, len(expectedStructVal.Fields), len(extractedStructValue.Fields))
+		for key, val := range expectedStructVal.Fields {
+			assert.Equal(t, val.Kind, extractedStructValue.Fields[key].Kind)
+		}
 	})
 }

@@ -2,6 +2,7 @@
 package coreutils
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -483,7 +484,17 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		}
 	case *core.LiteralType_Simple:
 		newT := t.Type.(*core.LiteralType_Simple)
-		lv, err := MakeLiteralForSimpleType(newT.Simple, fmt.Sprintf("%v", v))
+		strValue := fmt.Sprintf("%v", v)
+		if newT.Simple == core.SimpleType_STRUCT {
+			if _, isValueStringType := v.(string); !isValueStringType {
+				byteValue, err := json.Marshal(v)
+				if err != nil {
+					return nil, fmt.Errorf("unable to marshal to json string for struct value %v", v)
+				}
+				strValue = string(byteValue)
+			}
+		}
+		lv, err := MakeLiteralForSimpleType(newT.Simple, strValue)
 		if err != nil {
 			return nil, err
 		}
