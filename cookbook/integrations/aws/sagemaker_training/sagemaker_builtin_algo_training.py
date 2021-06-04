@@ -1,12 +1,11 @@
 """
-Training builtin algorithms on Amazon Sagemaker
-###################################################
-In this example we will show how it is possible to work with Built-in algorithms with Amazon sagemaker and even
-perform Hyper parameter optimization using Sagemaker HPO
+Built-in Sagemaker Algorithms
+#############################
+This example will show how it is possible to work with built-in algorithms with Amazon Sagemaker and perform hyper-parameter optimization using Sagemaker HPO.
 
 
-Defining a XGBoost Training job
---------------------------------
+Defining an XGBoost Training Job
+---------------------------------
 We will create a job that will train an XGBoost model using the prebuilt algorithms @Sagemaker.
 Refer to `Sagemaker XGBoost docs here <https://docs.aws.amazon.com/sagemaker/latest/dg/xgboost.html>`_.
 To understand more about XGBoost refer `here <https://xgboost.readthedocs.io/en/latest/>`_.
@@ -36,9 +35,8 @@ from flytekitplugins.awssagemaker import (
 )
 
 # %%
-# Defining the values of some hyperparameters, which will be used by the TrainingJob
-# these hyper-parameters are commonly used by the XGboost algorithm. Here we bootstrap them with some default Values
-# Usually the default values are selected or "tuned - refer to next section"
+# Below is the definition of the values of some hyperparameters, which will be used by the TrainingJob.
+# These hyper-parameters are commonly used by the XGboost algorithm. Here we bootstrap them with some default values, which are usually selected or "tuned - refer to next section".
 xgboost_hyperparameters: typing.Dict[str, str] = {
     "num_round": "100",
     "base_score": "0.5",
@@ -64,7 +62,7 @@ xgboost_hyperparameters: typing.Dict[str, str] = {
 }
 
 # %%
-# Here we define the actual algorithm (XGBOOST) and version of the algorithm to use
+# Below is the definition of the actual algorithm (XGBOOST) and the version of the algorithm to use:
 alg_spec = AlgorithmSpecification(
     input_mode=InputMode.FILE,
     algorithm_name=AlgorithmName.XGBOOST,
@@ -73,12 +71,11 @@ alg_spec = AlgorithmSpecification(
 )
 
 # %%
-# Finally lets use Flytekit plugin called SdkBuiltinAlgorithmTrainingJobTask, to create a task that wraps the algorithm.
-# This task does not really have a user-defined function as the actual algorithm is pre-defined in Sagemaker.
-# But, this task still has the same set of properties like any other FlyteTask
+# Finally, the Flytekit plugin called SdkBuiltinAlgorithmTrainingJobTask will be used to create a task that wraps the algorithm.
+# This task does not have a user-defined function as the actual algorithm is pre-defined in Sagemaker, but still has the same set of properties like any other FlyteTask.
 # - Caching
 # - Resource specification
-# - versioning etc
+# - Versioning etc
 xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
     name="xgboost_trainer",
     task_config=SagemakerTrainingJobConfig(
@@ -92,22 +89,21 @@ xgboost_train_task = SagemakerBuiltinAlgorithmsTask(
 
 
 # %%
-# You can use
-# `Single task Execution <https://lyft.github.io/flyte/user/features/single_task_execution.html?highlight=single%20task%20execution>`_
-# to execute just the task without needing to create a workflow.  To trigger an execution, you need to provide
+# `Single task Execution <https://lyft.github.io/flyte/user/features/single_task_execution.html?highlight=single%20task%20execution>`_ can be used
+# to execute just the task without needing to create a workflow.  To trigger an execution, you will need to provide:
 #
-# Project (flyteexamples) project where the execution will be created under
-# Domain (development) domain where the execution will be created, under the project
-# inputs - the actual inputs
+# Project (flyteexamples): project where the execution will be created under
+# Domain (development): domain where the execution will be created, under the project
+# Inputs: the actual inputs
 #
-# Pre-built algorithms have restrictive set of inputs. They always expect
+# Pre-built algorithms have a restrictive set of inputs. They always expect:
 #
 # #. Training data set
 # #. Validation data set
 # #. Static set of hyper parameters as a dictionary
 #
 # In this case we have taken the `PIMA Diabetes dataset <https://www.kaggle.com/kumargh/pimaindiansdiabetescsv>`_
-# and split it and uploaded to an s3 bucket
+# and split it and uploaded to an s3 bucket:
 def execute_training():
     xgboost_train_task(
         static_hyperparameters=xgboost_hyperparameters, train="", validation="",
@@ -116,18 +112,18 @@ def execute_training():
 
 # %%
 #
-# Optimize the hyper-parameters
+# Optimizing the Hyper-Parameters
 # --------------------------------
-# Amazon Sagemaker offers automatic hyper parameter blackbox optimization using HPO Service.
-# This technique is highly effective to figure out the right set of hyper parameters to use that
-# improve the overall accuracy of the model (or minimize the error)
-# Flyte makes it extremely effective to optimize a model using Amazon Sagemaker HPO. In this example we will look how
-# this can be done for the prebuilt algorithm training done in the previous section
+# Amazon Sagemaker offers automatic hyper-parameter blackbox optimization using the HPO Service.
+# This technique is highly effective to figure out the right set of hyper-parameters to use that
+# improve the overall accuracy of the model (or minimize the error).
+# Flyte makes it extremely effective to optimize a model using Amazon Sagemaker HPO. This example will show how
+# this can be done for the prebuilt algorithm training done in the previous section:
 #
-# Define an HPO Task, that wraps the training task
+# Defining an HPO Task That Wraps the Training Task
 # -------------------------------------------------
-# So to start with hyper parameter optimization, once a training task is created, wrap it in
-# SagemakerHPOTask as follows
+# To start with hyper-parameter optimization, once a training task is created, wrap it in
+# SagemakerHPOTask as follows:
 #
 
 
@@ -146,14 +142,14 @@ xgboost_hpo_task = SagemakerHPOTask(
 # %%
 # Launch the HPO Job
 # -------------------
-# Just like Training Job, HPO job can be launched directly from the notebook The inputs for an HPO job that wraps a
-# training job, are the combination of all inputs for the training job - i.e,
+# Just like Training Job, HPO job can be launched directly from the notebook. The inputs for an HPO job that wraps a
+# training job are the combination of all inputs for the training job, i.e.
 #
-# #. "train" dataset, "validation" dataset and "static hyper parameters" for Training job
+# #. "train" dataset, "validation" dataset and "static hyper parameters" for Training job,
 # #. HyperparameterTuningJobConfig, which consists of ParameterRanges, for the parameters that should be tuned,
-# #. tuning strategy - Bayesian OR Random (or others as described in Sagemaker)
-# #. Stopping condition and
-# #. Objective metric name and type (whether to minimize etc)
+# #. tuning strategy - Bayesian OR Random (or others as described in Sagemaker),
+# #. Stopping condition, and
+# #. Objective metric name and type (whether to minimize etc).
 #
 # When launching the TrainingJob and HPOJob, we need to define the inputs.
 # Inputs are those directly related to algorithm outputs. We use the inputs
@@ -197,5 +193,5 @@ def execute():
 
 
 # %%
-# Register and launch the task standalone!
+# Register and launch the task standalone.
 # hpo_exc = xgboost_hpo_task.register_and_launch("flyteexamples", "development", inputs=hpo_inputs)
