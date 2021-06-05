@@ -42,8 +42,6 @@ Options inherited from parent commands
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
-      --adminutils.batchSize int                   Maximum number of records to retrieve per call. (default 100)
-      --adminutils.maxRecords int                  Maximum number of records to retrieve. (default 500)
       --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
       --logger.formatter.type string               Sets logging format type. (default "json")

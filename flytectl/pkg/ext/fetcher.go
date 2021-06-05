@@ -3,6 +3,8 @@ package ext
 import (
 	"context"
 
+	"github.com/flyteorg/flytectl/pkg/filters"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
@@ -18,28 +20,28 @@ type AdminFetcherExtInterface interface {
 	FetchExecution(ctx context.Context, name, project, domain string) (*admin.Execution, error)
 
 	// FetchAllVerOfLP fetches all versions of launch plan in a  project, domain
-	FetchAllVerOfLP(ctx context.Context, lpName, project, domain string) ([]*admin.LaunchPlan, error)
+	FetchAllVerOfLP(ctx context.Context, lpName, project, domain string, filter filters.Filters) ([]*admin.LaunchPlan, error)
 
 	// FetchLPLatestVersion fetches latest version of launch plan in a  project, domain
-	FetchLPLatestVersion(ctx context.Context, name, project, domain string) (*admin.LaunchPlan, error)
+	FetchLPLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.LaunchPlan, error)
 
 	// FetchLPVersion fetches particular version of launch plan in a  project, domain
 	FetchLPVersion(ctx context.Context, name, version, project, domain string) (*admin.LaunchPlan, error)
 
 	// FetchAllVerOfTask fetches all versions of task in a  project, domain
-	FetchAllVerOfTask(ctx context.Context, name, project, domain string) ([]*admin.Task, error)
+	FetchAllVerOfTask(ctx context.Context, name, project, domain string, filter filters.Filters) ([]*admin.Task, error)
 
 	// FetchTaskLatestVersion fetches latest version of task in a  project, domain
-	FetchTaskLatestVersion(ctx context.Context, name, project, domain string) (*admin.Task, error)
+	FetchTaskLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Task, error)
 
 	// FetchTaskVersion fetches particular version of task in a  project, domain
 	FetchTaskVersion(ctx context.Context, name, version, project, domain string) (*admin.Task, error)
 
 	// FetchAllVerOfWorkflow fetches all versions of task in a  project, domain
-	FetchAllVerOfWorkflow(ctx context.Context, name, project, domain string) ([]*admin.Workflow, error)
+	FetchAllVerOfWorkflow(ctx context.Context, name, project, domain string, filter filters.Filters) ([]*admin.Workflow, error)
 
 	// FetchWorkflowLatestVersion fetches latest version of workflow in a  project, domain
-	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string) (*admin.Workflow, error)
+	FetchWorkflowLatestVersion(ctx context.Context, name, project, domain string, filter filters.Filters) (*admin.Workflow, error)
 
 	// FetchWorkflowVersion fetches particular version of workflow in a  project, domain
 	FetchWorkflowVersion(ctx context.Context, name, version, project, domain string) (*admin.Workflow, error)

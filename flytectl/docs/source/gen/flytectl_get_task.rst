@@ -31,15 +31,24 @@ Retrieves particular version of task by name within project and domain.
 
 ::
 
- flytectl get workflow -p flytesnacks -d development  core.basic.lp.greet --version v2
+ flytectl get task -p flytesnacks -d development  core.basic.lp.greet --version v2
 
-Retrieves project by filters.
+Retrieves all the tasks with filters.
 ::
-
- Not yet implemented
+  
+  bin/flytectl get task -p flytesnacks -d development --filter.field-selector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
+ 
+Retrieve a specific task with filters.
+::
+ 
+  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.field-selector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
+  
+Retrieves all the task with limit and sorting.
+::
+   
+  bin/flytectl get -p flytesnacks -d development task  --filter.sort-by=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the tasks within project and domain in yaml format.
-
 ::
 
  bin/flytectl get task -p flytesnacks -d development -o yaml
@@ -86,10 +95,14 @@ Options
 
 ::
 
-      --execFile string   execution file name to be used for generating execution spec of a single task.
-  -h, --help              help for task
-      --latest            flag to indicate to fetch the latest version, version flag will be ignored in this case
-      --version string    version of the task to be fetched.
+      --execFile string                execution file name to be used for generating execution spec of a single task.
+      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.field-selector string   Specifies the Field selector
+      --filter.limit int32             Specifies the limit (default 100)
+      --filter.sort-by string          Specifies which field to sort results  (default "created_at")
+  -h, --help                           help for task
+      --latest                         flag to indicate to fetch the latest version, version flag will be ignored in this case
+      --version string                 version of the task to be fetched.
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,8 +123,6 @@ Options inherited from parent commands
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
-      --adminutils.batchSize int                   Maximum number of records to retrieve per call. (default 100)
-      --adminutils.maxRecords int                  Maximum number of records to retrieve. (default 500)
       --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
       --logger.formatter.type string               Sets logging format type. (default "json")

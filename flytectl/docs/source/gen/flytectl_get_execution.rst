@@ -21,10 +21,21 @@ Retrieves execution by name within project and domain.
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r
 
-Retrieves execution by filters
+Retrieves all the execution with filters.
 ::
-
- Not yet implemented
+ 
+  bin/flytectl get execution -p flytesnacks -d development --filter.field-selector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
+ 
+Retrieve specific execution with filters.
+::
+ 
+  bin/flytectl get execution -p flytesnacks -d development  y8n2wtuspj --filter.field-selector="execution.phase in (FAILED),execution.duration<200" 
+ 
+Retrieves all the execution with limit and sorting.
+::
+  
+   bin/flytectl get execution -p flytesnacks -d development --filter.sort-by=created_at --filter.limit=1 --filter.asc
+   
 
 Retrieves all the execution within project and domain in yaml format
 
@@ -50,7 +61,11 @@ Options
 
 ::
 
-  -h, --help   help for execution
+      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.field-selector string   Specifies the Field selector
+      --filter.limit int32             Specifies the limit (default 100)
+      --filter.sort-by string          Specifies which field to sort results  (default "created_at")
+  -h, --help                           help for execution
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,8 +86,6 @@ Options inherited from parent commands
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
-      --adminutils.batchSize int                   Maximum number of records to retrieve per call. (default 100)
-      --adminutils.maxRecords int                  Maximum number of records to retrieve. (default 500)
       --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
       --logger.formatter.type string               Sets logging format type. (default "json")

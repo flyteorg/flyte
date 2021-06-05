@@ -3,7 +3,10 @@ package get
 import (
 	"context"
 
+	"github.com/flyteorg/flytectl/pkg/filters"
+
 	"github.com/flyteorg/flytectl/cmd/config"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -25,10 +28,17 @@ Retrieves execution by name within project and domain.
 
  bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r
 
-Retrieves execution by filters
+Retrieves all the executions with filters.
 ::
+ 
+  bin/flytectl get execution -p flytesnacks -d development --filter.field-selector="execution.phase in (FAILED;SUCCEEDED),execution.duration<200" 
 
- Not yet implemented
+ 
+Retrieves all the execution with limit and sorting.
+::
+  
+   bin/flytectl get execution -p flytesnacks -d development --filter.sort-by=created_at --filter.limit=1 --filter.asc
+   
 
 Retrieves all the execution within project and domain in yaml format
 
@@ -76,23 +86,17 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		}
 		executions = append(executions, execution)
 	} else {
-		executionList, err := cmdCtx.AdminClient().ListExecutions(ctx, &admin.ResourceListRequest{
-			Limit: 100,
-			Id: &admin.NamedEntityIdentifier{
-				Project: config.GetConfig().Project,
-				Domain:  config.GetConfig().Domain,
-			},
-		})
+		transformFilters, err := filters.BuildResourceListRequestWithName(execution.DefaultConfig.Filter, config.GetConfig().Project, config.GetConfig().Domain, "")
+		if err != nil {
+			return err
+		}
+		executionList, err := cmdCtx.AdminClient().ListExecutions(ctx, transformFilters)
 		if err != nil {
 			return err
 		}
 		executions = executionList.Executions
 	}
 	logger.Infof(ctx, "Retrieved %v executions", len(executions))
-	err := adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 		ExecutionToProtoMessages(executions)...)
-	if err != nil {
-		return err
-	}
-	return nil
 }

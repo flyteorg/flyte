@@ -3,6 +3,8 @@ package get
 import (
 	"context"
 
+	"github.com/flyteorg/flytectl/pkg/filters"
+
 	workflowconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
 	"github.com/flyteorg/flytectl/pkg/ext"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -10,7 +12,6 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/adminutils"
 	"github.com/flyteorg/flytectl/pkg/printer"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -42,10 +43,20 @@ Retrieves particular version of workflow by name within project and domain.
 
  flytectl get workflow -p flytesnacks -d development  core.basic.lp.go_greet --version v2
 
-Retrieves workflow by filters. 
+Retrieves all the workflows with filters.
 ::
-
- Not yet implemented
+ 
+  bin/flytectl get workflow -p flytesnacks -d development  --filter.field-selector="workflow.name=k8s_spark.dataframe_passing.my_smart_schema"
+ 
+Retrieve specific workflow with filters.
+::
+ 
+  bin/flytectl get workflow -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.field-selector="workflow.version=v1"
+  
+Retrieves all the workflows with limit and sorting.
+::
+  
+  bin/flytectl get -p flytesnacks -d development workflow  --filter.sort-by=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the workflow within project and domain in yaml format.
 
@@ -62,6 +73,18 @@ Retrieves all the workflow within project and domain in json format.
 Usage
 `
 )
+
+//go:generate pflags WorkflowConfig --default-var workflowConfig
+var (
+	workflowConfig = &WorkflowConfig{
+		Filter: filters.DefaultFilter,
+	}
+)
+
+// WorkflowConfig
+type WorkflowConfig struct {
+	Filter filters.Filters `json:"filter" pflag:","`
+}
 
 var workflowColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
@@ -94,12 +117,18 @@ func getWorkflowFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandC
 		return nil
 	}
 
-	workflows, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListWorkflowIds, adminutils.ListRequest{Project: config.GetConfig().Project, Domain: config.GetConfig().Domain})
+	transformFilters, err := filters.BuildResourceListRequestWithName(workflowConfig.Filter, config.GetConfig().Project, config.GetConfig().Domain, "")
 	if err != nil {
 		return err
 	}
+	workflowList, err := cmdCtx.AdminClient().ListWorkflows(ctx, transformFilters)
+	if err != nil {
+		return err
+	}
+	workflows := workflowList.Workflows
+
 	logger.Debugf(ctx, "Retrieved %v workflows", len(workflows))
-	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), entityColumns, adminutils.NamedEntityToProtoMessage(workflows)...)
+	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), workflowColumns, WorkflowToProtoMessages(workflows)...)
 }
 
 // FetchWorkflowForName fetches the workflow give it name.
@@ -109,7 +138,7 @@ func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterf
 	var workflow *admin.Workflow
 	var err error
 	if workflowconfig.DefaultConfig.Latest {
-		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain); err != nil {
+		if workflow, err = fetcher.FetchWorkflowLatestVersion(ctx, name, project, domain, workflowConfig.Filter); err != nil {
 			return nil, err
 		}
 		workflows = append(workflows, workflow)
@@ -119,7 +148,7 @@ func FetchWorkflowForName(ctx context.Context, fetcher ext.AdminFetcherExtInterf
 		}
 		workflows = append(workflows, workflow)
 	} else {
-		workflows, err = fetcher.FetchAllVerOfWorkflow(ctx, name, project, domain)
+		workflows, err = fetcher.FetchAllVerOfWorkflow(ctx, name, project, domain, workflowConfig.Filter)
 		if err != nil {
 			return nil, err
 		}
