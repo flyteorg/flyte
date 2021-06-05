@@ -6,4 +6,3 @@ bin
 _test
 ./config.yaml
 docs/build/*
-cmd/get/temp-output-file

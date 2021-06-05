@@ -17,7 +17,7 @@ func WriteConfigToFile(matchableAttrConfig interface{}, fileName string) error {
 		return fmt.Errorf("error: %v", err)
 	}
 	if _, err = os.Stat(fileName); err == nil {
-		if !cmdUtil.AskForConfirmation(fmt.Sprintf("warning file %v will be overwritten", fileName)) {
+		if !cmdUtil.AskForConfirmation(fmt.Sprintf("warning file %v will be overwritten", fileName), os.Stdin) {
 			return fmt.Errorf("backup the file before continuing")
 		}
 	}
