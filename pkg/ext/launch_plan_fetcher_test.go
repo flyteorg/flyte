@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytectl/pkg/filters"
+
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -16,6 +18,8 @@ import (
 
 var (
 	launchPlanListResponse *admin.LaunchPlanList
+	lpFilters              = filters.Filters{}
+	launchPlan1            *admin.LaunchPlan
 )
 
 func getLaunchPlanFetcherSetup() {
@@ -71,7 +75,7 @@ func getLaunchPlanFetcherSetup() {
 			},
 		},
 	}
-	launchPlan1 := &admin.LaunchPlan{
+	launchPlan1 = &admin.LaunchPlan{
 		Id: &core.Identifier{
 			Name:    "launchplan1",
 			Version: "v1",
@@ -116,29 +120,45 @@ func getLaunchPlanFetcherSetup() {
 func TestFetchAllVerOfLP(t *testing.T) {
 	getLaunchPlanFetcherSetup()
 	adminClient.OnListLaunchPlansMatch(mock.Anything, mock.Anything).Return(launchPlanListResponse, nil)
-	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain")
+	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain", lpFilters)
+	assert.Nil(t, err)
+}
+
+func TestFetchLPVersion(t *testing.T) {
+	getLaunchPlanFetcherSetup()
+	adminClient.OnGetLaunchPlanMatch(mock.Anything, mock.Anything).Return(launchPlan1, nil)
+	_, err := adminFetcherExt.FetchLPVersion(ctx, "launchplan1", "v1", "project", "domain")
 	assert.Nil(t, err)
 }
 
 func TestFetchAllVerOfLPError(t *testing.T) {
 	getLaunchPlanFetcherSetup()
 	adminClient.OnListLaunchPlansMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain")
+	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain", lpFilters)
 	assert.Equal(t, fmt.Errorf("failed"), err)
+}
+
+func TestFetchAllVerOfLPFilterError(t *testing.T) {
+	getLaunchPlanFetcherSetup()
+	lpFilters.FieldSelector = "hello="
+	adminClient.OnListLaunchPlansMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("Please add a valid field selector"))
+	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain", lpFilters)
+	assert.Equal(t, fmt.Errorf("Please add a valid field selector"), err)
 }
 
 func TestFetchAllVerOfLPEmptyResponse(t *testing.T) {
 	launchPlanListResponse := &admin.LaunchPlanList{}
 	getLaunchPlanFetcherSetup()
+	lpFilters.FieldSelector = ""
 	adminClient.OnListLaunchPlansMatch(mock.Anything, mock.Anything).Return(launchPlanListResponse, nil)
-	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain")
+	_, err := adminFetcherExt.FetchAllVerOfLP(ctx, "lpName", "project", "domain", lpFilters)
 	assert.Equal(t, fmt.Errorf("no launchplans retrieved for lpName"), err)
 }
 
 func TestFetchLPLatestVersion(t *testing.T) {
 	getLaunchPlanFetcherSetup()
 	adminClient.OnListLaunchPlansMatch(mock.Anything, mock.Anything).Return(launchPlanListResponse, nil)
-	_, err := adminFetcherExt.FetchLPLatestVersion(ctx, "lpName", "project", "domain")
+	_, err := adminFetcherExt.FetchLPLatestVersion(ctx, "lpName", "project", "domain", lpFilters)
 	assert.Nil(t, err)
 }
 
@@ -146,6 +166,6 @@ func TestFetchLPLatestVersionError(t *testing.T) {
 	launchPlanListResponse := &admin.LaunchPlanList{}
 	getLaunchPlanFetcherSetup()
 	adminClient.OnListLaunchPlansMatch(mock.Anything, mock.Anything).Return(launchPlanListResponse, nil)
-	_, err := adminFetcherExt.FetchLPLatestVersion(ctx, "lpName", "project", "domain")
+	_, err := adminFetcherExt.FetchLPLatestVersion(ctx, "lpName", "project", "domain", lpFilters)
 	assert.Equal(t, fmt.Errorf("no launchplans retrieved for lpName"), err)
 }

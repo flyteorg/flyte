@@ -21,10 +21,15 @@ Retrieves project by name
 
  bin/flytectl get project flytesnacks
 
-Retrieves project by filters
+Retrieves all the projects with filters.
 ::
-
- Not yet implemented
+ 
+  bin/flytectl get project --filter.field-selector="project.name=flytesnacks"
+ 
+Retrieves all the projects with limit and sorting.
+::
+ 
+  bin/flytectl get project --filter.sort-by=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the projects in yaml format
 
@@ -50,7 +55,11 @@ Options
 
 ::
 
-  -h, --help   help for project
+      --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
+      --filter.field-selector string   Specifies the Field selector
+      --filter.limit int32             Specifies the limit (default 100)
+      --filter.sort-by string          Specifies which field to sort results  (default "created_at")
+  -h, --help                           help for project
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,8 +80,6 @@ Options inherited from parent commands
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
-      --adminutils.batchSize int                   Maximum number of records to retrieve per call. (default 100)
-      --adminutils.maxRecords int                  Maximum number of records to retrieve. (default 500)
       --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
       --logger.formatter.type string               Sets logging format type. (default "json")

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytectl/pkg/filters"
+
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -16,6 +18,7 @@ import (
 
 var (
 	workflowListResponse *admin.WorkflowList
+	workflowFilter       = filters.Filters{}
 	workflowResponse     *admin.Workflow
 )
 
@@ -87,14 +90,14 @@ func getWorkflowFetcherSetup() {
 func TestFetchAllVerOfWorkflow(t *testing.T) {
 	getWorkflowFetcherSetup()
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(workflowListResponse, nil)
-	_, err := adminFetcherExt.FetchAllVerOfWorkflow(ctx, "workflowName", "project", "domain")
+	_, err := adminFetcherExt.FetchAllVerOfWorkflow(ctx, "workflowName", "project", "domain", workflowFilter)
 	assert.Nil(t, err)
 }
 
 func TestFetchAllVerOfWorkflowError(t *testing.T) {
 	getWorkflowFetcherSetup()
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
-	_, err := adminFetcherExt.FetchAllVerOfWorkflow(ctx, "workflowName", "project", "domain")
+	_, err := adminFetcherExt.FetchAllVerOfWorkflow(ctx, "workflowName", "project", "domain", workflowFilter)
 	assert.Equal(t, fmt.Errorf("failed"), err)
 }
 
@@ -102,7 +105,7 @@ func TestFetchAllVerOfWorkflowEmptyResponse(t *testing.T) {
 	workflowListResponse := &admin.WorkflowList{}
 	getWorkflowFetcherSetup()
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(workflowListResponse, nil)
-	_, err := adminFetcherExt.FetchAllVerOfWorkflow(ctx, "workflowName", "project", "domain")
+	_, err := adminFetcherExt.FetchAllVerOfWorkflow(ctx, "workflowName", "project", "domain", workflowFilter)
 	assert.Equal(t, fmt.Errorf("no workflow retrieved for workflowName"), err)
 }
 
@@ -110,7 +113,7 @@ func TestFetchWorkflowLatestVersion(t *testing.T) {
 	getWorkflowFetcherSetup()
 	adminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(workflowResponse, nil)
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(workflowListResponse, nil)
-	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain")
+	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain", workflowFilter)
 	assert.Nil(t, err)
 }
 
@@ -118,7 +121,6 @@ func TestFetchWorkflowLatestVersionError(t *testing.T) {
 	workflowListResponse := &admin.WorkflowList{}
 	getWorkflowFetcherSetup()
 	adminClient.OnListWorkflowsMatch(mock.Anything, mock.Anything).Return(workflowListResponse, nil)
-	adminClient.OnGetWorkflowMatch(mock.Anything, mock.Anything).Return(workflowResponse, nil)
-	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain")
+	_, err := adminFetcherExt.FetchWorkflowLatestVersion(ctx, "workflowName", "project", "domain", workflowFilter)
 	assert.Equal(t, fmt.Errorf("no workflow retrieved for workflowName"), err)
 }

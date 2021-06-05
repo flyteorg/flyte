@@ -84,7 +84,7 @@ func testDecodeJson_Config(t *testing.T, val, result interface{}) {
 	assert.NoError(t, decode_Config(val, result))
 }
 
-func testDecodeSlice_Config(t *testing.T, vStringSlice, result interface{}) {
+func testDecodeRaw_Config(t *testing.T, vStringSlice, result interface{}) {
 	assert.NoError(t, decode_Config(vStringSlice, result))
 }
 
@@ -100,14 +100,6 @@ func TestConfig_SetFlags(t *testing.T) {
 	assert.True(t, cmdFlags.HasFlags())
 
 	t.Run("Test_version", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vString, err := cmdFlags.GetString("version"); err == nil {
-				assert.Equal(t, string(DefaultConfig.Version), vString)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -122,14 +114,6 @@ func TestConfig_SetFlags(t *testing.T) {
 		})
 	})
 	t.Run("Test_latest", func(t *testing.T) {
-		t.Run("DefaultValue", func(t *testing.T) {
-			// Test that default value is set properly
-			if vBool, err := cmdFlags.GetBool("latest"); err == nil {
-				assert.Equal(t, bool(DefaultConfig.Latest), vBool)
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
@@ -137,6 +121,62 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("latest", testValue)
 			if vBool, err := cmdFlags.GetBool("latest"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Latest)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_filter.field-selector", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("filter.field-selector", testValue)
+			if vString, err := cmdFlags.GetString("filter.field-selector"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Filter.FieldSelector)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_filter.sort-by", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("filter.sort-by", testValue)
+			if vString, err := cmdFlags.GetString("filter.sort-by"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.Filter.SortBy)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_filter.limit", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("filter.limit", testValue)
+			if vInt32, err := cmdFlags.GetInt32("filter.limit"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.Filter.Limit)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_filter.asc", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("filter.asc", testValue)
+			if vBool, err := cmdFlags.GetBool("filter.asc"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.Filter.Asc)
 
 			} else {
 				assert.FailNow(t, err.Error())

@@ -2,9 +2,13 @@ package get
 
 import (
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionclusterlabel"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionqueueattribute"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
 	pluginoverride "github.com/flyteorg/flytectl/cmd/config/subcommand/plugin_override"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/taskresourceattribute"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
@@ -34,15 +38,15 @@ func CreateGetCommand() *cobra.Command {
 	getResourcesFuncs := map[string]cmdcore.CommandEntry{
 		"project": {CmdFunc: getProjectsFunc, Aliases: []string{"projects"}, ProjectDomainNotRequired: true,
 			Short: projectShort,
-			Long:  projectLong},
+			Long:  projectLong, PFlagProvider: project.DefaultConfig},
 		"task": {CmdFunc: getTaskFunc, Aliases: []string{"tasks"}, Short: taskShort,
-			Long: taskLong, PFlagProvider: taskConfig},
+			Long: taskLong, PFlagProvider: task.DefaultConfig},
 		"workflow": {CmdFunc: getWorkflowFunc, Aliases: []string{"workflows"}, Short: workflowShort,
 			Long: workflowLong, PFlagProvider: workflow.DefaultConfig},
 		"launchplan": {CmdFunc: getLaunchPlanFunc, Aliases: []string{"launchplans"}, Short: launchPlanShort,
-			Long: launchPlanLong, PFlagProvider: launchPlanConfig},
+			Long: launchPlanLong, PFlagProvider: launchplan.DefaultConfig},
 		"execution": {CmdFunc: getExecutionFunc, Aliases: []string{"executions"}, Short: executionShort,
-			Long: executionLong},
+			Long: executionLong, PFlagProvider: execution.DefaultConfig},
 		"task-resource-attribute": {CmdFunc: getTaskResourceAttributes, Aliases: []string{"task-resource-attributes"},
 			Short: taskResourceAttributesShort,
 			Long:  taskResourceAttributesLong, PFlagProvider: taskresourceattribute.DefaultFetchConfig},

@@ -4,9 +4,10 @@ import (
 	"context"
 
 	"github.com/flyteorg/flytectl/cmd/config"
+	taskConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytectl/pkg/adminutils"
 	"github.com/flyteorg/flytectl/pkg/ext"
+	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -38,15 +39,24 @@ Retrieves particular version of task by name within project and domain.
 
 ::
 
- flytectl get workflow -p flytesnacks -d development  core.basic.lp.greet --version v2
+ flytectl get task -p flytesnacks -d development  core.basic.lp.greet --version v2
 
-Retrieves project by filters.
+Retrieves all the tasks with filters.
 ::
-
- Not yet implemented
+  
+  bin/flytectl get task -p flytesnacks -d development --filter.field-selector="task.name=k8s_spark.pyspark_pi.print_every_time,task.version=v1" 
+ 
+Retrieve a specific task with filters.
+::
+ 
+  bin/flytectl get task -p flytesnacks -d development k8s_spark.pyspark_pi.print_every_time --filter.field-selector="task.version=v1,created_at>=2021-05-24T21:43:12.325335Z" 
+  
+Retrieves all the task with limit and sorting.
+::
+   
+  bin/flytectl get -p flytesnacks -d development task  --filter.sort-by=created_at --filter.limit=1 --filter.asc
 
 Retrieves all the tasks within project and domain in yaml format.
-
 ::
 
  bin/flytectl get task -p flytesnacks -d development -o yaml
@@ -85,18 +95,6 @@ Usage
 `
 )
 
-//go:generate pflags TaskConfig --default-var taskConfig
-var (
-	taskConfig = &TaskConfig{}
-)
-
-// FilesConfig
-type TaskConfig struct {
-	ExecFile string `json:"execFile" pflag:",execution file name to be used for generating execution spec of a single task."`
-	Version  string `json:"version" pflag:",version of the task to be fetched."`
-	Latest   bool   `json:"latest" pflag:", flag to indicate to fetch the latest version, version flag will be ignored in this case"`
-}
-
 var taskColumns = []printer.Column{
 	{Header: "Version", JSONPath: "$.id.version"},
 	{Header: "Name", JSONPath: "$.id.name"},
@@ -128,12 +126,18 @@ func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandConte
 		logger.Debugf(ctx, "Retrieved Task", tasks)
 		return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(tasks)...)
 	}
-	tasks, err := adminutils.GetAllNamedEntities(ctx, cmdCtx.AdminClient().ListTaskIds, adminutils.ListRequest{Project: project, Domain: domain})
+	transformFilters, err := filters.BuildResourceListRequestWithName(taskConfig.DefaultConfig.Filter, config.GetConfig().Project, config.GetConfig().Domain, "")
 	if err != nil {
 		return err
 	}
+	taskList, err := cmdCtx.AdminClient().ListTasks(ctx, transformFilters)
+	if err != nil {
+		return err
+	}
+	tasks := taskList.Tasks
+
 	logger.Debugf(ctx, "Retrieved %v Task", len(tasks))
-	return taskPrinter.Print(config.GetConfig().MustOutputFormat(), entityColumns, adminutils.NamedEntityToProtoMessage(tasks)...)
+	return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(tasks)...)
 }
 
 // FetchTaskForName Reads the task config to drive fetching the correct tasks.
@@ -141,27 +145,27 @@ func FetchTaskForName(ctx context.Context, fetcher ext.AdminFetcherExtInterface,
 	var tasks []*admin.Task
 	var err error
 	var task *admin.Task
-	if taskConfig.Latest {
-		if task, err = fetcher.FetchTaskLatestVersion(ctx, name, project, domain); err != nil {
+	if taskConfig.DefaultConfig.Latest {
+		if task, err = fetcher.FetchTaskLatestVersion(ctx, name, project, domain, taskConfig.DefaultConfig.Filter); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
-	} else if taskConfig.Version != "" {
-		if task, err = fetcher.FetchTaskVersion(ctx, name, taskConfig.Version, project, domain); err != nil {
+	} else if taskConfig.DefaultConfig.Version != "" {
+		if task, err = fetcher.FetchTaskVersion(ctx, name, taskConfig.DefaultConfig.Version, project, domain); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
 	} else {
-		tasks, err = fetcher.FetchAllVerOfTask(ctx, name, project, domain)
+		tasks, err = fetcher.FetchAllVerOfTask(ctx, name, project, domain, taskConfig.DefaultConfig.Filter)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if taskConfig.ExecFile != "" {
+	if taskConfig.DefaultConfig.ExecFile != "" {
 		// There would be atleast one task object when code reaches here and hence the length assertion is not required.
 		task = tasks[0]
 		// Only write the first task from the tasks object.
-		if err = CreateAndWriteExecConfigForTask(task, taskConfig.ExecFile); err != nil {
+		if err = CreateAndWriteExecConfigForTask(task, taskConfig.DefaultConfig.ExecFile); err != nil {
 			return nil, err
 		}
 	}
