@@ -33,7 +33,7 @@ func WriteExecConfigToFile(executionConfig ExecutionConfig, fileName string) err
 		fmt.Printf("error: %v", err)
 	}
 	if _, err = os.Stat(fileName); err == nil {
-		if !cmdUtil.AskForConfirmation(fmt.Sprintf("warning file %v will be overwritten", fileName)) {
+		if !cmdUtil.AskForConfirmation(fmt.Sprintf("warning file %v will be overwritten", fileName), os.Stdin) {
 			return errors.New("backup the file before continuing")
 		}
 	}

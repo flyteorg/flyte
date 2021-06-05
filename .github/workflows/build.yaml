@@ -2,7 +2,8 @@ name: build
 
 on:
   pull_request:
-  push:
+    branches:
+      - master
 
 jobs:
   build:
@@ -23,7 +24,7 @@ jobs:
         with:
           args: make install && make test_unit_codecov
       - name: Push CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1.0.5
         with:
           file: coverage.txt
           flags: unittests

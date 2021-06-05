@@ -3,24 +3,20 @@ package commandutils
 import (
 	"bufio"
 	"fmt"
-	"log"
-	"os"
+	"io"
 	"strings"
 )
 
-func AskForConfirmation(s string) bool {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		fmt.Printf("%s [y/n]: ", s)
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err)
-		}
-		response = strings.ToLower(strings.TrimSpace(response))
+func AskForConfirmation(s string, reader io.Reader) bool {
+	fmt.Printf("%s [y/n]: ", s)
+	r := bufio.NewScanner(reader)
+	for r.Scan() {
+		response := strings.ToLower(strings.TrimSpace(r.Text()))
 		if response == "y" || response == "yes" {
 			return true
-		} else if response == "n" || response == "no" {
+		} else if response == "n" || response == "No" {
 			return false
 		}
 	}
+	return false
 }

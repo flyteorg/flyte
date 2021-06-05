@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/cmd/create"
@@ -12,7 +14,6 @@ import (
 	"github.com/flyteorg/flytectl/cmd/register"
 	"github.com/flyteorg/flytectl/cmd/update"
 	"github.com/flyteorg/flytectl/cmd/version"
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	stdConfig "github.com/flyteorg/flytestdlib/config"
 	"github.com/flyteorg/flytestdlib/config/viper"
@@ -41,7 +42,7 @@ func newRootCmd() *cobra.Command {
 		DisableAutoGenTag: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "",
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", f.FilePathJoin(f.UserHomeDir(), configFileDir, configFileName),
 		"config file (default is $HOME/.flyte/config.yaml)")
 
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
@@ -69,7 +70,7 @@ func newRootCmd() *cobra.Command {
 func initConfig(_ *cobra.Command, _ []string) error {
 	configAccessor = viper.NewAccessor(stdConfig.Options{
 		StrictMode:  true,
-		SearchPaths: []string{cfgFile, f.FilePathJoin(f.UserHomeDir(), configFileDir, configFileName)},
+		SearchPaths: []string{cfgFile},
 	})
 
 	err := configAccessor.UpdateConfig(context.TODO())
