@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_blob_type import CoreBlobType  # noqa: F401,E501
+from flyteadmin.models.core_enum_type import CoreEnumType  # noqa: F401,E501
 from flyteadmin.models.core_literal_type import CoreLiteralType  # noqa: F401,E501
 from flyteadmin.models.core_schema_type import CoreSchemaType  # noqa: F401,E501
 from flyteadmin.models.core_simple_type import CoreSimpleType  # noqa: F401,E501
@@ -42,6 +43,7 @@ class CoreLiteralType(object):
         'collection_type': 'CoreLiteralType',
         'map_value_type': 'CoreLiteralType',
         'blob': 'CoreBlobType',
+        'enum_type': 'CoreEnumType',
         'metadata': 'ProtobufStruct'
     }
 
@@ -51,10 +53,11 @@ class CoreLiteralType(object):
         'collection_type': 'collection_type',
         'map_value_type': 'map_value_type',
         'blob': 'blob',
+        'enum_type': 'enum_type',
         'metadata': 'metadata'
     }
 
-    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, metadata=None):  # noqa: E501
+    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, metadata=None):  # noqa: E501
         """CoreLiteralType - a model defined in Swagger"""  # noqa: E501
 
         self._simple = None
@@ -62,6 +65,7 @@ class CoreLiteralType(object):
         self._collection_type = None
         self._map_value_type = None
         self._blob = None
+        self._enum_type = None
         self._metadata = None
         self.discriminator = None
 
@@ -75,6 +79,8 @@ class CoreLiteralType(object):
             self.map_value_type = map_value_type
         if blob is not None:
             self.blob = blob
+        if enum_type is not None:
+            self.enum_type = enum_type
         if metadata is not None:
             self.metadata = metadata
 
@@ -192,6 +198,29 @@ class CoreLiteralType(object):
         """
 
         self._blob = blob
+
+    @property
+    def enum_type(self):
+        """Gets the enum_type of this CoreLiteralType.  # noqa: E501
+
+        Defines an enum with pre-defined string values.  # noqa: E501
+
+        :return: The enum_type of this CoreLiteralType.  # noqa: E501
+        :rtype: CoreEnumType
+        """
+        return self._enum_type
+
+    @enum_type.setter
+    def enum_type(self, enum_type):
+        """Sets the enum_type of this CoreLiteralType.
+
+        Defines an enum with pre-defined string values.  # noqa: E501
+
+        :param enum_type: The enum_type of this CoreLiteralType.  # noqa: E501
+        :type: CoreEnumType
+        """
+
+        self._enum_type = enum_type
 
     @property
     def metadata(self):

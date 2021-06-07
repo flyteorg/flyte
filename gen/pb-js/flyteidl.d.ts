@@ -2875,6 +2875,58 @@ export namespace flyteidl {
             }
         }
 
+        /** Properties of an EnumType. */
+        interface IEnumType {
+
+            /** EnumType values */
+            values?: (string[]|null);
+        }
+
+        /** Represents an EnumType. */
+        class EnumType implements IEnumType {
+
+            /**
+             * Constructs a new EnumType.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IEnumType);
+
+            /** EnumType values. */
+            public values: string[];
+
+            /**
+             * Creates a new EnumType instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EnumType instance
+             */
+            public static create(properties?: flyteidl.core.IEnumType): flyteidl.core.EnumType;
+
+            /**
+             * Encodes the specified EnumType message. Does not implicitly {@link flyteidl.core.EnumType.verify|verify} messages.
+             * @param message EnumType message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IEnumType, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EnumType message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EnumType
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.EnumType;
+
+            /**
+             * Verifies an EnumType message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a LiteralType. */
         interface ILiteralType {
 
@@ -2892,6 +2944,9 @@ export namespace flyteidl {
 
             /** LiteralType blob */
             blob?: (flyteidl.core.IBlobType|null);
+
+            /** LiteralType enumType */
+            enumType?: (flyteidl.core.IEnumType|null);
 
             /** LiteralType metadata */
             metadata?: (google.protobuf.IStruct|null);
@@ -2921,11 +2976,14 @@ export namespace flyteidl {
             /** LiteralType blob. */
             public blob?: (flyteidl.core.IBlobType|null);
 
+            /** LiteralType enumType. */
+            public enumType?: (flyteidl.core.IEnumType|null);
+
             /** LiteralType metadata. */
             public metadata?: (google.protobuf.IStruct|null);
 
             /** LiteralType type. */
-            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob");
+            public type?: ("simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType");
 
             /**
              * Creates a new LiteralType instance using the specified properties.
