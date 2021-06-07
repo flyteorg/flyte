@@ -65,7 +65,7 @@ As with schedules, the notifications handling is composed of two parts. One hand
 This is only supported for Flyte instances running on AWS.
 
 Config
-------
+=======
 
 To publish notifications, you'll need to set up an `SNS topic <https://aws.amazon.com/sns/?whats-new-cards.sort-by=item.additionalFields.postDateTime&whats-new-cards.sort-order=desc>`_.
 

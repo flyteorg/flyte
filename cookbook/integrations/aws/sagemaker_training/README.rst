@@ -1,5 +1,5 @@
-AWS Sagemaker Training
-======================
+Sagemaker
+=========
 This section provides examples of Flyte Plugins that are designed to work with
 AWS Hosted services like Sagemaker, EMR, Athena, Redshift etc
 
@@ -44,7 +44,7 @@ Before following this example, make sure that
 - You have your `AWS role set up correctly for SageMaker <https://docs.aws.amazon.com/sagemaker/latest/dg/sagemaker-roles.html#sagemaker-roles-amazonsagemakerfullaccess-policy>`_
 - `AWS SageMaker k8s operator <https://github.com/aws/amazon-sagemaker-operator-for-k8s>`_ is installed in your k8s cluster
 
-Creating a dockerfile for Sagemaker custom training [Required]
+Creating a Dockerfile for Sagemaker Custom Training [Required]
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: docker

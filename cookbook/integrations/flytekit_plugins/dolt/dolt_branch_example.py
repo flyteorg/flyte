@@ -1,9 +1,9 @@
 """
-Basic DoltTable Example
---------------------
+Dolt Branches
+-------------
 
 In this example we'll show you how to use DoltTable
-to annotate dataframe inputs and outputs in your flyte tasks.
+along with Dolt's branch feature.
 
 """
 import os
@@ -112,5 +112,5 @@ if __name__ == "__main__":
 
 # %% Results
 # ^^^^^^^^^^^^
-
+#
 # Output results are split between branches:

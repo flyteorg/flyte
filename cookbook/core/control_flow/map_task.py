@@ -1,6 +1,6 @@
 """
-Write a map task
-------------------------------------------
+Map Tasks
+---------
 
 A map task lets you run a task over a list of inputs within a single workflow node. This means you can run thousands
 of instances of that task without creating a node for every instance, providing valuable performance gains. Furthermore

@@ -1,6 +1,6 @@
 """
-Call another workflow by subworkflow
-------------------------------------------
+Subworkflows
+------------
 
 Launch plans were introduced in the Basics section of this book. Subworkflows are similar in that they allow users
 to kick off one workflow from inside another. What's the difference? Think of launch plans as passing by pointer and

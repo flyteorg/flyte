@@ -97,6 +97,8 @@ class CustomSorter(FileNameSortKey):
         "basic_schema_example.py",
         "branch_example.py",
         "quickstart_example.py",
+        "dolt_quickstart_example.py",
+        "dolt_branch_example.py",
         ## Kubernetes
         "pod.py",
         "pyspark_pi.py",
@@ -111,11 +113,11 @@ class CustomSorter(FileNameSortKey):
         ## External Services
         "hive.py"
         # Extending Flyte
+        "backend_plugins.py",  # NOTE: for some reason this needs to be listed first here to show up last on the TOC
         "run_custom_types.py",
         "custom_task_plugin.py",
-        "backend_plugins.py",
-        ## Tutorials
-        # ML Training
+        # Tutorials
+        ## ML Training
         "diabetes.py",
         "house_price_predictor.py",
         "multiregion_house_price_predictor.py",
@@ -153,7 +155,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_search.extension",
     "sphinxext.remoteliteralinclude",
-    "sphinx_fontawesome",
+    "sphinx_panels",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -228,7 +230,7 @@ examples_dirs = [
     "../deployment/workflow",
     "../deployment/cluster",
     "../deployment/guides",
-    "../control_plane",
+    # "../control_plane",  # TODO: add content to this section
     "../integrations/flytekit_plugins/sqllite3",
     "../integrations/flytekit_plugins/papermilltasks",
     "../integrations/flytekit_plugins/sqlalchemy",
@@ -238,13 +240,11 @@ examples_dirs = [
     "../integrations/kubernetes/k8s_spark",
     "../integrations/kubernetes/kftensorflow",
     "../integrations/kubernetes/kfpytorch",
-    "../integrations/aws/athena",
+    # "../integrations/aws/athena",  # TODO: add content to this section
     "../integrations/aws/sagemaker_training",
     "../integrations/aws/sagemaker_pytorch",
     "../integrations/gcp",
     "../integrations/external_services/hive",
-    "../integrations/external_services/databricks",
-    "../integrations/external_services/snowflake",
     "../core/extend_flyte",
 ]
 gallery_dirs = [
@@ -258,7 +258,7 @@ gallery_dirs = [
     "auto/deployment/workflow",
     "auto/deployment/cluster",
     "auto/deployment/guides",
-    "auto/control_plane",
+    # "auto/control_plane",  # TODO: add content to this section
     "auto/integrations/flytekit_plugins/sqllite3",
     "auto/integrations/flytekit_plugins/papermilltasks",
     "auto/integrations/flytekit_plugins/sqlalchemy",
@@ -268,13 +268,11 @@ gallery_dirs = [
     "auto/integrations/kubernetes/k8s_spark",
     "auto/integrations/kubernetes/kftensorflow",
     "auto/integrations/kubernetes/kfpytorch",
-    "auto/integrations/aws/athena",
+    # "auto/integrations/aws/athena",  # TODO: add content to this section
     "auto/integrations/aws/sagemaker_training",
     "auto/integrations/aws/sagemaker_pytorch",
     "auto/integrations/gcp",
     "auto/integrations/external_services/hive",
-    "auto/integrations/external_services/databricks",
-    "auto/integrations/external_services/snowflake",
     "auto/core/extend_flyte",
 ]
 
@@ -283,9 +281,17 @@ image_scrapers = ()
 
 min_reported_time = 0
 
+# hide example pages with empty content
+ignore_py_files = [
+    "__init__",
+    "config_resource_mgr",
+    "optimize_perf",
+]
+
 sphinx_gallery_conf = {
     "examples_dirs": examples_dirs,
     "gallery_dirs": gallery_dirs,
+    "ignore_pattern": f"({'|'.join(ignore_py_files)})\.py",
     # "subsection_order": ExplicitOrder(
     #     [
     #         "../core/basic",

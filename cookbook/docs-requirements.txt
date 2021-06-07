@@ -18,7 +18,7 @@ beautifulsoup4==4.9.3
     # via
     #   furo
     #   sphinx-code-include
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
 chardet==4.0.0
     # via requests
@@ -42,10 +42,11 @@ docutils==0.16
     # via
     #   -r docs-requirements.in
     #   sphinx
+    #   sphinx-panels
     #   sphinx-rtd-theme
-flyteidl==0.18.44
+flyteidl==0.18.53
     # via flytekit
-flytekit==0.18.0
+flytekit==0.19.1
     # via -r docs-requirements.in
 git+git://github.com/flyteorg/furo@main
     # via -r docs-requirements.in
@@ -55,7 +56,7 @@ idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.0.1
+importlib-metadata==4.5.0
     # via keyring
 jinja2==3.0.1
     # via
@@ -96,7 +97,7 @@ pillow==8.2.0
     # via
     #   -r docs-requirements.in
     #   matplotlib
-protobuf==3.17.0
+protobuf==3.17.2
     # via
     #   flyteidl
     #   flytekit
@@ -170,6 +171,8 @@ sphinx-fontawesome==0.0.6
     # via -r docs-requirements.in
 sphinx-gallery==0.9.0
     # via -r docs-requirements.in
+sphinx-panels==0.6.0
+    # via -r docs-requirements.in
 sphinx-prompt==1.4.0
     # via -r docs-requirements.in
 sphinx-rtd-theme==0.5.2
@@ -183,6 +186,7 @@ sphinx==3.5.4
     #   sphinx-copybutton
     #   sphinx-fontawesome
     #   sphinx-gallery
+    #   sphinx-panels
     #   sphinx-prompt
     #   sphinx-rtd-theme
     #   sphinxext-remoteliteralinclude

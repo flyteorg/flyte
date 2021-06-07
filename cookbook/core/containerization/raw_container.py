@@ -1,4 +1,6 @@
 """
+.. _raw_container:
+
 Raw container example
 --------------------------
 

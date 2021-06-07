@@ -1,5 +1,5 @@
-Executing K8s Pods
-==================
+K8s Pods
+========
 By default Flyte tasks - ``@task`` are essentially single functions that are loaded in one container. But, often times there is a need to run a job, with more than one containers. For example,
 
   - a special Hyper-parameter optimizer with state stored in a redis db

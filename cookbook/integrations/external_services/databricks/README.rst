@@ -1,7 +1,0 @@
-##########
-Databricks
-##########
-
-.. NOTE::
-
-    Coming soon 🛠

@@ -1,45 +1,52 @@
 .. _plugins_extend:
 
-###########################
-When & How to Extend Flyte
-###########################
+###############
+Extending Flyte
+###############
 
-.. NOTE:: These docs are still work in progress. Please read through and if you have any questions don't shy away from either filing a github issue or ping us in the Slack channel. The community loves plugins and would love to help you in any way.
-
-The Core of Flyte is a container execution engine, where you can write one or more tasks and string them together to form a data dependency DAG - called a ``workflow``.
-If your work involves writing simple python or java tasks that can either perform operations on their own or can call out to external services - then there is **NO NEED to extend FLYTE**.
-
-But, in that case you can almost do everything using python / java or a container - So why should you even have to extend Flyte?
+The core of Flyte is a container execution engine, where you can write one or more tasks and compose them together to
+form a data dependency DAG, called a ``workflow``. If your work involves writing simple python or java tasks that can
+either perform operations on their own or can call out to external services, then there is **no to extend Flyte**.
 
 =================
-But First - Why?
+Why Extend Flyte?
 =================
 
-Case 1: I want to use my special Types - e.g. my own DataFrame format
+Case 1: I want to use my special Types, e.g. my own DataFrame format
 ==========================================================================
-Flyte, just like a programming language has a core type-system, but just like most languages, this type system can be extended by allowing users to add ``User defined Data types``.
-A User defined data type can be something that Flyte does not really understand, but is extremely useful for a users specific needs. For example it can be a custom user structure or a grouping of images in a specific encoding.
+Flyte, just like a programming language has a core type-system, but just like most languages, this type system can be
+extended by allowing users to add ``User defined Data types``. A User defined data type can be something that Flyte does
+not really understand, but is extremely useful for a users specific needs. For example it can be a custom user structure
+or a grouping of images in a specific encoding.
 
-Flytekit natively supports handling of structured data like User defined structures like DataClasses using JSON as the representation format. An example of this is available in FlyteCookbook - :std:doc:`auto/type_system/custom_objects`.
+Flytekit natively supports handling of structured data like User defined structures like DataClasses using JSON as the
+representation format. An example of this is available in FlyteCookbook - :std:doc:`auto/type_system/custom_objects`.
 
-For types that are not simply representable as JSON documents, Flytekit allows users to extends Flyte's type system and implement these types in Python. The user has to essentially implement a :py:class:`flytekit.extend.TypeTransformer` class to enable translation of the type from Users type to flyte understood types. As an example,
-instead of using :py:class:`pandas.DataFrame` directly, you may want to use `Pandera <https://pandera.readthedocs.io/en/stable/>`_ to perform validation of an input or output dataframe. an example can be found `here <https://github.com/flyteorg/flytekit/blob/master/plugins/tests/pandera/test_wf.py#L9>`_.
+For types that are not simply representable as JSON documents, Flytekit allows users to extends Flyte's type system and
+implement these types in Python. The user has to essentially implement a :py:class:`flytekit.extend.TypeTransformer`
+class to enable translation of the type from Users type to flyte understood types. As an example, instead of using
+:py:class:`pandas.DataFrame` directly, you may want to use `Pandera <https://pandera.readthedocs.io/en/stable/>`_ to
+perform validation of an input or output dataframe. an example can be found
+`here <https://github.com/flyteorg/flytekit/blob/master/plugins/tests/pandera/test_wf.py#L9>`_.
 
 To extend the type system in flytekit refer to an illustrative example found at - :std:ref:`advanced_custom_types`.
 
 
-Case 2: Add a new Task Type - Flyte capability
+Case 2: Add a new Task Type
 ===============================================
-So often times you want to interact with a service like,
+Often times you want to interact with a service like,
 
-    - a Database (Postgres, MySQL, etc)
-    - a DataWarehouse like (Snowflake, BigQuery, Redshift etc)
-    - a computation platform like (AWS EMR, Databricks etc)
+- a Database (Postgres, MySQL, etc)
+- a DataWarehouse like (Snowflake, BigQuery, Redshift etc)
+- a computation platform like (AWS EMR, Databricks etc)
 
-and you want this to be available like a template for all other users - open source or within your organization. This can be done by creating a task plugin.
-A Task-plugin makes it possible for you or other users to use your idea natively within Flyte as this capability was built into the flyte platform.
+You might want this to be available like a template for all other users - open source or within your organization. This
+can be done by creating a task plugin. A task plugin makes it possible for you or other users to use your idea natively
+within Flyte as this capability was built into the flyte platform.
 
-Thus for example, if you want users to write code simply using the ``@task`` decorator, but you want to provide a capability of running the function as a spark job or a sagemaker training job - then you can extend Flyte's task system - we will refer to this as the plugin and it could be possible to do the following
+Therefore, if you want users to write code simply using the :py:func:`~flytekit.task` decorator, but you want to provide a
+capability of running the function as a spark job or a sagemaker training job, then you can extend Flyte's task system.
+We will refer to this as the plugin and it could be possible to do the following
 
 .. code-block:: python
 
@@ -52,7 +59,7 @@ Thus for example, if you want users to write code simply using the ``@task`` dec
         ...
 
 
-OR provide an interface like this
+*or* provide an interface like this
 
 .. code-block:: python
 
@@ -60,16 +67,17 @@ OR provide an interface like this
 
     @workflow
     def my_wf(t: datetime) -> ...:
-    df = query_task(time=t)
-    return process(df=df)
+        df = query_task(time=t)
+        return process(df=df)
 
 
 
-===========================================================
-I want to write a Task Plugin or add a new TaskType
-===========================================================
+==============================================
+Writing a Task Plugin or Adding a New TaskType
+==============================================
 
-Interestingly there are 2 options here. You can write a task plugin simply as an extension in flytekit, or you can go deeper and write a Plugin in the Flyte backend itself.
+There are 2 options here: you can write a task plugin simply as an extension in flytekit or you can go deeper and write
+a plugin in the Flyte backend itself.
 
 Flytekit only plugin
 ======================
@@ -121,8 +129,4 @@ How do I decide which path to take?
     :alt: Ok you want to add a plugin, but which type? Follow the flowchart and then select the right next steps.
 
 
-Use the conclusion of the flow-chart to refer to the right doc
-================================================================
-
-- :ref:`advanced_custom_task_plugin`
-- :ref:`extend-plugin-flyte-backend`
+Use the conclusion of the flow-chart to point you to one of the examples below:

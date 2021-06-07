@@ -1,6 +1,6 @@
 """
-Basic DoltTable Example
---------------------
+Quickstart
+----------
 
 In this example we'll show you how to use DoltTable
 to annotate dataframe inputs and outputs in your flyte tasks.
@@ -23,7 +23,7 @@ rabbits_conf = DoltConfig(
 
 @task
 def populate_rabbits(a: int) -> DoltTable:
-    rabbits = [("George", a), ("Alice", a*2), ("Sugar Maple", a*3)]
+    rabbits = [("George", a), ("Alice", a * 2), ("Sugar Maple", a * 3)]
     df = pd.DataFrame(rabbits, columns=["name", "count"])
     return DoltTable(data=df, config=rabbits_conf)
 

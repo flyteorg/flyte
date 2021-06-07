@@ -2,7 +2,7 @@
 .. _extend-plugin-flyte-backend:
 
 ###############################
-Implementing Backend Extensions
+Writing Backend Extensions
 ###############################
 
 Now that you have landed here, we can assume that you have exhausted your options of extending and want to extend Flyte in a way that adds new capabilities to the platform.
@@ -51,27 +51,8 @@ The backend plugin is where the actual logic of the execution is implemented. Th
 #. A Web API plugin - `Async <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/webapi#AsyncPlugin>`_ or `Sync <https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.26/go/tasks/pluginmachinery/webapi#SyncPlugin>`_.
 #. Or if none of the above fits then - a `Core Plugin <https://pkg.go.dev/github.com/lyft/flyteplugins/go/tasks/pluginmachinery/core#Plugin>`_
 
-Kubernetes operator Plugin
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. NOTE::
-
-      Coming soon 🛠
-  
-
-Web API plugin
-^^^^^^^^^^^^^^^
-
-.. NOTE::
-
-      Coming soon 🛠
-  
-
-Catch-all - Core Plugin
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. NOTE::
-
-      Coming soon 🛠
+.. TODO: write content for Kubernetes operator Plugin
+.. TODO: write content for Web API plugin
+.. TODO: write content for Catch-all - Core Plugin
   
 """

@@ -2,61 +2,52 @@
 Integrations
 ############
 
-Flyte is designed to be highly extensible. Flyte can be extended in the following ways:
+Flyte is designed to be highly extensible and can be customized in multiple ways:
 
-#. Flytekit-only plugins: Plugins similar to executing a Python function in a container.
-#. Flyte backend global plugins: Plugins that are independent of the SDK, enable backend capabilities in Flyte, and are global for the entire deployment.
-#. Flyte custom container executions: These execute arbitrary containers, where the data is loaded into the container as files and read out of the containers. They can be written in C++ code, bash scripts and any other containerized program.
-#. Bring your own SDK: The open source community would love to help you with your own ideas of building a new SDK. Ideas include - ``golang``, ``javascript/nodejs``, etc.
+.. panels::
+    :header: text-center
 
-Available SDKs:
+    .. link-button:: flytekit_plugins
+       :type: ref
+       :text: Flytekit Plugins
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    These are Flytekit (python) plugins that are like executing a python function in a container.
 
-#. `Flytekit <https://github.com/lyft/flytekit>`_ is the Python SDK for writing Flyte tasks and workflows and is optimized for Machine Learning pipelines and ETL workloads.
-#. `Flytekit-Java <https://github.com/spotify/flytekit-java>`_ is the Java/SCALA SDK optimized for ETL and data processing workloads.
+    ---
 
-What Are Flytekit-Only [Python] Plugins?
-========================================
-Flytekit plugins are simple plugins that can be implemented purely in Python, unit tested locally, and allow extending Flytekit functionality. These plugins can be compared to Airflow Operators.
-The data is automatically marshalled and unmarshalled into and out of the plugin. Users should implement :py:class:`flytekit.core.base_task.PythonTask` API, defined in Flytekit.
+    .. link-button:: native_backend_plugins
+       :type: ref
+       :text: Native Backend Plugins
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Plugins that enable backend capabilities in Flyte and are independent of external services.
 
-Implementation 
-^^^^^^^^^^^^^^^
+    ---
 
-Flytekit Plugins are simply loaded and can be released independently like libraries. We follow a convention to name the plugin like
-``flytekitplugins-*``, where * implies the capability. 
+    .. link-button:: external_services
+       :type: ref
+       :text: External Services Backend Plugins
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Plugins that enable backend capabilities in Flyte and rely on external services like
+    AWS Sagemaker and Hive.
 
-For example ``flytekitplugins-papermill`` enables users to author flytekit tasks using `Papermill <https://papermill.readthedocs.io/en/latest/>`_.
+    ---
 
-What are Backend Plugins?
-=========================
+    Custom Container Executions
+    ^^^^^^^^^^^^
+    Execute arbitrary containers: You can write c++ code, bash scripts and any containerized program.
+    See the :ref:`raw container <raw_container>` as an example.
 
-Flyte has a unique capability of adding backend plugins. Backend plugins enable the Flyte platform to add new capabilities. This has several advantages, mainly:
+    ---
 
-#. Advanced introspection capabilities - ways to improve logging, etc.
-#. Service oriented architecture - ability to bugfix, deploy plugins without releasing new libraries and forcing all users to update their libraries.
-#. Better management of the system communication - for example in case of aborts, Flyte can guarantee cleanup of the remote resources.
-#. Reduced cost overhead, for many plugins which launch jobs on a remote service or cluster, the plugins are essentially just polling. This has a huge compute cost in traditional architectures like Airflow etc. Flyte on the other hand, can run these operations in its own control plane.
-#. The potential to create drastically new interfaces that work across multiple languages and platforms.
+    Bring Your Own SDK
+    ^^^^^^^^^^^^
+    The community would love to help you with your own ideas of building a new SDK. Currently the available SDKs are:
 
-Flyte backend plugins are more involved and implementation needs writing code in ``Golang`` that gets plugged into the Flyte backend engine. These plugins are statically loaded into the FlytePropeller. The contract for the plugin can be encoded in any serialization format - e.g. JSON, OpenAPI, protobuf. The community in general prefers using protobuf.
-Once the backend plugin is implemented, any language SDK can be implemented to provide a specialized interface for the user.
-
-Native Backend Plugins
-^^^^^^^^^^^^^^^^^^^^^^^
-Native Backend Plugins are plugins that can be executed without any external service dependencies. The compute is orchestrated by Flyte itself, within its provisioned kubernetes clusters. Some examples of native plugins are:
-
-#. Python functions
-#. K8s Containerized Spark
-#. Array Tasks
-#. Pod Tasks
-#. K8s native distributed Pytorch training using Kubeflow Pytorch Operator
-#. K8s native distributed Tensorflow training using Kubeflow TF Operator
-
-External Service Backend Plugins
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#. AWS Sagemaker Training
-#. AWS Batch
-#. Qubole Hive
+    - `flytekit <https://github.com/flyteorg/flytekit>`_: Flyte Python SDK
+    - `flytekit-java <https://github.com/spotify/flytekit-java>`_: Flyte Java/SCALA SDK
 
 Enabling Backend Plugins
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -85,7 +76,5 @@ Flyte uses Kustomize to generate the the deployment configuration which can be l
     :hidden:
  
     flytekit_plugins
-    kubernetes
-    aws
-    gcp
+    native_backend_plugins
     external_services

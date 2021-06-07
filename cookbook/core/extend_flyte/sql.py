@@ -1,8 +1,11 @@
 """
 .. _extend_sql_sqlite3:
 
-SQL Query Tasks - example SQLite3
-===================================
+SQL Query Tasks
+===============
+
+SQLite3 Example 
+---------------
 
 Flyte tasks are not always restricted to running user-supplied containers, nor even containers at all. Indeed, this is
 one of the most important design decisions in Flyte. Non-container tasks can have arbitrary targets for execution -

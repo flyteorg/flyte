@@ -5,10 +5,7 @@
 Accessing Secrets
 -----------------
 
-What Is Secrets Injection?
-##########################
-
-Flyte supports running a wide variety of tasks; from containers to SQL queries and service calls. In order for Flyte-run
+Flyte supports running a wide variety of tasks, from containers to SQL queries and service calls. In order for Flyte-run
 containers to request and access secrets, Flyte provides a native Secret construct.
 
 For a simple task that launches a Pod, the flow will look something like this:

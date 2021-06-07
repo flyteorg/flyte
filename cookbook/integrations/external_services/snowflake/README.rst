@@ -1,7 +1,0 @@
-#########
-Snowflake
-#########
-
-.. NOTE::
-
-    Coming soon 🛠
