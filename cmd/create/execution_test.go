@@ -144,7 +144,7 @@ func TestCreateTaskExecutionFunc(t *testing.T) {
 		},
 	}
 	mockClient.OnCreateExecutionMatch(ctx, mock.Anything).Return(executionCreateResponseTask, nil)
-	executionConfig.ExecFile = testDataFolder + "task_execution_spec.yaml"
+	executionConfig.ExecFile = testDataFolder + "task_execution_spec_with_iamrole.yaml"
 	err = createExecutionCommand(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "CreateExecution", ctx, mock.Anything)

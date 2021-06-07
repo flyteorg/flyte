@@ -57,11 +57,10 @@ func createExecutionRequestForTask(ctx context.Context, taskName string, project
 		Literals: variableLiterals,
 	}
 	var authRole *admin.AuthRole
-	if executionConfig.KubeServiceAcct != "" || executionConfig.IamRoleARN != "" {
-		authRole = &admin.AuthRole{
-			AssumableIamRole:         executionConfig.IamRoleARN,
-			KubernetesServiceAccount: executionConfig.KubeServiceAcct,
-		}
+	if executionConfig.KubeServiceAcct != "" {
+		authRole = &admin.AuthRole{KubernetesServiceAccount: executionConfig.KubeServiceAcct}
+	} else {
+		authRole = &admin.AuthRole{AssumableIamRole: executionConfig.IamRoleARN}
 	}
 	ID := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
