@@ -1,0 +1,15 @@
+iamRoleARN: "iamRoleARN"
+inputs:
+  sorted_list1:
+  - 0
+  - 2
+  - 4
+  sorted_list2:
+  - 1
+  - 3
+  - 5
+kubeServiceAcct: ""
+targetDomain: "development"
+targetProject: "flytesnacks"
+task: core.advanced.run_merge_sort.merge
+version: v2

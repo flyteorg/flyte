@@ -1,10 +1,10 @@
 Nouns
 ------
+Flytectl noun specify the resource on which the action needs to be performed eg: resources like project/workflow/task/execution
 
 .. toctree::
     :maxdepth: 1
     :caption: Nouns
-    :hidden:
  
     gen/flytectl_create_project
     gen/flytectl_create_execution

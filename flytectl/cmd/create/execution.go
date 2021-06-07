@@ -78,6 +78,51 @@ Also an execution can be relaunched by passing in current execution id.
 
  flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytectldemo -d development
 
+Generic data types are also supported for execution in similar way.Following is sample of how the inputs need to be specified while creating the execution.
+As usual the spec file should be generated first and then run the execution using the spec file.
+
+::
+
+ flytectl get task -d development -p flytectldemo  core.type_system.custom_objects.add --execFile adddatanum.yaml
+
+The generated file would look similar to this. Here you can see empty values dumped for generic data type x and y. 
+
+::
+
+    iamRoleARN: ""
+    inputs:
+      "x": {}
+      "y": {}
+    kubeServiceAcct: ""
+    targetDomain: ""
+    targetProject: ""
+    task: core.type_system.custom_objects.add
+    version: v3
+
+Modified file with struct data populated for x and y parameters for the task core.type_system.custom_objects.add
+
+::
+
+  iamRoleARN: "arn:aws:iam::123456789:role/dummy"
+  inputs:
+    "x":
+      "x": 2
+      "y": ydatafory
+      "z":
+        1 : "foo"
+        2 : "bar"
+    "y":
+      "x": 3
+      "y": ydataforx
+      "z":
+        3 : "buzz"
+        4 : "lightyear"
+  kubeServiceAcct: ""
+  targetDomain: ""
+  targetProject: ""
+  task: core.type_system.custom_objects.add
+  version: v3
+
 Usage
 `
 )

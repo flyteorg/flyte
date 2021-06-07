@@ -28,3 +28,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	sigs.k8s.io/yaml v1.2.0
 )
+
+replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v0.18.51-0.20210602050605-9ebebd25056e

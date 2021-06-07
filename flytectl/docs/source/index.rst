@@ -18,13 +18,7 @@ golang. To install simply copy paste the following into the command-line:
 Configure
 =========
 Flytectl allows configuring using a YAML file or pass every configuration value
-on command-line. The follow configuration is useful to setup.
-Place this in $HOME/.flyte directory with name config.yaml.
-This file is searched in
-* $HOME/.flyte
-* currDir from where you run flytectl
-* /etc/flyte/config
-* You can pass it commandline using --config <config-file-path>
+on command-line. The following configuration is useful to setup.
 
 Basic Configuration
 --------------------
@@ -34,12 +28,22 @@ Basic Configuration
   admin:
     # For GRPC endpoints you might want to use dns:///flyte.myexample.com
     endpoint: dns:///flyte.lyft.net
+    authType: Pkce
     # Change insecure flag to ensure that you use the right setting for your environment
     insecure: true
   logger:
     # Logger settings to control logger output. Useful to debug logger:
     show-source: true
     level: 1
+
+
+Place this in $HOME/.flyte directory with name config.yaml.
+This file is searched in
+
+- $HOME/.flyte
+- currDir from where you run flytectl
+- /etc/flyte/config
+- You can pass it commandline using --config <config-file-path>
 
 
 .. toctree::

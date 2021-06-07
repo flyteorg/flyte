@@ -99,15 +99,15 @@ html_theme_options = {
         "color-brand-primary": "#9D68E4",
         "color-brand-content": "#9D68E4",
     },
+}
+
+html_context = {
+    "home_page": "https://docs.flyte.org",
     # custom flyteorg furo theme options
     "github_repo": "flytectl",
     "github_username": "flyteorg",
     "github_commit": "master",
     "docs_path": "docs/source",  # path to documentation source
-}
-
-html_context = {
-    "home_page": "https://docs.flyte.org",
 }
 
 # The default sidebars (for documents that don't match any pattern) are

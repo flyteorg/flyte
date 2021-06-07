@@ -1,10 +1,10 @@
 Verbs
 ------
+Flytectl verbs specify the actions to be performed on the resources like create/get/update/delete
 
 .. toctree::
     :maxdepth: 1
     :caption: Verbs
-    :hidden:
  
     gen/flytectl_create
     gen/flytectl_get
