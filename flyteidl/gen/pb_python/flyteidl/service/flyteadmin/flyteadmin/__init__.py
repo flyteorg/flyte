@@ -154,6 +154,7 @@ from flyteadmin.models.core_connection_set import CoreConnectionSet
 from flyteadmin.models.core_container import CoreContainer
 from flyteadmin.models.core_container_port import CoreContainerPort
 from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig
+from flyteadmin.models.core_enum_type import CoreEnumType
 from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_error import CoreExecutionError
 from flyteadmin.models.core_io_strategy import CoreIOStrategy

@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='flyteidl.core',
   syntax='proto3',
   serialized_options=_b('Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core'),
-  serialized_pb=_b('\n\x19\x66lyteidl/core/types.proto\x12\rflyteidl.core\x1a\x1cgoogle/protobuf/struct.proto\"\x8c\x02\n\nSchemaType\x12\x37\n\x07\x63olumns\x18\x03 \x03(\x0b\x32&.flyteidl.core.SchemaType.SchemaColumn\x1a\xc4\x01\n\x0cSchemaColumn\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x45\n\x04type\x18\x02 \x01(\x0e\x32\x37.flyteidl.core.SchemaType.SchemaColumn.SchemaColumnType\"_\n\x10SchemaColumnType\x12\x0b\n\x07INTEGER\x10\x00\x12\t\n\x05\x46LOAT\x10\x01\x12\n\n\x06STRING\x10\x02\x12\x0b\n\x07\x42OOLEAN\x10\x03\x12\x0c\n\x08\x44\x41TETIME\x10\x04\x12\x0c\n\x08\x44URATION\x10\x05\"\x8f\x01\n\x08\x42lobType\x12\x0e\n\x06\x66ormat\x18\x01 \x01(\t\x12\x42\n\x0e\x64imensionality\x18\x02 \x01(\x0e\x32*.flyteidl.core.BlobType.BlobDimensionality\"/\n\x12\x42lobDimensionality\x12\n\n\x06SINGLE\x10\x00\x12\r\n\tMULTIPART\x10\x01\"\xb0\x02\n\x0bLiteralType\x12+\n\x06simple\x18\x01 \x01(\x0e\x32\x19.flyteidl.core.SimpleTypeH\x00\x12+\n\x06schema\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.SchemaTypeH\x00\x12\x35\n\x0f\x63ollection_type\x18\x03 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeH\x00\x12\x34\n\x0emap_value_type\x18\x04 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeH\x00\x12\'\n\x04\x62lob\x18\x05 \x01(\x0b\x32\x17.flyteidl.core.BlobTypeH\x00\x12)\n\x08metadata\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructB\x06\n\x04type\"/\n\x0fOutputReference\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x0b\n\x03var\x18\x02 \x01(\t\"0\n\x05\x45rror\x12\x16\n\x0e\x66\x61iled_node_id\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t*\x86\x01\n\nSimpleType\x12\x08\n\x04NONE\x10\x00\x12\x0b\n\x07INTEGER\x10\x01\x12\t\n\x05\x46LOAT\x10\x02\x12\n\n\x06STRING\x10\x03\x12\x0b\n\x07\x42OOLEAN\x10\x04\x12\x0c\n\x08\x44\x41TETIME\x10\x05\x12\x0c\n\x08\x44URATION\x10\x06\x12\n\n\x06\x42INARY\x10\x07\x12\t\n\x05\x45RROR\x10\x08\x12\n\n\x06STRUCT\x10\tB6Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
+  serialized_pb=_b('\n\x19\x66lyteidl/core/types.proto\x12\rflyteidl.core\x1a\x1cgoogle/protobuf/struct.proto\"\x8c\x02\n\nSchemaType\x12\x37\n\x07\x63olumns\x18\x03 \x03(\x0b\x32&.flyteidl.core.SchemaType.SchemaColumn\x1a\xc4\x01\n\x0cSchemaColumn\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x45\n\x04type\x18\x02 \x01(\x0e\x32\x37.flyteidl.core.SchemaType.SchemaColumn.SchemaColumnType\"_\n\x10SchemaColumnType\x12\x0b\n\x07INTEGER\x10\x00\x12\t\n\x05\x46LOAT\x10\x01\x12\n\n\x06STRING\x10\x02\x12\x0b\n\x07\x42OOLEAN\x10\x03\x12\x0c\n\x08\x44\x41TETIME\x10\x04\x12\x0c\n\x08\x44URATION\x10\x05\"\x8f\x01\n\x08\x42lobType\x12\x0e\n\x06\x66ormat\x18\x01 \x01(\t\x12\x42\n\x0e\x64imensionality\x18\x02 \x01(\x0e\x32*.flyteidl.core.BlobType.BlobDimensionality\"/\n\x12\x42lobDimensionality\x12\n\n\x06SINGLE\x10\x00\x12\r\n\tMULTIPART\x10\x01\"\x1a\n\x08\x45numType\x12\x0e\n\x06values\x18\x01 \x03(\t\"\xde\x02\n\x0bLiteralType\x12+\n\x06simple\x18\x01 \x01(\x0e\x32\x19.flyteidl.core.SimpleTypeH\x00\x12+\n\x06schema\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.SchemaTypeH\x00\x12\x35\n\x0f\x63ollection_type\x18\x03 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeH\x00\x12\x34\n\x0emap_value_type\x18\x04 \x01(\x0b\x32\x1a.flyteidl.core.LiteralTypeH\x00\x12\'\n\x04\x62lob\x18\x05 \x01(\x0b\x32\x17.flyteidl.core.BlobTypeH\x00\x12,\n\tenum_type\x18\x07 \x01(\x0b\x32\x17.flyteidl.core.EnumTypeH\x00\x12)\n\x08metadata\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructB\x06\n\x04type\"/\n\x0fOutputReference\x12\x0f\n\x07node_id\x18\x01 \x01(\t\x12\x0b\n\x03var\x18\x02 \x01(\t\"0\n\x05\x45rror\x12\x16\n\x0e\x66\x61iled_node_id\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t*\x86\x01\n\nSimpleType\x12\x08\n\x04NONE\x10\x00\x12\x0b\n\x07INTEGER\x10\x01\x12\t\n\x05\x46LOAT\x10\x02\x12\n\n\x06STRING\x10\x03\x12\x0b\n\x07\x42OOLEAN\x10\x04\x12\x0c\n\x08\x44\x41TETIME\x10\x05\x12\x0c\n\x08\x44URATION\x10\x06\x12\n\n\x06\x42INARY\x10\x07\x12\t\n\x05\x45RROR\x10\x08\x12\n\n\x06STRUCT\x10\tB6Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/coreb\x06proto3')
   ,
   dependencies=[google_dot_protobuf_dot_struct__pb2.DESCRIPTOR,])
 
@@ -75,8 +75,8 @@ _SIMPLETYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=898,
-  serialized_end=1032,
+  serialized_start=972,
+  serialized_end=1106,
 )
 _sym_db.RegisterEnumDescriptor(_SIMPLETYPE)
 
@@ -262,6 +262,37 @@ _BLOBTYPE = _descriptor.Descriptor(
 )
 
 
+_ENUMTYPE = _descriptor.Descriptor(
+  name='EnumType',
+  full_name='flyteidl.core.EnumType',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='values', full_name='flyteidl.core.EnumType.values', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=491,
+  serialized_end=517,
+)
+
+
 _LITERALTYPE = _descriptor.Descriptor(
   name='LiteralType',
   full_name='flyteidl.core.LiteralType',
@@ -305,7 +336,14 @@ _LITERALTYPE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='metadata', full_name='flyteidl.core.LiteralType.metadata', index=5,
+      name='enum_type', full_name='flyteidl.core.LiteralType.enum_type', index=5,
+      number=7, type=11, cpp_type=10, label=1,
+      has_default_value=False, default_value=None,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='metadata', full_name='flyteidl.core.LiteralType.metadata', index=6,
       number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
@@ -326,8 +364,8 @@ _LITERALTYPE = _descriptor.Descriptor(
       name='type', full_name='flyteidl.core.LiteralType.type',
       index=0, containing_type=None, fields=[]),
   ],
-  serialized_start=492,
-  serialized_end=796,
+  serialized_start=520,
+  serialized_end=870,
 )
 
 
@@ -364,8 +402,8 @@ _OUTPUTREFERENCE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=798,
-  serialized_end=845,
+  serialized_start=872,
+  serialized_end=919,
 )
 
 
@@ -402,8 +440,8 @@ _ERROR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=847,
-  serialized_end=895,
+  serialized_start=921,
+  serialized_end=969,
 )
 
 _SCHEMATYPE_SCHEMACOLUMN.fields_by_name['type'].enum_type = _SCHEMATYPE_SCHEMACOLUMN_SCHEMACOLUMNTYPE
@@ -417,6 +455,7 @@ _LITERALTYPE.fields_by_name['schema'].message_type = _SCHEMATYPE
 _LITERALTYPE.fields_by_name['collection_type'].message_type = _LITERALTYPE
 _LITERALTYPE.fields_by_name['map_value_type'].message_type = _LITERALTYPE
 _LITERALTYPE.fields_by_name['blob'].message_type = _BLOBTYPE
+_LITERALTYPE.fields_by_name['enum_type'].message_type = _ENUMTYPE
 _LITERALTYPE.fields_by_name['metadata'].message_type = google_dot_protobuf_dot_struct__pb2._STRUCT
 _LITERALTYPE.oneofs_by_name['type'].fields.append(
   _LITERALTYPE.fields_by_name['simple'])
@@ -433,8 +472,12 @@ _LITERALTYPE.fields_by_name['map_value_type'].containing_oneof = _LITERALTYPE.on
 _LITERALTYPE.oneofs_by_name['type'].fields.append(
   _LITERALTYPE.fields_by_name['blob'])
 _LITERALTYPE.fields_by_name['blob'].containing_oneof = _LITERALTYPE.oneofs_by_name['type']
+_LITERALTYPE.oneofs_by_name['type'].fields.append(
+  _LITERALTYPE.fields_by_name['enum_type'])
+_LITERALTYPE.fields_by_name['enum_type'].containing_oneof = _LITERALTYPE.oneofs_by_name['type']
 DESCRIPTOR.message_types_by_name['SchemaType'] = _SCHEMATYPE
 DESCRIPTOR.message_types_by_name['BlobType'] = _BLOBTYPE
+DESCRIPTOR.message_types_by_name['EnumType'] = _ENUMTYPE
 DESCRIPTOR.message_types_by_name['LiteralType'] = _LITERALTYPE
 DESCRIPTOR.message_types_by_name['OutputReference'] = _OUTPUTREFERENCE
 DESCRIPTOR.message_types_by_name['Error'] = _ERROR
@@ -462,6 +505,13 @@ BlobType = _reflection.GeneratedProtocolMessageType('BlobType', (_message.Messag
   # @@protoc_insertion_point(class_scope:flyteidl.core.BlobType)
   ))
 _sym_db.RegisterMessage(BlobType)
+
+EnumType = _reflection.GeneratedProtocolMessageType('EnumType', (_message.Message,), dict(
+  DESCRIPTOR = _ENUMTYPE,
+  __module__ = 'flyteidl.core.types_pb2'
+  # @@protoc_insertion_point(class_scope:flyteidl.core.EnumType)
+  ))
+_sym_db.RegisterMessage(EnumType)
 
 LiteralType = _reflection.GeneratedProtocolMessageType('LiteralType', (_message.Message,), dict(
   DESCRIPTOR = _LITERALTYPE,

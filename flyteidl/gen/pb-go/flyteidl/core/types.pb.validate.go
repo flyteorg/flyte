@@ -183,6 +183,70 @@ var _ interface {
 	ErrorName() string
 } = BlobTypeValidationError{}
 
+// Validate checks the field values on EnumType with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *EnumType) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// EnumTypeValidationError is the validation error returned by
+// EnumType.Validate if the designated constraints aren't met.
+type EnumTypeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnumTypeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnumTypeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnumTypeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnumTypeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnumTypeValidationError) ErrorName() string { return "EnumTypeValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EnumTypeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnumType.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnumTypeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnumTypeValidationError{}
+
 // Validate checks the field values on LiteralType with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.
@@ -248,6 +312,18 @@ func (m *LiteralType) Validate() error {
 			if err := v.Validate(); err != nil {
 				return LiteralTypeValidationError{
 					field:  "Blob",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *LiteralType_EnumType:
+
+		if v, ok := interface{}(m.GetEnumType()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return LiteralTypeValidationError{
+					field:  "EnumType",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

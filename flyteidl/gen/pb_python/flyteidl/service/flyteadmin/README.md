@@ -253,6 +253,7 @@ Class | Method | HTTP request | Description
  - [CoreContainer](docs/CoreContainer.md)
  - [CoreContainerPort](docs/CoreContainerPort.md)
  - [CoreDataLoadingConfig](docs/CoreDataLoadingConfig.md)
+ - [CoreEnumType](docs/CoreEnumType.md)
  - [CoreError](docs/CoreError.md)
  - [CoreExecutionError](docs/CoreExecutionError.md)
  - [CoreIOStrategy](docs/CoreIOStrategy.md)
