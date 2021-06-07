@@ -37,8 +37,9 @@ In abstract, a task in the system is characterized by:
 4. *Optional* Task interface definition
 
    In order for tasks to exchange data with each other, a task can define a signature (much like a function/method
-   signature in programming languages). A task interface defines the input and output variables - :std:ref:`variablesentry protos/docs/core/core:variablemap.variablesentry`
-   as well as their types :std:ref:`literaltype protos/docs/core/core:literaltype`.
+   signature in programming languages). A task interface defines the input and output variables -
+   :std:ref:`variablesentry <flyteidl:protos/docs/core/core:variablemap.variablesentry>`
+   as well as their types :std:ref:`literaltype <flyteidl:protos/docs/core/core:literaltype>`.
 
 Requirements
 ------------
@@ -59,7 +60,7 @@ Types
 -----
 Since it's impossible to define the unit of execution of a task the same way for all kinds of tasks, Flyte allows different task
 types in the system. Flyte comes with a set of defined, battle tested task types but also allows for a very flexible model to
-introducing new :ref:`plugins_extend_intro`.
+:std:ref:`define new types <cookbook:plugins_extend>`.
 
 Fault tolerance
 ---------------
@@ -76,4 +77,4 @@ Timeouts
 Memoization
 -----------
 Flyte supports memoization for task outputs to ensure identical invocations of a task are not repeatedly executed wasting compute resources.
-For more information on memoization please refer to :ref:`howto-enable-use-memoization`.
+For more information on memoization please refer to the :std:ref:`User Guide <cookbook:sphx_glr_auto_core_flyte_basics_task_cache.py>`.

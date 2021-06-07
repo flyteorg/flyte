@@ -21,6 +21,7 @@ chardet==4.0.0
 docutils==0.16
     # via
     #   sphinx
+    #   sphinx-panels
     #   sphinx-tabs
 git+git://github.com/flyteorg/furo@main
     # via -r doc-requirements.in
@@ -71,6 +72,8 @@ sphinx-fontawesome==0.0.6
     # via -r doc-requirements.in
 sphinx-issues==1.2.0
     # via -r doc-requirements.in
+sphinx-panels==0.6.0
+    # via -r doc-requirements.in
 sphinx-prompt==1.4.0
     # via -r doc-requirements.in
 sphinx-tabs==3.0.0
@@ -84,6 +87,7 @@ sphinx==3.5.4
     #   sphinx-copybutton
     #   sphinx-fontawesome
     #   sphinx-issues
+    #   sphinx-panels
     #   sphinx-prompt
     #   sphinx-tabs
     #   sphinxext-remoteliteralinclude

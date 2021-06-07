@@ -9,21 +9,74 @@ amazing community. We are a completely open community and we vouch to treat
 every member with respect. You will find the community very welcoming and warm,
 so please join us on:
 
-- `Slack <http://flyte-org.slack.com>`_
-- `Email <https://groups.google.com/a/flyte.org/d/forum/users>`_
-- `Twitter <https://twitter.com/flyteorg>`_
-- Community Sync every other Tuesday, 9:00 AM PDT/PST. Please check out the `calendar <https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles>`_ and feel free to pop in! `Zoom link <https://zoom.us/s/93875115830?pwd=YWZWOHl1ODRRVjhjVkxSV0pmZkJaZz09#success>`_
+.. panels::
+    :container: container-lg pb-4
+    :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+    :body: text-center
 
-Although Slack is currently our primary discussion platform, we also have discussion boards on:
+    .. link-button:: http://flyte-org.slack.com
+       :type: url
+       :text: Slack
+       :classes: btn-block stretched-link
 
-- `GitHub <https://github.com/flyteorg/flyte/discussions/categories/q-a>`_, featuring a list of Q&As and How-to questions
+    :fa:`slack`
 
-- `Flyte OSS LinkedIn Discussion Group <https://www.linkedin.com/groups/13962256/>`_   
+    ---
 
-We love contributions, so please contribute to
- - docs
- - examples
- - new plugins or plugin ideas
- - general feedback and discussions
+    .. link-button:: https://groups.google.com/a/flyte.org/d/forum/users
+       :type: url
+       :text: Google Group
+       :classes: btn-block stretched-link
+
+    :fa:`google`
+
+    ---
+
+    .. link-button:: https://twitter.com/flyteorg
+       :type: url
+       :text: Twitter
+       :classes: btn-block stretched-link
+
+    :fa:`twitter`
+
+    ---
+
+    .. link-button:: https://github.com/flyteorg/flyte/discussions
+       :type: url
+       :text: Github Discussions
+       :classes: btn-block stretched-link
+
+    :fa:`github`
+
+    ---
+
+    .. link-button:: https://www.linkedin.com/groups/13962256
+       :type: url
+       :text: LinkedIn Group
+       :classes: btn-block stretched-link
+
+    :fa:`linkedin`
+
+
+Open Source Community Sync
+--------------------------
+
+We host an Open Source Community Sync every other Tuesday, 9:00 AM PDT/PST.
+Please check out the `calendar <https://calendar.google.com/calendar/embed?src=admin%40flyte.org&ctz=America%2FLos_Angeles>`_
+and feel free to pop in!
+
+.. link-button:: https://zoom.us/s/93875115830?pwd=YWZWOHl1ODRRVjhjVkxSV0pmZkJaZz09#success
+    :type: url
+    :text: Zoom Link
+    :classes: btn-outline-secondary
+
+.. toctree::
+    :caption: Community
+    :maxdepth: -1
+    :name: communitytoc
+    :hidden:
  
-Thank you for being part of this amazing community!
+    contribute
+    roadmap
+    Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
+    troubleshoot

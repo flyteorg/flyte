@@ -103,7 +103,7 @@ Steps
 
   .. rubric:: 🎉 Congratulations, you just ran your first Flyte workflow 🎉
 
-  Next Steps: User Guide
-  #######################
-  
-  To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__ 🛫
+Next Steps: User Guide
+#######################
+
+To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__ 🛫

@@ -6,7 +6,9 @@ Launch plans are used to execute workflows. A workflow can have many launch plan
 
 Launch plans provide a way to templatize Flyte workflow invocations. Launch plans contain a set of bound workflow inputs that are passed as arguments to create an execution. Launch plans do not necessarily contain the entire set of required workflow inputs, but a launch plan is always necessary to trigger an execution. Additional input arguments can be provided at execution time to supplement launch plan static input values.
 
-In addition to templatizing inputs, launch plans allow you to run your workflow on one or multiple schedules. Each launch plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as optional notifications. Refer to :ref:`howto-notifications` for a deep dive into available notifications.
+In addition to templatizing inputs, launch plans allow you to run your workflow on one or multiple schedules. Each launch
+plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as
+optional notifications. Refer to the :std:ref:`User Guide <cookbook:sphx_glr_auto_deployment_cluster_notifications.py>` for a deep dive into available notifications.
 
 See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
 
@@ -40,7 +42,7 @@ Fixed inputs cannot be overridden. If a workflow is executed with a launch plan 
 .. _concepts-schedules:
 
 Schedules
-=========
+---------
 Workflows can be run automatically using schedules associated with launch plans. Schedules can either define a cron_expression_. or rate_unit_.
 
 At most one launch plan version for a given {Project, Domain, Name} combination can be active, which means at most one schedule can be active for a launch plan. However, many unique launch plans and corresponding schedules can be defined for the same workflow.

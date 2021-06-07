@@ -5,6 +5,23 @@ on:
       - master
   pull_request:
 jobs:
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch the code
+        uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f doc-requirements.txt ]; then pip install -r doc-requirements.txt; fi
+      - name: Build the documentation
+        run: make docs
+
   end-to-end:
     runs-on: ubuntu-latest
     steps:
