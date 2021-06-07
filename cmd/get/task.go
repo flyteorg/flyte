@@ -7,7 +7,6 @@ import (
 	taskConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/task"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/pkg/ext"
-	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -114,28 +113,22 @@ func TaskToProtoMessages(l []*admin.Task) []proto.Message {
 
 func getTaskFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	taskPrinter := printer.Printer{}
+	var tasks []*admin.Task
+	var err error
 	project := config.GetConfig().Project
 	domain := config.GetConfig().Domain
 	if len(args) == 1 {
 		name := args[0]
-		var tasks []*admin.Task
-		var err error
 		if tasks, err = FetchTaskForName(ctx, cmdCtx.AdminFetcherExt(), name, project, domain); err != nil {
 			return err
 		}
 		logger.Debugf(ctx, "Retrieved Task", tasks)
 		return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(tasks)...)
 	}
-	transformFilters, err := filters.BuildResourceListRequestWithName(taskConfig.DefaultConfig.Filter, config.GetConfig().Project, config.GetConfig().Domain, "")
+	tasks, err = cmdCtx.AdminFetcherExt().FetchAllVerOfTask(ctx, "", config.GetConfig().Project, config.GetConfig().Domain, taskConfig.DefaultConfig.Filter)
 	if err != nil {
 		return err
 	}
-	taskList, err := cmdCtx.AdminClient().ListTasks(ctx, transformFilters)
-	if err != nil {
-		return err
-	}
-	tasks := taskList.Tasks
-
 	logger.Debugf(ctx, "Retrieved %v Task", len(tasks))
 	return taskPrinter.Print(config.GetConfig().MustOutputFormat(), taskColumns, TaskToProtoMessages(tasks)...)
 }

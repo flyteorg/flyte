@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flytectl/pkg/ext/mocks"
-	"github.com/flyteorg/flytectl/pkg/filters"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
@@ -96,15 +95,4 @@ func TestGetWorkflowFuncWithError(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-}
-
-func TestGetWorkflowFunc(t *testing.T) {
-	setup()
-	getWorkflowSetup()
-	workflowConfig.Filter = filters.Filters{}
-	argsWorkflow := []string{}
-	mockClient.OnListWorkflowsMatch(ctx, resourceListRequestWorkflow).Return(workflowListResponse, nil)
-	err = getWorkflowFunc(ctx, argsWorkflow, cmdCtx)
-	assert.Nil(t, err)
-	mockClient.AssertCalled(t, "ListWorkflows", ctx, resourceListRequestWorkflow)
 }

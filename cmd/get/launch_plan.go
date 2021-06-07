@@ -3,8 +3,6 @@ package get
 import (
 	"context"
 
-	"github.com/flyteorg/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -126,11 +124,11 @@ func LaunchplanToProtoMessages(l []*admin.LaunchPlan) []proto.Message {
 
 func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	launchPlanPrinter := printer.Printer{}
+	var launchPlans []*admin.LaunchPlan
 	project := config.GetConfig().Project
 	domain := config.GetConfig().Domain
 	if len(args) == 1 {
 		name := args[0]
-		var launchPlans []*admin.LaunchPlan
 		var err error
 		if launchPlans, err = FetchLPForName(ctx, cmdCtx.AdminFetcherExt(), name, project, domain); err != nil {
 			return err
@@ -143,15 +141,12 @@ func getLaunchPlanFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comman
 		}
 		return nil
 	}
-	transformFilters, err := filters.BuildResourceListRequestWithName(launchplan.DefaultConfig.Filter, config.GetConfig().Project, config.GetConfig().Domain, "")
+
+	launchPlans, err := cmdCtx.AdminFetcherExt().FetchAllVerOfLP(ctx, "", config.GetConfig().Project, config.GetConfig().Domain, launchplan.DefaultConfig.Filter)
 	if err != nil {
 		return err
 	}
-	launchPlanList, err := cmdCtx.AdminClient().ListLaunchPlans(ctx, transformFilters)
-	if err != nil {
-		return err
-	}
-	launchPlans := launchPlanList.LaunchPlans
+
 	logger.Debugf(ctx, "Retrieved %v launch plans", len(launchPlans))
 	return launchPlanPrinter.Print(config.GetConfig().MustOutputFormat(), launchplansColumns,
 		LaunchplanToProtoMessages(launchPlans)...)

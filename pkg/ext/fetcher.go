@@ -19,6 +19,9 @@ type AdminFetcherExtInterface interface {
 	// FetchExecution fetches the execution based on name, project, domain
 	FetchExecution(ctx context.Context, name, project, domain string) (*admin.Execution, error)
 
+	// ListExecution fetches the all versions of  based on name, project, domain
+	ListExecution(ctx context.Context, project, domain string, filter filters.Filters) (*admin.ExecutionList, error)
+
 	// FetchAllVerOfLP fetches all versions of launch plan in a  project, domain
 	FetchAllVerOfLP(ctx context.Context, lpName, project, domain string, filter filters.Filters) ([]*admin.LaunchPlan, error)
 
@@ -51,6 +54,9 @@ type AdminFetcherExtInterface interface {
 
 	// FetchProjectDomainAttributes fetches project domain attributes particular resource type in a  project, domain
 	FetchProjectDomainAttributes(ctx context.Context, project, domain string, rsType admin.MatchableResource) (*admin.ProjectDomainAttributesGetResponse, error)
+
+	// ListProjects fetches all projects
+	ListProjects(ctx context.Context, filter filters.Filters) (*admin.Projects, error)
 }
 
 // AdminFetcherExtClient is used for interacting with extended features used for fetching data from admin service

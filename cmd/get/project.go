@@ -5,8 +5,6 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 
-	"github.com/flyteorg/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
@@ -72,11 +70,8 @@ func ProjectToProtoMessages(l []*admin.Project) []proto.Message {
 
 func getProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	adminPrinter := printer.Printer{}
-	transformFilters, err := filters.BuildProjectListRequest(project.DefaultConfig.Filter)
-	if err != nil {
-		return err
-	}
-	projects, err := cmdCtx.AdminClient().ListProjects(ctx, transformFilters)
+
+	projects, err := cmdCtx.AdminFetcherExt().ListProjects(ctx, project.DefaultConfig.Filter)
 	if err != nil {
 		return err
 	}

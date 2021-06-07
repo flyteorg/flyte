@@ -2,11 +2,15 @@ package get
 
 import (
 	"fmt"
+	"io"
 	"testing"
+
+	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 
 	"github.com/flyteorg/flytectl/pkg/filters"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
@@ -19,6 +23,10 @@ var (
 )
 
 func getProjectSetup() {
+
+	mockOutStream := new(io.Writer)
+	cmdCtx = cmdCore.NewCommandContext(mockClient, *mockOutStream)
+
 	argsProject = []string{"flyteexample"}
 	resourceListRequestProject = &admin.ProjectListRequest{}
 
@@ -51,12 +59,17 @@ func getProjectSetup() {
 	}
 }
 
-func TestProjectFunc(t *testing.T) {
+func TestListProjectFunc(t *testing.T) {
 	setup()
 	getProjectSetup()
+	mockClient := new(mocks.AdminServiceClient)
+	mockOutStream := new(io.Writer)
+	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
+
 	project.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListProjectsMatch(ctx, resourceListRequestProject).Return(projectListResponse, nil)
 	err = getProjectsFunc(ctx, argsProject, cmdCtx)
+
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "ListProjects", ctx, resourceListRequestProject)
 }
@@ -64,6 +77,9 @@ func TestProjectFunc(t *testing.T) {
 func TestGetProjectFunc(t *testing.T) {
 	setup()
 	getProjectSetup()
+
+	argsProject = []string{}
+
 	project.DefaultConfig.Filter = filters.Filters{}
 	mockClient.OnListProjectsMatch(ctx, resourceListRequestProject).Return(projectListResponse, nil)
 	err = getProjectsFunc(ctx, argsProject, cmdCtx)
