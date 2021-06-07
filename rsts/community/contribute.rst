@@ -5,28 +5,28 @@ Contributing to Flyte
 Thank you for taking the time to contribute to Flyte! Here are some guidelines for you to follow, which will make your first and follow-up contributions easier.
 
 .. note::
-    Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduct/>`_ before contributing to Flyte.
+    Please read our `Code of Conduct <https://lfprojects.org/policies/code-of-conduct/>`__ before contributing to Flyte.
 
 Code
 ====
-An issue tagged with ``good first issue`` is the best place to start for first-time contributors. Look into them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`_.
+An issue tagged with ``good first issue`` is the best place to start for first-time contributors. Look into them `here <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__.
 
-To take a step ahead, check out the repositories available under `flyteorg <https://github.com/flyteorg>`_.
+To take a step ahead, check out the repositories available under `flyteorg <https://github.com/flyteorg>`__.
 
 **Appetizer (for every repo): Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.** 
 
 .. note::
-    Note: To open a pull request, follow this `guide <https://guides.github.com/activities/forking/>`_.
+    Note: To open a pull request, follow this `guide <https://guides.github.com/activities/forking/>`__.
 
 *A piece of good news -- You can be added as a committer to any ``flyteorg`` repo as you become more involved with the project.*
 
-Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`_. A couple of checks are introduced to help in maintaining the robustness of the project. 
+Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__. A couple of checks are introduced to help in maintaining the robustness of the project. 
 
-#. To get through DCO, sign off on every commit. (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`_) 
+#. To get through DCO, sign off on every commit. (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__) 
 #. To improve code coverage, write unit tests to test your code.
 
 .. note::
-    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`_), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). 
+    Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`__), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). 
 
 Environment Setup
 *****************
@@ -38,14 +38,14 @@ Environment Setup
 
     The dependency graph between various flyteorg repos
 
-#. `flyte <https://github.com/lyft/flyte>`_
+#. `flyte <https://github.com/lyft/flyte>`__
     | Purpose: Deployment, Documentation, and Issues 
     | Languages: Kustomize & RST
-#. `flyteidl <https://github.com/lyft/flyteidl>`_
-    | Purpose: The Flyte Workflow specification in `protocol buffers <https://developers.google.com/protocol-buffers>`_ which forms the core of Flyte
+#. `flyteidl <https://github.com/lyft/flyteidl>`__
+    | Purpose: The Flyte Workflow specification in `protocol buffers <https://developers.google.com/protocol-buffers>`__ which forms the core of Flyte
     | Language: Protobuf
-    | Setup: Refer to the `README <https://github.com/flyteorg/flyteidl#generate-code-from-protobuf>`_
-#. `flytepropeller <https://github.com/lyft/flytepropeller>`_
+    | Setup: Refer to the `README <https://github.com/flyteorg/flyteidl#generate-code-from-protobuf>`__
+#. `flytepropeller <https://github.com/lyft/flytepropeller>`__
     | Purpose: Kubernetes native execution engine for Flyte Workflows and Tasks
     | Language: Go
 
@@ -56,7 +56,7 @@ Environment Setup
             * ``make test_unit``
             * ``make link``
         * To compile, run ``make compile``
-#. `flyteadmin <https://github.com/lyft/flyteadmin>`_
+#. `flyteadmin <https://github.com/lyft/flyteadmin>`__
     | Purpose: Control Plane
     | Language: Go
 
@@ -72,18 +72,18 @@ Environment Setup
         * To run integration tests locally:
             * ``make integration``
             * (or, to run in containerized dockernetes): ``make k8s_integration``
-#. `flytekit <https://github.com/lyft/flytekit>`_
+#. `flytekit <https://github.com/lyft/flytekit>`__
     | Purpose: Python SDK & Tools
     | Language: Python
-    | Setup: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/projects/flytekit/en/latest/contributing.html>`_
-#. `flyteconsole <https://github.com/lyft/flyteconsole>`_
+    | Setup: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/projects/flytekit/en/latest/contributing.html>`__
+#. `flyteconsole <https://github.com/lyft/flyteconsole>`__
     | Purpose: Admin Console
     | Language: Typescript
-    | Setup: Refer to the `README <https://github.com/flyteorg/flyteconsole#running-flyteconsole>`_
-#. `datacatalog <https://github.com/lyft/datacatalog>`_
+    | Setup: Refer to the `README <https://github.com/flyteorg/flyteconsole#running-flyteconsole>`__
+#. `datacatalog <https://github.com/lyft/datacatalog>`__
     | Purpose: Manage Input & Output Artifacts
     | Language: Go
-#. `flyteplugins <https://github.com/lyft/flyteplugins>`_
+#. `flyteplugins <https://github.com/lyft/flyteplugins>`__
     | Purpose: Flyte Plugins
     | Language: Go
 
@@ -93,10 +93,10 @@ Environment Setup
             * ``make generate``
             * ``make test_unit``
             * ``make link``
-#. `flytestdlib <https://github.com/lyft/flytestdlib>`_
+#. `flytestdlib <https://github.com/lyft/flytestdlib>`__
     | Purpose: Standard Library for Shared Components
     | Language: Go
-#. `flytesnacks <https://github.com/lyft/flytesnacks>`_
+#. `flytesnacks <https://github.com/lyft/flytesnacks>`__
     | Purpose: Examples, Tips, and Tricks to use Flytekit SDKs
     | Language: Python (In future, Java shall be added)
 
@@ -106,7 +106,7 @@ Environment Setup
             * Run the ``make start`` command in the root directory of the flytesnacks repo
             * Visit https://localhost:30081 to view the Flyte console consisting of the examples present in ``flytesnacks/cookbook/core`` directory
             * To fetch the new dependencies and rebuild the image, run ``make register``
-#. `flytectl <https://github.com/lyft/flytectl>`_
+#. `flytectl <https://github.com/lyft/flytectl>`__
     | Purpose: A Standalone Flyte CLI
     | Language: Go
 
@@ -119,28 +119,29 @@ Environment Setup
 
 Issues
 ======
-`GitHub Issues <https://github.com/flyteorg/flyte/issues>`_ is used for issue tracking. There are a variety of issue types available that you could use while filing an issue.
+`GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ is used for issue tracking. There are a variety of issue types available that you could use while filing an issue.
 
-* `Plugin Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=untriaged%2Cplugins&template=backend-plugin-request.md&title=%5BPlugin%5D>`_
-* `Bug Report <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2C+untriaged&template=bug_report.md&title=%5BBUG%5D+>`_
-* `Documentation Bug/Update Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2C+untriaged&template=docs_issue.md&title=%5BDocs%5D>`_
-* `Core Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged&template=feature_request.md&title=%5BCore+Feature%5D>`_
-* `Flytectl Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+flytectl&template=flytectl_issue.md&title=%5BFlytectl+Feature%5D>`_
-* `Housekeeping <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=housekeeping&template=housekeeping_template.md&title=%5BHousekeeping%5D+>`_
-* `UI Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+ui&template=ui_feature_request.md&title=%5BUI+Feature%5D>`_
+* `Plugin Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=untriaged%2Cplugins&template=backend-plugin-request.md&title=%5BPlugin%5D>`__
+* `Bug Report <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2C+untriaged&template=bug_report.md&title=%5BBUG%5D+>`__
+* `Documentation Bug/Update Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=documentation%2C+untriaged&template=docs_issue.md&title=%5BDocs%5D>`__
+* `Core Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged&template=feature_request.md&title=%5BCore+Feature%5D>`__
+* `Flytectl Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+flytectl&template=flytectl_issue.md&title=%5BFlytectl+Feature%5D>`__
+* `Housekeeping <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=housekeeping&template=housekeeping_template.md&title=%5BHousekeeping%5D+>`__
+* `UI Feature Request <https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2C+untriaged%2C+ui&template=ui_feature_request.md&title=%5BUI+Feature%5D>`__
 
-If none of the above fits your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`_ issue.
+If none of the above fits your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
 
 Documentation
 =============
 Flyte uses Sphinx for documentation and ``godocs`` for Golang. ``godocs`` is quite simple -- comment your code and you are good to go!
 
-Sphinx spans across multiple repositories under the `flyteorg <https://github.com/flyteorg>`_ repository. It uses reStructured Text (rst) files to store the documentation content. For both the API and code-related content, it extracts docstrings from the code files. 
+Sphinx spans across multiple repositories under the `flyteorg <https://github.com/flyteorg>`__ repository. It uses reStructured Text (rst) files to store the documentation content. For both the API and code-related content, it extracts docstrings from the code files. 
 
-To get started, look into `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`_. 
+To get started, look into `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__. 
 
-Environment Setup
-*****************
+Docs Environment Setup
+**********************
+
 Install all the requirements from the `docs-requirements.txt` file present in the root of a repository.
 
 .. code-block:: console
@@ -176,7 +177,7 @@ The edit option is found at the bottom of a page, as shown below.
 
 Intersphinx
 ***********
-`Intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`_ can generate automatic links to the documentation of objects in other projects.
+`Intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`__ can generate automatic links to the documentation of objects in other projects.
 
 To establish a reference to any other documentation from Flyte or within it, use intersphinx. 
 
@@ -192,7 +193,7 @@ For example:
     }
 
 .. note::
-    ``docs/source`` is present in the repository root. Click `here <https://github.com/flyteorg/flytekit/blob/55505c4a6f0240d8273eb16febcad64623764929/docs/source/conf.py#L194-L200>`_ to view the intersphinx configuration.
+    ``docs/source`` is present in the repository root. Click `here <https://github.com/flyteorg/flytekit/blob/55505c4a6f0240d8273eb16febcad64623764929/docs/source/conf.py#L194-L200>`__ to view the intersphinx configuration.
 
 The key refers to the name used to refer to the file (while referencing the documentation), and the URL denotes the precise location. 
 
@@ -216,7 +217,7 @@ Output:
 
 |
 
-Linking to Python elements changes based on what you're linking to. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`_ to learn more. 
+Linking to Python elements changes based on what you're linking to. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more. 
 
 |
 

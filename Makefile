@@ -65,3 +65,8 @@ helm_install:
 .PHONY: helm_upgrade
 helm_upgrade:
 	helm upgrade flyte --debug ./helm  -f helm/values-sandbox.yaml --create-namespace --namespace=flyte
+	bash script/prepare_artifacts.sh
+
+.PHONY: docs
+docs:
+	make -C rsts clean html SPHINXOPTS=-W

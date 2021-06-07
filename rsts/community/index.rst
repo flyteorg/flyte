@@ -21,9 +21,10 @@ Although Slack is currently our primary discussion platform, we also have discus
 - `Flyte OSS LinkedIn Discussion Group <https://www.linkedin.com/groups/13962256/>`_   
 
 We love contributions, so please contribute to
- - docs
- - examples
- - new plugins or plugin ideas
- - general feedback and discussions
+
+- docs
+- examples
+- new plugins or plugin ideas
+- general feedback and discussions
  
 Thank you for being part of this amazing community!
