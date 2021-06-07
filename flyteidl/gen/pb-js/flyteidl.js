@@ -6929,6 +6929,124 @@ export const flyteidl = $root.flyteidl = (() => {
             return BlobType;
         })();
 
+        core.EnumType = (function() {
+
+            /**
+             * Properties of an EnumType.
+             * @memberof flyteidl.core
+             * @interface IEnumType
+             * @property {Array.<string>|null} [values] EnumType values
+             */
+
+            /**
+             * Constructs a new EnumType.
+             * @memberof flyteidl.core
+             * @classdesc Represents an EnumType.
+             * @implements IEnumType
+             * @constructor
+             * @param {flyteidl.core.IEnumType=} [properties] Properties to set
+             */
+            function EnumType(properties) {
+                this.values = [];
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * EnumType values.
+             * @member {Array.<string>} values
+             * @memberof flyteidl.core.EnumType
+             * @instance
+             */
+            EnumType.prototype.values = $util.emptyArray;
+
+            /**
+             * Creates a new EnumType instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.EnumType
+             * @static
+             * @param {flyteidl.core.IEnumType=} [properties] Properties to set
+             * @returns {flyteidl.core.EnumType} EnumType instance
+             */
+            EnumType.create = function create(properties) {
+                return new EnumType(properties);
+            };
+
+            /**
+             * Encodes the specified EnumType message. Does not implicitly {@link flyteidl.core.EnumType.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.EnumType
+             * @static
+             * @param {flyteidl.core.IEnumType} message EnumType message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            EnumType.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.values != null && message.values.length)
+                    for (let i = 0; i < message.values.length; ++i)
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.values[i]);
+                return writer;
+            };
+
+            /**
+             * Decodes an EnumType message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.EnumType
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.EnumType} EnumType
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            EnumType.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.EnumType();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        if (!(message.values && message.values.length))
+                            message.values = [];
+                        message.values.push(reader.string());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies an EnumType message.
+             * @function verify
+             * @memberof flyteidl.core.EnumType
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            EnumType.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.values != null && message.hasOwnProperty("values")) {
+                    if (!Array.isArray(message.values))
+                        return "values: array expected";
+                    for (let i = 0; i < message.values.length; ++i)
+                        if (!$util.isString(message.values[i]))
+                            return "values: string[] expected";
+                }
+                return null;
+            };
+
+            return EnumType;
+        })();
+
         core.LiteralType = (function() {
 
             /**
@@ -6940,6 +7058,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.ILiteralType|null} [collectionType] LiteralType collectionType
              * @property {flyteidl.core.ILiteralType|null} [mapValueType] LiteralType mapValueType
              * @property {flyteidl.core.IBlobType|null} [blob] LiteralType blob
+             * @property {flyteidl.core.IEnumType|null} [enumType] LiteralType enumType
              * @property {google.protobuf.IStruct|null} [metadata] LiteralType metadata
              */
 
@@ -6999,6 +7118,14 @@ export const flyteidl = $root.flyteidl = (() => {
             LiteralType.prototype.blob = null;
 
             /**
+             * LiteralType enumType.
+             * @member {flyteidl.core.IEnumType|null|undefined} enumType
+             * @memberof flyteidl.core.LiteralType
+             * @instance
+             */
+            LiteralType.prototype.enumType = null;
+
+            /**
              * LiteralType metadata.
              * @member {google.protobuf.IStruct|null|undefined} metadata
              * @memberof flyteidl.core.LiteralType
@@ -7011,12 +7138,12 @@ export const flyteidl = $root.flyteidl = (() => {
 
             /**
              * LiteralType type.
-             * @member {"simple"|"schema"|"collectionType"|"mapValueType"|"blob"|undefined} type
+             * @member {"simple"|"schema"|"collectionType"|"mapValueType"|"blob"|"enumType"|undefined} type
              * @memberof flyteidl.core.LiteralType
              * @instance
              */
             Object.defineProperty(LiteralType.prototype, "type", {
-                get: $util.oneOfGetter($oneOfFields = ["simple", "schema", "collectionType", "mapValueType", "blob"]),
+                get: $util.oneOfGetter($oneOfFields = ["simple", "schema", "collectionType", "mapValueType", "blob", "enumType"]),
                 set: $util.oneOfSetter($oneOfFields)
             });
 
@@ -7056,6 +7183,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.BlobType.encode(message.blob, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                 if (message.metadata != null && message.hasOwnProperty("metadata"))
                     $root.google.protobuf.Struct.encode(message.metadata, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                if (message.enumType != null && message.hasOwnProperty("enumType"))
+                    $root.flyteidl.core.EnumType.encode(message.enumType, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                 return writer;
             };
 
@@ -7091,6 +7220,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 5:
                         message.blob = $root.flyteidl.core.BlobType.decode(reader, reader.uint32());
+                        break;
+                    case 7:
+                        message.enumType = $root.flyteidl.core.EnumType.decode(reader, reader.uint32());
                         break;
                     case 6:
                         message.metadata = $root.google.protobuf.Struct.decode(reader, reader.uint32());
@@ -7171,6 +7303,16 @@ export const flyteidl = $root.flyteidl = (() => {
                         let error = $root.flyteidl.core.BlobType.verify(message.blob);
                         if (error)
                             return "blob." + error;
+                    }
+                }
+                if (message.enumType != null && message.hasOwnProperty("enumType")) {
+                    if (properties.type === 1)
+                        return "type: multiple values";
+                    properties.type = 1;
+                    {
+                        let error = $root.flyteidl.core.EnumType.verify(message.enumType);
+                        if (error)
+                            return "enumType." + error;
                     }
                 }
                 if (message.metadata != null && message.hasOwnProperty("metadata")) {

@@ -21,6 +21,8 @@ type CoreLiteralType struct {
 	MapValueType *CoreLiteralType `json:"map_value_type,omitempty"`
 	// A blob might have specialized implementation details depending on associated metadata.
 	Blob *CoreBlobType `json:"blob,omitempty"`
+	// Defines an enum with pre-defined string values.
+	EnumType *CoreEnumType `json:"enum_type,omitempty"`
 	// This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by consumers to identify special behavior or display extended information for the type.
 	Metadata *ProtobufStruct `json:"metadata,omitempty"`
 }

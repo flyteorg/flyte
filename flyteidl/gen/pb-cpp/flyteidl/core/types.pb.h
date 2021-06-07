@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fcore_2ftypes_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[6]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -55,6 +55,9 @@ namespace core {
 class BlobType;
 class BlobTypeDefaultTypeInternal;
 extern BlobTypeDefaultTypeInternal _BlobType_default_instance_;
+class EnumType;
+class EnumTypeDefaultTypeInternal;
+extern EnumTypeDefaultTypeInternal _EnumType_default_instance_;
 class Error;
 class ErrorDefaultTypeInternal;
 extern ErrorDefaultTypeInternal _Error_default_instance_;
@@ -75,6 +78,7 @@ extern SchemaType_SchemaColumnDefaultTypeInternal _SchemaType_SchemaColumn_defau
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::core::BlobType* Arena::CreateMaybeMessage<::flyteidl::core::BlobType>(Arena*);
+template<> ::flyteidl::core::EnumType* Arena::CreateMaybeMessage<::flyteidl::core::EnumType>(Arena*);
 template<> ::flyteidl::core::Error* Arena::CreateMaybeMessage<::flyteidl::core::Error>(Arena*);
 template<> ::flyteidl::core::LiteralType* Arena::CreateMaybeMessage<::flyteidl::core::LiteralType>(Arena*);
 template<> ::flyteidl::core::OutputReference* Arena::CreateMaybeMessage<::flyteidl::core::OutputReference>(Arena*);
@@ -596,6 +600,134 @@ class BlobType final :
 };
 // -------------------------------------------------------------------
 
+class EnumType final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.EnumType) */ {
+ public:
+  EnumType();
+  virtual ~EnumType();
+
+  EnumType(const EnumType& from);
+
+  inline EnumType& operator=(const EnumType& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  EnumType(EnumType&& from) noexcept
+    : EnumType() {
+    *this = ::std::move(from);
+  }
+
+  inline EnumType& operator=(EnumType&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const EnumType& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const EnumType* internal_default_instance() {
+    return reinterpret_cast<const EnumType*>(
+               &_EnumType_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(EnumType* other);
+  friend void swap(EnumType& a, EnumType& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline EnumType* New() const final {
+    return CreateMaybeMessage<EnumType>(nullptr);
+  }
+
+  EnumType* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<EnumType>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const EnumType& from);
+  void MergeFrom(const EnumType& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(EnumType* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated string values = 1;
+  int values_size() const;
+  void clear_values();
+  static const int kValuesFieldNumber = 1;
+  const ::std::string& values(int index) const;
+  ::std::string* mutable_values(int index);
+  void set_values(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_values(int index, ::std::string&& value);
+  #endif
+  void set_values(int index, const char* value);
+  void set_values(int index, const char* value, size_t size);
+  ::std::string* add_values();
+  void add_values(const ::std::string& value);
+  #if LANG_CXX11
+  void add_values(::std::string&& value);
+  #endif
+  void add_values(const char* value);
+  void add_values(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& values() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_values();
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.EnumType)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField<::std::string> values_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2ftypes_2eproto;
+};
+// -------------------------------------------------------------------
+
 class LiteralType final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.LiteralType) */ {
  public:
@@ -634,6 +766,7 @@ class LiteralType final :
     kCollectionType = 3,
     kMapValueType = 4,
     kBlob = 5,
+    kEnumType = 7,
     TYPE_NOT_SET = 0,
   };
 
@@ -643,7 +776,7 @@ class LiteralType final :
                &_LiteralType_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(LiteralType* other);
   friend void swap(LiteralType& a, LiteralType& b) {
@@ -754,6 +887,15 @@ class LiteralType final :
   ::flyteidl::core::BlobType* mutable_blob();
   void set_allocated_blob(::flyteidl::core::BlobType* blob);
 
+  // .flyteidl.core.EnumType enum_type = 7;
+  bool has_enum_type() const;
+  void clear_enum_type();
+  static const int kEnumTypeFieldNumber = 7;
+  const ::flyteidl::core::EnumType& enum_type() const;
+  ::flyteidl::core::EnumType* release_enum_type();
+  ::flyteidl::core::EnumType* mutable_enum_type();
+  void set_allocated_enum_type(::flyteidl::core::EnumType* enum_type);
+
   void clear_type();
   TypeCase type_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.LiteralType)
@@ -764,6 +906,7 @@ class LiteralType final :
   void set_has_collection_type();
   void set_has_map_value_type();
   void set_has_blob();
+  void set_has_enum_type();
 
   inline bool has_type() const;
   inline void clear_has_type();
@@ -777,6 +920,7 @@ class LiteralType final :
     ::flyteidl::core::LiteralType* collection_type_;
     ::flyteidl::core::LiteralType* map_value_type_;
     ::flyteidl::core::BlobType* blob_;
+    ::flyteidl::core::EnumType* enum_type_;
   } type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -823,7 +967,7 @@ class OutputReference final :
                &_OutputReference_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(OutputReference* other);
   friend void swap(OutputReference& a, OutputReference& b) {
@@ -958,7 +1102,7 @@ class Error final :
                &_Error_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(Error* other);
   friend void swap(Error& a, Error& b) {
@@ -1238,6 +1382,79 @@ inline void BlobType::set_dimensionality(::flyteidl::core::BlobType_BlobDimensio
 
 // -------------------------------------------------------------------
 
+// EnumType
+
+// repeated string values = 1;
+inline int EnumType::values_size() const {
+  return values_.size();
+}
+inline void EnumType::clear_values() {
+  values_.Clear();
+}
+inline const ::std::string& EnumType::values(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.EnumType.values)
+  return values_.Get(index);
+}
+inline ::std::string* EnumType::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.EnumType.values)
+  return values_.Mutable(index);
+}
+inline void EnumType::set_values(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.core.EnumType.values)
+  values_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void EnumType::set_values(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.core.EnumType.values)
+  values_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void EnumType::set_values(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  values_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.EnumType.values)
+}
+inline void EnumType::set_values(int index, const char* value, size_t size) {
+  values_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.EnumType.values)
+}
+inline ::std::string* EnumType::add_values() {
+  // @@protoc_insertion_point(field_add_mutable:flyteidl.core.EnumType.values)
+  return values_.Add();
+}
+inline void EnumType::add_values(const ::std::string& value) {
+  values_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:flyteidl.core.EnumType.values)
+}
+#if LANG_CXX11
+inline void EnumType::add_values(::std::string&& value) {
+  values_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:flyteidl.core.EnumType.values)
+}
+#endif
+inline void EnumType::add_values(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  values_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:flyteidl.core.EnumType.values)
+}
+inline void EnumType::add_values(const char* value, size_t size) {
+  values_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:flyteidl.core.EnumType.values)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+EnumType::values() const {
+  // @@protoc_insertion_point(field_list:flyteidl.core.EnumType.values)
+  return values_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+EnumType::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.core.EnumType.values)
+  return &values_;
+}
+
+// -------------------------------------------------------------------
+
 // LiteralType
 
 // .flyteidl.core.SimpleType simple = 1;
@@ -1431,6 +1648,47 @@ inline ::flyteidl::core::BlobType* LiteralType::mutable_blob() {
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.core.LiteralType.blob)
   return type_.blob_;
+}
+
+// .flyteidl.core.EnumType enum_type = 7;
+inline bool LiteralType::has_enum_type() const {
+  return type_case() == kEnumType;
+}
+inline void LiteralType::set_has_enum_type() {
+  _oneof_case_[0] = kEnumType;
+}
+inline void LiteralType::clear_enum_type() {
+  if (has_enum_type()) {
+    delete type_.enum_type_;
+    clear_has_type();
+  }
+}
+inline ::flyteidl::core::EnumType* LiteralType::release_enum_type() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.LiteralType.enum_type)
+  if (has_enum_type()) {
+    clear_has_type();
+      ::flyteidl::core::EnumType* temp = type_.enum_type_;
+    type_.enum_type_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::EnumType& LiteralType::enum_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.LiteralType.enum_type)
+  return has_enum_type()
+      ? *type_.enum_type_
+      : *reinterpret_cast< ::flyteidl::core::EnumType*>(&::flyteidl::core::_EnumType_default_instance_);
+}
+inline ::flyteidl::core::EnumType* LiteralType::mutable_enum_type() {
+  if (!has_enum_type()) {
+    clear_type();
+    set_has_enum_type();
+    type_.enum_type_ = CreateMaybeMessage< ::flyteidl::core::EnumType >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.LiteralType.enum_type)
+  return type_.enum_type_;
 }
 
 // .google.protobuf.Struct metadata = 6;
@@ -1711,6 +1969,8 @@ inline void Error::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
