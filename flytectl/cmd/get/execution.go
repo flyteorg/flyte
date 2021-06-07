@@ -3,8 +3,6 @@ package get
 import (
 	"context"
 
-	"github.com/flyteorg/flytectl/pkg/filters"
-
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -85,18 +83,15 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 			return err
 		}
 		executions = append(executions, execution)
-	} else {
-		transformFilters, err := filters.BuildResourceListRequestWithName(execution.DefaultConfig.Filter, config.GetConfig().Project, config.GetConfig().Domain, "")
-		if err != nil {
-			return err
-		}
-		executionList, err := cmdCtx.AdminClient().ListExecutions(ctx, transformFilters)
-		if err != nil {
-			return err
-		}
-		executions = executionList.Executions
+		logger.Infof(ctx, "Retrieved %v executions", len(executions))
+		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
+			ExecutionToProtoMessages(executions)...)
 	}
-	logger.Infof(ctx, "Retrieved %v executions", len(executions))
+	executionList, err := cmdCtx.AdminFetcherExt().ListExecution(ctx, config.GetConfig().Project, config.GetConfig().Domain, execution.DefaultConfig.Filter)
+	if err != nil {
+		return err
+	}
+	logger.Infof(ctx, "Retrieved %v executions", len(executionList.Executions))
 	return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
-		ExecutionToProtoMessages(executions)...)
+		ExecutionToProtoMessages(executionList.Executions)...)
 }
