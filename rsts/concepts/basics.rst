@@ -13,7 +13,7 @@ Core Concepts
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     A **Task** is any independent unit of processing. They can be pure functions or functions with side-effects.
-    They also have configuration and requirements specification associated with each definition of the Task.
+    Each definition of a task also has associated configuration and requirements specifications.
  
     ---
  
