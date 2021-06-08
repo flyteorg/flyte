@@ -26,15 +26,15 @@ RUN python3.8 -m venv ${VENV}
 RUN ${VENV}/bin/pip install wheel
 
 # Install Python dependencies
-COPY ml_training/house_price_prediction/requirements.txt /root
+COPY house_price_prediction/requirements.txt /root
 RUN ${VENV}/bin/pip install -r /root/requirements.txt
 
 # Copy the makefile targets to expose on the container. This makes it easier to register.
 COPY in_container.mk /root/Makefile
-COPY ml_training/house_price_prediction/sandbox.config /root
+COPY house_price_prediction/sandbox.config /root
 
 # Copy the actual code
-COPY ml_training/house_price_prediction/ /root/house_price_prediction/
+COPY house_price_prediction/ /root/house_price_prediction/
 
 # Copy over the helper script that the SDK relies on
 RUN cp ${VENV}/bin/flytekit_venv /usr/local/bin/
