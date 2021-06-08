@@ -1,14 +1,14 @@
 """
-DataParallel distributed training of a Pytorch Model on Amazon Sagemaker using Flyte
-#####################################################################################
+Distributed Pytorch on Sagemaker
+################################
 
-This example is adapted from the following sagemake example.
+This example is adapted from the following sagemake example:
 https://github.com/aws/amazon-sagemaker-examples/blob/89831fcf99ea3110f52794db0f6433a4013a5bca/sagemaker-python-sdk/pytorch_mnist/mnist.py
 
 It shows how distributed training can be completely performed on the user side with minimal changes using Flyte.
 
 TODO: Flytekit will be adding further simplifications to make writing a distributed training algorithm even simpler, but
-      this example basically provides the full detailed
+      this example basically provides the full details.
 """
 import logging
 import os
@@ -65,7 +65,7 @@ class Hyperparameters(object):
 class TrainingArgs(Hyperparameters):
     """
     These are training arguments that contain additional metadata beyond the hyper parameters useful especially in
-    distributed training
+    distributed training:
     """
 
     hosts: typing.List[int] = None
@@ -384,7 +384,7 @@ def mnist_pytorch_job(hp: Hyperparameters) -> PythonPickledFile:
 
     # Data shouldn't be downloaded by the functions called in mp.spawn due to race conditions
     # These can be replaced by Flyte's blob type inputs. Note that the data here are assumed
-    # to be accessible via a local path
+    # to be accessible via a local path:
     download_training_data(args.data_dir)
     download_test_data(args.data_dir)
 
@@ -413,11 +413,11 @@ def mnist_pytorch_job(hp: Hyperparameters) -> PythonPickledFile:
 
 
 # %%
-# Create a pipeline
+# Create a Pipeline
 # ------------------
-# now the training and the plotting can be together put into a pipeline, in which case the training is performed first
+# Now the training and the plotting can be put together into a pipeline, where the training is performed first
 # followed by the plotting of the accuracy. Data is passed between them and the workflow itself outputs the image and
-# the serialize model
+# the serialize model:
 @workflow
 def pytorch_training_wf(hp: Hyperparameters) -> PythonPickledFile:
     return mnist_pytorch_job(hp=hp)
