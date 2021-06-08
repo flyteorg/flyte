@@ -1,7 +1,6 @@
 """
 Conditions
 --------------
-
 Flytekit supports conditions as a first class construct in the language. Conditions offer a way to selectively execute
 branches of a workflow based on static or dynamic data produced by other tasks or come in as workflow inputs.
 Conditions are very performant to be evaluated however, they are limited to certain binary and logical operators and can
@@ -26,10 +25,8 @@ def square(n: float) -> float:
     Parameters:
         n (float): name of the parameter for the task will be derived from the name of the input variable
                the type will be automatically deduced to be Types.Integer
-
     Return:
         float: The label for the output will be automatically assigned and type will be deduced from the annotation
-
     """
     return n * n
 
@@ -40,10 +37,8 @@ def double(n: float) -> float:
     Parameters:
         n (float): name of the parameter for the task will be derived from the name of the input variable
                the type will be automatically deduced to be Types.Integer
-
     Return:
         float: The label for the output will be automatically assigned and type will be deduced from the annotation
-
     """
     return 2 * n
 
@@ -173,8 +168,43 @@ def bool_input_wf(b: bool) -> int:
     return conditional("test").if_(b.is_true()).then(success()).else_().then(failed())
 
 
+# %%
+# Let us execute these workflows
 if __name__ == "__main__":
     print("Running basic_boolean_wf a few times")
     for i in range(0, 5):
         print(f"Basic boolean wf output {basic_boolean_wf()}")
         print(f"Boolean input {True if i < 2 else False}, workflow output {bool_input_wf(b=True if i < 2 else False)}")
+
+
+# %%
+# Also it is possible to arbitrarily nest conditional sections, inside other
+# conditional sections. Remember - conditional sections can only be in the
+# `then` part for a previous conditional block
+# The follow example shows how you can use float comparisons to create
+# a multi-level nested workflow
+@workflow
+def nested_conditions(my_input: float) -> float:
+    return (
+        conditional("fractions")
+        .if_((my_input > 0.1) & (my_input < 1.0))
+        .then(
+            conditional("inner_fractions")
+            .if_(my_input < 0.5)
+            .then(double(n=my_input))
+            .elif_((my_input > 0.5) & (my_input < 0.7))
+            .then(square(n=my_input))
+            .else_()
+            .fail("Only <0.7 allowed")
+        )
+        .elif_((my_input > 1.0) & (my_input < 10.0))
+        .then(square(n=my_input))
+        .else_()
+        .then(double(n=my_input))
+    )
+
+
+# %%
+# As usual you can execute nested conditionals locally
+if __name__ == "__main__":
+    print(f"nested_conditions(0.4) -> {nested_conditions(my_input=0.4)}")
