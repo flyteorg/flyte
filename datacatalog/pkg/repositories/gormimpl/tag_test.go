@@ -3,6 +3,8 @@ package gormimpl
 import (
 	"testing"
 
+	"github.com/jackc/pgconn"
+
 	"gorm.io/gorm"
 
 	"context"
@@ -20,7 +22,6 @@ import (
 	"github.com/flyteorg/flytestdlib/contextutils"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/lib/pq"
 	"google.golang.org/grpc/codes"
 )
 
@@ -28,8 +29,24 @@ func init() {
 	labeled.SetMetricKeys(contextutils.AppNameKey)
 }
 
+type pgError struct {
+	e   error
+	msg string
+}
+
+func (p *pgError) Error() string {
+	return p.msg
+}
+
+func (p *pgError) Unwrap() error {
+	return p.e
+}
+
 func getAlreadyExistsErr() error {
-	return &pq.Error{Code: "23505"}
+	return &pgError{
+		e:   &pgconn.PgError{Code: "23505"},
+		msg: "some error",
+	}
 }
 
 func getTestTag() models.Tag {
