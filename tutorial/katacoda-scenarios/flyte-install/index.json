@@ -2,9 +2,7 @@
   "title": "Flyte",
   "description": "Flyte Installation",
   "details": {
-    "steps": [
-      {
-        "code" : "set-env.sh",
+    "steps": [{
         "title": "Step 1",
         "text": "step1.md"
       },{
@@ -19,16 +17,17 @@
       "text": "finish.md"
     },
     "intro": {
-
+      "code": "foreground.sh",
       "text": "intro.md"
     }
   },
   "environment": {
+    "hideintro": true,
     "uilayout": "terminal-terminal",
     "showdashboard": true,
-    "dashboards": [{"name": "Flyte Get Started", "href": "https://flyte.org"},{"name": "Flyte Console", "href": "https://[[HOST_SUBDOMAIN]]-80-[[KATACODA_HOST]].environments.katacoda.com"}]
+    "dashboards": [{"name": "Flyte Get Started", "href": "https://flyte.org"},{"name": "Flyte Console", "href": "https://[[HOST_SUBDOMAIN]]-30081-[[KATACODA_HOST]].environments.katacoda.com"}]
   },
   "backend": {
-    "imageid": "kubernetes-cluster-running:1.18"
+    "imageid": "ubuntu:2004"
   }
 }
