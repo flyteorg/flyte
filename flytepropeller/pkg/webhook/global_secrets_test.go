@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+
 	"github.com/stretchr/testify/assert"
 
 	"github.com/go-test/deep"
@@ -81,7 +83,7 @@ func TestGlobalSecrets_Inject(t *testing.T) {
 				envSecretManager: tt.envSecretManager,
 			}
 
-			assert.NotEmpty(t, g.ID())
+			assert.Equal(t, config.SecretManagerTypeGlobal, g.Type())
 
 			got, _, err := g.Inject(context.Background(), tt.args.secret, tt.args.p)
 			if (err != nil) != tt.wantErr {

@@ -36,6 +36,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+
 	"github.com/flyteorg/flytepropeller/pkg/utils/secrets"
 
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
@@ -57,7 +59,7 @@ const webhookName = "flyte-pod-webhook.flyte.org"
 // PodMutator implements controller-runtime WebHook interface.
 type PodMutator struct {
 	decoder  *admission.Decoder
-	cfg      *Config
+	cfg      *config.Config
 	Mutators []MutatorConfig
 }
 
@@ -219,12 +221,12 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 	return mutateConfig, nil
 }
 
-func NewPodMutator(cfg *Config, scope promutils.Scope) *PodMutator {
+func NewPodMutator(cfg *config.Config, scope promutils.Scope) *PodMutator {
 	return &PodMutator{
 		cfg: cfg,
 		Mutators: []MutatorConfig{
 			{
-				Mutator: NewSecretsMutator(scope.NewSubScope("secrets")),
+				Mutator: NewSecretsMutator(cfg, scope.NewSubScope("secrets")),
 			},
 		},
 	}

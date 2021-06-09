@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+
 	"k8s.io/client-go/tools/clientcmd/api/latest"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -84,7 +86,7 @@ func TestPodMutator_Mutate(t *testing.T) {
 }
 
 func Test_CreateMutationWebhookConfiguration(t *testing.T) {
-	pm := NewPodMutator(&Config{
+	pm := NewPodMutator(&config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
 	}, promutils.NewTestScope())
@@ -103,7 +105,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 }
 
 func Test_Handle(t *testing.T) {
-	pm := NewPodMutator(&Config{
+	pm := NewPodMutator(&config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
 	}, promutils.NewTestScope())
