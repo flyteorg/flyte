@@ -94,8 +94,8 @@ func TestUpdateVolumeMounts(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := UpdateVolumeMounts(tt.args.containers, tt.args.volumeMount); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("UpdateVolumeMounts() = %v, want %v", got, tt.want)
+			if got := AppendVolumeMounts(tt.args.containers, tt.args.volumeMount); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("AppendVolumeMounts() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -170,8 +170,8 @@ func TestUpdateEnvVars(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := UpdateEnvVars(tt.args.containers, tt.args.envVar); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("UpdateEnvVars() = %v, want %v", got, tt.want)
+			if got := AppendEnvVars(tt.args.containers, tt.args.envVar); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("AppendEnvVars() = %v, want %v", got, tt.want)
 			}
 		})
 	}

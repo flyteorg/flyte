@@ -60,17 +60,17 @@ func CreateVolumeMountForSecret(volumeName string, secret *core.Secret) corev1.V
 	}
 }
 
-func UpdateVolumeMounts(containers []corev1.Container, mount corev1.VolumeMount) []corev1.Container {
+func AppendVolumeMounts(containers []corev1.Container, mount corev1.VolumeMount) []corev1.Container {
 	res := make([]corev1.Container, 0, len(containers))
 	for _, c := range containers {
-		c.VolumeMounts = append(c.VolumeMounts, mount)
+		c.VolumeMounts = appendVolumeMountIfNotExists(c.VolumeMounts, mount)
 		res = append(res, c)
 	}
 
 	return res
 }
 
-func UpdateEnvVars(containers []corev1.Container, envVar corev1.EnvVar) []corev1.Container {
+func AppendEnvVars(containers []corev1.Container, envVar corev1.EnvVar) []corev1.Container {
 	res := make([]corev1.Container, 0, len(containers))
 	for _, c := range containers {
 		if !hasEnvVar(c.Env, envVar.Name) {
@@ -81,4 +81,24 @@ func UpdateEnvVars(containers []corev1.Container, envVar corev1.EnvVar) []corev1
 	}
 
 	return res
+}
+
+func appendVolumeIfNotExists(volumes []corev1.Volume, vol corev1.Volume) []corev1.Volume {
+	for _, v := range volumes {
+		if v.Name == vol.Name {
+			return volumes
+		}
+	}
+
+	return append(volumes, vol)
+}
+
+func appendVolumeMountIfNotExists(volumes []corev1.VolumeMount, vol corev1.VolumeMount) []corev1.VolumeMount {
+	for _, v := range volumes {
+		if v.Name == vol.Name {
+			return volumes
+		}
+	}
+
+	return append(volumes, vol)
 }
