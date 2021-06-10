@@ -2,8 +2,8 @@
 
 .. _secrets:
 
-Accessing Secrets
------------------
+Using Secrets in a Task
+-----------------------
 
 Flyte supports running a wide variety of tasks, from containers to SQL queries and service calls. In order for Flyte-run
 containers to request and access secrets, Flyte provides a native Secret construct.

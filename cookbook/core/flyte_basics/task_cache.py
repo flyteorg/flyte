@@ -1,6 +1,6 @@
 """
-Task Cache
------------
+Caching
+--------
 
 Flyte provides the ability to cache the output of task executions to make the subsequent executions faster. A well-behaved Flyte task should generate deterministic output given the same inputs and task functionality.
 

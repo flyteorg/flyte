@@ -1,7 +1,7 @@
 .. _deployment_cluster:
 
 Cluster Deployment
-------------------
+-------------------
 
 Locally, Flytekit relies on the Python interpreter to execute both tasks and workflows.
 To leverage the full power of Flyte, we recommend using a deployed backend of Flyte. Flyte can be run

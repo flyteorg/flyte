@@ -1,7 +1,8 @@
 .. _plugins-spark-k8s:
 
-K8s Cluster Spark Jobs
-=======================
+Spark on Kubernetes
+====================
+
 Flyte can execute Spark jobs natively on a Kubernetes Cluster, which manages the lifecycle, spin-up, and tear down
 of a virtual cluster. It leverages the open-sourced `Spark On K8s Operator <https://github.com/GoogleCloudPlatform/spark-on-k8s-operator>`_
 and can be enabled without signing up for any service. 
@@ -11,7 +12,7 @@ Spark cluster will be automatically configured using the decorated ``SparkConf``
 hands-on tutorial for writing pyspark tasks.
 
 Environment Setup
-----------------------
+------------------
 
 #. Install ``flytekitplugins-spark`` using ``pip`` in your environment that contains ``flytekit >= 0.16.0``.
 

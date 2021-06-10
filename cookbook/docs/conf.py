@@ -238,7 +238,7 @@ examples_dirs = [
     "../integrations/flytekit_plugins/dolt",
     "../integrations/kubernetes/pod",
     "../integrations/kubernetes/k8s_spark",
-    "../integrations/kubernetes/kftensorflow",
+    # "../integrations/kubernetes/kftensorflow",  # TODO: need to update content
     "../integrations/kubernetes/kfpytorch",
     # "../integrations/aws/athena",  # TODO: add content to this section
     "../integrations/aws/sagemaker_training",
@@ -266,7 +266,7 @@ gallery_dirs = [
     "auto/integrations/flytekit_plugins/dolt",
     "auto/integrations/kubernetes/pod",
     "auto/integrations/kubernetes/k8s_spark",
-    "auto/integrations/kubernetes/kftensorflow",
+    # "auto/integrations/kubernetes/kftensorflow",  # TODO: need to update content
     "auto/integrations/kubernetes/kfpytorch",
     # "auto/integrations/aws/athena",  # TODO: add content to this section
     "auto/integrations/aws/sagemaker_training",

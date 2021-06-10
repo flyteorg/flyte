@@ -1,6 +1,6 @@
 """
 Workflows
-------------------------------
+----------
 
 Once you've had a handle on tasks, we can move to workflows. Workflow are the other basic building block of Flyte.
 
