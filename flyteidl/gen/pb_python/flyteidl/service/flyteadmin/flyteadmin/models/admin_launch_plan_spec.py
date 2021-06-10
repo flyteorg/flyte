@@ -54,7 +54,8 @@ class AdminLaunchPlanSpec(object):
         'auth_role': 'AdminAuthRole',
         'security_context': 'CoreSecurityContext',
         'quality_of_service': 'CoreQualityOfService',
-        'raw_output_data_config': 'AdminRawOutputDataConfig'
+        'raw_output_data_config': 'AdminRawOutputDataConfig',
+        'max_parallelism': 'int'
     }
 
     attribute_map = {
@@ -69,10 +70,11 @@ class AdminLaunchPlanSpec(object):
         'auth_role': 'auth_role',
         'security_context': 'security_context',
         'quality_of_service': 'quality_of_service',
-        'raw_output_data_config': 'raw_output_data_config'
+        'raw_output_data_config': 'raw_output_data_config',
+        'max_parallelism': 'max_parallelism'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -87,6 +89,7 @@ class AdminLaunchPlanSpec(object):
         self._security_context = None
         self._quality_of_service = None
         self._raw_output_data_config = None
+        self._max_parallelism = None
         self.discriminator = None
 
         if workflow_id is not None:
@@ -113,6 +116,8 @@ class AdminLaunchPlanSpec(object):
             self.quality_of_service = quality_of_service
         if raw_output_data_config is not None:
             self.raw_output_data_config = raw_output_data_config
+        if max_parallelism is not None:
+            self.max_parallelism = max_parallelism
 
     @property
     def workflow_id(self):
@@ -373,6 +378,29 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._raw_output_data_config = raw_output_data_config
+
+    @property
+    def max_parallelism(self):
+        """Gets the max_parallelism of this AdminLaunchPlanSpec.  # noqa: E501
+
+        Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.  # noqa: E501
+
+        :return: The max_parallelism of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: int
+        """
+        return self._max_parallelism
+
+    @max_parallelism.setter
+    def max_parallelism(self, max_parallelism):
+        """Sets the max_parallelism of this AdminLaunchPlanSpec.
+
+        Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.  # noqa: E501
+
+        :param max_parallelism: The max_parallelism of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: int
+        """
+
+        self._max_parallelism = max_parallelism
 
     def to_dict(self):
         """Returns the model properties as a dict"""

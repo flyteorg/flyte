@@ -2895,6 +2895,7 @@ definitions:
         annotations:
           values:
             key: "values"
+        max_parallelism: 6
         notifications:
           notifications:
           - pager_duty:
@@ -3241,6 +3242,7 @@ definitions:
           annotations:
             values:
               key: "values"
+          max_parallelism: 6
           notifications:
             notifications:
             - pager_duty:
@@ -3418,6 +3420,7 @@ definitions:
           annotations:
             values:
               key: "values"
+          max_parallelism: 6
           notifications:
             notifications:
             - pager_duty:
@@ -3616,6 +3619,13 @@ definitions:
       quality_of_service:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
+      max_parallelism:
+        type: "integer"
+        format: "int32"
+        description: "Controls the maximum number of tasknodes that can be run in\
+          \ parallel for the entire workflow.\nThis is useful to achieve fairness.\
+          \ Note: MapTasks are regarded as one unit,\nand parallelism/concurrency\
+          \ of MapTasks is independent from this."
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
       \ across phase changes.."
@@ -3653,6 +3663,7 @@ definitions:
       annotations:
         values:
           key: "values"
+      max_parallelism: 6
       notifications:
         notifications:
         - pager_duty:
@@ -3942,15 +3953,9 @@ definitions:
         fixed_inputs:
           literals: {}
         role: "role"
-        quality_of_service:
-          tier: {}
-          spec:
-            queueing_budget: "queueing_budget"
         auth:
           kubernetes_service_account: "kubernetes_service_account"
           assumable_iam_role: "assumable_iam_role"
-        raw_output_data_config:
-          output_location_prefix: "output_location_prefix"
         entity_metadata:
           schedule:
             kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -3995,6 +4000,16 @@ definitions:
         annotations:
           values:
             key: "values"
+        max_parallelism: 5
+        labels:
+          values:
+            key: "values"
+        quality_of_service:
+          tier: {}
+          spec:
+            queueing_budget: "queueing_budget"
+        raw_output_data_config:
+          output_location_prefix: "output_location_prefix"
         default_inputs:
           parameters:
             key:
@@ -4117,9 +4132,6 @@ definitions:
             group_version: "group_version"
             key: "key"
             group: "group"
-        labels:
-          values:
-            key: "values"
         auth_role:
           kubernetes_service_account: "kubernetes_service_account"
           assumable_iam_role: "assumable_iam_role"
@@ -4421,15 +4433,9 @@ definitions:
           fixed_inputs:
             literals: {}
           role: "role"
-          quality_of_service:
-            tier: {}
-            spec:
-              queueing_budget: "queueing_budget"
           auth:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
-          raw_output_data_config:
-            output_location_prefix: "output_location_prefix"
           entity_metadata:
             schedule:
               kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -4474,6 +4480,16 @@ definitions:
           annotations:
             values:
               key: "values"
+          max_parallelism: 5
+          labels:
+            values:
+              key: "values"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           default_inputs:
             parameters:
               key:
@@ -4596,9 +4612,6 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
-          labels:
-            values:
-              key: "values"
           auth_role:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
@@ -4731,15 +4744,9 @@ definitions:
           fixed_inputs:
             literals: {}
           role: "role"
-          quality_of_service:
-            tier: {}
-            spec:
-              queueing_budget: "queueing_budget"
           auth:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
-          raw_output_data_config:
-            output_location_prefix: "output_location_prefix"
           entity_metadata:
             schedule:
               kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -4784,6 +4791,16 @@ definitions:
           annotations:
             values:
               key: "values"
+          max_parallelism: 5
+          labels:
+            values:
+              key: "values"
+          quality_of_service:
+            tier: {}
+            spec:
+              queueing_budget: "queueing_budget"
+          raw_output_data_config:
+            output_location_prefix: "output_location_prefix"
           default_inputs:
             parameters:
               key:
@@ -4906,9 +4923,6 @@ definitions:
               group_version: "group_version"
               key: "key"
               group: "group"
-          labels:
-            values:
-              key: "values"
           auth_role:
             kubernetes_service_account: "kubernetes_service_account"
             assumable_iam_role: "assumable_iam_role"
@@ -5006,6 +5020,13 @@ definitions:
         $ref: "#/definitions/coreQualityOfService"
       raw_output_data_config:
         $ref: "#/definitions/adminRawOutputDataConfig"
+      max_parallelism:
+        type: "integer"
+        format: "int32"
+        description: "Controls the maximum number of tasknodes that can be run in\
+          \ parallel for the entire workflow.\nThis is useful to achieve fairness.\
+          \ Note: MapTasks are regarded as one unit,\nand parallelism/concurrency\
+          \ of MapTasks is independent from this."
     description: "User-provided launch plan definition and configuration values."
     example:
       workflow_id:
@@ -5017,15 +5038,9 @@ definitions:
       fixed_inputs:
         literals: {}
       role: "role"
-      quality_of_service:
-        tier: {}
-        spec:
-          queueing_budget: "queueing_budget"
       auth:
         kubernetes_service_account: "kubernetes_service_account"
         assumable_iam_role: "assumable_iam_role"
-      raw_output_data_config:
-        output_location_prefix: "output_location_prefix"
       entity_metadata:
         schedule:
           kickoff_time_input_arg: "kickoff_time_input_arg"
@@ -5070,6 +5085,16 @@ definitions:
       annotations:
         values:
           key: "values"
+      max_parallelism: 5
+      labels:
+        values:
+          key: "values"
+      quality_of_service:
+        tier: {}
+        spec:
+          queueing_budget: "queueing_budget"
+      raw_output_data_config:
+        output_location_prefix: "output_location_prefix"
       default_inputs:
         parameters:
           key:
@@ -5192,9 +5217,6 @@ definitions:
           group_version: "group_version"
           key: "key"
           group: "group"
-      labels:
-        values:
-          key: "values"
       auth_role:
         kubernetes_service_account: "kubernetes_service_account"
         assumable_iam_role: "assumable_iam_role"

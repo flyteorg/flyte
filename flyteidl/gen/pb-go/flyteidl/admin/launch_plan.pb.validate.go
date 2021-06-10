@@ -554,6 +554,8 @@ func (m *LaunchPlanSpec) Validate() error {
 		}
 	}
 
+	// no validation rules for MaxParallelism
+
 	return nil
 }
 

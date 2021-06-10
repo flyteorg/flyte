@@ -4495,6 +4495,17 @@ public final class LaunchPlanOuterClass {
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder();
+
+    /**
+     * <pre>
+     * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+     * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+     * and parallelism/concurrency of MapTasks is independent from this.
+     * </pre>
+     *
+     * <code>int32 max_parallelism = 18;</code>
+     */
+    int getMaxParallelism();
   }
   /**
    * <pre>
@@ -4687,6 +4698,11 @@ public final class LaunchPlanOuterClass {
                 rawOutputDataConfig_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 144: {
+
+              maxParallelism_ = input.readInt32();
               break;
             }
             default: {
@@ -5102,6 +5118,21 @@ public final class LaunchPlanOuterClass {
       return getRawOutputDataConfig();
     }
 
+    public static final int MAX_PARALLELISM_FIELD_NUMBER = 18;
+    private int maxParallelism_;
+    /**
+     * <pre>
+     * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+     * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+     * and parallelism/concurrency of MapTasks is independent from this.
+     * </pre>
+     *
+     * <code>int32 max_parallelism = 18;</code>
+     */
+    public int getMaxParallelism() {
+      return maxParallelism_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5151,6 +5182,9 @@ public final class LaunchPlanOuterClass {
       }
       if (rawOutputDataConfig_ != null) {
         output.writeMessage(17, getRawOutputDataConfig());
+      }
+      if (maxParallelism_ != 0) {
+        output.writeInt32(18, maxParallelism_);
       }
       unknownFields.writeTo(output);
     }
@@ -5207,6 +5241,10 @@ public final class LaunchPlanOuterClass {
       if (rawOutputDataConfig_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, getRawOutputDataConfig());
+      }
+      if (maxParallelism_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(18, maxParallelism_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5280,6 +5318,8 @@ public final class LaunchPlanOuterClass {
         if (!getRawOutputDataConfig()
             .equals(other.getRawOutputDataConfig())) return false;
       }
+      if (getMaxParallelism()
+          != other.getMaxParallelism()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5337,6 +5377,8 @@ public final class LaunchPlanOuterClass {
         hash = (37 * hash) + RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER;
         hash = (53 * hash) + getRawOutputDataConfig().hashCode();
       }
+      hash = (37 * hash) + MAX_PARALLELISM_FIELD_NUMBER;
+      hash = (53 * hash) + getMaxParallelism();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5542,6 +5584,8 @@ public final class LaunchPlanOuterClass {
           rawOutputDataConfig_ = null;
           rawOutputDataConfigBuilder_ = null;
         }
+        maxParallelism_ = 0;
+
         return this;
       }
 
@@ -5624,6 +5668,7 @@ public final class LaunchPlanOuterClass {
         } else {
           result.rawOutputDataConfig_ = rawOutputDataConfigBuilder_.build();
         }
+        result.maxParallelism_ = maxParallelism_;
         onBuilt();
         return result;
       }
@@ -5708,6 +5753,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasRawOutputDataConfig()) {
           mergeRawOutputDataConfig(other.getRawOutputDataConfig());
+        }
+        if (other.getMaxParallelism() != 0) {
+          setMaxParallelism(other.getMaxParallelism());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -7436,6 +7484,50 @@ public final class LaunchPlanOuterClass {
           rawOutputDataConfig_ = null;
         }
         return rawOutputDataConfigBuilder_;
+      }
+
+      private int maxParallelism_ ;
+      /**
+       * <pre>
+       * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+       * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+       * and parallelism/concurrency of MapTasks is independent from this.
+       * </pre>
+       *
+       * <code>int32 max_parallelism = 18;</code>
+       */
+      public int getMaxParallelism() {
+        return maxParallelism_;
+      }
+      /**
+       * <pre>
+       * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+       * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+       * and parallelism/concurrency of MapTasks is independent from this.
+       * </pre>
+       *
+       * <code>int32 max_parallelism = 18;</code>
+       */
+      public Builder setMaxParallelism(int value) {
+        
+        maxParallelism_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+       * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+       * and parallelism/concurrency of MapTasks is independent from this.
+       * </pre>
+       *
+       * <code>int32 max_parallelism = 18;</code>
+       */
+      public Builder clearMaxParallelism() {
+        
+        maxParallelism_ = 0;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -13452,7 +13544,7 @@ public final class LaunchPlanOuterClass {
       "lanList\0220\n\014launch_plans\030\001 \003(\0132\032.flyteidl" +
       ".admin.LaunchPlan\022\r\n\005token\030\002 \001(\t\"F\n\004Auth" +
       "\022\032\n\022assumable_iam_role\030\001 \001(\t\022\"\n\032kubernet" +
-      "es_service_account\030\002 \001(\t\"\344\004\n\016LaunchPlanS" +
+      "es_service_account\030\002 \001(\t\"\375\004\n\016LaunchPlanS" +
       "pec\022.\n\013workflow_id\030\001 \001(\0132\031.flyteidl.core" +
       ".Identifier\022;\n\017entity_metadata\030\002 \001(\0132\".f" +
       "lyteidl.admin.LaunchPlanMetadata\0223\n\016defa" +
@@ -13467,29 +13559,30 @@ public final class LaunchPlanOuterClass {
       "flyteidl.core.SecurityContext\022;\n\022quality" +
       "_of_service\030\020 \001(\0132\037.flyteidl.core.Qualit" +
       "yOfService\022C\n\026raw_output_data_config\030\021 \001" +
-      "(\0132#.flyteidl.admin.RawOutputDataConfig\"" +
-      "\217\002\n\021LaunchPlanClosure\022.\n\005state\030\001 \001(\0162\037.f" +
-      "lyteidl.admin.LaunchPlanState\0224\n\017expecte" +
-      "d_inputs\030\002 \001(\0132\033.flyteidl.core.Parameter" +
-      "Map\0224\n\020expected_outputs\030\003 \001(\0132\032.flyteidl" +
-      ".core.VariableMap\022.\n\ncreated_at\030\004 \001(\0132\032." +
-      "google.protobuf.Timestamp\022.\n\nupdated_at\030" +
-      "\005 \001(\0132\032.google.protobuf.Timestamp\"u\n\022Lau" +
-      "nchPlanMetadata\022*\n\010schedule\030\001 \001(\0132\030.flyt" +
-      "eidl.admin.Schedule\0223\n\rnotifications\030\002 \003" +
-      "(\0132\034.flyteidl.admin.Notification\"p\n\027Laun" +
-      "chPlanUpdateRequest\022%\n\002id\030\001 \001(\0132\031.flytei" +
-      "dl.core.Identifier\022.\n\005state\030\002 \001(\0162\037.flyt" +
-      "eidl.admin.LaunchPlanState\"\032\n\030LaunchPlan" +
-      "UpdateResponse\"L\n\027ActiveLaunchPlanReques" +
-      "t\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEnti" +
-      "tyIdentifier\"\203\001\n\033ActiveLaunchPlanListReq" +
-      "uest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n" +
-      "\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005" +
-      " \001(\0132\024.flyteidl.admin.Sort*+\n\017LaunchPlan" +
-      "State\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B7Z5githu" +
-      "b.com/flyteorg/flyteidl/gen/pb-go/flytei" +
-      "dl/adminb\006proto3"
+      "(\0132#.flyteidl.admin.RawOutputDataConfig\022" +
+      "\027\n\017max_parallelism\030\022 \001(\005\"\217\002\n\021LaunchPlanC" +
+      "losure\022.\n\005state\030\001 \001(\0162\037.flyteidl.admin.L" +
+      "aunchPlanState\0224\n\017expected_inputs\030\002 \001(\0132" +
+      "\033.flyteidl.core.ParameterMap\0224\n\020expected" +
+      "_outputs\030\003 \001(\0132\032.flyteidl.core.VariableM" +
+      "ap\022.\n\ncreated_at\030\004 \001(\0132\032.google.protobuf" +
+      ".Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032.google." +
+      "protobuf.Timestamp\"u\n\022LaunchPlanMetadata" +
+      "\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.admin.Sche" +
+      "dule\0223\n\rnotifications\030\002 \003(\0132\034.flyteidl.a" +
+      "dmin.Notification\"p\n\027LaunchPlanUpdateReq" +
+      "uest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
+      "ier\022.\n\005state\030\002 \001(\0162\037.flyteidl.admin.Laun" +
+      "chPlanState\"\032\n\030LaunchPlanUpdateResponse\"" +
+      "L\n\027ActiveLaunchPlanRequest\0221\n\002id\030\001 \001(\0132%" +
+      ".flyteidl.admin.NamedEntityIdentifier\"\203\001" +
+      "\n\033ActiveLaunchPlanListRequest\022\017\n\007project" +
+      "\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n" +
+      "\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl" +
+      ".admin.Sort*+\n\017LaunchPlanState\022\014\n\010INACTI" +
+      "VE\020\000\022\n\n\006ACTIVE\020\001B7Z5github.com/flyteorg/" +
+      "flyteidl/gen/pb-go/flyteidl/adminb\006proto" +
+      "3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13546,7 +13639,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new
