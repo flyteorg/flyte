@@ -2117,6 +2117,12 @@ class ExecutionSpec final :
   ::flyteidl::core::QualityOfService* mutable_quality_of_service();
   void set_allocated_quality_of_service(::flyteidl::core::QualityOfService* quality_of_service);
 
+  // int32 max_parallelism = 18;
+  void clear_max_parallelism();
+  static const int kMaxParallelismFieldNumber = 18;
+  ::google::protobuf::int32 max_parallelism() const;
+  void set_max_parallelism(::google::protobuf::int32 value);
+
   // .flyteidl.admin.NotificationList notifications = 5;
   bool has_notifications() const;
   void clear_notifications();
@@ -2155,6 +2161,7 @@ class ExecutionSpec final :
   ::flyteidl::core::SecurityContext* security_context_;
   ::flyteidl::admin::AuthRole* auth_role_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
+  ::google::protobuf::int32 max_parallelism_;
   union NotificationOverridesUnion {
     NotificationOverridesUnion() {}
     ::flyteidl::admin::NotificationList* notifications_;
@@ -4949,6 +4956,20 @@ inline void ExecutionSpec::set_allocated_quality_of_service(::flyteidl::core::Qu
   }
   quality_of_service_ = quality_of_service;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionSpec.quality_of_service)
+}
+
+// int32 max_parallelism = 18;
+inline void ExecutionSpec::clear_max_parallelism() {
+  max_parallelism_ = 0;
+}
+inline ::google::protobuf::int32 ExecutionSpec::max_parallelism() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.max_parallelism)
+  return max_parallelism_;
+}
+inline void ExecutionSpec::set_max_parallelism(::google::protobuf::int32 value) {
+  
+  max_parallelism_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionSpec.max_parallelism)
 }
 
 inline bool ExecutionSpec::has_notification_overrides() const {

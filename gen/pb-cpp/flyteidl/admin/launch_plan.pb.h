@@ -980,6 +980,12 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::RawOutputDataConfig* mutable_raw_output_data_config();
   void set_allocated_raw_output_data_config(::flyteidl::admin::RawOutputDataConfig* raw_output_data_config);
 
+  // int32 max_parallelism = 18;
+  void clear_max_parallelism();
+  static const int kMaxParallelismFieldNumber = 18;
+  ::google::protobuf::int32 max_parallelism() const;
+  void set_max_parallelism(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.LaunchPlanSpec)
  private:
   class HasBitSetters;
@@ -997,6 +1003,7 @@ class LaunchPlanSpec final :
   ::flyteidl::core::SecurityContext* security_context_;
   ::flyteidl::core::QualityOfService* quality_of_service_;
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
+  ::google::protobuf::int32 max_parallelism_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 };
@@ -2810,6 +2817,20 @@ inline void LaunchPlanSpec::set_allocated_raw_output_data_config(::flyteidl::adm
   }
   raw_output_data_config_ = raw_output_data_config;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.raw_output_data_config)
+}
+
+// int32 max_parallelism = 18;
+inline void LaunchPlanSpec::clear_max_parallelism() {
+  max_parallelism_ = 0;
+}
+inline ::google::protobuf::int32 LaunchPlanSpec::max_parallelism() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.max_parallelism)
+  return max_parallelism_;
+}
+inline void LaunchPlanSpec::set_max_parallelism(::google::protobuf::int32 value) {
+  
+  max_parallelism_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.LaunchPlanSpec.max_parallelism)
 }
 
 // -------------------------------------------------------------------

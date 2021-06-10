@@ -243,6 +243,11 @@ message ExecutionSpec {
 
     // Indicates the runtime priority of the execution.
     core.QualityOfService quality_of_service = 17;
+
+    // Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+    // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+    // and parallelism/concurrency of MapTasks is independent from this.
+    int32 max_parallelism = 18;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

@@ -3346,6 +3346,11 @@
         "quality_of_service": {
           "$ref": "#/definitions/coreQualityOfService",
           "description": "Indicates the runtime priority of the execution."
+        },
+        "max_parallelism": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.\nThis is useful to achieve fairness. Note: MapTasks are regarded as one unit,\nand parallelism/concurrency of MapTasks is independent from this."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes.."
@@ -3554,6 +3559,11 @@
         },
         "raw_output_data_config": {
           "$ref": "#/definitions/adminRawOutputDataConfig"
+        },
+        "max_parallelism": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.\nThis is useful to achieve fairness. Note: MapTasks are regarded as one unit,\nand parallelism/concurrency of MapTasks is independent from this."
         }
       },
       "description": "User-provided launch plan definition and configuration values."

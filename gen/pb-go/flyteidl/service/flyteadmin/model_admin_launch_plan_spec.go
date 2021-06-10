@@ -27,4 +27,6 @@ type AdminLaunchPlanSpec struct {
 	// Indicates the runtime priority of the execution.
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`
 	RawOutputDataConfig *AdminRawOutputDataConfig `json:"raw_output_data_config,omitempty"`
+	// Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.
+	MaxParallelism int32 `json:"max_parallelism,omitempty"`
 }

@@ -20971,6 +20971,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.ISecurityContext|null} [securityContext] ExecutionSpec securityContext
              * @property {flyteidl.admin.IAuthRole|null} [authRole] ExecutionSpec authRole
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] ExecutionSpec qualityOfService
+             * @property {number|null} [maxParallelism] ExecutionSpec maxParallelism
              */
 
             /**
@@ -21068,6 +21069,14 @@ export const flyteidl = $root.flyteidl = (() => {
              */
             ExecutionSpec.prototype.qualityOfService = null;
 
+            /**
+             * ExecutionSpec maxParallelism.
+             * @member {number} maxParallelism
+             * @memberof flyteidl.admin.ExecutionSpec
+             * @instance
+             */
+            ExecutionSpec.prototype.maxParallelism = 0;
+
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
 
@@ -21126,6 +21135,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.admin.AuthRole.encode(message.authRole, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 if (message.qualityOfService != null && message.hasOwnProperty("qualityOfService"))
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
+                if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                    writer.uint32(/* id 18, wireType 0 =*/144).int32(message.maxParallelism);
                 return writer;
             };
 
@@ -21176,6 +21187,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 17:
                         message.qualityOfService = $root.flyteidl.core.QualityOfService.decode(reader, reader.uint32());
+                        break;
+                    case 18:
+                        message.maxParallelism = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -21252,6 +21266,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "qualityOfService." + error;
                 }
+                if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                    if (!$util.isInteger(message.maxParallelism))
+                        return "maxParallelism: integer expected";
                 return null;
             };
 
@@ -22431,6 +22448,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @property {flyteidl.core.ISecurityContext|null} [securityContext] LaunchPlanSpec securityContext
              * @property {flyteidl.core.IQualityOfService|null} [qualityOfService] LaunchPlanSpec qualityOfService
              * @property {flyteidl.admin.IRawOutputDataConfig|null} [rawOutputDataConfig] LaunchPlanSpec rawOutputDataConfig
+             * @property {number|null} [maxParallelism] LaunchPlanSpec maxParallelism
              */
 
             /**
@@ -22545,6 +22563,14 @@ export const flyteidl = $root.flyteidl = (() => {
             LaunchPlanSpec.prototype.rawOutputDataConfig = null;
 
             /**
+             * LaunchPlanSpec maxParallelism.
+             * @member {number} maxParallelism
+             * @memberof flyteidl.admin.LaunchPlanSpec
+             * @instance
+             */
+            LaunchPlanSpec.prototype.maxParallelism = 0;
+
+            /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
              * @function create
              * @memberof flyteidl.admin.LaunchPlanSpec
@@ -22592,6 +22618,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     $root.flyteidl.core.QualityOfService.encode(message.qualityOfService, writer.uint32(/* id 16, wireType 2 =*/130).fork()).ldelim();
                 if (message.rawOutputDataConfig != null && message.hasOwnProperty("rawOutputDataConfig"))
                     $root.flyteidl.admin.RawOutputDataConfig.encode(message.rawOutputDataConfig, writer.uint32(/* id 17, wireType 2 =*/138).fork()).ldelim();
+                if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                    writer.uint32(/* id 18, wireType 0 =*/144).int32(message.maxParallelism);
                 return writer;
             };
 
@@ -22648,6 +22676,9 @@ export const flyteidl = $root.flyteidl = (() => {
                         break;
                     case 17:
                         message.rawOutputDataConfig = $root.flyteidl.admin.RawOutputDataConfig.decode(reader, reader.uint32());
+                        break;
+                    case 18:
+                        message.maxParallelism = reader.int32();
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -22726,6 +22757,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     if (error)
                         return "rawOutputDataConfig." + error;
                 }
+                if (message.maxParallelism != null && message.hasOwnProperty("maxParallelism"))
+                    if (!$util.isInteger(message.maxParallelism))
+                        return "maxParallelism: integer expected";
                 return null;
             };
 

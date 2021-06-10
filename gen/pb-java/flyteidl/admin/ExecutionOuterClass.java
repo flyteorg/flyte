@@ -14911,6 +14911,17 @@ public final class ExecutionOuterClass {
      */
     flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
 
+    /**
+     * <pre>
+     * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+     * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+     * and parallelism/concurrency of MapTasks is independent from this.
+     * </pre>
+     *
+     * <code>int32 max_parallelism = 18;</code>
+     */
+    int getMaxParallelism();
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -15078,6 +15089,11 @@ public final class ExecutionOuterClass {
                 qualityOfService_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 144: {
+
+              maxParallelism_ = input.readInt32();
               break;
             }
             default: {
@@ -15473,6 +15489,21 @@ public final class ExecutionOuterClass {
       return getQualityOfService();
     }
 
+    public static final int MAX_PARALLELISM_FIELD_NUMBER = 18;
+    private int maxParallelism_;
+    /**
+     * <pre>
+     * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+     * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+     * and parallelism/concurrency of MapTasks is independent from this.
+     * </pre>
+     *
+     * <code>int32 max_parallelism = 18;</code>
+     */
+    public int getMaxParallelism() {
+      return maxParallelism_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15517,6 +15548,9 @@ public final class ExecutionOuterClass {
       }
       if (qualityOfService_ != null) {
         output.writeMessage(17, getQualityOfService());
+      }
+      if (maxParallelism_ != 0) {
+        output.writeInt32(18, maxParallelism_);
       }
       unknownFields.writeTo(output);
     }
@@ -15567,6 +15601,10 @@ public final class ExecutionOuterClass {
       if (qualityOfService_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, getQualityOfService());
+      }
+      if (maxParallelism_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(18, maxParallelism_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -15623,6 +15661,8 @@ public final class ExecutionOuterClass {
         if (!getQualityOfService()
             .equals(other.getQualityOfService())) return false;
       }
+      if (getMaxParallelism()
+          != other.getMaxParallelism()) return false;
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
         case 5:
@@ -15679,6 +15719,8 @@ public final class ExecutionOuterClass {
         hash = (37 * hash) + QUALITY_OF_SERVICE_FIELD_NUMBER;
         hash = (53 * hash) + getQualityOfService().hashCode();
       }
+      hash = (37 * hash) + MAX_PARALLELISM_FIELD_NUMBER;
+      hash = (53 * hash) + getMaxParallelism();
       switch (notificationOverridesCase_) {
         case 5:
           hash = (37 * hash) + NOTIFICATIONS_FIELD_NUMBER;
@@ -15878,6 +15920,8 @@ public final class ExecutionOuterClass {
           qualityOfService_ = null;
           qualityOfServiceBuilder_ = null;
         }
+        maxParallelism_ = 0;
+
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -15956,6 +16000,7 @@ public final class ExecutionOuterClass {
         } else {
           result.qualityOfService_ = qualityOfServiceBuilder_.build();
         }
+        result.maxParallelism_ = maxParallelism_;
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
         return result;
@@ -16028,6 +16073,9 @@ public final class ExecutionOuterClass {
         }
         if (other.hasQualityOfService()) {
           mergeQualityOfService(other.getQualityOfService());
+        }
+        if (other.getMaxParallelism() != 0) {
+          setMaxParallelism(other.getMaxParallelism());
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -17540,6 +17588,50 @@ public final class ExecutionOuterClass {
           qualityOfService_ = null;
         }
         return qualityOfServiceBuilder_;
+      }
+
+      private int maxParallelism_ ;
+      /**
+       * <pre>
+       * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+       * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+       * and parallelism/concurrency of MapTasks is independent from this.
+       * </pre>
+       *
+       * <code>int32 max_parallelism = 18;</code>
+       */
+      public int getMaxParallelism() {
+        return maxParallelism_;
+      }
+      /**
+       * <pre>
+       * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+       * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+       * and parallelism/concurrency of MapTasks is independent from this.
+       * </pre>
+       *
+       * <code>int32 max_parallelism = 18;</code>
+       */
+      public Builder setMaxParallelism(int value) {
+        
+        maxParallelism_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+       * This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+       * and parallelism/concurrency of MapTasks is independent from this.
+       * </pre>
+       *
+       * <code>int32 max_parallelism = 18;</code>
+       */
+      public Builder clearMaxParallelism() {
+        
+        maxParallelism_ = 0;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -21129,7 +21221,7 @@ public final class ExecutionOuterClass {
       "\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORK" +
       "FLOW\020\004\"G\n\020NotificationList\0223\n\rnotificati" +
       "ons\030\001 \003(\0132\034.flyteidl.admin.Notification\"" +
-      "\227\004\n\rExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031" +
+      "\260\004\n\rExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031" +
       ".flyteidl.core.Identifier\022-\n\006inputs\030\002 \001(" +
       "\0132\031.flyteidl.core.LiteralMapB\002\030\001\0223\n\010meta" +
       "data\030\003 \001(\0132!.flyteidl.admin.ExecutionMet" +
@@ -21141,20 +21233,21 @@ public final class ExecutionOuterClass {
       "\001(\0132\036.flyteidl.core.SecurityContext\022/\n\ta" +
       "uth_role\030\020 \001(\0132\030.flyteidl.admin.AuthRole" +
       "B\002\030\001\022;\n\022quality_of_service\030\021 \001(\0132\037.flyte" +
-      "idl.core.QualityOfServiceB\030\n\026notificatio" +
-      "n_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateR" +
-      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
-      "lowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n" +
-      "\032ExecutionTerminateResponse\"Y\n\037WorkflowE" +
-      "xecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.fly" +
-      "teidl.core.WorkflowExecutionIdentifier\"\326" +
-      "\001\n WorkflowExecutionGetDataResponse\022(\n\007o" +
-      "utputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlob\022\'\n" +
-      "\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlob\022." +
-      "\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lite" +
-      "ralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteidl." +
-      "core.LiteralMapB7Z5github.com/flyteorg/f" +
-      "lyteidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "idl.core.QualityOfService\022\027\n\017max_paralle" +
+      "lism\030\022 \001(\005B\030\n\026notification_overridesJ\004\010\004" +
+      "\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id\030\001 " +
+      "\001(\0132*.flyteidl.core.WorkflowExecutionIde" +
+      "ntifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTermi" +
+      "nateResponse\"Y\n\037WorkflowExecutionGetData" +
+      "Request\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Work" +
+      "flowExecutionIdentifier\"\326\001\n WorkflowExec" +
+      "utionGetDataResponse\022(\n\007outputs\030\001 \001(\0132\027." +
+      "flyteidl.admin.UrlBlob\022\'\n\006inputs\030\002 \001(\0132\027" +
+      ".flyteidl.admin.UrlBlob\022.\n\013full_inputs\030\003" +
+      " \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014full_" +
+      "outputs\030\004 \001(\0132\031.flyteidl.core.LiteralMap" +
+      "B7Z5github.com/flyteorg/flyteidl/gen/pb-" +
+      "go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21252,7 +21345,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new
