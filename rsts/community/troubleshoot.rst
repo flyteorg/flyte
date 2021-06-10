@@ -8,12 +8,11 @@ Troubleshooting Guide
 Here are a couple of techniques we believe could help you sort out issues quickly.
 
 #######################
-``Make Start`` Command
+``make start`` Command
 #######################
 
-* If the issue is related to the ``make start`` command:
-    - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
-    - If ``make start`` results in a timeout issue:
+- ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
+- If ``make start`` results in a timeout issue:
        .. code-block:: bash
   
          Starting Flyte sandbox
@@ -26,18 +25,18 @@ Here are a couple of techniques we believe could help you sort out issues quickl
        
        You can run ``make teardown`` followed by the ``make start`` command.
 
-    - If the ``make start`` command isn't proceeding by any chance, check the pods' statuses by run this command  
+- If the ``make start`` command isn't proceeding by any chance, check the pods' statuses by run this command  
 
       ::
 
        docker exec flyte-sandbox kubectl get po -A
-    - If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command which gives detailed overview of pod's status
+- If you think a pod's crashing or getting evicted by any chance, describe the pod by running the command which gives detailed overview of pod's status
 
       ::
 
        docker exec flyte-sandbox kubectl describe po <pod-name> -n flyte 
 
-    - If Kubernetes reports a disk pressure issue: (node.kubernetes.io/disk-pressure)
+- If Kubernetes reports a disk pressure issue: (node.kubernetes.io/disk-pressure)
     
       - Check the memory stats of the docker container using the command ``docker exec flyte-sandbox df -h``.
       - Prune the images and volumes. 
@@ -56,7 +55,6 @@ Using Flyte with Google Cloud Platform
      - Refer to docs :ref:`howto-serviceaccounts`
      - More information about WorkloadIdentity at https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
  #. If you are just using a simple Nodepool wide permissions then check the cluster's ServiceAccount for Storage permissions. Do they look fine?
-
  #. If not, then start a dummy pod in the intended namespace and check for
 
 ::
