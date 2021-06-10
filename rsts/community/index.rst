@@ -56,6 +56,15 @@ so please join us on:
        :classes: btn-block stretched-link
 
     :fa:`linkedin`
+    
+    ---
+
+    .. link-button:: https://blog.flyte.org/
+       :type: url
+       :text: Flyte Blog
+       :classes: btn-block stretched-link
+
+    :fa:` `
 
 
 Open Source Community Sync
@@ -68,6 +77,13 @@ and feel free to pop in!
 .. link-button:: https://zoom.us/s/93875115830?pwd=YWZWOHl1ODRRVjhjVkxSV0pmZkJaZz09#success
     :type: url
     :text: Zoom Link
+    :classes: btn-outline-secondary
+    
+If you would like to suggest an alternative meeting time due to time zone differences, please let us know.
+
+.. link-button:: https://docs.google.com/forms/d/e/1FAIpQLSeMMAT9g7G0fNVwNX4KdNOoK--0Gf-OOsooccFQ8uIOqDgv-g/viewform?usp=sf_link
+    :type: url
+    :text: OSS Meeting Time Feedback Form
     :classes: btn-outline-secondary
 
 .. toctree::
