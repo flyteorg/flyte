@@ -103,6 +103,11 @@ message LaunchPlanSpec {
     core.QualityOfService quality_of_service = 16;
 
     RawOutputDataConfig raw_output_data_config = 17;
+
+    // Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+    // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
+    // and parallelism/concurrency of MapTasks is independent from this.
+    int32 max_parallelism = 18;
 }
 
 // Values computed by the flyte platform after launch plan registration.

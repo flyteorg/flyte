@@ -50,7 +50,8 @@ class AdminExecutionSpec(object):
         'annotations': 'AdminAnnotations',
         'security_context': 'CoreSecurityContext',
         'auth_role': 'AdminAuthRole',
-        'quality_of_service': 'CoreQualityOfService'
+        'quality_of_service': 'CoreQualityOfService',
+        'max_parallelism': 'int'
     }
 
     attribute_map = {
@@ -63,10 +64,11 @@ class AdminExecutionSpec(object):
         'annotations': 'annotations',
         'security_context': 'security_context',
         'auth_role': 'auth_role',
-        'quality_of_service': 'quality_of_service'
+        'quality_of_service': 'quality_of_service',
+        'max_parallelism': 'max_parallelism'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -79,6 +81,7 @@ class AdminExecutionSpec(object):
         self._security_context = None
         self._auth_role = None
         self._quality_of_service = None
+        self._max_parallelism = None
         self.discriminator = None
 
         if launch_plan is not None:
@@ -101,6 +104,8 @@ class AdminExecutionSpec(object):
             self.auth_role = auth_role
         if quality_of_service is not None:
             self.quality_of_service = quality_of_service
+        if max_parallelism is not None:
+            self.max_parallelism = max_parallelism
 
     @property
     def launch_plan(self):
@@ -325,6 +330,29 @@ class AdminExecutionSpec(object):
         """
 
         self._quality_of_service = quality_of_service
+
+    @property
+    def max_parallelism(self):
+        """Gets the max_parallelism of this AdminExecutionSpec.  # noqa: E501
+
+        Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.  # noqa: E501
+
+        :return: The max_parallelism of this AdminExecutionSpec.  # noqa: E501
+        :rtype: int
+        """
+        return self._max_parallelism
+
+    @max_parallelism.setter
+    def max_parallelism(self, max_parallelism):
+        """Sets the max_parallelism of this AdminExecutionSpec.
+
+        Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.  # noqa: E501
+
+        :param max_parallelism: The max_parallelism of this AdminExecutionSpec.  # noqa: E501
+        :type: int
+        """
+
+        self._max_parallelism = max_parallelism
 
     def to_dict(self):
         """Returns the model properties as a dict"""

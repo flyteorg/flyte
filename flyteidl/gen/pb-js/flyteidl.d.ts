@@ -8769,6 +8769,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec qualityOfService */
             qualityOfService?: (flyteidl.core.IQualityOfService|null);
+
+            /** ExecutionSpec maxParallelism */
+            maxParallelism?: (number|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -8809,6 +8812,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec qualityOfService. */
             public qualityOfService?: (flyteidl.core.IQualityOfService|null);
+
+            /** ExecutionSpec maxParallelism. */
+            public maxParallelism: number;
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -9400,6 +9406,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec rawOutputDataConfig */
             rawOutputDataConfig?: (flyteidl.admin.IRawOutputDataConfig|null);
+
+            /** LaunchPlanSpec maxParallelism */
+            maxParallelism?: (number|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -9446,6 +9455,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec rawOutputDataConfig. */
             public rawOutputDataConfig?: (flyteidl.admin.IRawOutputDataConfig|null);
+
+            /** LaunchPlanSpec maxParallelism. */
+            public maxParallelism: number;
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.

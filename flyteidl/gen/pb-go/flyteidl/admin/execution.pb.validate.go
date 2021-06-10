@@ -1229,6 +1229,8 @@ func (m *ExecutionSpec) Validate() error {
 		}
 	}
 
+	// no validation rules for MaxParallelism
+
 	switch m.NotificationOverrides.(type) {
 
 	case *ExecutionSpec_Notifications:
