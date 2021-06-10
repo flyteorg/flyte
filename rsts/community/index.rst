@@ -64,7 +64,7 @@ so please join us on:
        :text: Flyte Blog
        :classes: btn-block stretched-link
 
-    :fa:` `
+    :fa:`blog`
 
 
 Open Source Community Sync
