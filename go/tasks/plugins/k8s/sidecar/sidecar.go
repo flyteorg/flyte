@@ -2,7 +2,6 @@ package sidecar
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
@@ -234,28 +233,6 @@ func (sidecarResourceHandler) BuildIdentityResource(_ context.Context, _ plugins
 	return flytek8s.BuildIdentityPod(), nil
 }
 
-func determinePrimaryContainerPhase(primaryContainerName string, statuses []k8sv1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
-	for _, s := range statuses {
-		if s.Name == primaryContainerName {
-			if s.State.Waiting != nil || s.State.Running != nil {
-				return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
-			}
-
-			if s.State.Terminated != nil {
-				if s.State.Terminated.ExitCode != 0 {
-					return pluginsCore.PhaseInfoRetryableFailure(
-						s.State.Terminated.Reason, s.State.Terminated.Message, info)
-				}
-				return pluginsCore.PhaseInfoSuccess(info)
-			}
-		}
-	}
-
-	// If for some reason we can't find the primary container, always just return a permanent failure
-	return pluginsCore.PhaseInfoFailure("PrimaryContainerMissing",
-		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
-}
-
 func (sidecarResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, r client.Object) (pluginsCore.PhaseInfo, error) {
 	pod := r.(*k8sv1.Pod)
 
@@ -290,7 +267,7 @@ func (sidecarResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8
 		return pluginsCore.PhaseInfoUndefined, errors.Errorf(errors.BadTaskSpecification,
 			"missing primary container annotation for pod")
 	}
-	primaryContainerPhase := determinePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
+	primaryContainerPhase := flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
 
 	if primaryContainerPhase.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion+1, primaryContainerPhase.Info()), nil

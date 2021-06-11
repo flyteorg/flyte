@@ -276,7 +276,7 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 	// No chance to reach the required success numbers.
 	if totalRunning+totalSuccesses+totalWaitingForResources < minSuccesses {
 		logger.Infof(ctx, "Array failed early because total failures > minSuccesses[%v]. Snapshot totalRunning[%v] + totalSuccesses[%v] + totalWaitingForResource[%v]",
-			totalRunning, totalSuccesses, totalWaitingForResources, minSuccesses)
+			minSuccesses, totalRunning, totalSuccesses, totalWaitingForResources)
 		return PhaseWriteToDiscoveryThenFail
 	}
 
