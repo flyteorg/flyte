@@ -224,6 +224,28 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	return pluginsCore.PhaseInfoSuccess(&info), nil
 }
 
+func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.ContainerStatus, info *pluginsCore.TaskInfo) pluginsCore.PhaseInfo {
+	for _, s := range statuses {
+		if s.Name == primaryContainerName {
+			if s.State.Waiting != nil || s.State.Running != nil {
+				return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
+			}
+
+			if s.State.Terminated != nil {
+				if s.State.Terminated.ExitCode != 0 {
+					return pluginsCore.PhaseInfoRetryableFailure(
+						s.State.Terminated.Reason, s.State.Terminated.Message, info)
+				}
+				return pluginsCore.PhaseInfoSuccess(info)
+			}
+		}
+	}
+
+	// If for some reason we can't find the primary container, always just return a permanent failure
+	return pluginsCore.PhaseInfoFailure("PrimaryContainerMissing",
+		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
+}
+
 func ConvertPodFailureToError(status v1.PodStatus) (code, message string) {
 	code = "UnknownError"
 	message = "Pod failed. No message received from kubernetes."

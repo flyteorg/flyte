@@ -248,6 +248,16 @@ func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8s
 	case v1.PodUnknown:
 		phaseInfo = core.PhaseInfoUndefined
 	default:
+		primaryContainerName, ok := pod.GetAnnotations()[primaryContainerKey]
+		if ok {
+			// Special handling for determining the phase of an array job for a Pod task.
+			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &taskInfo)
+			if phaseInfo.Phase() == core.PhaseRunning && len(taskInfo.Logs) > 0 {
+				return core.PhaseInfoRunning(core.DefaultPhaseVersion+1, phaseInfo.Info()), nil
+			}
+			return phaseInfo, nil
+		}
+
 		if len(taskInfo.Logs) > 0 {
 			phaseInfo = core.PhaseInfoRunning(core.DefaultPhaseVersion+1, &taskInfo)
 		} else {

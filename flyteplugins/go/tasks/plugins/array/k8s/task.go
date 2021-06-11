@@ -10,8 +10,6 @@ import (
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
-
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
@@ -22,6 +20,7 @@ import (
 	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/storage"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
@@ -51,6 +50,26 @@ const (
 	MonitorError
 )
 
+func getTaskContainerIndex(pod *v1.Pod) (int, error) {
+	primaryContainerName, ok := pod.Annotations[primaryContainerKey]
+	// For tasks with a Container target, we only ever build one container as part of the pod
+	if !ok {
+		if len(pod.Spec.Containers) == 1 {
+			return 0, nil
+		}
+		// For tasks with a K8sPod task target, they may produce multiple containers but at least one must be the designated primary.
+		return -1, errors2.Errorf(ErrBuildPodTemplate, "Expected a specified primary container key when building an array job with a K8sPod spec target")
+
+	}
+
+	for idx, container := range pod.Spec.Containers {
+		if container.Name == primaryContainerName {
+			return idx, nil
+		}
+	}
+	return -1, errors2.Errorf(ErrBuildPodTemplate, "Couldn't find any container matching the primary container key when building an array job with a K8sPod spec target")
+}
+
 func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient) (LaunchResult, error) {
 	podTemplate, _, err := FlyteArrayJobToK8sPodTemplate(ctx, tCtx, t.Config.NamespaceTemplate)
 	if err != nil {
@@ -60,12 +79,12 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 	if t.Config.RemoteClusterConfig.Enabled {
 		podTemplate.OwnerReferences = nil
 	}
-	var args []string
-	if len(podTemplate.Spec.Containers) > 0 {
-		args = append(podTemplate.Spec.Containers[0].Command, podTemplate.Spec.Containers[0].Args...)
-		podTemplate.Spec.Containers[0].Command = []string{}
-	} else {
+	if len(podTemplate.Spec.Containers) == 0 {
 		return LaunchError, errors2.Wrapf(ErrReplaceCmdTemplate, err, "No containers found in podSpec.")
+	}
+	containerIndex, err := getTaskContainerIndex(&podTemplate)
+	if err != nil {
+		return LaunchError, err
 	}
 
 	indexStr := strconv.Itoa(t.ChildIdx)
@@ -73,30 +92,18 @@ func (t Task) Launch(ctx context.Context, tCtx core.TaskExecutionContext, kubeCl
 
 	pod := podTemplate.DeepCopy()
 	pod.Name = podName
-	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, corev1.EnvVar{
+	pod.Spec.Containers[containerIndex].Env = append(pod.Spec.Containers[containerIndex].Env, corev1.EnvVar{
 		Name:  FlyteK8sArrayIndexVarName,
 		Value: indexStr,
 	})
 
-	pod.Spec.Containers[0].Env = append(pod.Spec.Containers[0].Env, arrayJobEnvVars...)
+	pod.Spec.Containers[containerIndex].Env = append(pod.Spec.Containers[containerIndex].Env, arrayJobEnvVars...)
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return LaunchError, errors2.Wrapf(ErrGetTaskTypeVersion, err, "Unable to read task template")
 	} else if taskTemplate == nil {
 		return LaunchError, errors2.Wrapf(ErrGetTaskTypeVersion, err, "Missing task template")
 	}
-	inputReader := array.GetInputReader(tCtx, taskTemplate)
-	pod.Spec.Containers[0].Args, err = template.Render(ctx, args,
-		template.Parameters{
-			TaskExecMetadata: tCtx.TaskExecutionMetadata(),
-			Inputs:           inputReader,
-			OutputPath:       tCtx.OutputWriter(),
-			Task:             tCtx.TaskReader(),
-		})
-	if err != nil {
-		return LaunchError, errors2.Wrapf(ErrReplaceCmdTemplate, err, "Failed to replace cmd args")
-	}
-
 	pod = ApplyPodPolicies(ctx, t.Config, pod)
 	pod = applyNodeSelectorLabels(ctx, t.Config, pod)
 	pod = applyPodTolerations(ctx, t.Config, pod)

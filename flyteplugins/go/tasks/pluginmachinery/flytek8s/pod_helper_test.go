@@ -613,3 +613,79 @@ func TestDemystifyPending_testcases(t *testing.T) {
 		})
 	}
 }
+
+func TestDeterminePrimaryContainerPhase(t *testing.T) {
+	primaryContainerName := "primary"
+	secondaryContainer := v1.ContainerStatus{
+		Name: "secondary",
+		State: v1.ContainerState{
+			Terminated: &v1.ContainerStateTerminated{
+				ExitCode: 0,
+			},
+		},
+	}
+	var info = &pluginsCore.TaskInfo{}
+	t.Run("primary container waiting", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason: "just dawdling",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
+	})
+	t.Run("primary container running", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Running: &v1.ContainerStateRunning{
+						StartedAt: metaV1.Now(),
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
+	})
+	t.Run("primary container failed", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 1,
+						Reason:   "foo",
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, "foo", phaseInfo.Err().Code)
+		assert.Equal(t, "foo failed", phaseInfo.Err().Message)
+	})
+	t.Run("primary container succeeded", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 0,
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
+	})
+	t.Run("missing primary container", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer,
+		}, info)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().Message)
+	})
+}
