@@ -74,6 +74,66 @@ func TestSimpleLiteralCasting(t *testing.T) {
 		)
 		assert.True(t, castable, "Metadata should be ignored")
 	})
+
+	t.Run("EnumToString", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_EnumType{EnumType: &core.EnumType{
+					Values: []string{"x", "y"},
+				}},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+			},
+		)
+		assert.True(t, castable, "Enum should be castable to string")
+	})
+
+	t.Run("EnumToEnum", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_EnumType{EnumType: &core.EnumType{
+					Values: []string{"x", "y"},
+				}},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_EnumType{EnumType: &core.EnumType{
+					Values: []string{"x", "y"},
+				}},
+			},
+		)
+		assert.True(t, castable, "Enum should be castable to Enums if they are identical")
+	})
+
+	t.Run("EnumToEnum", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_EnumType{EnumType: &core.EnumType{
+					Values: []string{"x", "y"},
+				}},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_EnumType{EnumType: &core.EnumType{
+					Values: []string{"m", "n"},
+				}},
+			},
+		)
+		assert.False(t, castable, "Enum should not be castable to non matching enums")
+	})
+
+	t.Run("StringToEnum", func(t *testing.T) {
+		castable := AreTypesCastable(
+			&core.LiteralType{
+				Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING},
+			},
+			&core.LiteralType{
+				Type: &core.LiteralType_EnumType{EnumType: &core.EnumType{
+					Values: []string{"x", "y"},
+				}},
+			},
+		)
+		assert.True(t, castable, "Strings should be castable to enums - may result in runtime failure")
+	})
 }
 
 func TestCollectionCasting(t *testing.T) {
