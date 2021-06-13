@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
@@ -42,8 +43,7 @@ func newRootCmd() *cobra.Command {
 		DisableAutoGenTag: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", f.FilePathJoin(f.UserHomeDir(), configFileDir, configFileName),
-		"config file (default is $HOME/.flyte/config.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.flyte/config.yaml)")
 
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())
 
@@ -68,9 +68,16 @@ func newRootCmd() *cobra.Command {
 }
 
 func initConfig(_ *cobra.Command, _ []string) error {
+	configFile := f.FilePathJoin(f.UserHomeDir(), configFileDir, configFileName)
+	if len(os.Getenv("FLYTECTL_CONFIG")) > 0 {
+		configFile = os.Getenv("FLYTECTL_CONFIG")
+	}
+	if len(cfgFile) > 0 {
+		configFile = cfgFile
+	}
 	configAccessor = viper.NewAccessor(stdConfig.Options{
 		StrictMode:  true,
-		SearchPaths: []string{cfgFile},
+		SearchPaths: []string{configFile},
 	})
 
 	err := configAccessor.UpdateConfig(context.TODO())
