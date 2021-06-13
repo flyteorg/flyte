@@ -123,12 +123,12 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 	shouldWatchChanges := true
 	// If a config file is found, read it in.
 	if err = v.viper.ReadInConfig(); err == nil {
-		logger.Printf(ctx, "Using config file: %+v", v.viper.ConfigFilesUsed())
+		logger.Debugf(ctx, "Using config file: %+v", v.viper.ConfigFilesUsed())
 	} else if asErrorCollection, ok := err.(stdLibErrs.ErrorCollection); ok {
 		shouldWatchChanges = false
 		for i, e := range asErrorCollection {
 			if _, isNotFound := errors.Cause(e).(viperLib.ConfigFileNotFoundError); isNotFound {
-				logger.Printf(ctx, "[%v] Couldn't find a config file [%v]. Relying on env vars and pflags.",
+				logger.Infof(ctx, "[%v] Couldn't find a config file [%v]. Relying on env vars and pflags.",
 					i, v.viper.underlying[i].ConfigFileUsed())
 			} else {
 				return err
@@ -136,7 +136,7 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 		}
 	} else if reflect.TypeOf(err) == reflect.TypeOf(viperLib.ConfigFileNotFoundError{}) {
 		shouldWatchChanges = false
-		logger.Printf(ctx, "Couldn't find a config file. Relying on env vars and pflags.")
+		logger.Info(ctx, "Couldn't find a config file. Relying on env vars and pflags.")
 	} else {
 		return err
 	}
@@ -146,7 +146,7 @@ func (v viperAccessor) updateConfig(ctx context.Context, r config.Section) error
 			// Watch config files to pick up on file changes without requiring a full application restart.
 			// This call must occur after *all* config paths have been added.
 			v.viper.OnConfigChange(func(e fsnotify.Event) {
-				fmt.Printf("Got a notification change for file [%v]\n", e.Name)
+				logger.Debugf(ctx, "Got a notification change for file [%v] \n", e.Name)
 				v.configChangeHandler()
 			})
 			v.viper.WatchConfig()
@@ -233,14 +233,14 @@ func jsonUnmarshallerHook(_, to reflect.Type, data interface{}) (interface{}, er
 		ctx := context.Background()
 		raw, err := json.Marshal(data)
 		if err != nil {
-			logger.Printf(ctx, "Failed to marshal Data: %v. Error: %v. Skipping jsonUnmarshalHook", data, err)
+			logger.Errorf(ctx, "Failed to marshal Data: %v. Error: %v. Skipping jsonUnmarshalHook", data, err)
 			return data, nil
 		}
 
 		res := reflect.New(to).Interface()
 		err = json.Unmarshal(raw, &res)
 		if err != nil {
-			logger.Printf(ctx, "Failed to umarshal Data: %v. Error: %v. Skipping jsonUnmarshalHook", data, err)
+			logger.Errorf(ctx, "Failed to umarshal Data: %v. Error: %v. Skipping jsonUnmarshalHook", data, err)
 			return data, nil
 		}
 
@@ -355,9 +355,9 @@ func (v viperAccessor) configChangeHandler() {
 	err := v.RefreshFromConfig(ctx, v.rootConfig, false)
 	if err != nil {
 		// TODO: Retry? panic?
-		logger.Printf(ctx, "Failed to update config. Error: %v", err)
+		logger.Errorf(ctx, "Failed to update config. Error: %v", err)
 	} else {
-		logger.Printf(ctx, "Refreshed config in response to file(s) change.")
+		logger.Infof(ctx, "Refreshed config in response to file(s) change.")
 	}
 }
 
@@ -375,11 +375,11 @@ func (v viperAccessor) RefreshFromConfig(ctx context.Context, r config.Section, 
 func (v viperAccessor) sendUpdatedEvents(ctx context.Context, root config.Section, forceSend bool, sectionKey config.SectionKey) {
 	for key, section := range root.GetSections() {
 		if !section.GetConfigChangedAndClear() && !forceSend {
-			logger.Infof(ctx, "Config section [%v] hasn't changed.", sectionKey+key)
+			logger.Debugf(ctx, "Config section [%v] hasn't changed.", sectionKey+key)
 		} else if section.GetConfigUpdatedHandler() == nil {
-			logger.Infof(ctx, "Config section [%v] updated. No update handler registered.", sectionKey+key)
+			logger.Debugf(ctx, "Config section [%v] updated. No update handler registered.", sectionKey+key)
 		} else {
-			logger.Infof(ctx, "Config section [%v] updated. Firing updated event.", sectionKey+key)
+			logger.Debugf(ctx, "Config section [%v] updated. Firing updated event.", sectionKey+key)
 			section.GetConfigUpdatedHandler()(ctx, section.GetConfig())
 		}
 
