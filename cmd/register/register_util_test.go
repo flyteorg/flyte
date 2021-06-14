@@ -310,3 +310,11 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 		assert.Equal(t, &admin.RawOutputDataConfig{OutputLocationPrefix: "prefix"}, lpSpec.RawOutputDataConfig)
 	})
 }
+
+func TestFlyteManifest(t *testing.T) {
+	flytesnacks, tag, err := getFlyteTestManifest()
+	assert.Nil(t, err)
+	assert.Contains(t, tag, "v")
+	assert.NotEmpty(t, tag)
+	assert.Greater(t, len(flytesnacks), 1)
+}

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/flyteorg/flytectl/cmd/sandbox"
+
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 
 	"github.com/flyteorg/flytectl/cmd/config"
@@ -58,6 +60,7 @@ func newRootCmd() *cobra.Command {
 	rootCmd.AddCommand(update.CreateUpdateCommand())
 	rootCmd.AddCommand(register.RemoteRegisterCommand())
 	rootCmd.AddCommand(delete.RemoteDeleteCommand())
+	rootCmd.AddCommand(sandbox.CreateSandboxCommand())
 	// Added version command
 	versioncmd := version.GetVersionCommand(rootCmd)
 	cmdCore.AddCommands(rootCmd, versioncmd)

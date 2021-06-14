@@ -79,6 +79,10 @@ Usage
 )
 
 func registerFromFilesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
+	return Register(ctx, args, cmdCtx)
+}
+
+func Register(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
 	dataRefs, tmpDir, _err := getSortedFileList(ctx, args)
 	if _err != nil {
 		logger.Errorf(ctx, "error while un-archiving files in tmp dir due to %v", _err)
