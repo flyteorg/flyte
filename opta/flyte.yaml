@@ -23,7 +23,7 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
+#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
@@ -36,7 +36,7 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
+#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
