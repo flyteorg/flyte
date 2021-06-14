@@ -1,4 +1,4 @@
-# Auto generated file# ---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 # Core System settings
 # This section consists of Core components of Flyte and their deployment
 # settings. This includes FlyteAdmin service, Datacatalog, FlytePropeller and
@@ -15,7 +15,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: ghcr.io/flyteorg/flyteadmin
-    tag: v0.6.0
+    tag: v0.6.0 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -63,7 +63,7 @@ datacatalog:
   image:
     # -- Docker image for Datacatalog deployment
     repository: ghcr.io/flyteorg/datacatalog
-    tag: v0.3.4
+    tag: v0.3.4 # DATACATALOG_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -109,7 +109,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.11.0
+    tag: v0.11.0 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -152,7 +152,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: ghcr.io/flyteorg/flyteconsole
-    tag: v0.20.1
+    tag: v0.20.1 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -702,16 +702,22 @@ cluster_resource_manager:
               value: "5"
           - projectQuotaMemory:
               value: "4000Mi"
+          - defaultIamRole:
+              value: ""
         - staging:
           - projectQuotaCpu:
               value: "2"
           - projectQuotaMemory:
               value: "3000Mi"
+          - defaultIamRole:
+              value: ""
         - development:
           - projectQuotaCpu:
               value: "4"
           - projectQuotaMemory:
               value: "3000Mi"
+          - defaultIamRole:
+              value: ""
       refresh: 5m
 
   # -- Resource templates that should be applied
@@ -767,6 +773,10 @@ sparkoperator:
       spark:
         # -- Spark default configuration
         spark-config-default:
+          # We override the default credentials chain provider for Hadoop so that
+          # it can use the serviceAccount based IAM role or ec2 metadata based.
+          # This is more in line with how AWS works
+          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
           - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
           - spark.kubernetes.allocation.batch.size: "50"
           - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
