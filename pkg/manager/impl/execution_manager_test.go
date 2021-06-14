@@ -2932,7 +2932,46 @@ func TestGetExecutionConfig(t *testing.T) {
 	execConfig, err := executionManager.getExecutionConfig(context.TODO(), &admin.ExecutionCreateRequest{
 		Project: workflowIdentifier.Project,
 		Domain:  workflowIdentifier.Domain,
+		Spec:    &admin.ExecutionSpec{},
+	}, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, execConfig.MaxParallelism, int32(100))
+}
+
+func TestGetExecutionConfig_Spec(t *testing.T) {
+	resourceManager := managerMocks.MockResourceManager{}
+	resourceManager.GetResourceFunc = func(ctx context.Context,
+		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		t.Errorf("When a user specifies max parallelism in a spec, the db should not be queried")
+		return nil, nil
+	}
+
+	executionManager := ExecutionManager{
+		resourceManager: &resourceManager,
+	}
+	execConfig, err := executionManager.getExecutionConfig(context.TODO(), &admin.ExecutionCreateRequest{
+		Project: workflowIdentifier.Project,
+		Domain:  workflowIdentifier.Domain,
+		Spec: &admin.ExecutionSpec{
+			MaxParallelism: 100,
+		},
+	}, &admin.LaunchPlan{
+		Spec: &admin.LaunchPlanSpec{
+			MaxParallelism: 50,
+		},
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, execConfig.MaxParallelism, int32(100))
+
+	execConfig, err = executionManager.getExecutionConfig(context.TODO(), &admin.ExecutionCreateRequest{
+		Project: workflowIdentifier.Project,
+		Domain:  workflowIdentifier.Domain,
+		Spec:    &admin.ExecutionSpec{},
+	}, &admin.LaunchPlan{
+		Spec: &admin.LaunchPlanSpec{
+			MaxParallelism: 50,
+		},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, execConfig.MaxParallelism, int32(50))
 }

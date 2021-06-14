@@ -404,7 +404,22 @@ func (m *ExecutionManager) getInheritedExecMetadata(ctx context.Context, request
 	return parentNodeExecutionID, sourceExecutionID, nil
 }
 
-func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admin.ExecutionCreateRequest) (*admin.WorkflowExecutionConfig, error) {
+// Produces execution-time attributes for workflow execution.
+// Defaults to overridable execution values set in the execution create request, then looks at the launch plan values
+// (if any) before defaulting to values set in the matchable resource db.
+func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admin.ExecutionCreateRequest,
+	launchPlan *admin.LaunchPlan) (*admin.WorkflowExecutionConfig, error) {
+	if request.Spec.MaxParallelism > 0 {
+		return &admin.WorkflowExecutionConfig{
+			MaxParallelism: request.Spec.MaxParallelism,
+		}, nil
+	}
+	if launchPlan != nil && launchPlan.Spec.MaxParallelism > 0 {
+		return &admin.WorkflowExecutionConfig{
+			MaxParallelism: launchPlan.Spec.MaxParallelism,
+		}, nil
+	}
+
 	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
 		Project:      request.Project,
 		Domain:       request.Domain,
@@ -512,7 +527,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		logger.Errorf(ctx, "Failed to get quality of service for [%+v] with error: %v", workflowExecutionID, err)
 		return nil, nil, err
 	}
-	executionConfig, err := m.getExecutionConfig(ctx, &request)
+	executionConfig, err := m.getExecutionConfig(ctx, &request, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -684,7 +699,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Errorf(ctx, "Failed to get quality of service for [%+v] with error: %v", workflowExecutionID, err)
 		return nil, nil, err
 	}
-	executionConfig, err := m.getExecutionConfig(ctx, &request)
+	executionConfig, err := m.getExecutionConfig(ctx, &request, launchPlan)
 	if err != nil {
 		return nil, nil, err
 	}
