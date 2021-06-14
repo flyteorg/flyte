@@ -2,8 +2,8 @@ environments:
   - name: default
     path: "./env.yaml" # NOTE: relative path to environment
     variables:
-      region: {region}
-      account_id: {account_id}
+      region: <region>
+      account_id: <account_id>
 name: service-flyte
 modules:
   - name: postgres
