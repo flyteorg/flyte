@@ -3,17 +3,25 @@ module github.com/flyteorg/flytectl
 go 1.13
 
 require (
-	github.com/dustin/go-humanize v1.0.0 // indirect
-	github.com/flyteorg/flyteidl v0.19.2
+	github.com/Microsoft/go-winio v0.5.0 // indirect
+	github.com/containerd/containerd v1.5.2 // indirect
+	github.com/docker/docker v20.10.7+incompatible
+	github.com/docker/go-connections v0.4.0
+	github.com/enescakir/emoji v1.0.0
+	github.com/flyteorg/flyteidl v0.18.51
 	github.com/flyteorg/flytestdlib v0.3.21
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.3
-	github.com/google/uuid v1.1.2
+	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/google/uuid v1.2.0
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/kr/text v0.2.0 // indirect
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mitchellh/mapstructure v1.4.1
+	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect
+	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/sirupsen/logrus v1.8.0
 	github.com/spf13/cobra v1.1.3
@@ -26,6 +34,6 @@ require (
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0
+	gotest.tools v2.2.0+incompatible
 	sigs.k8s.io/yaml v1.2.0
 )
-

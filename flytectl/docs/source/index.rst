@@ -8,12 +8,19 @@
 Install
 =======
 Flytectl is a Golang binary and can be installed on any platform supported by
-golang. To install simply copy paste the following into the command-line:
+golang
+
+Install flytectl with homebrew tap
+
+.. prompt:: bash
+
+   brew tap flyteorg/homebrew-tap/flytectl
+
+Install flytectl with shell script
 
 .. prompt:: bash
 
    curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
-
 
 Configure
 =========
@@ -29,8 +36,6 @@ Basic Configuration
     # For GRPC endpoints you might want to use dns:///flyte.myexample.com
     endpoint: dns:///flyte.lyft.net
     authType: Pkce
-    # Change insecure flag to ensure that you use the right setting for your environment
-    insecure: true
   logger:
     # Logger settings to control logger output. Useful to debug logger:
     show-source: true

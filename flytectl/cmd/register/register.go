@@ -28,6 +28,8 @@ func RemoteRegisterCommand() *cobra.Command {
 	registerResourcesFuncs := map[string]cmdcore.CommandEntry{
 		"files": {CmdFunc: registerFromFilesFunc, Aliases: []string{"file"}, PFlagProvider: rconfig.DefaultFilesConfig,
 			Short: registerFilesShort, Long: registerFilesLong},
+		"examples": {CmdFunc: registerExamplesFunc, Aliases: []string{"example", "flytesnack", "flytesnacks"}, PFlagProvider: rconfig.DefaultFilesConfig,
+			Short: registerExampleShort, Long: registerExampleLong},
 	}
 	cmdcore.AddCommands(registerCmd, registerResourcesFuncs)
 	return registerCmd
