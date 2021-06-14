@@ -78,6 +78,9 @@ const (
 
 	// A workflow is missing any nodes to execute
 	NoNodesFound ErrorCode = "NoNodesFound"
+
+	// Given value is not a legal Enum value (or not part of the defined set of enum values)
+	IllegalEnumValue ErrorCode = "IllegalEnumValue"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -189,6 +192,14 @@ func NewMismatchingBindingsErr(nodeID, sinkParam, expectedType, receivedType str
 	return newError(
 		MismatchingBindings,
 		fmt.Sprintf("Input [%v] on node [%v] expects bindings of type [%v].  Received [%v]", sinkParam, nodeID, expectedType, receivedType),
+		nodeID,
+	)
+}
+
+func NewIllegalEnumValueError(nodeID, sinkParam, receivedVal string, expectedVals []string) *CompileError {
+	return newError(
+		IllegalEnumValue,
+		fmt.Sprintf("Input [%v] on node [%v] is an Enum and expects value to be one of [%v].  Received [%v]", sinkParam, nodeID, expectedVals, receivedVal),
 		nodeID,
 	)
 }

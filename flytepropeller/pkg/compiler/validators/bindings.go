@@ -91,6 +91,21 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 			errs.Collect(errors.NewMismatchingTypesErr(nodeID, nodeParam, literalType.String(), expectedType.String()))
 		}
 
+		if expectedType.GetEnumType() != nil {
+			v := binding.GetScalar().GetPrimitive().GetStringValue()
+			// Let us assert that the bound value is a correct enum Value
+			found := false
+			for _, ev := range expectedType.GetEnumType().Values {
+				if ev == v {
+					found = true
+					break
+				}
+			}
+			if !found {
+				errs.Collect(errors.NewIllegalEnumValueError(nodeID, nodeParam, v, expectedType.GetEnumType().Values))
+			}
+		}
+
 		return literalType, []c.NodeID{}, !errs.HasErrors()
 	default:
 		errs.Collect(errors.NewUnrecognizedValueErr(nodeID, reflect.TypeOf(binding.GetValue()).String()))
