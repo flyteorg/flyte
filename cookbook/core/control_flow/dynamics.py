@@ -1,6 +1,6 @@
 """
-Dynamic Workflows
------------------
+Dynamic Tasks
+--------------
 
 A workflow is typically static where the directed acyclic graph's (DAG) structure is known at compile-time. However, scenarios exist where a run-time parameter (e.g. the output of an earlier task) determines the full DAG structure.
 
