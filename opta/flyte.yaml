@@ -1,12 +1,12 @@
 environments:
   - name: default
-    path: "./environment.yaml" # NOTE: relative path to environment
+    path: "./env.yaml" # NOTE: relative path to environment
     variables:
-      region: {aws_region}
+      region: {region}
       account_id: {account_id}
 name: service-flyte
 modules:
-  - name: db
+  - name: postgres
     type: aws-postgres
   - name: s3
     type: aws-s3
@@ -23,7 +23,7 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-#      - "arn:aws:iam::{account_id}:policy/{env_name}-{env_name}-awsses-sender" # Uncomment out for SES
+      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
@@ -36,7 +36,7 @@ modules:
     type: aws-iam-role
     extra_iam_policies:
       - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
-      - "arn:aws:iam::{account_id}:policy/{env_name}-{env_name}-awsses-sender" # TODO: if opta ever updates to remove the duplicate env name here, change the templating
+      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
     allowed_k8s_services:
       - namespace: "*"
         service_name: "*"
@@ -49,118 +49,113 @@ modules:
     create_namespace: true
     values_file: "../helm/values-eks.yaml" # NOTE: relative path to values yaml
     values:
-      # Opta will not re-apply an already applied helm chart unless values within service.yaml related to that helm chart
-      # has changed.
-      # To avoid mistakes there, we automatically compute a helm_version based on the helm/Chart.lock, helm/values.yaml
-      # and helm/values-eks.yaml file hashes.
-      flyte:
-        postgres:
-          enabled: false
-        db:
-          database:
-            port: 5432
-            username: "${{module.db.db_user}}"
-            host: "${{module.db.db_host}}"
-            dbname: "${{module.db.db_name}}"
-        common:
-          ingress:
-            albSSLRedirect: false
-            host: "{parent.domain}"
-            annotations:
-              kubernetes.io/ingress.class: "nginx"
-          databaseSecret:
-            secretManifest:
-              stringData:
-                pass.txt: "${{module.db.db_password}}"
-        storage:
-          bucketName: "{parent_name}-{layer_name}"
-          s3:
-            region: "{vars.region}"
-        flyteadmin:
-          serviceAccount:
-            create: true
-            annotations:
-              eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
-        datacatalog:
-          serviceAccount:
-            create: true
-            annotations:
-              eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
-        flytepropeller:
-          serviceAccount:
-            create: true
-            annotations:
-              eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
-        workflow_scheduler:
-          enabled: true
-          config:
-            scheduler:
-              # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
-              eventScheduler:
-                scheme: aws
-                region: "{vars.region}"
-                scheduleRole: "${{module.adminflyterole.role_arn}}"
-                targetName: "${{module.schedulesQueue.queue_arn}}"
-                scheduleNamePrefix: flyte
-              workflowExecutor:
-                scheme: aws
-                region: "{vars.region}"
-                scheduleQueueName: "${{module.schedulesQueue.queue_name}}"
-                accountId: "{vars.account_id}"
-                reconnectAttempts: 10
-                reconnectDelaySeconds: 30
-        workflow_notifications:
-          enabled: true
-          config:
-            notifications:
-              type: aws
-              region: "{vars.region}"
-              publisher:
-                topicName: "${{module.topic.topic_arn}}"
-              processor:
-                queueName: "${{module.notifcationsQueue.queue_name}}"
-                accountId: "{vars.account_id}"
-              emailer:
-                subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
-                sender: "flyte@{parent.domain}"
-                body: |
-                  Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
-                  Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
-                  {{ error }}
-        configmap:
-          remoteData:
-            remoteData:
-              region: "{vars.region}"
+      postgres:
+        enabled: false
+      db:
+        database:
+          port: 5432
+          username: "${{module.postgres.db_user}}"
+          host: "${{module.postgres.db_host}}"
+          dbname: "${{module.postgres.db_name}}"
+      common:
+        ingress:
+          albSSLRedirect: false
+          host: "{parent.domain}"
+          annotations:
+            kubernetes.io/ingress.class: "nginx"
+        databaseSecret:
+          secretManifest:
+            stringData:
+              pass.txt: "${{module.postgres.db_password}}"
+      storage:
+        bucketName: "{parent_name}-{layer_name}"
+        s3:
+          region: "{vars.region}"
+      flyteadmin:
+        serviceAccount:
+          create: true
+          annotations:
+            eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      datacatalog:
+        serviceAccount:
+          create: true
+          annotations:
+            eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      flytepropeller:
+        serviceAccount:
+          create: true
+          annotations:
+            eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      workflow_scheduler:
+        enabled: true
+        config:
+          scheduler:
+            # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
+            eventScheduler:
               scheme: aws
-              signedUrls:
-                durationMinutes: 3
-          task_logs:
-            plugins:
-              logs:
-                cloudwatch-region: "{vars.region}"
-        cluster_resource_manager:
-          enabled: true
-          config:
-            cluster_resources:
-              customData:
-                - production:
-                    - defaultIamRole:
-                        value: "${{module.userflyterole.role_arn}}"
-                    - projectQuotaCpu:
-                        value: "6"
-                    - projectQuotaMemory:
-                        value: "6000Mi"
-                - staging:
-                    - defaultIamRole:
-                        value: "${{module.userflyterole.role_arn}}"
-                    - projectQuotaCpu:
-                        value: "6"
-                    - projectQuotaMemory:
-                        value: "6000Mi"
-                - development:
-                    - defaultIamRole:
-                        value: "${{module.userflyterole.role_arn}}"
-                    - projectQuotaCpu:
-                        value: "6"
-                    - projectQuotaMemory:
-                        value: "6000Mi"
+              region: "{vars.region}"
+              scheduleRole: "${{module.adminflyterole.role_arn}}"
+              targetName: "${{module.schedulesQueue.queue_arn}}"
+              scheduleNamePrefix: flyte
+            workflowExecutor:
+              scheme: aws
+              region: "{vars.region}"
+              scheduleQueueName: "${{module.schedulesQueue.queue_name}}"
+              accountId: "{vars.account_id}"
+              reconnectAttempts: 10
+              reconnectDelaySeconds: 30
+      workflow_notifications:
+        enabled: true
+        config:
+          notifications:
+            type: aws
+            region: "{vars.region}"
+            publisher:
+              topicName: "${{module.topic.topic_arn}}"
+            processor:
+              queueName: "${{module.notifcationsQueue.queue_name}}"
+              accountId: "{vars.account_id}"
+            emailer:
+              subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+              sender: "flyte@{parent.domain}"
+              body: |
+                Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+                Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+                {{ error }}
+      configmap:
+        remoteData:
+          remoteData:
+            region: "{vars.region}"
+            scheme: aws
+            signedUrls:
+              durationMinutes: 3
+        task_logs:
+          plugins:
+            logs:
+              cloudwatch-region: "{vars.region}"
+      cluster_resource_manager:
+        enabled: true
+        config:
+          cluster_resources:
+            customData:
+              - production:
+                  - defaultIamRole:
+                      value: "${{module.userflyterole.role_arn}}"
+                  - projectQuotaCpu:
+                      value: "6"
+                  - projectQuotaMemory:
+                      value: "6000Mi"
+              - staging:
+                  - defaultIamRole:
+                      value: "${{module.userflyterole.role_arn}}"
+                  - projectQuotaCpu:
+                      value: "6"
+                  - projectQuotaMemory:
+                      value: "6000Mi"
+              - development:
+                  - defaultIamRole:
+                      value: "${{module.userflyterole.role_arn}}"
+                  - projectQuotaCpu:
+                      value: "6"
+                  - projectQuotaMemory:
+                      value: "6000Mi"
