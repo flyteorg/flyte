@@ -300,16 +300,22 @@ data:
             value: "5"
         - projectQuotaMemory:
             value: 4000Mi
+        - defaultIamRole:
+            value: ""
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
+        - defaultIamRole:
+            value: ""
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
+        - defaultIamRole:
+            value: ""
       refresh: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
@@ -486,6 +492,7 @@ data:
     plugins:
       spark:
         spark-config-default:
+        - spark.hadoop.fs.s3a.aws.credentials.provider: com.amazonaws.auth.DefaultAWSCredentialsProviderChain
         - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
         - spark.kubernetes.allocation.batch.size: "50"
         - spark.hadoop.fs.s3a.acl.default: BucketOwnerFullControl
@@ -1278,7 +1285,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2a74fd52cd1aea9ab4a05907782a3f50be7777930a292f8c74de653dc71ff19"
+        configChecksum: "e1266c4248f9e651eccb3408d86f3047512cb8adef4cece29881eee04b533a9"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1586,7 +1593,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "73d82b14cc9e0ed31b4c5731396ec0a43727ceb7cf3c247c0e3c9023ce1cda2"
+        configChecksum: "d7574f202361ac84763afe5b50a19b752775ac471c2369fd6ecf339154bd976"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1658,7 +1665,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.11.0
       annotations:
-        configChecksum: "73d82b14cc9e0ed31b4c5731396ec0a43727ceb7cf3c247c0e3c9023ce1cda2"
+        configChecksum: "d7574f202361ac84763afe5b50a19b752775ac471c2369fd6ecf339154bd976"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
