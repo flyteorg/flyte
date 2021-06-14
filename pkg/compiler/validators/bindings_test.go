@@ -105,6 +105,70 @@ func TestValidateBindings(t *testing.T) {
 		}
 	})
 
+	t.Run("Enum legal string", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var:     "x",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral("x")),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: &core.LiteralType{Type: &core.LiteralType_EnumType{
+						EnumType: &core.EnumType{
+							Values: []string{"x", "y", "z"},
+						},
+					}},
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.True(t, ok)
+		if compileErrors.HasErrors() {
+			assert.NoError(t, compileErrors)
+		}
+	})
+
+	t.Run("Enum illegal string", func(t *testing.T) {
+		wf := &mocks.WorkflowBuilder{}
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+
+		bindings := []*core.Binding{
+			{
+				Var:     "m",
+				Binding: LiteralToBinding(coreutils.MustMakeLiteral("x")),
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: &core.LiteralType{Type: &core.LiteralType_EnumType{
+						EnumType: &core.EnumType{
+							Values: []string{"x", "y", "z"},
+						},
+					}},
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.False(t, ok)
+		if !compileErrors.HasErrors() {
+			assert.Error(t, compileErrors)
+		}
+	})
+
 	t.Run("Maps", func(t *testing.T) {
 		wf := &mocks.WorkflowBuilder{}
 		n := &mocks.NodeBuilder{}
