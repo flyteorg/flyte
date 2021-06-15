@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
       - name: Run GoReleaser dry run
         uses: goreleaser/goreleaser-action@v2
         with:

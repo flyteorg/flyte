@@ -9,7 +9,7 @@ require (
 	github.com/docker/go-connections v0.4.0
 	github.com/enescakir/emoji v1.0.0
 	github.com/flyteorg/flyteidl v0.19.2
-	github.com/flyteorg/flytestdlib v0.3.21
+	github.com/flyteorg/flytestdlib v0.3.24
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-github v17.0.0+incompatible
