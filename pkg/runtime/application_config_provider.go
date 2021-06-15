@@ -44,12 +44,7 @@ var schedulerConfig = config.MustRegisterSection(scheduler, &interfaces.Schedule
 	},
 })
 var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.RemoteDataConfig{
-	Scheme: common.Local,
-	Region: "us-east-1",
-	SignedURL: interfaces.SignedURL{
-		DurationMinutes: 3,
-	},
-	MaxSizeInBytes: 1048576, // 1 Mib
+	Scheme: common.None,
 })
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
 	Type: common.Local,
