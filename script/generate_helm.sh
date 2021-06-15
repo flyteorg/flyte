@@ -12,7 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 helm dep update ${DIR}/../helm/
 
 for deployment in ${DEPLOYMENT}; do
-    helm template flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte -n flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
 
 echo "Generating helm docs"
