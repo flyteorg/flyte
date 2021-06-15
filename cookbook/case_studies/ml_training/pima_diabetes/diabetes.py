@@ -1,6 +1,6 @@
 """
-Train an XGBoost model and validate it
-----------------------------------------
+Train and Validate a Diabetes Classification XGBoost Model
+-----------------------------------------------------------
 
 """
 import typing

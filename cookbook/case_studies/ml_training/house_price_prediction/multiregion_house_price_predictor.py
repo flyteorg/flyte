@@ -1,13 +1,13 @@
 """
-Predicting the House Price in Multiple Regions Using an XGBoost Model and Flytekit (Python)
--------------------------------------------------------------------------------------------
+Predicting House Price in Multiple Regions with XGBoost and Dynamic Workflows
+------------------------------------------------------------------------------
 
 In this example, you'll use the house price prediction model for one region to expand it to multiple regions. 
 """
 
 # %%
-# Step 1: Importing the Libraries
-# ===============================
+# Importing the Libraries
+# ========================
 # First, import all the required libraries.
 import typing
 
@@ -30,8 +30,8 @@ except ImportError:
     )
 
 # %%
-# Step 2: Initializing the Variables
-# ==================================
+# Initializing the Variables
+# ===========================
 # Initialize the variables to be used while building the model.
 NUM_HOUSES_PER_LOCATION = 1000
 COLUMNS = [
@@ -57,8 +57,8 @@ LOCATIONS = [
 ]
 
 # %%
-# Step 3: Task -- Generating & Splitting the Data for Multiple Regions
-# ====================================================================
+# Task: Generating & Splitting the Data for Multiple Regions
+# ============================================================
 # Call the previously defined helper functions to generate and split the data. Finally, return the DataFrame objects.
 
 dataset = typing.NamedTuple(
@@ -95,9 +95,8 @@ def generate_and_split_data_multiloc(
 
 
 # %%
-# Step 4: Dynamic Task -- Training the XGBoost Model & Generating the Predictionsfor Multiple Regions
-# ===================================================================================================
-# (A "Dynamic" Task (aka Workflow) spins up internal workflows)
+# Dynamic Workflow: Training the XGBoost Model & Generating the Predictions for Multiple Regions
+# ===============================================================================================
 #
 # Fit the model to the data and generate predictions (two functionalities in a single task to make it more powerful!)
 #
@@ -118,8 +117,8 @@ def parallel_fit_predict(
 
 
 # %%
-# Step 5: Workflow -- Defining the Workflow
-# =========================================
+# Defining the Workflow
+# ======================
 # Include the following three steps in the workflow:
 #
 # #. Generate and split the data (Step 3)

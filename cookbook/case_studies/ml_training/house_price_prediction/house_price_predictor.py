@@ -1,6 +1,6 @@
 """
-Predicting the House Price in a Region Using an XGBoost Model and Flytekit (Python)
------------------------------------------------------------------------------------
+Predicting House Price in a Region with XGBoost
+------------------------------------------------
 """
 
 # %%
@@ -13,8 +13,8 @@ Predicting the House Price in a Region Using an XGBoost Model and Flytekit (Pyth
 #       pip install xgboost
 
 # %%
-# Step 1: Importing the Libraries
-# ===============================
+# Importing the Libraries
+# ========================
 # First, import all the required libraries.
 import typing
 
@@ -27,8 +27,8 @@ from flytekit import Resources, dynamic, task, workflow
 from flytekit.types.file import FlyteFile
 
 # %%
-# Step 2: Initializing the Variables
-# ==================================
+# Initializing the Variables
+# ===========================
 # Initialize the variables to be used while building the model.
 NUM_HOUSES_PER_LOCATION = 1000
 COLUMNS = [
@@ -44,8 +44,8 @@ MAX_YEAR = 2021
 SPLIT_RATIOS = [0.6, 0.3, 0.1]
 
 # %%
-# Step 3: Defining the Data Generation Functions
-# ==============================================
+# Defining the Data Generation Functions
+# =======================================
 # Define a function to generate the price of a house.
 def gen_price(house) -> int:
     _base_price = int(house["SQUARE_FEET"] * 150)
@@ -142,8 +142,8 @@ def split_data(
 
 
 # %%
-# Step 4: Task -- Generating & Splitting the Data
-# ===============================================
+# Task: Generating & Splitting the Data
+# ======================================
 # Call the previously defined helper functions to generate and split the data. Finally, return the DataFrame objects.
 dataset = typing.NamedTuple(
     "GenerateSplitDataOutputs",
@@ -160,8 +160,8 @@ def generate_and_split_data(number_of_houses: int, seed: int) -> dataset:
 
 
 # %%
-# Step 5: Task -- Training the XGBoost Model
-# ==========================================
+# Task: Training the XGBoost Model
+# =================================
 # Serialize the XGBoost model using joblib and store the model in a dat file.
 model_file = typing.NamedTuple("Model", model=FlyteFile[typing.TypeVar("joblib.dat")])
 
@@ -186,8 +186,8 @@ def fit(loc: str, train: pd.DataFrame, val: pd.DataFrame) -> model_file:
 
 
 # %%
-# Step 6: Task -- Generating the Predictions
-# ==========================================
+# Task: Generating the Predictions
+# ===================================
 # Unserialize the XGBoost model using joblib and generate the predictions.
 @task(cache_version="1.0", cache=True, limits=Resources(mem="600Mi"))
 def predict(
@@ -208,8 +208,8 @@ def predict(
 
 
 # %%
-# Step 7: Workflow -- Defining the Workflow
-# =========================================
+# Defining the Workflow
+# ======================
 # Include the following three steps in the workflow:
 #
 # #. Generate and split the data (Step 4)

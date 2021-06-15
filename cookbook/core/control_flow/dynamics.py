@@ -1,14 +1,12 @@
 """
-Dynamic Tasks
---------------
+Dynamic Workflows
+------------------
 
-A workflow is typically static where the directed acyclic graph's (DAG) structure is known at compile-time. However, scenarios exist where a run-time parameter (e.g. the output of an earlier task) determines the full DAG structure.
+A workflow is typically static where the directed acyclic graph's (DAG) structure is known at compile-time. However,
+scenarios exist where a run-time parameter (e.g. the output of an earlier task) determines the full DAG structure.
 
-In such cases, dynamic workflows can be used. Here's a code example that counts the common characters between any two strings.
-
-Inputs: s1 = "Pear", s2 = "Earth"
-
-Output: 3
+Dynamic workflows can be used in such cases. Here's a code example that counts the common characters between any two
+strings.
 
 """
 
@@ -63,8 +61,8 @@ def derive_count(freq1: typing.List[int], freq2: typing.List[int]) -> int:
 # The looping is dependent on the number of characters of both the strings which aren't known until the run time. If the ``@task`` decorator is used to encapsulate the calls mentioned above, the compilation will fail very early on due to the absence of the literal values.
 # Therefore, ``@dynamic`` decorator has to be used.
 #
-# Dynamic workflow is effectively both a task and a workflow. The key thing to note is that the ``body of tasks is run at run time and the
-# body of workflows is run at compile (aka registration) time``. Essentially, this is what a dynamic workflow leverages -- it’s a workflow that is compiled at run time (the best of both worlds)!
+# Dynamic workflow is effectively both a task and a workflow. The key thing to note is that the _body of tasks is run at run time and the
+# body of workflows is run at compile (aka registration) time_. Essentially, this is what a dynamic workflow leverages -- it’s a workflow that is compiled at run time (the best of both worlds)!
 #
 # At execution (run) time, Flytekit runs the compilation step, and produces
 # a ``WorkflowTemplate`` (from the dynamic workflow), which Flytekit then passes back to Flyte Propeller for further running, exactly how sub-workflows are handled.
