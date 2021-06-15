@@ -488,7 +488,7 @@ configmap:
         thirdPartyConfig:
           flyteClient:
             clientId: flytectl
-            redirectUri: https://localhost:53593/callback
+            redirectUri: http://localhost:53593/callback
             scopes:
               - offline
               - all
