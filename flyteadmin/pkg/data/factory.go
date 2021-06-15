@@ -82,6 +82,8 @@ func GetRemoteDataHandler(cfg RemoteDataHandlerConfig) RemoteDataHandler {
 		return &remoteDataHandler{
 			remoteURL: implementations.NewAWSRemoteURL(awsConfig, presignedURLDuration),
 		}
+	case common.None:
+		fallthrough
 	default:
 		logger.Infof(context.Background(),
 			"Using default noop remote url implementation for cloud provider type [%s]", cfg.CloudProvider)

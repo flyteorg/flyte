@@ -8,4 +8,5 @@ const (
 	AWS   CloudProvider = "aws"
 	GCP   CloudProvider = "gcp"
 	Local CloudProvider = "local"
+	None  CloudProvider = "none"
 )
