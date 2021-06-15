@@ -36,6 +36,8 @@ jobs:
           path: /tmp/release-snacks-core/
           key: release-snacks-core
       - name: Generate Serialize proto
+        env:
+          REGISTRY: "ghcr.io/flyteorg"
         run: |
           make -C cookbook/core serialize
           mkdir -p cookbook/release-snacks /tmp/release-snacks-core/
@@ -54,6 +56,8 @@ jobs:
           path: /tmp/release-snacks-integrations/
           key: release-snacks-plugins
       - name: Generate Serialize proto
+        env:
+          REGISTRY: "ghcr.io/flyteorg"
         run: |
           make -C cookbook/integrations serialize
           mkdir -p cookbook/release-snacks /tmp/release-snacks-integrations/
@@ -72,6 +76,8 @@ jobs:
           path: /tmp/release-snacks-case-studies/
           key: release-snacks-case-studies
       - name: Generate Serialize proto
+        env:
+          REGISTRY: "ghcr.io/flyteorg"
         run: |
           make -C cookbook/case_studies serialize
           mkdir -p cookbook/release-snacks /tmp/release-snacks-case-studies/
