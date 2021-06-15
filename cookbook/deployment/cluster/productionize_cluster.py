@@ -5,195 +5,127 @@ Productionize Your Flyte Cluster
 Handling Production Load
 ########################
 
-In order to handle production load, you'll want to replace the sandbox's object store and PostgreSQL database with production grade storage systems. To do this, you'll need to modify your Flyte configuration to remove the sandbox datastores and reference new ones. Scroll down to the end of the page for an illustration of setting up Flyte Cluster in a single AWS EKS (or any K8s cluster on AWS).
+In order to handle production load robustly, securely and with high availability, there are a number of important tasks that need to
+be done independently from the sandbox deployment:
 
-Flyte Configuration
-*******************
+* The kubernetes cluster needs to run securely and robustly
+* The sandbox's object store must be replaced by a production grade storage system
+* The sandbox's PostgreSQL database must be replaced by a production grade deployment of postgres
+* A production grade task queueing system must be provisioned and configured
+* A production grade notification system must be provisioned and configured
+* All the above must be done in a secure fashion
+* (Optionally) An official dns domain must be created
+* (Optionally) A production grade email sending system must be provisioned and configured
 
-A Flyte deployment contains around 50 kubernetes resources.
-The Flyte team has chosen to use the "kustomize" tool to manage these configs.
-Take a moment to read the `kustomize docs <https://github.com/kubernetes-sigs/kustomize>`__. Understanding kustomize will be important to modifying Flyte configurations.
+A Flyte user may provision and orchestrate this setup by themselves, but the Flyte team has partnered with the
+`Opta <https://github.com/run-x/opta>`_ team to create a streamlined production deployment strategy for AWS with
+ready-to-use templates provided in the `Flyte repo <https://github.com/flyteorg/flyte/tree/master/opta>`_. The following
+documentation specifies how to use and further configure them.
 
-The ``/kustomize`` directory in the `flyte repository <https://github.com/flyteorg/flyte/tree/master/kustomize>`__ is designed for use with ``kustomize`` to tailor Flyte deployments to your needs.
-Important subdirectories are described below.
+Deploying Opta Environment and Service for Flyte
+************************************************
+**The Environment**
+To begin using Opta, please first `download the latest version <https://docs.opta.dev/installation/>`_ and all the listed
+prerequisites and make sure that you have
+`admin/fullwrite AWS credentials setup on your terminal <https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html>`_.
+With that prepared, go to the Opta subdirectory in the Flyte repo, and open up env.yaml in your editor. Please find and
+replace the following values with your desired ones:
 
-base
-  The `base directory <https://github.com/flyteorg/flyte/tree/master/kustomize/base>`__ contains minimal configurations for each Flyte component.
+* <account_id>: your AWS account ID
+* <region>: your AWS region
+* <domain>: your desired domain for your Flyte deployment (should be a domain which you own or a subdomain thereof - this environment will promptyly take ownership of the domain/subdomain so make sure it will only be used for this purpose)
+* <env_name>: a name for the new isolated cloud environment which is going to be created (e.g. flyte-prod)
+* <your_company>: your company or organization's name
 
-dependencies
-  The `dependencies directory <https://github.com/flyteorg/flyte/tree/master/kustomize/dependencies>`__ contains deploy configurations for components like ``PostgreSQL`` that Flyte depends on.
+Once complete please run ``opta apply -c env.yaml`` and follow the prompts.
 
-These directories were designed so that you can modify them using ``kustomize`` to generate a custom Flyte deployment.
-In fact, this is how we create the ``sandbox`` deployment.
+**DNS Delegation**
+Once Opta's apply for the environment is completed, you will need to complete dns delegation to fully setup public
+traffic access. You may find instructions on `how to do so here <https://docs.opta.dev/miscellaneous/ingress/>`_.
 
-Understanding the sandbox deployment will help you to create your own custom deployments.
+**The Flyte Deployment**
+Once dns deployment delegation is complete, you may deploy the Flyte service and affiliated resources. Go to the Opta
+subdirectory in the Flyte repo, and open up flyte.yaml in your editor. Please find and replace the following values with
+your desired ones:
 
-Understanding the Sandbox
-*************************
+* <account_id>: your AWS account ID
+* <region>: your AWS region
 
-The sandbox deployment is managed by a set of kustomize `overlays <https://github.com/kubernetes-sigs/kustomize/blob/master/docs/glossary.md#overlay>`__ that alter the ``base`` configurations to compose the sandbox deployment.
+Once complete please run ``opta apply -c flyte.yaml`` and follow the prompts.
 
-The sandbox overlays live in the `kustomize/overlays/sandbox <https://github.com/flyteorg/flyte/tree/master/kustomize/overlays/sandbox>`__ directory. There are overlays for each component, and a "flyte" overlay that aggregates the components into a single deploy file.
-
-**Component Overlays**
-  For each modified component, there is an kustomize overlay at ``kustomize/overlays/sandbox/{{ component }}``.
-  The overlay will typically reference the ``base`` for that component, and modify it to the needs of the sandbox.
-
-  Using kustomize "patches", we add or override specific configs from the ``base`` resources. For example, in the "console" overlay, we specify a patch in the `kustomization.yaml <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/flyte/kustomization.yaml>`__. This patch adds memory and cpu limits to the console deployment config.
-
-  Each Flyte component requires at least one configuration file. The configuration files for each component live in the component overlay. For example, the FlyteAdmin config lives at `kustomize/overlays/sandbox/flyte/admin/deployment.yaml <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/flyte/admin/deployment.yaml>`__. These files get included as Kubernetes configmaps and mounted into pods.
-
-**Flyte Overlay**
-  The ``flyte`` overlay is meant to aggregate the components into a single deployment file.
-  The `kustomization.yaml overlay <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/flyte/kustomization.yaml>`__ in that directory lists the components to be included in the deploy.
-
-  We run ``kustomize build`` against the ``flyte`` directory to generate the complete `sandbox deployment yaml <https://github.com/flyteorg/flyte/blob/master/deployment/sandbox/flyte_generated.yaml>`__ we used earlier to deploy Flyte sandbox.
-
-Creating Your Own Deployment
+Understanding the Opta Yamls
 ****************************
+The Opta yaml files
 
-Before you create a custom deployment, you'll need to `install kustomize <https://github.com/kubernetes-sigs/kustomize#kustomize>`__.
+**Production Grade Environment**
+The Opta env.yaml is responsible for setting up the base infrastructure necessary for most cloud resources. The base
+module sets up the VPC and subnets (both public and private) used by the environment as well as the shared KMS keys.
+The dns sets up the hosted zone for domain and ssl certificates once completed. The k8s-cluster creates the
+Kubernetes cluster and node pool (with encrypted disk storage). And lastly the k8s-base module sets up the resources
+within Kubernetes like the autoscaler, metrics server, and ingress.
 
-The simplest way to create your own custom deployment is to clone the sandbox deploy and modify it to your liking.
+**Production Grade Database**
+The aws-postgres module in flyte.yaml creates an Aurora Postgresql database with disk encryption and regular snapshot
+backups. You can read more about it `here <https://docs.opta.dev/modules-reference/service-modules/aws/#postgres>`_
+
+**Production Grade Object Store**
+The aws-s3 module in flyte.yaml creates a new S3 bucket for Flyte, including disk encryption. You can read more about it
+`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-s3>`_
+
+**Production Grade Notification System**
+Flyte uses a combination of the AWS Simple Notification Service (SNS) and Simple Queueing service for a notification
+system. flyte.yaml creates both the SNS topic and SQS queue (via the notifcationsQueue and topic modules), which are
+encrypted with unique KMS keys and only the  flyte roles can access them. You can read more about the queues
+`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sqs>`_ and the topics
+`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sns>`_.
+
+**Production Grade Queueing System**
+Flyte uses SQS to power its task scheduling system, and flyte.yaml creates said queue (via the schedulesQueue
+module) with encryption and principle of least privilege rbac access like the other SQS queue above.
+
+**Secure IAM Roles for Data and Control Planes**
 
 
-.. TODO: update this section
+**Flyte Deployment via Helm**
+A Flyte deployment contains around 50 kubernetes resources.
 
-.. NOTE::
-   This section is getting updated to use the new kustomize installation of Flyte. Link to kustomize
+Additional Setup
+****************
+By now you should be set up for most production deployments, but there are some extra steps which we recommend that
+most users consider.
 
-To do this, check out the ``flyte`` repo ::
+**Email Setup**
+Flyte has the power to send email notifications, which can be enabled in Opta via
+`AWS' Simple Email Service <https://aws.amazon.com/ses/>`_ with a few extra steps (NOTE: make sure to have completed dns
+delegation first):
+1. Simply go to env.yaml and uncomment out the last line ( `- type: aws-ses` ) 
 
-  git clone https://github.com/flyteorg/flyte.git
+2. Run ``opta apply -c env.yaml`` again
 
-Copy the sandbox configuration to a new directory on your machine, and enter the new directory. ::
+This will enable SES on your account and environment domain -- you may be prompted to fill in some user-specific input to take your account out of SES sandbox if not done already. 
+It may take a day for AWS to enable production SES on your account (you will be kept notified via the email addresses inputted on the user
+prompt) but that should not prevent you from moving forward. 
 
-  cp -r flyte/kustomize/overlays/sandbox my-flyte-deployment
-  cd my-flyte-deployment
+3. Lastly, go ahead and uncomment out the 'Uncomment out for SES' line in the flyte.yaml and rerun ``opta apply -c flyte.yaml``.
 
-Since the ``base`` files are not in your local copy, you'll need to make some slight modifications to reference the ``base`` files from our GitHub repository. :: 
+You will now be able to receive emails sent by Flyte as soon as AWS approves your account. You may also specify other
+non-default email senders via the helm chart values.
 
-  find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../base~github.com/flyteorg/flyte/kustomize/base~'
-  find . -name kustomization.yaml -print0 | xargs -0 sed -i.bak 's~../../../dependencies~github.com/flyteorg/flyte/kustomize/dependencies~'
-  find . -name '*.bak' | xargs rm
+**Flyte Rbac**
+All Flyte deployments are currently insecure on the application level by default (e.g. open/accessible to everyone) so it
+is strongly recommended that users `add authentication <https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/cluster/auth_setup.html>`_.
 
-You should now be able to run kustomize against the ``flyte`` directory. ::
+**Extra configuration**
+It is possible to add extra configuration to your Flyte deployment by modifying the values passed in the helm chart
+used by Opta. Please refer to the possible values allowed from the `Flyte helm chart <https://github.com/flyteorg/flyte/tree/master/helm>`_
+and update the values field of the Flyte module in the flyte.yaml file accordingly.
 
-  kustomize build flyte > flyte_generated.yaml
 
-This will generate a deployment file identical to the sandbox deploy, and place it in a file called ``flyte_generated.yaml`` 
-
-Going Beyond the Sandbox
-************************
-
-Let's modify the sandbox deployment to use cloud providers for the database and object store. 
-
-Production Grade Database
-*************************
-
-The ``FlyteAdmin`` and ``DataCatalog`` components rely on PostgreSQL to store persistent records. 
-
-In this section, we'll modify the Flyte deploy to use a remote PostgreSQL database instead.
-
-First, you'll need to set up a reliable PostgreSQL database. The easiest way achieve this is to use a cloud provider like AWS `RDS <https://aws.amazon.com/rds/postgresql/>`__, GCP `Cloud SQL <https://cloud.google.com/sql/docs/postgres/>`__, or Azure `PostgreSQL <https://azure.microsoft.com/en-us/services/postgresql/>`__ to manage the PostgreSQL database for you. Create one and make note of the username, password, endpoint, and port.
-
-Next, remove old sandbox database by opening up the ``flyte/kustomization.yaml`` file and deleting database component. ::
-
-  - github.com/flyteorg/flyte/kustomize/dependencies/database
-
-With this line removed, you can re-run ``kustomize build flyte > flyte_generated.yaml`` and see that the the postgres deployment has been removed from the ``flyte_generated.yaml`` file.
-
-Now, let's re-configure ``FlyteAdmin`` to use the new database.
-Edit the ``admindeployment/flyteadmin_config.yaml`` file, and change the ``storage`` key like so ::
-
-    database:
-      host: {{ your-database.endpoint }}
-      port: {{ your database port }}
-      username: {{ your_database_username }}
-      password: {{ your_database_password }}
-      dbname: flyteadmin
-
-Do the same thing in ``datacatalog/datacatalog_config.yaml``, but use the dbname ``datacatalog`` ::
-
-    database:
-      host: {{ your-database.endpoint }}
-      port: {{ your database port }}
-      username: {{ your_database_username }}
-      password: {{ your_database_password }}
-      dbname: datacatalog
-
-Note: *You can mount the database password into the pod and use the "passwordPath" config to point to a file on disk instead of specifying the password here.*
-
-Next, remove the "check-db-ready" init container from `admindeployment/admindeployment.yaml <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/flyte/admin/deployment.yaml#L14-L21>`__. This check is no longer needed.
-
-Production Grade Object Store
-*****************************
-
-``FlyteAdmin``, ``FlytePropeller``, and ``DataCatalog`` components rely on an Object Store to hold files.
-
-In this section, we'll modify the Flyte deploy to use `AWS S3 <https://aws.amazon.com/s3/>`__ for object storage.
-The process for other cloud providers like `GCP GCS <https://cloud.google.com/storage/>`__ should be similar.
-
-To start, `create an s3 bucket <https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html>`__.
-
-Next, remove the old sandbox object store by opening up the ``flyte/kustomization.yaml`` file and deleting the storage line. ::
-
-  - github.com/flyteorg/flyte/kustomize/dependencies/storage
-
-With this line gone, you can re-run ``kustomize build flyte > flyte_generated.yaml`` and see that the sandbox object store has been removed from the ``flyte_generated.yaml`` file.
-
-Next, open the configs ``admindeployment/flyteadmin_config.yaml``, ``propeller/config.yaml``, ``datacatalog/datacatalog_config.yaml`` and look for the ``storage`` configuration.
-
-Change the ``storage`` configuration in each of these configs to use your new s3 bucket like so ::
-
-    storage:
-      type: s3
-      container: {{ YOUR-S3-BUCKET }}
-      connection:
-        auth-type: accesskey
-        access-key: {{ YOUR_AWS_ACCESS_KEY }}
-        secret-key: {{ YOUR_AWS_SECRET_KEY }}
-        region: {{ YOUR-AWS-REGION }}
-
-Note: *To use IAM roles for authentication, switch to the "iam" auth-type.*
-
-Next, open ``propeller/plugins/config.yaml`` and remove the `default-env-vars <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/flyte/config/propeller/plugins/k8s.yaml#L3-L6>`__ (no need to replace them, the default behavior is sufficient).
-
-Now if you re-run ``kustomize build flyte > flyte_generated.yaml``, you should see that the configmaps have been updated.
-
-Run ``kubectl apply -f flyte_generated.yaml`` to deploy these changes to your cluster for a production-ready deployment.
-
-Dynamically Configured Projects
-*******************************
-
-As your Flyte user-base evolves, adding new projects is as simple as registering them through the cli ::
-
-  flyte-cli register-project -h {{ your-flyte-admin-host.com }}  -p myflyteproject --name "My Flyte Project" \
-    --description "My very first project onboarding onto Flyte"
-
-A cron which runs at the cadence specified in flyteadmin config will ensure that all the kubernetes resources necessary for the new project are created and new workflows can successfully
-be registered and executed under the new project.
-
-This project should immediately show up in the Flyte console after refreshing.
-
-Using AWS EKS to Host Flyte
-***************************
-
-Illustration of Setting up Flyte Cluster in a Single AWS EKS
-============================================================
-
-.. notes::
-
-   - Flyte needs a prefix in an AWS S3 bucket to store all of its metadata. This is where the data about executions, workflows, tasks is stored
-     - this S3 bucket/prefix should be accessible to all FlytePropeller, FlyteAdmin, Datacatalog and running executions (user pods).
-   - FlyteAdmin can use any RDBMS database, but we recommend Postgres. At scale, we have used AWS Aurora.
-   - Datacatalog also uses a postgres database similar to admin. They both could share the same physical instance, but prefer to have 2 logically separate databases.
-   - If you want to use AWS IAM role for SeviceAccounts, first enable the IAM for service accounts for your EKS cluster and the provisioning of the service account should be managed outside of flyte and provided to Flyte at the time of execution (as a parameter). Ensure that pods in the EKS cluster can assume this role.
-   
-.. TODO: check if first class support is still being worked on
-
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_single_cluster_eks.png
-    :alt: Illustration of setting up Flyte Cluster in a single AWS EKS (or any K8s cluster on AWS)
+Raw Helm Deployment
+*******************
+It is certainly possible to deploy a production Flyte cluster directly using the helm chart if a user does not wish to
+use Opta. To do so properly, one will need to ensure they have completed the initial security/ha/robustness checklist
+from above, and then use `helm <https://helm.sh/>`_ to deploy the `Flyte helm chart <https://github.com/flyteorg/flyte/tree/master/helm>`_.
 
 
 """
