@@ -8,7 +8,7 @@ require (
 	github.com/docker/docker v20.10.7+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/enescakir/emoji v1.0.0
-	github.com/flyteorg/flyteidl v0.18.51
+	github.com/flyteorg/flyteidl v0.19.2
 	github.com/flyteorg/flytestdlib v0.3.21
 	github.com/ghodss/yaml v1.0.0
 	github.com/golang/protobuf v1.4.3
