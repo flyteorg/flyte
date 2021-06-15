@@ -65,9 +65,7 @@ Enabling a Specific Backend Plugin in Your Own Kustomize Generator
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Flyte uses Kustomize to generate the the deployment configuration which can be leveraged to `kustomize your own deployment <https://github.com/flyteorg/flyte/tree/master/kustomize>`_.
 
-.. admonition:: Coming Soon!
-
-    We will soon be supporting Helm. Track the `GitHub Issue <https://github.com/flyteorg/flyte/issues/299>`__ to stay tuned!
+.. TODO: write doct on Helm https://github.com/flyteorg/flyte/issues/299
 
 
 .. toctree::

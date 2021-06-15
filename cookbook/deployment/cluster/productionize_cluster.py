@@ -1,9 +1,6 @@
 """
 Productionize Your Flyte Cluster
 --------------------------------
-########################
-Handling Production Load
-########################
 
 In order to handle production load robustly, securely and with high availability, there are a number of important tasks that need to
 be done independently from the sandbox deployment:

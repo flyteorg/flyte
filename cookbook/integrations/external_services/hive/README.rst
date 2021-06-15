@@ -15,8 +15,6 @@ To use the flytekit hive plugin simply run the following:
 
 No Need of a dockerfile
 ------------------------
-This plugin is purely a spec and since SQL is completely portable has no need to build a container. Thus this plugin examples do not have any Dockerfile
+This plugin is purely a spec. Since SQL is completely portable there is no need to build a Docker container.
 
 .. TODO: write a subsection for "Configuring the backend to get hive working"
-
-This is coming soon.

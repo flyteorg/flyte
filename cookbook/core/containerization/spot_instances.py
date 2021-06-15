@@ -62,10 +62,4 @@ def add_one_and_print(value_to_print: int) -> int:
 # In a nutshell, you should use spot/preemptible instances when you want to reduce the total cost of running jobs at the expense of potential delays in execution due to restarts.
 
 # %%
-# How to Recover From Interruptions?
-# ==================================
-#
-# .. NOTE::
-#
-#     Coming soon 🛠
-#
+# .. TODO: Write "How to Recover From Interruptions?" section

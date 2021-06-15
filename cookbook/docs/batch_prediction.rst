@@ -1,3 +1,5 @@
+:nosearch:
+
 #################
 Batch Predictions
 #################

@@ -1,15 +1,11 @@
 """
-#################################
 Configuring Your Flyte Deployment
-#################################
-
-As the complexity of your user base grows, you may find yourself tweaking resource assignments based on specific projects, domains, and workflows. This document walks through how and in what ways you can configure your Flyte deployment.
-
-.. _config_resource_types:
+----------------------------------
 
 ***************************
 Configurable Resource Types
 ***************************
+
 Flyte allows these custom settings along with the following combination of dimensions:
 
 - domain

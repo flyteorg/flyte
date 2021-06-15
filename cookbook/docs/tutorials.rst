@@ -15,8 +15,3 @@ feature engineering, model training, and batch predictions.
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Train machine learning models from using your framework of choice.
-
-    ---
-    :body: d-flex center-card-content
-
-    *More tutorials coming soon...*

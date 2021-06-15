@@ -102,7 +102,9 @@ the first place you start at. Here
 Backend Plugin
 ===============
 
-Doc on how to writed a backend plugins is coming soon. A backend plugin essentially makes it possible for users to write extensions for FlytePropeller (Flytes scheduling engine). This enables complete control on the visualization and availability of the plugin.
+A backend plugin essentially makes it possible for users to write extensions for FlytePropeller (Flytes scheduling engine). This enables complete control on the visualization and availability of the plugin.
+
+.. TODO: Write doc on how to writed a backend plugins. 
 
 **Pros**
 

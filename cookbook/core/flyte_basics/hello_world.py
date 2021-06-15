@@ -1,6 +1,6 @@
 """
-Hello World Workflow
---------------------
+Hello World
+------------
 This simple workflow calls a task that returns "Hello World" and then just sets that as the final output of the workflow.
 """
 import typing
@@ -37,3 +37,8 @@ def my_wf() -> str:
 #   will result in an error
 if __name__ == "__main__":
     print(f"Running my_wf() {my_wf()}")
+
+
+# %%
+# In the next few examples you'll learn more about the core ideas of Flyte, which are tasks, workflows, and launch
+# plans.
