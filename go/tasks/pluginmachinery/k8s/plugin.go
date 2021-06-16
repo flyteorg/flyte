@@ -46,6 +46,11 @@ type PluginProperties struct {
 	DisableInjectFinalizer bool
 	// Specifies the length of TaskExecutionID generated name. default: 50
 	GeneratedNameMaxLength *int
+	// DisableDeleteResourceOnFinalize disables deleting the created resource on finalize. That behavior is controllable
+	// on the base K8sPluginConfig level but can be disabled for individual plugins. Plugins should generally not
+	// override that behavior unless the resource that gets created for this plugin does not consume resources (cluster's
+	// cpu/memory... etc. or external resources) once the plugin's Plugin.GetTaskPhase() returns a terminal phase.
+	DisableDeleteResourceOnFinalize bool
 }
 
 // Special context passed in to plugins when checking task phase
