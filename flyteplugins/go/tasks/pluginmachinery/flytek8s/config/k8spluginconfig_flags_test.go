@@ -385,4 +385,26 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_delete-resource-on-finalize", func(t *testing.T) {
+		t.Run("DefaultValue", func(t *testing.T) {
+			// Test that default value is set properly
+			if vBool, err := cmdFlags.GetBool("delete-resource-on-finalize"); err == nil {
+				assert.Equal(t, bool(defaultK8sConfig.DeleteResourceOnFinalize), vBool)
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("delete-resource-on-finalize", testValue)
+			if vBool, err := cmdFlags.GetBool("delete-resource-on-finalize"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vBool), &actual.DeleteResourceOnFinalize)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

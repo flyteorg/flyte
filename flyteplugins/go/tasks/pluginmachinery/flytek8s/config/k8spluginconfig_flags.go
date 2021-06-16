@@ -54,5 +54,6 @@ func (cfg K8sPluginConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.cpu"), defaultK8sConfig.CoPilot.CPU, "Used to set cpu for co-pilot containers")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.memory"), defaultK8sConfig.CoPilot.Memory, "Used to set memory for co-pilot containers")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "co-pilot.storage"), defaultK8sConfig.CoPilot.Storage, "Default storage limit for individual inputs / outputs")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "delete-resource-on-finalize"), defaultK8sConfig.DeleteResourceOnFinalize, "Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This,  however,  will cause k8s log links to expire as soon as the resource is finalized.")
 	return cmdFlags
 }

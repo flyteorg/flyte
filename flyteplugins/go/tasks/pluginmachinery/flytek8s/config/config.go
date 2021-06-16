@@ -100,6 +100,11 @@ type K8sPluginConfig struct {
 
 	// Flyte CoPilot Configuration
 	CoPilot FlyteCoPilotConfig `json:"co-pilot" pflag:",Co-Pilot Configuration"`
+
+	// DeleteResourceOnFinalize instructs the system to delete the resource on finalize. This ensures that no resources
+	// are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as
+	// soon as the resource is finalized.
+	DeleteResourceOnFinalize bool `json:"delete-resource-on-finalize" pflag:",Instructs the system to delete the resource on finalize. This ensures that no resources are kept around (potentially consuming cluster resources). This, however, will cause k8s log links to expire as soon as the resource is finalized."`
 }
 
 type FlyteCoPilotConfig struct {
