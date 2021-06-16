@@ -68,28 +68,20 @@ func addMapValues(overrides map[string]string, flyteWfValues map[string]string) 
 	return flyteWfValues
 }
 
-func (c *FlytePropeller) addPermissions(launchPlan admin.LaunchPlan, flyteWf *v1alpha1.FlyteWorkflow) {
+func (c *FlytePropeller) addPermissions(auth *admin.AuthRole, flyteWf *v1alpha1.FlyteWorkflow) {
 	// Set role permissions based on launch plan Auth values.
 	// The branched-ness of this check is due to the presence numerous deprecated fields
-	var role string
-	if launchPlan.Spec.GetAuthRole() != nil && len(launchPlan.GetSpec().GetAuthRole().GetAssumableIamRole()) > 0 {
-		role = launchPlan.GetSpec().GetAuthRole().GetAssumableIamRole()
-	} else if launchPlan.GetSpec().GetAuth() != nil && len(launchPlan.GetSpec().GetAuth().GetAssumableIamRole()) > 0 {
-		role = launchPlan.GetSpec().GetAuth().GetAssumableIamRole()
-	} else if len(launchPlan.GetSpec().GetRole()) > 0 {
-		// Although deprecated, older launch plans may reference the role field instead of the Auth AssumableIamRole.
-		role = launchPlan.GetSpec().GetRole()
+	if auth == nil {
+		return
 	}
-	if launchPlan.GetSpec().GetAuthRole() != nil && len(launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()) > 0 {
-		flyteWf.ServiceAccountName = launchPlan.GetSpec().GetAuthRole().GetKubernetesServiceAccount()
-	} else if launchPlan.GetSpec().GetAuth() != nil && len(launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount()) > 0 {
-		flyteWf.ServiceAccountName = launchPlan.GetSpec().GetAuth().GetKubernetesServiceAccount()
-	}
-	if len(role) > 0 {
+	if len(auth.AssumableIamRole) > 0 {
 		if flyteWf.Annotations == nil {
 			flyteWf.Annotations = map[string]string{}
 		}
-		flyteWf.Annotations[c.roleNameKey] = role
+		flyteWf.Annotations[c.roleNameKey] = auth.AssumableIamRole
+	}
+	if len(auth.KubernetesServiceAccount) > 0 {
+		flyteWf.ServiceAccountName = auth.KubernetesServiceAccount
 	}
 }
 
@@ -135,7 +127,7 @@ func (c *FlytePropeller) ExecuteWorkflow(ctx context.Context, input interfaces.E
 	acceptAtWrapper := v1.NewTime(input.AcceptedAt)
 	flyteWf.AcceptedAt = &acceptAtWrapper
 
-	c.addPermissions(input.Reference, flyteWf)
+	c.addPermissions(input.Auth, flyteWf)
 
 	labels := addMapValues(input.Labels, flyteWf.Labels)
 	flyteWf.Labels = labels

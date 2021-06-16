@@ -20,6 +20,7 @@ type ExecuteWorkflowInput struct {
 	QueueingBudget      time.Duration
 	TaskPluginOverrides []*admin.PluginOverride
 	ExecutionConfig     *admin.WorkflowExecutionConfig
+	Auth                *admin.AuthRole
 }
 
 type ExecuteTaskInput struct {

@@ -41,6 +41,9 @@ var clusterName = "C1"
 
 var acceptedAt = time.Now()
 
+const testRole = "role"
+const testK8sServiceAccount = "sa"
+
 func getFlytePropellerForTest(execCluster interfaces2.ClusterInterface, builder *FlyteWorkflowBuilderTest) *FlytePropeller {
 	return &FlytePropeller{
 		executionCluster: execCluster,
@@ -143,8 +146,8 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 				"customlabel": "labelval",
 			}, workflow.Labels)
 			expectedAnnotations := map[string]string{
-				"iam.amazonaws.com/role": "role-1",
-				"customannotation":       "annotationval",
+				roleNameKey:        testRole,
+				"customannotation": "annotationval",
 			}
 			assert.EqualValues(t, expectedAnnotations, workflow.Annotations)
 
@@ -155,6 +158,7 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 				},
 			}, workflow.ExecutionConfig.TaskPluginImpls)
 			assert.Empty(t, opts)
+			assert.Equal(t, workflow.ServiceAccountName, testK8sServiceAccount)
 			return nil, nil
 		},
 	}
@@ -179,7 +183,6 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 					Domain:  "lp-d",
 				},
 				Spec: &admin.LaunchPlanSpec{
-					Role: "role-1",
 					WorkflowId: &core.Identifier{
 						Name: "wf",
 					},
@@ -199,6 +202,10 @@ func TestExecuteWorkflowHappyCase(t *testing.T) {
 					MissingPluginBehavior: admin.PluginOverride_USE_DEFAULT,
 				},
 			},
+			Auth: &admin.AuthRole{
+				AssumableIamRole:         testRole,
+				KubernetesServiceAccount: testK8sServiceAccount,
+			},
 		})
 	assert.Nil(t, err)
 	assert.NotNil(t, execInfo)
@@ -210,7 +217,7 @@ func TestExecuteWorkflowCallFailed(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{
 		createCallback: func(workflow *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error) {
 			expectedAnnotations := map[string]string{
-				"iam.amazonaws.com/role": "role-1",
+				roleNameKey: testRole,
 			}
 			assert.EqualValues(t, expectedAnnotations, workflow.Annotations)
 			assert.Empty(t, opts)
@@ -242,13 +249,15 @@ func TestExecuteWorkflowCallFailed(t *testing.T) {
 					Domain:  "d",
 				},
 				Spec: &admin.LaunchPlanSpec{
-					Role: "role-1",
 					WorkflowId: &core.Identifier{
 						Name: "wf",
 					},
 				},
 			},
 			AcceptedAt: acceptedAt,
+			Auth: &admin.AuthRole{
+				AssumableIamRole: testRole,
+			},
 		})
 
 	assert.NotNil(t, err)
@@ -295,13 +304,15 @@ func TestExecuteWorkflowAlreadyExistsNoError(t *testing.T) {
 					Domain:  "d",
 				},
 				Spec: &admin.LaunchPlanSpec{
-					Role: "role-1",
 					WorkflowId: &core.Identifier{
 						Name: "wf",
 					},
 				},
 			},
 			AcceptedAt: acceptedAt,
+			Auth: &admin.AuthRole{
+				AssumableIamRole: "role-1",
+			},
 		})
 
 	assert.Nil(t, err)
@@ -432,41 +443,14 @@ func TestAddPermissions(t *testing.T) {
 	cluster := getFakeExecutionCluster()
 	propeller := getFlytePropellerForTest(cluster, &FlyteWorkflowBuilderTest{})
 	flyteWf := v1alpha1.FlyteWorkflow{}
-	propeller.addPermissions(admin.LaunchPlan{
-		Spec: &admin.LaunchPlanSpec{
-			Auth: &admin.Auth{
-				AssumableIamRole: "rollie-pollie",
-			},
-			Role: "ignore-me",
-		},
+	propeller.addPermissions(&admin.AuthRole{
+		AssumableIamRole:         testRole,
+		KubernetesServiceAccount: testK8sServiceAccount,
 	}, &flyteWf)
 	assert.EqualValues(t, flyteWf.Annotations, map[string]string{
-		roleNameKey: "rollie-pollie",
+		roleNameKey: testRole,
 	})
-
-	flyteWf = v1alpha1.FlyteWorkflow{}
-	propeller.addPermissions(admin.LaunchPlan{
-		Spec: &admin.LaunchPlanSpec{
-			Role: "rollie-pollie",
-		},
-	}, &flyteWf)
-	assert.EqualValues(t, flyteWf.Annotations, map[string]string{
-		roleNameKey: "rollie-pollie",
-	})
-
-	flyteWf = v1alpha1.FlyteWorkflow{}
-	propeller.addPermissions(admin.LaunchPlan{
-		Spec: &admin.LaunchPlanSpec{
-			Auth: &admin.Auth{
-				KubernetesServiceAccount: "service-account",
-				AssumableIamRole:         "rollie-pollie",
-			},
-		},
-	}, &flyteWf)
-	assert.Equal(t, "service-account", flyteWf.ServiceAccountName)
-	assert.EqualValues(t, flyteWf.Annotations, map[string]string{
-		roleNameKey: "rollie-pollie",
-	})
+	assert.Equal(t, testK8sServiceAccount, flyteWf.ServiceAccountName)
 }
 
 func TestAddExecutionOverrides(t *testing.T) {
