@@ -15,7 +15,7 @@ Where does Flyte fit in?
 
 A typical house price prediction model isn’t dynamic, but a task has to be dynamic when multiple regions are involved. 
 
-To learn more about dynamic workflows, refer to `Write a dynamic task <https://docs.flyte.org/projects/cookbook/en/latest/auto_core_intermediate/dynamics.html>`__.
+To learn more about dynamic workflows, refer to `Write a dynamic task <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/dynamics.html#dynamic-workflows>`__.
 
 Dataset
 =======
