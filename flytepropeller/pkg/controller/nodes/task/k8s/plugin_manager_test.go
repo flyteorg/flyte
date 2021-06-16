@@ -707,6 +707,85 @@ func TestResourceManagerConstruction(t *testing.T) {
 	assert.NotNil(t, rm)
 }
 
+func TestFinalize(t *testing.T) {
+	t.Run("DeleteResourceOnFinalize=True", func(t *testing.T) {
+		ctx := context.Background()
+		sCtx := &pluginsCoreMock.SetupContext{}
+		fakeKubeClient := mocks.NewFakeKubeClient()
+		sCtx.OnKubeClient().Return(fakeKubeClient)
+
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DeleteResourceOnFinalize: true}))
+		p := pluginsk8sMock.Plugin{}
+		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+		o := &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "abc",
+				Namespace: "xyz",
+			},
+		}
+
+		assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
+
+		p.OnBuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
+		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient}
+		actualO := &v1.Pod{}
+		// Assert the object exists before calling finalize
+		assert.NoError(t, fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
+			Name:      o.Name,
+			Namespace: o.Namespace,
+		}, actualO))
+
+		// Finalize should now delete the object
+		assert.NoError(t, pluginManager.Finalize(ctx, tctx))
+
+		// Assert the object is now deleted.
+		assert.Error(t, fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
+			Name:      o.Name,
+			Namespace: o.Namespace,
+		}, actualO))
+	})
+
+	t.Run("DeleteResourceOnFinalize=False", func(t *testing.T) {
+		ctx := context.Background()
+		sCtx := &pluginsCoreMock.SetupContext{}
+		fakeKubeClient := mocks.NewFakeKubeClient()
+		sCtx.OnKubeClient().Return(fakeKubeClient)
+
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{DeleteResourceOnFinalize: false}))
+		p := pluginsk8sMock.Plugin{}
+		p.OnGetProperties().Return(k8s.PluginProperties{DisableInjectFinalizer: true})
+		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
+		o := &v1.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "abc",
+				Namespace: "xyz",
+			},
+		}
+
+		assert.NoError(t, fakeKubeClient.GetClient().Create(ctx, o))
+
+		p.OnBuildIdentityResource(ctx, tctx.TaskExecutionMetadata()).Return(o, nil)
+		pluginManager := PluginManager{plugin: &p, kubeClient: fakeKubeClient}
+		actualO := &v1.Pod{}
+		// Assert the object exists before calling finalize
+		assert.NoError(t, fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
+			Name:      o.Name,
+			Namespace: o.Namespace,
+		}, actualO))
+
+		// Finalize should now delete the object
+		assert.NoError(t, pluginManager.Finalize(ctx, tctx))
+
+		// Assert the object is still here.
+		assert.NoError(t, fakeKubeClient.GetClient().Get(ctx, k8stypes.NamespacedName{
+			Name:      o.Name,
+			Namespace: o.Namespace,
+		}, actualO))
+	})
+
+}
+
 func init() {
 	labeled.SetMetricKeys(contextutils.ProjectKey)
 }
