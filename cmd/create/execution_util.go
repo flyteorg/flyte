@@ -16,60 +16,79 @@ import (
 
 func createExecutionRequestForWorkflow(ctx context.Context, workflowName, project, domain string,
 	cmdCtx cmdCore.CommandContext) (*admin.ExecutionCreateRequest, error) {
-	var lp *admin.LaunchPlan
-	var err error
-
 	// Fetch the launch plan
-	if lp, err = cmdCtx.AdminFetcherExt().FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain); err != nil {
+	lp, err := cmdCtx.AdminFetcherExt().FetchLPVersion(ctx, workflowName, executionConfig.Version, project, domain)
+	if err != nil {
 		return nil, err
 	}
 
 	// Create workflow params literal map
-	var paramLiterals map[string]*core.Literal
 	workflowParams := cmdGet.WorkflowParams(lp)
-
-	if paramLiterals, err = MakeLiteralForParams(executionConfig.Inputs, workflowParams); err != nil {
+	paramLiterals, err := MakeLiteralForParams(executionConfig.Inputs, workflowParams)
+	if err != nil {
 		return nil, err
 	}
+
 	var inputs = &core.LiteralMap{
 		Literals: paramLiterals,
 	}
 
-	ID := lp.Id
-	return createExecutionRequest(ID, inputs, nil), nil
+	// Set both deprecated field and new field for security identity passing
+	authRole := &admin.AuthRole{
+		KubernetesServiceAccount: executionConfig.KubeServiceAcct,
+		AssumableIamRole:         executionConfig.IamRoleARN,
+	}
+
+	securityContext := &core.SecurityContext{
+		RunAs: &core.Identity{
+			K8SServiceAccount: executionConfig.KubeServiceAcct,
+			IamRole:           executionConfig.IamRoleARN,
+		},
+	}
+
+	return createExecutionRequest(lp.Id, inputs, securityContext, authRole), nil
 }
 
 func createExecutionRequestForTask(ctx context.Context, taskName string, project string, domain string,
 	cmdCtx cmdCore.CommandContext) (*admin.ExecutionCreateRequest, error) {
-	var task *admin.Task
-	var err error
 	// Fetch the task
-	if task, err = cmdCtx.AdminFetcherExt().FetchTaskVersion(ctx, taskName, executionConfig.Version, project, domain); err != nil {
+	task, err := cmdCtx.AdminFetcherExt().FetchTaskVersion(ctx, taskName, executionConfig.Version, project, domain)
+	if err != nil {
 		return nil, err
 	}
 	// Create task variables literal map
-	var variableLiterals map[string]*core.Literal
 	taskInputs := cmdGet.TaskInputs(task)
-	if variableLiterals, err = MakeLiteralForVariables(executionConfig.Inputs, taskInputs); err != nil {
+	variableLiterals, err := MakeLiteralForVariables(executionConfig.Inputs, taskInputs)
+	if err != nil {
 		return nil, err
 	}
+
 	var inputs = &core.LiteralMap{
 		Literals: variableLiterals,
 	}
-	var authRole *admin.AuthRole
-	if executionConfig.KubeServiceAcct != "" {
-		authRole = &admin.AuthRole{KubernetesServiceAccount: executionConfig.KubeServiceAcct}
-	} else {
-		authRole = &admin.AuthRole{AssumableIamRole: executionConfig.IamRoleARN}
+
+	// Set both deprecated field and new field for security identity passing
+	authRole := &admin.AuthRole{
+		KubernetesServiceAccount: executionConfig.KubeServiceAcct,
+		AssumableIamRole:         executionConfig.IamRoleARN,
 	}
-	ID := &core.Identifier{
+
+	securityContext := &core.SecurityContext{
+		RunAs: &core.Identity{
+			K8SServiceAccount: executionConfig.KubeServiceAcct,
+			IamRole:           executionConfig.IamRoleARN,
+		},
+	}
+
+	id := &core.Identifier{
 		ResourceType: core.ResourceType_TASK,
 		Project:      project,
 		Domain:       domain,
 		Name:         task.Id.Name,
 		Version:      task.Id.Version,
 	}
-	return createExecutionRequest(ID, inputs, authRole), nil
+
+	return createExecutionRequest(id, inputs, securityContext, authRole), nil
 }
 
 func relaunchExecution(ctx context.Context, executionName string, project string, domain string,
@@ -88,8 +107,9 @@ func relaunchExecution(ctx context.Context, executionName string, project string
 	return nil
 }
 
-func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap,
+func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap, securityContext *core.SecurityContext,
 	authRole *admin.AuthRole) *admin.ExecutionCreateRequest {
+
 	return &admin.ExecutionCreateRequest{
 		Project: executionConfig.TargetProject,
 		Domain:  executionConfig.TargetDomain,
@@ -101,7 +121,8 @@ func createExecutionRequest(ID *core.Identifier, inputs *core.LiteralMap,
 				Principal: "sdk",
 				Nesting:   0,
 			},
-			AuthRole: authRole,
+			AuthRole:        authRole,
+			SecurityContext: securityContext,
 		},
 		Inputs: inputs,
 	}
