@@ -610,6 +610,28 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 }
 
+func resolvePermissions(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
+	if request.Spec.AuthRole != nil {
+		return request.Spec.AuthRole
+	}
+
+	// Set role permissions based on launch plan Auth values.
+	// The branched-ness of this check is due to the presence numerous deprecated fields
+	if launchPlan.Spec.GetAuthRole() != nil {
+		return launchPlan.Spec.GetAuthRole()
+	} else if launchPlan.GetSpec().GetAuth() != nil {
+		return &admin.AuthRole{
+			AssumableIamRole:         launchPlan.GetSpec().GetAuth().AssumableIamRole,
+			KubernetesServiceAccount: launchPlan.GetSpec().GetAuth().KubernetesServiceAccount,
+		}
+	} else if len(launchPlan.GetSpec().GetRole()) > 0 {
+		return &admin.AuthRole{
+			AssumableIamRole: launchPlan.GetSpec().GetRole(),
+		}
+	}
+	return &admin.AuthRole{}
+}
+
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
@@ -713,6 +735,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		AcceptedAt:      requestedAt,
 		QueueingBudget:  qualityOfService.QueuingBudget,
 		ExecutionConfig: executionConfig,
+		Auth:            resolvePermissions(&request, launchPlan),
 	}
 	err = m.addLabelsAndAnnotations(request.Spec, &executeWorkflowInputs)
 	if err != nil {

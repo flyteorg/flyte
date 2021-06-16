@@ -2975,3 +2975,61 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, execConfig.MaxParallelism, int32(50))
 }
+
+func TestResolvePermissions(t *testing.T) {
+	assumableIamRole := "role"
+	k8sServiceAccount := "sa"
+
+	t.Run("use request values", func(t *testing.T) {
+		auth := resolvePermissions(&admin.ExecutionCreateRequest{
+			Spec: &admin.ExecutionSpec{
+				AuthRole: &admin.AuthRole{
+					AssumableIamRole:         assumableIamRole,
+					KubernetesServiceAccount: k8sServiceAccount,
+				},
+			},
+		}, &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				AuthRole: &admin.AuthRole{
+					AssumableIamRole:         "lp role",
+					KubernetesServiceAccount: "k8s sa",
+				},
+			},
+		})
+		assert.Equal(t, assumableIamRole, auth.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
+	})
+	t.Run("prefer lp auth role over auth", func(t *testing.T) {
+		auth := resolvePermissions(&admin.ExecutionCreateRequest{
+			Spec: &admin.ExecutionSpec{},
+		}, &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				AuthRole: &admin.AuthRole{
+					AssumableIamRole:         assumableIamRole,
+					KubernetesServiceAccount: k8sServiceAccount,
+				},
+				Auth: &admin.Auth{
+					AssumableIamRole:         "lp role",
+					KubernetesServiceAccount: "k8s sa",
+				},
+			},
+		})
+		assert.Equal(t, assumableIamRole, auth.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
+	})
+	t.Run("prefer lp auth over role", func(t *testing.T) {
+		auth := resolvePermissions(&admin.ExecutionCreateRequest{
+			Spec: &admin.ExecutionSpec{},
+		}, &admin.LaunchPlan{
+			Spec: &admin.LaunchPlanSpec{
+				Auth: &admin.Auth{
+					AssumableIamRole:         assumableIamRole,
+					KubernetesServiceAccount: k8sServiceAccount,
+				},
+				Role: "old role",
+			},
+		})
+		assert.Equal(t, assumableIamRole, auth.AssumableIamRole)
+		assert.Equal(t, k8sServiceAccount, auth.KubernetesServiceAccount)
+	})
+}
