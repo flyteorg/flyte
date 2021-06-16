@@ -361,10 +361,13 @@ func (e *PluginManager) ClearFinalizers(ctx context.Context, o client.Object) er
 	return nil
 }
 
-func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) error {
-	// If you change InjectFinalizer on the
-	if config.GetK8sPluginConfig().InjectFinalizer {
-		o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (err error) {
+	errs := stdErrors.ErrorCollection{}
+	var o client.Object
+	var nsName k8stypes.NamespacedName
+	cfg := config.GetK8sPluginConfig()
+	if cfg.InjectFinalizer || cfg.DeleteResourceOnFinalize {
+		o, err = e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 		if err != nil {
 			// This will recurrent, so we will skip further finalize
 			logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
@@ -372,7 +375,14 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 		}
 
 		e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
-		nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
+		nsName = k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
+	}
+
+	// In InjectFinalizer is on, it means we may have added the finalizers when we launched this resource. Attempt to
+	// clear them to allow the object to be deleted/garbage collected. If InjectFinalizer was turned on (through config)
+	// after the resource was created, we will not find any finalizers to clear and the object may have already been
+	// deleted at this point. Therefore, account for these cases and do not consider them errors.
+	if cfg.InjectFinalizer {
 		// Attempt to get resource from informer cache, if not found, retrieve it from API server.
 		if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
 			if IsK8sObjectNotExists(err) {
@@ -389,10 +399,26 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 		// the same event (idempotent) and then come here again...
 		err = e.ClearFinalizers(ctx, o)
 		if err != nil {
-			return err
+			errs.Append(err)
 		}
 	}
-	return nil
+
+	// If we should delete the resource when finalize is called, do a best effort delete.
+	if cfg.DeleteResourceOnFinalize && !e.plugin.GetProperties().DisableDeleteResourceOnFinalize {
+		// Attempt to delete resource, if not found, return success.
+		if err := e.kubeClient.GetClient().Delete(ctx, o); err != nil {
+			if IsK8sObjectNotExists(err) {
+				return errs.ErrorOrDefault()
+			}
+
+			// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
+			// Pod does not exist error. This should be retried using the retry policy
+			logger.Warningf(ctx, "Failed in finalizing. Failed to delete Resource with name: %v. Error: %v", nsName, err)
+			errs.Append(fmt.Errorf("finalize: failed to delete resource with name [%v]. Error: %w", nsName, err))
+		}
+	}
+
+	return errs.ErrorOrDefault()
 }
 
 func NewPluginManagerWithBackOff(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry, backOffController *backoff.Controller,
@@ -406,7 +432,9 @@ func NewPluginManagerWithBackOff(ctx context.Context, iCtx pluginsCore.SetupCont
 }
 
 // Creates a K8s generic task executor. This provides an easier way to build task executors that create K8s resources.
-func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry, monitorIndex *ResourceMonitorIndex) (*PluginManager, error) {
+func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry,
+	monitorIndex *ResourceMonitorIndex) (*PluginManager, error) {
+
 	if iCtx.EnqueueOwner() == nil {
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize plugin, enqueue Owner cannot be nil or empty.")
 	}
