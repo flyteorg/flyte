@@ -58,7 +58,7 @@ setup:
 		-p $(FLYTE_PROXY_PORT):30081 \
 		-p $(K8S_DASHBOARD_PROXY_PORT):30082 \
 		-p $(MINIO_PROXY_PORT):30084 \
-		ghcr.io/flyteorg/flyte-sandbox:dind > /dev/null
+		cr.flyte.org/flyteorg/flyte-sandbox:dind > /dev/null
 
 .PHONY: wait
 wait:
@@ -68,7 +68,7 @@ wait:
 .PHONY: start
 start: setup wait
 	$(call LOG,Registering examples from commit: latest)
-	REGISTRY=ghcr.io/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
+	REGISTRY=cr.flyte.org/flyteorg VERSION=latest $(call RUN_IN_SANDBOX,make -C cookbook/$(EXAMPLES_MODULE) fast_register)
 
 	echo "Flyte is ready! Flyte UI is available at http://localhost:$(FLYTE_PROXY_PORT)/console."
 
