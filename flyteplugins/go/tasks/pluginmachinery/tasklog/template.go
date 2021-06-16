@@ -3,6 +3,7 @@ package tasklog
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -15,6 +16,8 @@ import (
 // {{ .containerId }}: The container id docker/crio generated at run time,
 // {{ .logName }}: A deployment specific name where to expect the logs to be.
 // {{ .hostname }}: The hostname where the pod is running and where logs reside.
+// {{ .podUnixStartTime }}: The pod creation time (in unix seconds, not millis)
+// {{ .podUnixFinishTime }}: Don't have a good mechanism for this yet, but approximating with time.Now for now
 type TemplateLogPlugin struct {
 	templateUris  []string
 	messageFormat core.TaskLog_MessageFormat
@@ -26,22 +29,26 @@ type regexValPair struct {
 }
 
 type templateRegexes struct {
-	PodName       *regexp.Regexp
-	Namespace     *regexp.Regexp
-	ContainerName *regexp.Regexp
-	ContainerID   *regexp.Regexp
-	LogName       *regexp.Regexp
-	Hostname      *regexp.Regexp
+	PodName           *regexp.Regexp
+	Namespace         *regexp.Regexp
+	ContainerName     *regexp.Regexp
+	ContainerID       *regexp.Regexp
+	LogName           *regexp.Regexp
+	Hostname          *regexp.Regexp
+	PodUnixStartTime  *regexp.Regexp
+	PodUnixFinishTime *regexp.Regexp
 }
 
 func mustInitTemplateRegexes() templateRegexes {
 	return templateRegexes{
-		PodName:       mustCreateRegex("podName"),
-		Namespace:     mustCreateRegex("namespace"),
-		ContainerName: mustCreateRegex("containerName"),
-		ContainerID:   mustCreateRegex("containerID"),
-		LogName:       mustCreateRegex("logName"),
-		Hostname:      mustCreateRegex("hostname"),
+		PodName:           mustCreateRegex("podName"),
+		Namespace:         mustCreateRegex("namespace"),
+		ContainerName:     mustCreateRegex("containerName"),
+		ContainerID:       mustCreateRegex("containerID"),
+		LogName:           mustCreateRegex("logName"),
+		Hostname:          mustCreateRegex("hostname"),
+		PodUnixStartTime:  mustCreateRegex("podUnixStartTime"),
+		PodUnixFinishTime: mustCreateRegex("podUnixFinishTime"),
 	}
 }
 
@@ -59,13 +66,15 @@ func replaceAll(template string, values []regexValPair) string {
 	return template
 }
 
-func (s TemplateLogPlugin) GetTaskLog(podName, namespace, containerName, containerID, logName string) (core.TaskLog, error) {
+func (s TemplateLogPlugin) GetTaskLog(podName, namespace, containerName, containerID, logName string, podUnixStartTime, podUnixFinishTime int64) (core.TaskLog, error) {
 	o, err := s.GetTaskLogs(Input{
-		LogName:       logName,
-		Namespace:     namespace,
-		PodName:       podName,
-		ContainerName: containerName,
-		ContainerID:   containerID,
+		LogName:           logName,
+		Namespace:         namespace,
+		PodName:           podName,
+		ContainerName:     containerName,
+		ContainerID:       containerID,
+		PodUnixStartTime:  podUnixStartTime,
+		PodUnixFinishTime: podUnixFinishTime,
 	})
 
 	if err != nil || len(o.TaskLogs) == 0 {
@@ -113,6 +122,14 @@ func (s TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 					{
 						regex: regexes.Hostname,
 						val:   input.HostName,
+					},
+					{
+						regex: regexes.PodUnixStartTime,
+						val:   strconv.FormatInt(input.PodUnixStartTime, 10),
+					},
+					{
+						regex: regexes.PodUnixFinishTime,
+						val:   strconv.FormatInt(input.PodUnixFinishTime, 10),
 					},
 				},
 			),
