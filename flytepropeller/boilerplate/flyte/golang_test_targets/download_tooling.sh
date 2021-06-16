@@ -20,6 +20,7 @@ tools=(
   "github.com/flyteorg/flytestdlib/cli/pflags"
   "github.com/golangci/golangci-lint/cmd/golangci-lint"
   "github.com/alvaroloes/enumer"
+  "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
 )
 
 tmp_dir=$(mktemp -d -t gotooling-XXX)
