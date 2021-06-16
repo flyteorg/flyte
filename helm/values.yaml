@@ -15,7 +15,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: ghcr.io/flyteorg/flyteadmin
-    tag: v0.6.0 # FLYTEADMIN_TAG
+    tag: v0.6.4 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
   resources:
@@ -62,7 +62,7 @@ datacatalog:
   image:
     # -- Docker image for Datacatalog deployment
     repository: ghcr.io/flyteorg/datacatalog
-    tag: v0.3.4 # DATACATALOG_TAG
+    tag: v0.3.5 # DATACATALOG_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
   resources:
@@ -108,7 +108,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: ghcr.io/flyteorg/flytepropeller
-    tag: v0.11.0 # FLYTEPROPELLER_TAG
+    tag: v0.12.3 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
