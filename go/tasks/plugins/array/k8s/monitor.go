@@ -222,9 +222,10 @@ func FetchPodStatusAndLogs(ctx context.Context, client core.KubeClient, name k8s
 
 		if logPlugin != nil {
 			o, err := logPlugin.GetTaskLogs(tasklog.Input{
-				PodName:   pod.Name,
-				Namespace: pod.Namespace,
-				LogName:   fmt.Sprintf(" #%d-%d", index, retryAttempt),
+				PodName:          pod.Name,
+				Namespace:        pod.Namespace,
+				LogName:          fmt.Sprintf(" #%d-%d", index, retryAttempt),
+				PodUnixStartTime: pod.CreationTimestamp.Unix(),
 			})
 
 			if err != nil {

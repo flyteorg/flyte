@@ -5,12 +5,14 @@ import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 // Input contains all available information about task's execution that a log plugin can use to construct task's
 // log links.
 type Input struct {
-	HostName      string `json:"hostname"`
-	PodName       string `json:"podName"`
-	Namespace     string `json:"namespace"`
-	ContainerName string `json:"containerName"`
-	ContainerID   string `json:"containerId"`
-	LogName       string `json:"logName"`
+	HostName          string `json:"hostname"`
+	PodName           string `json:"podName"`
+	Namespace         string `json:"namespace"`
+	ContainerName     string `json:"containerName"`
+	ContainerID       string `json:"containerId"`
+	LogName           string `json:"logName"`
+	PodUnixStartTime  int64  `json:"podUnixStartTime"`
+	PodUnixFinishTime int64  `json:"podUnixFinishTime"`
 }
 
 // Output contains all task logs a plugin generates for a given Input.

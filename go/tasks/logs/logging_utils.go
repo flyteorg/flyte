@@ -3,6 +3,7 @@ package logs
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
@@ -44,11 +45,13 @@ func GetLogsForContainerInPod(ctx context.Context, pod *v1.Pod, index uint32, na
 
 	logs, err := logPlugin.GetTaskLogs(
 		tasklog.Input{
-			PodName:       pod.Name,
-			Namespace:     pod.Namespace,
-			ContainerName: pod.Spec.Containers[index].Name,
-			ContainerID:   pod.Status.ContainerStatuses[index].ContainerID,
-			LogName:       nameSuffix,
+			PodName:           pod.Name,
+			Namespace:         pod.Namespace,
+			ContainerName:     pod.Spec.Containers[index].Name,
+			ContainerID:       pod.Status.ContainerStatuses[index].ContainerID,
+			LogName:           nameSuffix,
+			PodUnixStartTime:  pod.CreationTimestamp.Unix(),
+			PodUnixFinishTime: time.Now().Unix(),
 		},
 	)
 
