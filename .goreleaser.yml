@@ -12,3 +12,4 @@ release:
   disable: false
   extra_files:
     - glob: ./release/*
+    - glob: .cr-release-packages/
