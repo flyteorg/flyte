@@ -50,6 +50,7 @@ class CustomSorter(FileNameSortKey):
         "task_cache.py",
         "files.py",
         "folders.py",
+        "named_outputs.py"
         # Control Flow
         "run_conditions.py",
         "subworkflows.py",
