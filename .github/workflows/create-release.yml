@@ -16,18 +16,12 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: "0"
+
       - name: Install Helm
         uses: azure/setup-helm@v1
         with:
           version: v3.4.0
-      - name: setup chart releaser
-        env:
-          CR_VERSION: "1.2.1"
-        run: |
-          wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz \
-              && tar -xf /tmp/chart-releaser.tar.gz -C . \
-              && chmod +x cr \
-              && rm /tmp/chart-releaser.tar.gz
+              
       - name: Bump version and push tag
         id: bump-version
         uses: anothrNick/github-tag-action@1.17.2
@@ -36,17 +30,29 @@ jobs:
           WITH_V: true
           CUSTOM_TAG: ${{ github.event.inputs.version }}
           RELEASE_BRANCHES: master
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: "0"
           ref: ${{ github.event.inputs.version }}
+
+      - name: setup chart releaser
+        env:
+          CR_VERSION: "1.2.1"
+        run: |
+          wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz \
+              && tar -xf /tmp/chart-releaser.tar.gz -C . \
+              && chmod +x cr \
+              && rm /tmp/chart-releaser.tar.gz
+
+      - name: Clean git
+        run: git stash
+
       - name: build Release Menifest
         run: |
           make prepare_artifacts
           ./cr package helm
-      - name: Clean git
-        run: git stash
-      
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
@@ -60,4 +66,4 @@ jobs:
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
           mkdir .cr-index
-          ./cr index --owner evalsocket --git-repo flyte --charts-repo=https://evalsocket.github.io/flyte --push --token=${{ secrets.FLYTE_BOT_PAT }} --release-name-template="{{ .Version }}"
+          ./cr index --owner flyteorg --git-repo flyte --charts-repo="https://flyteorg.github.io/flyte" --push --token=${{ secrets.FLYTE_BOT_PAT }} --release-name-template="{{ .Version }}"
