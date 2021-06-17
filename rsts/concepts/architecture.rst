@@ -1,8 +1,8 @@
 .. _divedeep-architecture-overview:
 
-#############################
-Architecture Overview
-#############################
+######################
+Component Architecture
+######################
 
 This document aims to demystify how Flyte's major components ``FlyteIDL``, ``FlyteKit``, ``FlyteCLI``, ``FlyteConsole``, ``FlyteAdmin``, ``FlytePropeller``, and ``FlytePlugins`` fit together at a high level.
 
@@ -16,8 +16,8 @@ The Flyte IDL (Interface Definition Language) is where shared Flyte entities are
 FlyteIDL uses the `protobuf <https://developers.google.com/protocol-buffers/>`_ schema to describe entities. Clients are generated for Python, Golang, and JavaScript and imported by Flyte components.
 
 
-Planes ✈️
-=========
+Planes
+======
 
 Flyte components are separated into 3 logical planes. The planes are summarized here and explained in further detail below. The goal is that any of these planes can be replaced by an alternate implementation.
 

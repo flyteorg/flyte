@@ -20,9 +20,8 @@
    :hidden:
 
    concepts/basics
-   concepts/core
    concepts/control_plane
-   concepts/execution_time
+   concepts/architecture
 
 .. toctree::
    :caption: Community
@@ -31,9 +30,6 @@
    :hidden:
 
    Join the Community <community/index>
-   community/contribute
-   community/roadmap
-   community/troubleshoot
 
 .. toctree::
    :caption: API Reference
@@ -43,14 +39,6 @@
 
    References <reference/index>
 
-.. toctree::
-   :caption: How-Tos
-   :maxdepth: 1
-   :name: howtotoc
-   :hidden:
-
-   plugins/index
-   howto/index
    
 Meet Flyte
 ==========
@@ -122,5 +110,5 @@ Whether you want to write Flyte workflows, deploy the Flyte platform to your k8 
 
 * :ref:`Get Started <gettingstarted>`
 * :ref:`Main Concepts <divedeep>`
-* :ref:`Extend Flyte <plugins>`
+* :ref:`Extend Flyte <cookbook:plugins_extend>`
 * :ref:`Join the Community <community>`

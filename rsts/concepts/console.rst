@@ -27,8 +27,9 @@ Before we can run the server, we need to set up an environment variable or two.
 The Flyte console displays information fetched from the Flyte Admin API. This
 environment variable specifies the host prefix used in constructing API requests.
 
-*Note*: this is only the host portion of the API endpoint, consisting of the
-protocol, domain, and port (if not using the standard 80/443).
+.. NOTE::
+    this is only the host portion of the API endpoint, consisting of the
+    protocol, domain, and port (if not using the standard 80/443).
 
 This value will be combined with a suffix (such as ``/api/v1``) to construct the
 final URL used in an API request.

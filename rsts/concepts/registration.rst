@@ -1,8 +1,8 @@
 .. _divedeep-registration:
 
-##################################
-Understanding Registration process
-##################################
+############
+Registration
+############
 
 .. image:: https://raw.githubusercontent.com/lyft/flyte/assets/img/flyte_wf_registration_overview.svg?sanitize=true
 

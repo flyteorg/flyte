@@ -61,7 +61,7 @@ extensions = [
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
     "sphinx_search.extension",
-    "sphinx_fontawesome",
+    "sphinx_panels",
 ]
 
 extlinks = {
@@ -107,7 +107,6 @@ html_logo = "images/flyte_circle_gradient_1_4x4.png"
 html_theme = "furo"
 html_title = "Flyte Docs"
 
-html_static_path = ["_static"]
 templates_path = ["_templates"]
 
 pygments_style = "tango"

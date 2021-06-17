@@ -40,7 +40,7 @@ Steps
 
 .. code-block::
 
-  cookbook/core/basic/hello_world.py
+  cookbook/core/flyte_basics/hello_world.py
 
 5. Add ``name: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Then update the body of ``say_hello`` to consume that argument.
 
@@ -73,7 +73,7 @@ Steps
 
 .. prompt:: bash
 
-  python cookbook/core/basic/hello_world.py
+  python cookbook/core/flyte_basics/hello_world.py
 
 *Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
 
@@ -81,7 +81,7 @@ Steps
 
 .. prompt:: bash
 
-  REGISTRY=ghcr.io/flyteorg make fast_register
+  REGISTRY=cr.flyte.org/flyteorg make fast_register
 
 .. note::
    If the images are to be re-built, run ``make register`` command.
@@ -103,7 +103,7 @@ Steps
 
   .. rubric:: 🎉 Congratulations, you just ran your first Flyte workflow 🎉
 
-  Next Steps: User Guide
-  #######################
-  
-  To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__ 🛫
+Next Steps: User Guide
+#######################
+
+To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__ 🛫

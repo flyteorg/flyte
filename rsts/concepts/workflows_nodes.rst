@@ -33,7 +33,9 @@ Executions
 ----------
 
 A workflow can only be executed through a :ref:`launch plan <divedeep-launchplans>`.
-A workflow can be launched many times with a variety of launch plans and inputs. Workflows that produce inputs and outputs can take advantage of :ref:`task caching <howto-enable-use-memoization>` to cache intermediate inputs and outputs and speed-up subsequent executions.
+A workflow can be launched many times with a variety of launch plans and inputs. Workflows that produce inputs and
+outputs can take advantage of :std:ref:`User Guide <cookbook:sphx_glr_auto_core_flyte_basics_task_cache.py>` to cache
+intermediate inputs and outputs and speed-up subsequent executions.
 
 .. _divedeep-nodes:
 
