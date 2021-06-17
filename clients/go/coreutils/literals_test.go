@@ -617,4 +617,14 @@ func TestMakeLiteralForType(t *testing.T) {
 		_, err := MakeLiteralForType(literalType, "m")
 		assert.Error(t, err)
 	})
+
+	t.Run("Nil string", func(t *testing.T) {
+		var literalType = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}}
+		l, err := MakeLiteralForType(literalType, nil)
+		assert.NoError(t, err)
+		assert.Equal(t, "", l.GetScalar().GetPrimitive().GetStringValue())
+		l, err = MakeLiteralForType(literalType, "")
+		assert.NoError(t, err)
+		assert.Equal(t, "", l.GetScalar().GetPrimitive().GetStringValue())
+	})
 }
