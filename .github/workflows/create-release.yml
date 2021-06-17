@@ -31,6 +31,7 @@ jobs:
       - name: build Release Menifest
         run: |
           make prepare_artifacts
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
