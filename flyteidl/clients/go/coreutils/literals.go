@@ -489,6 +489,10 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 	case *core.LiteralType_Simple:
 		newT := t.Type.(*core.LiteralType_Simple)
 		strValue := fmt.Sprintf("%v", v)
+		if v == nil {
+			strValue = ""
+		}
+
 		if newT.Simple == core.SimpleType_STRUCT {
 			if _, isValueStringType := v.(string); !isValueStringType {
 				byteValue, err := json.Marshal(v)
