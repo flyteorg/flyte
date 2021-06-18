@@ -8,7 +8,9 @@ import (
 	"testing"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
+	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
 
@@ -29,8 +31,10 @@ func cleanup(client *client.Client) error {
 		return err
 	}
 	for _, v := range containers {
-		if strings.Contains(v.Names[0], SandboxClusterName) {
-			if err := client.ContainerRemove(context.Background(), v.ID, types.ContainerRemoveOptions{}); err != nil {
+		if strings.Contains(v.Names[0], flyteSandboxClusterName) {
+			if err := client.ContainerRemove(context.Background(), v.ID, types.ContainerRemoveOptions{
+				Force: true,
+			}); err != nil {
 				return err
 			}
 		}
@@ -41,10 +45,6 @@ func cleanup(client *client.Client) error {
 func setupSandbox() {
 	mockAdminClient := u.MockClient
 	cmdCtx = cmdCore.NewCommandContext(mockAdminClient, u.MockOutStream)
-	_, err := os.Stat(f.FilePathJoin(f.UserHomeDir(), ".flyte"))
-	if os.IsNotExist(err) {
-		_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
-	}
 	_ = setupFlytectlConfig()
 }
 
@@ -81,6 +81,7 @@ func TestSetupFlytectlConfig(t *testing.T) {
 	check := os.IsNotExist(err)
 	assert.Equal(t, check, false)
 	_ = configCleanup()
+
 }
 
 func TestTearDownSandbox(t *testing.T) {
@@ -89,12 +90,47 @@ func TestTearDownSandbox(t *testing.T) {
 	err := teardownSandboxCluster(context.Background(), []string{}, cmdCtx)
 	assert.Nil(t, err)
 	assert.Nil(t, cleanup(cli))
+
+	volumes = []mount.Mount{}
+	_ = startSandboxCluster(context.Background(), []string{}, cmdCtx)
+	err = teardownSandboxCluster(context.Background(), []string{}, cmdCtx)
+	assert.Nil(t, err)
+
 }
 
-func TestStartContainer(t *testing.T) {
-	setupSandbox()
+func TestStartSandbox(t *testing.T) {
 	cli, _ := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+
 	assert.Nil(t, cleanup(cli))
+	setupSandbox()
+	volumes = []mount.Mount{}
+	sandboxConfig.DefaultConfig.SnacksRepo = "/tmp"
 	err := startSandboxCluster(context.Background(), []string{}, cmdCtx)
 	assert.Nil(t, err)
+
+	assert.Nil(t, cleanup(cli))
+	setupSandbox()
+	sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+	err = startSandboxCluster(context.Background(), []string{}, cmdCtx)
+	assert.NotNil(t, err)
+
+	assert.Nil(t, cleanup(cli))
+	_, err = startContainer(cli, []mount.Mount{})
+	assert.Nil(t, err)
+
+	assert.Nil(t, cleanup(cli))
+	ImageName = ""
+	_, err = startContainer(cli, []mount.Mount{})
+	assert.NotNil(t, err)
+}
+
+func TestGetSandbox(t *testing.T) {
+	cli, _ := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	assert.Nil(t, cleanup(cli))
+	setupSandbox()
+	sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+	_ = startSandboxCluster(context.Background(), []string{}, cmdCtx)
+
+	container := removeSandboxIfExist(cli, strings.NewReader("y"))
+	assert.Nil(t, container)
 }

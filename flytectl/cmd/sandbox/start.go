@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/enescakir/emoji"
+	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
+	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 )
 
 const (
@@ -17,11 +19,23 @@ const (
 Start will run the flyte sandbox cluster inside a docker container and setup the config that is required 
 ::
 
- bin/flytectl start
+ bin/flytectl sandbox start
+	
+Mount your flytesnacks repository code inside sandbox 
+::
 
+ bin/flytectl sandbox start --flytesnacks=$HOME/flyteorg/flytesnacks 
 Usage
 	`
 )
+
+var volumes = []mount.Mount{
+	{
+		Type:   mount.TypeBind,
+		Source: f.FilePathJoin(f.UserHomeDir(), ".flyte"),
+		Target: K3sDir,
+	},
+}
 
 type ExecResult struct {
 	StdOut   string
@@ -41,34 +55,36 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 		return err
 	}
 
-	if container := getSandbox(cli); container != nil {
-		if cmdUtil.AskForConfirmation("delete existing sandbox cluster", os.Stdin) {
-			if err := teardownSandboxCluster(ctx, []string{}, cmdCtx); err != nil {
-				return err
-			}
-		}
+	if err := removeSandboxIfExist(cli, os.Stdin); err != nil {
+		return err
 	}
 
-	ID, err := startContainer(cli)
-	if err == nil {
-		os.Setenv("KUBECONFIG", Kubeconfig)
-
-		defer func() {
-			if r := recover(); r != nil {
-				fmt.Println("Something goes wrong with container status", r)
-			}
-		}()
-
-		go watchError(cli, ID)
-		if err := readLogs(cli, ID); err != nil {
-			return err
-		}
-
-		fmt.Printf("Add (KUBECONFIG) to your environment variabl \n")
-		fmt.Printf("export KUBECONFIG=%v \n", Kubeconfig)
-		return nil
+	if len(sandboxConfig.DefaultConfig.SnacksRepo) > 0 {
+		volumes = append(volumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Target: flyteSnackDir,
+		})
 	}
-	fmt.Println("Something goes wrong. We are not able to start sandbox container, Please check your docker client and try again \n", emoji.Rocket)
-	fmt.Printf("error: %v", err)
+
+	os.Setenv("KUBECONFIG", Kubeconfig)
+	os.Setenv("FLYTECTL_CONFIG", FlytectlConfig)
+
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("Something goes wrong with container status", r)
+		}
+	}()
+
+	ID, err := startContainer(cli, volumes)
+	if err != nil {
+		fmt.Println("Something goes wrong. We are not able to start sandbox container, Please check your docker client and try again ")
+		return fmt.Errorf("error: %v", err)
+	}
+
+	_ = readLogs(cli, ID, SuccessMessage)
+	fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
+	fmt.Printf("export KUBECONFIG=%v \n", Kubeconfig)
+	fmt.Printf("export FLYTECTL_CONFIG=%v \n", FlytectlConfig)
 	return nil
 }

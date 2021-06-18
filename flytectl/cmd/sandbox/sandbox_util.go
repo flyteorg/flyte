@@ -10,26 +10,32 @@ import (
 	"os"
 	"strings"
 
+	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
-
 	"github.com/enescakir/emoji"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 )
 
 var (
-	Kubeconfig         = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
-	FlytectlConfig     = f.FilePathJoin(f.UserHomeDir(), ".flyte", "config.yaml")
-	SuccessMessage     = "Flyte is ready! Flyte UI is available at http://localhost:30081/console"
-	ImageName          = "ghcr.io/flyteorg/flyte-sandbox:dind"
-	SandboxClusterName = "flyte-sandbox"
-	Environment        = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
+	Kubeconfig              = f.FilePathJoin(f.UserHomeDir(), ".flyte", "k3s", "k3s.yaml")
+	FlytectlConfig          = f.FilePathJoin(f.UserHomeDir(), ".flyte", "config-sandbox.yaml")
+	SuccessMessage          = "Flyte is ready! Flyte UI is available at http://localhost:30081/console"
+	ImageName               = "ghcr.io/flyteorg/flyte-sandbox:dind"
+	flyteSandboxClusterName = "flyte-sandbox"
+	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
+	flyteSnackDir           = "/usr/src"
+	K3sDir                  = "/etc/rancher/"
 )
 
 func setupFlytectlConfig() error {
+
+	_ = os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte"), 0755)
+
 	response, err := http.Get("https://raw.githubusercontent.com/flyteorg/flytectl/master/config.yaml")
 	if err != nil {
 		return err
@@ -41,11 +47,7 @@ func setupFlytectlConfig() error {
 		return err
 	}
 
-	err = ioutil.WriteFile(FlytectlConfig, data, 0600)
-	if err != nil {
-		fmt.Printf("Please create ~/.flyte dir %v \n", emoji.ManTechnologist)
-		return err
-	}
+	_ = ioutil.WriteFile(FlytectlConfig, data, 0600)
 	return nil
 }
 
@@ -62,21 +64,31 @@ func configCleanup() error {
 }
 
 func getSandbox(cli *client.Client) *types.Container {
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{
+	containers, _ := cli.ContainerList(context.Background(), types.ContainerListOptions{
 		All: true,
 	})
-	if err != nil {
-		return nil
-	}
 	for _, v := range containers {
-		if strings.Contains(v.Names[0], SandboxClusterName) {
+		if strings.Contains(v.Names[0], flyteSandboxClusterName) {
 			return &v
 		}
 	}
 	return nil
 }
 
-func startContainer(cli *client.Client) (string, error) {
+func removeSandboxIfExist(cli *client.Client, reader io.Reader) error {
+	if c := getSandbox(cli); c != nil {
+		if cmdUtil.AskForConfirmation("delete existing sandbox cluster", reader) {
+			err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
+				Force: true,
+			})
+			return err
+		}
+		os.Exit(0)
+	}
+	return nil
+}
+
+func startContainer(cli *client.Client, volumes []mount.Mount) (string, error) {
 	ExposedPorts, PortBindings, _ := nat.ParsePortSpecs([]string{
 		"127.0.0.1:30086:30086",
 		"127.0.0.1:30081:30081",
@@ -87,38 +99,23 @@ func startContainer(cli *client.Client) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	if _, err := io.Copy(os.Stdout, r); err != nil {
-		return "", err
-	}
-
+	_, _ = io.Copy(os.Stdout, r)
 	resp, err := cli.ContainerCreate(context.Background(), &container.Config{
 		Env:          Environment,
 		Image:        ImageName,
 		Tty:          false,
 		ExposedPorts: ExposedPorts,
 	}, &container.HostConfig{
-		Mounts: []mount.Mount{
-			{
-				Type:   mount.TypeBind,
-				Source: f.FilePathJoin(f.UserHomeDir(), ".flyte"),
-				Target: "/etc/rancher/",
-			},
-			// TODO (Yuvraj) Add flytectl config in sandbox and mount with host file system
-			//{
-			//	Type:   mount.TypeBind,
-			//	Source: f.FilePathJoin(f.UserHomeDir(), ".flyte", "config.yaml"),
-			//	Target: "/.flyte/",
-			//},
-		},
+		Mounts:       volumes,
 		PortBindings: PortBindings,
 		Privileged:   true,
 	}, nil,
-		nil, SandboxClusterName)
+		nil, flyteSandboxClusterName)
+
 	if err != nil {
 		return "", err
 	}
-
+	go watchError(cli, resp.ID)
 	if err := cli.ContainerStart(context.Background(), resp.ID, types.ContainerStartOptions{}); err != nil {
 		return "", err
 	}
@@ -127,6 +124,7 @@ func startContainer(cli *client.Client) (string, error) {
 
 func watchError(cli *client.Client, id string) {
 	statusCh, errCh := cli.ContainerWait(context.Background(), id, container.WaitConditionNotRunning)
+
 	select {
 	case err := <-errCh:
 		if err != nil {
@@ -136,7 +134,7 @@ func watchError(cli *client.Client, id string) {
 	}
 }
 
-func readLogs(cli *client.Client, id string) error {
+func readLogs(cli *client.Client, id, message string) error {
 	reader, err := cli.ContainerLogs(context.Background(), id, types.ContainerLogsOptions{
 		ShowStderr: true,
 		ShowStdout: true,
@@ -147,9 +145,10 @@ func readLogs(cli *client.Client, id string) error {
 		return err
 	}
 	scanner := bufio.NewScanner(reader)
+
 	for scanner.Scan() {
-		if strings.Contains(scanner.Text(), SuccessMessage) {
-			fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, SuccessMessage, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
+		if strings.Contains(scanner.Text(), message) {
+			fmt.Printf("%v %v %v %v %v \n", emoji.ManTechnologist, message, emoji.Rocket, emoji.Rocket, emoji.PartyPopper)
 			fmt.Printf("Please visit https://github.com/flyteorg/flytesnacks for more example %v \n", emoji.Rocket)
 			fmt.Printf("Register all flytesnacks example by running 'flytectl register examples  -d development  -p flytesnacks' \n")
 			break
