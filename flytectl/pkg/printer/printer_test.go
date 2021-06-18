@@ -38,6 +38,7 @@ func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
 
 // TODO Convert this to a Testable Example. For some reason the comparison fails
 func TestJSONToTable(t *testing.T) {
+	trunc := 5
 	d := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 	j := []struct {
 		A string `json:"a"`
@@ -45,7 +46,7 @@ func TestJSONToTable(t *testing.T) {
 		S *Inner `json:"s"`
 	}{
 		{"hello", 0, &Inner{"x-hello", nil}},
-		{"hello", 0, &Inner{"x-hello", &d}},
+		{"hello world", 0, &Inner{"x-hello", &d}},
 		{"hello", 0, nil},
 	}
 
@@ -53,8 +54,8 @@ func TestJSONToTable(t *testing.T) {
 	assert.NoError(t, err)
 	p := Printer{}
 	assert.NoError(t, p.JSONToTable(b, []Column{
-		{"A", "$.a"},
-		{"S", "$.s.y"},
+		{"A", "$.a", &trunc},
+		{"S", "$.s.y", nil},
 	}))
 	// Output:
 	// | A     | S                    |

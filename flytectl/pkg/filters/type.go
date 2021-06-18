@@ -3,8 +3,9 @@ package filters
 var (
 	DefaultLimit  int32 = 100
 	DefaultFilter       = Filters{
-		Limit: DefaultLimit,
-		Asc:   false,
+		Limit:  DefaultLimit,
+		SortBy: "created_at",
+		Asc:    false,
 	}
 )
 

@@ -40,6 +40,6 @@ func teardownSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.C
 	if err := configCleanup(); err != nil {
 		fmt.Printf("Config cleanup failed. Which Failed due to %v \n ", err)
 	}
-	fmt.Printf("Sandbox cluster is removed successfully %v \n", emoji.Rocket)
+	fmt.Printf("%v %v Sandbox cluster is removed successfully. \n", emoji.Broom, emoji.Broom)
 	return nil
 }

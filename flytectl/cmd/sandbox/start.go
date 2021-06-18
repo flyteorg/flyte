@@ -44,10 +44,10 @@ type ExecResult struct {
 }
 
 func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	fmt.Printf("%v It will take some time, We will start a fresh flyte cluster for you %v %v\n", emoji.ManTechnologist, emoji.Rocket, emoji.Rocket)
+	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
-		fmt.Printf("Please Check your docker client %v \n", emoji.ManTechnologist)
+		fmt.Printf("%v Please Check your docker client %v \n", emoji.GrimacingFace, emoji.Whale)
 		return err
 	}
 
@@ -72,13 +72,13 @@ func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.Comm
 
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("Something goes wrong with container status", r)
+			fmt.Printf("%v Something went horribly wrong! %s\n", emoji.GrimacingFace, r)
 		}
 	}()
 
 	ID, err := startContainer(cli, volumes)
 	if err != nil {
-		fmt.Println("Something goes wrong. We are not able to start sandbox container, Please check your docker client and try again ")
+		fmt.Printf("%v Something went horribly wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
 		return fmt.Errorf("error: %v", err)
 	}
 
