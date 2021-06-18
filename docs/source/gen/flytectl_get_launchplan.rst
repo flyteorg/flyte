@@ -39,7 +39,7 @@ Retrieves all the launch plans with filters.
  
   bin/flytectl get launchplan -p flytesnacks -d development --filter.field-selector="name=core.basic.lp.go_greet"
  
-Retrieves specific launch plans with filters.
+Retrieves launch plans entity search across all versions with filters.
 ::
  
   bin/flytectl get launchplan -p flytesnacks -d development k8s_spark.dataframe_passing.my_smart_schema --filter.field-selector="version=v1"
@@ -67,7 +67,7 @@ Retrieves a launch plans within project and domain for a version and generate th
 
 ::
 
- flytectl get launchplan -d development -p flytectldemo core.advanced.run_merge_sort.merge_sort --execFile execution_spec.yam
+ flytectl get launchplan -d development -p flytectldemo core.advanced.run_merge_sort.merge_sort --execFile execution_spec.yaml
 
 The generated file would look similar to this
 
@@ -103,7 +103,7 @@ Options
       --filter.asc                     Specifies the sorting order. By default flytectl sort result in descending order
       --filter.field-selector string   Specifies the Field selector
       --filter.limit int32             Specifies the limit (default 100)
-      --filter.sort-by string          Specifies which field to sort results  (default "created_at")
+      --filter.sort-by string          Specifies which field to sort result by 
   -h, --help                           help for launchplan
       --latest                         flag to indicate to fetch the latest version, version flag will be ignored in this case
       --version string                 version of the launchplan to be fetched.
@@ -127,13 +127,13 @@ Options inherited from parent commands
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
-      --config string                              config file (default is $HOME/.flyte/config.yaml)
+  -c, --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
       --logger.show-source                         Includes source code location in logs.
-  -o, --output string                              Specifies the output type - supported formats [TABLE JSON YAML] (default "TABLE")
+  -o, --output string                              Specifies the output type - supported formats [TABLE JSON YAML DOT DOTURL]. NOTE: dot, doturl are only supported for Workflow (default "TABLE")
   -p, --project string                             Specifies the Flyte project.
       --root.domain string                         Specified the domain to work on.
       --root.output string                         Specified the output type.

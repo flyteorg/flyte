@@ -1,27 +1,39 @@
-.. _flytectl_register:
+.. _flytectl_sandbox_teardown:
 
-flytectl register
------------------
+flytectl sandbox teardown
+-------------------------
 
-Registers tasks/workflows/launchplans from list of generated serialized files.
+Teardown will cleanup the sandbox environment
 
 Synopsis
 ~~~~~~~~
 
 
 
-Takes input files as serialized versions of the tasks/workflows/launchplans and registers them with flyteadmin.
-Currently these input files are protobuf files generated as output from flytekit serialize.
-Project & Domain are mandatory fields to be passed for registration and an optional version which defaults to v1
-If the entities are already registered with flyte for the same version then registration would fail.
+Teardown will remove docker container and all the flyte config 
+::
 
+ bin/flytectl sandbox teardown 
+
+Stop will remove docker container and all the flyte config 
+::
+
+ bin/flytectl sandbox stop 
+
+
+Usage
+
+
+::
+
+  flytectl sandbox teardown [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for register
+  -h, --help   help for teardown
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,7 +82,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_register_examples` 	 - Registers flytesnack example
-* :doc:`flytectl_register_files` 	 - Registers file resources
+* :doc:`flytectl_sandbox` 	 - Used for testing flyte sandbox.
 

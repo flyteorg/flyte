@@ -4,14 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 
+	"github.com/flyteorg/flytectl/pkg/visualize"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/errors"
+
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/kataras/tablewriter"
 	"github.com/landoop/tableprinter"
+	"github.com/pkg/browser"
 	"github.com/yalp/jsonpath"
 )
 
@@ -22,7 +27,11 @@ const (
 	OutputFormatTABLE OutputFormat = iota
 	OutputFormatJSON
 	OutputFormatYAML
+	OutputFormatDOT
+	OutputFormatDOTURL
 )
+
+const GraphVisualizationServiceURL = "http://graph.flyte.org/#"
 
 func OutputFormats() []string {
 	var v []string
@@ -137,6 +146,29 @@ func (p Printer) Print(format OutputFormat, columns []Column, messages ...proto.
 			}
 			fmt.Println(string(v))
 		}
+	case OutputFormatDOT, OutputFormatDOTURL:
+		var workflows []*admin.Workflow
+		for _, m := range messages {
+			if w, ok := m.(*admin.Workflow); ok {
+				workflows = append(workflows, w)
+			} else {
+				return fmt.Errorf("visualization is only supported on workflows")
+			}
+		}
+		if len(workflows) == 0 {
+			return fmt.Errorf("atleast one workflow required for visualization")
+		}
+		workflow := workflows[0]
+		graphStr, err := visualize.RenderWorkflow(workflow.Closure.CompiledWorkflow)
+		if err != nil {
+			return errors.Wrapf("VisualizationError", err, "failed to visualize workflow")
+		}
+		if format == OutputFormatDOTURL {
+			urlToOpen := GraphVisualizationServiceURL + url.PathEscape(graphStr)
+			fmt.Println("Opening the browser at " + urlToOpen)
+			return browser.OpenURL(urlToOpen)
+		}
+		fmt.Println(graphStr)
 	default: // Print table
 		rows, err := json.Marshal(printableMessages)
 		if err != nil {

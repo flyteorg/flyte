@@ -1,8 +1,10 @@
 package workflow
 
-import "github.com/flyteorg/flytectl/pkg/filters"
+import (
+	"github.com/flyteorg/flytectl/pkg/filters"
+)
 
-//go:generate pflags Config --default-var DefaultConfig
+//go:generate pflags Config --default-var DefaultConfig --bind-default-var
 
 var (
 	DefaultConfig = &Config{

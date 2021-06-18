@@ -39,7 +39,7 @@ the continueOnError flag.
 Using short format of continueOnError flag
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError
 
 Overriding the default version v1 using version string.
 ::
@@ -50,25 +50,25 @@ Change the o/p format has not effect on registration. The O/p is currently avail
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -o yaml
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -o yaml
 
 Override IamRole during registration.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -i "arn:aws:iam::123456789:role/dummy"
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -v v2 -i "arn:aws:iam::123456789:role/dummy"
 
 Override Kubernetes service account during registration.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -k "kubernetes-service-account"
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -v v2 -k "kubernetes-service-account"
 
 Override Output location prefix during registration.
 
 ::
 
- bin/flytectl register file  _pb_output/* -d development  -p flytesnacks -c -v v2 -l "s3://dummy/prefix"
+ bin/flytectl register file  _pb_output/* -d development  -p flytesnacks --continueOnError -v v2 -l "s3://dummy/prefix"
 
 Usage
 
@@ -84,7 +84,7 @@ Options
 
   -a, --archive                       pass in archive file either an http link or local path.
   -i, --assumableIamRole string        Custom assumable iam auth role to register launch plans with.
-  -c, --continueOnError               continue on error when registering files.
+      --continueOnError               continue on error when registering files.
   -h, --help                          help for files
   -k, --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
   -l, --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
@@ -109,13 +109,13 @@ Options inherited from parent commands
       --admin.scopes strings                       List of scopes to request
       --admin.tokenUrl string                      OPTIONAL: Your IdP's token endpoint. It'll be discovered from flyte admin's OAuth Metadata endpoint if not provided.
       --admin.useAuth                              Deprecated: Auth will be enabled/disabled based on admin's dynamically discovered information.
-      --config string                              config file (default is $HOME/.flyte/config.yaml)
+  -c, --config string                              config file (default is $HOME/.flyte/config.yaml)
   -d, --domain string                              Specifies the Flyte project's domain.
       --logger.formatter.type string               Sets logging format type. (default "json")
       --logger.level int                           Sets the minimum logging level. (default 4)
       --logger.mute                                Mutes all logs regardless of severity. Intended for benchmarks/tests only.
       --logger.show-source                         Includes source code location in logs.
-  -o, --output string                              Specifies the output type - supported formats [TABLE JSON YAML] (default "TABLE")
+  -o, --output string                              Specifies the output type - supported formats [TABLE JSON YAML DOT DOTURL]. NOTE: dot, doturl are only supported for Workflow (default "TABLE")
   -p, --project string                             Specifies the Flyte project.
       --root.domain string                         Specified the domain to work on.
       --root.output string                         Specified the output type.
