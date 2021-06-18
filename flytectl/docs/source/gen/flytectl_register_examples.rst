@@ -1,27 +1,40 @@
-.. _flytectl_register:
+.. _flytectl_register_examples:
 
-flytectl register
------------------
+flytectl register examples
+--------------------------
 
-Registers tasks/workflows/launchplans from list of generated serialized files.
+Registers flytesnack example
 
 Synopsis
 ~~~~~~~~
 
 
 
-Takes input files as serialized versions of the tasks/workflows/launchplans and registers them with flyteadmin.
-Currently these input files are protobuf files generated as output from flytekit serialize.
-Project & Domain are mandatory fields to be passed for registration and an optional version which defaults to v1
-If the entities are already registered with flyte for the same version then registration would fail.
+Registers all latest flytesnacks example
+::
 
+ bin/flytectl register examples  -d development  -p flytesnacks
+
+
+Usage
+
+
+::
+
+  flytectl register examples [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help   help for register
+  -a, --archive                       pass in archive file either an http link or local path.
+  -i, --assumableIamRole string        Custom assumable iam auth role to register launch plans with.
+      --continueOnError               continue on error when registering files.
+  -h, --help                          help for examples
+  -k, --k8ServiceAccount string        custom kubernetes service account auth role to register launch plans with.
+  -l, --outputLocationPrefix string    custom output location prefix for offloaded types (files/schemas).
+  -v, --version string                version of the entity to be registered with flyte. (default "v1")
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,7 +83,5 @@ Options inherited from parent commands
 SEE ALSO
 ~~~~~~~~
 
-* :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_register_examples` 	 - Registers flytesnack example
-* :doc:`flytectl_register_files` 	 - Registers file resources
+* :doc:`flytectl_register` 	 - Registers tasks/workflows/launchplans from list of generated serialized files.
 

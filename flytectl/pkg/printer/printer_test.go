@@ -2,6 +2,7 @@ package printer
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -20,6 +21,14 @@ type Inner struct {
 }
 
 func LaunchplanToProtoMessages(l []*admin.LaunchPlan) []proto.Message {
+	messages := make([]proto.Message, 0, len(l))
+	for _, m := range l {
+		messages = append(messages, m)
+	}
+	return messages
+}
+
+func WorkflowToProtoMessages(l []*admin.Workflow) []proto.Message {
 	messages := make([]proto.Message, 0, len(l))
 	for _, m := range l {
 		messages = append(messages, m)
@@ -57,9 +66,9 @@ func TestJSONToTable(t *testing.T) {
 }
 
 func TestOutputFormats(t *testing.T) {
-	expected := []string{"TABLE", "JSON", "YAML"}
+	expected := []string{"TABLE", "JSON", "YAML", "DOT", "DOTURL"}
 	outputs := OutputFormats()
-	assert.Equal(t, 3, len(outputs))
+	assert.Equal(t, 5, len(outputs))
 	assert.Equal(t, expected, outputs)
 }
 
@@ -77,7 +86,7 @@ func TestOutputFormatStringErr(t *testing.T) {
 }
 
 func TestIsAOutputFormat(t *testing.T) {
-	o := OutputFormat(4)
+	o := OutputFormat(5)
 	check := o.IsAOutputFormat()
 	assert.Equal(t, false, check)
 
@@ -123,4 +132,123 @@ func TestPrint(t *testing.T) {
 	assert.Nil(t, err)
 	err = p.Print(OutputFormat(2), lp, LaunchplanToProtoMessages(launchPlans)...)
 	assert.Nil(t, err)
+	err = p.Print(OutputFormat(3), lp, LaunchplanToProtoMessages(launchPlans)...)
+	assert.NotNil(t, err)
+	err = p.Print(OutputFormat(4), lp, LaunchplanToProtoMessages(launchPlans)...)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("visualization is only supported on workflows"), err)
+
+	sortedListLiteralType := core.Variable{
+		Type: &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: &core.LiteralType{
+					Type: &core.LiteralType_Simple{
+						Simple: core.SimpleType_INTEGER,
+					},
+				},
+			},
+		},
+	}
+	variableMap := map[string]*core.Variable{
+		"sorted_list1": &sortedListLiteralType,
+		"sorted_list2": &sortedListLiteralType,
+	}
+
+	var compiledTasks []*core.CompiledTask
+	compiledTasks = append(compiledTasks, &core.CompiledTask{
+		Template: &core.TaskTemplate{
+			Id: &core.Identifier{
+				Project: "dummyProject",
+				Domain:  "dummyDomain",
+				Name:    "dummyName",
+				Version: "dummyVersion",
+			},
+			Interface: &core.TypedInterface{
+				Inputs: &core.VariableMap{
+					Variables: variableMap,
+				},
+			},
+		},
+	})
+
+	workflow1 := &admin.Workflow{
+		Id: &core.Identifier{
+			Name:    "task1",
+			Version: "v1",
+		},
+		Closure: &admin.WorkflowClosure{
+			CreatedAt: &timestamppb.Timestamp{Seconds: 1, Nanos: 0},
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Tasks: compiledTasks,
+			},
+		},
+	}
+
+	workflows := []*admin.Workflow{workflow1}
+
+	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
+	assert.Nil(t, err)
+	workflows = []*admin.Workflow{}
+	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("atleast one workflow required for visualization"), err)
+	var badCompiledTasks []*core.CompiledTask
+	badCompiledTasks = append(badCompiledTasks, &core.CompiledTask{
+		Template: &core.TaskTemplate{},
+	})
+	badWorkflow := &admin.Workflow{
+		Id: &core.Identifier{
+			Name:    "task1",
+			Version: "v1",
+		},
+		Closure: &admin.WorkflowClosure{
+			CreatedAt: &timestamppb.Timestamp{Seconds: 1, Nanos: 0},
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Tasks: badCompiledTasks,
+			},
+		},
+	}
+	workflows = []*admin.Workflow{badWorkflow}
+	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
+	assert.NotNil(t, err)
+
+	assert.Equal(t, fmt.Errorf("no template found in the workflow task template:<> "), errors.Unwrap(err))
+
+	badWorkflow2 := &admin.Workflow{
+		Id: &core.Identifier{
+			Name:    "task1",
+			Version: "v1",
+		},
+		Closure: &admin.WorkflowClosure{
+			CreatedAt:        &timestamppb.Timestamp{Seconds: 1, Nanos: 0},
+			CompiledWorkflow: nil,
+		},
+	}
+	workflows = []*admin.Workflow{badWorkflow2}
+	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("empty workflow closure"), errors.Unwrap(err))
+
+	var badSubWorkflow []*core.CompiledWorkflow
+	badSubWorkflow = append(badSubWorkflow, &core.CompiledWorkflow{
+		Template: &core.WorkflowTemplate{},
+	})
+
+	badWorkflow3 := &admin.Workflow{
+		Id: &core.Identifier{
+			Name:    "task1",
+			Version: "v1",
+		},
+		Closure: &admin.WorkflowClosure{
+			CreatedAt: &timestamppb.Timestamp{Seconds: 1, Nanos: 0},
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Tasks:        compiledTasks,
+				SubWorkflows: badSubWorkflow,
+			},
+		},
+	}
+	workflows = []*admin.Workflow{badWorkflow3}
+	err = p.Print(OutputFormat(3), lp, WorkflowToProtoMessages(workflows)...)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("no template found in the sub workflow template:<> "), errors.Unwrap(err))
 }

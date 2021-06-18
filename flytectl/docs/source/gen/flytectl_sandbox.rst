@@ -1,19 +1,25 @@
-.. _flytectl_register:
+.. _flytectl_sandbox:
 
-flytectl register
------------------
+flytectl sandbox
+----------------
 
-Registers tasks/workflows/launchplans from list of generated serialized files.
+Used for testing flyte sandbox.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Takes input files as serialized versions of the tasks/workflows/launchplans and registers them with flyteadmin.
-Currently these input files are protobuf files generated as output from flytekit serialize.
-Project & Domain are mandatory fields to be passed for registration and an optional version which defaults to v1
-If the entities are already registered with flyte for the same version then registration would fail.
+Example Create sandbox cluster.
+::
+
+ bin/flytectl sandbox start 
+	
+	
+Example Remove sandbox cluster.
+::
+
+ bin/flytectl sandbox teardown 	
 
 
 Options
@@ -21,7 +27,7 @@ Options
 
 ::
 
-  -h, --help   help for register
+  -h, --help   help for sandbox
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,6 +77,6 @@ SEE ALSO
 ~~~~~~~~
 
 * :doc:`flytectl` 	 - flyetcl CLI tool
-* :doc:`flytectl_register_examples` 	 - Registers flytesnack example
-* :doc:`flytectl_register_files` 	 - Registers file resources
+* :doc:`flytectl_sandbox_start` 	 - Start the flyte sandbox
+* :doc:`flytectl_sandbox_teardown` 	 - Teardown will cleanup the sandbox environment
 
