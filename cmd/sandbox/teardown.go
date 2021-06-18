@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/docker/docker/api/types"
 	"github.com/enescakir/emoji"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
@@ -18,12 +18,7 @@ Teardown will remove docker container and all the flyte config
 ::
 
  bin/flytectl sandbox teardown 
-
-Stop will remove docker container and all the flyte config 
-::
-
- bin/flytectl sandbox stop 
-
+	
 
 Usage
 `
@@ -36,15 +31,12 @@ func teardownSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.C
 		return err
 	}
 
-	container := getSandbox(cli)
-	if container != nil {
-		if err := cli.ContainerRemove(ctx, container.ID, types.ContainerRemoveOptions{
+	c := getSandbox(cli)
+	if c != nil {
+		_ = cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
 			Force: true,
-		}); err != nil {
-			return err
-		}
+		})
 	}
-
 	if err := configCleanup(); err != nil {
 		fmt.Printf("Config cleanup failed. Which Failed due to %v \n ", err)
 	}
