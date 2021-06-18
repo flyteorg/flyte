@@ -44,6 +44,8 @@ func OutputFormats() []string {
 type Column struct {
 	Header   string
 	JSONPath string
+	// Optional Truncation directive to limit content. This will simply truncate the string output.
+	TruncateTo *int
 }
 
 type Printer struct{}
@@ -65,7 +67,14 @@ func extractRow(data interface{}, columns []Column) []string {
 		if err != nil || out == nil {
 			out = ""
 		}
-		tableData = append(tableData, fmt.Sprintf("%s", out))
+		s := fmt.Sprintf("%s", out)
+		if c.TruncateTo != nil {
+			t := *c.TruncateTo
+			if len(s) > t {
+				s = s[:t]
+			}
+		}
+		tableData = append(tableData, s)
 	}
 	return tableData
 }

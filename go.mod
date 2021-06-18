@@ -12,7 +12,6 @@ require (
 	github.com/flyteorg/flyteidl v0.19.3
 	github.com/flyteorg/flytestdlib v0.3.24
 	github.com/ghodss/yaml v1.0.0
-	github.com/goccy/go-graphviz v0.0.9
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.1.0 // indirect

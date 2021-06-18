@@ -54,6 +54,8 @@ Usage
 `
 )
 
+var hundredChars = 100
+
 var executionColumns = []printer.Column{
 	{Header: "Name", JSONPath: "$.id.name"},
 	{Header: "Launch Plan Name", JSONPath: "$.spec.launchPlan.name"},
@@ -61,8 +63,8 @@ var executionColumns = []printer.Column{
 	{Header: "Phase", JSONPath: "$.closure.phase"},
 	{Header: "Started", JSONPath: "$.closure.startedAt"},
 	{Header: "Elapsed Time", JSONPath: "$.closure.duration"},
-	{Header: "Abort data", JSONPath: "$.closure.abortMetadata[\"cause\"]"},
-	{Header: "Error data", JSONPath: "$.closure.error[\"message\"]"},
+	{Header: "Abort data (Trunc)", JSONPath: "$.closure.abortMetadata[\"cause\"]", TruncateTo: &hundredChars},
+	{Header: "Error data (Trunc)", JSONPath: "$.closure.error[\"message\"]", TruncateTo: &hundredChars},
 }
 
 func ExecutionToProtoMessages(l []*admin.Execution) []proto.Message {
@@ -78,11 +80,11 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 	var executions []*admin.Execution
 	if len(args) > 0 {
 		name := args[0]
-		execution, err := cmdCtx.AdminFetcherExt().FetchExecution(ctx, name, config.GetConfig().Project, config.GetConfig().Domain)
+		exec, err := cmdCtx.AdminFetcherExt().FetchExecution(ctx, name, config.GetConfig().Project, config.GetConfig().Domain)
 		if err != nil {
 			return err
 		}
-		executions = append(executions, execution)
+		executions = append(executions, exec)
 		logger.Infof(ctx, "Retrieved %v executions", len(executions))
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 			ExecutionToProtoMessages(executions)...)

@@ -6,6 +6,8 @@ import (
 	"io"
 	"testing"
 
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
@@ -25,6 +27,10 @@ func TestListExecutionFunc(t *testing.T) {
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	execListRequest := &admin.ResourceListRequest{
 		Limit: 100,
+		SortBy: &admin.Sort{
+			Key:       "created_at",
+			Direction: admin.Sort_DESCENDING,
+		},
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -58,7 +64,9 @@ func TestListExecutionFunc(t *testing.T) {
 	executionList := &admin.ExecutionList{
 		Executions: executions,
 	}
-	mockClient.OnListExecutionsMatch(ctx, execListRequest).Return(executionList, nil)
+	mockClient.OnListExecutionsMatch(mock.Anything, mock.MatchedBy(func(o *admin.ResourceListRequest) bool {
+		return execListRequest.SortBy.Key == o.SortBy.Key && execListRequest.SortBy.Direction == o.SortBy.Direction && execListRequest.Filters == o.Filters && execListRequest.Limit == o.Limit
+	})).Return(executionList, nil)
 	err := getExecutionFunc(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "ListExecutions", ctx, execListRequest)
@@ -75,6 +83,9 @@ func TestListExecutionFuncWithError(t *testing.T) {
 	cmdCtx := cmdCore.NewCommandContext(mockClient, *mockOutStream)
 	execListRequest := &admin.ResourceListRequest{
 		Limit: 100,
+		SortBy: &admin.Sort{
+			Key: "created_at",
+		},
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
 			Domain:  domainValue,
@@ -104,7 +115,9 @@ func TestListExecutionFuncWithError(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	mockClient.OnListExecutionsMatch(ctx, execListRequest).Return(nil, errors.New("executions NotFound"))
+	mockClient.OnListExecutionsMatch(mock.Anything, mock.MatchedBy(func(o *admin.ResourceListRequest) bool {
+		return execListRequest.SortBy.Key == o.SortBy.Key && execListRequest.SortBy.Direction == o.SortBy.Direction && execListRequest.Filters == o.Filters && execListRequest.Limit == o.Limit
+	})).Return(nil, errors.New("executions NotFound"))
 	err := getExecutionFunc(ctx, args, cmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, err, errors.New("executions NotFound"))
