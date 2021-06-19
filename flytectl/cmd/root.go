@@ -47,8 +47,6 @@ func newRootCmd() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file (default is $HOME/.flyte/config.yaml)")
 
-	configAccessor.InitializePflags(rootCmd.PersistentFlags())
-
 	// Due to https://github.com/flyteorg/flyte/issues/341, project flag will have to be specified as
 	// --root.project, this adds a convenience on top to allow --project to be used
 	rootCmd.PersistentFlags().StringVarP(&(config.GetConfig().Project), "project", "p", "", "Specifies the Flyte project.")
