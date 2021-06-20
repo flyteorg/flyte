@@ -20,6 +20,7 @@ __pycache__/
 Chart.lock
 **/*.bak
 .cr-release-packages/
+.cr-index/
 helm/flyte/charts/
 helm/flyte/requirements.lock
 bin/
