@@ -42,6 +42,8 @@ jobs:
           ref: ${{ github.event.inputs.version }}
 
       - name: Preprare Flyte Release
+        env:
+          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
         run: |
           make prepare_artifacts
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
 # Create dir structure
 mkdir -p release .cr-index .cr-release-packages

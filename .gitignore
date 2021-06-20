@@ -22,4 +22,4 @@ Chart.lock
 .cr-release-packages/
 helm/flyte/charts/
 helm/flyte/requirements.lock
-cr
+bin/
