@@ -3136,7 +3136,7 @@ spec:
           command:
           - sh
           - -c
-          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+          - until pg_isready -h  -p ; do echo waiting for database; sleep 2; done;
         - command:
           - flyteadmin
           - --config

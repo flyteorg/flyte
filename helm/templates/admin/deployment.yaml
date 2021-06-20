@@ -24,7 +24,7 @@ spec:
           command:
           - sh
           - -c
-          - until pg_isready -h postgres -p 5432; do echo waiting for database; sleep 2; done;
+          - until pg_isready -h {{ .Values.db.database.host }} -p {{ .Values.db.database.port }}; do echo waiting for database; sleep 2; done;
         {{- end }}
         - command:
           - flyteadmin
