@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flytectl/pkg/docker"
+
 	"github.com/docker/docker/api/types"
 	"github.com/enescakir/emoji"
 
-	"github.com/docker/docker/client"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 )
 
@@ -25,19 +26,24 @@ Usage
 )
 
 func teardownSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := docker.GetDockerClient()
 	if err != nil {
 		return err
 	}
 
-	c := getSandbox(cli)
+	return tearDownSandbox(ctx, cli)
+}
+
+func tearDownSandbox(ctx context.Context, cli docker.Docker) error {
+	c := docker.GetSandbox(ctx, cli)
 	if c != nil {
-		_ = cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
+		if err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
 			Force: true,
-		})
+		}); err != nil {
+			return err
+		}
 	}
-	if err := configCleanup(); err != nil {
+	if err := docker.ConfigCleanup(); err != nil {
 		fmt.Printf("Config cleanup failed. Which Failed due to %v \n ", err)
 	}
 	fmt.Printf("%v %v Sandbox cluster is removed successfully. \n", emoji.Broom, emoji.Broom)

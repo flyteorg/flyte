@@ -1,16 +1,18 @@
 package sandbox
 
 import (
+	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 
+	"github.com/flyteorg/flytectl/pkg/docker"
+
 	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
 	"github.com/enescakir/emoji"
 	sandboxConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 )
 
 const (
@@ -29,14 +31,6 @@ Usage
 	`
 )
 
-var volumes = []mount.Mount{
-	{
-		Type:   mount.TypeBind,
-		Source: f.FilePathJoin(f.UserHomeDir(), ".flyte"),
-		Target: K3sDir,
-	},
-}
-
 type ExecResult struct {
 	StdOut   string
 	StdErr   string
@@ -44,47 +38,66 @@ type ExecResult struct {
 }
 
 func startSandboxCluster(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	cli, err := docker.GetDockerClient()
 	if err != nil {
-		fmt.Printf("%v Please Check your docker client %v \n", emoji.GrimacingFace, emoji.Whale)
 		return err
 	}
 
-	if err := setupFlytectlConfig(); err != nil {
+	reader, err := startSandbox(ctx, cli, os.Stdin)
+	if err != nil {
 		return err
 	}
+	docker.WaitForSandbox(reader, docker.SuccessMessage)
+	return nil
+}
 
-	if err := removeSandboxIfExist(cli, os.Stdin); err != nil {
-		return err
+func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bufio.Scanner, error) {
+	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
+	if err := docker.SetupFlyteDir(); err != nil {
+		return nil, err
+	}
+
+	if err := docker.GetFlyteSandboxConfig(); err != nil {
+		return nil, err
+	}
+
+	if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
+		return nil, err
 	}
 
 	if len(sandboxConfig.DefaultConfig.SnacksRepo) > 0 {
-		volumes = append(volumes, mount.Mount{
+		docker.Volumes = append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.SnacksRepo,
-			Target: flyteSnackDir,
+			Target: docker.FlyteSnackDir,
 		})
 	}
 
-	os.Setenv("KUBECONFIG", Kubeconfig)
-	os.Setenv("FLYTECTL_CONFIG", FlytectlConfig)
+	os.Setenv("KUBECONFIG", docker.Kubeconfig)
+	os.Setenv("FLYTECTL_CONFIG", docker.FlytectlConfig)
+	if err := docker.PullDockerImage(ctx, cli, docker.ImageName); err != nil {
+		return nil, err
+	}
 
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Printf("%v Something went horribly wrong! %s\n", emoji.GrimacingFace, r)
+	exposedPorts, portBindings, _ := docker.GetSandboxPorts()
+	ID, err := docker.StartContainer(ctx, cli, docker.Volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName, docker.ImageName)
+	if err != nil {
+		fmt.Printf("%v Something went wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
+		return nil, err
+	}
+
+	_, errCh := docker.WatchError(ctx, cli, ID)
+	logReader, err := docker.ReadLogs(ctx, cli, ID)
+	if err != nil {
+		return nil, err
+	}
+	go func() {
+		err := <-errCh
+		if err != nil {
+			fmt.Printf("err: %v", err)
+			os.Exit(1)
 		}
 	}()
 
-	ID, err := startContainer(cli, volumes)
-	if err != nil {
-		fmt.Printf("%v Something went horribly wrong: Failed to start Sandbox container %v, Please check your docker client and try again. \n", emoji.GrimacingFace, emoji.Whale)
-		return fmt.Errorf("error: %v", err)
-	}
-
-	_ = readLogs(cli, ID, SuccessMessage)
-	fmt.Printf("Add KUBECONFIG and FLYTECTL_CONFIG to your environment variable \n")
-	fmt.Printf("export KUBECONFIG=%v \n", Kubeconfig)
-	fmt.Printf("export FLYTECTL_CONFIG=%v \n", FlytectlConfig)
-	return nil
+	return logReader, nil
 }
