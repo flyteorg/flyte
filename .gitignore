@@ -22,3 +22,4 @@ _build/
 .vscode/
 *-out.html
 *-out.ipynb
+.python-version

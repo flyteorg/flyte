@@ -131,3 +131,4 @@ If this is your first time using Flyte, check out the
 
    Introduction <tutorials>
    ml_training
+   feature_engineering

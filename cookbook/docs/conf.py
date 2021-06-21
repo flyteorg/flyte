@@ -125,6 +125,8 @@ class CustomSorter(FileNameSortKey):
         "diabetes.py",
         "house_price_predictor.py",
         "multiregion_house_price_predictor.py",
+        "datacleaning_tasks.py",
+        "datacleaning_workflow.py",
     ]
 
     def __call__(self, filename):
@@ -229,6 +231,7 @@ examples_dirs = [
     "../core/type_system",
     "../case_studies/ml_training/pima_diabetes",
     "../case_studies/ml_training/house_price_prediction",
+    "../case_studies/feature_engineering/sqlite_datacleaning",
     "../testing",
     "../core/containerization",
     "../deployment/workflow",
@@ -257,6 +260,7 @@ gallery_dirs = [
     "auto/core/type_system",
     "auto/case_studies/ml_training/pima_diabetes",
     "auto/case_studies/ml_training/house_price_prediction",
+    "auto/case_studies/feature_engineering/sqlite_datacleaning",
     "auto/testing",
     "auto/core/containerization",
     "auto/deployment/workflow",
@@ -342,6 +346,7 @@ if len(examples_dirs) != len(gallery_dirs):
 # sure that the only rst files in the example directories are README.rst
 hide_download_page_ids = []
 
+
 def hide_example_page(file_handler):
     """Heuristic that determines whether example file contains python code."""
     example_content = file_handler.read().strip()
@@ -355,7 +360,13 @@ def hide_example_page(file_handler):
         if line.startswith("import"):
             no_imports = False
 
-    return example_content.startswith('"""') and example_content.endswith('"""') and no_percent_comments and no_imports
+    return (
+        example_content.startswith('"""')
+        and example_content.endswith('"""')
+        and no_percent_comments
+        and no_imports
+    )
+
 
 for source_dir in sphinx_gallery_conf["examples_dirs"]:
     for f in Path(source_dir).glob("*.rst"):
@@ -368,11 +379,16 @@ for source_dir in sphinx_gallery_conf["examples_dirs"]:
     for f in Path(source_dir).glob("*.py"):
         with f.open() as fh:
             if hide_example_page(fh):
-                page_id = str(f).replace("..", "auto").replace("/", "-").replace(".", "-").replace("_", "-")
+                page_id = (
+                    str(f)
+                    .replace("..", "auto")
+                    .replace("/", "-")
+                    .replace(".", "-")
+                    .replace("_", "-")
+                )
                 hide_download_page_ids.append(f"sphx-glr-download-{page_id}")
 
-SPHX_GALLERY_CSS_TEMPLATE = \
-"""
+SPHX_GALLERY_CSS_TEMPLATE = """
 {hide_download_page_ids} {{
     height: 0px;
     visibility: hidden;
@@ -382,9 +398,7 @@ SPHX_GALLERY_CSS_TEMPLATE = \
 with Path("_static/sphx_gallery_autogen.css").open("w") as f:
     f.write(
         SPHX_GALLERY_CSS_TEMPLATE.format(
-            hide_download_page_ids=",\n".join(
-                f"#{x}" for x in hide_download_page_ids
-            )
+            hide_download_page_ids=",\n".join(f"#{x}" for x in hide_download_page_ids)
         )
     )
 
