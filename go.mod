@@ -16,6 +16,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.2.0
+	github.com/hashicorp/go-version v1.3.0 // indirect
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/kr/text v0.2.0 // indirect
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27
