@@ -15,7 +15,7 @@ for file in ./deployment/**/flyte_generated.yaml; do
 done
 
 # Download helm chart releaser
-wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_darwin_amd64.tar.gz 
+wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz 
 mkdir -p bin
 tar -xf /tmp/chart-releaser.tar.gz -C bin
 chmod +x bin/cr
