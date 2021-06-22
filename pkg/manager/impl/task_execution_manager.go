@@ -302,9 +302,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		Inputs:  &signedInputsURLBlob,
 		Outputs: &signedOutputsURLBlob,
 	}
-	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
-	remoteDataScheme := m.config.ApplicationConfiguration().GetRemoteDataConfig().Scheme
-	if remoteDataScheme == common.Local || signedInputsURLBlob.Bytes < maxDataSize {
+	if util.ShouldFetchData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedInputsURLBlob) {
 		var fullInputs core.LiteralMap
 		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(taskExecution.InputUri), &fullInputs)
 		if err != nil {
@@ -312,7 +310,8 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		}
 		response.FullInputs = &fullInputs
 	}
-	if remoteDataScheme == common.Local || (signedOutputsURLBlob.Bytes < maxDataSize && len(taskExecution.Closure.GetOutputUri()) > 0) {
+	if util.ShouldFetchOutputData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedOutputsURLBlob,
+		taskExecution.Closure.GetOutputUri()) {
 		var fullOutputs core.LiteralMap
 		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(taskExecution.Closure.GetOutputUri()), &fullOutputs)
 		if err != nil {
