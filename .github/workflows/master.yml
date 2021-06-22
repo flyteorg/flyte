@@ -49,7 +49,7 @@ jobs:
   goreleaser:
     name: Release Case studies example
     runs-on: ubuntu-latest
-    needs: [ core-releaser, case_studies-releaser, integrations-releaser ]
+    needs: [ examples-releaser ]
     steps:
       - uses: actions/checkout@v2
         with:
