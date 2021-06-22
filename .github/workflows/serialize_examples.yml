@@ -1,0 +1,25 @@
+name: Serialize Examples
+
+on:
+  pull_request:
+
+jobs:
+  core-build:
+    name: Serialize Examples
+    strategy:
+      matrix:
+        directory: [ "core", "integrations", "case_studies" ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-${{ matrix.directory }}/
+          key: release-snacks-${{ matrix.directory }}
+      - name: Generate Serialize proto
+        env:
+          REGISTRY: "ghcr.io/flyteorg"
+        run: |
+          make -C cookbook/${{ matrix.directory }} serialize
