@@ -452,9 +452,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		Inputs:  &signedInputsURLBlob,
 		Outputs: &signedOutputsURLBlob,
 	}
-	maxDataSize := m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes
-	remoteDataScheme := m.config.ApplicationConfiguration().GetRemoteDataConfig().Scheme
-	if remoteDataScheme == common.Local || signedInputsURLBlob.Bytes < maxDataSize {
+	if util.ShouldFetchData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedInputsURLBlob) {
 		var fullInputs core.LiteralMap
 		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecution.InputUri), &fullInputs)
 		if err != nil {
@@ -462,7 +460,8 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		}
 		response.FullInputs = &fullInputs
 	}
-	if remoteDataScheme == common.Local || (signedOutputsURLBlob.Bytes < maxDataSize && len(nodeExecution.Closure.GetOutputUri()) > 0) {
+	if util.ShouldFetchOutputData(m.config.ApplicationConfiguration().GetRemoteDataConfig(), signedOutputsURLBlob,
+		nodeExecution.Closure.GetOutputUri()) {
 		var fullOutputs core.LiteralMap
 		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecution.Closure.GetOutputUri()), &fullOutputs)
 		if err != nil {
