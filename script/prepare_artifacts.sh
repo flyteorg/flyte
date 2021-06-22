@@ -19,10 +19,7 @@ wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/rel
 mkdir -p bin
 tar -xf /tmp/chart-releaser.tar.gz -C bin
 chmod +x bin/cr
-rm /tmp/chart-releaser.tar.gz \
-
-# Clean Git History
-git stash
+rm /tmp/chart-releaser.tar.gz 
 
 # Package helm chart
 bin/cr package helm

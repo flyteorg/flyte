@@ -22,7 +22,7 @@ jobs:
         with:
           version: v3.4.0
             
-      - name: Setup Git
+      - name: Configure Git
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
