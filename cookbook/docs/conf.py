@@ -426,3 +426,4 @@ sphinx_tabs_valid_builders = ['linkcheck']
 # Sphinx-mermaid config
 mermaid_output_format = 'raw'
 mermaid_version = 'latest'
+mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
