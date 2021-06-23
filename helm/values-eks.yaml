@@ -164,7 +164,6 @@ contour:
 
 common:
   ingress:
-    host: flyte.example.com
     albSSLRedirect: true
     separateGrpcIngress: true
     annotations:
@@ -173,7 +172,7 @@ common:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:832573439839:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:832573439839:certificate/a7db79d4-4f8c-4c7b-a4f4-109bf2fb5efa
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
       # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)
