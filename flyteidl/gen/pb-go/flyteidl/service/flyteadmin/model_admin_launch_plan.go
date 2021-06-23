@@ -11,7 +11,10 @@ package flyteadmin
 
 // A LaunchPlan provides the capability to templatize workflow executions. Launch plans simplify associating one or more schedules, inputs and notifications with your workflows. Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow definition doesn't necessarily have a default value for said input.
 type AdminLaunchPlan struct {
+	// Uniquely identifies a launch plan entity.
 	Id *CoreIdentifier `json:"id,omitempty"`
+	// User-provided launch plan details, including reference workflow, inputs and other metadata.
 	Spec *AdminLaunchPlanSpec `json:"spec,omitempty"`
+	// Values computed by the flyte platform after launch plan registration.
 	Closure *AdminLaunchPlanClosure `json:"closure,omitempty"`
 }

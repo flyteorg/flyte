@@ -20,6 +20,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
+// For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
 type WorkflowAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
@@ -158,13 +160,19 @@ func (m *WorkflowAttributesUpdateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_WorkflowAttributesUpdateResponse proto.InternalMessageInfo
 
+// Request to get an individual workflow attribute override.
 type WorkflowAttributesGetRequest struct {
 	// Unique project id which this set of attributes references.
+	// +required
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	// Unique domain id which this set of attributes references.
+	// +required
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	// Workflow name which this set of attributes references.
-	Workflow             string            `protobuf:"bytes,3,opt,name=workflow,proto3" json:"workflow,omitempty"`
+	// +required
+	Workflow string `protobuf:"bytes,3,opt,name=workflow,proto3" json:"workflow,omitempty"`
+	// Which type of matchable attributes to return.
+	// +required
 	ResourceType         MatchableResource `protobuf:"varint,4,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.admin.MatchableResource" json:"resource_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -224,6 +232,7 @@ func (m *WorkflowAttributesGetRequest) GetResourceType() MatchableResource {
 	return MatchableResource_TASK_RESOURCE
 }
 
+// Response to get an individual workflow attribute override.
 type WorkflowAttributesGetResponse struct {
 	Attributes           *WorkflowAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
@@ -263,13 +272,19 @@ func (m *WorkflowAttributesGetResponse) GetAttributes() *WorkflowAttributes {
 	return nil
 }
 
+// Request to delete a set matchable workflow attribute override.
 type WorkflowAttributesDeleteRequest struct {
 	// Unique project id which this set of attributes references.
+	// +required
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	// Unique domain id which this set of attributes references.
+	// +required
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
 	// Workflow name which this set of attributes references.
-	Workflow             string            `protobuf:"bytes,3,opt,name=workflow,proto3" json:"workflow,omitempty"`
+	// +required
+	Workflow string `protobuf:"bytes,3,opt,name=workflow,proto3" json:"workflow,omitempty"`
+	// Which type of matchable attributes to delete.
+	// +required
 	ResourceType         MatchableResource `protobuf:"varint,4,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.admin.MatchableResource" json:"resource_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`

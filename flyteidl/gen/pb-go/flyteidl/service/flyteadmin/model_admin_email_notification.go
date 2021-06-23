@@ -9,7 +9,7 @@
 
 package flyteadmin
 
+// Defines an email notification specification.
 type AdminEmailNotification struct {
-	// The list of email addresses recipients for this notification.
 	RecipientsEmail []string `json:"recipients_email,omitempty"`
 }

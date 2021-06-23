@@ -13,7 +13,9 @@ package flyteadmin
 type AdminLaunchPlanSpec struct {
 	WorkflowId *CoreIdentifier `json:"workflow_id,omitempty"`
 	EntityMetadata *AdminLaunchPlanMetadata `json:"entity_metadata,omitempty"`
+	// Input values to be passed for the execution. These can be overriden when an execution is created with this launch plan.
 	DefaultInputs *CoreParameterMap `json:"default_inputs,omitempty"`
+	// Fixed, non-overridable inputs for the Launch Plan. These can not be overriden when an execution is created with this launch plan.
 	FixedInputs *CoreLiteralMap `json:"fixed_inputs,omitempty"`
 	Role string `json:"role,omitempty"`
 	// Custom labels to be applied to the execution resource.
@@ -26,6 +28,7 @@ type AdminLaunchPlanSpec struct {
 	SecurityContext *CoreSecurityContext `json:"security_context,omitempty"`
 	// Indicates the runtime priority of the execution.
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`
+	// Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
 	RawOutputDataConfig *AdminRawOutputDataConfig `json:"raw_output_data_config,omitempty"`
 	// Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.
 	MaxParallelism int32 `json:"max_parallelism,omitempty"`

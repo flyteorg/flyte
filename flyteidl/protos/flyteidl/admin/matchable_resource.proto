@@ -30,6 +30,7 @@ enum MatchableResource {
   WORKFLOW_EXECUTION_CONFIG = 6;
 }
 
+// Defines a set of overridable task resource attributes set during task registration.
 message TaskResourceSpec {
   string cpu = 1;
 
@@ -40,6 +41,7 @@ message TaskResourceSpec {
   string storage = 4;  
 }
 
+// Defines task resource defaults and limits that will be applied at task registration.
 message TaskResourceAttributes {
   TaskResourceSpec defaults = 1;
 
@@ -74,6 +76,7 @@ message PluginOverride {
   repeated string plugin_id = 2;
 
   enum MissingPluginBehavior {
+    // By default, if this plugin is not enabled for a Flyte deployment then execution will fail.
     FAIL = 0;
 
     // Uses the system-configured default implementation.
@@ -116,6 +119,8 @@ message MatchingAttributes {
 
 // Represents a custom set of attributes applied for either a domain; a domain and project; or
 // domain, project and workflow name.
+// These are used to override system level defaults for kubernetes cluster resource management,
+// default execution values, and more all across different levels of specificity.
 message MatchableAttributesConfiguration {
     MatchingAttributes attributes = 1;
 
@@ -128,12 +133,13 @@ message MatchableAttributesConfiguration {
     string launch_plan = 5;
 }
 
-// Request all matching resource attributes.
+// Request all matching resource attributes for a resource type.
 message ListMatchableAttributesRequest {
+    // +required
     MatchableResource resource_type = 1;
 }
 
-// Response for a request for all matching resource attributes.
+// Response for a request for all matching resource attributes for a resource type.
 message ListMatchableAttributesResponse {
     repeated MatchableAttributesConfiguration configurations = 1;
 }

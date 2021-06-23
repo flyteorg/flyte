@@ -58,7 +58,6 @@ class AdminExecutionRelaunchRequest(object):
     def id(self):
         """Gets the id of this AdminExecutionRelaunchRequest.  # noqa: E501
 
-        Identifier of the workflow execution to relaunch.  # noqa: E501
 
         :return: The id of this AdminExecutionRelaunchRequest.  # noqa: E501
         :rtype: CoreWorkflowExecutionIdentifier
@@ -69,7 +68,6 @@ class AdminExecutionRelaunchRequest(object):
     def id(self, id):
         """Sets the id of this AdminExecutionRelaunchRequest.
 
-        Identifier of the workflow execution to relaunch.  # noqa: E501
 
         :param id: The id of this AdminExecutionRelaunchRequest.  # noqa: E501
         :type: CoreWorkflowExecutionIdentifier

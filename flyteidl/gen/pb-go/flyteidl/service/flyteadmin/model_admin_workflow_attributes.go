@@ -9,6 +9,7 @@
 
 package flyteadmin
 
+// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow. For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
 type AdminWorkflowAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
 	Project string `json:"project,omitempty"`

@@ -12,6 +12,7 @@ package flyteadmin
 type AdminNodeExecutionMetaData struct {
 	// Node executions are grouped depending on retries of the parent Retry group is unique within the context of a parent node.
 	RetryGroup string `json:"retry_group,omitempty"`
+	// Boolean flag indicating if the node has child nodes under it This can be true when a node contains a dynamic workflow which then produces child nodes.
 	IsParentNode bool `json:"is_parent_node,omitempty"`
 	SpecNodeId string `json:"spec_node_id,omitempty"`
 }

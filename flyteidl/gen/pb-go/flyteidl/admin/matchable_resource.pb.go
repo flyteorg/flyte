@@ -73,6 +73,7 @@ func (MatchableResource) EnumDescriptor() ([]byte, []int) {
 type PluginOverride_MissingPluginBehavior int32
 
 const (
+	// By default, if this plugin is not enabled for a Flyte deployment then execution will fail.
 	PluginOverride_FAIL PluginOverride_MissingPluginBehavior = 0
 	// Uses the system-configured default implementation.
 	PluginOverride_USE_DEFAULT PluginOverride_MissingPluginBehavior = 1
@@ -96,6 +97,7 @@ func (PluginOverride_MissingPluginBehavior) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_1d15bcabb02640f4, []int{5, 0}
 }
 
+// Defines a set of overridable task resource attributes set during task registration.
 type TaskResourceSpec struct {
 	Cpu                  string   `protobuf:"bytes,1,opt,name=cpu,proto3" json:"cpu,omitempty"`
 	Gpu                  string   `protobuf:"bytes,2,opt,name=gpu,proto3" json:"gpu,omitempty"`
@@ -159,6 +161,7 @@ func (m *TaskResourceSpec) GetStorage() string {
 	return ""
 }
 
+// Defines task resource defaults and limits that will be applied at task registration.
 type TaskResourceAttributes struct {
 	Defaults             *TaskResourceSpec `protobuf:"bytes,1,opt,name=defaults,proto3" json:"defaults,omitempty"`
 	Limits               *TaskResourceSpec `protobuf:"bytes,2,opt,name=limits,proto3" json:"limits,omitempty"`
@@ -627,6 +630,8 @@ func (*MatchingAttributes) XXX_OneofWrappers() []interface{} {
 
 // Represents a custom set of attributes applied for either a domain; a domain and project; or
 // domain, project and workflow name.
+// These are used to override system level defaults for kubernetes cluster resource management,
+// default execution values, and more all across different levels of specificity.
 type MatchableAttributesConfiguration struct {
 	Attributes           *MatchingAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	Domain               string              `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
@@ -698,8 +703,9 @@ func (m *MatchableAttributesConfiguration) GetLaunchPlan() string {
 	return ""
 }
 
-// Request all matching resource attributes.
+// Request all matching resource attributes for a resource type.
 type ListMatchableAttributesRequest struct {
+	// +required
 	ResourceType         MatchableResource `protobuf:"varint,1,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.admin.MatchableResource" json:"resource_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -738,7 +744,7 @@ func (m *ListMatchableAttributesRequest) GetResourceType() MatchableResource {
 	return MatchableResource_TASK_RESOURCE
 }
 
-// Response for a request for all matching resource attributes.
+// Response for a request for all matching resource attributes for a resource type.
 type ListMatchableAttributesResponse struct {
 	Configurations       []*MatchableAttributesConfiguration `protobuf:"bytes,1,rep,name=configurations,proto3" json:"configurations,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`

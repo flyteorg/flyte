@@ -55,19 +55,20 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Name of the project that contains the identifiers."
+        description: "Name of the project that contains the identifiers.\n+required."
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Name of the domain the identifiers belongs to within the project."
+        description: "Name of the domain the identifiers belongs to within the project.\n\
+          +required."
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -83,8 +84,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -92,7 +92,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -190,7 +191,7 @@ paths:
         x-optionalDataType: "String"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -214,8 +215,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -223,7 +223,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -512,7 +513,7 @@ paths:
         x-optionalDataType: "String"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -536,8 +537,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -545,7 +545,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -636,19 +637,20 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Name of the project that contains the identifiers."
+        description: "Name of the project that contains the identifiers.\n+required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Name of the domain the identifiers belongs to within the project."
+        description: "Name of the domain the identifiers belongs to within the project.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -664,8 +666,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -673,7 +674,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -750,7 +752,7 @@ paths:
         x-optionalDataType: "String"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -774,8 +776,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -783,7 +784,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -827,7 +829,7 @@ paths:
         x-exportParamName: "IdName"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -851,8 +853,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -860,7 +861,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -990,15 +992,15 @@ paths:
       parameters:
       - name: "resource_type"
         in: "query"
-        description: " - TASK_RESOURCE: Applies to customizable task resource requests\
-          \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
-          \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
-          \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
-          \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
-          \ Configures default quality of service when undefined in an execution spec.\n\
-          \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
-          \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
-          \ customizable workflow-execution specifications and overrides."
+        description: "+required.\n\n - TASK_RESOURCE: Applies to customizable task\
+          \ resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring\
+          \ templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures\
+          \ task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL:\
+          \ Configures the K8s cluster label to be used for execution to be run\n\
+          \ - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service\
+          \ when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable\
+          \ plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG:\
+          \ Adds defaults for customizable workflow-execution specifications and overrides."
         required: false
         type: "string"
         default: "TASK_RESOURCE"
@@ -1026,6 +1028,8 @@ paths:
       parameters:
       - name: "resource_type"
         in: "path"
+        description: "Resource type of the metadata to get. One of Task, Workflow\
+          \ or LaunchPlan.\n+required"
         required: true
         type: "string"
         enum:
@@ -1069,7 +1073,7 @@ paths:
       parameters:
       - name: "resource_type"
         in: "path"
-        description: "Resource type of the metadata to update"
+        description: "Resource type of the metadata to update\n+required"
         required: true
         type: "string"
         enum:
@@ -1121,6 +1125,8 @@ paths:
       parameters:
       - name: "resource_type"
         in: "path"
+        description: "Resource type of the metadata to query. One of Task, Workflow\
+          \ or LaunchPlan.\n+required"
         required: true
         type: "string"
         enum:
@@ -1132,7 +1138,7 @@ paths:
         x-exportParamName: "ResourceType"
       - name: "project"
         in: "path"
-        description: "Name of the project that contains the identifiers."
+        description: "Name of the project that contains the identifiers.\n+required"
         required: true
         type: "string"
         x-exportParamName: "Project"
@@ -1160,8 +1166,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1169,7 +1174,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -1254,7 +1260,7 @@ paths:
         x-exportParamName: "WorkflowExecutionIdName"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -1262,8 +1268,6 @@ paths:
         x-optionalDataType: "Int64"
       - name: "token"
         in: "query"
-        description: "In the case of multiple pages of results, the, server-provided\
-          \ token can be used to fetch the next page\nin a query.\n+optional."
         required: false
         type: "string"
         x-exportParamName: "Token"
@@ -1278,8 +1282,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1287,7 +1290,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -1349,23 +1353,26 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Unique project id which this set of attributes references."
+        description: "Unique project id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Unique domain id which this set of attributes references."
+        description: "Unique domain id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "resource_type"
         in: "query"
-        description: " - TASK_RESOURCE: Applies to customizable task resource requests\
-          \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
-          \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
-          \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
-          \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+        description: "Which type of matchable attributes to return.\n+required.\n\n\
+          \ - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n\
+          \ - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster\
+          \ resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution\
+          \ queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster\
+          \ label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
           \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
@@ -1397,13 +1404,15 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Unique project id which this set of attributes references."
+        description: "Unique project id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Unique domain id which this set of attributes references."
+        description: "Unique domain id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
@@ -1427,7 +1436,7 @@ paths:
       parameters:
       - name: "limit"
         in: "query"
-        description: "Indicates the number of projects to be returned."
+        description: "Indicates the number of projects to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -1451,8 +1460,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1460,7 +1468,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -1503,6 +1512,7 @@ paths:
       parameters:
       - name: "id"
         in: "path"
+        description: "Globally unique project name."
         required: true
         type: "string"
         x-exportParamName: "Id"
@@ -1637,7 +1647,7 @@ paths:
         x-exportParamName: "NodeExecutionIdNodeId"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -1661,8 +1671,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1670,7 +1679,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -1693,19 +1703,20 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Name of the project that contains the identifiers."
+        description: "Name of the project that contains the identifiers.\n+required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Name of the domain the identifiers belongs to within the project."
+        description: "Name of the domain the identifiers belongs to within the project.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -1721,8 +1732,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1730,7 +1740,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -1807,7 +1818,7 @@ paths:
         x-optionalDataType: "String"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -1831,8 +1842,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1840,7 +1850,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -1884,7 +1895,7 @@ paths:
         x-exportParamName: "IdName"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -1908,8 +1919,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -1917,7 +1927,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -2048,29 +2059,32 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Unique project id which this set of attributes references."
+        description: "Unique project id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Unique domain id which this set of attributes references."
+        description: "Unique domain id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "workflow"
         in: "path"
-        description: "Workflow name which this set of attributes references."
+        description: "Workflow name which this set of attributes references.\n+required"
         required: true
         type: "string"
         x-exportParamName: "Workflow"
       - name: "resource_type"
         in: "query"
-        description: " - TASK_RESOURCE: Applies to customizable task resource requests\
-          \ and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes\
-          \ cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task\
-          \ execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the\
-          \ K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
+        description: "Which type of matchable attributes to return.\n+required.\n\n\
+          \ - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n\
+          \ - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster\
+          \ resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution\
+          \ queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster\
+          \ label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION:\
           \ Configures default quality of service when undefined in an execution spec.\n\
           \ - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior\
           \ for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for\
@@ -2102,19 +2116,21 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Unique project id which this set of attributes references."
+        description: "Unique project id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Unique domain id which this set of attributes references."
+        description: "Unique domain id which this set of attributes references.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "workflow"
         in: "path"
-        description: "Workflow name which this set of attributes references."
+        description: "Workflow name which this set of attributes references.\n+required"
         required: true
         type: "string"
         x-exportParamName: "Workflow"
@@ -2139,19 +2155,20 @@ paths:
       parameters:
       - name: "project"
         in: "path"
-        description: "Name of the project that contains the identifiers."
+        description: "Name of the project that contains the identifiers.\n+required"
         required: true
         type: "string"
         x-exportParamName: "Project"
       - name: "domain"
         in: "path"
-        description: "Name of the domain the identifiers belongs to within the project."
+        description: "Name of the domain the identifiers belongs to within the project.\n\
+          +required"
         required: true
         type: "string"
         x-exportParamName: "Domain"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -2167,8 +2184,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -2176,7 +2192,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -2253,7 +2270,7 @@ paths:
         x-optionalDataType: "String"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -2277,8 +2294,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -2286,7 +2302,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -2330,7 +2347,7 @@ paths:
         x-exportParamName: "IdName"
       - name: "limit"
         in: "query"
-        description: "Indicates the number of resources to be returned."
+        description: "Indicates the number of resources to be returned.\n+required."
         required: false
         type: "integer"
         format: "int64"
@@ -2354,8 +2371,7 @@ paths:
         x-optionalDataType: "String"
       - name: "sort_by.key"
         in: "query"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        description: "Indicates an attribute to sort the response values.\n+required."
         required: false
         type: "string"
         x-exportParamName: "SortByKey"
@@ -2363,7 +2379,8 @@ paths:
       - name: "sort_by.direction"
         in: "query"
         description: "Indicates the direction to apply sort key for response values.\n\
-          +optional."
+          +optional.\n\n - DESCENDING: By default, fields are sorted in descending\
+          \ order."
         required: false
         type: "string"
         default: "DESCENDING"
@@ -2541,7 +2558,9 @@ definitions:
     default: "UPLOAD_ON_EXIT"
   PluginOverrideMissingPluginBehavior:
     type: "string"
-    description: " - USE_DEFAULT: Uses the system-configured default implementation."
+    description: " - FAIL: By default, if this plugin is not enabled for a Flyte deployment\
+      \ then execution will fail.\n - USE_DEFAULT: Uses the system-configured default\
+      \ implementation."
     enum:
     - "FAIL"
     - "USE_DEFAULT"
@@ -2631,6 +2650,7 @@ definitions:
     default: "ANY"
   SortDirection:
     type: "string"
+    description: " - DESCENDING: By default, fields are sorted in descending order."
     enum:
     - "DESCENDING"
     - "ASCENDING"
@@ -2677,6 +2697,7 @@ definitions:
       principal:
         type: "string"
         title: "Identifies the entity (if any) responsible for terminating the execution"
+    description: "Specifies metadata around an aborted workflow execution."
     example:
       principal: "principal"
       cause: "cause"
@@ -2754,6 +2775,7 @@ definitions:
       offset:
         type: "string"
         title: "ISO 8601 duration as described by https://en.wikipedia.org/wiki/ISO_8601#Durations"
+    description: "Options for schedules to run according to a cron expression."
     example:
       schedule: "schedule"
       offset: "offset"
@@ -2762,6 +2784,7 @@ definitions:
     properties:
       id:
         type: "string"
+        description: "Globally unique domain name."
       name:
         type: "string"
         description: "Display name."
@@ -2775,9 +2798,10 @@ definitions:
     properties:
       recipients_email:
         type: "array"
-        description: "The list of email addresses recipients for this notification."
+        title: "The list of email addresses recipients for this notification.\n+required"
         items:
           type: "string"
+    description: "Defines an email notification specification."
     example:
       recipients_email:
       - "recipients_email"
@@ -2981,7 +3005,7 @@ definitions:
     type: "object"
     properties:
       outputs:
-        description: "A map of outputs in the case of a successful execution."
+        description: "Output URI in the case of a successful execution."
         $ref: "#/definitions/adminLiteralMapBlob"
       error:
         description: "Error information in the case of a failed execution."
@@ -3004,7 +3028,7 @@ definitions:
       started_at:
         type: "string"
         format: "date-time"
-        description: "Reported ime at which the execution began running."
+        description: "Reported time at which the execution began running."
       duration:
         type: "string"
         description: "The amount of time the execution spent running."
@@ -3099,25 +3123,25 @@ definitions:
     properties:
       project:
         type: "string"
-        description: "Name of the project the execution belongs to."
+        title: "Name of the project the execution belongs to.\n+required"
       domain:
         type: "string"
-        description: "Name of the domain the execution belongs to.\nA domain can be\
-          \ considered as a subset within a specific project."
+        title: "Name of the domain the execution belongs to.\nA domain can be considered\
+          \ as a subset within a specific project.\n+required"
       name:
         type: "string"
         title: "User provided value for the resource.\nIf none is provided the system\
           \ will generate a unique string.\n+optional"
       spec:
-        description: "Additional fields necessary to launch the execution."
+        title: "Additional fields necessary to launch the execution.\n+optional"
         $ref: "#/definitions/adminExecutionSpec"
       inputs:
-        description: "The inputs required to start the execution. All required inputs\
-          \ must be\nincluded in this map. If not required and not provided, defaults\
-          \ apply."
+        title: "The inputs required to start the execution. All required inputs must\
+          \ be\nincluded in this map. If not required and not provided, defaults apply.\n\
+          +optional"
         $ref: "#/definitions/coreLiteralMap"
     description: "Request to launch an execution with the given project, domain and\
-      \ optionally name."
+      \ optionally-assigned name."
   adminExecutionCreateResponse:
     type: "object"
     properties:
@@ -3527,7 +3551,7 @@ definitions:
         description: "For scheduled executions, the requested time for execution for\
           \ this specific schedule invocation."
       parent_node_execution:
-        title: "Which subworkflow node launched this execution"
+        title: "Which subworkflow node (if any) launched this execution"
         $ref: "#/definitions/coreNodeExecutionIdentifier"
       reference_execution:
         description: "Optional, a reference workflow execution related to this execution.\n\
@@ -3574,7 +3598,7 @@ definitions:
     type: "object"
     properties:
       id:
-        description: "Identifier of the workflow execution to relaunch."
+        title: "Identifier of the workflow execution to relaunch.\n+required"
         $ref: "#/definitions/coreWorkflowExecutionIdentifier"
       name:
         type: "string"
@@ -3622,13 +3646,13 @@ definitions:
       max_parallelism:
         type: "integer"
         format: "int32"
-        description: "Controls the maximum number of tasknodes that can be run in\
+        description: "Controls the maximum number of task nodes that can be run in\
           \ parallel for the entire workflow.\nThis is useful to achieve fairness.\
           \ Note: MapTasks are regarded as one unit,\nand parallelism/concurrency\
           \ of MapTasks is independent from this."
     description: "An ExecutionSpec encompasses all data used to launch this execution.\
       \ The Spec does not change over the lifetime\nof an execution as it progresses\
-      \ across phase changes.."
+      \ across phase changes."
     example:
       launch_plan:
         domain: "domain"
@@ -3813,10 +3837,14 @@ definitions:
     type: "object"
     properties:
       id:
+        description: "Uniquely identifies a launch plan entity."
         $ref: "#/definitions/coreIdentifier"
       spec:
+        description: "User-provided launch plan details, including reference workflow,\
+          \ inputs and other metadata."
         $ref: "#/definitions/adminLaunchPlanSpec"
       closure:
+        description: "Values computed by the flyte platform after launch plan registration."
         $ref: "#/definitions/adminLaunchPlanClosure"
     description: "A LaunchPlan provides the capability to templatize workflow executions.\n\
       Launch plans simplify associating one or more schedules, inputs and notifications\
@@ -4139,13 +4167,15 @@ definitions:
     type: "object"
     properties:
       state:
-        title: "Indicate the Launch plan phase"
+        description: "Indicate the Launch plan state."
         $ref: "#/definitions/adminLaunchPlanState"
       expected_inputs:
-        title: "Indicates the set of inputs to execute the Launch plan"
+        title: "Indicates the set of inputs expected when creating an execution with\
+          \ the Launch plan"
         $ref: "#/definitions/coreParameterMap"
       expected_outputs:
-        title: "Indicates the set of outputs from the Launch plan"
+        title: "Indicates the set of outputs expected to be produced by creating an\
+          \ execution with the Launch plan"
         $ref: "#/definitions/coreVariableMap"
       created_at:
         type: "string"
@@ -4282,11 +4312,11 @@ definitions:
         description: "User-provided launch plan details, including reference workflow,\
           \ inputs and other metadata."
         $ref: "#/definitions/adminLaunchPlanSpec"
-    description: "Request to register a launch plan. A LaunchPlanSpec may include\
-      \ a complete or incomplete set of inputs required\nto launch a workflow execution.\
-      \ By default all launch plans are registered in state INACTIVE. If you wish\
-      \ to\nset the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after\
-      \ you have created a launch plan."
+    description: "Request to register a launch plan. The included LaunchPlanSpec may\
+      \ have a complete or incomplete set of inputs required\nto launch a workflow\
+      \ execution. By default all launch plans are registered in state INACTIVE. If\
+      \ you wish to\nset the state to ACTIVE, you must submit a LaunchPlanUpdateRequest,\
+      \ after you have successfully created a launch plan."
   adminLaunchPlanCreateResponse:
     type: "object"
   adminLaunchPlanList:
@@ -4991,10 +5021,12 @@ definitions:
         title: "Metadata for the Launch Plan"
         $ref: "#/definitions/adminLaunchPlanMetadata"
       default_inputs:
-        title: "Input values to be passed for the execution"
+        description: "Input values to be passed for the execution.\nThese can be overriden\
+          \ when an execution is created with this launch plan."
         $ref: "#/definitions/coreParameterMap"
       fixed_inputs:
-        title: "Fixed, non-overridable inputs for the Launch Plan"
+        description: "Fixed, non-overridable inputs for the Launch Plan.\nThese can\
+          \ not be overriden when an execution is created with this launch plan."
         $ref: "#/definitions/coreLiteralMap"
       role:
         type: "string"
@@ -5019,6 +5051,8 @@ definitions:
         description: "Indicates the runtime priority of the execution."
         $ref: "#/definitions/coreQualityOfService"
       raw_output_data_config:
+        description: "Encapsulates user settings pertaining to offloaded data (i.e.\
+          \ Blobs, Schema, query data, etc.)."
         $ref: "#/definitions/adminRawOutputDataConfig"
       max_parallelism:
         type: "integer"
@@ -5236,10 +5270,10 @@ definitions:
     type: "object"
     properties:
       id:
-        description: "Identifier of launch plan for which to change state."
+        description: "Identifier of launch plan for which to change state.\n+required."
         $ref: "#/definitions/coreIdentifier"
       state:
-        description: "Desired state to apply to the launch plan."
+        description: "Desired state to apply to the launch plan.\n+required."
         $ref: "#/definitions/adminLaunchPlanState"
     description: "Request to set the referenced launch plan state to the configured\
       \ value."
@@ -5253,7 +5287,8 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/adminMatchableAttributesConfiguration"
-    description: "Response for a request for all matching resource attributes."
+    description: "Response for a request for all matching resource attributes for\
+      \ a resource type."
     example:
       configurations:
       - launch_plan: "launch_plan"
@@ -5371,7 +5406,9 @@ definitions:
       launch_plan:
         type: "string"
     description: "Represents a custom set of attributes applied for either a domain;\
-      \ a domain and project; or\ndomain, project and workflow name."
+      \ a domain and project; or\ndomain, project and workflow name.\nThese are used\
+      \ to override system level defaults for kubernetes cluster resource management,\n\
+      default execution values, and more all across different levels of specificity."
     example:
       launch_plan: "launch_plan"
       workflow: "workflow"
@@ -5499,13 +5536,17 @@ definitions:
     type: "object"
     properties:
       resource_type:
+        description: "Resource type of the named entity. One of Task, Workflow or\
+          \ LaunchPlan."
         $ref: "#/definitions/coreResourceType"
       id:
         $ref: "#/definitions/adminNamedEntityIdentifier"
       metadata:
+        description: "Additional metadata around a named entity."
         $ref: "#/definitions/adminNamedEntityMetadata"
-    title: "Describes information common to a NamedEntity, identified by a project\
-      \ /\ndomain / name / resource type combination"
+    description: "Encapsulates information common to a NamedEntity, a Flyte resource\
+      \ such as a task,\nworkflow or launch plan. A NamedEntity is exclusively identified\
+      \ by its resource type\nand identifier."
     example:
       metadata:
         description: "description"
@@ -5530,8 +5571,10 @@ definitions:
         title: "User provided value for the resource.\nThe combination of project\
           \ + domain + name uniquely identifies the resource.\n+optional - in certain\
           \ contexts - like 'List API', 'Launch plans'"
-    description: "Encapsulation of fields that identifies a Flyte resource.\nA resource\
-      \ can internally have multiple versions."
+    description: "Encapsulation of fields that identifies a Flyte resource.\nA Flyte\
+      \ resource can be a task, workflow or launch plan.\nA resource can internally\
+      \ have multiple versions and is uniquely identified\nby project, domain, and\
+      \ name."
     example:
       domain: "domain"
       name: "name"
@@ -5602,6 +5645,7 @@ definitions:
         description: "Shared state across all version of the entity\nAt this point\
           \ in time, only workflow entities can have their state archived."
         $ref: "#/definitions/adminNamedEntityState"
+    description: "Additional metadata around a named entity."
     example:
       description: "description"
       state: {}
@@ -5621,15 +5665,15 @@ definitions:
     type: "object"
     properties:
       resource_type:
-        title: "Resource type of the metadata to update"
+        title: "Resource type of the metadata to update\n+required"
         $ref: "#/definitions/coreResourceType"
       id:
-        title: "Identifier of the metadata to update"
+        title: "Identifier of the metadata to update\n+required"
         $ref: "#/definitions/adminNamedEntityIdentifier"
       metadata:
-        title: "Metadata object to set as the new value"
+        title: "Metadata object to set as the new value\n+required"
         $ref: "#/definitions/adminNamedEntityMetadata"
-    description: "Request to set the referenced launch plan state to the configured\
+    description: "Request to set the referenced named entity state to the configured\
       \ value."
   adminNamedEntityUpdateResponse:
     type: "object"
@@ -5639,6 +5683,8 @@ definitions:
     properties:
       output_uri:
         type: "string"
+        description: "Links to a remotely stored, serialized core.LiteralMap of node\
+          \ execution outputs."
       error:
         title: "Error information for the Node"
         $ref: "#/definitions/coreExecutionError"
@@ -5724,18 +5770,20 @@ definitions:
     type: "object"
     properties:
       inputs:
-        description: "Signed url to fetch a core.LiteralMap of node execution inputs."
+        description: "Signed url to fetch a core.LiteralMap of node execution inputs.\n\
+          Deprecated: Please use full_inputs instead."
         $ref: "#/definitions/adminUrlBlob"
       outputs:
-        description: "Signed url to fetch a core.LiteralMap of node execution outputs."
+        description: "Signed url to fetch a core.LiteralMap of node execution outputs.\n\
+          Deprecated: Please use full_outputs instead."
         $ref: "#/definitions/adminUrlBlob"
       full_inputs:
-        description: "Optional, full_inputs will only be populated if they are under\
-          \ a configured size threshold."
+        description: "Full_inputs will only be populated if they are under a configured\
+          \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
       full_outputs:
-        description: "Optional, full_outputs will only be populated if they are under\
-          \ a configured size threshold."
+        description: "Full_outputs will only be populated if they are under a configured\
+          \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
       dynamic_workflow:
         description: "Optional Workflow closure for a dynamically generated workflow,\
@@ -8792,7 +8840,9 @@ definitions:
       is_parent_node:
         type: "boolean"
         format: "boolean"
-        title: "Boolean flag indicating if the node has child nodes under it"
+        description: "Boolean flag indicating if the node has child nodes under it\n\
+          This can be true when a node contains a dynamic workflow which then produces\n\
+          child nodes."
       spec_node_id:
         type: "string"
         title: "Node id of the node in the original workflow\nThis maps to value of\
@@ -8807,8 +8857,8 @@ definitions:
     properties:
       phases:
         type: "array"
-        description: "A list of phases to which users can associate the notifications\
-          \ to."
+        title: "A list of phases to which users can associate the notifications to.\n\
+          +required"
         items:
           $ref: "#/definitions/coreWorkflowExecutionPhase"
       email:
@@ -8818,8 +8868,8 @@ definitions:
       slack:
         $ref: "#/definitions/adminSlackNotification"
     description: "Represents a structure for notifications based on execution status.\n\
-      The Notification content is configured within Admin. Future iterations could\n\
-      expose configuring notifications with custom content."
+      The notification content is configured within flyte admin but can be templatized.\n\
+      Future iterations could expose configuring notifications with custom content."
     example:
       pager_duty:
         recipients_email:
@@ -8880,10 +8930,11 @@ definitions:
     properties:
       recipients_email:
         type: "array"
-        description: "Currently, PagerDuty notifications leverage email to trigger\
-          \ a notification."
+        title: "Currently, PagerDuty notifications leverage email to trigger a notification.\n\
+          +required"
         items:
           type: "string"
+    description: "Defines a pager duty notification specification."
     example:
       recipients_email:
       - "recipients_email"
@@ -8939,6 +8990,7 @@ definitions:
     properties:
       id:
         type: "string"
+        description: "Globally unique project name."
       name:
         type: "string"
         description: "Display name."
@@ -8980,6 +9032,9 @@ definitions:
         description: "Unique domain id for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
+    description: "Defines a set of custom matching attributes which defines resource\
+      \ defaults for a project and domain.\nFor more info on matchable attributes,\
+      \ see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
     example:
       domain: "domain"
       project: "project"
@@ -9027,12 +9082,14 @@ definitions:
     properties:
       project:
         type: "string"
-        description: "Unique project id which this set of attributes references."
+        title: "Unique project id which this set of attributes references.\n+required"
       domain:
         type: "string"
-        description: "Unique domain id which this set of attributes references."
+        title: "Unique domain id which this set of attributes references.\n+required"
       resource_type:
+        title: "Which type of matchable attributes to delete.\n+required"
         $ref: "#/definitions/adminMatchableResource"
+    description: "Request to delete a set matchable project domain attribute override."
   adminProjectDomainAttributesDeleteResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -9041,6 +9098,7 @@ definitions:
     properties:
       attributes:
         $ref: "#/definitions/adminProjectDomainAttributes"
+    description: "Response to get an individual project domain attribute override."
     example:
       attributes:
         domain: "domain"
@@ -9088,6 +9146,7 @@ definitions:
     type: "object"
     properties:
       attributes:
+        title: "+required"
         $ref: "#/definitions/adminProjectDomainAttributes"
     description: "Sets custom attributes for a project-domain combination."
   adminProjectDomainAttributesUpdateResponse:
@@ -9097,6 +9156,7 @@ definitions:
     type: "object"
     properties:
       project:
+        title: "+required"
         $ref: "#/definitions/adminProject"
   adminProjectRegisterResponse:
     type: "object"
@@ -9184,9 +9244,11 @@ definitions:
     properties:
       recipients_email:
         type: "array"
-        description: "Currently, Slack notifications leverage email to trigger a notification."
+        title: "Currently, Slack notifications leverage email to trigger a notification.\n\
+          +required"
         items:
           type: "string"
+    description: "Defines a slack notification specification."
     example:
       recipients_email:
       - "recipients_email"
@@ -9196,19 +9258,18 @@ definitions:
     properties:
       key:
         type: "string"
-        description: "Indicates an attribute to sort the response values.\nTODO(katrogan):\
-          \ Add string validation here. This should never be empty."
+        title: "Indicates an attribute to sort the response values.\n+required"
       direction:
         title: "Indicates the direction to apply sort key for response values.\n+optional"
         $ref: "#/definitions/SortDirection"
-    description: "Species sort ordering in a list request."
+    description: "Specifies sort ordering in a list request."
   adminSystemMetadata:
     type: "object"
     properties:
       execution_cluster:
         type: "string"
         description: "Which execution cluster this execution ran on."
-    description: "Represents system rather than user-facing metadata about an execution."
+    description: "Represents system, rather than user-facing, metadata about an execution."
     example:
       execution_cluster: "execution_cluster"
   adminTask:
@@ -9645,10 +9706,10 @@ definitions:
     type: "object"
     properties:
       id:
-        description: "id represents the unique identifier of the task."
+        title: "id represents the unique identifier of the task.\n+required"
         $ref: "#/definitions/coreIdentifier"
       spec:
-        description: "Represents the specification for task."
+        title: "Represents the specification for task.\n+required"
         $ref: "#/definitions/adminTaskSpec"
     description: "Represents a request structure to create a revision of a task."
   adminTaskCreateResponse:
@@ -9764,18 +9825,20 @@ definitions:
     type: "object"
     properties:
       inputs:
-        description: "Signed url to fetch a core.LiteralMap of task execution inputs."
+        description: "Signed url to fetch a core.LiteralMap of task execution inputs.\n\
+          Deprecated: Please use full_inputs instead."
         $ref: "#/definitions/adminUrlBlob"
       outputs:
-        description: "Signed url to fetch a core.LiteralMap of task execution outputs."
+        description: "Signed url to fetch a core.LiteralMap of task execution outputs.\n\
+          Deprecated: Please use full_outputs instead."
         $ref: "#/definitions/adminUrlBlob"
       full_inputs:
-        description: "Optional, full_inputs will only be populated if they are under\
-          \ a configured size threshold."
+        description: "Full_inputs will only be populated if they are under a configured\
+          \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
       full_outputs:
-        description: "Optional, full_outputs will only be populated if they are under\
-          \ a configured size threshold."
+        description: "Full_outputs will only be populated if they are under a configured\
+          \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
     description: "Response structure for TaskExecutionGetDataRequest which contains\
       \ inputs and outputs for a task execution."
@@ -10362,6 +10425,8 @@ definitions:
         $ref: "#/definitions/adminTaskResourceSpec"
       limits:
         $ref: "#/definitions/adminTaskResourceSpec"
+    description: "Defines task resource defaults and limits that will be applied at\
+      \ task registration."
     example:
       defaults:
         memory: "memory"
@@ -10384,6 +10449,8 @@ definitions:
         type: "string"
       storage:
         type: "string"
+    description: "Defines a set of overridable task resource attributes set during\
+      \ task registration."
     example:
       memory: "memory"
       cpu: "cpu"
@@ -13362,6 +13429,9 @@ definitions:
         description: "Workflow name for which this set of attributes will be applied."
       matching_attributes:
         $ref: "#/definitions/adminMatchingAttributes"
+    description: "Defines a set of custom matching attributes which defines resource\
+      \ defaults for a project, domain and workflow.\nFor more info on matchable attributes,\
+      \ see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
     example:
       workflow: "workflow"
       domain: "domain"
@@ -13410,15 +13480,17 @@ definitions:
     properties:
       project:
         type: "string"
-        description: "Unique project id which this set of attributes references."
+        title: "Unique project id which this set of attributes references.\n+required"
       domain:
         type: "string"
-        description: "Unique domain id which this set of attributes references."
+        title: "Unique domain id which this set of attributes references.\n+required"
       workflow:
         type: "string"
-        description: "Workflow name which this set of attributes references."
+        title: "Workflow name which this set of attributes references.\n+required"
       resource_type:
+        title: "Which type of matchable attributes to delete.\n+required"
         $ref: "#/definitions/adminMatchableResource"
+    description: "Request to delete a set matchable workflow attribute override."
   adminWorkflowAttributesDeleteResponse:
     type: "object"
     description: "Purposefully empty, may be populated in the future."
@@ -13427,6 +13499,7 @@ definitions:
     properties:
       attributes:
         $ref: "#/definitions/adminWorkflowAttributes"
+    description: "Response to get an individual workflow attribute override."
     example:
       attributes:
         workflow: "workflow"
@@ -16395,10 +16468,10 @@ definitions:
     type: "object"
     properties:
       id:
-        description: "id represents the unique identifier of the workflow."
+        title: "id represents the unique identifier of the workflow.\n+required"
         $ref: "#/definitions/coreIdentifier"
       spec:
-        description: "Represents the specification for workflow."
+        title: "Represents the specification for workflow.\n+required"
         $ref: "#/definitions/adminWorkflowSpec"
     description: "Represents a request structure to create a revision of a workflow."
   adminWorkflowCreateResponse:
@@ -16432,18 +16505,20 @@ definitions:
     type: "object"
     properties:
       outputs:
-        description: "Signed url to fetch a core.LiteralMap of execution outputs."
+        description: "Signed url to fetch a core.LiteralMap of execution outputs.\n\
+          Deprecated: Please use full_outputs instead."
         $ref: "#/definitions/adminUrlBlob"
       inputs:
-        description: "Signed url to fetch a core.LiteralMap of execution inputs."
+        description: "Signed url to fetch a core.LiteralMap of execution inputs.\n\
+          Deprecated: Please use full_inputs instead."
         $ref: "#/definitions/adminUrlBlob"
       full_inputs:
-        description: "Optional, full_inputs will only be populated if they are under\
-          \ a configured size threshold."
+        description: "Full_inputs will only be populated if they are under a configured\
+          \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
       full_outputs:
-        description: "Optional, full_outputs will only be populated if they are under\
-          \ a configured size threshold."
+        description: "Full_outputs will only be populated if they are under a configured\
+          \ size threshold."
         $ref: "#/definitions/coreLiteralMap"
     description: "Response structure for WorkflowExecutionGetDataRequest which contains\
       \ inputs and outputs for an execution."
@@ -33067,6 +33142,7 @@ definitions:
     type: "object"
     properties:
       executionId:
+        description: "The identifier for a workflow execution launched by a node."
         $ref: "#/definitions/coreWorkflowExecutionIdentifier"
     title: "Metadata for a WorkflowNode"
     example:

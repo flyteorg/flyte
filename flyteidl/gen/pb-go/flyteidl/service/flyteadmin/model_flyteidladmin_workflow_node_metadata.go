@@ -10,5 +10,6 @@
 package flyteadmin
 
 type FlyteidladminWorkflowNodeMetadata struct {
+	// The identifier for a workflow execution launched by a node.
 	ExecutionId *CoreWorkflowExecutionIdentifier `json:"executionId,omitempty"`
 }

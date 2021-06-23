@@ -9,6 +9,7 @@
 
 package flyteadmin
 
+// Response to get an individual project domain attribute override.
 type AdminProjectDomainAttributesGetResponse struct {
 	Attributes *AdminProjectDomainAttributes `json:"attributes,omitempty"`
 }

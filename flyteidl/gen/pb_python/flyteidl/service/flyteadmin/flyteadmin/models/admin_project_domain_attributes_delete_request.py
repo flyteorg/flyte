@@ -63,7 +63,6 @@ class AdminProjectDomainAttributesDeleteRequest(object):
     def project(self):
         """Gets the project of this AdminProjectDomainAttributesDeleteRequest.  # noqa: E501
 
-        Unique project id which this set of attributes references.  # noqa: E501
 
         :return: The project of this AdminProjectDomainAttributesDeleteRequest.  # noqa: E501
         :rtype: str
@@ -74,7 +73,6 @@ class AdminProjectDomainAttributesDeleteRequest(object):
     def project(self, project):
         """Sets the project of this AdminProjectDomainAttributesDeleteRequest.
 
-        Unique project id which this set of attributes references.  # noqa: E501
 
         :param project: The project of this AdminProjectDomainAttributesDeleteRequest.  # noqa: E501
         :type: str
@@ -86,7 +84,6 @@ class AdminProjectDomainAttributesDeleteRequest(object):
     def domain(self):
         """Gets the domain of this AdminProjectDomainAttributesDeleteRequest.  # noqa: E501
 
-        Unique domain id which this set of attributes references.  # noqa: E501
 
         :return: The domain of this AdminProjectDomainAttributesDeleteRequest.  # noqa: E501
         :rtype: str
@@ -97,7 +94,6 @@ class AdminProjectDomainAttributesDeleteRequest(object):
     def domain(self, domain):
         """Sets the domain of this AdminProjectDomainAttributesDeleteRequest.
 
-        Unique domain id which this set of attributes references.  # noqa: E501
 
         :param domain: The domain of this AdminProjectDomainAttributesDeleteRequest.  # noqa: E501
         :type: str

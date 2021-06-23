@@ -25,8 +25,10 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 // Represents a request structure to create a revision of a task.
 type TaskCreateRequest struct {
 	// id represents the unique identifier of the task.
+	// +required
 	Id *core.Identifier `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Represents the specification for task.
+	// +required
 	Spec                 *TaskSpec `protobuf:"bytes,2,opt,name=spec,proto3" json:"spec,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`

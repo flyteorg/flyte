@@ -16,6 +16,7 @@ message FixedRate {
     FixedRateUnit unit = 2;
 }
 
+// Options for schedules to run according to a cron expression.
 message CronSchedule {
     // Standard/default cron implementation as described by https://en.wikipedia.org/wiki/Cron#CRON_expression;
     // Also supports nonstandard predefined scheduling definitions

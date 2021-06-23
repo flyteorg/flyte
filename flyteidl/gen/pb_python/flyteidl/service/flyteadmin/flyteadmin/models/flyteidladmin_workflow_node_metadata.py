@@ -53,6 +53,7 @@ class FlyteidladminWorkflowNodeMetadata(object):
     def execution_id(self):
         """Gets the execution_id of this FlyteidladminWorkflowNodeMetadata.  # noqa: E501
 
+        The identifier for a workflow execution launched by a node.  # noqa: E501
 
         :return: The execution_id of this FlyteidladminWorkflowNodeMetadata.  # noqa: E501
         :rtype: CoreWorkflowExecutionIdentifier
@@ -63,6 +64,7 @@ class FlyteidladminWorkflowNodeMetadata(object):
     def execution_id(self, execution_id):
         """Sets the execution_id of this FlyteidladminWorkflowNodeMetadata.
 
+        The identifier for a workflow execution launched by a node.  # noqa: E501
 
         :param execution_id: The execution_id of this FlyteidladminWorkflowNodeMetadata.  # noqa: E501
         :type: CoreWorkflowExecutionIdentifier

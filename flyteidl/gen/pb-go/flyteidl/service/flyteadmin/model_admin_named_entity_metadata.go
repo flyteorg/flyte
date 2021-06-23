@@ -9,6 +9,7 @@
 
 package flyteadmin
 
+// Additional metadata around a named entity.
 type AdminNamedEntityMetadata struct {
 	Description string `json:"description,omitempty"`
 	// Shared state across all version of the entity At this point in time, only workflow entities can have their state archived.

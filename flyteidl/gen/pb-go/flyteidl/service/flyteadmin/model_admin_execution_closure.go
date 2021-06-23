@@ -14,7 +14,7 @@ import (
 )
 
 type AdminExecutionClosure struct {
-	// A map of outputs in the case of a successful execution.
+	// Output URI in the case of a successful execution.
 	Outputs *AdminLiteralMapBlob `json:"outputs,omitempty"`
 	// Error information in the case of a failed execution.
 	Error_ *CoreExecutionError `json:"error,omitempty"`
@@ -25,7 +25,7 @@ type AdminExecutionClosure struct {
 	ComputedInputs *CoreLiteralMap `json:"computed_inputs,omitempty"`
 	// Most recent recorded phase for the execution.
 	Phase *CoreWorkflowExecutionPhase `json:"phase,omitempty"`
-	// Reported ime at which the execution began running.
+	// Reported time at which the execution began running.
 	StartedAt time.Time `json:"started_at,omitempty"`
 	// The amount of time the execution spent running.
 	Duration string `json:"duration,omitempty"`

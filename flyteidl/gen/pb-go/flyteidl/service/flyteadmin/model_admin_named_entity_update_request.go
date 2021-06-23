@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Request to set the referenced launch plan state to the configured value.
+// Request to set the referenced named entity state to the configured value.
 type AdminNamedEntityUpdateRequest struct {
 	ResourceType *CoreResourceType `json:"resource_type,omitempty"`
 	Id *AdminNamedEntityIdentifier `json:"id,omitempty"`

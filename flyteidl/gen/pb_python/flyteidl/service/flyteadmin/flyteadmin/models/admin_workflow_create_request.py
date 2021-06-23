@@ -59,7 +59,6 @@ class AdminWorkflowCreateRequest(object):
     def id(self):
         """Gets the id of this AdminWorkflowCreateRequest.  # noqa: E501
 
-        id represents the unique identifier of the workflow.  # noqa: E501
 
         :return: The id of this AdminWorkflowCreateRequest.  # noqa: E501
         :rtype: CoreIdentifier
@@ -70,7 +69,6 @@ class AdminWorkflowCreateRequest(object):
     def id(self, id):
         """Sets the id of this AdminWorkflowCreateRequest.
 
-        id represents the unique identifier of the workflow.  # noqa: E501
 
         :param id: The id of this AdminWorkflowCreateRequest.  # noqa: E501
         :type: CoreIdentifier
@@ -82,7 +80,6 @@ class AdminWorkflowCreateRequest(object):
     def spec(self):
         """Gets the spec of this AdminWorkflowCreateRequest.  # noqa: E501
 
-        Represents the specification for workflow.  # noqa: E501
 
         :return: The spec of this AdminWorkflowCreateRequest.  # noqa: E501
         :rtype: AdminWorkflowSpec
@@ -93,7 +90,6 @@ class AdminWorkflowCreateRequest(object):
     def spec(self, spec):
         """Sets the spec of this AdminWorkflowCreateRequest.
 
-        Represents the specification for workflow.  # noqa: E501
 
         :param spec: The spec of this AdminWorkflowCreateRequest.  # noqa: E501
         :type: AdminWorkflowSpec

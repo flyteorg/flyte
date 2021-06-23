@@ -21,7 +21,11 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Indicates that a sent event was not used to update execution state due to
+// the referenced execution already being terminated (and therefore inelegible
+// for further state transitions).
 type EventErrorAlreadyInTerminalState struct {
+	// +required
 	CurrentPhase         string   `protobuf:"bytes,1,opt,name=current_phase,json=currentPhase,proto3" json:"current_phase,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -60,7 +64,10 @@ func (m *EventErrorAlreadyInTerminalState) GetCurrentPhase() string {
 	return ""
 }
 
+// Indicates why a sent event was not used to update execution.
 type EventFailureReason struct {
+	// +required
+	//
 	// Types that are valid to be assigned to Reason:
 	//	*EventFailureReason_AlreadyInTerminalState
 	Reason               isEventFailureReason_Reason `protobuf_oneof:"reason"`

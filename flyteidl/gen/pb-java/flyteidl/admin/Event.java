@@ -19,16 +19,30 @@ public final class Event {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>string current_phase = 1;</code>
      */
     java.lang.String getCurrentPhase();
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>string current_phase = 1;</code>
      */
     com.google.protobuf.ByteString
         getCurrentPhaseBytes();
   }
   /**
+   * <pre>
+   * Indicates that a sent event was not used to update execution state due to
+   * the referenced execution already being terminated (and therefore inelegible
+   * for further state transitions).
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.EventErrorAlreadyInTerminalState}
    */
   public  static final class EventErrorAlreadyInTerminalState extends
@@ -109,6 +123,10 @@ public final class Event {
     public static final int CURRENT_PHASE_FIELD_NUMBER = 1;
     private volatile java.lang.Object currentPhase_;
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>string current_phase = 1;</code>
      */
     public java.lang.String getCurrentPhase() {
@@ -124,6 +142,10 @@ public final class Event {
       }
     }
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>string current_phase = 1;</code>
      */
     public com.google.protobuf.ByteString
@@ -295,6 +317,12 @@ public final class Event {
       return builder;
     }
     /**
+     * <pre>
+     * Indicates that a sent event was not used to update execution state due to
+     * the referenced execution already being terminated (and therefore inelegible
+     * for further state transitions).
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.EventErrorAlreadyInTerminalState}
      */
     public static final class Builder extends
@@ -444,6 +472,10 @@ public final class Event {
 
       private java.lang.Object currentPhase_ = "";
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>string current_phase = 1;</code>
        */
       public java.lang.String getCurrentPhase() {
@@ -459,6 +491,10 @@ public final class Event {
         }
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>string current_phase = 1;</code>
        */
       public com.google.protobuf.ByteString
@@ -475,6 +511,10 @@ public final class Event {
         }
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>string current_phase = 1;</code>
        */
       public Builder setCurrentPhase(
@@ -488,6 +528,10 @@ public final class Event {
         return this;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>string current_phase = 1;</code>
        */
       public Builder clearCurrentPhase() {
@@ -497,6 +541,10 @@ public final class Event {
         return this;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>string current_phase = 1;</code>
        */
       public Builder setCurrentPhaseBytes(
@@ -583,6 +631,10 @@ public final class Event {
     public flyteidl.admin.Event.EventFailureReason.ReasonCase getReasonCase();
   }
   /**
+   * <pre>
+   * Indicates why a sent event was not used to update execution.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.EventFailureReason}
    */
   public  static final class EventFailureReason extends
@@ -898,6 +950,10 @@ public final class Event {
       return builder;
     }
     /**
+     * <pre>
+     * Indicates why a sent event was not used to update execution.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.EventFailureReason}
      */
     public static final class Builder extends
@@ -2113,7 +2169,7 @@ public final class Event {
   }
   /**
    * <pre>
-   * a placeholder for now
+   * Purposefully empty, may be populated in the future.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.WorkflowExecutionEventResponse}
@@ -2331,7 +2387,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * a placeholder for now
+     * Purposefully empty, may be populated in the future.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.WorkflowExecutionEventResponse}
@@ -3379,7 +3435,7 @@ public final class Event {
   }
   /**
    * <pre>
-   * a placeholder for now
+   * Purposefully empty, may be populated in the future.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NodeExecutionEventResponse}
@@ -3597,7 +3653,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * a placeholder for now
+     * Purposefully empty, may be populated in the future.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NodeExecutionEventResponse}
@@ -4645,7 +4701,7 @@ public final class Event {
   }
   /**
    * <pre>
-   * a placeholder for now
+   * Purposefully empty, may be populated in the future.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.TaskExecutionEventResponse}
@@ -4863,7 +4919,7 @@ public final class Event {
     }
     /**
      * <pre>
-     * a placeholder for now
+     * Purposefully empty, may be populated in the future.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.TaskExecutionEventResponse}

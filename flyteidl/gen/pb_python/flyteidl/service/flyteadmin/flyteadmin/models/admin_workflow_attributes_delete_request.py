@@ -68,7 +68,6 @@ class AdminWorkflowAttributesDeleteRequest(object):
     def project(self):
         """Gets the project of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
 
-        Unique project id which this set of attributes references.  # noqa: E501
 
         :return: The project of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
         :rtype: str
@@ -79,7 +78,6 @@ class AdminWorkflowAttributesDeleteRequest(object):
     def project(self, project):
         """Sets the project of this AdminWorkflowAttributesDeleteRequest.
 
-        Unique project id which this set of attributes references.  # noqa: E501
 
         :param project: The project of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
         :type: str
@@ -91,7 +89,6 @@ class AdminWorkflowAttributesDeleteRequest(object):
     def domain(self):
         """Gets the domain of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
 
-        Unique domain id which this set of attributes references.  # noqa: E501
 
         :return: The domain of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
         :rtype: str
@@ -102,7 +99,6 @@ class AdminWorkflowAttributesDeleteRequest(object):
     def domain(self, domain):
         """Sets the domain of this AdminWorkflowAttributesDeleteRequest.
 
-        Unique domain id which this set of attributes references.  # noqa: E501
 
         :param domain: The domain of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
         :type: str
@@ -114,7 +110,6 @@ class AdminWorkflowAttributesDeleteRequest(object):
     def workflow(self):
         """Gets the workflow of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
 
-        Workflow name which this set of attributes references.  # noqa: E501
 
         :return: The workflow of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
         :rtype: str
@@ -125,7 +120,6 @@ class AdminWorkflowAttributesDeleteRequest(object):
     def workflow(self, workflow):
         """Sets the workflow of this AdminWorkflowAttributesDeleteRequest.
 
-        Workflow name which this set of attributes references.  # noqa: E501
 
         :param workflow: The workflow of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
         :type: str

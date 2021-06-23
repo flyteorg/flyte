@@ -75,7 +75,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def inputs(self):
         """Gets the inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
 
-        Signed url to fetch a core.LiteralMap of node execution inputs.  # noqa: E501
+        Signed url to fetch a core.LiteralMap of node execution inputs. Deprecated: Please use full_inputs instead.  # noqa: E501
 
         :return: The inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :rtype: AdminUrlBlob
@@ -86,7 +86,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def inputs(self, inputs):
         """Sets the inputs of this AdminNodeExecutionGetDataResponse.
 
-        Signed url to fetch a core.LiteralMap of node execution inputs.  # noqa: E501
+        Signed url to fetch a core.LiteralMap of node execution inputs. Deprecated: Please use full_inputs instead.  # noqa: E501
 
         :param inputs: The inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :type: AdminUrlBlob
@@ -98,7 +98,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def outputs(self):
         """Gets the outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
 
-        Signed url to fetch a core.LiteralMap of node execution outputs.  # noqa: E501
+        Signed url to fetch a core.LiteralMap of node execution outputs. Deprecated: Please use full_outputs instead.  # noqa: E501
 
         :return: The outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :rtype: AdminUrlBlob
@@ -109,7 +109,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def outputs(self, outputs):
         """Sets the outputs of this AdminNodeExecutionGetDataResponse.
 
-        Signed url to fetch a core.LiteralMap of node execution outputs.  # noqa: E501
+        Signed url to fetch a core.LiteralMap of node execution outputs. Deprecated: Please use full_outputs instead.  # noqa: E501
 
         :param outputs: The outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :type: AdminUrlBlob
@@ -121,7 +121,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_inputs(self):
         """Gets the full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
 
-        Optional, full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
 
         :return: The full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -132,7 +132,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_inputs(self, full_inputs):
         """Sets the full_inputs of this AdminNodeExecutionGetDataResponse.
 
-        Optional, full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
 
         :param full_inputs: The full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :type: CoreLiteralMap
@@ -144,7 +144,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_outputs(self):
         """Gets the full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
 
-        Optional, full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
 
         :return: The full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -155,7 +155,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_outputs(self, full_outputs):
         """Sets the full_outputs of this AdminNodeExecutionGetDataResponse.
 
-        Optional, full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
 
         :param full_outputs: The full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :type: CoreLiteralMap
