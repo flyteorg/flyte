@@ -71,7 +71,6 @@ class AdminNotification(object):
     def phases(self):
         """Gets the phases of this AdminNotification.  # noqa: E501
 
-        A list of phases to which users can associate the notifications to.  # noqa: E501
 
         :return: The phases of this AdminNotification.  # noqa: E501
         :rtype: list[CoreWorkflowExecutionPhase]
@@ -82,7 +81,6 @@ class AdminNotification(object):
     def phases(self, phases):
         """Sets the phases of this AdminNotification.
 
-        A list of phases to which users can associate the notifications to.  # noqa: E501
 
         :param phases: The phases of this AdminNotification.  # noqa: E501
         :type: list[CoreWorkflowExecutionPhase]

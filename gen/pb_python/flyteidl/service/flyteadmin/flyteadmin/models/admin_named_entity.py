@@ -65,6 +65,7 @@ class AdminNamedEntity(object):
     def resource_type(self):
         """Gets the resource_type of this AdminNamedEntity.  # noqa: E501
 
+        Resource type of the named entity. One of Task, Workflow or LaunchPlan.  # noqa: E501
 
         :return: The resource_type of this AdminNamedEntity.  # noqa: E501
         :rtype: CoreResourceType
@@ -75,6 +76,7 @@ class AdminNamedEntity(object):
     def resource_type(self, resource_type):
         """Sets the resource_type of this AdminNamedEntity.
 
+        Resource type of the named entity. One of Task, Workflow or LaunchPlan.  # noqa: E501
 
         :param resource_type: The resource_type of this AdminNamedEntity.  # noqa: E501
         :type: CoreResourceType
@@ -107,6 +109,7 @@ class AdminNamedEntity(object):
     def metadata(self):
         """Gets the metadata of this AdminNamedEntity.  # noqa: E501
 
+        Additional metadata around a named entity.  # noqa: E501
 
         :return: The metadata of this AdminNamedEntity.  # noqa: E501
         :rtype: AdminNamedEntityMetadata
@@ -117,6 +120,7 @@ class AdminNamedEntity(object):
     def metadata(self, metadata):
         """Sets the metadata of this AdminNamedEntity.
 
+        Additional metadata around a named entity.  # noqa: E501
 
         :param metadata: The metadata of this AdminNamedEntity.  # noqa: E501
         :type: AdminNamedEntityMetadata

@@ -15,15 +15,18 @@ import "google/protobuf/struct.proto";
 // A message used to fetch a single task execution entity.
 message TaskExecutionGetRequest {
     // Unique identifier for the task execution.
+    // +required
     core.TaskExecutionIdentifier id = 1;
 }
 
-// Represents a request structure to retrieve a list of task execution entities.
+// Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
 message TaskExecutionListRequest {
     // Indicates the node execution to filter by.
+    // +required
     core.NodeExecutionIdentifier node_execution_id = 1;
 
     // Indicates the number of resources to be returned.
+    // +required
     uint32 limit    = 2;
 
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
@@ -108,23 +111,26 @@ message TaskExecutionClosure {
     event.TaskExecutionMetadata metadata  = 16;
 }
 
-// Request structure to fetch inputs and output urls for a task execution.
+// Request structure to fetch inputs and output for a task execution.
 message TaskExecutionGetDataRequest {
     // The identifier of the task execution for which to fetch inputs and outputs.
+    // +required
     core.TaskExecutionIdentifier id        = 1;
 }
 
 // Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution.
 message TaskExecutionGetDataResponse {
     // Signed url to fetch a core.LiteralMap of task execution inputs.
-    UrlBlob inputs                             = 1;
+    // Deprecated: Please use full_inputs instead.
+    UrlBlob inputs                             = 1 [deprecated = true];
 
     // Signed url to fetch a core.LiteralMap of task execution outputs.
-    UrlBlob outputs                            = 2;
+    // Deprecated: Please use full_outputs instead.
+    UrlBlob outputs                            = 2 [deprecated = true];
 
-    // Optional, full_inputs will only be populated if they are under a configured size threshold.
+    // Full_inputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_inputs                = 3;
 
-    // Optional, full_outputs will only be populated if they are under a configured size threshold.
+    // Full_outputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_outputs               = 4;
 }

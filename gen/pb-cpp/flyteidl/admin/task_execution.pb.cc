@@ -319,19 +319,19 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto
   "\030\020 \001(\0132%.flyteidl.event.TaskExecutionMet"
   "adataB\017\n\routput_result\"Q\n\033TaskExecutionG"
   "etDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.cor"
-  "e.TaskExecutionIdentifier\"\322\001\n\034TaskExecut"
-  "ionGetDataResponse\022\'\n\006inputs\030\001 \001(\0132\027.fly"
-  "teidl.admin.UrlBlob\022(\n\007outputs\030\002 \001(\0132\027.f"
-  "lyteidl.admin.UrlBlob\022.\n\013full_inputs\030\003 \001"
-  "(\0132\031.flyteidl.core.LiteralMap\022/\n\014full_ou"
-  "tputs\030\004 \001(\0132\031.flyteidl.core.LiteralMapB7"
-  "Z5github.com/flyteorg/flyteidl/gen/pb-go"
-  "/flyteidl/adminb\006proto3"
+  "e.TaskExecutionIdentifier\"\332\001\n\034TaskExecut"
+  "ionGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.fly"
+  "teidl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\013"
+  "2\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_in"
+  "puts\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n"
+  "\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Lite"
+  "ralMapB7Z5github.com/flyteorg/flyteidl/g"
+  "en/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto,
-  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1703,
+  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1711,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto() {
@@ -3611,7 +3611,7 @@ const char* TaskExecutionGetDataResponse::_InternalParse(const char* begin, cons
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.admin.UrlBlob inputs = 1;
+      // .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -3624,7 +3624,7 @@ const char* TaskExecutionGetDataResponse::_InternalParse(const char* begin, cons
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
-      // .flyteidl.admin.UrlBlob outputs = 2;
+      // .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
@@ -3693,7 +3693,7 @@ bool TaskExecutionGetDataResponse::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.admin.UrlBlob inputs = 1;
+      // .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
@@ -3704,7 +3704,7 @@ bool TaskExecutionGetDataResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // .flyteidl.admin.UrlBlob outputs = 2;
+      // .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
@@ -3764,13 +3764,13 @@ void TaskExecutionGetDataResponse::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.admin.UrlBlob inputs = 1;
+  // .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
   if (this->has_inputs()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       1, HasBitSetters::inputs(this), output);
   }
 
-  // .flyteidl.admin.UrlBlob outputs = 2;
+  // .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
   if (this->has_outputs()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       2, HasBitSetters::outputs(this), output);
@@ -3801,14 +3801,14 @@ void TaskExecutionGetDataResponse::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.admin.UrlBlob inputs = 1;
+  // .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
   if (this->has_inputs()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         1, HasBitSetters::inputs(this), target);
   }
 
-  // .flyteidl.admin.UrlBlob outputs = 2;
+  // .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
   if (this->has_outputs()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
@@ -3850,14 +3850,14 @@ size_t TaskExecutionGetDataResponse::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .flyteidl.admin.UrlBlob inputs = 1;
+  // .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
   if (this->has_inputs()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *inputs_);
   }
 
-  // .flyteidl.admin.UrlBlob outputs = 2;
+  // .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
   if (this->has_outputs()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(

@@ -12,9 +12,9 @@ import "flyteidl/admin/schedule.proto";
 import "flyteidl/admin/common.proto";
 import "google/protobuf/timestamp.proto";
 
-// Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required
+// Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
 // to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
-// set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan.
+// set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
 message LaunchPlanCreateRequest {
     // Uniquely identifies a launch plan entity.
     core.Identifier id = 1;
@@ -42,9 +42,13 @@ enum LaunchPlanState {
 // Launch plans can be shared and used to trigger executions with predefined inputs even when a workflow
 // definition doesn't necessarily have a default value for said input.
 message LaunchPlan {
+    // Uniquely identifies a launch plan entity.
     core.Identifier id = 1;
 
+    // User-provided launch plan details, including reference workflow, inputs and other metadata.
     LaunchPlanSpec spec = 2;
+
+    // Values computed by the flyte platform after launch plan registration.
     LaunchPlanClosure closure = 3;
 }
 
@@ -61,6 +65,8 @@ message LaunchPlanList {
 // Use either of these roles when they have permissions required by your workflow execution.
 // Deprecated.
 message Auth {
+    option deprecated = true;
+
     // Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
     string assumable_iam_role = 1;
 
@@ -76,10 +82,12 @@ message LaunchPlanSpec {
     // Metadata for the Launch Plan
     LaunchPlanMetadata entity_metadata = 2;
 
-    // Input values to be passed for the execution
+    // Input values to be passed for the execution.
+    // These can be overriden when an execution is created with this launch plan.
     core.ParameterMap default_inputs = 3;
 
-    // Fixed, non-overridable inputs for the Launch Plan
+    // Fixed, non-overridable inputs for the Launch Plan.
+    // These can not be overriden when an execution is created with this launch plan.
     core.LiteralMap fixed_inputs = 4;
 
     // String to indicate the role to use to execute the workflow underneath
@@ -102,6 +110,7 @@ message LaunchPlanSpec {
     // Indicates the runtime priority of the execution.
     core.QualityOfService quality_of_service = 16;
 
+    // Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
     RawOutputDataConfig raw_output_data_config = 17;
 
     // Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
@@ -114,13 +123,13 @@ message LaunchPlanSpec {
 // These include expected_inputs required to be present in a CreateExecutionRequest
 // to launch the reference workflow as well timestamp values associated with the launch plan.
 message LaunchPlanClosure {
-    // Indicate the Launch plan phase
+    // Indicate the Launch plan state. 
     LaunchPlanState state = 1;
 
-    // Indicates the set of inputs to execute the Launch plan
+    // Indicates the set of inputs expected when creating an execution with the Launch plan
     core.ParameterMap expected_inputs = 2;
 
-    // Indicates the set of outputs from the Launch plan
+    // Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
     core.VariableMap expected_outputs = 3;
 
     // Time at which the launch plan was created.
@@ -143,9 +152,11 @@ message LaunchPlanMetadata {
 // Request to set the referenced launch plan state to the configured value.
 message LaunchPlanUpdateRequest {
     // Identifier of launch plan for which to change state.
+    // +required.
     core.Identifier id = 1;
 
     // Desired state to apply to the launch plan.
+    // +required.
     LaunchPlanState state = 2;
 }
 
@@ -155,17 +166,24 @@ message LaunchPlanUpdateResponse {
 
 // Represents a request struct for finding an active launch plan for a given NamedEntityIdentifier
 message ActiveLaunchPlanRequest {
+    // +required.
     NamedEntityIdentifier id = 1;
 }
 
 // Represents a request structure to list active launch plans within a project/domain.
 message ActiveLaunchPlanListRequest {
     // Name of the project that contains the identifiers.
+    // +required.
     string project = 1;
+
     // Name of the domain the identifiers belongs to within the project.
+    // +required.
     string domain = 2;
+
     // Indicates the number of resources to be returned.
+    // +required.
     uint32 limit = 3;
+
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query.
     // +optional

@@ -88,7 +88,7 @@ Deprecated.
 EmailNotification
 ------------------------------------------------------------------
 
-
+Defines an email notification specification.
 
 
 
@@ -96,7 +96,7 @@ EmailNotification
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "recipients_email", ":ref:`ref_string`", "repeated", "The list of email addresses recipients for this notification."
+   "recipients_email", ":ref:`ref_string`", "repeated", "The list of email addresses recipients for this notification. +required"
 
 
 
@@ -154,8 +154,9 @@ Labels.ValuesEntry
 NamedEntity
 ------------------------------------------------------------------
 
-Describes information common to a NamedEntity, identified by a project /
-domain / name / resource type combination
+Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
+workflow or launch plan. A NamedEntity is exclusively identified by its resource type
+and identifier.
 
 
 
@@ -163,9 +164,9 @@ domain / name / resource type combination
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", ""
+   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Resource type of the named entity. One of Task, Workflow or LaunchPlan."
    "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", ""
-   "metadata", ":ref:`ref_flyteidl.admin.NamedEntityMetadata`", "", ""
+   "metadata", ":ref:`ref_flyteidl.admin.NamedEntityMetadata`", "", "Additional metadata around a named entity."
 
 
 
@@ -186,8 +187,8 @@ A request to retrieve the metadata associated with a NamedEntityIdentifier
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", ""
-   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", ""
+   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required"
+   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "The identifier for the named entity for which to fetch metadata. +required"
 
 
 
@@ -201,7 +202,9 @@ NamedEntityIdentifier
 ------------------------------------------------------------------
 
 Encapsulation of fields that identifies a Flyte resource.
-A resource can internally have multiple versions.
+A Flyte resource can be a task, workflow or launch plan.
+A resource can internally have multiple versions and is uniquely identified
+by project, domain, and name.
 
 
 
@@ -246,7 +249,7 @@ Represents a list of NamedEntityIdentifiers.
 NamedEntityIdentifierListRequest
 ------------------------------------------------------------------
 
-Represents a request structure to list identifiers.
+Represents a request structure to list NamedEntityIdentifiers.
 
 
 
@@ -254,11 +257,11 @@ Represents a request structure to list identifiers.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Name of the project that contains the identifiers."
-   "domain", ":ref:`ref_string`", "", "Name of the domain the identifiers belongs to within the project."
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
+   "project", ":ref:`ref_string`", "", "Name of the project that contains the identifiers. +required"
+   "domain", ":ref:`ref_string`", "", "Name of the domain the identifiers belongs to within the project. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
-   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
+   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Specifies how listed entities should be sorted in the response. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. +optional"
 
 
@@ -302,12 +305,12 @@ Represents a request structure to list NamedEntity objects
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", ""
-   "project", ":ref:`ref_string`", "", "Name of the project that contains the identifiers."
+   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required"
+   "project", ":ref:`ref_string`", "", "Name of the project that contains the identifiers. +required"
    "domain", ":ref:`ref_string`", "", "Name of the domain the identifiers belongs to within the project."
    "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
-   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
+   "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Specifies how listed entities should be sorted in the response. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. +optional"
 
 
@@ -321,7 +324,7 @@ Represents a request structure to list NamedEntity objects
 NamedEntityMetadata
 ------------------------------------------------------------------
 
-
+Additional metadata around a named entity.
 
 
 
@@ -343,7 +346,7 @@ NamedEntityMetadata
 NamedEntityUpdateRequest
 ------------------------------------------------------------------
 
-Request to set the referenced launch plan state to the configured value.
+Request to set the referenced named entity state to the configured value.
 
 
 
@@ -351,9 +354,9 @@ Request to set the referenced launch plan state to the configured value.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Resource type of the metadata to update"
-   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "Identifier of the metadata to update"
-   "metadata", ":ref:`ref_flyteidl.admin.NamedEntityMetadata`", "", "Metadata object to set as the new value"
+   "resource_type", ":ref:`ref_flyteidl.core.ResourceType`", "", "Resource type of the metadata to update +required"
+   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "Identifier of the metadata to update +required"
+   "metadata", ":ref:`ref_flyteidl.admin.NamedEntityMetadata`", "", "Metadata object to set as the new value +required"
 
 
 
@@ -381,8 +384,8 @@ Notification
 ------------------------------------------------------------------
 
 Represents a structure for notifications based on execution status.
-The Notification content is configured within Admin. Future iterations could
-expose configuring notifications with custom content.
+The notification content is configured within flyte admin but can be templatized.
+Future iterations could expose configuring notifications with custom content.
 
 
 
@@ -390,7 +393,7 @@ expose configuring notifications with custom content.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "phases", ":ref:`ref_flyteidl.core.WorkflowExecution.Phase`", "repeated", "A list of phases to which users can associate the notifications to."
+   "phases", ":ref:`ref_flyteidl.core.WorkflowExecution.Phase`", "repeated", "A list of phases to which users can associate the notifications to. +required"
    "email", ":ref:`ref_flyteidl.admin.EmailNotification`", "", ""
    "pager_duty", ":ref:`ref_flyteidl.admin.PagerDutyNotification`", "", ""
    "slack", ":ref:`ref_flyteidl.admin.SlackNotification`", "", ""
@@ -406,7 +409,8 @@ expose configuring notifications with custom content.
 ObjectGetRequest
 ------------------------------------------------------------------
 
-Represents a structure to fetch a single resource.
+Shared request structure to fetch a single resource.
+Resources include: Task, Workflow, LaunchPlan
 
 
 
@@ -414,7 +418,7 @@ Represents a structure to fetch a single resource.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "Indicates a unique version of resource."
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "Indicates a unique version of resource. +required"
 
 
 
@@ -427,7 +431,7 @@ Represents a structure to fetch a single resource.
 PagerDutyNotification
 ------------------------------------------------------------------
 
-
+Defines a pager duty notification specification.
 
 
 
@@ -435,7 +439,7 @@ PagerDutyNotification
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "recipients_email", ":ref:`ref_string`", "repeated", "Currently, PagerDuty notifications leverage email to trigger a notification."
+   "recipients_email", ":ref:`ref_string`", "repeated", "Currently, PagerDuty notifications leverage email to trigger a notification. +required"
 
 
 
@@ -470,7 +474,7 @@ See https://github.com/flyteorg/flyte/issues/211 for more background information
 ResourceListRequest
 ------------------------------------------------------------------
 
-Represents a request structure to retrieve a list of resources.
+Shared request structure to retrieve a list of resources.
 Resources include: Task, Workflow, LaunchPlan
 
 
@@ -479,8 +483,8 @@ Resources include: Task, Workflow, LaunchPlan
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "id represents the unique identifier of the resource."
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
+   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "id represents the unique identifier of the resource. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
@@ -496,7 +500,7 @@ Resources include: Task, Workflow, LaunchPlan
 SlackNotification
 ------------------------------------------------------------------
 
-
+Defines a slack notification specification.
 
 
 
@@ -504,7 +508,7 @@ SlackNotification
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "recipients_email", ":ref:`ref_string`", "repeated", "Currently, Slack notifications leverage email to trigger a notification."
+   "recipients_email", ":ref:`ref_string`", "repeated", "Currently, Slack notifications leverage email to trigger a notification. +required"
 
 
 
@@ -517,7 +521,7 @@ SlackNotification
 Sort
 ------------------------------------------------------------------
 
-Species sort ordering in a list request.
+Specifies sort ordering in a list request.
 
 
 
@@ -525,7 +529,7 @@ Species sort ordering in a list request.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "key", ":ref:`ref_string`", "", "Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty."
+   "key", ":ref:`ref_string`", "", "Indicates an attribute to sort the response values. +required"
    "direction", ":ref:`ref_flyteidl.admin.Sort.Direction`", "", "Indicates the direction to apply sort key for response values. +optional"
 
 
@@ -586,7 +590,7 @@ Sort.Direction
    :header: "Name", "Number", "Description"
    :widths: auto
 
-   "DESCENDING", "0", ""
+   "DESCENDING", "0", "By default, fields are sorted in descending order."
    "ASCENDING", "1", ""
 
  <!-- end enums -->
@@ -612,7 +616,9 @@ flyteidl/admin/event.proto
 EventErrorAlreadyInTerminalState
 ------------------------------------------------------------------
 
-
+Indicates that a sent event was not used to update execution state due to
+the referenced execution already being terminated (and therefore inelegible
+for further state transitions).
 
 
 
@@ -620,7 +626,7 @@ EventErrorAlreadyInTerminalState
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "current_phase", ":ref:`ref_string`", "", ""
+   "current_phase", ":ref:`ref_string`", "", "+required"
 
 
 
@@ -633,7 +639,7 @@ EventErrorAlreadyInTerminalState
 EventFailureReason
 ------------------------------------------------------------------
 
-
+Indicates why a sent event was not used to update execution.
 
 
 
@@ -676,7 +682,7 @@ Request to send a notification that a node execution event has occurred.
 NodeExecutionEventResponse
 ------------------------------------------------------------------
 
-a placeholder for now
+Purposefully empty, may be populated in the future.
 
 
 
@@ -712,7 +718,7 @@ Request to send a notification that a task execution event has occurred.
 TaskExecutionEventResponse
 ------------------------------------------------------------------
 
-a placeholder for now
+Purposefully empty, may be populated in the future.
 
 
 
@@ -748,7 +754,7 @@ Request to send a notification that a workflow execution event has occurred.
 WorkflowExecutionEventResponse
 ------------------------------------------------------------------
 
-a placeholder for now
+Purposefully empty, may be populated in the future.
 
 
 
@@ -780,7 +786,7 @@ flyteidl/admin/execution.proto
 AbortMetadata
 ------------------------------------------------------------------
 
-
+Specifies metadata around an aborted workflow execution.
 
 
 
@@ -835,13 +841,13 @@ Encapsulates the results of the Execution
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "outputs", ":ref:`ref_flyteidl.admin.LiteralMapBlob`", "", "A map of outputs in the case of a successful execution."
+   "outputs", ":ref:`ref_flyteidl.admin.LiteralMapBlob`", "", "Output URI in the case of a successful execution."
    "error", ":ref:`ref_flyteidl.core.ExecutionError`", "", "Error information in the case of a failed execution."
    "abort_cause", ":ref:`ref_string`", "", "**Deprecated.** In the case of a user-specified abort, this will pass along the user-supplied cause."
    "abort_metadata", ":ref:`ref_flyteidl.admin.AbortMetadata`", "", "In the case of a user-specified abort, this will pass along the user and their supplied cause."
    "computed_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "**Deprecated.** Inputs computed and passed for execution. computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan"
    "phase", ":ref:`ref_flyteidl.core.WorkflowExecution.Phase`", "", "Most recent recorded phase for the execution."
-   "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Reported ime at which the execution began running."
+   "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Reported time at which the execution began running."
    "duration", ":ref:`ref_google.protobuf.Duration`", "", "The amount of time the execution spent running."
    "created_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Reported time at which the execution was created."
    "updated_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Reported time at which the execution was last updated."
@@ -859,7 +865,7 @@ Encapsulates the results of the Execution
 ExecutionCreateRequest
 ------------------------------------------------------------------
 
-Request to launch an execution with the given project, domain and optionally name.
+Request to launch an execution with the given project, domain and optionally-assigned name.
 
 
 
@@ -867,11 +873,11 @@ Request to launch an execution with the given project, domain and optionally nam
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Name of the project the execution belongs to."
-   "domain", ":ref:`ref_string`", "", "Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project."
+   "project", ":ref:`ref_string`", "", "Name of the project the execution belongs to. +required"
+   "domain", ":ref:`ref_string`", "", "Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project. +required"
    "name", ":ref:`ref_string`", "", "User provided value for the resource. If none is provided the system will generate a unique string. +optional"
-   "spec", ":ref:`ref_flyteidl.admin.ExecutionSpec`", "", "Additional fields necessary to launch the execution."
-   "inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply."
+   "spec", ":ref:`ref_flyteidl.admin.ExecutionSpec`", "", "Additional fields necessary to launch the execution. +optional"
+   "inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply. +optional"
 
 
 
@@ -941,7 +947,7 @@ These attributes are assigned at launch time and do not change.
    "principal", ":ref:`ref_string`", "", "Identifier of the entity that triggered this execution. For systems using back-end authentication any value set here will be discarded in favor of the authenticated user context."
    "nesting", ":ref:`ref_uint32`", "", "Indicates the nestedness of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1."
    "scheduled_at", ":ref:`ref_google.protobuf.Timestamp`", "", "For scheduled executions, the requested time for execution for this specific schedule invocation."
-   "parent_node_execution", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Which subworkflow node launched this execution"
+   "parent_node_execution", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Which subworkflow node (if any) launched this execution"
    "reference_execution", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Optional, a reference workflow execution related to this execution. In the case of a relaunch, this references the original workflow execution."
    "system_metadata", ":ref:`ref_flyteidl.admin.SystemMetadata`", "", "Optional, platform-specific metadata about the execution. In this the future this may be gated behind an ACL or some sort of authorization."
 
@@ -964,7 +970,7 @@ Request to relaunch the referenced execution.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of the workflow execution to relaunch."
+   "id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of the workflow execution to relaunch. +required"
    "name", ":ref:`ref_string`", "", "User provided value for the relaunched execution. If none is provided the system will generate a unique string. +optional"
 
 
@@ -979,7 +985,7 @@ ExecutionSpec
 ------------------------------------------------------------------
 
 An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
-of an execution as it progresses across phase changes..
+of an execution as it progresses across phase changes.
 
 
 
@@ -997,6 +1003,7 @@ of an execution as it progresses across phase changes..
    "security_context", ":ref:`ref_flyteidl.core.SecurityContext`", "", "Optional: security context override to apply this execution."
    "auth_role", ":ref:`ref_flyteidl.admin.AuthRole`", "", "**Deprecated.** Optional: auth override to apply this execution."
    "quality_of_service", ":ref:`ref_flyteidl.core.QualityOfService`", "", "Indicates the runtime priority of the execution."
+   "max_parallelism", ":ref:`ref_int32`", "", "Controls the maximum number of task nodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this."
 
 
 
@@ -1057,7 +1064,7 @@ Input/output data can represented by actual values or a link to where values are
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "values", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Data in LiteralMap format"
+   "values", ":ref:`ref_flyteidl.core.LiteralMap`", "", "**Deprecated.** Data in LiteralMap format"
    "uri", ":ref:`ref_string`", "", "In the event that the map is too large, we return a uri to the data"
 
 
@@ -1092,7 +1099,7 @@ NotificationList
 SystemMetadata
 ------------------------------------------------------------------
 
-Represents system rather than user-facing metadata about an execution.
+Represents system, rather than user-facing, metadata about an execution.
 
 
 
@@ -1113,7 +1120,7 @@ Represents system rather than user-facing metadata about an execution.
 WorkflowExecutionGetDataRequest
 ------------------------------------------------------------------
 
-Request structure to fetch inputs and output urls for an execution.
+Request structure to fetch inputs, output and other data produced by an execution.
 
 
 
@@ -1142,10 +1149,10 @@ Response structure for WorkflowExecutionGetDataRequest which contains inputs and
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "Signed url to fetch a core.LiteralMap of execution outputs."
-   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "Signed url to fetch a core.LiteralMap of execution inputs."
-   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Optional, full_inputs will only be populated if they are under a configured size threshold."
-   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Optional, full_outputs will only be populated if they are under a configured size threshold."
+   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of execution outputs. Deprecated: Please use full_outputs instead."
+   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of execution inputs. Deprecated: Please use full_inputs instead."
+   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_inputs will only be populated if they are under a configured size threshold."
+   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_outputs will only be populated if they are under a configured size threshold."
 
 
 
@@ -1224,9 +1231,9 @@ Represents a request structure to list active launch plans within a project/doma
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Name of the project that contains the identifiers."
-   "domain", ":ref:`ref_string`", "", "Name of the domain the identifiers belongs to within the project."
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
+   "project", ":ref:`ref_string`", "", "Name of the project that contains the identifiers. +required."
+   "domain", ":ref:`ref_string`", "", "Name of the domain the identifiers belongs to within the project. +required."
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required."
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
 
@@ -1249,7 +1256,7 @@ Represents a request struct for finding an active launch plan for a given NamedE
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", ""
+   "id", ":ref:`ref_flyteidl.admin.NamedEntityIdentifier`", "", "+required."
 
 
 
@@ -1297,9 +1304,9 @@ definition doesn't necessarily have a default value for said input.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", ""
-   "spec", ":ref:`ref_flyteidl.admin.LaunchPlanSpec`", "", ""
-   "closure", ":ref:`ref_flyteidl.admin.LaunchPlanClosure`", "", ""
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "Uniquely identifies a launch plan entity."
+   "spec", ":ref:`ref_flyteidl.admin.LaunchPlanSpec`", "", "User-provided launch plan details, including reference workflow, inputs and other metadata."
+   "closure", ":ref:`ref_flyteidl.admin.LaunchPlanClosure`", "", "Values computed by the flyte platform after launch plan registration."
 
 
 
@@ -1322,9 +1329,9 @@ to launch the reference workflow as well timestamp values associated with the la
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "state", ":ref:`ref_flyteidl.admin.LaunchPlanState`", "", "Indicate the Launch plan phase"
-   "expected_inputs", ":ref:`ref_flyteidl.core.ParameterMap`", "", "Indicates the set of inputs to execute the Launch plan"
-   "expected_outputs", ":ref:`ref_flyteidl.core.VariableMap`", "", "Indicates the set of outputs from the Launch plan"
+   "state", ":ref:`ref_flyteidl.admin.LaunchPlanState`", "", "Indicate the Launch plan state."
+   "expected_inputs", ":ref:`ref_flyteidl.core.ParameterMap`", "", "Indicates the set of inputs expected when creating an execution with the Launch plan"
+   "expected_outputs", ":ref:`ref_flyteidl.core.VariableMap`", "", "Indicates the set of outputs expected to be produced by creating an execution with the Launch plan"
    "created_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the launch plan was created."
    "updated_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the launch plan was last updated."
 
@@ -1339,9 +1346,9 @@ to launch the reference workflow as well timestamp values associated with the la
 LaunchPlanCreateRequest
 ------------------------------------------------------------------
 
-Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required
+Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
 to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
-set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan.
+set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
 
 
 
@@ -1432,8 +1439,8 @@ User-provided launch plan definition and configuration values.
 
    "workflow_id", ":ref:`ref_flyteidl.core.Identifier`", "", "Reference to the Workflow template that the launch plan references"
    "entity_metadata", ":ref:`ref_flyteidl.admin.LaunchPlanMetadata`", "", "Metadata for the Launch Plan"
-   "default_inputs", ":ref:`ref_flyteidl.core.ParameterMap`", "", "Input values to be passed for the execution"
-   "fixed_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Fixed, non-overridable inputs for the Launch Plan"
+   "default_inputs", ":ref:`ref_flyteidl.core.ParameterMap`", "", "Input values to be passed for the execution. These can be overriden when an execution is created with this launch plan."
+   "fixed_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Fixed, non-overridable inputs for the Launch Plan. These can not be overriden when an execution is created with this launch plan."
    "role", ":ref:`ref_string`", "", "**Deprecated.** String to indicate the role to use to execute the workflow underneath"
    "labels", ":ref:`ref_flyteidl.admin.Labels`", "", "Custom labels to be applied to the execution resource."
    "annotations", ":ref:`ref_flyteidl.admin.Annotations`", "", "Custom annotations to be applied to the execution resource."
@@ -1441,7 +1448,8 @@ User-provided launch plan definition and configuration values.
    "auth_role", ":ref:`ref_flyteidl.admin.AuthRole`", "", "**Deprecated.** "
    "security_context", ":ref:`ref_flyteidl.core.SecurityContext`", "", "Indicates security context for permissions triggered with this launch plan"
    "quality_of_service", ":ref:`ref_flyteidl.core.QualityOfService`", "", "Indicates the runtime priority of the execution."
-   "raw_output_data_config", ":ref:`ref_flyteidl.admin.RawOutputDataConfig`", "", ""
+   "raw_output_data_config", ":ref:`ref_flyteidl.admin.RawOutputDataConfig`", "", "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
+   "max_parallelism", ":ref:`ref_int32`", "", "Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this."
 
 
 
@@ -1462,8 +1470,8 @@ Request to set the referenced launch plan state to the configured value.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "Identifier of launch plan for which to change state."
-   "state", ":ref:`ref_flyteidl.admin.LaunchPlanState`", "", "Desired state to apply to the launch plan."
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "Identifier of launch plan for which to change state. +required."
+   "state", ":ref:`ref_flyteidl.admin.LaunchPlanState`", "", "Desired state to apply to the launch plan. +required."
 
 
 
@@ -1613,7 +1621,7 @@ ExecutionQueueAttributes
 ListMatchableAttributesRequest
 ------------------------------------------------------------------
 
-Request all matching resource attributes.
+Request all matching resource attributes for a resource type.
 
 
 
@@ -1621,7 +1629,7 @@ Request all matching resource attributes.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", ""
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "+required"
 
 
 
@@ -1634,7 +1642,7 @@ Request all matching resource attributes.
 ListMatchableAttributesResponse
 ------------------------------------------------------------------
 
-Response for a request for all matching resource attributes.
+Response for a request for all matching resource attributes for a resource type.
 
 
 
@@ -1657,6 +1665,8 @@ MatchableAttributesConfiguration
 
 Represents a custom set of attributes applied for either a domain; a domain and project; or
 domain, project and workflow name.
+These are used to override system level defaults for kubernetes cluster resource management,
+default execution values, and more all across different levels of specificity.
 
 
 
@@ -1754,7 +1764,7 @@ PluginOverrides
 TaskResourceAttributes
 ------------------------------------------------------------------
 
-
+Defines task resource defaults and limits that will be applied at task registration.
 
 
 
@@ -1776,7 +1786,7 @@ TaskResourceAttributes
 TaskResourceSpec
 ------------------------------------------------------------------
 
-
+Defines a set of overridable task resource attributes set during task registration.
 
 
 
@@ -1851,7 +1861,7 @@ PluginOverride.MissingPluginBehavior
    :header: "Name", "Number", "Description"
    :widths: auto
 
-   "FAIL", "0", ""
+   "FAIL", "0", "By default, if this plugin is not enabled for a Flyte deployment then execution will fail."
    "USE_DEFAULT", "1", "Uses the system-configured default implementation."
 
  <!-- end enums -->
@@ -1934,7 +1944,7 @@ Container for node execution details and results.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "output_uri", ":ref:`ref_string`", "", ""
+   "output_uri", ":ref:`ref_string`", "", "Links to a remotely stored, serialized core.LiteralMap of node execution outputs."
    "error", ":ref:`ref_flyteidl.core.ExecutionError`", "", "Error information for the Node"
    "phase", ":ref:`ref_flyteidl.core.NodeExecution.Phase`", "", "The last recorded phase for this node execution."
    "started_at", ":ref:`ref_google.protobuf.Timestamp`", "", "Time at which the node execution began running."
@@ -1956,6 +1966,7 @@ NodeExecutionForTaskListRequest
 ------------------------------------------------------------------
 
 Represents a request structure to retrieve a list of node execution entities launched by a specific task.
+This can arise when a task yields a subworkflow.
 
 
 
@@ -1963,8 +1974,8 @@ Represents a request structure to retrieve a list of node execution entities lau
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "task_execution_id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Indicates the node execution to filter by."
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
+   "task_execution_id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Indicates the node execution to filter by. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
@@ -1980,7 +1991,7 @@ Represents a request structure to retrieve a list of node execution entities lau
 NodeExecutionGetDataRequest
 ------------------------------------------------------------------
 
-Request structure to fetch inputs and output urls for a node execution.
+Request structure to fetch inputs and output for a node execution.
 
 
 
@@ -2009,10 +2020,10 @@ Response structure for NodeExecutionGetDataRequest which contains inputs and out
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "Signed url to fetch a core.LiteralMap of node execution inputs."
-   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "Signed url to fetch a core.LiteralMap of node execution outputs."
-   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Optional, full_inputs will only be populated if they are under a configured size threshold."
-   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Optional, full_outputs will only be populated if they are under a configured size threshold."
+   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of node execution inputs. Deprecated: Please use full_inputs instead."
+   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of node execution outputs. Deprecated: Please use full_outputs instead."
+   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_inputs will only be populated if they are under a configured size threshold."
+   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_outputs will only be populated if they are under a configured size threshold."
    "dynamic_workflow", ":ref:`ref_flyteidl.admin.DynamicWorkflowNodeMetadata`", "", "Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here."
 
 
@@ -2034,7 +2045,7 @@ A message used to fetch a single node execution entity.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Uniquely identifies an individual node execution."
+   "id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Uniquely identifies an individual node execution. +required"
 
 
 
@@ -2077,9 +2088,9 @@ Represents a request structure to retrieve a list of node execution entities.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "workflow_execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Indicates the workflow execution to filter by."
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
-   "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional"
+   "workflow_execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Indicates the workflow execution to filter by. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
+   "token", ":ref:`ref_string`", "", ""
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
    "unique_parent_id", ":ref:`ref_string`", "", "Unique identifier of the parent node in the execution +optional"
@@ -2104,7 +2115,7 @@ Represents additional attributes related to a Node Execution
    :widths: auto
 
    "retry_group", ":ref:`ref_string`", "", "Node executions are grouped depending on retries of the parent Retry group is unique within the context of a parent node."
-   "is_parent_node", ":ref:`ref_bool`", "", "Boolean flag indicating if the node has child nodes under it"
+   "is_parent_node", ":ref:`ref_bool`", "", "Boolean flag indicating if the node has child nodes under it This can be true when a node contains a dynamic workflow which then produces child nodes."
    "spec_node_id", ":ref:`ref_string`", "", "Node id of the node in the original workflow This maps to value of WorkflowTemplate.nodes[X].id"
 
 
@@ -2148,7 +2159,7 @@ Metadata for a WorkflowNode
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "executionId", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", ""
+   "executionId", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "The identifier for a workflow execution launched by a node."
 
 
 
@@ -2232,7 +2243,7 @@ e.g. "production", "development", etc.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_string`", "", ""
+   "id", ":ref:`ref_string`", "", "Globally unique domain name."
    "name", ":ref:`ref_string`", "", "Display name."
 
 
@@ -2254,7 +2265,7 @@ Top-level namespace used to classify different entities like workflows and execu
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_string`", "", ""
+   "id", ":ref:`ref_string`", "", "Globally unique project name."
    "name", ":ref:`ref_string`", "", "Display name."
    "domains", ":ref:`ref_flyteidl.admin.Domain`", "repeated", ""
    "description", ":ref:`ref_string`", "", ""
@@ -2280,7 +2291,7 @@ ProjectListRequest
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of projects to be returned."
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of projects to be returned. +required"
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering. +optional"
@@ -2304,7 +2315,7 @@ ProjectRegisterRequest
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_flyteidl.admin.Project`", "", ""
+   "project", ":ref:`ref_flyteidl.admin.Project`", "", "+required"
 
 
 
@@ -2402,7 +2413,8 @@ flyteidl/admin/project_domain_attributes.proto
 ProjectDomainAttributes
 ------------------------------------------------------------------
 
-
+Defines a set of custom matching attributes which defines resource defaults for a project and domain.
+For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
 
 
 
@@ -2425,7 +2437,7 @@ ProjectDomainAttributes
 ProjectDomainAttributesDeleteRequest
 ------------------------------------------------------------------
 
-
+Request to delete a set matchable project domain attribute override.
 
 
 
@@ -2433,9 +2445,9 @@ ProjectDomainAttributesDeleteRequest
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references."
-   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references."
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", ""
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to delete. +required"
 
 
 
@@ -2462,7 +2474,7 @@ Purposefully empty, may be populated in the future.
 ProjectDomainAttributesGetRequest
 ------------------------------------------------------------------
 
-
+Request to get an individual project domain attribute override.
 
 
 
@@ -2470,9 +2482,9 @@ ProjectDomainAttributesGetRequest
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references."
-   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references."
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", ""
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to return. +required"
 
 
 
@@ -2485,7 +2497,7 @@ ProjectDomainAttributesGetRequest
 ProjectDomainAttributesGetResponse
 ------------------------------------------------------------------
 
-
+Response to get an individual project domain attribute override.
 
 
 
@@ -2514,7 +2526,7 @@ Sets custom attributes for a project-domain combination.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "attributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributes`", "", ""
+   "attributes", ":ref:`ref_flyteidl.admin.ProjectDomainAttributes`", "", "+required"
 
 
 
@@ -2559,7 +2571,7 @@ flyteidl/admin/schedule.proto
 CronSchedule
 ------------------------------------------------------------------
 
-
+Options for schedules to run according to a cron expression.
 
 
 
@@ -2717,8 +2729,8 @@ Represents a request structure to create a revision of a task.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the task."
-   "spec", ":ref:`ref_flyteidl.admin.TaskSpec`", "", "Represents the specification for task."
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the task. +required"
+   "spec", ":ref:`ref_flyteidl.admin.TaskSpec`", "", "Represents the specification for task. +required"
 
 
 
@@ -2866,7 +2878,7 @@ Container for task execution details and results.
 TaskExecutionGetDataRequest
 ------------------------------------------------------------------
 
-Request structure to fetch inputs and output urls for a task execution.
+Request structure to fetch inputs and output for a task execution.
 
 
 
@@ -2874,7 +2886,7 @@ Request structure to fetch inputs and output urls for a task execution.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "The identifier of the task execution for which to fetch inputs and outputs."
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "The identifier of the task execution for which to fetch inputs and outputs. +required"
 
 
 
@@ -2895,10 +2907,10 @@ Response structure for TaskExecutionGetDataRequest which contains inputs and out
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "Signed url to fetch a core.LiteralMap of task execution inputs."
-   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "Signed url to fetch a core.LiteralMap of task execution outputs."
-   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Optional, full_inputs will only be populated if they are under a configured size threshold."
-   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Optional, full_outputs will only be populated if they are under a configured size threshold."
+   "inputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of task execution inputs. Deprecated: Please use full_inputs instead."
+   "outputs", ":ref:`ref_flyteidl.admin.UrlBlob`", "", "**Deprecated.** Signed url to fetch a core.LiteralMap of task execution outputs. Deprecated: Please use full_outputs instead."
+   "full_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_inputs will only be populated if they are under a configured size threshold."
+   "full_outputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Full_outputs will only be populated if they are under a configured size threshold."
 
 
 
@@ -2919,7 +2931,7 @@ A message used to fetch a single task execution entity.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Unique identifier for the task execution."
+   "id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Unique identifier for the task execution. +required"
 
 
 
@@ -2954,7 +2966,7 @@ Response structure for a query to list of task execution entities.
 TaskExecutionListRequest
 ------------------------------------------------------------------
 
-Represents a request structure to retrieve a list of task execution entities.
+Represents a request structure to retrieve a list of task execution entities yielded by a specific node execution.
 
 
 
@@ -2962,8 +2974,8 @@ Represents a request structure to retrieve a list of task execution entities.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "node_execution_id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Indicates the node execution to filter by."
-   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned."
+   "node_execution_id", ":ref:`ref_flyteidl.core.NodeExecutionIdentifier`", "", "Indicates the node execution to filter by. +required"
+   "limit", ":ref:`ref_uint32`", "", "Indicates the number of resources to be returned. +required"
    "token", ":ref:`ref_string`", "", "In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional"
    "filters", ":ref:`ref_string`", "", "Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional"
    "sort_by", ":ref:`ref_flyteidl.admin.Sort`", "", "Sort ordering for returned list. +optional"
@@ -3127,8 +3139,8 @@ Represents a request structure to create a revision of a workflow.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow."
-   "spec", ":ref:`ref_flyteidl.admin.WorkflowSpec`", "", "Represents the specification for workflow."
+   "id", ":ref:`ref_flyteidl.core.Identifier`", "", "id represents the unique identifier of the workflow. +required"
+   "spec", ":ref:`ref_flyteidl.admin.WorkflowSpec`", "", "Represents the specification for workflow. +required"
 
 
 
@@ -3217,7 +3229,8 @@ flyteidl/admin/workflow_attributes.proto
 WorkflowAttributes
 ------------------------------------------------------------------
 
-
+Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
+For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
 
 
 
@@ -3241,7 +3254,7 @@ WorkflowAttributes
 WorkflowAttributesDeleteRequest
 ------------------------------------------------------------------
 
-
+Request to delete a set matchable workflow attribute override.
 
 
 
@@ -3249,10 +3262,10 @@ WorkflowAttributesDeleteRequest
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references."
-   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references."
-   "workflow", ":ref:`ref_string`", "", "Workflow name which this set of attributes references."
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", ""
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
+   "workflow", ":ref:`ref_string`", "", "Workflow name which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to delete. +required"
 
 
 
@@ -3279,7 +3292,7 @@ Purposefully empty, may be populated in the future.
 WorkflowAttributesGetRequest
 ------------------------------------------------------------------
 
-
+Request to get an individual workflow attribute override.
 
 
 
@@ -3287,10 +3300,10 @@ WorkflowAttributesGetRequest
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references."
-   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references."
-   "workflow", ":ref:`ref_string`", "", "Workflow name which this set of attributes references."
-   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", ""
+   "project", ":ref:`ref_string`", "", "Unique project id which this set of attributes references. +required"
+   "domain", ":ref:`ref_string`", "", "Unique domain id which this set of attributes references. +required"
+   "workflow", ":ref:`ref_string`", "", "Workflow name which this set of attributes references. +required"
+   "resource_type", ":ref:`ref_flyteidl.admin.MatchableResource`", "", "Which type of matchable attributes to return. +required"
 
 
 
@@ -3303,7 +3316,7 @@ WorkflowAttributesGetRequest
 WorkflowAttributesGetResponse
 ------------------------------------------------------------------
 
-
+Response to get an individual workflow attribute override.
 
 
 

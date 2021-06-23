@@ -51,7 +51,6 @@ class AdminPagerDutyNotification(object):
     def recipients_email(self):
         """Gets the recipients_email of this AdminPagerDutyNotification.  # noqa: E501
 
-        Currently, PagerDuty notifications leverage email to trigger a notification.  # noqa: E501
 
         :return: The recipients_email of this AdminPagerDutyNotification.  # noqa: E501
         :rtype: list[str]
@@ -62,7 +61,6 @@ class AdminPagerDutyNotification(object):
     def recipients_email(self, recipients_email):
         """Sets the recipients_email of this AdminPagerDutyNotification.
 
-        Currently, PagerDuty notifications leverage email to trigger a notification.  # noqa: E501
 
         :param recipients_email: The recipients_email of this AdminPagerDutyNotification.  # noqa: E501
         :type: list[str]

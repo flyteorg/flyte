@@ -84,6 +84,7 @@ class AdminNodeExecutionMetaData(object):
     def is_parent_node(self):
         """Gets the is_parent_node of this AdminNodeExecutionMetaData.  # noqa: E501
 
+        Boolean flag indicating if the node has child nodes under it This can be true when a node contains a dynamic workflow which then produces child nodes.  # noqa: E501
 
         :return: The is_parent_node of this AdminNodeExecutionMetaData.  # noqa: E501
         :rtype: bool
@@ -94,6 +95,7 @@ class AdminNodeExecutionMetaData(object):
     def is_parent_node(self, is_parent_node):
         """Sets the is_parent_node of this AdminNodeExecutionMetaData.
 
+        Boolean flag indicating if the node has child nodes under it This can be true when a node contains a dynamic workflow which then produces child nodes.  # noqa: E501
 
         :param is_parent_node: The is_parent_node of this AdminNodeExecutionMetaData.  # noqa: E501
         :type: bool

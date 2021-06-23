@@ -11,13 +11,15 @@ import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
-// Request to launch an execution with the given project, domain and optionally name.
+// Request to launch an execution with the given project, domain and optionally-assigned name.
 message ExecutionCreateRequest {
     // Name of the project the execution belongs to.
+    // +required
     string project = 1;
 
     // Name of the domain the execution belongs to.
     // A domain can be considered as a subset within a specific project.
+    // +required
     string domain = 2;
 
     // User provided value for the resource.
@@ -26,16 +28,19 @@ message ExecutionCreateRequest {
     string name = 3;
 
     // Additional fields necessary to launch the execution.
+    // +optional
     ExecutionSpec spec = 4;
 
     // The inputs required to start the execution. All required inputs must be
     // included in this map. If not required and not provided, defaults apply.
+    // +optional
     core.LiteralMap inputs = 5;
 }
 
 // Request to relaunch the referenced execution.
 message ExecutionRelaunchRequest {
     // Identifier of the workflow execution to relaunch.
+    // +required
     core.WorkflowExecutionIdentifier id = 1;
 
     // User provided value for the relaunched execution.
@@ -83,13 +88,14 @@ message ExecutionList {
 message LiteralMapBlob {
     oneof data {
         // Data in LiteralMap format
-        core.LiteralMap values = 1;
+        core.LiteralMap values = 1 [deprecated = true];
 
         // In the event that the map is too large, we return a uri to the data
         string uri = 2;
     }
 }
 
+// Specifies metadata around an aborted workflow execution.
 message AbortMetadata {
     // In the case of a user-specified abort, this will pass along the user-supplied cause.
     string cause = 1;
@@ -103,7 +109,7 @@ message ExecutionClosure {
     // A result produced by a terminated execution.
     // A pending (non-terminal) execution will not have any output result.
     oneof output_result {
-        // A map of outputs in the case of a successful execution.
+        // Output URI in the case of a successful execution.
         LiteralMapBlob outputs = 1;
 
         // Error information in the case of a failed execution.
@@ -123,7 +129,7 @@ message ExecutionClosure {
     // Most recent recorded phase for the execution.
     core.WorkflowExecution.Phase phase = 4;
 
-    // Reported ime at which the execution began running.
+    // Reported time at which the execution began running.
     google.protobuf.Timestamp started_at = 5;
 
     // The amount of time the execution spent running.
@@ -144,7 +150,7 @@ message ExecutionClosure {
     core.Identifier workflow_id = 11;
 }
 
-// Represents system rather than user-facing metadata about an execution.
+// Represents system, rather than user-facing, metadata about an execution.
 message SystemMetadata {
 
     // Which execution cluster this execution ran on.
@@ -188,7 +194,7 @@ message ExecutionMetadata {
     // For scheduled executions, the requested time for execution for this specific schedule invocation.
     google.protobuf.Timestamp scheduled_at = 4;
 
-    // Which subworkflow node launched this execution
+    // Which subworkflow node (if any) launched this execution
     core.NodeExecutionIdentifier parent_node_execution = 5;
 
     // Optional, a reference workflow execution related to this execution.
@@ -205,7 +211,7 @@ message NotificationList {
 }
 
 // An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime
-// of an execution as it progresses across phase changes..
+// of an execution as it progresses across phase changes.
 message ExecutionSpec {
     // Launch plan to be executed
     core.Identifier launch_plan = 1;
@@ -244,7 +250,7 @@ message ExecutionSpec {
     // Indicates the runtime priority of the execution.
     core.QualityOfService quality_of_service = 17;
 
-    // Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.
+    // Controls the maximum number of task nodes that can be run in parallel for the entire workflow.
     // This is useful to achieve fairness. Note: MapTasks are regarded as one unit,
     // and parallelism/concurrency of MapTasks is independent from this.
     int32 max_parallelism = 18;
@@ -267,7 +273,7 @@ message ExecutionTerminateResponse {
     // Purposefully empty, may be populated in the future.
 }
 
-// Request structure to fetch inputs and output urls for an execution.
+// Request structure to fetch inputs, output and other data produced by an execution.
 message WorkflowExecutionGetDataRequest {
     // The identifier of the execution for which to fetch inputs and outputs.
     core.WorkflowExecutionIdentifier id = 1;
@@ -276,13 +282,16 @@ message WorkflowExecutionGetDataRequest {
 // Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
 message WorkflowExecutionGetDataResponse {
     // Signed url to fetch a core.LiteralMap of execution outputs.
-    UrlBlob outputs = 1;
-    // Signed url to fetch a core.LiteralMap of execution inputs.
-    UrlBlob inputs = 2;
+    // Deprecated: Please use full_outputs instead.
+    UrlBlob outputs = 1 [deprecated = true];
 
-    // Optional, full_inputs will only be populated if they are under a configured size threshold.
+    // Signed url to fetch a core.LiteralMap of execution inputs.
+    // Deprecated: Please use full_inputs instead.
+    UrlBlob inputs = 2 [deprecated = true];
+
+    // Full_inputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_inputs = 3;
 
-    // Optional, full_outputs will only be populated if they are under a configured size threshold.
+    // Full_outputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_outputs = 4;
 }

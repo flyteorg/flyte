@@ -16,19 +16,24 @@ import "google/protobuf/duration.proto";
 message NodeExecutionGetRequest {
 
    // Uniquely identifies an individual node execution.
+   // +required
    core.NodeExecutionIdentifier id  = 1;  
 }
 
 // Represents a request structure to retrieve a list of node execution entities.
 message NodeExecutionListRequest {
     // Indicates the workflow execution to filter by.
+   // +required
     core.WorkflowExecutionIdentifier workflow_execution_id = 1;
 
     // Indicates the number of resources to be returned.
+   // +required
     uint32 limit    = 2;
+
     // In the case of multiple pages of results, the, server-provided token can be used to fetch the next page
     // in a query.
     // +optional
+
     string token    = 3;
     // Indicates a list of filters passed as string.
     // More info on constructing filters : <Link>
@@ -45,16 +50,21 @@ message NodeExecutionListRequest {
 }
 
 // Represents a request structure to retrieve a list of node execution entities launched by a specific task.
+// This can arise when a task yields a subworkflow.
 message NodeExecutionForTaskListRequest {
     // Indicates the node execution to filter by.
+    // +required
     core.TaskExecutionIdentifier task_execution_id = 1;
 
     // Indicates the number of resources to be returned.
+    // +required
     uint32 limit    = 2;
+
     // In the case of multiple pages of results, the, server-provided token can be used to fetch the next page
     // in a query.
     // +optional
     string token    = 3;
+
     // Indicates a list of filters passed as string.
     // More info on constructing filters : <Link>
     // +optional
@@ -91,6 +101,8 @@ message NodeExecutionMetaData {
     string retry_group = 1;
 
     // Boolean flag indicating if the node has child nodes under it
+    // This can be true when a node contains a dynamic workflow which then produces
+    // child nodes.
     bool is_parent_node = 2;
 
     // Node id of the node in the original workflow
@@ -111,6 +123,7 @@ message NodeExecutionList {
 message NodeExecutionClosure {
     // Only a node in a terminal state will have a non-empty output_result.
     oneof output_result {
+        // Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
         string output_uri                  = 1;
 
         // Error information for the Node
@@ -142,6 +155,7 @@ message NodeExecutionClosure {
 
 // Metadata for a WorkflowNode
 message WorkflowNodeMetadata {
+    // The identifier for a workflow execution launched by a node.
     core.WorkflowExecutionIdentifier executionId        = 1;
 }
 
@@ -162,7 +176,7 @@ message DynamicWorkflowNodeMetadata {
     core.CompiledWorkflowClosure compiled_workflow = 2;
 }
 
-// Request structure to fetch inputs and output urls for a node execution.
+// Request structure to fetch inputs and output for a node execution.
 message NodeExecutionGetDataRequest {
     // The identifier of the node execution for which to fetch inputs and outputs.
     core.NodeExecutionIdentifier id        = 1;
@@ -171,15 +185,17 @@ message NodeExecutionGetDataRequest {
 // Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution.
 message NodeExecutionGetDataResponse {
     // Signed url to fetch a core.LiteralMap of node execution inputs.
-    UrlBlob inputs                             = 1;
+    // Deprecated: Please use full_inputs instead.
+    UrlBlob inputs                             = 1  [deprecated = true];
 
     // Signed url to fetch a core.LiteralMap of node execution outputs.
-    UrlBlob outputs                            = 2;
+    // Deprecated: Please use full_outputs instead.
+    UrlBlob outputs                            = 2  [deprecated = true];
 
-    // Optional, full_inputs will only be populated if they are under a configured size threshold.
+    // Full_inputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_inputs                = 3;
 
-    // Optional, full_outputs will only be populated if they are under a configured size threshold. 
+    // Full_outputs will only be populated if they are under a configured size threshold. 
     core.LiteralMap full_outputs               = 4;
 
     // Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.

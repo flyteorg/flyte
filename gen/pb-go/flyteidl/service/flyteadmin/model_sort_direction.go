@@ -8,7 +8,7 @@
  */
 
 package flyteadmin
-
+// SortDirection :  - DESCENDING: By default, fields are sorted in descending order.
 type SortDirection string
 
 // List of SortDirection

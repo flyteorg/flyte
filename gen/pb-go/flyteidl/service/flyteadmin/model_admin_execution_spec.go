@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime of an execution as it progresses across phase changes..
+// An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime of an execution as it progresses across phase changes.
 type AdminExecutionSpec struct {
 	LaunchPlan *CoreIdentifier `json:"launch_plan,omitempty"`
 	Inputs *CoreLiteralMap `json:"inputs,omitempty"`
@@ -28,6 +28,6 @@ type AdminExecutionSpec struct {
 	AuthRole *AdminAuthRole `json:"auth_role,omitempty"`
 	// Indicates the runtime priority of the execution.
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`
-	// Controls the maximum number of tasknodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.
+	// Controls the maximum number of task nodes that can be run in parallel for the entire workflow. This is useful to achieve fairness. Note: MapTasks are regarded as one unit, and parallelism/concurrency of MapTasks is independent from this.
 	MaxParallelism int32 `json:"max_parallelism,omitempty"`
 }

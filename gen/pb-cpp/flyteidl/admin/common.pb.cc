@@ -806,26 +806,26 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fcommon_2eproto[] =
   "otificationH\000\022;\n\npager_duty\030\003 \001(\0132%.flyt"
   "eidl.admin.PagerDutyNotificationH\000\0222\n\005sl"
   "ack\030\004 \001(\0132!.flyteidl.admin.SlackNotifica"
-  "tionH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r"
-  "\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006values\030\001 \003(\0132"
-  "\".flyteidl.admin.Labels.ValuesEntry\032-\n\013V"
-  "aluesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002"
-  "8\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyt"
-  "eidl.admin.Annotations.ValuesEntry\032-\n\013Va"
-  "luesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028"
-  "\001\"J\n\010AuthRole\022\032\n\022assumable_iam_role\030\001 \001("
-  "\t\022\"\n\032kubernetes_service_account\030\002 \001(\t\"5\n"
-  "\023RawOutputDataConfig\022\036\n\026output_location_"
-  "prefix\030\001 \001(\t*\\\n\020NamedEntityState\022\027\n\023NAME"
-  "D_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIV"
-  "ED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5github.com"
-  "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad"
-  "minb\006proto3"
+  "tionH\000B\006\n\004type\")\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r"
+  "\n\005bytes\030\002 \001(\003:\002\030\001\"k\n\006Labels\0222\n\006values\030\001 "
+  "\003(\0132\".flyteidl.admin.Labels.ValuesEntry\032"
+  "-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001"
+  "(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'."
+  "flyteidl.admin.Annotations.ValuesEntry\032-"
+  "\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001("
+  "\t:\0028\001\"N\n\010AuthRole\022\032\n\022assumable_iam_role\030"
+  "\001 \001(\t\022\"\n\032kubernetes_service_account\030\002 \001("
+  "\t:\002\030\001\"5\n\023RawOutputDataConfig\022\036\n\026output_l"
+  "ocation_prefix\030\001 \001(\t*\\\n\020NamedEntityState"
+  "\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTIT"
+  "Y_ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5gi"
+  "thub.com/flyteorg/flyteidl/gen/pb-go/fly"
+  "teidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fcommon_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fcommon_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fcommon_2eproto,
-  "flyteidl/admin/common.proto", &assign_descriptors_table_flyteidl_2fadmin_2fcommon_2eproto, 2611,
+  "flyteidl/admin/common.proto", &assign_descriptors_table_flyteidl_2fadmin_2fcommon_2eproto, 2619,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fcommon_2eproto() {

@@ -9,6 +9,7 @@
 
 package flyteadmin
 
+// Response to get an individual workflow attribute override.
 type AdminWorkflowAttributesGetResponse struct {
 	Attributes *AdminWorkflowAttributes `json:"attributes,omitempty"`
 }

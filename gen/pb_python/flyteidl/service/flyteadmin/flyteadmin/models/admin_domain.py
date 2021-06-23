@@ -56,6 +56,7 @@ class AdminDomain(object):
     def id(self):
         """Gets the id of this AdminDomain.  # noqa: E501
 
+        Globally unique domain name.  # noqa: E501
 
         :return: The id of this AdminDomain.  # noqa: E501
         :rtype: str
@@ -66,6 +67,7 @@ class AdminDomain(object):
     def id(self, id):
         """Sets the id of this AdminDomain.
 
+        Globally unique domain name.  # noqa: E501
 
         :param id: The id of this AdminDomain.  # noqa: E501
         :type: str

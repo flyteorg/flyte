@@ -65,6 +65,7 @@ class AdminLaunchPlan(object):
     def id(self):
         """Gets the id of this AdminLaunchPlan.  # noqa: E501
 
+        Uniquely identifies a launch plan entity.  # noqa: E501
 
         :return: The id of this AdminLaunchPlan.  # noqa: E501
         :rtype: CoreIdentifier
@@ -75,6 +76,7 @@ class AdminLaunchPlan(object):
     def id(self, id):
         """Sets the id of this AdminLaunchPlan.
 
+        Uniquely identifies a launch plan entity.  # noqa: E501
 
         :param id: The id of this AdminLaunchPlan.  # noqa: E501
         :type: CoreIdentifier
@@ -86,6 +88,7 @@ class AdminLaunchPlan(object):
     def spec(self):
         """Gets the spec of this AdminLaunchPlan.  # noqa: E501
 
+        User-provided launch plan details, including reference workflow, inputs and other metadata.  # noqa: E501
 
         :return: The spec of this AdminLaunchPlan.  # noqa: E501
         :rtype: AdminLaunchPlanSpec
@@ -96,6 +99,7 @@ class AdminLaunchPlan(object):
     def spec(self, spec):
         """Sets the spec of this AdminLaunchPlan.
 
+        User-provided launch plan details, including reference workflow, inputs and other metadata.  # noqa: E501
 
         :param spec: The spec of this AdminLaunchPlan.  # noqa: E501
         :type: AdminLaunchPlanSpec
@@ -107,6 +111,7 @@ class AdminLaunchPlan(object):
     def closure(self):
         """Gets the closure of this AdminLaunchPlan.  # noqa: E501
 
+        Values computed by the flyte platform after launch plan registration.  # noqa: E501
 
         :return: The closure of this AdminLaunchPlan.  # noqa: E501
         :rtype: AdminLaunchPlanClosure
@@ -117,6 +122,7 @@ class AdminLaunchPlan(object):
     def closure(self, closure):
         """Sets the closure of this AdminLaunchPlan.
 
+        Values computed by the flyte platform after launch plan registration.  # noqa: E501
 
         :param closure: The closure of this AdminLaunchPlan.  # noqa: E501
         :type: AdminLaunchPlanClosure

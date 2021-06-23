@@ -15,6 +15,7 @@ import (
 
 // Container for node execution details and results.
 type AdminNodeExecutionClosure struct {
+	// Links to a remotely stored, serialized core.LiteralMap of node execution outputs.
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
 	// The last recorded phase for this node execution.

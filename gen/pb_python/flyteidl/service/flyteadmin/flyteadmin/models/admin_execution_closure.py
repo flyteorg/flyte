@@ -114,7 +114,7 @@ class AdminExecutionClosure(object):
     def outputs(self):
         """Gets the outputs of this AdminExecutionClosure.  # noqa: E501
 
-        A map of outputs in the case of a successful execution.  # noqa: E501
+        Output URI in the case of a successful execution.  # noqa: E501
 
         :return: The outputs of this AdminExecutionClosure.  # noqa: E501
         :rtype: AdminLiteralMapBlob
@@ -125,7 +125,7 @@ class AdminExecutionClosure(object):
     def outputs(self, outputs):
         """Sets the outputs of this AdminExecutionClosure.
 
-        A map of outputs in the case of a successful execution.  # noqa: E501
+        Output URI in the case of a successful execution.  # noqa: E501
 
         :param outputs: The outputs of this AdminExecutionClosure.  # noqa: E501
         :type: AdminLiteralMapBlob
@@ -250,7 +250,7 @@ class AdminExecutionClosure(object):
     def started_at(self):
         """Gets the started_at of this AdminExecutionClosure.  # noqa: E501
 
-        Reported ime at which the execution began running.  # noqa: E501
+        Reported time at which the execution began running.  # noqa: E501
 
         :return: The started_at of this AdminExecutionClosure.  # noqa: E501
         :rtype: datetime
@@ -261,7 +261,7 @@ class AdminExecutionClosure(object):
     def started_at(self, started_at):
         """Sets the started_at of this AdminExecutionClosure.
 
-        Reported ime at which the execution began running.  # noqa: E501
+        Reported time at which the execution began running.  # noqa: E501
 
         :param started_at: The started_at of this AdminExecutionClosure.  # noqa: E501
         :type: datetime

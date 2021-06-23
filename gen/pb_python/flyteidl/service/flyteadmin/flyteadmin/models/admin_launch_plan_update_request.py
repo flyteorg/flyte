@@ -59,7 +59,7 @@ class AdminLaunchPlanUpdateRequest(object):
     def id(self):
         """Gets the id of this AdminLaunchPlanUpdateRequest.  # noqa: E501
 
-        Identifier of launch plan for which to change state.  # noqa: E501
+        Identifier of launch plan for which to change state. +required.  # noqa: E501
 
         :return: The id of this AdminLaunchPlanUpdateRequest.  # noqa: E501
         :rtype: CoreIdentifier
@@ -70,7 +70,7 @@ class AdminLaunchPlanUpdateRequest(object):
     def id(self, id):
         """Sets the id of this AdminLaunchPlanUpdateRequest.
 
-        Identifier of launch plan for which to change state.  # noqa: E501
+        Identifier of launch plan for which to change state. +required.  # noqa: E501
 
         :param id: The id of this AdminLaunchPlanUpdateRequest.  # noqa: E501
         :type: CoreIdentifier
@@ -82,7 +82,7 @@ class AdminLaunchPlanUpdateRequest(object):
     def state(self):
         """Gets the state of this AdminLaunchPlanUpdateRequest.  # noqa: E501
 
-        Desired state to apply to the launch plan.  # noqa: E501
+        Desired state to apply to the launch plan. +required.  # noqa: E501
 
         :return: The state of this AdminLaunchPlanUpdateRequest.  # noqa: E501
         :rtype: AdminLaunchPlanState
@@ -93,7 +93,7 @@ class AdminLaunchPlanUpdateRequest(object):
     def state(self, state):
         """Sets the state of this AdminLaunchPlanUpdateRequest.
 
-        Desired state to apply to the launch plan.  # noqa: E501
+        Desired state to apply to the launch plan. +required.  # noqa: E501
 
         :param state: The state of this AdminLaunchPlanUpdateRequest.  # noqa: E501
         :type: AdminLaunchPlanState

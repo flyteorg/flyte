@@ -58,7 +58,6 @@ class AdminSort(object):
     def key(self):
         """Gets the key of this AdminSort.  # noqa: E501
 
-        Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.  # noqa: E501
 
         :return: The key of this AdminSort.  # noqa: E501
         :rtype: str
@@ -69,7 +68,6 @@ class AdminSort(object):
     def key(self, key):
         """Sets the key of this AdminSort.
 
-        Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.  # noqa: E501
 
         :param key: The key of this AdminSort.  # noqa: E501
         :type: str

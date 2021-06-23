@@ -11,9 +11,11 @@ import "google/protobuf/timestamp.proto";
 // Represents a request structure to create a revision of a workflow.
 message WorkflowCreateRequest {
     // id represents the unique identifier of the workflow.
+    // +required
     core.Identifier id     = 1;
     
     // Represents the specification for workflow.
+    // +required
     WorkflowSpec spec      = 2;
 }
 

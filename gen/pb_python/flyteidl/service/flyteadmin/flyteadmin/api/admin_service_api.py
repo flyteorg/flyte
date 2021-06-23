@@ -736,8 +736,8 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param AdminProjectDomainAttributesDeleteRequest body: (required)
         :return: AdminProjectDomainAttributesDeleteResponse
                  If the method is called asynchronously,
@@ -760,8 +760,8 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param AdminProjectDomainAttributesDeleteRequest body: (required)
         :return: AdminProjectDomainAttributesDeleteResponse
                  If the method is called asynchronously,
@@ -851,9 +851,9 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str workflow: Workflow name which this set of attributes references. (required)
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
+        :param str workflow: Workflow name which this set of attributes references. +required (required)
         :param AdminWorkflowAttributesDeleteRequest body: (required)
         :return: AdminWorkflowAttributesDeleteResponse
                  If the method is called asynchronously,
@@ -876,9 +876,9 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str workflow: Workflow name which this set of attributes references. (required)
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
+        :param str workflow: Workflow name which this set of attributes references. +required (required)
         :param AdminWorkflowAttributesDeleteRequest body: (required)
         :return: AdminWorkflowAttributesDeleteResponse
                  If the method is called asynchronously,
@@ -1446,7 +1446,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: (required)
+        :param str resource_type: Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -1471,7 +1471,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: (required)
+        :param str resource_type: Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -1815,9 +1815,9 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
+        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1839,9 +1839,9 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
+        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2605,10 +2605,10 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str workflow: Workflow name which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
+        :param str workflow: Workflow name which this set of attributes references. +required (required)
+        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2630,10 +2630,10 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Unique project id which this set of attributes references. (required)
-        :param str domain: Unique domain id which this set of attributes references. (required)
-        :param str workflow: Workflow name which this set of attributes references. (required)
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+        :param str project: Unique project id which this set of attributes references. +required (required)
+        :param str domain: Unique domain id which this set of attributes references. +required (required)
+        :param str workflow: Workflow name which this set of attributes references. +required (required)
+        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2724,12 +2724,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required. (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2751,12 +2751,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required. (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2850,11 +2850,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2879,11 +2879,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2978,12 +2978,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -3006,12 +3006,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -3108,11 +3108,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3137,11 +3137,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3243,11 +3243,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3272,11 +3272,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3371,7 +3371,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3393,7 +3393,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type:  - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3466,13 +3466,13 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: (required)
-        :param str project: Name of the project that contains the identifiers. (required)
+        :param str resource_type: Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required (required)
+        :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
@@ -3495,13 +3495,13 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: (required)
-        :param str project: Name of the project that contains the identifiers. (required)
+        :param str resource_type: Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required (required)
+        :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
@@ -3604,11 +3604,11 @@ class AdminServiceApi(object):
         :param str workflow_execution_id_project: Name of the project the resource belongs to. (required)
         :param str workflow_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str workflow_execution_id_name: User or system provided value for the resource. (required)
-        :param int limit: Indicates the number of resources to be returned.
-        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token:
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
@@ -3634,11 +3634,11 @@ class AdminServiceApi(object):
         :param str workflow_execution_id_project: Name of the project the resource belongs to. (required)
         :param str workflow_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str workflow_execution_id_name: User or system provided value for the resource. (required)
-        :param int limit: Indicates the number of resources to be returned.
-        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token:
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
@@ -3750,11 +3750,11 @@ class AdminServiceApi(object):
         :param str task_execution_id_task_id_version: Specific version of the resource. (required)
         :param int task_execution_id_retry_attempt: (required)
         :param str task_execution_id_task_id_resource_type: Identifies the specific type of resource that this identifer corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3786,11 +3786,11 @@ class AdminServiceApi(object):
         :param str task_execution_id_task_id_version: Specific version of the resource. (required)
         :param int task_execution_id_retry_attempt: (required)
         :param str task_execution_id_task_id_resource_type: Identifies the specific type of resource that this identifer corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3927,11 +3927,11 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param int limit: Indicates the number of projects to be returned.
+        :param int limit: Indicates the number of projects to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminProjects
                  If the method is called asynchronously,
                  returns the request thread.
@@ -3953,11 +3953,11 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param int limit: Indicates the number of projects to be returned.
+        :param int limit: Indicates the number of projects to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminProjects
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4042,11 +4042,11 @@ class AdminServiceApi(object):
         :param str node_execution_id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str node_execution_id_execution_id_name: User or system provided value for the resource. (required)
         :param str node_execution_id_node_id: (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4072,11 +4072,11 @@ class AdminServiceApi(object):
         :param str node_execution_id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str node_execution_id_execution_id_name: User or system provided value for the resource. (required)
         :param str node_execution_id_node_id: (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4181,12 +4181,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -4209,12 +4209,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -4311,11 +4311,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4340,11 +4340,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4446,11 +4446,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4475,11 +4475,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4574,12 +4574,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -4602,12 +4602,12 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str project: Name of the project that contains the identifiers. (required)
-        :param str domain: Name of the domain the identifiers belongs to within the project. (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param str project: Name of the project that contains the identifiers. +required (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :param str filters: Indicates a list of filters passed as string. +optional.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -4704,11 +4704,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4733,11 +4733,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4839,11 +4839,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4868,11 +4868,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned.
+        :param int limit: Indicates the number of resources to be returned. +required.
         :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -5419,7 +5419,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to update (required)
+        :param str resource_type: Resource type of the metadata to update +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -5445,7 +5445,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to update (required)
+        :param str resource_type: Resource type of the metadata to update +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -5550,7 +5550,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str id: (required)
+        :param str id: Globally unique project name. (required)
         :param AdminProject body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
@@ -5573,7 +5573,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str id: (required)
+        :param str id: Globally unique project name. (required)
         :param AdminProject body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,

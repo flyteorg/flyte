@@ -51,7 +51,6 @@ class AdminEmailNotification(object):
     def recipients_email(self):
         """Gets the recipients_email of this AdminEmailNotification.  # noqa: E501
 
-        The list of email addresses recipients for this notification.  # noqa: E501
 
         :return: The recipients_email of this AdminEmailNotification.  # noqa: E501
         :rtype: list[str]
@@ -62,7 +61,6 @@ class AdminEmailNotification(object):
     def recipients_email(self, recipients_email):
         """Sets the recipients_email of this AdminEmailNotification.
 
-        The list of email addresses recipients for this notification.  # noqa: E501
 
         :param recipients_email: The recipients_email of this AdminEmailNotification.  # noqa: E501
         :type: list[str]

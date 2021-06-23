@@ -68,6 +68,11 @@ public final class ProjectDomainAttributesOuterClass {
     flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder getMatchingAttributesOrBuilder();
   }
   /**
+   * <pre>
+   * Defines a set of custom matching attributes which defines resource defaults for a project and domain.
+   * For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributes}
    */
   public  static final class ProjectDomainAttributes extends
@@ -451,6 +456,11 @@ public final class ProjectDomainAttributesOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Defines a set of custom matching attributes which defines resource defaults for a project and domain.
+     * For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributes}
      */
     public static final class Builder extends
@@ -971,14 +981,26 @@ public final class ProjectDomainAttributesOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
      */
     boolean hasAttributes();
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
      */
     flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes getAttributes();
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
      */
     flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributesOrBuilder getAttributesOrBuilder();
@@ -1074,18 +1096,30 @@ public final class ProjectDomainAttributesOuterClass {
     public static final int ATTRIBUTES_FIELD_NUMBER = 1;
     private flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes attributes_;
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
      */
     public boolean hasAttributes() {
       return attributes_ != null;
     }
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
      */
     public flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes getAttributes() {
       return attributes_ == null ? flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes.getDefaultInstance() : attributes_;
     }
     /**
+     * <pre>
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
      */
     public flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributesOrBuilder getAttributesOrBuilder() {
@@ -1415,12 +1449,20 @@ public final class ProjectDomainAttributesOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes, flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes.Builder, flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributesOrBuilder> attributesBuilder_;
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public boolean hasAttributes() {
         return attributesBuilder_ != null || attributes_ != null;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes getAttributes() {
@@ -1431,6 +1473,10 @@ public final class ProjectDomainAttributesOuterClass {
         }
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public Builder setAttributes(flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes value) {
@@ -1447,6 +1493,10 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public Builder setAttributes(
@@ -1461,6 +1511,10 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public Builder mergeAttributes(flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes value) {
@@ -1479,6 +1533,10 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public Builder clearAttributes() {
@@ -1493,6 +1551,10 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributes.Builder getAttributesBuilder() {
@@ -1501,6 +1563,10 @@ public final class ProjectDomainAttributesOuterClass {
         return getAttributesFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       public flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributesOrBuilder getAttributesOrBuilder() {
@@ -1512,6 +1578,10 @@ public final class ProjectDomainAttributesOuterClass {
         }
       }
       /**
+       * <pre>
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.ProjectDomainAttributes attributes = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -2006,6 +2076,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -2014,6 +2085,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -2024,6 +2096,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -2032,6 +2105,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -2040,15 +2114,29 @@ public final class ProjectDomainAttributesOuterClass {
         getDomainBytes();
 
     /**
+     * <pre>
+     * Which type of matchable attributes to return.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     int getResourceTypeValue();
     /**
+     * <pre>
+     * Which type of matchable attributes to return.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType();
   }
   /**
+   * <pre>
+   * Request to get an individual project domain attribute override.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetRequest}
    */
   public  static final class ProjectDomainAttributesGetRequest extends
@@ -2145,6 +2233,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -2164,6 +2253,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -2187,6 +2277,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -2206,6 +2297,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -2227,12 +2319,22 @@ public final class ProjectDomainAttributesOuterClass {
     public static final int RESOURCE_TYPE_FIELD_NUMBER = 3;
     private int resourceType_;
     /**
+     * <pre>
+     * Which type of matchable attributes to return.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     public int getResourceTypeValue() {
       return resourceType_;
     }
     /**
+     * <pre>
+     * Which type of matchable attributes to return.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     public flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType() {
@@ -2416,6 +2518,10 @@ public final class ProjectDomainAttributesOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Request to get an individual project domain attribute override.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetRequest}
      */
     public static final class Builder extends
@@ -2580,6 +2686,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -2599,6 +2706,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -2619,6 +2727,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -2636,6 +2745,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -2649,6 +2759,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -2669,6 +2780,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -2688,6 +2800,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -2708,6 +2821,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -2725,6 +2839,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -2738,6 +2853,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -2756,12 +2872,22 @@ public final class ProjectDomainAttributesOuterClass {
 
       private int resourceType_ = 0;
       /**
+       * <pre>
+       * Which type of matchable attributes to return.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public int getResourceTypeValue() {
         return resourceType_;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to return.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public Builder setResourceTypeValue(int value) {
@@ -2770,6 +2896,11 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to return.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType() {
@@ -2778,6 +2909,11 @@ public final class ProjectDomainAttributesOuterClass {
         return result == null ? flyteidl.admin.MatchableResourceOuterClass.MatchableResource.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to return.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public Builder setResourceType(flyteidl.admin.MatchableResourceOuterClass.MatchableResource value) {
@@ -2790,6 +2926,11 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to return.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public Builder clearResourceType() {
@@ -2869,6 +3010,10 @@ public final class ProjectDomainAttributesOuterClass {
     flyteidl.admin.ProjectDomainAttributesOuterClass.ProjectDomainAttributesOrBuilder getAttributesOrBuilder();
   }
   /**
+   * <pre>
+   * Response to get an individual project domain attribute override.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetResponse}
    */
   public  static final class ProjectDomainAttributesGetResponse extends
@@ -3134,6 +3279,10 @@ public final class ProjectDomainAttributesOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Response to get an individual project domain attribute override.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesGetResponse}
      */
     public static final class Builder extends
@@ -3464,6 +3613,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3472,6 +3622,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3482,6 +3633,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3490,6 +3642,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3498,15 +3651,29 @@ public final class ProjectDomainAttributesOuterClass {
         getDomainBytes();
 
     /**
+     * <pre>
+     * Which type of matchable attributes to delete.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     int getResourceTypeValue();
     /**
+     * <pre>
+     * Which type of matchable attributes to delete.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType();
   }
   /**
+   * <pre>
+   * Request to delete a set matchable project domain attribute override.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesDeleteRequest}
    */
   public  static final class ProjectDomainAttributesDeleteRequest extends
@@ -3603,6 +3770,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3622,6 +3790,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique project id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3645,6 +3814,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3664,6 +3834,7 @@ public final class ProjectDomainAttributesOuterClass {
     /**
      * <pre>
      * Unique domain id which this set of attributes references.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3685,12 +3856,22 @@ public final class ProjectDomainAttributesOuterClass {
     public static final int RESOURCE_TYPE_FIELD_NUMBER = 3;
     private int resourceType_;
     /**
+     * <pre>
+     * Which type of matchable attributes to delete.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     public int getResourceTypeValue() {
       return resourceType_;
     }
     /**
+     * <pre>
+     * Which type of matchable attributes to delete.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
      */
     public flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType() {
@@ -3874,6 +4055,10 @@ public final class ProjectDomainAttributesOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Request to delete a set matchable project domain attribute override.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.ProjectDomainAttributesDeleteRequest}
      */
     public static final class Builder extends
@@ -4038,6 +4223,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4057,6 +4243,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4077,6 +4264,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4094,6 +4282,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4107,6 +4296,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique project id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4127,6 +4317,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4146,6 +4337,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4166,6 +4358,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4183,6 +4376,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4196,6 +4390,7 @@ public final class ProjectDomainAttributesOuterClass {
       /**
        * <pre>
        * Unique domain id which this set of attributes references.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4214,12 +4409,22 @@ public final class ProjectDomainAttributesOuterClass {
 
       private int resourceType_ = 0;
       /**
+       * <pre>
+       * Which type of matchable attributes to delete.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public int getResourceTypeValue() {
         return resourceType_;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to delete.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public Builder setResourceTypeValue(int value) {
@@ -4228,6 +4433,11 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to delete.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType() {
@@ -4236,6 +4446,11 @@ public final class ProjectDomainAttributesOuterClass {
         return result == null ? flyteidl.admin.MatchableResourceOuterClass.MatchableResource.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to delete.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public Builder setResourceType(flyteidl.admin.MatchableResourceOuterClass.MatchableResource value) {
@@ -4248,6 +4463,11 @@ public final class ProjectDomainAttributesOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Which type of matchable attributes to delete.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.MatchableResource resource_type = 3;</code>
        */
       public Builder clearResourceType() {
