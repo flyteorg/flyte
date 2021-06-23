@@ -215,7 +215,7 @@ db:
   database:
     port: 5432
     # -- Create a user called flyte
-    username: flyte
+    username: flyteadmin
     host: admindb.cluster-c7wfhpvwbpaz.us-east-2.rds.amazonaws.com
     # -- Create a DB called flyteadmin (OR change the name here)
     dbname: flyteadmin
