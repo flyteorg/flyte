@@ -110,7 +110,7 @@ non-default email senders via the helm chart values.
 
 **Flyte Rbac**
 All Flyte deployments are currently insecure on the application level by default (e.g. open/accessible to everyone) so it
-is strongly recommended that users `add authentication <https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/cluster/auth_setup.html>`_.
+is strongly recommended that users `add authentication <https://docs.flyte.org/projects/cookbook/en/latest/auto/deployment/cluster/auth_setup.html#authentication-setup>`_.
 
 **Extra configuration**
 It is possible to add extra configuration to your Flyte deployment by modifying the values passed in the helm chart

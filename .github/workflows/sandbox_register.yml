@@ -2,6 +2,9 @@ name: Sandbox Register
 
 on:
   pull_request:
+    paths-ignore:
+      - 'cookbook/docs/**'
+      - 'cookbook/deployment/**'
     branches:
       - master
 

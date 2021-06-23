@@ -2,6 +2,9 @@ name: Serialize Examples
 
 on:
   pull_request:
+    paths-ignore:
+      - 'cookbook/docs/**'
+      - 'cookbook/deployment/**'
 
 jobs:
   core-build:

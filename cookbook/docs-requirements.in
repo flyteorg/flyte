@@ -11,6 +11,8 @@ sphinx-copybutton
 sphinxext-remoteliteralinclude
 sphinx_fontawesome
 sphinx-panels
+sphinx-tabs
+sphinxcontrib-mermaid
 docutils==0.16
 astroid==2.4.2
 matplotlib
