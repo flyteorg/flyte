@@ -7,7 +7,9 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 
 // Encapsulation of fields that identifies a Flyte resource.
-// A resource can internally have multiple versions.
+// A Flyte resource can be a task, workflow or launch plan.
+// A resource can internally have multiple versions and is uniquely identified
+// by project, domain, and name.
 message NamedEntityIdentifier {
     // Name of the project the resource belongs to.
     string project = 1;
@@ -32,6 +34,7 @@ enum NamedEntityState {
     SYSTEM_GENERATED = 2;
 }
 
+// Additional metadata around a named entity.
 message NamedEntityMetadata {
     // Common description across all versions of the entity
     // +optional
@@ -42,22 +45,28 @@ message NamedEntityMetadata {
     NamedEntityState state = 2;
 }
 
-// Describes information common to a NamedEntity, identified by a project /
-// domain / name / resource type combination
+// Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
+// workflow or launch plan. A NamedEntity is exclusively identified by its resource type
+// and identifier.
 message NamedEntity {
+    // Resource type of the named entity. One of Task, Workflow or LaunchPlan.
     flyteidl.core.ResourceType resource_type = 1;
     NamedEntityIdentifier id = 2;
+
+    // Additional metadata around a named entity.
     NamedEntityMetadata metadata = 3;
 }
 
-// Species sort ordering in a list request.
+// Specifies sort ordering in a list request.
 message Sort {
     enum Direction {
+
+        // By default, fields are sorted in descending order.
         DESCENDING = 0;
         ASCENDING = 1;
     }
     // Indicates an attribute to sort the response values.
-    // TODO(katrogan): Add string validation here. This should never be empty.
+    // +required
     string key = 1;
 
     // Indicates the direction to apply sort key for response values.
@@ -65,20 +74,26 @@ message Sort {
     Direction direction = 2;
 }
 
-// Represents a request structure to list identifiers.
+// Represents a request structure to list NamedEntityIdentifiers.
 message NamedEntityIdentifierListRequest {
     // Name of the project that contains the identifiers.
+    // +required
     string project = 1;
+
     // Name of the domain the identifiers belongs to within the project.
+    // +required
     string domain = 2;
+
     // Indicates the number of resources to be returned.
+    // +required
     uint32 limit = 3;
+
     // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
     // in a query.
     // +optional
     string token = 4;
 
-    // Sort ordering.
+    // Specifies how listed entities should be sorted in the response.
     // +optional
     Sort sort_by = 5;
 
@@ -89,8 +104,11 @@ message NamedEntityIdentifierListRequest {
 
 // Represents a request structure to list NamedEntity objects
 message NamedEntityListRequest {
+    // Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+    // +required
     flyteidl.core.ResourceType resource_type = 1;
     // Name of the project that contains the identifiers.
+    // +required
     string project = 2;
     // Name of the domain the identifiers belongs to within the project.
     string domain = 3;
@@ -101,7 +119,7 @@ message NamedEntityListRequest {
     // +optional
     string token = 5;
 
-    // Sort ordering.
+    // Specifies how listed entities should be sorted in the response.
     // +optional
     Sort sort_by = 6;
 
@@ -133,18 +151,27 @@ message NamedEntityList {
 
 // A request to retrieve the metadata associated with a NamedEntityIdentifier
 message NamedEntityGetRequest {
+    // Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+    // +required
     flyteidl.core.ResourceType resource_type = 1;
+
+    // The identifier for the named entity for which to fetch metadata.
+    // +required
     NamedEntityIdentifier id = 2;
 }
 
-// Request to set the referenced launch plan state to the configured value.
+// Request to set the referenced named entity state to the configured value.
 message NamedEntityUpdateRequest {
     // Resource type of the metadata to update
+    // +required
     flyteidl.core.ResourceType resource_type = 1;
+
     // Identifier of the metadata to update
+    // +required
     NamedEntityIdentifier id = 2;
 
     // Metadata object to set as the new value
+    // +required
     NamedEntityMetadata metadata = 3;
 }
 
@@ -152,23 +179,30 @@ message NamedEntityUpdateRequest {
 message NamedEntityUpdateResponse {
 }
 
-// Represents a structure to fetch a single resource.
+// Shared request structure to fetch a single resource.
+// Resources include: Task, Workflow, LaunchPlan
 message ObjectGetRequest {
     // Indicates a unique version of resource.
+    // +required
     core.Identifier id = 1;
 }
 
-// Represents a request structure to retrieve a list of resources.
+// Shared request structure to retrieve a list of resources.
 // Resources include: Task, Workflow, LaunchPlan
 message ResourceListRequest {
     // id represents the unique identifier of the resource.
+    // +required
     NamedEntityIdentifier id = 1;
+
     // Indicates the number of resources to be returned.
+    // +required
     uint32 limit = 2;
+
     // In the case of multiple pages of results, this server-provided token can be used to fetch the next page
     // in a query.
     // +optional
     string token = 3;
+
     // Indicates a list of filters passed as string.
     // More info on constructing filters : <Link>
     // +optional
@@ -179,29 +213,37 @@ message ResourceListRequest {
     Sort sort_by = 5;
 }
 
+// Defines an email notification specification.
 message EmailNotification {
     // The list of email addresses recipients for this notification.
+    // +required
     repeated string recipients_email = 1;
 }
 
+// Defines a pager duty notification specification.
 message PagerDutyNotification {
     // Currently, PagerDuty notifications leverage email to trigger a notification.
+    // +required
     repeated string recipients_email = 1;
 }
 
+// Defines a slack notification specification.
 message SlackNotification {
     // Currently, Slack notifications leverage email to trigger a notification.
+    // +required
     repeated string recipients_email = 1;
-
 }
 
 // Represents a structure for notifications based on execution status.
-// The Notification content is configured within Admin. Future iterations could
-// expose configuring notifications with custom content.
+// The notification content is configured within flyte admin but can be templatized.
+// Future iterations could expose configuring notifications with custom content.
 message Notification {
     // A list of phases to which users can associate the notifications to.
+    // +required
     repeated core.WorkflowExecution.Phase phases = 1;
 
+    // The type of notification to trigger.
+    // +required
     oneof type {
         EmailNotification email = 2;
         PagerDutyNotification pager_duty = 3;
@@ -212,6 +254,8 @@ message Notification {
 
 // Represents a string url and associated metadata used throughout the platform.
 message UrlBlob {
+    option deprecated = true;
+
     // Actual url value.
     string url = 1;
 
@@ -239,6 +283,8 @@ message Annotations {
 // Use either of these roles when they have permissions required by your workflow execution.
 // Deprecated.
 message AuthRole {
+    option deprecated = true;
+
     // Defines an optional iam role which will be used for tasks run in executions created with this launch plan.
     string assumable_iam_role = 1;
 

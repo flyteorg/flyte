@@ -11,9 +11,11 @@ import "google/protobuf/timestamp.proto";
 // Represents a request structure to create a revision of a task.
 message TaskCreateRequest {
     // id represents the unique identifier of the task.
+    // +required
     core.Identifier id           = 1;
     
     // Represents the specification for task.
+    // +required
     TaskSpec spec                = 2;
 }
 
@@ -28,7 +30,6 @@ message TaskCreateResponse {
 message Task {
     // id represents the unique identifier of the task.
     core.Identifier id       = 1;
-
 
     // closure encapsulates all the fields that maps to a compiled version of the task.
     TaskClosure closure      = 2;

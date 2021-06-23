@@ -20,6 +20,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Defines a set of custom matching attributes which defines resource defaults for a project and domain.
+// For more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`.
 type ProjectDomainAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
@@ -79,6 +81,7 @@ func (m *ProjectDomainAttributes) GetMatchingAttributes() *MatchingAttributes {
 
 // Sets custom attributes for a project-domain combination.
 type ProjectDomainAttributesUpdateRequest struct {
+	// +required
 	Attributes           *ProjectDomainAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_unrecognized     []byte                   `json:"-"`
@@ -149,11 +152,16 @@ func (m *ProjectDomainAttributesUpdateResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ProjectDomainAttributesUpdateResponse proto.InternalMessageInfo
 
+// Request to get an individual project domain attribute override.
 type ProjectDomainAttributesGetRequest struct {
 	// Unique project id which this set of attributes references.
+	// +required
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	// Unique domain id which this set of attributes references.
-	Domain               string            `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	// +required
+	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	// Which type of matchable attributes to return.
+	// +required
 	ResourceType         MatchableResource `protobuf:"varint,3,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.admin.MatchableResource" json:"resource_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -206,6 +214,7 @@ func (m *ProjectDomainAttributesGetRequest) GetResourceType() MatchableResource 
 	return MatchableResource_TASK_RESOURCE
 }
 
+// Response to get an individual project domain attribute override.
 type ProjectDomainAttributesGetResponse struct {
 	Attributes           *ProjectDomainAttributes `protobuf:"bytes,1,opt,name=attributes,proto3" json:"attributes,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
@@ -245,11 +254,16 @@ func (m *ProjectDomainAttributesGetResponse) GetAttributes() *ProjectDomainAttri
 	return nil
 }
 
+// Request to delete a set matchable project domain attribute override.
 type ProjectDomainAttributesDeleteRequest struct {
 	// Unique project id which this set of attributes references.
+	// +required
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	// Unique domain id which this set of attributes references.
-	Domain               string            `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	// +required
+	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	// Which type of matchable attributes to delete.
+	// +required
 	ResourceType         MatchableResource `protobuf:"varint,3,opt,name=resource_type,json=resourceType,proto3,enum=flyteidl.admin.MatchableResource" json:"resource_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`

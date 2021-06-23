@@ -97,6 +97,7 @@ func (m *FixedRate) GetUnit() FixedRateUnit {
 	return FixedRateUnit_MINUTE
 }
 
+// Options for schedules to run according to a cron expression.
 type CronSchedule struct {
 	// Standard/default cron implementation as described by https://en.wikipedia.org/wiki/Cron#CRON_expression;
 	// Also supports nonstandard predefined scheduling definitions

@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan.
+// Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
 type AdminLaunchPlanCreateRequest struct {
 	// Uniquely identifies a launch plan entity.
 	Id *CoreIdentifier `json:"id,omitempty"`

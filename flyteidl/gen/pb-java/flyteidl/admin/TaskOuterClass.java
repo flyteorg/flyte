@@ -21,6 +21,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * id represents the unique identifier of the task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -29,6 +30,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * id represents the unique identifier of the task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -37,6 +39,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * id represents the unique identifier of the task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -46,6 +49,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents the specification for task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -54,6 +58,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents the specification for task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -62,6 +67,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents the specification for task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -174,6 +180,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * id represents the unique identifier of the task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -184,6 +191,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * id represents the unique identifier of the task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -194,6 +202,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * id represents the unique identifier of the task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -207,6 +216,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents the specification for task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -217,6 +227,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents the specification for task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -227,6 +238,7 @@ public final class TaskOuterClass {
     /**
      * <pre>
      * Represents the specification for task.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -590,6 +602,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -600,6 +613,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -614,6 +628,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -634,6 +649,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -652,6 +668,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -674,6 +691,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -692,6 +710,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -704,6 +723,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -719,6 +739,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * id represents the unique identifier of the task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -743,6 +764,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -753,6 +775,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -767,6 +790,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -787,6 +811,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -805,6 +830,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -827,6 +853,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -845,6 +872,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -857,6 +885,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>
@@ -872,6 +901,7 @@ public final class TaskOuterClass {
       /**
        * <pre>
        * Represents the specification for task.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.TaskSpec spec = 2;</code>

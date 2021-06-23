@@ -726,8 +726,8 @@ func (a *AdminServiceApiService) CreateWorkflowEvent(ctx context.Context, body A
 AdminServiceApiService
 Delete the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Unique project id which this set of attributes references.
- * @param domain Unique domain id which this set of attributes references.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
  * @param body
 
 @return AdminProjectDomainAttributesDeleteResponse
@@ -820,9 +820,9 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes(ctx context.Conte
 AdminServiceApiService
 Delete the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Unique project id which this set of attributes references.
- * @param domain Unique domain id which this set of attributes references.
- * @param workflow Workflow name which this set of attributes references.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
+ * @param workflow Workflow name which this set of attributes references. +required
  * @param body
 
 @return AdminWorkflowAttributesDeleteResponse
@@ -1300,7 +1300,7 @@ func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject st
 AdminServiceApiService
 Retrieve a NamedEntity object.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType
+ * @param resourceType Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
@@ -1585,10 +1585,10 @@ func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExe
 AdminServiceApiService
 Retrieve the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Unique project id which this set of attributes references.
- * @param domain Unique domain id which this set of attributes references.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
  * @param optional nil or *GetProjectDomainAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
 
 @return AdminProjectDomainAttributesGetResponse
 */
@@ -2213,11 +2213,11 @@ func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject stri
 AdminServiceApiService
 Retrieve the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Unique project id which this set of attributes references.
- * @param domain Unique domain id which this set of attributes references.
- * @param workflow Workflow name which this set of attributes references.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
+ * @param workflow Workflow name which this set of attributes references. +required
  * @param optional nil or *GetWorkflowAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
 
 @return AdminWorkflowAttributesGetResponse
 */
@@ -2316,13 +2316,13 @@ func (a *AdminServiceApiService) GetWorkflowAttributes(ctx context.Context, proj
 AdminServiceApiService
 Fetch the active launch plan versions specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Name of the project that contains the identifiers.
- * @param domain Name of the domain the identifiers belongs to within the project.
+ * @param project Name of the project that contains the identifiers. +required.
+ * @param domain Name of the domain the identifiers belongs to within the project. +required.
  * @param optional nil or *ListActiveLaunchPlansOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
@@ -2436,11 +2436,11 @@ Fetch existing workflow executions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param optional nil or *ListExecutionsOpts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminExecutionList
 */
@@ -2558,13 +2558,13 @@ func (a *AdminServiceApiService) ListExecutions(ctx context.Context, idProject s
 AdminServiceApiService
 Fetch existing launch plan definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Name of the project that contains the identifiers.
- * @param domain Name of the domain the identifiers belongs to within the project.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project. +required
  * @param optional nil or *ListLaunchPlanIdsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityIdentifierList
@@ -2683,11 +2683,11 @@ Fetch existing launch plan definitions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListLaunchPlansOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
@@ -2806,11 +2806,11 @@ Fetch existing launch plan definitions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param optional nil or *ListLaunchPlans2Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
@@ -2929,7 +2929,7 @@ AdminServiceApiService
 Retrieve a list of MatchableAttributesConfiguration objects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *ListMatchableAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
+     * @param "ResourceType" (optional.String) -  +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.
 
 @return AdminListMatchableAttributesResponse
 */
@@ -3025,14 +3025,14 @@ func (a *AdminServiceApiService) ListMatchableAttributes(ctx context.Context, lo
 AdminServiceApiService
 Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType
- * @param project Name of the project that contains the identifiers.
+ * @param resourceType Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required
+ * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project.
  * @param optional nil or *ListNamedEntitiesOpts - Optional Parameters:
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityList
@@ -3152,11 +3152,11 @@ Fetch existing node executions matching input filters.
  * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param workflowExecutionIdName User or system provided value for the resource.
  * @param optional nil or *ListNodeExecutionsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) - 
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "UniqueParentId" (optional.String) -  Unique identifier of the parent node in the execution +optional.
 
 @return AdminNodeExecutionList
@@ -3287,11 +3287,11 @@ Fetch child node executions launched by the specified task execution.
  * @param taskExecutionIdRetryAttempt
  * @param optional nil or *ListNodeExecutionsForTaskOpts - Optional Parameters:
      * @param "TaskExecutionIdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifer corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminNodeExecutionList
 */
@@ -3417,11 +3417,11 @@ AdminServiceApiService
 Fetch registered projects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *ListProjectsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminProjects
 */
@@ -3538,11 +3538,11 @@ Fetch existing task executions matching input filters.
  * @param nodeExecutionIdExecutionIdName User or system provided value for the resource.
  * @param nodeExecutionIdNodeId
  * @param optional nil or *ListTaskExecutionsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskExecutionList
 */
@@ -3658,13 +3658,13 @@ func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExe
 AdminServiceApiService
 Fetch existing task definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Name of the project that contains the identifiers.
- * @param domain Name of the domain the identifiers belongs to within the project.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project. +required
  * @param optional nil or *ListTaskIdsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityIdentifierList
@@ -3783,11 +3783,11 @@ Fetch existing task definitions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListTasksOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskList
 */
@@ -3906,11 +3906,11 @@ Fetch existing task definitions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param optional nil or *ListTasks2Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskList
 */
@@ -4028,13 +4028,13 @@ func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idProject strin
 AdminServiceApiService
 Fetch an existing workflow definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param project Name of the project that contains the identifiers.
- * @param domain Name of the domain the identifiers belongs to within the project.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project. +required
  * @param optional nil or *ListWorkflowIdsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
 
 @return AdminNamedEntityIdentifierList
@@ -4153,11 +4153,11 @@ Fetch existing workflow definitions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListWorkflowsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminWorkflowList
 */
@@ -4276,11 +4276,11 @@ Fetch existing workflow definitions matching input filters.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param optional nil or *ListWorkflows2Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. TODO(katrogan): Add string validation here. This should never be empty.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminWorkflowList
 */
@@ -4772,7 +4772,7 @@ func (a *AdminServiceApiService) UpdateLaunchPlan(ctx context.Context, idProject
 AdminServiceApiService
 Update the fields associated with a NamedEntity
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType Resource type of the metadata to update
+ * @param resourceType Resource type of the metadata to update +required
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
@@ -4870,7 +4870,7 @@ func (a *AdminServiceApiService) UpdateNamedEntity(ctx context.Context, resource
 AdminServiceApiService flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
 Update a project.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param id
+ * @param id Globally unique project name.
  * @param body
 
 @return AdminProjectUpdateResponse

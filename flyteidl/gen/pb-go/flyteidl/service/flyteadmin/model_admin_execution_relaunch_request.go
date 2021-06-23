@@ -11,7 +11,6 @@ package flyteadmin
 
 // Request to relaunch the referenced execution.
 type AdminExecutionRelaunchRequest struct {
-	// Identifier of the workflow execution to relaunch.
 	Id *CoreWorkflowExecutionIdentifier `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 }

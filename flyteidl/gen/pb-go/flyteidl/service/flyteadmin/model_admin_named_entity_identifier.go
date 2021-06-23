@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Encapsulation of fields that identifies a Flyte resource. A resource can internally have multiple versions.
+// Encapsulation of fields that identifies a Flyte resource. A Flyte resource can be a task, workflow or launch plan. A resource can internally have multiple versions and is uniquely identified by project, domain, and name.
 type AdminNamedEntityIdentifier struct {
 	// Name of the project the resource belongs to.
 	Project string `json:"project,omitempty"`

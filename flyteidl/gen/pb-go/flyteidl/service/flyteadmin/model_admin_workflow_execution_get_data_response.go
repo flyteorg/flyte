@@ -11,12 +11,12 @@ package flyteadmin
 
 // Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution.
 type AdminWorkflowExecutionGetDataResponse struct {
-	// Signed url to fetch a core.LiteralMap of execution outputs.
+	// Signed url to fetch a core.LiteralMap of execution outputs. Deprecated: Please use full_outputs instead.
 	Outputs *AdminUrlBlob `json:"outputs,omitempty"`
-	// Signed url to fetch a core.LiteralMap of execution inputs.
+	// Signed url to fetch a core.LiteralMap of execution inputs. Deprecated: Please use full_inputs instead.
 	Inputs *AdminUrlBlob `json:"inputs,omitempty"`
-	// Optional, full_inputs will only be populated if they are under a configured size threshold.
+	// Full_inputs will only be populated if they are under a configured size threshold.
 	FullInputs *CoreLiteralMap `json:"full_inputs,omitempty"`
-	// Optional, full_outputs will only be populated if they are under a configured size threshold.
+	// Full_outputs will only be populated if they are under a configured size threshold.
 	FullOutputs *CoreLiteralMap `json:"full_outputs,omitempty"`
 }

@@ -75,6 +75,7 @@ class AdminLaunchPlanClosure(object):
     def state(self):
         """Gets the state of this AdminLaunchPlanClosure.  # noqa: E501
 
+        Indicate the Launch plan state.  # noqa: E501
 
         :return: The state of this AdminLaunchPlanClosure.  # noqa: E501
         :rtype: AdminLaunchPlanState
@@ -85,6 +86,7 @@ class AdminLaunchPlanClosure(object):
     def state(self, state):
         """Sets the state of this AdminLaunchPlanClosure.
 
+        Indicate the Launch plan state.  # noqa: E501
 
         :param state: The state of this AdminLaunchPlanClosure.  # noqa: E501
         :type: AdminLaunchPlanState

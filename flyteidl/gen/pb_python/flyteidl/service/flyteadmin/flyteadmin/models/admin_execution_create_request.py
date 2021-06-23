@@ -74,7 +74,6 @@ class AdminExecutionCreateRequest(object):
     def project(self):
         """Gets the project of this AdminExecutionCreateRequest.  # noqa: E501
 
-        Name of the project the execution belongs to.  # noqa: E501
 
         :return: The project of this AdminExecutionCreateRequest.  # noqa: E501
         :rtype: str
@@ -85,7 +84,6 @@ class AdminExecutionCreateRequest(object):
     def project(self, project):
         """Sets the project of this AdminExecutionCreateRequest.
 
-        Name of the project the execution belongs to.  # noqa: E501
 
         :param project: The project of this AdminExecutionCreateRequest.  # noqa: E501
         :type: str
@@ -97,7 +95,6 @@ class AdminExecutionCreateRequest(object):
     def domain(self):
         """Gets the domain of this AdminExecutionCreateRequest.  # noqa: E501
 
-        Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project.  # noqa: E501
 
         :return: The domain of this AdminExecutionCreateRequest.  # noqa: E501
         :rtype: str
@@ -108,7 +105,6 @@ class AdminExecutionCreateRequest(object):
     def domain(self, domain):
         """Sets the domain of this AdminExecutionCreateRequest.
 
-        Name of the domain the execution belongs to. A domain can be considered as a subset within a specific project.  # noqa: E501
 
         :param domain: The domain of this AdminExecutionCreateRequest.  # noqa: E501
         :type: str
@@ -141,7 +137,6 @@ class AdminExecutionCreateRequest(object):
     def spec(self):
         """Gets the spec of this AdminExecutionCreateRequest.  # noqa: E501
 
-        Additional fields necessary to launch the execution.  # noqa: E501
 
         :return: The spec of this AdminExecutionCreateRequest.  # noqa: E501
         :rtype: AdminExecutionSpec
@@ -152,7 +147,6 @@ class AdminExecutionCreateRequest(object):
     def spec(self, spec):
         """Sets the spec of this AdminExecutionCreateRequest.
 
-        Additional fields necessary to launch the execution.  # noqa: E501
 
         :param spec: The spec of this AdminExecutionCreateRequest.  # noqa: E501
         :type: AdminExecutionSpec
@@ -164,7 +158,6 @@ class AdminExecutionCreateRequest(object):
     def inputs(self):
         """Gets the inputs of this AdminExecutionCreateRequest.  # noqa: E501
 
-        The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply.  # noqa: E501
 
         :return: The inputs of this AdminExecutionCreateRequest.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -175,7 +168,6 @@ class AdminExecutionCreateRequest(object):
     def inputs(self, inputs):
         """Sets the inputs of this AdminExecutionCreateRequest.
 
-        The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply.  # noqa: E501
 
         :param inputs: The inputs of this AdminExecutionCreateRequest.  # noqa: E501
         :type: CoreLiteralMap

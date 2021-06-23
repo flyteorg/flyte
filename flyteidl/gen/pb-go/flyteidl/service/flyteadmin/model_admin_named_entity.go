@@ -9,8 +9,11 @@
 
 package flyteadmin
 
+// Encapsulates information common to a NamedEntity, a Flyte resource such as a task, workflow or launch plan. A NamedEntity is exclusively identified by its resource type and identifier.
 type AdminNamedEntity struct {
+	// Resource type of the named entity. One of Task, Workflow or LaunchPlan.
 	ResourceType *CoreResourceType `json:"resource_type,omitempty"`
 	Id *AdminNamedEntityIdentifier `json:"id,omitempty"`
+	// Additional metadata around a named entity.
 	Metadata *AdminNamedEntityMetadata `json:"metadata,omitempty"`
 }

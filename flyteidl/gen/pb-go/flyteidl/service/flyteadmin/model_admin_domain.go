@@ -11,6 +11,7 @@ package flyteadmin
 
 // Namespace within a project commonly used to differentiate between different service instances. e.g. \"production\", \"development\", etc.
 type AdminDomain struct {
+	// Globally unique domain name.
 	Id string `json:"id,omitempty"`
 	// Display name.
 	Name string `json:"name,omitempty"`

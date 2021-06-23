@@ -9,7 +9,7 @@
 
 package flyteadmin
 
+// Defines a pager duty notification specification.
 type AdminPagerDutyNotification struct {
-	// Currently, PagerDuty notifications leverage email to trigger a notification.
 	RecipientsEmail []string `json:"recipients_email,omitempty"`
 }

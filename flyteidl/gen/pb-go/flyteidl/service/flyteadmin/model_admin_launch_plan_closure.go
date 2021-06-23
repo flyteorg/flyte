@@ -15,6 +15,7 @@ import (
 
 // Values computed by the flyte platform after launch plan registration. These include expected_inputs required to be present in a CreateExecutionRequest to launch the reference workflow as well timestamp values associated with the launch plan.
 type AdminLaunchPlanClosure struct {
+	// Indicate the Launch plan state.
 	State *AdminLaunchPlanState `json:"state,omitempty"`
 	ExpectedInputs *CoreParameterMap `json:"expected_inputs,omitempty"`
 	ExpectedOutputs *CoreVariableMap `json:"expected_outputs,omitempty"`

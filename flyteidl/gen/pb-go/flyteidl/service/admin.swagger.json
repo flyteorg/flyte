@@ -70,21 +70,21 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Name of the project that contains the identifiers.",
+            "description": "Name of the project that contains the identifiers.\n+required.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Name of the domain the identifiers belongs to within the project.",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -99,14 +99,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -214,7 +214,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -236,14 +236,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -612,7 +612,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -634,14 +634,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -758,21 +758,21 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Name of the project that contains the identifiers.",
+            "description": "Name of the project that contains the identifiers.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Name of the domain the identifiers belongs to within the project.",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -787,14 +787,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -888,7 +888,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -910,14 +910,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -969,7 +969,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -991,14 +991,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1144,7 +1144,7 @@
         "parameters": [
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
+            "description": "+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1180,6 +1180,7 @@
         "parameters": [
           {
             "name": "resource_type",
+            "description": "Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.\n+required",
             "in": "path",
             "required": true,
             "type": "string",
@@ -1231,7 +1232,7 @@
         "parameters": [
           {
             "name": "resource_type",
-            "description": "Resource type of the metadata to update",
+            "description": "Resource type of the metadata to update\n+required",
             "in": "path",
             "required": true,
             "type": "string",
@@ -1293,6 +1294,7 @@
         "parameters": [
           {
             "name": "resource_type",
+            "description": "Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.\n+required",
             "in": "path",
             "required": true,
             "type": "string",
@@ -1306,7 +1308,7 @@
           },
           {
             "name": "project",
-            "description": "Name of the project that contains the identifiers.",
+            "description": "Name of the project that contains the identifiers.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1335,14 +1337,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1447,7 +1449,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1455,7 +1457,6 @@
           },
           {
             "name": "token",
-            "description": "In the case of multiple pages of results, the, server-provided token can be used to fetch the next page\nin a query.\n+optional.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1469,14 +1470,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1555,21 +1556,21 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Unique project id which this set of attributes references.",
+            "description": "Unique project id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Unique domain id which this set of attributes references.",
+            "description": "Unique domain id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
+            "description": "Which type of matchable attributes to return.\n+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1603,14 +1604,14 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Unique project id which this set of attributes references.",
+            "description": "Unique project id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Unique domain id which this set of attributes references.",
+            "description": "Unique domain id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1644,7 +1645,7 @@
         "parameters": [
           {
             "name": "limit",
-            "description": "Indicates the number of projects to be returned.",
+            "description": "Indicates the number of projects to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1666,14 +1667,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1730,6 +1731,7 @@
         "parameters": [
           {
             "name": "id",
+            "description": "Globally unique project name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1886,7 +1888,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1908,14 +1910,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -1946,21 +1948,21 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Name of the project that contains the identifiers.",
+            "description": "Name of the project that contains the identifiers.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Name of the domain the identifiers belongs to within the project.",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -1975,14 +1977,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2076,7 +2078,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2098,14 +2100,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2157,7 +2159,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2179,14 +2181,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2344,28 +2346,28 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Unique project id which this set of attributes references.",
+            "description": "Unique project id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Unique domain id which this set of attributes references.",
+            "description": "Unique domain id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "workflow",
-            "description": "Workflow name which this set of attributes references.",
+            "description": "Workflow name which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "resource_type",
-            "description": " - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
+            "description": "Which type of matchable attributes to return.\n+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2399,21 +2401,21 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Unique project id which this set of attributes references.",
+            "description": "Unique project id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Unique domain id which this set of attributes references.",
+            "description": "Unique domain id which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "workflow",
-            "description": "Workflow name which this set of attributes references.",
+            "description": "Workflow name which this set of attributes references.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
@@ -2447,21 +2449,21 @@
         "parameters": [
           {
             "name": "project",
-            "description": "Name of the project that contains the identifiers.",
+            "description": "Name of the project that contains the identifiers.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "domain",
-            "description": "Name of the domain the identifiers belongs to within the project.",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2476,14 +2478,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2577,7 +2579,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2599,14 +2601,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2658,7 +2660,7 @@
           },
           {
             "name": "limit",
-            "description": "Indicates the number of resources to be returned.",
+            "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -2680,14 +2682,14 @@
           },
           {
             "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty.",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -2872,7 +2874,7 @@
         "USE_DEFAULT"
       ],
       "default": "FAIL",
-      "description": " - USE_DEFAULT: Uses the system-configured default implementation."
+      "description": " - FAIL: By default, if this plugin is not enabled for a Flyte deployment then execution will fail.\n - USE_DEFAULT: Uses the system-configured default implementation."
     },
     "ProjectProjectState": {
       "type": "string",
@@ -2970,7 +2972,8 @@
         "DESCENDING",
         "ASCENDING"
       ],
-      "default": "DESCENDING"
+      "default": "DESCENDING",
+      "description": " - DESCENDING: By default, fields are sorted in descending order."
     },
     "TaskExecutionMetadataInstanceClass": {
       "type": "string",
@@ -3011,7 +3014,8 @@
           "type": "string",
           "title": "Identifies the entity (if any) responsible for terminating the execution"
         }
-      }
+      },
+      "description": "Specifies metadata around an aborted workflow execution."
     },
     "adminAnnotations": {
       "type": "object",
@@ -3077,13 +3081,15 @@
           "type": "string",
           "title": "ISO 8601 duration as described by https://en.wikipedia.org/wiki/ISO_8601#Durations"
         }
-      }
+      },
+      "description": "Options for schedules to run according to a cron expression."
     },
     "adminDomain": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Globally unique domain name."
         },
         "name": {
           "type": "string",
@@ -3100,9 +3106,10 @@
           "items": {
             "type": "string"
           },
-          "description": "The list of email addresses recipients for this notification."
+          "title": "The list of email addresses recipients for this notification.\n+required"
         }
-      }
+      },
+      "description": "Defines an email notification specification."
     },
     "adminExecution": {
       "type": "object",
@@ -3127,7 +3134,7 @@
       "properties": {
         "outputs": {
           "$ref": "#/definitions/adminLiteralMapBlob",
-          "description": "A map of outputs in the case of a successful execution."
+          "description": "Output URI in the case of a successful execution."
         },
         "error": {
           "$ref": "#/definitions/coreExecutionError",
@@ -3152,7 +3159,7 @@
         "started_at": {
           "type": "string",
           "format": "date-time",
-          "description": "Reported ime at which the execution began running."
+          "description": "Reported time at which the execution began running."
         },
         "duration": {
           "type": "string",
@@ -3196,11 +3203,11 @@
       "properties": {
         "project": {
           "type": "string",
-          "description": "Name of the project the execution belongs to."
+          "title": "Name of the project the execution belongs to.\n+required"
         },
         "domain": {
           "type": "string",
-          "description": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project."
+          "title": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required"
         },
         "name": {
           "type": "string",
@@ -3208,14 +3215,14 @@
         },
         "spec": {
           "$ref": "#/definitions/adminExecutionSpec",
-          "description": "Additional fields necessary to launch the execution."
+          "title": "Additional fields necessary to launch the execution.\n+optional"
         },
         "inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply."
+          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         }
       },
-      "description": "Request to launch an execution with the given project, domain and optionally name."
+      "description": "Request to launch an execution with the given project, domain and optionally-assigned name."
     },
     "adminExecutionCreateResponse": {
       "type": "object",
@@ -3264,7 +3271,7 @@
         },
         "parent_node_execution": {
           "$ref": "#/definitions/coreNodeExecutionIdentifier",
-          "title": "Which subworkflow node launched this execution"
+          "title": "Which subworkflow node (if any) launched this execution"
         },
         "reference_execution": {
           "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
@@ -3294,7 +3301,7 @@
       "properties": {
         "id": {
           "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
-          "description": "Identifier of the workflow execution to relaunch."
+          "title": "Identifier of the workflow execution to relaunch.\n+required"
         },
         "name": {
           "type": "string",
@@ -3350,10 +3357,10 @@
         "max_parallelism": {
           "type": "integer",
           "format": "int32",
-          "description": "Controls the maximum number of tasknodes that can be run in parallel for the entire workflow.\nThis is useful to achieve fairness. Note: MapTasks are regarded as one unit,\nand parallelism/concurrency of MapTasks is independent from this."
+          "description": "Controls the maximum number of task nodes that can be run in parallel for the entire workflow.\nThis is useful to achieve fairness. Note: MapTasks are regarded as one unit,\nand parallelism/concurrency of MapTasks is independent from this."
         }
       },
-      "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes.."
+      "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
     },
     "adminExecutionTerminateRequest": {
       "type": "object",
@@ -3422,13 +3429,16 @@
       "type": "object",
       "properties": {
         "id": {
-          "$ref": "#/definitions/coreIdentifier"
+          "$ref": "#/definitions/coreIdentifier",
+          "description": "Uniquely identifies a launch plan entity."
         },
         "spec": {
-          "$ref": "#/definitions/adminLaunchPlanSpec"
+          "$ref": "#/definitions/adminLaunchPlanSpec",
+          "description": "User-provided launch plan details, including reference workflow, inputs and other metadata."
         },
         "closure": {
-          "$ref": "#/definitions/adminLaunchPlanClosure"
+          "$ref": "#/definitions/adminLaunchPlanClosure",
+          "description": "Values computed by the flyte platform after launch plan registration."
         }
       },
       "description": "A LaunchPlan provides the capability to templatize workflow executions.\nLaunch plans simplify associating one or more schedules, inputs and notifications with your workflows.\nLaunch plans can be shared and used to trigger executions with predefined inputs even when a workflow\ndefinition doesn't necessarily have a default value for said input."
@@ -3438,15 +3448,15 @@
       "properties": {
         "state": {
           "$ref": "#/definitions/adminLaunchPlanState",
-          "title": "Indicate the Launch plan phase"
+          "description": "Indicate the Launch plan state."
         },
         "expected_inputs": {
           "$ref": "#/definitions/coreParameterMap",
-          "title": "Indicates the set of inputs to execute the Launch plan"
+          "title": "Indicates the set of inputs expected when creating an execution with the Launch plan"
         },
         "expected_outputs": {
           "$ref": "#/definitions/coreVariableMap",
-          "title": "Indicates the set of outputs from the Launch plan"
+          "title": "Indicates the set of outputs expected to be produced by creating an execution with the Launch plan"
         },
         "created_at": {
           "type": "string",
@@ -3473,7 +3483,7 @@
           "description": "User-provided launch plan details, including reference workflow, inputs and other metadata."
         }
       },
-      "description": "Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required\nto launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to\nset the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan."
+      "description": "Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required\nto launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to\nset the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan."
     },
     "adminLaunchPlanCreateResponse": {
       "type": "object"
@@ -3524,11 +3534,11 @@
         },
         "default_inputs": {
           "$ref": "#/definitions/coreParameterMap",
-          "title": "Input values to be passed for the execution"
+          "description": "Input values to be passed for the execution.\nThese can be overriden when an execution is created with this launch plan."
         },
         "fixed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "title": "Fixed, non-overridable inputs for the Launch Plan"
+          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overriden when an execution is created with this launch plan."
         },
         "role": {
           "type": "string",
@@ -3558,7 +3568,8 @@
           "description": "Indicates the runtime priority of the execution."
         },
         "raw_output_data_config": {
-          "$ref": "#/definitions/adminRawOutputDataConfig"
+          "$ref": "#/definitions/adminRawOutputDataConfig",
+          "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.)."
         },
         "max_parallelism": {
           "type": "integer",
@@ -3582,11 +3593,11 @@
       "properties": {
         "id": {
           "$ref": "#/definitions/coreIdentifier",
-          "description": "Identifier of launch plan for which to change state."
+          "description": "Identifier of launch plan for which to change state.\n+required."
         },
         "state": {
           "$ref": "#/definitions/adminLaunchPlanState",
-          "description": "Desired state to apply to the launch plan."
+          "description": "Desired state to apply to the launch plan.\n+required."
         }
       },
       "description": "Request to set the referenced launch plan state to the configured value."
@@ -3605,7 +3616,7 @@
           }
         }
       },
-      "description": "Response for a request for all matching resource attributes."
+      "description": "Response for a request for all matching resource attributes for a resource type."
     },
     "adminLiteralMapBlob": {
       "type": "object",
@@ -3640,7 +3651,7 @@
           "type": "string"
         }
       },
-      "description": "Represents a custom set of attributes applied for either a domain; a domain and project; or\ndomain, project and workflow name."
+      "description": "Represents a custom set of attributes applied for either a domain; a domain and project; or\ndomain, project and workflow name.\nThese are used to override system level defaults for kubernetes cluster resource management,\ndefault execution values, and more all across different levels of specificity."
     },
     "adminMatchableResource": {
       "type": "string",
@@ -3687,16 +3698,18 @@
       "type": "object",
       "properties": {
         "resource_type": {
-          "$ref": "#/definitions/coreResourceType"
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Resource type of the named entity. One of Task, Workflow or LaunchPlan."
         },
         "id": {
           "$ref": "#/definitions/adminNamedEntityIdentifier"
         },
         "metadata": {
-          "$ref": "#/definitions/adminNamedEntityMetadata"
+          "$ref": "#/definitions/adminNamedEntityMetadata",
+          "description": "Additional metadata around a named entity."
         }
       },
-      "title": "Describes information common to a NamedEntity, identified by a project /\ndomain / name / resource type combination"
+      "description": "Encapsulates information common to a NamedEntity, a Flyte resource such as a task,\nworkflow or launch plan. A NamedEntity is exclusively identified by its resource type\nand identifier."
     },
     "adminNamedEntityIdentifier": {
       "type": "object",
@@ -3714,7 +3727,7 @@
           "title": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'"
         }
       },
-      "description": "Encapsulation of fields that identifies a Flyte resource.\nA resource can internally have multiple versions."
+      "description": "Encapsulation of fields that identifies a Flyte resource.\nA Flyte resource can be a task, workflow or launch plan.\nA resource can internally have multiple versions and is uniquely identified\nby project, domain, and name."
     },
     "adminNamedEntityIdentifierList": {
       "type": "object",
@@ -3761,7 +3774,8 @@
           "$ref": "#/definitions/adminNamedEntityState",
           "description": "Shared state across all version of the entity\nAt this point in time, only workflow entities can have their state archived."
         }
-      }
+      },
+      "description": "Additional metadata around a named entity."
     },
     "adminNamedEntityState": {
       "type": "string",
@@ -3778,18 +3792,18 @@
       "properties": {
         "resource_type": {
           "$ref": "#/definitions/coreResourceType",
-          "title": "Resource type of the metadata to update"
+          "title": "Resource type of the metadata to update\n+required"
         },
         "id": {
           "$ref": "#/definitions/adminNamedEntityIdentifier",
-          "title": "Identifier of the metadata to update"
+          "title": "Identifier of the metadata to update\n+required"
         },
         "metadata": {
           "$ref": "#/definitions/adminNamedEntityMetadata",
-          "title": "Metadata object to set as the new value"
+          "title": "Metadata object to set as the new value\n+required"
         }
       },
-      "description": "Request to set the referenced launch plan state to the configured value."
+      "description": "Request to set the referenced named entity state to the configured value."
     },
     "adminNamedEntityUpdateResponse": {
       "type": "object",
@@ -3799,7 +3813,8 @@
       "type": "object",
       "properties": {
         "output_uri": {
-          "type": "string"
+          "type": "string",
+          "description": "Links to a remotely stored, serialized core.LiteralMap of node execution outputs."
         },
         "error": {
           "$ref": "#/definitions/coreExecutionError",
@@ -3859,19 +3874,19 @@
       "properties": {
         "inputs": {
           "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of node execution inputs."
+          "description": "Signed url to fetch a core.LiteralMap of node execution inputs.\nDeprecated: Please use full_inputs instead."
         },
         "outputs": {
           "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of node execution outputs."
+          "description": "Signed url to fetch a core.LiteralMap of node execution outputs.\nDeprecated: Please use full_outputs instead."
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Optional, full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold."
         },
         "dynamic_workflow": {
           "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
@@ -3906,7 +3921,7 @@
         "is_parent_node": {
           "type": "boolean",
           "format": "boolean",
-          "title": "Boolean flag indicating if the node has child nodes under it"
+          "description": "Boolean flag indicating if the node has child nodes under it\nThis can be true when a node contains a dynamic workflow which then produces\nchild nodes."
         },
         "spec_node_id": {
           "type": "string",
@@ -3923,7 +3938,7 @@
           "items": {
             "$ref": "#/definitions/coreWorkflowExecutionPhase"
           },
-          "description": "A list of phases to which users can associate the notifications to."
+          "title": "A list of phases to which users can associate the notifications to.\n+required"
         },
         "email": {
           "$ref": "#/definitions/adminEmailNotification"
@@ -3935,7 +3950,7 @@
           "$ref": "#/definitions/adminSlackNotification"
         }
       },
-      "description": "Represents a structure for notifications based on execution status.\nThe Notification content is configured within Admin. Future iterations could\nexpose configuring notifications with custom content."
+      "description": "Represents a structure for notifications based on execution status.\nThe notification content is configured within flyte admin but can be templatized.\nFuture iterations could expose configuring notifications with custom content."
     },
     "adminNotificationList": {
       "type": "object",
@@ -3956,9 +3971,10 @@
           "items": {
             "type": "string"
           },
-          "description": "Currently, PagerDuty notifications leverage email to trigger a notification."
+          "title": "Currently, PagerDuty notifications leverage email to trigger a notification.\n+required"
         }
-      }
+      },
+      "description": "Defines a pager duty notification specification."
     },
     "adminPluginOverride": {
       "type": "object",
@@ -3996,7 +4012,8 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Globally unique project name."
         },
         "name": {
           "type": "string",
@@ -4035,23 +4052,26 @@
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
         }
-      }
+      },
+      "description": "Defines a set of custom matching attributes which defines resource defaults for a project and domain.\nFor more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
     },
     "adminProjectDomainAttributesDeleteRequest": {
       "type": "object",
       "properties": {
         "project": {
           "type": "string",
-          "description": "Unique project id which this set of attributes references."
+          "title": "Unique project id which this set of attributes references.\n+required"
         },
         "domain": {
           "type": "string",
-          "description": "Unique domain id which this set of attributes references."
+          "title": "Unique domain id which this set of attributes references.\n+required"
         },
         "resource_type": {
-          "$ref": "#/definitions/adminMatchableResource"
+          "$ref": "#/definitions/adminMatchableResource",
+          "title": "Which type of matchable attributes to delete.\n+required"
         }
-      }
+      },
+      "description": "Request to delete a set matchable project domain attribute override."
     },
     "adminProjectDomainAttributesDeleteResponse": {
       "type": "object",
@@ -4063,13 +4083,15 @@
         "attributes": {
           "$ref": "#/definitions/adminProjectDomainAttributes"
         }
-      }
+      },
+      "description": "Response to get an individual project domain attribute override."
     },
     "adminProjectDomainAttributesUpdateRequest": {
       "type": "object",
       "properties": {
         "attributes": {
-          "$ref": "#/definitions/adminProjectDomainAttributes"
+          "$ref": "#/definitions/adminProjectDomainAttributes",
+          "title": "+required"
         }
       },
       "description": "Sets custom attributes for a project-domain combination."
@@ -4082,7 +4104,8 @@
       "type": "object",
       "properties": {
         "project": {
-          "$ref": "#/definitions/adminProject"
+          "$ref": "#/definitions/adminProject",
+          "title": "+required"
         }
       }
     },
@@ -4145,23 +4168,24 @@
           "items": {
             "type": "string"
           },
-          "description": "Currently, Slack notifications leverage email to trigger a notification."
+          "title": "Currently, Slack notifications leverage email to trigger a notification.\n+required"
         }
-      }
+      },
+      "description": "Defines a slack notification specification."
     },
     "adminSort": {
       "type": "object",
       "properties": {
         "key": {
           "type": "string",
-          "description": "Indicates an attribute to sort the response values.\nTODO(katrogan): Add string validation here. This should never be empty."
+          "title": "Indicates an attribute to sort the response values.\n+required"
         },
         "direction": {
           "$ref": "#/definitions/SortDirection",
           "title": "Indicates the direction to apply sort key for response values.\n+optional"
         }
       },
-      "description": "Species sort ordering in a list request."
+      "description": "Specifies sort ordering in a list request."
     },
     "adminSystemMetadata": {
       "type": "object",
@@ -4171,7 +4195,7 @@
           "description": "Which execution cluster this execution ran on."
         }
       },
-      "description": "Represents system rather than user-facing metadata about an execution."
+      "description": "Represents system, rather than user-facing, metadata about an execution."
     },
     "adminTask": {
       "type": "object",
@@ -4207,11 +4231,11 @@
       "properties": {
         "id": {
           "$ref": "#/definitions/coreIdentifier",
-          "description": "id represents the unique identifier of the task."
+          "title": "id represents the unique identifier of the task.\n+required"
         },
         "spec": {
           "$ref": "#/definitions/adminTaskSpec",
-          "description": "Represents the specification for task."
+          "title": "Represents the specification for task.\n+required"
         }
       },
       "description": "Represents a request structure to create a revision of a task."
@@ -4302,19 +4326,19 @@
       "properties": {
         "inputs": {
           "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of task execution inputs."
+          "description": "Signed url to fetch a core.LiteralMap of task execution inputs.\nDeprecated: Please use full_inputs instead."
         },
         "outputs": {
           "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of task execution outputs."
+          "description": "Signed url to fetch a core.LiteralMap of task execution outputs.\nDeprecated: Please use full_outputs instead."
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Optional, full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution."
@@ -4361,7 +4385,8 @@
         "limits": {
           "$ref": "#/definitions/adminTaskResourceSpec"
         }
-      }
+      },
+      "description": "Defines task resource defaults and limits that will be applied at task registration."
     },
     "adminTaskResourceSpec": {
       "type": "object",
@@ -4378,7 +4403,8 @@
         "storage": {
           "type": "string"
         }
-      }
+      },
+      "description": "Defines a set of overridable task resource attributes set during task registration."
     },
     "adminTaskSpec": {
       "type": "object",
@@ -4455,27 +4481,30 @@
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
         }
-      }
+      },
+      "description": "Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.\nFor more info on matchable attributes, see - :ref:`ref_flyteidl/admin/matchable_resource.proto`."
     },
     "adminWorkflowAttributesDeleteRequest": {
       "type": "object",
       "properties": {
         "project": {
           "type": "string",
-          "description": "Unique project id which this set of attributes references."
+          "title": "Unique project id which this set of attributes references.\n+required"
         },
         "domain": {
           "type": "string",
-          "description": "Unique domain id which this set of attributes references."
+          "title": "Unique domain id which this set of attributes references.\n+required"
         },
         "workflow": {
           "type": "string",
-          "description": "Workflow name which this set of attributes references."
+          "title": "Workflow name which this set of attributes references.\n+required"
         },
         "resource_type": {
-          "$ref": "#/definitions/adminMatchableResource"
+          "$ref": "#/definitions/adminMatchableResource",
+          "title": "Which type of matchable attributes to delete.\n+required"
         }
-      }
+      },
+      "description": "Request to delete a set matchable workflow attribute override."
     },
     "adminWorkflowAttributesDeleteResponse": {
       "type": "object",
@@ -4487,7 +4516,8 @@
         "attributes": {
           "$ref": "#/definitions/adminWorkflowAttributes"
         }
-      }
+      },
+      "description": "Response to get an individual workflow attribute override."
     },
     "adminWorkflowAttributesUpdateRequest": {
       "type": "object",
@@ -4522,11 +4552,11 @@
       "properties": {
         "id": {
           "$ref": "#/definitions/coreIdentifier",
-          "description": "id represents the unique identifier of the workflow."
+          "title": "id represents the unique identifier of the workflow.\n+required"
         },
         "spec": {
           "$ref": "#/definitions/adminWorkflowSpec",
-          "description": "Represents the specification for workflow."
+          "title": "Represents the specification for workflow.\n+required"
         }
       },
       "description": "Represents a request structure to create a revision of a workflow."
@@ -4567,19 +4597,19 @@
       "properties": {
         "outputs": {
           "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of execution outputs."
+          "description": "Signed url to fetch a core.LiteralMap of execution outputs.\nDeprecated: Please use full_outputs instead."
         },
         "inputs": {
           "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of execution inputs."
+          "description": "Signed url to fetch a core.LiteralMap of execution inputs.\nDeprecated: Please use full_inputs instead."
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Optional, full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Optional, full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."
@@ -6282,7 +6312,8 @@
       "type": "object",
       "properties": {
         "executionId": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
+          "description": "The identifier for a workflow execution launched by a node."
         }
       },
       "title": "Metadata for a WorkflowNode"

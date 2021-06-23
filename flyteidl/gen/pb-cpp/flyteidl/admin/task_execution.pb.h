@@ -1125,23 +1125,23 @@ class TaskExecutionGetDataResponse final :
 
   // accessors -------------------------------------------------------
 
-  // .flyteidl.admin.UrlBlob inputs = 1;
-  bool has_inputs() const;
-  void clear_inputs();
-  static const int kInputsFieldNumber = 1;
-  const ::flyteidl::admin::UrlBlob& inputs() const;
-  ::flyteidl::admin::UrlBlob* release_inputs();
-  ::flyteidl::admin::UrlBlob* mutable_inputs();
-  void set_allocated_inputs(::flyteidl::admin::UrlBlob* inputs);
+  // .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_inputs() const;
+  PROTOBUF_DEPRECATED void clear_inputs();
+  PROTOBUF_DEPRECATED static const int kInputsFieldNumber = 1;
+  PROTOBUF_DEPRECATED const ::flyteidl::admin::UrlBlob& inputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::UrlBlob* release_inputs();
+  PROTOBUF_DEPRECATED ::flyteidl::admin::UrlBlob* mutable_inputs();
+  PROTOBUF_DEPRECATED void set_allocated_inputs(::flyteidl::admin::UrlBlob* inputs);
 
-  // .flyteidl.admin.UrlBlob outputs = 2;
-  bool has_outputs() const;
-  void clear_outputs();
-  static const int kOutputsFieldNumber = 2;
-  const ::flyteidl::admin::UrlBlob& outputs() const;
-  ::flyteidl::admin::UrlBlob* release_outputs();
-  ::flyteidl::admin::UrlBlob* mutable_outputs();
-  void set_allocated_outputs(::flyteidl::admin::UrlBlob* outputs);
+  // .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_outputs() const;
+  PROTOBUF_DEPRECATED void clear_outputs();
+  PROTOBUF_DEPRECATED static const int kOutputsFieldNumber = 2;
+  PROTOBUF_DEPRECATED const ::flyteidl::admin::UrlBlob& outputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::UrlBlob* release_outputs();
+  PROTOBUF_DEPRECATED ::flyteidl::admin::UrlBlob* mutable_outputs();
+  PROTOBUF_DEPRECATED void set_allocated_outputs(::flyteidl::admin::UrlBlob* outputs);
 
   // .flyteidl.core.LiteralMap full_inputs = 3;
   bool has_full_inputs() const;
@@ -2312,7 +2312,7 @@ inline void TaskExecutionGetDataRequest::set_allocated_id(::flyteidl::core::Task
 
 // TaskExecutionGetDataResponse
 
-// .flyteidl.admin.UrlBlob inputs = 1;
+// .flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
 inline bool TaskExecutionGetDataResponse::has_inputs() const {
   return this != internal_default_instance() && inputs_ != nullptr;
 }
@@ -2357,7 +2357,7 @@ inline void TaskExecutionGetDataResponse::set_allocated_inputs(::flyteidl::admin
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.inputs)
 }
 
-// .flyteidl.admin.UrlBlob outputs = 2;
+// .flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
 inline bool TaskExecutionGetDataResponse::has_outputs() const {
   return this != internal_default_instance() && outputs_ != nullptr;
 }

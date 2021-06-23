@@ -11,8 +11,6 @@ package flyteadmin
 
 // Represents a request structure to create a revision of a task.
 type AdminTaskCreateRequest struct {
-	// id represents the unique identifier of the task.
 	Id *CoreIdentifier `json:"id,omitempty"`
-	// Represents the specification for task.
 	Spec *AdminTaskSpec `json:"spec,omitempty"`
 }

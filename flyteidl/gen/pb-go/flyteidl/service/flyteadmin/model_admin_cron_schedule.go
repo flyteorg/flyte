@@ -9,6 +9,7 @@
 
 package flyteadmin
 
+// Options for schedules to run according to a cron expression.
 type AdminCronSchedule struct {
 	Schedule string `json:"schedule,omitempty"`
 	Offset string `json:"offset,omitempty"`

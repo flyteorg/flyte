@@ -748,6 +748,10 @@ public final class ScheduleOuterClass {
         getOffsetBytes();
   }
   /**
+   * <pre>
+   * Options for schedules to run according to a cron expression.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.CronSchedule}
    */
   public  static final class CronSchedule extends
@@ -1087,6 +1091,10 @@ public final class ScheduleOuterClass {
       return builder;
     }
     /**
+     * <pre>
+     * Options for schedules to run according to a cron expression.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.CronSchedule}
      */
     public static final class Builder extends

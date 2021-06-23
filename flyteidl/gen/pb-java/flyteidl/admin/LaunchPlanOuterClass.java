@@ -176,9 +176,9 @@ public final class LaunchPlanOuterClass {
   }
   /**
    * <pre>
-   * Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required
+   * Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
    * to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
-   * set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan.
+   * set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.LaunchPlanCreateRequest}
@@ -521,9 +521,9 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Request to register a launch plan. A LaunchPlanSpec may include a complete or incomplete set of inputs required
+     * Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
      * to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
-     * set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have created a launch plan.
+     * set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.LaunchPlanCreateRequest}
@@ -1476,40 +1476,76 @@ public final class LaunchPlanOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Uniquely identifies a launch plan entity.
+     * </pre>
+     *
      * <code>.flyteidl.core.Identifier id = 1;</code>
      */
     boolean hasId();
     /**
+     * <pre>
+     * Uniquely identifies a launch plan entity.
+     * </pre>
+     *
      * <code>.flyteidl.core.Identifier id = 1;</code>
      */
     flyteidl.core.IdentifierOuterClass.Identifier getId();
     /**
+     * <pre>
+     * Uniquely identifies a launch plan entity.
+     * </pre>
+     *
      * <code>.flyteidl.core.Identifier id = 1;</code>
      */
     flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder();
 
     /**
+     * <pre>
+     * User-provided launch plan details, including reference workflow, inputs and other metadata.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
      */
     boolean hasSpec();
     /**
+     * <pre>
+     * User-provided launch plan details, including reference workflow, inputs and other metadata.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
      */
     flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec getSpec();
     /**
+     * <pre>
+     * User-provided launch plan details, including reference workflow, inputs and other metadata.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
      */
     flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpecOrBuilder getSpecOrBuilder();
 
     /**
+     * <pre>
+     * Values computed by the flyte platform after launch plan registration.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
      */
     boolean hasClosure();
     /**
+     * <pre>
+     * Values computed by the flyte platform after launch plan registration.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
      */
     flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure getClosure();
     /**
+     * <pre>
+     * Values computed by the flyte platform after launch plan registration.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
      */
     flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosureOrBuilder getClosureOrBuilder();
@@ -1634,18 +1670,30 @@ public final class LaunchPlanOuterClass {
     public static final int ID_FIELD_NUMBER = 1;
     private flyteidl.core.IdentifierOuterClass.Identifier id_;
     /**
+     * <pre>
+     * Uniquely identifies a launch plan entity.
+     * </pre>
+     *
      * <code>.flyteidl.core.Identifier id = 1;</code>
      */
     public boolean hasId() {
       return id_ != null;
     }
     /**
+     * <pre>
+     * Uniquely identifies a launch plan entity.
+     * </pre>
+     *
      * <code>.flyteidl.core.Identifier id = 1;</code>
      */
     public flyteidl.core.IdentifierOuterClass.Identifier getId() {
       return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
     }
     /**
+     * <pre>
+     * Uniquely identifies a launch plan entity.
+     * </pre>
+     *
      * <code>.flyteidl.core.Identifier id = 1;</code>
      */
     public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
@@ -1655,18 +1703,30 @@ public final class LaunchPlanOuterClass {
     public static final int SPEC_FIELD_NUMBER = 2;
     private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec spec_;
     /**
+     * <pre>
+     * User-provided launch plan details, including reference workflow, inputs and other metadata.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
      */
     public boolean hasSpec() {
       return spec_ != null;
     }
     /**
+     * <pre>
+     * User-provided launch plan details, including reference workflow, inputs and other metadata.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
      */
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec getSpec() {
       return spec_ == null ? flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec.getDefaultInstance() : spec_;
     }
     /**
+     * <pre>
+     * User-provided launch plan details, including reference workflow, inputs and other metadata.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
      */
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpecOrBuilder getSpecOrBuilder() {
@@ -1676,18 +1736,30 @@ public final class LaunchPlanOuterClass {
     public static final int CLOSURE_FIELD_NUMBER = 3;
     private flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure closure_;
     /**
+     * <pre>
+     * Values computed by the flyte platform after launch plan registration.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
      */
     public boolean hasClosure() {
       return closure_ != null;
     }
     /**
+     * <pre>
+     * Values computed by the flyte platform after launch plan registration.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
      */
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure getClosure() {
       return closure_ == null ? flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure.getDefaultInstance() : closure_;
     }
     /**
+     * <pre>
+     * Values computed by the flyte platform after launch plan registration.
+     * </pre>
+     *
      * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
      */
     public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosureOrBuilder getClosureOrBuilder() {
@@ -2080,12 +2152,20 @@ public final class LaunchPlanOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public boolean hasId() {
         return idBuilder_ != null || id_ != null;
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier getId() {
@@ -2096,6 +2176,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public Builder setId(flyteidl.core.IdentifierOuterClass.Identifier value) {
@@ -2112,6 +2196,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public Builder setId(
@@ -2126,6 +2214,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public Builder mergeId(flyteidl.core.IdentifierOuterClass.Identifier value) {
@@ -2144,6 +2236,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public Builder clearId() {
@@ -2158,6 +2254,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier.Builder getIdBuilder() {
@@ -2166,6 +2266,10 @@ public final class LaunchPlanOuterClass {
         return getIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
@@ -2177,6 +2281,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * Uniquely identifies a launch plan entity.
+       * </pre>
+       *
        * <code>.flyteidl.core.Identifier id = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -2197,12 +2305,20 @@ public final class LaunchPlanOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpecOrBuilder> specBuilder_;
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public boolean hasSpec() {
         return specBuilder_ != null || spec_ != null;
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec getSpec() {
@@ -2213,6 +2329,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public Builder setSpec(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec value) {
@@ -2229,6 +2349,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public Builder setSpec(
@@ -2243,6 +2367,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public Builder mergeSpec(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec value) {
@@ -2261,6 +2389,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public Builder clearSpec() {
@@ -2275,6 +2407,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpec.Builder getSpecBuilder() {
@@ -2283,6 +2419,10 @@ public final class LaunchPlanOuterClass {
         return getSpecFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanSpecOrBuilder getSpecOrBuilder() {
@@ -2294,6 +2434,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * User-provided launch plan details, including reference workflow, inputs and other metadata.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanSpec spec = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -2314,12 +2458,20 @@ public final class LaunchPlanOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure.Builder, flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosureOrBuilder> closureBuilder_;
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public boolean hasClosure() {
         return closureBuilder_ != null || closure_ != null;
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure getClosure() {
@@ -2330,6 +2482,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public Builder setClosure(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure value) {
@@ -2346,6 +2502,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public Builder setClosure(
@@ -2360,6 +2520,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public Builder mergeClosure(flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure value) {
@@ -2378,6 +2542,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public Builder clearClosure() {
@@ -2392,6 +2560,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosure.Builder getClosureBuilder() {
@@ -2400,6 +2572,10 @@ public final class LaunchPlanOuterClass {
         return getClosureFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       public flyteidl.admin.LaunchPlanOuterClass.LaunchPlanClosureOrBuilder getClosureOrBuilder() {
@@ -2411,6 +2587,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * Values computed by the flyte platform after launch plan registration.
+       * </pre>
+       *
        * <code>.flyteidl.admin.LaunchPlanClosure closure = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -3453,7 +3633,7 @@ public final class LaunchPlanOuterClass {
 
   }
 
-  public interface AuthOrBuilder extends
+  @java.lang.Deprecated public interface AuthOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.Auth)
       com.google.protobuf.MessageOrBuilder {
 
@@ -3502,7 +3682,7 @@ public final class LaunchPlanOuterClass {
    *
    * Protobuf type {@code flyteidl.admin.Auth}
    */
-  public  static final class Auth extends
+  @java.lang.Deprecated public  static final class Auth extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:flyteidl.admin.Auth)
       AuthOrBuilder {
@@ -4279,7 +4459,8 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * Input values to be passed for the execution
+     * Input values to be passed for the execution.
+     * These can be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -4287,7 +4468,8 @@ public final class LaunchPlanOuterClass {
     boolean hasDefaultInputs();
     /**
      * <pre>
-     * Input values to be passed for the execution
+     * Input values to be passed for the execution.
+     * These can be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -4295,7 +4477,8 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Interface.ParameterMap getDefaultInputs();
     /**
      * <pre>
-     * Input values to be passed for the execution
+     * Input values to be passed for the execution.
+     * These can be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -4304,7 +4487,8 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * Fixed, non-overridable inputs for the Launch Plan
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -4312,7 +4496,8 @@ public final class LaunchPlanOuterClass {
     boolean hasFixedInputs();
     /**
      * <pre>
-     * Fixed, non-overridable inputs for the Launch Plan
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -4320,7 +4505,8 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Literals.LiteralMap getFixedInputs();
     /**
      * <pre>
-     * Fixed, non-overridable inputs for the Launch Plan
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -4484,14 +4670,26 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Execution.QualityOfServiceOrBuilder getQualityOfServiceOrBuilder();
 
     /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     boolean hasRawOutputDataConfig();
     /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig();
     /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder();
@@ -4807,7 +5005,8 @@ public final class LaunchPlanOuterClass {
     private flyteidl.core.Interface.ParameterMap defaultInputs_;
     /**
      * <pre>
-     * Input values to be passed for the execution
+     * Input values to be passed for the execution.
+     * These can be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -4817,7 +5016,8 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Input values to be passed for the execution
+     * Input values to be passed for the execution.
+     * These can be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -4827,7 +5027,8 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Input values to be passed for the execution
+     * Input values to be passed for the execution.
+     * These can be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -4840,7 +5041,8 @@ public final class LaunchPlanOuterClass {
     private flyteidl.core.Literals.LiteralMap fixedInputs_;
     /**
      * <pre>
-     * Fixed, non-overridable inputs for the Launch Plan
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -4850,7 +5052,8 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Fixed, non-overridable inputs for the Launch Plan
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -4860,7 +5063,8 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Fixed, non-overridable inputs for the Launch Plan
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overriden when an execution is created with this launch plan.
      * </pre>
      *
      * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -5100,18 +5304,30 @@ public final class LaunchPlanOuterClass {
     public static final int RAW_OUTPUT_DATA_CONFIG_FIELD_NUMBER = 17;
     private flyteidl.admin.Common.RawOutputDataConfig rawOutputDataConfig_;
     /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     public boolean hasRawOutputDataConfig() {
       return rawOutputDataConfig_ != null;
     }
     /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
       return rawOutputDataConfig_ == null ? flyteidl.admin.Common.RawOutputDataConfig.getDefaultInstance() : rawOutputDataConfig_;
     }
     /**
+     * <pre>
+     * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+     * </pre>
+     *
      * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
      */
     public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
@@ -6097,7 +6313,8 @@ public final class LaunchPlanOuterClass {
           flyteidl.core.Interface.ParameterMap, flyteidl.core.Interface.ParameterMap.Builder, flyteidl.core.Interface.ParameterMapOrBuilder> defaultInputsBuilder_;
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6107,7 +6324,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6121,7 +6339,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6141,7 +6360,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6159,7 +6379,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6181,7 +6402,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6199,7 +6421,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6211,7 +6434,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6226,7 +6450,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Input values to be passed for the execution
+       * Input values to be passed for the execution.
+       * These can be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap default_inputs = 3;</code>
@@ -6250,7 +6475,8 @@ public final class LaunchPlanOuterClass {
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> fixedInputsBuilder_;
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6260,7 +6486,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6274,7 +6501,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6294,7 +6522,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6312,7 +6541,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6334,7 +6564,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6352,7 +6583,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6364,7 +6596,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -6379,7 +6612,8 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Fixed, non-overridable inputs for the Launch Plan
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overriden when an execution is created with this launch plan.
        * </pre>
        *
        * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
@@ -7373,12 +7607,20 @@ public final class LaunchPlanOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.RawOutputDataConfig, flyteidl.admin.Common.RawOutputDataConfig.Builder, flyteidl.admin.Common.RawOutputDataConfigOrBuilder> rawOutputDataConfigBuilder_;
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public boolean hasRawOutputDataConfig() {
         return rawOutputDataConfigBuilder_ != null || rawOutputDataConfig_ != null;
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public flyteidl.admin.Common.RawOutputDataConfig getRawOutputDataConfig() {
@@ -7389,6 +7631,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public Builder setRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
@@ -7405,6 +7651,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public Builder setRawOutputDataConfig(
@@ -7419,6 +7669,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public Builder mergeRawOutputDataConfig(flyteidl.admin.Common.RawOutputDataConfig value) {
@@ -7437,6 +7691,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public Builder clearRawOutputDataConfig() {
@@ -7451,6 +7709,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public flyteidl.admin.Common.RawOutputDataConfig.Builder getRawOutputDataConfigBuilder() {
@@ -7459,6 +7721,10 @@ public final class LaunchPlanOuterClass {
         return getRawOutputDataConfigFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       public flyteidl.admin.Common.RawOutputDataConfigOrBuilder getRawOutputDataConfigOrBuilder() {
@@ -7470,6 +7736,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).
+       * </pre>
+       *
        * <code>.flyteidl.admin.RawOutputDataConfig raw_output_data_config = 17;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -7588,7 +7858,7 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * Indicate the Launch plan phase
+     * Indicate the Launch plan state. 
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -7596,7 +7866,7 @@ public final class LaunchPlanOuterClass {
     int getStateValue();
     /**
      * <pre>
-     * Indicate the Launch plan phase
+     * Indicate the Launch plan state. 
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -7605,7 +7875,7 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * Indicates the set of inputs to execute the Launch plan
+     * Indicates the set of inputs expected when creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -7613,7 +7883,7 @@ public final class LaunchPlanOuterClass {
     boolean hasExpectedInputs();
     /**
      * <pre>
-     * Indicates the set of inputs to execute the Launch plan
+     * Indicates the set of inputs expected when creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -7621,7 +7891,7 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Interface.ParameterMap getExpectedInputs();
     /**
      * <pre>
-     * Indicates the set of inputs to execute the Launch plan
+     * Indicates the set of inputs expected when creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -7630,7 +7900,7 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * Indicates the set of outputs from the Launch plan
+     * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -7638,7 +7908,7 @@ public final class LaunchPlanOuterClass {
     boolean hasExpectedOutputs();
     /**
      * <pre>
-     * Indicates the set of outputs from the Launch plan
+     * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -7646,7 +7916,7 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Interface.VariableMap getExpectedOutputs();
     /**
      * <pre>
-     * Indicates the set of outputs from the Launch plan
+     * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -7843,7 +8113,7 @@ public final class LaunchPlanOuterClass {
     private int state_;
     /**
      * <pre>
-     * Indicate the Launch plan phase
+     * Indicate the Launch plan state. 
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -7853,7 +8123,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicate the Launch plan phase
+     * Indicate the Launch plan state. 
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -7868,7 +8138,7 @@ public final class LaunchPlanOuterClass {
     private flyteidl.core.Interface.ParameterMap expectedInputs_;
     /**
      * <pre>
-     * Indicates the set of inputs to execute the Launch plan
+     * Indicates the set of inputs expected when creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -7878,7 +8148,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicates the set of inputs to execute the Launch plan
+     * Indicates the set of inputs expected when creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -7888,7 +8158,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicates the set of inputs to execute the Launch plan
+     * Indicates the set of inputs expected when creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -7901,7 +8171,7 @@ public final class LaunchPlanOuterClass {
     private flyteidl.core.Interface.VariableMap expectedOutputs_;
     /**
      * <pre>
-     * Indicates the set of outputs from the Launch plan
+     * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -7911,7 +8181,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicates the set of outputs from the Launch plan
+     * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -7921,7 +8191,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Indicates the set of outputs from the Launch plan
+     * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
      * </pre>
      *
      * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8426,7 +8696,7 @@ public final class LaunchPlanOuterClass {
       private int state_ = 0;
       /**
        * <pre>
-       * Indicate the Launch plan phase
+       * Indicate the Launch plan state. 
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -8436,7 +8706,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicate the Launch plan phase
+       * Indicate the Launch plan state. 
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -8448,7 +8718,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicate the Launch plan phase
+       * Indicate the Launch plan state. 
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -8460,7 +8730,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicate the Launch plan phase
+       * Indicate the Launch plan state. 
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -8476,7 +8746,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicate the Launch plan phase
+       * Indicate the Launch plan state. 
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 1;</code>
@@ -8493,7 +8763,7 @@ public final class LaunchPlanOuterClass {
           flyteidl.core.Interface.ParameterMap, flyteidl.core.Interface.ParameterMap.Builder, flyteidl.core.Interface.ParameterMapOrBuilder> expectedInputsBuilder_;
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8503,7 +8773,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8517,7 +8787,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8537,7 +8807,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8555,7 +8825,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8577,7 +8847,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8595,7 +8865,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8607,7 +8877,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8622,7 +8892,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of inputs to execute the Launch plan
+       * Indicates the set of inputs expected when creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.ParameterMap expected_inputs = 2;</code>
@@ -8646,7 +8916,7 @@ public final class LaunchPlanOuterClass {
           flyteidl.core.Interface.VariableMap, flyteidl.core.Interface.VariableMap.Builder, flyteidl.core.Interface.VariableMapOrBuilder> expectedOutputsBuilder_;
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8656,7 +8926,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8670,7 +8940,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8690,7 +8960,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8708,7 +8978,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8730,7 +9000,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8748,7 +9018,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8760,7 +9030,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -8775,7 +9045,7 @@ public final class LaunchPlanOuterClass {
       }
       /**
        * <pre>
-       * Indicates the set of outputs from the Launch plan
+       * Indicates the set of outputs expected to be produced by creating an execution with the Launch plan
        * </pre>
        *
        * <code>.flyteidl.core.VariableMap expected_outputs = 3;</code>
@@ -10319,6 +10589,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Identifier of launch plan for which to change state.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10327,6 +10598,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Identifier of launch plan for which to change state.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10335,6 +10607,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Identifier of launch plan for which to change state.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10344,6 +10617,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Desired state to apply to the launch plan.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -10352,6 +10626,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Desired state to apply to the launch plan.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -10458,6 +10733,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Identifier of launch plan for which to change state.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10468,6 +10744,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Identifier of launch plan for which to change state.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10478,6 +10755,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Identifier of launch plan for which to change state.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10491,6 +10769,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Desired state to apply to the launch plan.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -10501,6 +10780,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Desired state to apply to the launch plan.
+     * +required.
      * </pre>
      *
      * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -10852,6 +11132,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10862,6 +11143,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10876,6 +11158,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10896,6 +11179,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10914,6 +11198,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10936,6 +11221,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10954,6 +11240,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10966,6 +11253,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -10981,6 +11269,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Identifier of launch plan for which to change state.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11003,6 +11292,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Desired state to apply to the launch plan.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -11013,6 +11303,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Desired state to apply to the launch plan.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -11025,6 +11316,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Desired state to apply to the launch plan.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -11037,6 +11329,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Desired state to apply to the launch plan.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -11053,6 +11346,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Desired state to apply to the launch plan.
+       * +required.
        * </pre>
        *
        * <code>.flyteidl.admin.LaunchPlanState state = 2;</code>
@@ -11540,14 +11834,26 @@ public final class LaunchPlanOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * +required.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
      */
     boolean hasId();
     /**
+     * <pre>
+     * +required.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
      */
     flyteidl.admin.Common.NamedEntityIdentifier getId();
     /**
+     * <pre>
+     * +required.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
      */
     flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder();
@@ -11643,18 +11949,30 @@ public final class LaunchPlanOuterClass {
     public static final int ID_FIELD_NUMBER = 1;
     private flyteidl.admin.Common.NamedEntityIdentifier id_;
     /**
+     * <pre>
+     * +required.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
      */
     public boolean hasId() {
       return id_ != null;
     }
     /**
+     * <pre>
+     * +required.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
      */
     public flyteidl.admin.Common.NamedEntityIdentifier getId() {
       return id_ == null ? flyteidl.admin.Common.NamedEntityIdentifier.getDefaultInstance() : id_;
     }
     /**
+     * <pre>
+     * +required.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
      */
     public flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder() {
@@ -11984,12 +12302,20 @@ public final class LaunchPlanOuterClass {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.NamedEntityIdentifier, flyteidl.admin.Common.NamedEntityIdentifier.Builder, flyteidl.admin.Common.NamedEntityIdentifierOrBuilder> idBuilder_;
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public boolean hasId() {
         return idBuilder_ != null || id_ != null;
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public flyteidl.admin.Common.NamedEntityIdentifier getId() {
@@ -12000,6 +12326,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public Builder setId(flyteidl.admin.Common.NamedEntityIdentifier value) {
@@ -12016,6 +12346,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public Builder setId(
@@ -12030,6 +12364,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public Builder mergeId(flyteidl.admin.Common.NamedEntityIdentifier value) {
@@ -12048,6 +12386,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public Builder clearId() {
@@ -12062,6 +12404,10 @@ public final class LaunchPlanOuterClass {
         return this;
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public flyteidl.admin.Common.NamedEntityIdentifier.Builder getIdBuilder() {
@@ -12070,6 +12416,10 @@ public final class LaunchPlanOuterClass {
         return getIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       public flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder() {
@@ -12081,6 +12431,10 @@ public final class LaunchPlanOuterClass {
         }
       }
       /**
+       * <pre>
+       * +required.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -12156,6 +12510,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required.
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -12164,6 +12519,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required.
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -12174,6 +12530,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required.
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -12182,6 +12539,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required.
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -12192,6 +12550,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Indicates the number of resources to be returned.
+     * +required.
      * </pre>
      *
      * <code>uint32 limit = 3;</code>
@@ -12367,6 +12726,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required.
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -12386,6 +12746,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required.
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -12409,6 +12770,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required.
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -12428,6 +12790,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required.
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -12451,6 +12814,7 @@ public final class LaunchPlanOuterClass {
     /**
      * <pre>
      * Indicates the number of resources to be returned.
+     * +required.
      * </pre>
      *
      * <code>uint32 limit = 3;</code>
@@ -12932,6 +13296,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required.
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -12951,6 +13316,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required.
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -12971,6 +13337,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required.
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -12988,6 +13355,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required.
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -13001,6 +13369,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required.
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -13021,6 +13390,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required.
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -13040,6 +13410,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required.
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -13060,6 +13431,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required.
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -13077,6 +13449,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required.
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -13090,6 +13463,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required.
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -13110,6 +13484,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required.
        * </pre>
        *
        * <code>uint32 limit = 3;</code>
@@ -13120,6 +13495,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required.
        * </pre>
        *
        * <code>uint32 limit = 3;</code>
@@ -13133,6 +13509,7 @@ public final class LaunchPlanOuterClass {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required.
        * </pre>
        *
        * <code>uint32 limit = 3;</code>
@@ -13542,47 +13919,47 @@ public final class LaunchPlanOuterClass {
       "in.LaunchPlanSpec\0222\n\007closure\030\003 \001(\0132!.fly" +
       "teidl.admin.LaunchPlanClosure\"Q\n\016LaunchP" +
       "lanList\0220\n\014launch_plans\030\001 \003(\0132\032.flyteidl" +
-      ".admin.LaunchPlan\022\r\n\005token\030\002 \001(\t\"F\n\004Auth" +
+      ".admin.LaunchPlan\022\r\n\005token\030\002 \001(\t\"J\n\004Auth" +
       "\022\032\n\022assumable_iam_role\030\001 \001(\t\022\"\n\032kubernet" +
-      "es_service_account\030\002 \001(\t\"\375\004\n\016LaunchPlanS" +
-      "pec\022.\n\013workflow_id\030\001 \001(\0132\031.flyteidl.core" +
-      ".Identifier\022;\n\017entity_metadata\030\002 \001(\0132\".f" +
-      "lyteidl.admin.LaunchPlanMetadata\0223\n\016defa" +
-      "ult_inputs\030\003 \001(\0132\033.flyteidl.core.Paramet" +
-      "erMap\022/\n\014fixed_inputs\030\004 \001(\0132\031.flyteidl.c" +
-      "ore.LiteralMap\022\020\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labe" +
-      "ls\030\006 \001(\0132\026.flyteidl.admin.Labels\0220\n\013anno" +
-      "tations\030\007 \001(\0132\033.flyteidl.admin.Annotatio" +
-      "ns\022&\n\004auth\030\010 \001(\0132\024.flyteidl.admin.AuthB\002" +
-      "\030\001\022/\n\tauth_role\030\t \001(\0132\030.flyteidl.admin.A" +
-      "uthRoleB\002\030\001\0228\n\020security_context\030\n \001(\0132\036." +
-      "flyteidl.core.SecurityContext\022;\n\022quality" +
-      "_of_service\030\020 \001(\0132\037.flyteidl.core.Qualit" +
-      "yOfService\022C\n\026raw_output_data_config\030\021 \001" +
-      "(\0132#.flyteidl.admin.RawOutputDataConfig\022" +
-      "\027\n\017max_parallelism\030\022 \001(\005\"\217\002\n\021LaunchPlanC" +
-      "losure\022.\n\005state\030\001 \001(\0162\037.flyteidl.admin.L" +
-      "aunchPlanState\0224\n\017expected_inputs\030\002 \001(\0132" +
-      "\033.flyteidl.core.ParameterMap\0224\n\020expected" +
-      "_outputs\030\003 \001(\0132\032.flyteidl.core.VariableM" +
-      "ap\022.\n\ncreated_at\030\004 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032.google." +
-      "protobuf.Timestamp\"u\n\022LaunchPlanMetadata" +
-      "\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.admin.Sche" +
-      "dule\0223\n\rnotifications\030\002 \003(\0132\034.flyteidl.a" +
-      "dmin.Notification\"p\n\027LaunchPlanUpdateReq" +
-      "uest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
-      "ier\022.\n\005state\030\002 \001(\0162\037.flyteidl.admin.Laun" +
-      "chPlanState\"\032\n\030LaunchPlanUpdateResponse\"" +
-      "L\n\027ActiveLaunchPlanRequest\0221\n\002id\030\001 \001(\0132%" +
-      ".flyteidl.admin.NamedEntityIdentifier\"\203\001" +
-      "\n\033ActiveLaunchPlanListRequest\022\017\n\007project" +
-      "\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n" +
-      "\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl" +
-      ".admin.Sort*+\n\017LaunchPlanState\022\014\n\010INACTI" +
-      "VE\020\000\022\n\n\006ACTIVE\020\001B7Z5github.com/flyteorg/" +
-      "flyteidl/gen/pb-go/flyteidl/adminb\006proto" +
-      "3"
+      "es_service_account\030\002 \001(\t:\002\030\001\"\375\004\n\016LaunchP" +
+      "lanSpec\022.\n\013workflow_id\030\001 \001(\0132\031.flyteidl." +
+      "core.Identifier\022;\n\017entity_metadata\030\002 \001(\013" +
+      "2\".flyteidl.admin.LaunchPlanMetadata\0223\n\016" +
+      "default_inputs\030\003 \001(\0132\033.flyteidl.core.Par" +
+      "ameterMap\022/\n\014fixed_inputs\030\004 \001(\0132\031.flytei" +
+      "dl.core.LiteralMap\022\020\n\004role\030\005 \001(\tB\002\030\001\022&\n\006" +
+      "labels\030\006 \001(\0132\026.flyteidl.admin.Labels\0220\n\013" +
+      "annotations\030\007 \001(\0132\033.flyteidl.admin.Annot" +
+      "ations\022&\n\004auth\030\010 \001(\0132\024.flyteidl.admin.Au" +
+      "thB\002\030\001\022/\n\tauth_role\030\t \001(\0132\030.flyteidl.adm" +
+      "in.AuthRoleB\002\030\001\0228\n\020security_context\030\n \001(" +
+      "\0132\036.flyteidl.core.SecurityContext\022;\n\022qua" +
+      "lity_of_service\030\020 \001(\0132\037.flyteidl.core.Qu" +
+      "alityOfService\022C\n\026raw_output_data_config" +
+      "\030\021 \001(\0132#.flyteidl.admin.RawOutputDataCon" +
+      "fig\022\027\n\017max_parallelism\030\022 \001(\005\"\217\002\n\021LaunchP" +
+      "lanClosure\022.\n\005state\030\001 \001(\0162\037.flyteidl.adm" +
+      "in.LaunchPlanState\0224\n\017expected_inputs\030\002 " +
+      "\001(\0132\033.flyteidl.core.ParameterMap\0224\n\020expe" +
+      "cted_outputs\030\003 \001(\0132\032.flyteidl.core.Varia" +
+      "bleMap\022.\n\ncreated_at\030\004 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032.goo" +
+      "gle.protobuf.Timestamp\"u\n\022LaunchPlanMeta" +
+      "data\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.admin." +
+      "Schedule\0223\n\rnotifications\030\002 \003(\0132\034.flytei" +
+      "dl.admin.Notification\"p\n\027LaunchPlanUpdat" +
+      "eRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Ide" +
+      "ntifier\022.\n\005state\030\002 \001(\0162\037.flyteidl.admin." +
+      "LaunchPlanState\"\032\n\030LaunchPlanUpdateRespo" +
+      "nse\"L\n\027ActiveLaunchPlanRequest\0221\n\002id\030\001 \001" +
+      "(\0132%.flyteidl.admin.NamedEntityIdentifie" +
+      "r\"\203\001\n\033ActiveLaunchPlanListRequest\022\017\n\007pro" +
+      "ject\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(" +
+      "\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyt" +
+      "eidl.admin.Sort*+\n\017LaunchPlanState\022\014\n\010IN" +
+      "ACTIVE\020\000\022\n\n\006ACTIVE\020\001B7Z5github.com/flyte" +
+      "org/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -216,7 +216,9 @@ public final class Common {
   /**
    * <pre>
    * Encapsulation of fields that identifies a Flyte resource.
-   * A resource can internally have multiple versions.
+   * A Flyte resource can be a task, workflow or launch plan.
+   * A resource can internally have multiple versions and is uniquely identified
+   * by project, domain, and name.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NamedEntityIdentifier}
@@ -619,7 +621,9 @@ public final class Common {
     /**
      * <pre>
      * Encapsulation of fields that identifies a Flyte resource.
-     * A resource can internally have multiple versions.
+     * A Flyte resource can be a task, workflow or launch plan.
+     * A resource can internally have multiple versions and is uniquely identified
+     * by project, domain, and name.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NamedEntityIdentifier}
@@ -1161,6 +1165,10 @@ public final class Common {
     flyteidl.admin.Common.NamedEntityState getState();
   }
   /**
+   * <pre>
+   * Additional metadata around a named entity.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.NamedEntityMetadata}
    */
   public  static final class NamedEntityMetadata extends
@@ -1481,6 +1489,10 @@ public final class Common {
       return builder;
     }
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.NamedEntityMetadata}
      */
     public static final class Builder extends
@@ -1855,10 +1867,18 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     int getResourceTypeValue();
     /**
+     * <pre>
+     * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     flyteidl.core.IdentifierOuterClass.ResourceType getResourceType();
@@ -1877,22 +1897,35 @@ public final class Common {
     flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder();
 
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
      */
     boolean hasMetadata();
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
      */
     flyteidl.admin.Common.NamedEntityMetadata getMetadata();
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
      */
     flyteidl.admin.Common.NamedEntityMetadataOrBuilder getMetadataOrBuilder();
   }
   /**
    * <pre>
-   * Describes information common to a NamedEntity, identified by a project /
-   * domain / name / resource type combination
+   * Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
+   * workflow or launch plan. A NamedEntity is exclusively identified by its resource type
+   * and identifier.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NamedEntity}
@@ -2001,12 +2034,20 @@ public final class Common {
     public static final int RESOURCE_TYPE_FIELD_NUMBER = 1;
     private int resourceType_;
     /**
+     * <pre>
+     * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     public int getResourceTypeValue() {
       return resourceType_;
     }
     /**
+     * <pre>
+     * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     public flyteidl.core.IdentifierOuterClass.ResourceType getResourceType() {
@@ -2039,18 +2080,30 @@ public final class Common {
     public static final int METADATA_FIELD_NUMBER = 3;
     private flyteidl.admin.Common.NamedEntityMetadata metadata_;
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
      */
     public boolean hasMetadata() {
       return metadata_ != null;
     }
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
      */
     public flyteidl.admin.Common.NamedEntityMetadata getMetadata() {
       return metadata_ == null ? flyteidl.admin.Common.NamedEntityMetadata.getDefaultInstance() : metadata_;
     }
     /**
+     * <pre>
+     * Additional metadata around a named entity.
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
      */
     public flyteidl.admin.Common.NamedEntityMetadataOrBuilder getMetadataOrBuilder() {
@@ -2245,8 +2298,9 @@ public final class Common {
     }
     /**
      * <pre>
-     * Describes information common to a NamedEntity, identified by a project /
-     * domain / name / resource type combination
+     * Encapsulates information common to a NamedEntity, a Flyte resource such as a task,
+     * workflow or launch plan. A NamedEntity is exclusively identified by its resource type
+     * and identifier.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NamedEntity}
@@ -2425,12 +2479,20 @@ public final class Common {
 
       private int resourceType_ = 0;
       /**
+       * <pre>
+       * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public int getResourceTypeValue() {
         return resourceType_;
       }
       /**
+       * <pre>
+       * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder setResourceTypeValue(int value) {
@@ -2439,6 +2501,10 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public flyteidl.core.IdentifierOuterClass.ResourceType getResourceType() {
@@ -2447,6 +2513,10 @@ public final class Common {
         return result == null ? flyteidl.core.IdentifierOuterClass.ResourceType.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder setResourceType(flyteidl.core.IdentifierOuterClass.ResourceType value) {
@@ -2459,6 +2529,10 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Resource type of the named entity. One of Task, Workflow or LaunchPlan.
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder clearResourceType() {
@@ -2589,12 +2663,20 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.NamedEntityMetadata, flyteidl.admin.Common.NamedEntityMetadata.Builder, flyteidl.admin.Common.NamedEntityMetadataOrBuilder> metadataBuilder_;
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public boolean hasMetadata() {
         return metadataBuilder_ != null || metadata_ != null;
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public flyteidl.admin.Common.NamedEntityMetadata getMetadata() {
@@ -2605,6 +2687,10 @@ public final class Common {
         }
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public Builder setMetadata(flyteidl.admin.Common.NamedEntityMetadata value) {
@@ -2621,6 +2707,10 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public Builder setMetadata(
@@ -2635,6 +2725,10 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public Builder mergeMetadata(flyteidl.admin.Common.NamedEntityMetadata value) {
@@ -2653,6 +2747,10 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public Builder clearMetadata() {
@@ -2667,6 +2765,10 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public flyteidl.admin.Common.NamedEntityMetadata.Builder getMetadataBuilder() {
@@ -2675,6 +2777,10 @@ public final class Common {
         return getMetadataFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       public flyteidl.admin.Common.NamedEntityMetadataOrBuilder getMetadataOrBuilder() {
@@ -2686,6 +2792,10 @@ public final class Common {
         }
       }
       /**
+       * <pre>
+       * Additional metadata around a named entity.
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -2761,7 +2871,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates an attribute to sort the response values.
-     * TODO(katrogan): Add string validation here. This should never be empty.
+     * +required
      * </pre>
      *
      * <code>string key = 1;</code>
@@ -2770,7 +2880,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates an attribute to sort the response values.
-     * TODO(katrogan): Add string validation here. This should never be empty.
+     * +required
      * </pre>
      *
      * <code>string key = 1;</code>
@@ -2799,7 +2909,7 @@ public final class Common {
   }
   /**
    * <pre>
-   * Species sort ordering in a list request.
+   * Specifies sort ordering in a list request.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.Sort}
@@ -2892,6 +3002,10 @@ public final class Common {
     public enum Direction
         implements com.google.protobuf.ProtocolMessageEnum {
       /**
+       * <pre>
+       * By default, fields are sorted in descending order.
+       * </pre>
+       *
        * <code>DESCENDING = 0;</code>
        */
       DESCENDING(0),
@@ -2903,6 +3017,10 @@ public final class Common {
       ;
 
       /**
+       * <pre>
+       * By default, fields are sorted in descending order.
+       * </pre>
+       *
        * <code>DESCENDING = 0;</code>
        */
       public static final int DESCENDING_VALUE = 0;
@@ -2989,7 +3107,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates an attribute to sort the response values.
-     * TODO(katrogan): Add string validation here. This should never be empty.
+     * +required
      * </pre>
      *
      * <code>string key = 1;</code>
@@ -3009,7 +3127,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates an attribute to sort the response values.
-     * TODO(katrogan): Add string validation here. This should never be empty.
+     * +required
      * </pre>
      *
      * <code>string key = 1;</code>
@@ -3221,7 +3339,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Species sort ordering in a list request.
+     * Specifies sort ordering in a list request.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.Sort}
@@ -3381,7 +3499,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates an attribute to sort the response values.
-       * TODO(katrogan): Add string validation here. This should never be empty.
+       * +required
        * </pre>
        *
        * <code>string key = 1;</code>
@@ -3401,7 +3519,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates an attribute to sort the response values.
-       * TODO(katrogan): Add string validation here. This should never be empty.
+       * +required
        * </pre>
        *
        * <code>string key = 1;</code>
@@ -3422,7 +3540,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates an attribute to sort the response values.
-       * TODO(katrogan): Add string validation here. This should never be empty.
+       * +required
        * </pre>
        *
        * <code>string key = 1;</code>
@@ -3440,7 +3558,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates an attribute to sort the response values.
-       * TODO(katrogan): Add string validation here. This should never be empty.
+       * +required
        * </pre>
        *
        * <code>string key = 1;</code>
@@ -3454,7 +3572,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates an attribute to sort the response values.
-       * TODO(katrogan): Add string validation here. This should never be empty.
+       * +required
        * </pre>
        *
        * <code>string key = 1;</code>
@@ -3600,6 +3718,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3608,6 +3727,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3618,6 +3738,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3626,6 +3747,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3636,6 +3758,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates the number of resources to be returned.
+     * +required
      * </pre>
      *
      * <code>uint32 limit = 3;</code>
@@ -3666,7 +3789,7 @@ public final class Common {
 
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -3675,7 +3798,7 @@ public final class Common {
     boolean hasSortBy();
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -3684,7 +3807,7 @@ public final class Common {
     flyteidl.admin.Common.Sort getSortBy();
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -3714,7 +3837,7 @@ public final class Common {
   }
   /**
    * <pre>
-   * Represents a request structure to list identifiers.
+   * Represents a request structure to list NamedEntityIdentifiers.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NamedEntityIdentifierListRequest}
@@ -3838,6 +3961,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3857,6 +3981,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 1;</code>
@@ -3880,6 +4005,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3899,6 +4025,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the domain the identifiers belongs to within the project.
+     * +required
      * </pre>
      *
      * <code>string domain = 2;</code>
@@ -3922,6 +4049,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates the number of resources to be returned.
+     * +required
      * </pre>
      *
      * <code>uint32 limit = 3;</code>
@@ -3980,7 +4108,7 @@ public final class Common {
     private flyteidl.admin.Common.Sort sortBy_;
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -3991,7 +4119,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -4002,7 +4130,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -4269,7 +4397,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Represents a request structure to list identifiers.
+     * Represents a request structure to list NamedEntityIdentifiers.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NamedEntityIdentifierListRequest}
@@ -4464,6 +4592,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4483,6 +4612,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4503,6 +4633,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4520,6 +4651,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4533,6 +4665,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 1;</code>
@@ -4553,6 +4686,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4572,6 +4706,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4592,6 +4727,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4609,6 +4745,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4622,6 +4759,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the domain the identifiers belongs to within the project.
+       * +required
        * </pre>
        *
        * <code>string domain = 2;</code>
@@ -4642,6 +4780,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required
        * </pre>
        *
        * <code>uint32 limit = 3;</code>
@@ -4652,6 +4791,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required
        * </pre>
        *
        * <code>uint32 limit = 3;</code>
@@ -4665,6 +4805,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required
        * </pre>
        *
        * <code>uint32 limit = 3;</code>
@@ -4780,7 +4921,7 @@ public final class Common {
           flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> sortByBuilder_;
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4791,7 +4932,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4806,7 +4947,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4827,7 +4968,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4846,7 +4987,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4869,7 +5010,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4888,7 +5029,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4901,7 +5042,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -4917,7 +5058,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -5088,10 +5229,20 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     int getResourceTypeValue();
     /**
+     * <pre>
+     * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     flyteidl.core.IdentifierOuterClass.ResourceType getResourceType();
@@ -5099,6 +5250,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 2;</code>
@@ -5107,6 +5259,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 2;</code>
@@ -5165,7 +5318,7 @@ public final class Common {
 
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -5174,7 +5327,7 @@ public final class Common {
     boolean hasSortBy();
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -5183,7 +5336,7 @@ public final class Common {
     flyteidl.admin.Common.Sort getSortBy();
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -5342,12 +5495,22 @@ public final class Common {
     public static final int RESOURCE_TYPE_FIELD_NUMBER = 1;
     private int resourceType_;
     /**
+     * <pre>
+     * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     public int getResourceTypeValue() {
       return resourceType_;
     }
     /**
+     * <pre>
+     * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     public flyteidl.core.IdentifierOuterClass.ResourceType getResourceType() {
@@ -5361,6 +5524,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 2;</code>
@@ -5380,6 +5544,7 @@ public final class Common {
     /**
      * <pre>
      * Name of the project that contains the identifiers.
+     * +required
      * </pre>
      *
      * <code>string project = 2;</code>
@@ -5503,7 +5668,7 @@ public final class Common {
     private flyteidl.admin.Common.Sort sortBy_;
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -5514,7 +5679,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -5525,7 +5690,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Sort ordering.
+     * Specifies how listed entities should be sorted in the response.
      * +optional
      * </pre>
      *
@@ -6001,12 +6166,22 @@ public final class Common {
 
       private int resourceType_ = 0;
       /**
+       * <pre>
+       * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public int getResourceTypeValue() {
         return resourceType_;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder setResourceTypeValue(int value) {
@@ -6015,6 +6190,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public flyteidl.core.IdentifierOuterClass.ResourceType getResourceType() {
@@ -6023,6 +6203,11 @@ public final class Common {
         return result == null ? flyteidl.core.IdentifierOuterClass.ResourceType.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder setResourceType(flyteidl.core.IdentifierOuterClass.ResourceType value) {
@@ -6035,6 +6220,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder clearResourceType() {
@@ -6048,6 +6238,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 2;</code>
@@ -6067,6 +6258,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 2;</code>
@@ -6087,6 +6279,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 2;</code>
@@ -6104,6 +6297,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 2;</code>
@@ -6117,6 +6311,7 @@ public final class Common {
       /**
        * <pre>
        * Name of the project that contains the identifiers.
+       * +required
        * </pre>
        *
        * <code>string project = 2;</code>
@@ -6364,7 +6559,7 @@ public final class Common {
           flyteidl.admin.Common.Sort, flyteidl.admin.Common.Sort.Builder, flyteidl.admin.Common.SortOrBuilder> sortByBuilder_;
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6375,7 +6570,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6390,7 +6585,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6411,7 +6606,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6430,7 +6625,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6453,7 +6648,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6472,7 +6667,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6485,7 +6680,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -6501,7 +6696,7 @@ public final class Common {
       }
       /**
        * <pre>
-       * Sort ordering.
+       * Specifies how listed entities should be sorted in the response.
        * +optional
        * </pre>
        *
@@ -8844,23 +9039,48 @@ public final class Common {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     int getResourceTypeValue();
     /**
+     * <pre>
+     * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     flyteidl.core.IdentifierOuterClass.ResourceType getResourceType();
 
     /**
+     * <pre>
+     * The identifier for the named entity for which to fetch metadata.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
      */
     boolean hasId();
     /**
+     * <pre>
+     * The identifier for the named entity for which to fetch metadata.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
      */
     flyteidl.admin.Common.NamedEntityIdentifier getId();
     /**
+     * <pre>
+     * The identifier for the named entity for which to fetch metadata.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
      */
     flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder();
@@ -8963,12 +9183,22 @@ public final class Common {
     public static final int RESOURCE_TYPE_FIELD_NUMBER = 1;
     private int resourceType_;
     /**
+     * <pre>
+     * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     public int getResourceTypeValue() {
       return resourceType_;
     }
     /**
+     * <pre>
+     * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
      */
     public flyteidl.core.IdentifierOuterClass.ResourceType getResourceType() {
@@ -8980,18 +9210,33 @@ public final class Common {
     public static final int ID_FIELD_NUMBER = 2;
     private flyteidl.admin.Common.NamedEntityIdentifier id_;
     /**
+     * <pre>
+     * The identifier for the named entity for which to fetch metadata.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
      */
     public boolean hasId() {
       return id_ != null;
     }
     /**
+     * <pre>
+     * The identifier for the named entity for which to fetch metadata.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
      */
     public flyteidl.admin.Common.NamedEntityIdentifier getId() {
       return id_ == null ? flyteidl.admin.Common.NamedEntityIdentifier.getDefaultInstance() : id_;
     }
     /**
+     * <pre>
+     * The identifier for the named entity for which to fetch metadata.
+     * +required
+     * </pre>
+     *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
      */
     public flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder() {
@@ -9335,12 +9580,22 @@ public final class Common {
 
       private int resourceType_ = 0;
       /**
+       * <pre>
+       * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public int getResourceTypeValue() {
         return resourceType_;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder setResourceTypeValue(int value) {
@@ -9349,6 +9604,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public flyteidl.core.IdentifierOuterClass.ResourceType getResourceType() {
@@ -9357,6 +9617,11 @@ public final class Common {
         return result == null ? flyteidl.core.IdentifierOuterClass.ResourceType.UNRECOGNIZED : result;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder setResourceType(flyteidl.core.IdentifierOuterClass.ResourceType value) {
@@ -9369,6 +9634,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
        */
       public Builder clearResourceType() {
@@ -9382,12 +9652,22 @@ public final class Common {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.admin.Common.NamedEntityIdentifier, flyteidl.admin.Common.NamedEntityIdentifier.Builder, flyteidl.admin.Common.NamedEntityIdentifierOrBuilder> idBuilder_;
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public boolean hasId() {
         return idBuilder_ != null || id_ != null;
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public flyteidl.admin.Common.NamedEntityIdentifier getId() {
@@ -9398,6 +9678,11 @@ public final class Common {
         }
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public Builder setId(flyteidl.admin.Common.NamedEntityIdentifier value) {
@@ -9414,6 +9699,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public Builder setId(
@@ -9428,6 +9718,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public Builder mergeId(flyteidl.admin.Common.NamedEntityIdentifier value) {
@@ -9446,6 +9741,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public Builder clearId() {
@@ -9460,6 +9760,11 @@ public final class Common {
         return this;
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public flyteidl.admin.Common.NamedEntityIdentifier.Builder getIdBuilder() {
@@ -9468,6 +9773,11 @@ public final class Common {
         return getIdFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       public flyteidl.admin.Common.NamedEntityIdentifierOrBuilder getIdOrBuilder() {
@@ -9479,6 +9789,11 @@ public final class Common {
         }
       }
       /**
+       * <pre>
+       * The identifier for the named entity for which to fetch metadata.
+       * +required
+       * </pre>
+       *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -9554,6 +9869,7 @@ public final class Common {
     /**
      * <pre>
      * Resource type of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -9562,6 +9878,7 @@ public final class Common {
     /**
      * <pre>
      * Resource type of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -9571,6 +9888,7 @@ public final class Common {
     /**
      * <pre>
      * Identifier of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -9579,6 +9897,7 @@ public final class Common {
     /**
      * <pre>
      * Identifier of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -9587,6 +9906,7 @@ public final class Common {
     /**
      * <pre>
      * Identifier of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -9596,6 +9916,7 @@ public final class Common {
     /**
      * <pre>
      * Metadata object to set as the new value
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -9604,6 +9925,7 @@ public final class Common {
     /**
      * <pre>
      * Metadata object to set as the new value
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -9612,6 +9934,7 @@ public final class Common {
     /**
      * <pre>
      * Metadata object to set as the new value
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -9620,7 +9943,7 @@ public final class Common {
   }
   /**
    * <pre>
-   * Request to set the referenced launch plan state to the configured value.
+   * Request to set the referenced named entity state to the configured value.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.NamedEntityUpdateRequest}
@@ -9731,6 +10054,7 @@ public final class Common {
     /**
      * <pre>
      * Resource type of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -9741,6 +10065,7 @@ public final class Common {
     /**
      * <pre>
      * Resource type of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -9756,6 +10081,7 @@ public final class Common {
     /**
      * <pre>
      * Identifier of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -9766,6 +10092,7 @@ public final class Common {
     /**
      * <pre>
      * Identifier of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -9776,6 +10103,7 @@ public final class Common {
     /**
      * <pre>
      * Identifier of the metadata to update
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -9789,6 +10117,7 @@ public final class Common {
     /**
      * <pre>
      * Metadata object to set as the new value
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -9799,6 +10128,7 @@ public final class Common {
     /**
      * <pre>
      * Metadata object to set as the new value
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -9809,6 +10139,7 @@ public final class Common {
     /**
      * <pre>
      * Metadata object to set as the new value
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10005,7 +10336,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Request to set the referenced launch plan state to the configured value.
+     * Request to set the referenced named entity state to the configured value.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.NamedEntityUpdateRequest}
@@ -10186,6 +10517,7 @@ public final class Common {
       /**
        * <pre>
        * Resource type of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -10196,6 +10528,7 @@ public final class Common {
       /**
        * <pre>
        * Resource type of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -10208,6 +10541,7 @@ public final class Common {
       /**
        * <pre>
        * Resource type of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -10220,6 +10554,7 @@ public final class Common {
       /**
        * <pre>
        * Resource type of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -10236,6 +10571,7 @@ public final class Common {
       /**
        * <pre>
        * Resource type of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.ResourceType resource_type = 1;</code>
@@ -10253,6 +10589,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10263,6 +10600,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10277,6 +10615,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10297,6 +10636,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10315,6 +10655,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10337,6 +10678,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10355,6 +10697,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10367,6 +10710,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10382,6 +10726,7 @@ public final class Common {
       /**
        * <pre>
        * Identifier of the metadata to update
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 2;</code>
@@ -10406,6 +10751,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10416,6 +10762,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10430,6 +10777,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10450,6 +10798,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10468,6 +10817,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10490,6 +10840,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10508,6 +10859,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10520,6 +10872,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -10535,6 +10888,7 @@ public final class Common {
       /**
        * <pre>
        * Metadata object to set as the new value
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityMetadata metadata = 3;</code>
@@ -11031,6 +11385,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates a unique version of resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11039,6 +11394,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates a unique version of resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11047,6 +11403,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates a unique version of resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11055,7 +11412,8 @@ public final class Common {
   }
   /**
    * <pre>
-   * Represents a structure to fetch a single resource.
+   * Shared request structure to fetch a single resource.
+   * Resources include: Task, Workflow, LaunchPlan
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.ObjectGetRequest}
@@ -11146,6 +11504,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates a unique version of resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11156,6 +11515,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates a unique version of resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11166,6 +11526,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates a unique version of resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11336,7 +11697,8 @@ public final class Common {
     }
     /**
      * <pre>
-     * Represents a structure to fetch a single resource.
+     * Shared request structure to fetch a single resource.
+     * Resources include: Task, Workflow, LaunchPlan
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.ObjectGetRequest}
@@ -11499,6 +11861,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11509,6 +11872,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11523,6 +11887,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11543,6 +11908,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11561,6 +11927,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11583,6 +11950,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11601,6 +11969,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11613,6 +11982,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11628,6 +11998,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates a unique version of resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.core.Identifier id = 1;</code>
@@ -11705,6 +12076,7 @@ public final class Common {
     /**
      * <pre>
      * id represents the unique identifier of the resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -11713,6 +12085,7 @@ public final class Common {
     /**
      * <pre>
      * id represents the unique identifier of the resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -11721,6 +12094,7 @@ public final class Common {
     /**
      * <pre>
      * id represents the unique identifier of the resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -11730,6 +12104,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates the number of resources to be returned.
+     * +required
      * </pre>
      *
      * <code>uint32 limit = 2;</code>
@@ -11810,7 +12185,7 @@ public final class Common {
   }
   /**
    * <pre>
-   * Represents a request structure to retrieve a list of resources.
+   * Shared request structure to retrieve a list of resources.
    * Resources include: Task, Workflow, LaunchPlan
    * </pre>
    *
@@ -11934,6 +12309,7 @@ public final class Common {
     /**
      * <pre>
      * id represents the unique identifier of the resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -11944,6 +12320,7 @@ public final class Common {
     /**
      * <pre>
      * id represents the unique identifier of the resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -11954,6 +12331,7 @@ public final class Common {
     /**
      * <pre>
      * id represents the unique identifier of the resource.
+     * +required
      * </pre>
      *
      * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -11967,6 +12345,7 @@ public final class Common {
     /**
      * <pre>
      * Indicates the number of resources to be returned.
+     * +required
      * </pre>
      *
      * <code>uint32 limit = 2;</code>
@@ -12312,7 +12691,7 @@ public final class Common {
     }
     /**
      * <pre>
-     * Represents a request structure to retrieve a list of resources.
+     * Shared request structure to retrieve a list of resources.
      * Resources include: Task, Workflow, LaunchPlan
      * </pre>
      *
@@ -12510,6 +12889,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12520,6 +12900,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12534,6 +12915,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12554,6 +12936,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12572,6 +12955,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12594,6 +12978,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12612,6 +12997,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12624,6 +13010,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12639,6 +13026,7 @@ public final class Common {
       /**
        * <pre>
        * id represents the unique identifier of the resource.
+       * +required
        * </pre>
        *
        * <code>.flyteidl.admin.NamedEntityIdentifier id = 1;</code>
@@ -12661,6 +13049,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required
        * </pre>
        *
        * <code>uint32 limit = 2;</code>
@@ -12671,6 +13060,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required
        * </pre>
        *
        * <code>uint32 limit = 2;</code>
@@ -12684,6 +13074,7 @@ public final class Common {
       /**
        * <pre>
        * Indicates the number of resources to be returned.
+       * +required
        * </pre>
        *
        * <code>uint32 limit = 2;</code>
@@ -13114,6 +13505,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13123,6 +13515,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13131,6 +13524,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13139,6 +13533,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13147,6 +13542,10 @@ public final class Common {
         getRecipientsEmailBytes(int index);
   }
   /**
+   * <pre>
+   * Defines an email notification specification.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.EmailNotification}
    */
   public  static final class EmailNotification extends
@@ -13235,6 +13634,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13246,6 +13646,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13256,6 +13657,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13266,6 +13668,7 @@ public final class Common {
     /**
      * <pre>
      * The list of email addresses recipients for this notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13437,6 +13840,10 @@ public final class Common {
       return builder;
     }
     /**
+     * <pre>
+     * Defines an email notification specification.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.EmailNotification}
      */
     public static final class Builder extends
@@ -13606,6 +14013,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13617,6 +14025,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13627,6 +14036,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13637,6 +14047,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13648,6 +14059,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13665,6 +14077,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13682,6 +14095,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13697,6 +14111,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13710,6 +14125,7 @@ public final class Common {
       /**
        * <pre>
        * The list of email addresses recipients for this notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -13785,6 +14201,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13794,6 +14211,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13802,6 +14220,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13810,6 +14229,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13818,6 +14238,10 @@ public final class Common {
         getRecipientsEmailBytes(int index);
   }
   /**
+   * <pre>
+   * Defines a pager duty notification specification.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.PagerDutyNotification}
    */
   public  static final class PagerDutyNotification extends
@@ -13906,6 +14330,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13917,6 +14342,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13927,6 +14353,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -13937,6 +14364,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, PagerDuty notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14108,6 +14536,10 @@ public final class Common {
       return builder;
     }
     /**
+     * <pre>
+     * Defines a pager duty notification specification.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.PagerDutyNotification}
      */
     public static final class Builder extends
@@ -14277,6 +14709,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14288,6 +14721,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14298,6 +14732,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14308,6 +14743,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14319,6 +14755,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14336,6 +14773,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14353,6 +14791,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14368,6 +14807,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14381,6 +14821,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, PagerDuty notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14456,6 +14897,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14465,6 +14907,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14473,6 +14916,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14481,6 +14925,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14489,6 +14934,10 @@ public final class Common {
         getRecipientsEmailBytes(int index);
   }
   /**
+   * <pre>
+   * Defines a slack notification specification.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.admin.SlackNotification}
    */
   public  static final class SlackNotification extends
@@ -14577,6 +15026,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14588,6 +15038,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14598,6 +15049,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14608,6 +15060,7 @@ public final class Common {
     /**
      * <pre>
      * Currently, Slack notifications leverage email to trigger a notification.
+     * +required
      * </pre>
      *
      * <code>repeated string recipients_email = 1;</code>
@@ -14779,6 +15232,10 @@ public final class Common {
       return builder;
     }
     /**
+     * <pre>
+     * Defines a slack notification specification.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.admin.SlackNotification}
      */
     public static final class Builder extends
@@ -14948,6 +15405,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14959,6 +15417,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14969,6 +15428,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14979,6 +15439,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -14990,6 +15451,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -15007,6 +15469,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -15024,6 +15487,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -15039,6 +15503,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -15052,6 +15517,7 @@ public final class Common {
       /**
        * <pre>
        * Currently, Slack notifications leverage email to trigger a notification.
+       * +required
        * </pre>
        *
        * <code>repeated string recipients_email = 1;</code>
@@ -15127,6 +15593,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15135,6 +15602,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15143,6 +15611,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15151,6 +15620,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15160,6 +15630,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15210,8 +15681,8 @@ public final class Common {
   /**
    * <pre>
    * Represents a structure for notifications based on execution status.
-   * The Notification content is configured within Admin. Future iterations could
-   * expose configuring notifications with custom content.
+   * The notification content is configured within flyte admin but can be templatized.
+   * Future iterations could expose configuring notifications with custom content.
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.Notification}
@@ -15409,6 +15880,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15420,6 +15892,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15430,6 +15903,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15440,6 +15914,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15451,6 +15926,7 @@ public final class Common {
     /**
      * <pre>
      * A list of phases to which users can associate the notifications to.
+     * +required
      * </pre>
      *
      * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -15764,8 +16240,8 @@ public final class Common {
     /**
      * <pre>
      * Represents a structure for notifications based on execution status.
-     * The Notification content is configured within Admin. Future iterations could
-     * expose configuring notifications with custom content.
+     * The notification content is configured within flyte admin but can be templatized.
+     * Future iterations could expose configuring notifications with custom content.
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.Notification}
@@ -15996,6 +16472,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16007,6 +16484,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16017,6 +16495,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16027,6 +16506,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16044,6 +16524,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16060,6 +16541,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16076,6 +16558,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16089,6 +16572,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16100,6 +16584,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16110,6 +16595,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16124,6 +16610,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16137,6 +16624,7 @@ public final class Common {
       /**
        * <pre>
        * A list of phases to which users can associate the notifications to.
+       * +required
        * </pre>
        *
        * <code>repeated .flyteidl.core.WorkflowExecution.Phase phases = 1;</code>
@@ -16611,7 +17099,7 @@ public final class Common {
 
   }
 
-  public interface UrlBlobOrBuilder extends
+  @java.lang.Deprecated public interface UrlBlobOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.UrlBlob)
       com.google.protobuf.MessageOrBuilder {
 
@@ -16649,7 +17137,7 @@ public final class Common {
    *
    * Protobuf type {@code flyteidl.admin.UrlBlob}
    */
-  public  static final class UrlBlob extends
+  @java.lang.Deprecated public  static final class UrlBlob extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:flyteidl.admin.UrlBlob)
       UrlBlobOrBuilder {
@@ -18881,7 +19369,7 @@ public final class Common {
 
   }
 
-  public interface AuthRoleOrBuilder extends
+  @java.lang.Deprecated public interface AuthRoleOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.AuthRole)
       com.google.protobuf.MessageOrBuilder {
 
@@ -18930,7 +19418,7 @@ public final class Common {
    *
    * Protobuf type {@code flyteidl.admin.AuthRole}
    */
-  public  static final class AuthRole extends
+  @java.lang.Deprecated public  static final class AuthRole extends
       com.google.protobuf.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:flyteidl.admin.AuthRole)
       AuthRoleOrBuilder {
@@ -20435,21 +20923,21 @@ public final class Common {
       "otificationH\000\022;\n\npager_duty\030\003 \001(\0132%.flyt" +
       "eidl.admin.PagerDutyNotificationH\000\0222\n\005sl" +
       "ack\030\004 \001(\0132!.flyteidl.admin.SlackNotifica" +
-      "tionH\000B\006\n\004type\"%\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r" +
-      "\n\005bytes\030\002 \001(\003\"k\n\006Labels\0222\n\006values\030\001 \003(\0132" +
-      "\".flyteidl.admin.Labels.ValuesEntry\032-\n\013V" +
-      "aluesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\002" +
-      "8\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyt" +
-      "eidl.admin.Annotations.ValuesEntry\032-\n\013Va" +
-      "luesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028" +
-      "\001\"J\n\010AuthRole\022\032\n\022assumable_iam_role\030\001 \001(" +
-      "\t\022\"\n\032kubernetes_service_account\030\002 \001(\t\"5\n" +
-      "\023RawOutputDataConfig\022\036\n\026output_location_" +
-      "prefix\030\001 \001(\t*\\\n\020NamedEntityState\022\027\n\023NAME" +
-      "D_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIV" +
-      "ED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5github.com" +
-      "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad" +
-      "minb\006proto3"
+      "tionH\000B\006\n\004type\")\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r" +
+      "\n\005bytes\030\002 \001(\003:\002\030\001\"k\n\006Labels\0222\n\006values\030\001 " +
+      "\003(\0132\".flyteidl.admin.Labels.ValuesEntry\032" +
+      "-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
+      "(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'." +
+      "flyteidl.admin.Annotations.ValuesEntry\032-" +
+      "\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(" +
+      "\t:\0028\001\"N\n\010AuthRole\022\032\n\022assumable_iam_role\030" +
+      "\001 \001(\t\022\"\n\032kubernetes_service_account\030\002 \001(" +
+      "\t:\002\030\001\"5\n\023RawOutputDataConfig\022\036\n\026output_l" +
+      "ocation_prefix\030\001 \001(\t*\\\n\020NamedEntityState" +
+      "\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTIT" +
+      "Y_ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5gi" +
+      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
+      "teidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

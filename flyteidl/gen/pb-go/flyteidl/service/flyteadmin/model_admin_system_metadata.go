@@ -9,7 +9,7 @@
 
 package flyteadmin
 
-// Represents system rather than user-facing metadata about an execution.
+// Represents system, rather than user-facing, metadata about an execution.
 type AdminSystemMetadata struct {
 	// Which execution cluster this execution ran on.
 	ExecutionCluster string `json:"execution_cluster,omitempty"`

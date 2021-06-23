@@ -9,7 +9,7 @@
 
 package flyteadmin
 
+// Defines a slack notification specification.
 type AdminSlackNotification struct {
-	// Currently, Slack notifications leverage email to trigger a notification.
 	RecipientsEmail []string `json:"recipients_email,omitempty"`
 }
