@@ -253,7 +253,7 @@ data:
       host: admindb.cluster-c7wfhpvwbpaz.us-east-2.rds.amazonaws.com
       passwordPath: /etc/db/pass.txt
       port: 5432
-      username: flyte
+      username: flyteadmin
   domain.yaml: | 
     domains:
     - id: development
@@ -395,7 +395,7 @@ data:
       host: admindb.cluster-c7wfhpvwbpaz.us-east-2.rds.amazonaws.com
       passwordPath: /etc/db/pass.txt
       port: 5432
-      username: flyte
+      username: flyteadmin
   logger.yaml: | 
     logger:
       level: 5
@@ -1325,7 +1325,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "243a425bde17ac7461591faf58e38543e6efffebd120481e216d9e7a52b08b3"
+        configChecksum: "7bd6c0ed1d8013e4b99b02fe14b455a4e769dd310fc18d8cfe42f33c95b58fa"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: eng
@@ -1547,7 +1547,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "174ca82d7b7556f536b47b0e7a2b4bae6d9466b8106da79b31f7997a91af4ed"
+        configChecksum: "a82c476f1d107f18293c06f3e4134a8889fc55cf4bc77dcd8db999ae89990cf"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: eng
