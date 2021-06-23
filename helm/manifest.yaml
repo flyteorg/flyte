@@ -30,6 +30,48 @@ metadata:
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: eng
+    helm.sh/chart: flyte-0.2.0
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::832573439839:role/iam-role-flyte
+---
+# Source: flyte/templates/datacatalog/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datacatalog
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: eng
+    helm.sh/chart: flyte-0.2.0
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::832573439839:role/iam-role-flyte
+---
+# Source: flyte/templates/propeller/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytepropeller
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: eng
+    helm.sh/chart: flyte-0.2.0
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::832573439839:role/iam-role-flyte
+---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
 apiVersion: v1
@@ -677,7 +719,6 @@ rules:
   - "*"
 ---
 # Source: flyte/templates/admin/rbac.yaml
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -708,7 +749,6 @@ rules:
   - '*'
 ---
 # Source: flyte/templates/propeller/rbac.yaml
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
