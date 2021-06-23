@@ -89,7 +89,8 @@ The make target is a handy wrapper around the following:
 - :code:`--image` is the non-optional fully qualified name of the container image housing your code
 
 In-container serialization
-""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Notice that the commands above are run locally, _not_ inside the container. Strictly speaking, to be rigourous, serialization should be done within the container for the following reasons.
 
 1. It ensures that the versions of all libraries used at execution time on the Flyte platform, are the same that are used during serialization.
