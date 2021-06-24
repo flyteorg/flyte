@@ -81,7 +81,7 @@ Steps
 
 .. prompt:: bash
 
-  REGISTRY=ghcr.io/flyteorg make fast_register
+  REGISTRY=cr.flyte.org/flyteorg make fast_register
 
 .. note::
    If the images are to be re-built, run ``make register`` command.

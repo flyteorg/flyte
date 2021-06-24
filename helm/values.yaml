@@ -14,7 +14,7 @@ flyteadmin:
   replicaCount: 1
   image:
     # -- Docker image for Flyteadmin deployment
-    repository: ghcr.io/flyteorg/flyteadmin
+    repository: cr.flyte.org/flyteorg/flyteadmin
     tag: v0.6.0 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteadmin deployment
@@ -62,7 +62,7 @@ datacatalog:
   replicaCount: 1
   image:
     # -- Docker image for Datacatalog deployment
-    repository: ghcr.io/flyteorg/datacatalog
+    repository: cr.flyte.org/flyteorg/datacatalog
     tag: v0.3.4 # DATACATALOG_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -108,7 +108,7 @@ flytepropeller:
   replicaCount: 1
   image:
     # -- Docker image for Flytepropeller deployment
-    repository: ghcr.io/flyteorg/flytepropeller
+    repository: cr.flyte.org/flyteorg/flytepropeller
     tag: v0.11.0 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
@@ -151,7 +151,7 @@ flyteconsole:
   replicaCount: 1
   image:
     # -- Docker image for Flyteconsole deployment
-    repository: ghcr.io/flyteorg/flyteconsole
+    repository: cr.flyte.org/flyteorg/flyteconsole
     tag: v0.20.1 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
@@ -489,7 +489,7 @@ configmap:
         thirdPartyConfig:
           flyteClient:
             clientId: flytectl
-            redirectUri: https://localhost:53593/callback
+            redirectUri: http://localhost:53593/callback
             scopes:
               - offline
               - all
@@ -555,7 +555,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: ghcr.io/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
+          image: cr.flyte.org/lyft/flyteplugins/flytecopilot:dc4bdbd61cac88a39a5ff43e40f026bdbc2c78a2
           start-timeout: 30s
 
   # -- Core propeller configuration

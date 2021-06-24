@@ -393,7 +393,7 @@ data:
       k8s:
         co-pilot:
           name: "flyte-copilot-"
-          image: "ghcr.io/flyteorg/flytecopilot:v0.5.28"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v0.5.28"
           start-timeout: "30s"
   core.yaml: |
     propeller:
@@ -474,7 +474,7 @@ data:
 
 kind: ConfigMap
 metadata:
-  name: flyte-propeller-config-dtdt5gbgg2
+  name: flyte-propeller-config-d9cm925f8m
   namespace: flyte
 ---
 apiVersion: v1
@@ -614,7 +614,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/datacatalog:v0.3.4
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.4
         imagePullPolicy: IfNotPresent
         name: datacatalog
         ports:
@@ -632,7 +632,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/datacatalog:v0.3.4
+        image: cr.flyte.org/flyteorg/datacatalog:v0.3.4
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -689,7 +689,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.11.0
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.11.0
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -702,7 +702,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-d9cm925f8m
         name: config-volume
       - name: webhook-certs
         secret:
@@ -737,7 +737,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: ghcr.io/flyteorg/flyteadmin:v0.6.0
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.0
         imagePullPolicy: IfNotPresent
         name: flyteadmin
         ports:
@@ -790,7 +790,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - migrate
         - run
-        image: ghcr.io/flyteorg/flyteadmin:v0.6.0
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.0
         imagePullPolicy: IfNotPresent
         name: run-migrations
         volumeMounts:
@@ -806,7 +806,7 @@ spec:
         - seed-projects
         - flytetester
         - flytesnacks
-        image: ghcr.io/flyteorg/flyteadmin:v0.6.0
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.0
         imagePullPolicy: IfNotPresent
         name: seed-projects
         volumeMounts:
@@ -820,7 +820,7 @@ spec:
         - /etc/flyte/config/*.yaml
         - clusterresource
         - sync
-        image: ghcr.io/flyteorg/flyteadmin:v0.6.0
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.0
         imagePullPolicy: IfNotPresent
         name: sync-cluster-resources
         volumeMounts:
@@ -840,7 +840,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flyteadmin:v0.6.0
+        image: cr.flyte.org/flyteorg/flyteadmin:v0.6.0
         imagePullPolicy: IfNotPresent
         name: generate-secrets
         volumeMounts:
@@ -896,7 +896,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: ghcr.io/flyteorg/flytepropeller:v0.11.0
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.11.0
         imagePullPolicy: IfNotPresent
         name: flytepropeller
         ports:
@@ -909,7 +909,7 @@ spec:
       serviceAccountName: flytepropeller
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-d9cm925f8m
         name: config-volume
       - name: auth
         secret:
@@ -1015,7 +1015,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/flyteorg/flytepropeller:v0.11.0
+        image: cr.flyte.org/flyteorg/flytepropeller:v0.11.0
         imagePullPolicy: IfNotPresent
         name: webhook
         volumeMounts:
@@ -1025,7 +1025,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       volumes:
       - configMap:
-          name: flyte-propeller-config-dtdt5gbgg2
+          name: flyte-propeller-config-d9cm925f8m
         name: config-volume
   ttlSecondsAfterFinished: 0
 ---

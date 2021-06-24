@@ -1,0 +1,162 @@
+environments:
+  - name: default
+    path: "./env.yaml" # NOTE: relative path to environment
+    variables:
+      region: <region>
+      account_id: <account_id>
+name: service-flyte
+modules:
+  - name: postgres
+    type: aws-postgres
+  - name: s3
+    type: aws-s3
+    bucket_name: "{parent_name}-{layer_name}"
+  - name: notifcationsQueue
+    type: aws-sqs
+  - name: schedulesQueue
+    type: aws-sqs
+  - name: topic
+    type: aws-sns
+    sqs_subscribers:
+      - "${{module.notifcationsQueue.queue_arn}}"
+  - name: adminflyterole
+    type: aws-iam-role
+    extra_iam_policies:
+      - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
+#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SES
+    allowed_k8s_services:
+      - namespace: "*"
+        service_name: "*"
+    links:
+      - s3: [ "write" ]
+      - notifcationsQueue
+      - schedulesQueue
+      - topic
+  - name: userflyterole
+    type: aws-iam-role
+    extra_iam_policies:
+      - "arn:aws:iam::aws:policy/CloudWatchEventsFullAccess"
+#      - "arn:aws:iam::{vars.account_id}:policy/{env}-{env}-awsses-sender" # Uncomment out for SESre, change the templating
+    allowed_k8s_services:
+      - namespace: "*"
+        service_name: "*"
+    links:
+      - s3: [ "write" ]
+  - type: helm-chart
+    chart: "../helm" # NOTE: relative path to chart
+    namespace: flyte
+    timeout: 600
+    create_namespace: true
+    values_file: "../helm/values-eks.yaml" # NOTE: relative path to values yaml
+    # Additional overrides to the values provided by the chart. Opta enables piping through produced outputs from prior modules/steps.
+    values:
+      postgres:
+        enabled: false
+      db:
+        database:
+          port: 5432
+          username: "${{module.postgres.db_user}}"
+          host: "${{module.postgres.db_host}}"
+          dbname: "${{module.postgres.db_name}}"
+      common:
+        ingress:
+          albSSLRedirect: false
+          host: "{parent.domain}"
+          annotations:
+            kubernetes.io/ingress.class: "nginx"
+        databaseSecret:
+          secretManifest:
+            stringData:
+              pass.txt: "${{module.postgres.db_password}}"
+      storage:
+        bucketName: "{parent_name}-{layer_name}"
+        s3:
+          region: "{vars.region}"
+      flyteadmin:
+        serviceAccount:
+          create: true
+          annotations:
+            eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      datacatalog:
+        serviceAccount:
+          create: true
+          annotations:
+            eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      flytepropeller:
+        serviceAccount:
+          create: true
+          annotations:
+            eks.amazonaws.com/role-arn: "${{module.adminflyterole.role_arn}}"
+      workflow_scheduler:
+        enabled: true
+        config:
+          scheduler:
+            # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
+            eventScheduler:
+              scheme: aws
+              region: "{vars.region}"
+              scheduleRole: "${{module.adminflyterole.role_arn}}"
+              targetName: "${{module.schedulesQueue.queue_arn}}"
+              scheduleNamePrefix: flyte
+            workflowExecutor:
+              scheme: aws
+              region: "{vars.region}"
+              scheduleQueueName: "${{module.schedulesQueue.queue_name}}"
+              accountId: "{vars.account_id}"
+              reconnectAttempts: 10
+              reconnectDelaySeconds: 30
+      workflow_notifications:
+        enabled: true
+        config:
+          notifications:
+            type: aws
+            region: "{vars.region}"
+            publisher:
+              topicName: "${{module.topic.topic_arn}}"
+            processor:
+              queueName: "${{module.notifcationsQueue.queue_name}}"
+              accountId: "{vars.account_id}"
+            emailer:
+              subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
+              sender: "flyte@{parent.domain}"
+              body: |
+                Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
+                Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
+                {{ error }}
+      configmap:
+        remoteData:
+          remoteData:
+            region: "{vars.region}"
+            scheme: aws
+            signedUrls:
+              durationMinutes: 3
+        task_logs:
+          plugins:
+            logs:
+              cloudwatch-region: "{vars.region}"
+      cluster_resource_manager:
+        enabled: true
+        config:
+          cluster_resources:
+            customData:
+              - production:
+                  - defaultIamRole:
+                      value: "${{module.userflyterole.role_arn}}"
+                  - projectQuotaCpu:
+                      value: "6"
+                  - projectQuotaMemory:
+                      value: "6000Mi"
+              - staging:
+                  - defaultIamRole:
+                      value: "${{module.userflyterole.role_arn}}"
+                  - projectQuotaCpu:
+                      value: "6"
+                  - projectQuotaMemory:
+                      value: "6000Mi"
+              - development:
+                  - defaultIamRole:
+                      value: "${{module.userflyterole.role_arn}}"
+                  - projectQuotaCpu:
+                      value: "6"
+                  - projectQuotaMemory:
+                      value: "6000Mi"

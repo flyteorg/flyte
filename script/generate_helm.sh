@@ -12,7 +12,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 helm dep update ${DIR}/../helm/
 
 for deployment in ${DEPLOYMENT}; do
-    helm template flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
+    helm template flyte -n flyte ${DIR}/../helm/ -f ${DIR}/../helm/values-${deployment}.yaml > ${DIR}/../deployment/${deployment}/flyte_helm_generated.yaml
 done
 
 echo "Generating helm docs"
@@ -21,7 +21,7 @@ then
     GO111MODULE=on go get github.com/norwoodj/helm-docs/cmd/helm-docs
 fi
 
-~/go/bin/helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
+${GOPATH:-~/go}/bin/helm-docs -t ${DIR}/../helm/README.md.gotmpl ${DIR}/../helm/
 
 # This section is used by GitHub workflow to ensure that the generation step was run
 if [ -n "$DELTA_CHECK" ]; then
