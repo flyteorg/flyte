@@ -106,7 +106,7 @@ func TestConfig_SetFlags(t *testing.T) {
 
 			cmdFlags.Set("flytesnacks", testValue)
 			if vString, err := cmdFlags.GetString("flytesnacks"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SnacksRepo)
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SourcesPath)
 
 			} else {
 				assert.FailNow(t, err.Error())
