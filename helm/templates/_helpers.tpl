@@ -189,7 +189,7 @@ storage:
     auth-type: accesskey
     secret-key: miniostorage
     disable-ssl: true
-    endpoint: http://minio.flyte.svc.cluster.local:9000
+    endpoint: http://minio.{{ .Release.Namespace }}.svc.cluster.local:9000
     region: us-east-1
 {{- else if eq .Values.storage.type "custom" }}
 {{- with .Values.storage.custom -}}
