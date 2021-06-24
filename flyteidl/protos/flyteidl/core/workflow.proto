@@ -9,7 +9,9 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/core/literals.proto";
+import "flyteidl/core/tasks.proto";
 import "flyteidl/core/types.proto";
+import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 
 // Defines a condition and the execution unit that should be executed if the condition is satisfied.
@@ -50,6 +52,9 @@ message TaskNode {
         // A globally unique identifier for the task.
         Identifier reference_id = 1;
     }
+
+    // Optional overrides applied at task execution time.
+    TaskNodeOverrides overrides = 2;
 }
 
 // Refers to a the workflow the node is to execute.
@@ -193,4 +198,10 @@ message WorkflowTemplate {
 
     // workflow defaults
     WorkflowMetadataDefaults metadata_defaults = 7;
+}
+
+// Optional task node overrides that will be applied at task execution time.
+message TaskNodeOverrides {
+    // A customizable interface to convey resources requested for a task container. 
+    Resources resources = 1;
 }

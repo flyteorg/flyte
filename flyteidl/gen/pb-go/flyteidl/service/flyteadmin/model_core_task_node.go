@@ -13,4 +13,6 @@ package flyteadmin
 type CoreTaskNode struct {
 	// A globally unique identifier for the task.
 	ReferenceId *CoreIdentifier `json:"reference_id,omitempty"`
+	// Optional overrides applied at task execution time.
+	Overrides *CoreTaskNodeOverrides `json:"overrides,omitempty"`
 }

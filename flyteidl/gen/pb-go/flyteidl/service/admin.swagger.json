@@ -5797,9 +5797,23 @@
         "reference_id": {
           "$ref": "#/definitions/coreIdentifier",
           "description": "A globally unique identifier for the task."
+        },
+        "overrides": {
+          "$ref": "#/definitions/coreTaskNodeOverrides",
+          "description": "Optional overrides applied at task execution time."
         }
       },
       "description": "Refers to the task that the Node is to execute."
+    },
+    "coreTaskNodeOverrides": {
+      "type": "object",
+      "properties": {
+        "resources": {
+          "$ref": "#/definitions/coreResources",
+          "description": "A customizable interface to convey resources requested for a task container."
+        }
+      },
+      "description": "Optional task node overrides that will be applied at task execution time."
     },
     "coreTaskTemplate": {
       "type": "object",
