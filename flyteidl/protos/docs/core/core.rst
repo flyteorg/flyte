@@ -2547,6 +2547,28 @@ Refers to the task that the Node is to execute.
    :widths: auto
 
    "reference_id", ":ref:`ref_flyteidl.core.Identifier`", "", "A globally unique identifier for the task."
+   "overrides", ":ref:`ref_flyteidl.core.TaskNodeOverrides`", "", "Optional overrides applied at task execution time."
+
+
+
+
+
+
+
+.. _ref_flyteidl.core.TaskNodeOverrides:
+
+TaskNodeOverrides
+------------------------------------------------------------------
+
+Optional task node overrides that will be applied at task execution time.
+
+
+
+.. csv-table:: TaskNodeOverrides type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "resources", ":ref:`ref_flyteidl.core.Resources`", "", "A customizable interface to convey resources requested for a task container."
 
 
 

@@ -3309,6 +3309,31 @@ public final class Workflow {
      */
     flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getReferenceIdOrBuilder();
 
+    /**
+     * <pre>
+     * Optional overrides applied at task execution time.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+     */
+    boolean hasOverrides();
+    /**
+     * <pre>
+     * Optional overrides applied at task execution time.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+     */
+    flyteidl.core.Workflow.TaskNodeOverrides getOverrides();
+    /**
+     * <pre>
+     * Optional overrides applied at task execution time.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+     */
+    flyteidl.core.Workflow.TaskNodeOverridesOrBuilder getOverridesOrBuilder();
+
     public flyteidl.core.Workflow.TaskNode.ReferenceCase getReferenceCase();
   }
   /**
@@ -3366,6 +3391,19 @@ public final class Workflow {
                 reference_ = subBuilder.buildPartial();
               }
               referenceCase_ = 1;
+              break;
+            }
+            case 18: {
+              flyteidl.core.Workflow.TaskNodeOverrides.Builder subBuilder = null;
+              if (overrides_ != null) {
+                subBuilder = overrides_.toBuilder();
+              }
+              overrides_ = input.readMessage(flyteidl.core.Workflow.TaskNodeOverrides.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(overrides_);
+                overrides_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -3474,6 +3512,39 @@ public final class Workflow {
       return flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance();
     }
 
+    public static final int OVERRIDES_FIELD_NUMBER = 2;
+    private flyteidl.core.Workflow.TaskNodeOverrides overrides_;
+    /**
+     * <pre>
+     * Optional overrides applied at task execution time.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+     */
+    public boolean hasOverrides() {
+      return overrides_ != null;
+    }
+    /**
+     * <pre>
+     * Optional overrides applied at task execution time.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+     */
+    public flyteidl.core.Workflow.TaskNodeOverrides getOverrides() {
+      return overrides_ == null ? flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance() : overrides_;
+    }
+    /**
+     * <pre>
+     * Optional overrides applied at task execution time.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+     */
+    public flyteidl.core.Workflow.TaskNodeOverridesOrBuilder getOverridesOrBuilder() {
+      return getOverrides();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3491,6 +3562,9 @@ public final class Workflow {
       if (referenceCase_ == 1) {
         output.writeMessage(1, (flyteidl.core.IdentifierOuterClass.Identifier) reference_);
       }
+      if (overrides_ != null) {
+        output.writeMessage(2, getOverrides());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3503,6 +3577,10 @@ public final class Workflow {
       if (referenceCase_ == 1) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, (flyteidl.core.IdentifierOuterClass.Identifier) reference_);
+      }
+      if (overrides_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getOverrides());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3519,6 +3597,11 @@ public final class Workflow {
       }
       flyteidl.core.Workflow.TaskNode other = (flyteidl.core.Workflow.TaskNode) obj;
 
+      if (hasOverrides() != other.hasOverrides()) return false;
+      if (hasOverrides()) {
+        if (!getOverrides()
+            .equals(other.getOverrides())) return false;
+      }
       if (!getReferenceCase().equals(other.getReferenceCase())) return false;
       switch (referenceCase_) {
         case 1:
@@ -3539,6 +3622,10 @@ public final class Workflow {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasOverrides()) {
+        hash = (37 * hash) + OVERRIDES_FIELD_NUMBER;
+        hash = (53 * hash) + getOverrides().hashCode();
+      }
       switch (referenceCase_) {
         case 1:
           hash = (37 * hash) + REFERENCE_ID_FIELD_NUMBER;
@@ -3684,6 +3771,12 @@ public final class Workflow {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        if (overridesBuilder_ == null) {
+          overrides_ = null;
+        } else {
+          overrides_ = null;
+          overridesBuilder_ = null;
+        }
         referenceCase_ = 0;
         reference_ = null;
         return this;
@@ -3718,6 +3811,11 @@ public final class Workflow {
           } else {
             result.reference_ = referenceIdBuilder_.build();
           }
+        }
+        if (overridesBuilder_ == null) {
+          result.overrides_ = overrides_;
+        } else {
+          result.overrides_ = overridesBuilder_.build();
         }
         result.referenceCase_ = referenceCase_;
         onBuilt();
@@ -3768,6 +3866,9 @@ public final class Workflow {
 
       public Builder mergeFrom(flyteidl.core.Workflow.TaskNode other) {
         if (other == flyteidl.core.Workflow.TaskNode.getDefaultInstance()) return this;
+        if (other.hasOverrides()) {
+          mergeOverrides(other.getOverrides());
+        }
         switch (other.getReferenceCase()) {
           case REFERENCE_ID: {
             mergeReferenceId(other.getReferenceId());
@@ -3991,6 +4092,159 @@ public final class Workflow {
         referenceCase_ = 1;
         onChanged();;
         return referenceIdBuilder_;
+      }
+
+      private flyteidl.core.Workflow.TaskNodeOverrides overrides_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.TaskNodeOverrides, flyteidl.core.Workflow.TaskNodeOverrides.Builder, flyteidl.core.Workflow.TaskNodeOverridesOrBuilder> overridesBuilder_;
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public boolean hasOverrides() {
+        return overridesBuilder_ != null || overrides_ != null;
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public flyteidl.core.Workflow.TaskNodeOverrides getOverrides() {
+        if (overridesBuilder_ == null) {
+          return overrides_ == null ? flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance() : overrides_;
+        } else {
+          return overridesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public Builder setOverrides(flyteidl.core.Workflow.TaskNodeOverrides value) {
+        if (overridesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          overrides_ = value;
+          onChanged();
+        } else {
+          overridesBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public Builder setOverrides(
+          flyteidl.core.Workflow.TaskNodeOverrides.Builder builderForValue) {
+        if (overridesBuilder_ == null) {
+          overrides_ = builderForValue.build();
+          onChanged();
+        } else {
+          overridesBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public Builder mergeOverrides(flyteidl.core.Workflow.TaskNodeOverrides value) {
+        if (overridesBuilder_ == null) {
+          if (overrides_ != null) {
+            overrides_ =
+              flyteidl.core.Workflow.TaskNodeOverrides.newBuilder(overrides_).mergeFrom(value).buildPartial();
+          } else {
+            overrides_ = value;
+          }
+          onChanged();
+        } else {
+          overridesBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public Builder clearOverrides() {
+        if (overridesBuilder_ == null) {
+          overrides_ = null;
+          onChanged();
+        } else {
+          overrides_ = null;
+          overridesBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public flyteidl.core.Workflow.TaskNodeOverrides.Builder getOverridesBuilder() {
+        
+        onChanged();
+        return getOverridesFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      public flyteidl.core.Workflow.TaskNodeOverridesOrBuilder getOverridesOrBuilder() {
+        if (overridesBuilder_ != null) {
+          return overridesBuilder_.getMessageOrBuilder();
+        } else {
+          return overrides_ == null ?
+              flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance() : overrides_;
+        }
+      }
+      /**
+       * <pre>
+       * Optional overrides applied at task execution time.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskNodeOverrides overrides = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.TaskNodeOverrides, flyteidl.core.Workflow.TaskNodeOverrides.Builder, flyteidl.core.Workflow.TaskNodeOverridesOrBuilder> 
+          getOverridesFieldBuilder() {
+        if (overridesBuilder_ == null) {
+          overridesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.TaskNodeOverrides, flyteidl.core.Workflow.TaskNodeOverrides.Builder, flyteidl.core.Workflow.TaskNodeOverridesOrBuilder>(
+                  getOverrides(),
+                  getParentForChildren(),
+                  isClean());
+          overrides_ = null;
+        }
+        return overridesBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14495,6 +14749,680 @@ public final class Workflow {
 
   }
 
+  public interface TaskNodeOverridesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.TaskNodeOverrides)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A customizable interface to convey resources requested for a task container. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.Resources resources = 1;</code>
+     */
+    boolean hasResources();
+    /**
+     * <pre>
+     * A customizable interface to convey resources requested for a task container. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.Resources resources = 1;</code>
+     */
+    flyteidl.core.Tasks.Resources getResources();
+    /**
+     * <pre>
+     * A customizable interface to convey resources requested for a task container. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.Resources resources = 1;</code>
+     */
+    flyteidl.core.Tasks.ResourcesOrBuilder getResourcesOrBuilder();
+  }
+  /**
+   * <pre>
+   * Optional task node overrides that will be applied at task execution time.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.TaskNodeOverrides}
+   */
+  public  static final class TaskNodeOverrides extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.TaskNodeOverrides)
+      TaskNodeOverridesOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use TaskNodeOverrides.newBuilder() to construct.
+    private TaskNodeOverrides(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private TaskNodeOverrides() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TaskNodeOverrides(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Tasks.Resources.Builder subBuilder = null;
+              if (resources_ != null) {
+                subBuilder = resources_.toBuilder();
+              }
+              resources_ = input.readMessage(flyteidl.core.Tasks.Resources.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(resources_);
+                resources_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNodeOverrides_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Workflow.TaskNodeOverrides.class, flyteidl.core.Workflow.TaskNodeOverrides.Builder.class);
+    }
+
+    public static final int RESOURCES_FIELD_NUMBER = 1;
+    private flyteidl.core.Tasks.Resources resources_;
+    /**
+     * <pre>
+     * A customizable interface to convey resources requested for a task container. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.Resources resources = 1;</code>
+     */
+    public boolean hasResources() {
+      return resources_ != null;
+    }
+    /**
+     * <pre>
+     * A customizable interface to convey resources requested for a task container. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.Resources resources = 1;</code>
+     */
+    public flyteidl.core.Tasks.Resources getResources() {
+      return resources_ == null ? flyteidl.core.Tasks.Resources.getDefaultInstance() : resources_;
+    }
+    /**
+     * <pre>
+     * A customizable interface to convey resources requested for a task container. 
+     * </pre>
+     *
+     * <code>.flyteidl.core.Resources resources = 1;</code>
+     */
+    public flyteidl.core.Tasks.ResourcesOrBuilder getResourcesOrBuilder() {
+      return getResources();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (resources_ != null) {
+        output.writeMessage(1, getResources());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (resources_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getResources());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Workflow.TaskNodeOverrides)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Workflow.TaskNodeOverrides other = (flyteidl.core.Workflow.TaskNodeOverrides) obj;
+
+      if (hasResources() != other.hasResources()) return false;
+      if (hasResources()) {
+        if (!getResources()
+            .equals(other.getResources())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasResources()) {
+        hash = (37 * hash) + RESOURCES_FIELD_NUMBER;
+        hash = (53 * hash) + getResources().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.TaskNodeOverrides parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Workflow.TaskNodeOverrides prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Optional task node overrides that will be applied at task execution time.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.TaskNodeOverrides}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.TaskNodeOverrides)
+        flyteidl.core.Workflow.TaskNodeOverridesOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNodeOverrides_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Workflow.TaskNodeOverrides.class, flyteidl.core.Workflow.TaskNodeOverrides.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Workflow.TaskNodeOverrides.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (resourcesBuilder_ == null) {
+          resources_ = null;
+        } else {
+          resources_ = null;
+          resourcesBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_TaskNodeOverrides_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.TaskNodeOverrides getDefaultInstanceForType() {
+        return flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.TaskNodeOverrides build() {
+        flyteidl.core.Workflow.TaskNodeOverrides result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.TaskNodeOverrides buildPartial() {
+        flyteidl.core.Workflow.TaskNodeOverrides result = new flyteidl.core.Workflow.TaskNodeOverrides(this);
+        if (resourcesBuilder_ == null) {
+          result.resources_ = resources_;
+        } else {
+          result.resources_ = resourcesBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Workflow.TaskNodeOverrides) {
+          return mergeFrom((flyteidl.core.Workflow.TaskNodeOverrides)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Workflow.TaskNodeOverrides other) {
+        if (other == flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance()) return this;
+        if (other.hasResources()) {
+          mergeResources(other.getResources());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Workflow.TaskNodeOverrides parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Workflow.TaskNodeOverrides) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Tasks.Resources resources_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.Resources, flyteidl.core.Tasks.Resources.Builder, flyteidl.core.Tasks.ResourcesOrBuilder> resourcesBuilder_;
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public boolean hasResources() {
+        return resourcesBuilder_ != null || resources_ != null;
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public flyteidl.core.Tasks.Resources getResources() {
+        if (resourcesBuilder_ == null) {
+          return resources_ == null ? flyteidl.core.Tasks.Resources.getDefaultInstance() : resources_;
+        } else {
+          return resourcesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public Builder setResources(flyteidl.core.Tasks.Resources value) {
+        if (resourcesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          resources_ = value;
+          onChanged();
+        } else {
+          resourcesBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public Builder setResources(
+          flyteidl.core.Tasks.Resources.Builder builderForValue) {
+        if (resourcesBuilder_ == null) {
+          resources_ = builderForValue.build();
+          onChanged();
+        } else {
+          resourcesBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public Builder mergeResources(flyteidl.core.Tasks.Resources value) {
+        if (resourcesBuilder_ == null) {
+          if (resources_ != null) {
+            resources_ =
+              flyteidl.core.Tasks.Resources.newBuilder(resources_).mergeFrom(value).buildPartial();
+          } else {
+            resources_ = value;
+          }
+          onChanged();
+        } else {
+          resourcesBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public Builder clearResources() {
+        if (resourcesBuilder_ == null) {
+          resources_ = null;
+          onChanged();
+        } else {
+          resources_ = null;
+          resourcesBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public flyteidl.core.Tasks.Resources.Builder getResourcesBuilder() {
+        
+        onChanged();
+        return getResourcesFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      public flyteidl.core.Tasks.ResourcesOrBuilder getResourcesOrBuilder() {
+        if (resourcesBuilder_ != null) {
+          return resourcesBuilder_.getMessageOrBuilder();
+        } else {
+          return resources_ == null ?
+              flyteidl.core.Tasks.Resources.getDefaultInstance() : resources_;
+        }
+      }
+      /**
+       * <pre>
+       * A customizable interface to convey resources requested for a task container. 
+       * </pre>
+       *
+       * <code>.flyteidl.core.Resources resources = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.Resources, flyteidl.core.Tasks.Resources.Builder, flyteidl.core.Tasks.ResourcesOrBuilder> 
+          getResourcesFieldBuilder() {
+        if (resourcesBuilder_ == null) {
+          resourcesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.Resources, flyteidl.core.Tasks.Resources.Builder, flyteidl.core.Tasks.ResourcesOrBuilder>(
+                  getResources(),
+                  getParentForChildren(),
+                  isClean());
+          resources_ = null;
+        }
+        return resourcesBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.TaskNodeOverrides)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.TaskNodeOverrides)
+    private static final flyteidl.core.Workflow.TaskNodeOverrides DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Workflow.TaskNodeOverrides();
+    }
+
+    public static flyteidl.core.Workflow.TaskNodeOverrides getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<TaskNodeOverrides>
+        PARSER = new com.google.protobuf.AbstractParser<TaskNodeOverrides>() {
+      @java.lang.Override
+      public TaskNodeOverrides parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TaskNodeOverrides(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<TaskNodeOverrides> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TaskNodeOverrides> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Workflow.TaskNodeOverrides getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_IfBlock_descriptor;
   private static final 
@@ -14550,6 +15478,11 @@ public final class Workflow {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_WorkflowTemplate_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_TaskNodeOverrides_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -14564,53 +15497,58 @@ public final class Workflow {
       "yteidl/core/execution.proto\032\036flyteidl/co" +
       "re/identifier.proto\032\035flyteidl/core/inter" +
       "face.proto\032\034flyteidl/core/literals.proto" +
-      "\032\031flyteidl/core/types.proto\032\036google/prot" +
-      "obuf/duration.proto\"f\n\007IfBlock\0223\n\tcondit" +
-      "ion\030\001 \001(\0132 .flyteidl.core.BooleanExpress" +
-      "ion\022&\n\tthen_node\030\002 \001(\0132\023.flyteidl.core.N" +
-      "ode\"\266\001\n\013IfElseBlock\022$\n\004case\030\001 \001(\0132\026.flyt" +
-      "eidl.core.IfBlock\022%\n\005other\030\002 \003(\0132\026.flyte" +
-      "idl.core.IfBlock\022(\n\telse_node\030\003 \001(\0132\023.fl" +
-      "yteidl.core.NodeH\000\022%\n\005error\030\004 \001(\0132\024.flyt" +
-      "eidl.core.ErrorH\000B\t\n\007default\"9\n\nBranchNo" +
-      "de\022+\n\007if_else\030\001 \001(\0132\032.flyteidl.core.IfEl" +
-      "seBlock\"J\n\010TaskNode\0221\n\014reference_id\030\001 \001(" +
-      "\0132\031.flyteidl.core.IdentifierH\000B\013\n\trefere" +
-      "nce\"\207\001\n\014WorkflowNode\0223\n\016launchplan_ref\030\001" +
-      " \001(\0132\031.flyteidl.core.IdentifierH\000\0225\n\020sub" +
-      "_workflow_ref\030\002 \001(\0132\031.flyteidl.core.Iden" +
-      "tifierH\000B\013\n\treference\"\247\001\n\014NodeMetadata\022\014" +
-      "\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031.google.p" +
-      "rotobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.flyt" +
-      "eidl.core.RetryStrategy\022\027\n\rinterruptible" +
-      "\030\006 \001(\010H\000B\025\n\023interruptible_value\"#\n\005Alias" +
-      "\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\322\002\n\004Node\022\n\n" +
-      "\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.flyteidl.c" +
-      "ore.NodeMetadata\022&\n\006inputs\030\003 \003(\0132\026.flyte" +
-      "idl.core.Binding\022\031\n\021upstream_node_ids\030\004 " +
-      "\003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.flyteidl.c" +
-      "ore.Alias\022,\n\ttask_node\030\006 \001(\0132\027.flyteidl." +
-      "core.TaskNodeH\000\0224\n\rworkflow_node\030\007 \001(\0132\033" +
-      ".flyteidl.core.WorkflowNodeH\000\0220\n\013branch_" +
-      "node\030\010 \001(\0132\031.flyteidl.core.BranchNodeH\000B" +
-      "\010\n\006target\"\347\001\n\020WorkflowMetadata\022;\n\022qualit" +
-      "y_of_service\030\001 \001(\0132\037.flyteidl.core.Quali" +
-      "tyOfService\022C\n\non_failure\030\002 \001(\0162/.flytei" +
-      "dl.core.WorkflowMetadata.OnFailurePolicy" +
-      "\"Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020" +
-      "\000\022(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLET" +
-      "E\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n\rinter" +
-      "ruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002i" +
-      "d\030\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010me" +
-      "tadata\030\002 \001(\0132\037.flyteidl.core.WorkflowMet" +
-      "adata\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core" +
-      ".TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteid" +
-      "l.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl." +
-      "core.Binding\022)\n\014failure_node\030\006 \001(\0132\023.fly" +
-      "teidl.core.Node\022B\n\021metadata_defaults\030\007 \001" +
-      "(\0132\'.flyteidl.core.WorkflowMetadataDefau" +
-      "ltsB6Z4github.com/flyteorg/flyteidl/gen/" +
-      "pb-go/flyteidl/coreb\006proto3"
+      "\032\031flyteidl/core/tasks.proto\032\031flyteidl/co" +
+      "re/types.proto\032\034flyteidl/core/security.p" +
+      "roto\032\036google/protobuf/duration.proto\"f\n\007" +
+      "IfBlock\0223\n\tcondition\030\001 \001(\0132 .flyteidl.co" +
+      "re.BooleanExpression\022&\n\tthen_node\030\002 \001(\0132" +
+      "\023.flyteidl.core.Node\"\266\001\n\013IfElseBlock\022$\n\004" +
+      "case\030\001 \001(\0132\026.flyteidl.core.IfBlock\022%\n\005ot" +
+      "her\030\002 \003(\0132\026.flyteidl.core.IfBlock\022(\n\tels" +
+      "e_node\030\003 \001(\0132\023.flyteidl.core.NodeH\000\022%\n\005e" +
+      "rror\030\004 \001(\0132\024.flyteidl.core.ErrorH\000B\t\n\007de" +
+      "fault\"9\n\nBranchNode\022+\n\007if_else\030\001 \001(\0132\032.f" +
+      "lyteidl.core.IfElseBlock\"\177\n\010TaskNode\0221\n\014" +
+      "reference_id\030\001 \001(\0132\031.flyteidl.core.Ident" +
+      "ifierH\000\0223\n\toverrides\030\002 \001(\0132 .flyteidl.co" +
+      "re.TaskNodeOverridesB\013\n\treference\"\207\001\n\014Wo" +
+      "rkflowNode\0223\n\016launchplan_ref\030\001 \001(\0132\031.fly" +
+      "teidl.core.IdentifierH\000\0225\n\020sub_workflow_" +
+      "ref\030\002 \001(\0132\031.flyteidl.core.IdentifierH\000B\013" +
+      "\n\treference\"\247\001\n\014NodeMetadata\022\014\n\004name\030\001 \001" +
+      "(\t\022*\n\007timeout\030\004 \001(\0132\031.google.protobuf.Du" +
+      "ration\022-\n\007retries\030\005 \001(\0132\034.flyteidl.core." +
+      "RetryStrategy\022\027\n\rinterruptible\030\006 \001(\010H\000B\025" +
+      "\n\023interruptible_value\"#\n\005Alias\022\013\n\003var\030\001 " +
+      "\001(\t\022\r\n\005alias\030\002 \001(\t\"\322\002\n\004Node\022\n\n\002id\030\001 \001(\t\022" +
+      "-\n\010metadata\030\002 \001(\0132\033.flyteidl.core.NodeMe" +
+      "tadata\022&\n\006inputs\030\003 \003(\0132\026.flyteidl.core.B" +
+      "inding\022\031\n\021upstream_node_ids\030\004 \003(\t\022,\n\016out" +
+      "put_aliases\030\005 \003(\0132\024.flyteidl.core.Alias\022" +
+      ",\n\ttask_node\030\006 \001(\0132\027.flyteidl.core.TaskN" +
+      "odeH\000\0224\n\rworkflow_node\030\007 \001(\0132\033.flyteidl." +
+      "core.WorkflowNodeH\000\0220\n\013branch_node\030\010 \001(\013" +
+      "2\031.flyteidl.core.BranchNodeH\000B\010\n\006target\"" +
+      "\347\001\n\020WorkflowMetadata\022;\n\022quality_of_servi" +
+      "ce\030\001 \001(\0132\037.flyteidl.core.QualityOfServic" +
+      "e\022C\n\non_failure\030\002 \001(\0162/.flyteidl.core.Wo" +
+      "rkflowMetadata.OnFailurePolicy\"Q\n\017OnFail" +
+      "urePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000\022(\n$FAIL_" +
+      "AFTER_EXECUTABLE_NODES_COMPLETE\020\001\"1\n\030Wor" +
+      "kflowMetadataDefaults\022\025\n\rinterruptible\030\001" +
+      " \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030\001 \001(\0132\031." +
+      "flyteidl.core.Identifier\0221\n\010metadata\030\002 \001" +
+      "(\0132\037.flyteidl.core.WorkflowMetadata\0220\n\ti" +
+      "nterface\030\003 \001(\0132\035.flyteidl.core.TypedInte" +
+      "rface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl.core.Nod" +
+      "e\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.core.Bindi" +
+      "ng\022)\n\014failure_node\030\006 \001(\0132\023.flyteidl.core" +
+      ".Node\022B\n\021metadata_defaults\030\007 \001(\0132\'.flyte" +
+      "idl.core.WorkflowMetadataDefaults\"@\n\021Tas" +
+      "kNodeOverrides\022+\n\tresources\030\001 \001(\0132\030.flyt" +
+      "eidl.core.ResourcesB6Z4github.com/flyteo" +
+      "rg/flyteidl/gen/pb-go/flyteidl/coreb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14628,7 +15566,9 @@ public final class Workflow {
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Interface.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
+          flyteidl.core.Tasks.getDescriptor(),
           flyteidl.core.Types.getDescriptor(),
+          flyteidl.core.Security.getDescriptor(),
           com.google.protobuf.DurationProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_core_IfBlock_descriptor =
@@ -14654,7 +15594,7 @@ public final class Workflow {
     internal_static_flyteidl_core_TaskNode_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskNode_descriptor,
-        new java.lang.String[] { "ReferenceId", "Reference", });
+        new java.lang.String[] { "ReferenceId", "Overrides", "Reference", });
     internal_static_flyteidl_core_WorkflowNode_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_WorkflowNode_fieldAccessorTable = new
@@ -14697,12 +15637,20 @@ public final class Workflow {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowTemplate_descriptor,
         new java.lang.String[] { "Id", "Metadata", "Interface", "Nodes", "Outputs", "FailureNode", "MetadataDefaults", });
+    internal_static_flyteidl_core_TaskNodeOverrides_descriptor =
+      getDescriptor().getMessageTypes().get(11);
+    internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_TaskNodeOverrides_descriptor,
+        new java.lang.String[] { "Resources", });
     flyteidl.core.Condition.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
+    flyteidl.core.Tasks.getDescriptor();
     flyteidl.core.Types.getDescriptor();
+    flyteidl.core.Security.getDescriptor();
     com.google.protobuf.DurationProto.getDescriptor();
   }
 

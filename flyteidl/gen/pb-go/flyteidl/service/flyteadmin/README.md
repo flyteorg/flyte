@@ -248,6 +248,7 @@ Class | Method | HTTP request | Description
  - [CoreTaskLog](docs/CoreTaskLog.md)
  - [CoreTaskMetadata](docs/CoreTaskMetadata.md)
  - [CoreTaskNode](docs/CoreTaskNode.md)
+ - [CoreTaskNodeOverrides](docs/CoreTaskNodeOverrides.md)
  - [CoreTaskTemplate](docs/CoreTaskTemplate.md)
  - [CoreTypedInterface](docs/CoreTypedInterface.md)
  - [CoreVariable](docs/CoreVariable.md)

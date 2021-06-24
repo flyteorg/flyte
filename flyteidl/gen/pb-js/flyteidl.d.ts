@@ -886,6 +886,9 @@ export namespace flyteidl {
 
             /** TaskNode referenceId */
             referenceId?: (flyteidl.core.IIdentifier|null);
+
+            /** TaskNode overrides */
+            overrides?: (flyteidl.core.ITaskNodeOverrides|null);
         }
 
         /** Represents a TaskNode. */
@@ -899,6 +902,9 @@ export namespace flyteidl {
 
             /** TaskNode referenceId. */
             public referenceId?: (flyteidl.core.IIdentifier|null);
+
+            /** TaskNode overrides. */
+            public overrides?: (flyteidl.core.ITaskNodeOverrides|null);
 
             /** TaskNode reference. */
             public reference?: "referenceId";
@@ -1426,6 +1432,58 @@ export namespace flyteidl {
 
             /**
              * Verifies a WorkflowTemplate message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskNodeOverrides. */
+        interface ITaskNodeOverrides {
+
+            /** TaskNodeOverrides resources */
+            resources?: (flyteidl.core.IResources|null);
+        }
+
+        /** Represents a TaskNodeOverrides. */
+        class TaskNodeOverrides implements ITaskNodeOverrides {
+
+            /**
+             * Constructs a new TaskNodeOverrides.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITaskNodeOverrides);
+
+            /** TaskNodeOverrides resources. */
+            public resources?: (flyteidl.core.IResources|null);
+
+            /**
+             * Creates a new TaskNodeOverrides instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskNodeOverrides instance
+             */
+            public static create(properties?: flyteidl.core.ITaskNodeOverrides): flyteidl.core.TaskNodeOverrides;
+
+            /**
+             * Encodes the specified TaskNodeOverrides message. Does not implicitly {@link flyteidl.core.TaskNodeOverrides.verify|verify} messages.
+             * @param message TaskNodeOverrides message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITaskNodeOverrides, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskNodeOverrides message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskNodeOverrides
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TaskNodeOverrides;
+
+            /**
+             * Verifies a TaskNodeOverrides message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
