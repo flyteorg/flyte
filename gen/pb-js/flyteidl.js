@@ -2105,6 +2105,7 @@ export const flyteidl = $root.flyteidl = (() => {
              * @memberof flyteidl.core
              * @interface ITaskNode
              * @property {flyteidl.core.IIdentifier|null} [referenceId] TaskNode referenceId
+             * @property {flyteidl.core.ITaskNodeOverrides|null} [overrides] TaskNode overrides
              */
 
             /**
@@ -2129,6 +2130,14 @@ export const flyteidl = $root.flyteidl = (() => {
              * @instance
              */
             TaskNode.prototype.referenceId = null;
+
+            /**
+             * TaskNode overrides.
+             * @member {flyteidl.core.ITaskNodeOverrides|null|undefined} overrides
+             * @memberof flyteidl.core.TaskNode
+             * @instance
+             */
+            TaskNode.prototype.overrides = null;
 
             // OneOf field names bound to virtual getters and setters
             let $oneOfFields;
@@ -2170,6 +2179,8 @@ export const flyteidl = $root.flyteidl = (() => {
                     writer = $Writer.create();
                 if (message.referenceId != null && message.hasOwnProperty("referenceId"))
                     $root.flyteidl.core.Identifier.encode(message.referenceId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                if (message.overrides != null && message.hasOwnProperty("overrides"))
+                    $root.flyteidl.core.TaskNodeOverrides.encode(message.overrides, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                 return writer;
             };
 
@@ -2193,6 +2204,9 @@ export const flyteidl = $root.flyteidl = (() => {
                     switch (tag >>> 3) {
                     case 1:
                         message.referenceId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                        break;
+                    case 2:
+                        message.overrides = $root.flyteidl.core.TaskNodeOverrides.decode(reader, reader.uint32());
                         break;
                     default:
                         reader.skipType(tag & 7);
@@ -2221,6 +2235,11 @@ export const flyteidl = $root.flyteidl = (() => {
                         if (error)
                             return "referenceId." + error;
                     }
+                }
+                if (message.overrides != null && message.hasOwnProperty("overrides")) {
+                    let error = $root.flyteidl.core.TaskNodeOverrides.verify(message.overrides);
+                    if (error)
+                        return "overrides." + error;
                 }
                 return null;
             };
@@ -3482,6 +3501,118 @@ export const flyteidl = $root.flyteidl = (() => {
             };
 
             return WorkflowTemplate;
+        })();
+
+        core.TaskNodeOverrides = (function() {
+
+            /**
+             * Properties of a TaskNodeOverrides.
+             * @memberof flyteidl.core
+             * @interface ITaskNodeOverrides
+             * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
+             */
+
+            /**
+             * Constructs a new TaskNodeOverrides.
+             * @memberof flyteidl.core
+             * @classdesc Represents a TaskNodeOverrides.
+             * @implements ITaskNodeOverrides
+             * @constructor
+             * @param {flyteidl.core.ITaskNodeOverrides=} [properties] Properties to set
+             */
+            function TaskNodeOverrides(properties) {
+                if (properties)
+                    for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        if (properties[keys[i]] != null)
+                            this[keys[i]] = properties[keys[i]];
+            }
+
+            /**
+             * TaskNodeOverrides resources.
+             * @member {flyteidl.core.IResources|null|undefined} resources
+             * @memberof flyteidl.core.TaskNodeOverrides
+             * @instance
+             */
+            TaskNodeOverrides.prototype.resources = null;
+
+            /**
+             * Creates a new TaskNodeOverrides instance using the specified properties.
+             * @function create
+             * @memberof flyteidl.core.TaskNodeOverrides
+             * @static
+             * @param {flyteidl.core.ITaskNodeOverrides=} [properties] Properties to set
+             * @returns {flyteidl.core.TaskNodeOverrides} TaskNodeOverrides instance
+             */
+            TaskNodeOverrides.create = function create(properties) {
+                return new TaskNodeOverrides(properties);
+            };
+
+            /**
+             * Encodes the specified TaskNodeOverrides message. Does not implicitly {@link flyteidl.core.TaskNodeOverrides.verify|verify} messages.
+             * @function encode
+             * @memberof flyteidl.core.TaskNodeOverrides
+             * @static
+             * @param {flyteidl.core.ITaskNodeOverrides} message TaskNodeOverrides message or plain object to encode
+             * @param {$protobuf.Writer} [writer] Writer to encode to
+             * @returns {$protobuf.Writer} Writer
+             */
+            TaskNodeOverrides.encode = function encode(message, writer) {
+                if (!writer)
+                    writer = $Writer.create();
+                if (message.resources != null && message.hasOwnProperty("resources"))
+                    $root.flyteidl.core.Resources.encode(message.resources, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                return writer;
+            };
+
+            /**
+             * Decodes a TaskNodeOverrides message from the specified reader or buffer.
+             * @function decode
+             * @memberof flyteidl.core.TaskNodeOverrides
+             * @static
+             * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+             * @param {number} [length] Message length if known beforehand
+             * @returns {flyteidl.core.TaskNodeOverrides} TaskNodeOverrides
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            TaskNodeOverrides.decode = function decode(reader, length) {
+                if (!(reader instanceof $Reader))
+                    reader = $Reader.create(reader);
+                let end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TaskNodeOverrides();
+                while (reader.pos < end) {
+                    let tag = reader.uint32();
+                    switch (tag >>> 3) {
+                    case 1:
+                        message.resources = $root.flyteidl.core.Resources.decode(reader, reader.uint32());
+                        break;
+                    default:
+                        reader.skipType(tag & 7);
+                        break;
+                    }
+                }
+                return message;
+            };
+
+            /**
+             * Verifies a TaskNodeOverrides message.
+             * @function verify
+             * @memberof flyteidl.core.TaskNodeOverrides
+             * @static
+             * @param {Object.<string,*>} message Plain object to verify
+             * @returns {string|null} `null` if valid, otherwise the reason why it is not
+             */
+            TaskNodeOverrides.verify = function verify(message) {
+                if (typeof message !== "object" || message === null)
+                    return "object expected";
+                if (message.resources != null && message.hasOwnProperty("resources")) {
+                    let error = $root.flyteidl.core.Resources.verify(message.resources);
+                    if (error)
+                        return "resources." + error;
+                }
+                return null;
+            };
+
+            return TaskNodeOverrides;
         })();
 
         core.ComparisonExpression = (function() {

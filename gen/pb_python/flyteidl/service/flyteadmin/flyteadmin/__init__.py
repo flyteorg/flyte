@@ -197,6 +197,7 @@ from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase
 from flyteadmin.models.core_task_log import CoreTaskLog
 from flyteadmin.models.core_task_metadata import CoreTaskMetadata
 from flyteadmin.models.core_task_node import CoreTaskNode
+from flyteadmin.models.core_task_node_overrides import CoreTaskNodeOverrides
 from flyteadmin.models.core_task_template import CoreTaskTemplate
 from flyteadmin.models.core_typed_interface import CoreTypedInterface
 from flyteadmin.models.core_variable import CoreVariable

@@ -6112,6 +6112,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -6327,6 +6339,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -6541,6 +6565,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -6946,6 +6982,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -7161,6 +7209,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -7375,6 +7435,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -8172,6 +8244,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -8387,6 +8471,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -8601,6 +8697,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -10831,6 +10939,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -11046,6 +11166,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -11260,6 +11392,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -11665,6 +11809,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -11880,6 +12036,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -12094,6 +12262,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -12891,6 +13071,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -13106,6 +13298,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -13320,6 +13524,18 @@ definitions:
                     name: "name"
                     project: "project"
                     version: "version"
+                  overrides:
+                    resources:
+                      requests:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
+                      limits:
+                      - name: {}
+                        value: "value"
+                      - name: {}
+                        value: "value"
                 id: "id"
                 workflow_node:
                   launchplan_ref:
@@ -13880,6 +14096,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -14095,6 +14323,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -14309,6 +14549,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -14714,6 +14966,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -14929,6 +15193,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -15143,6 +15419,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -15940,6 +16228,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -16155,6 +16455,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -16369,6 +16681,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -16869,6 +17193,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -17084,6 +17420,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -17298,6 +17646,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -17703,6 +18063,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -17918,6 +18290,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -18132,6 +18516,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -18929,6 +19325,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -19144,6 +19552,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -19358,6 +19778,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -19773,6 +20205,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -19988,6 +20432,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -20202,6 +20658,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -20607,6 +21075,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -20822,6 +21302,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -21036,6 +21528,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -21833,6 +22337,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -22048,6 +22564,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -22262,6 +22790,18 @@ definitions:
                       name: "name"
                       project: "project"
                       version: "version"
+                    overrides:
+                      resources:
+                        requests:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
+                        limits:
+                        - name: {}
+                          value: "value"
+                        - name: {}
+                          value: "value"
                   id: "id"
                   workflow_node:
                     launchplan_ref:
@@ -23345,6 +23885,18 @@ definitions:
               name: "name"
               project: "project"
               version: "version"
+            overrides:
+              resources:
+                requests:
+                - name: {}
+                  value: "value"
+                - name: {}
+                  value: "value"
+                limits:
+                - name: {}
+                  value: "value"
+                - name: {}
+                  value: "value"
           id: "id"
           workflow_node:
             launchplan_ref:
@@ -23560,6 +24112,18 @@ definitions:
               name: "name"
               project: "project"
               version: "version"
+            overrides:
+              resources:
+                requests:
+                - name: {}
+                  value: "value"
+                - name: {}
+                  value: "value"
+                limits:
+                - name: {}
+                  value: "value"
+                - name: {}
+                  value: "value"
           id: "id"
           workflow_node:
             launchplan_ref:
@@ -23774,6 +24338,18 @@ definitions:
               name: "name"
               project: "project"
               version: "version"
+            overrides:
+              resources:
+                requests:
+                - name: {}
+                  value: "value"
+                - name: {}
+                  value: "value"
+                limits:
+                - name: {}
+                  value: "value"
+                - name: {}
+                  value: "value"
           id: "id"
           workflow_node:
             launchplan_ref:
@@ -24206,6 +24782,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -24421,6 +25009,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -24635,6 +25235,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -25040,6 +25652,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -25255,6 +25879,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -25469,6 +26105,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -26266,6 +26914,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -26481,6 +27141,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -26695,6 +27367,18 @@ definitions:
                 name: "name"
                 project: "project"
                 version: "version"
+              overrides:
+                resources:
+                  requests:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
+                  limits:
+                  - name: {}
+                    value: "value"
+                  - name: {}
+                    value: "value"
             id: "id"
             workflow_node:
               launchplan_ref:
@@ -27674,6 +28358,18 @@ definitions:
           name: "name"
           project: "project"
           version: "version"
+        overrides:
+          resources:
+            requests:
+            - name: {}
+              value: "value"
+            - name: {}
+              value: "value"
+            limits:
+            - name: {}
+              value: "value"
+            - name: {}
+              value: "value"
       id: "id"
       workflow_node:
         launchplan_ref:
@@ -28452,6 +29148,9 @@ definitions:
       reference_id:
         description: "A globally unique identifier for the task."
         $ref: "#/definitions/coreIdentifier"
+      overrides:
+        description: "Optional overrides applied at task execution time."
+        $ref: "#/definitions/coreTaskNodeOverrides"
     description: "Refers to the task that the Node is to execute."
     example:
       reference_id:
@@ -28460,6 +29159,39 @@ definitions:
         name: "name"
         project: "project"
         version: "version"
+      overrides:
+        resources:
+          requests:
+          - name: {}
+            value: "value"
+          - name: {}
+            value: "value"
+          limits:
+          - name: {}
+            value: "value"
+          - name: {}
+            value: "value"
+  coreTaskNodeOverrides:
+    type: "object"
+    properties:
+      resources:
+        description: "A customizable interface to convey resources requested for a\
+          \ task container."
+        $ref: "#/definitions/coreResources"
+    description: "Optional task node overrides that will be applied at task execution\
+      \ time."
+    example:
+      resources:
+        requests:
+        - name: {}
+          value: "value"
+        - name: {}
+          value: "value"
+        limits:
+        - name: {}
+          value: "value"
+        - name: {}
+          value: "value"
   coreTaskTemplate:
     type: "object"
     properties:
@@ -29298,6 +30030,18 @@ definitions:
             name: "name"
             project: "project"
             version: "version"
+          overrides:
+            resources:
+              requests:
+              - name: {}
+                value: "value"
+              - name: {}
+                value: "value"
+              limits:
+              - name: {}
+                value: "value"
+              - name: {}
+                value: "value"
         id: "id"
         workflow_node:
           launchplan_ref:
@@ -29513,6 +30257,18 @@ definitions:
             name: "name"
             project: "project"
             version: "version"
+          overrides:
+            resources:
+              requests:
+              - name: {}
+                value: "value"
+              - name: {}
+                value: "value"
+              limits:
+              - name: {}
+                value: "value"
+              - name: {}
+                value: "value"
         id: "id"
         workflow_node:
           launchplan_ref:
@@ -29727,6 +30483,18 @@ definitions:
             name: "name"
             project: "project"
             version: "version"
+          overrides:
+            resources:
+              requests:
+              - name: {}
+                value: "value"
+              - name: {}
+                value: "value"
+              limits:
+              - name: {}
+                value: "value"
+              - name: {}
+                value: "value"
         id: "id"
         workflow_node:
           launchplan_ref:
@@ -30355,6 +31123,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -30570,6 +31350,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -30784,6 +31576,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -31189,6 +31993,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -31404,6 +32220,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -31618,6 +32446,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -32415,6 +33255,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -32630,6 +33482,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
@@ -32844,6 +33708,18 @@ definitions:
                   name: "name"
                   project: "project"
                   version: "version"
+                overrides:
+                  resources:
+                    requests:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
+                    limits:
+                    - name: {}
+                      value: "value"
+                    - name: {}
+                      value: "value"
               id: "id"
               workflow_node:
                 launchplan_ref:
