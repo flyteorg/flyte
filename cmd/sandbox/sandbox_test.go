@@ -13,7 +13,7 @@ func TestCreateSandboxCommand(t *testing.T) {
 	assert.Equal(t, sandboxCommand.Use, "sandbox")
 	assert.Equal(t, sandboxCommand.Short, "Used for testing flyte sandbox.")
 	fmt.Println(sandboxCommand.Commands())
-	assert.Equal(t, len(sandboxCommand.Commands()), 2)
+	assert.Equal(t, len(sandboxCommand.Commands()), 3)
 	cmdNouns := sandboxCommand.Commands()
 	// Sort by Use value.
 	sort.Slice(cmdNouns, func(i, j int) bool {
@@ -24,8 +24,12 @@ func TestCreateSandboxCommand(t *testing.T) {
 	assert.Equal(t, cmdNouns[0].Short, startShort)
 	assert.Equal(t, cmdNouns[0].Long, startLong)
 
-	assert.Equal(t, cmdNouns[1].Use, "teardown")
-	assert.Equal(t, cmdNouns[1].Short, teardownShort)
-	assert.Equal(t, cmdNouns[1].Long, teardownLong)
+	assert.Equal(t, cmdNouns[1].Use, "status")
+	assert.Equal(t, cmdNouns[1].Short, statusShort)
+	assert.Equal(t, cmdNouns[1].Long, statusLong)
+
+	assert.Equal(t, cmdNouns[2].Use, "teardown")
+	assert.Equal(t, cmdNouns[2].Short, teardownShort)
+	assert.Equal(t, cmdNouns[2].Long, teardownLong)
 
 }
