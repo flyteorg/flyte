@@ -26,7 +26,7 @@ Start will run the flyte sandbox cluster inside a docker container and setup the
 Mount your flytesnacks repository code inside sandbox 
 ::
 
- bin/flytectl sandbox start --flytesnacks=$HOME/flyteorg/flytesnacks 
+ bin/flytectl sandbox start --sourcesPath=$HOME/flyteorg/flytesnacks 
 Usage
 	`
 )
@@ -65,10 +65,10 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		return nil, err
 	}
 
-	if len(sandboxConfig.DefaultConfig.SnacksRepo) > 0 {
+	if len(sandboxConfig.DefaultConfig.SourcesPath) > 0 {
 		docker.Volumes = append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 	}

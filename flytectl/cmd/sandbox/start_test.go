@@ -61,10 +61,10 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.SourcesPath = f.UserHomeDir()
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -97,10 +97,10 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.SourcesPath = f.UserHomeDir()
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -133,10 +133,10 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.SourcesPath = f.UserHomeDir()
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -177,10 +177,10 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.SourcesPath = f.UserHomeDir()
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -213,10 +213,10 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.SourcesPath = f.UserHomeDir()
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -249,10 +249,10 @@ func TestStartSandboxFunc(t *testing.T) {
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
 		mockDocker := &mocks.Docker{}
-		sandboxConfig.DefaultConfig.SnacksRepo = f.UserHomeDir()
+		sandboxConfig.DefaultConfig.SourcesPath = f.UserHomeDir()
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SnacksRepo,
+			Source: sandboxConfig.DefaultConfig.SourcesPath,
 			Target: docker.FlyteSnackDir,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
@@ -312,7 +312,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		}).Return(reader, nil)
 		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
 		docker.Client = mockDocker
-		sandboxConfig.DefaultConfig.SnacksRepo = ""
+		sandboxConfig.DefaultConfig.SourcesPath = ""
 		err := startSandboxCluster(ctx, []string{}, cmdCtx)
 		assert.Nil(t, err)
 	})
@@ -348,7 +348,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		}).Return(reader, nil)
 		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
 		docker.Client = mockDocker
-		sandboxConfig.DefaultConfig.SnacksRepo = ""
+		sandboxConfig.DefaultConfig.SourcesPath = ""
 		err := startSandboxCluster(ctx, []string{}, cmdCtx)
 		assert.NotNil(t, err)
 	})

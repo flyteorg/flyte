@@ -5,7 +5,7 @@ var (
 	DefaultConfig = &Config{}
 )
 
-// Config
+// Config represents the config parameters exposed for the `sandbox` command.
 type Config struct {
-	SnacksRepo string `json:"flytesnacks" pflag:", Path of your flytesnacks repository"`
+	SourcesPath string `json:"sourcesPath" pflag:",Path to your source code path where flyte workflows and tasks are."`
 }

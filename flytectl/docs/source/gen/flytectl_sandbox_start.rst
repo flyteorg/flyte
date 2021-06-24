@@ -18,7 +18,7 @@ Start will run the flyte sandbox cluster inside a docker container and setup the
 Mount your flytesnacks repository code inside sandbox 
 ::
 
- bin/flytectl sandbox start --flytesnacks=$HOME/flyteorg/flytesnacks 
+ bin/flytectl sandbox start --sourcesPath=$HOME/flyteorg/flytesnacks
 Usage
 	
 
@@ -31,7 +31,7 @@ Options
 
 ::
 
-      --flytesnacks string    Path of your flytesnacks repository
+      --sourcesPath string   Path to your source code path where flyte workflows and tasks are.
   -h, --help                 help for start
 
 Options inherited from parent commands

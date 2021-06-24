@@ -9,8 +9,6 @@ PACKAGE ?=github.com/flyteorg/flytestdlib
 
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
 
-
-
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
