@@ -99,13 +99,13 @@ func TestConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
-	t.Run("Test_flytesnacks", func(t *testing.T) {
+	t.Run("Test_sourcesPath", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("flytesnacks", testValue)
-			if vString, err := cmdFlags.GetString("flytesnacks"); err == nil {
+			cmdFlags.Set("sourcesPath", testValue)
+			if vString, err := cmdFlags.GetString("sourcesPath"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SourcesPath)
 
 			} else {
