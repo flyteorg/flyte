@@ -104,6 +104,32 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
 	})
 
+	t.Run("node with resource overrides", func(t *testing.T) {
+		expectedCPU := resource.MustParse("20Mi")
+		n.Node.Target = &core.Node_TaskNode{
+			TaskNode: &core.TaskNode{
+				Reference: &core.TaskNode_ReferenceId{
+					ReferenceId: &core.Identifier{Name: "ref_2"},
+				},
+				Overrides: &core.TaskNodeOverrides{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{
+								Name:  core.Resources_CPU,
+								Value: "20Mi",
+							},
+						},
+					},
+				},
+			},
+		}
+
+		spec := mustBuild(t, n, 1, errs.NewScope())
+		assert.NotNil(t, spec.Resources)
+		assert.NotNil(t, spec.Resources.Requests.Cpu())
+		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
+	})
+
 	t.Run("LaunchPlanRef", func(t *testing.T) {
 		n.Node.Target = &core.Node_WorkflowNode{
 			WorkflowNode: &core.WorkflowNode{
