@@ -100,6 +100,8 @@ func CreateTaskExecutionModel(input CreateTaskExecutionModelInput) (*models.Task
 		CreatedAt:  input.Request.Event.OccurredAt,
 		Logs:       input.Request.Event.Logs,
 		CustomInfo: input.Request.Event.CustomInfo,
+		Reason:     input.Request.Event.Reason,
+		TaskType:   input.Request.Event.TaskType,
 	}
 
 	eventPhase := input.Request.Event.Phase
@@ -209,6 +211,9 @@ func UpdateTaskExecutionModel(request *admin.TaskExecutionEventRequest, taskExec
 	taskExecutionClosure.Phase = request.Event.Phase
 	taskExecutionClosure.UpdatedAt = request.Event.OccurredAt
 	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
+	if len(request.Event.Reason) > 0 {
+		taskExecutionClosure.Reason = request.Event.Reason
+	}
 	if (existingTaskPhase == core.TaskExecution_QUEUED.String() || existingTaskPhase == core.TaskExecution_UNDEFINED.String()) && taskExecutionModel.Phase == core.TaskExecution_RUNNING.String() {
 		err = addTaskStartedState(request, taskExecutionModel, &taskExecutionClosure)
 		if err != nil {
