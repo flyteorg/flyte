@@ -27,6 +27,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	}
 
 	var task *core.TaskTemplate
+	var resources *core.Resources
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -41,9 +42,15 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			errs.Collect(errors.NewTaskReferenceNotFoundErr(n.GetId(), taskID))
 			return nil, !errs.HasErrors()
 		}
+
+		if n.GetTaskNode().Overrides != nil && n.GetTaskNode().Overrides.Resources != nil {
+			resources = n.GetTaskNode().Overrides.Resources
+		} else {
+			resources = getResources(task)
+		}
 	}
 
-	res, err := utils.ToK8sResourceRequirements(getResources(task))
+	res, err := utils.ToK8sResourceRequirements(resources)
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
 		return nil, false
