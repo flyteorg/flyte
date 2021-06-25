@@ -81,7 +81,7 @@
  },{
    "name": "case-studies-pima-diabetes",
    "priority": "P2",
-   "path": "case_studies/ml_training/pima-diabetes",
+   "path": "case_studies/ml_training/pima_diabetes",
    "exitCondition": {
      "exit_success": true,
      "exit_message": ""

@@ -1,0 +1,78 @@
+name: Serialize & Release Examples
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'cookbook/docs/**'
+      - 'cookbook/deployment/**'
+  create:
+    tags:
+      - v*
+
+jobs:
+  serialize-example:
+    name: Serialize
+    strategy:
+      matrix:
+        directory: [ "core", "integrations", "case_studies" ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        if: github.event_name != 'pull_request'
+        with:
+          path: /tmp/release-snacks-${{ matrix.directory }}/
+          key: release-snacks-${{ matrix.directory }}-${{ github.sha }}
+      - name: Serialize Examples
+        env:
+          REGISTRY: "ghcr.io/flyteorg"
+        run: |
+          REGISTRY=ghcr.io/flyteorg VERSION=latest make -C cookbook/${{ matrix.directory }} serialize
+      - name: Cache Serialized protos
+        if: github.event_name != 'pull_request'
+        env:
+          REGISTRY: "ghcr.io/flyteorg"
+        run: |
+          mkdir -p cookbook/release-snacks /tmp/release-snacks-${{ matrix.directory }}/
+          make -C cookbook archive
+          cp -r /tmp/release-snacks-${{ matrix.directory }}/* cookbook/release-snacks/
+  releaser:
+    name: Release example
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    needs: [ serialize-example ]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-core/
+          key: release-snacks-core-${{ github.sha }}
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-case_studies/
+          key: release-snacks-case_studies-${{ github.sha }}
+      - uses: actions/cache@v1
+        with:
+          path: /tmp/release-snacks-integrations/
+          key: release-snacks-integrations-${{ github.sha }}
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+          ref: ${{ steps.bump-version.outputs.tag }}
+      - name: Copy artifacts
+        run: |
+          mkdir -p cookbook/release-snacks
+          cp -r /tmp/release-snacks-core/* cookbook/release-snacks/
+          cp -r /tmp/release-snacks-case_studies/* cookbook/release-snacks/
+          cp -r /tmp/release-snacks-integrations/* cookbook/release-snacks/
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
