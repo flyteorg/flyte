@@ -38,21 +38,23 @@ spec:
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
+        {{- if .Values.flyteadmin.initialProjects }}
         - command:
           - flyteadmin
           - --config
           - {{ .Values.flyteadmin.configPath }}
           - migrate
           - seed-projects
-          - flytesnacks
-          - flytetester
-          - flyteexamples
+          {{- range .Values.flyteadmin.initialProjects }}
+          - {{ . }}
+          {{- end }}
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: seed-projects
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
+        {{- end }}
         {{- if .Values.cluster_resource_manager.enabled }}
         - command:
           - flyteadmin
