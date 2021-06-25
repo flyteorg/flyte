@@ -18,7 +18,7 @@ Almost any action can be implemented and introduced into Flyte as a Plugin.
  - Tasks that call web services
 
 Flyte ships with some defaults, for example running a simple python function does not need any hosted service, so Flyte knows how to
-execute these tasks on Kubernetes. Turns out these are the vastt majority of tasks in ML and Flyte is deftly adept at handling a very large
+execute these tasks on Kubernetes. Turns out these are the vast majority of tasks in ML and Flyte is deftly adept at handling a very large
 scale on kubernetes. this is achieved by implementing a unique scheduler on top of K8s.
 
 Dynamic Tasks
