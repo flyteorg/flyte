@@ -54,9 +54,10 @@ metadata:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: flyte-admin-auth
+  name: flyte-admin-secrets
   namespace: flyte
 type: Opaque
+stringData:
 ---
 # Source: flyte/templates/common/secret.yaml
 apiVersion: v1
@@ -1421,7 +1422,7 @@ spec:
           name: resource-templates
         - name: auth
           secret:
-            secretName: flyte-admin-auth
+            secretName: flyte-admin-secrets
       affinity: 
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

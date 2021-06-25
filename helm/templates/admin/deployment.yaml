@@ -144,7 +144,7 @@ spec:
         {{- end }}
         - name: auth
           secret:
-            secretName: flyte-admin-auth
+            secretName: flyte-admin-secrets
       {{- with .Values.flyteadmin.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

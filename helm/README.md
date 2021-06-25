@@ -130,6 +130,7 @@ helm upgrade -f values-sandbox.yaml flyte .
 | flyteadmin.podAnnotations | object | `{}` | Annotations for Flyteadmin pods |
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
+| flyteadmin.secrets | object | `{}` |  |
 | flyteadmin.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
 | flyteadmin.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":{}}` | Configuration for service accounts for FlyteAdmin |
 | flyteadmin.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flyteadmin pods |
