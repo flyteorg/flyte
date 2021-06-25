@@ -25,6 +25,7 @@ Options
 SEE ALSO
 ~~~~~~~~
 
+* :doc:`flytectl_completion` 	 - Generate completion script
 * :doc:`flytectl_config` 	 - Runs various config commands, look at the help of this command to get a list of available commands..
 * :doc:`flytectl_create` 	 - Used for creating various flyte resources including tasks/workflows/launchplans/executions/project.
 * :doc:`flytectl_delete` 	 - Used for terminating/deleting various flyte resources including tasks/workflows/launchplans/executions/project.

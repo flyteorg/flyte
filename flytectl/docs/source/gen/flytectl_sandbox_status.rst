@@ -1,38 +1,35 @@
-.. _flytectl_sandbox_start:
+.. _flytectl_sandbox_status:
 
-flytectl sandbox start
-----------------------
+flytectl sandbox status
+-----------------------
 
-Start the flyte sandbox
+Get the status of the sandbox environment.
 
 Synopsis
 ~~~~~~~~
 
 
 
-Start will run the flyte sandbox cluster inside a docker container and setup the config that is required 
-::
+Status will retrieve the status of the Sandbox environment. Currently FlyteSandbox runs as a local docker container.
+This will return the docker status for this container
 
- bin/flytectl sandbox start
-	
-Mount your flytesnacks repository code inside sandbox 
-::
-
- bin/flytectl sandbox start --sourcesPath=$HOME/flyteorg/flytesnacks 
 Usage
-	
+::
+
+ bin/flytectl sandbox status 
+
+
 
 ::
 
-  flytectl sandbox start [flags]
+  flytectl sandbox status [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-      --flytesnacks string    Path of your flytesnacks repository
-  -h, --help                 help for start
+  -h, --help   help for status
 
 Options inherited from parent commands
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
