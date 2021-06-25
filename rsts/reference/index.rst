@@ -1,8 +1,12 @@
 .. _reference:
 
-#############
+##########
+References
+##########
+
+
 API Reference
-#############
+-------------
 
 .. panels::
    :header: text-center
@@ -40,8 +44,22 @@ API Reference
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
    The Java/Scala SDK for Flyte.
-   
+
    ---
+
+   .. link-button:: https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html
+      :type: url
+      :text: FlyteAdmin
+      :classes: btn-block stretched-link
+   ^^^^^^^^^^^^
+   The service responsible for managing Flyte entities and administering workflow executions.
+
+
+Component Reference
+-------------------
+
+.. panels::
+   :header: text-center
 
    .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller
       :type: url
@@ -49,15 +67,6 @@ API Reference
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
    The K8s-native operator that executes Flyte workflows.
-
-   ---
-
-   .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin
-      :type: url
-      :text: FlyteAdmin
-      :classes: btn-block stretched-link
-   ^^^^^^^^^^^^
-   The service responsible for managing Flyte entities and administering workflow executions.
 
    ---
 
@@ -92,7 +101,7 @@ API Reference
 
 .. toctree::
    :maxdepth: 1
-   :caption: Component Reference (Code docs)
+   :caption: Component Reference
    :name: componentreftoc
    :hidden:
 
