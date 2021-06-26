@@ -25,6 +25,11 @@ Steps
 
 #. The repo comes with a sample workflow, which can be found under ``myapp/workflows/example.py``. The structure below shows the most important files and how a typical flyteapp should be laid out.
 
+    .. raw:: html
+
+       <details>
+       <summary><a>Important files a typical flyteapp should have</a></summary>
+
     .. code-block:: text
 
         .
@@ -41,11 +46,31 @@ Steps
 
         You can use pip-compile to build your requirements file. the Dockerfile that comes with this is not GPU ready, but is a simple Dockerfile that should work for most apps.
 
+    .. raw:: html
+
+       </details>
+
+
     The workflow can be run locally simply by running it as a python script - ``note the __main__ at the bottom of the file``
 
     .. prompt::
 
         python myapp/workflows/example.py
+
+
+   .. raw:: html
+
+       <details>
+       <summary><a>Expected Output</a></summary>
+
+   .. prompt::
+
+        Running my_wf() hello world
+
+   .. raw:: html
+
+       </details>
+
 
 #. Let us install :std:ref:`flytectl`. ``flytectl`` is a commandline interface for flyte.
 
@@ -178,6 +203,20 @@ Steps
     .. prompt::
 
       python myapp/workflows/example.py
+
+
+   .. raw:: html
+
+       <details>
+       <summary><a>Expected Output</a></summary>
+
+   .. prompt::
+
+        Running my_wf(name='adam') hello world, adam
+
+   .. raw:: html
+
+       </details>
 
     *Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
 
