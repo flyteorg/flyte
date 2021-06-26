@@ -1,109 +1,104 @@
-.. _gettingstarted:
+.. _gettingstarted_implement:
 
-Getting started
+Getting Started
 ---------------
 
-.. rubric:: Estimated time to complete: 3 minutes.
+.. raw:: html
+  
+    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
+
+.. div:: getting-started-panels
+
+    .. panels::
+        :body: text-center
+        :container: container-xs
+        :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
+
+        ---
+        .. link-button:: gettingstarted_implement
+            :type: ref
+            :text: 1. Implement
+            :classes: btn-primary btn-block stretched-link
+        
+        ---
+        .. link-button:: gettingstarted_scale
+            :type: ref
+            :text: 2. Scale
+            :classes: btn-block stretched-link
+        ---
+        .. link-button:: gettingstarted_iterate
+            :type: ref
+            :text: 3. Iterate
+            :classes: btn-block stretched-link
+
+.. caution::
+
+    We recommend using an OSX or a Linux machine, as we have not tested this on Windows. If you happen to test it, please let us know.
+
+Implement Your Workflows in Python
+==================================
 
 Prerequisites
-***************
+^^^^^^^^^^^^^^^^
+Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <https://git-scm.com/>`__, and `Python <https://www.python.org/downloads/>`__ >= 3.7 installed.
 
-Make sure you have `docker installed <https://docs.docker.com/get-docker/>`__ and `git <https://git-scm.com/>`__ installed, then install flytekit:
+Start a new project / repository
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended using a  `virtual environment <https://docs.python.org/3/library/venv.html>`__) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo.
 
-Steps
-*****
+.. prompt:: bash (venv)$
 
-1. First install the python Flytekit SDK and clone the ``flytesnacks`` repo:
+    pip install flytekit
+    git clone https://github.com/flyteorg/flytekit-python-template.git myflyteapp
+    cd myflyteapp
 
-.. prompt:: bash
+The repo comes with a sample workflow, which can be found under ``myapp/workflows/example.py``. The structure below shows the most important files and how a typical Flyte app should be laid out.
 
-  pip install --pre flytekit
-  git clone git@github.com:flyteorg/flytesnacks.git flytesnacks
-  cd flytesnacks
+.. dropdown:: A typical Flyte app should have these files
 
-2. The repo comes with some useful Make targets to make your experimentation workflow easier. Run ``make help`` to get the supported commands.
-   Let's start a sandbox cluster:
+   .. code-block:: text
 
-.. prompt:: bash
+       .
+       ├── Dockerfile
+       ├── docker_build_and_tag.sh
+       ├── myapp
+       │         ├── __init__.py
+       │         └── workflows
+       │             ├── __init__.py
+       │             └── example.py
+       └── requirements.txt
 
-  make start
+   .. note::
 
-.. tip::
-  In case make start throws any error please refer to the troubleshooting guide here `Troubleshoot <https://docs.flyte.org/en/latest/community/troubleshoot.html>`__
-    
-3. Take a minute to explore Flyte Console through the provided URL.
+       Two things to note here:
 
-.. image:: https://github.com/flyteorg/flyte/raw/static-resources/img/first-run-console-2.gif
-    :alt: A quick visual tour for launching your first Workflow.
+       * You can use `pip-compile` to build your requirements file.
+       * The Dockerfile that comes with this is not GPU ready, but is a simple Dockerfile that should work for most of your apps.
 
-4. Open ``hello_world.py`` in your favorite editor.
+Run the Workflow Locally
+^^^^^^^^^^^^^^^^^^^^^^^^
+The workflow can be run locally, simply by running it as a Python script; note the ``__main__`` entry point at the `bottom of the file <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py#L58>`__.
 
-.. code-block::
+.. prompt:: bash (venv)$
 
-  cookbook/core/flyte_basics/hello_world.py
+   python myapp/workflows/example.py
 
-5. Add ``name: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Then update the body of ``say_hello`` to consume that argument.
+.. dropdown:: Expected output
 
-.. tip::
+   .. prompt:: text
 
-  .. code-block:: python
-
-    @task
-    def say_hello(name: str) -> str:
-        return f"hello world, {name}"
-
-.. tip::
-
-  .. code-block:: python
-
-    @workflow
-    def my_wf(name: str) -> str:
-        res = say_hello(name=name)
-        return res
-
-6. Update the simple test at the bottom of the file to pass in a name. E.g.
-
-.. tip::
-
-  .. code-block:: python
-
-    print(f"Running my_wf(name='adam') {my_wf(name='adam')}")
-
-7. When you run this file locally, it should output ``hello world, adam``. Run this command in your terminal:
-
-.. prompt:: bash
-
-  python cookbook/core/flyte_basics/hello_world.py
-
-*Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
-
-8. Run:
-
-.. prompt:: bash
-
-  REGISTRY=cr.flyte.org/flyteorg make fast_register
-
-.. note::
-   If the images are to be re-built, run ``make register`` command.
-
-9. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
-
-10. Give it a minute and once it's done, check out "Inputs/Outputs" on the top right corner to see your updated greeting.
-
-.. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/exercise.gif
-    :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
+      Running my_wf() hello world
 
 .. admonition:: Recap
 
-  You have successfully:
+  .. rubric:: 🎉 Congratulations! You just ran your first Flyte workflow locally, let's take it to the cloud!
 
-  1. Run a flyte sandbox cluster,
-  2. Run a flyte workflow locally,
-  3. Run a flyte workflow on a cluster.
 
-  .. rubric:: 🎉 Congratulations, you just ran your first Flyte workflow 🎉
+.. toctree::
+   :maxdepth: -1
+   :caption: Getting Started
+   :hidden:
 
-Next Steps: User Guide
-#######################
-
-To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__ 🛫
+   Build and Deploy your application<getting_started_scale>
+   Iterate "fast"er<getting_started_iterate>
+   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
