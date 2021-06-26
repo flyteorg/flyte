@@ -64,12 +64,12 @@ The workflow can be run locally simply by running it as a python script - ``note
 
 # #. Now lets start a local sandbox cluster to test your workflow deployment. link to doc explaining what is sandbox. You can skip this step if you already have a Flyte sandbox or a hosted Flyte deployed.::
 
-    flytectl start sandbox --source myflyteapp
+    flytectl sandbox start --source myflyteapp
 
 # #. Flyte uses docker containers to package your workflows and tasks and send it to the remote Flyte cluster. Thus if you notice there is a ``Dockerfile`` already in the cloned repo::
 
-    docker build . --tag
-    docker push
+    flytectl sandbox exec -- docker build . --tag
+    optional: docker push
 
 # #. Now that the container is built, lets provide this information to the Flyte backend. To do that you have to package the workflow using the pyflyte cli, that is bundled with flytekit::
 
