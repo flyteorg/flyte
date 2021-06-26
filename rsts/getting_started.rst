@@ -87,7 +87,7 @@ Steps
 
     flytectl setup-config
 
-# Flyte uses docker containers to package your workflows and tasks and send it to the remote Flyte cluster. Thus if you notice there is a ``Dockerfile`` already in the cloned repo. You can build the docker container and push the built image to a registry. Follow the instructions below
+#. Flyte uses docker containers to package your workflows and tasks and send it to the remote Flyte cluster. Thus if you notice there is a ``Dockerfile`` already in the cloned repo. You can build the docker container and push the built image to a registry. Follow the instructions below
 
     .. tabs::
 
@@ -127,6 +127,76 @@ Steps
 
     .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/flytesnacks/tutorial/exercise.gif
         :alt: A quick visual tour for launching a workflow and checking the outputs when they're done.
+
+#. Open ``example.py`` in your favorite editor.
+
+    .. code-block::
+
+        myapp/workflows/example.py
+
+    .. raw:: html
+
+       <details>
+       <summary><a>myapp/workflows/example.py</a></summary>
+
+    .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/simplify-template/myapp/workflows/example.py
+    :language: python
+
+    .. raw:: html
+
+       </details>
+
+#. Add ``name: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Then update the body of ``say_hello`` to consume that argument.
+
+    .. tip::
+
+      .. code-block:: python
+
+        @task
+        def say_hello(name: str) -> str:
+            return f"hello world, {name}"
+
+    .. tip::
+
+      .. code-block:: python
+
+        @workflow
+        def my_wf(name: str) -> str:
+            res = say_hello(name=name)
+            return res
+
+#. Update the simple test at the bottom of the file to pass in a name. E.g.
+
+    .. tip::
+
+      .. code-block:: python
+
+        print(f"Running my_wf(name='adam') {my_wf(name='adam')}")
+
+#. When you run this file locally, it should output ``hello world, adam``. Run this command in your terminal:
+
+    .. prompt::
+
+      python myapp/workflows/example.py
+
+    *Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
+
+
+#. To deploy this workflow to the Flyte cluster (sandbox), you can repeat the previous step of docker build -> package -> register. But, since you have not really updated any of the dependencies in your requirements file, it is possible to push just the code to flyte, without really re-building the entire docker container. The docker container that was built previously is enough.
+
+    .. prompt::
+
+      pyflyte package ... --fast
+
+#. You can now deploy the code using flytectl, with an additional argument called --fast
+
+    .. prompt::
+
+        flytectl register --fast
+
+#. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
+
+
 
 
 .. admonition:: Recap
