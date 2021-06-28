@@ -78,6 +78,7 @@ Here are the setup instructions to start contributing to `flytesnacks` repo:
 4. Test your code!
     * If the Python code can be run locally, just use `python <my file>` to run it.
     * If the Python code has to be tested in a cluster:
+        * Install [flytectl](https://docs.flyte.org/projects/flytectl/en/stable/) by running `brew install flyteorg/homebrew-tap/flytectl`. 
         * Run the `make start` command in the root directory of the flytesnacks repo
         * Visit https://localhost:30081 to view the Flyte console consisting of the examples present in flytesnacks/cookbook/core directory
         * To fetch new dependencies and rebuild the image, run `make register`

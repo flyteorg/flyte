@@ -23,3 +23,5 @@ _build/
 *-out.html
 *-out.ipynb
 .python-version
+./cookbook/release-snacks/*.tgz
+./cookbook/flyte_tests_manifest.json
