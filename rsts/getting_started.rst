@@ -9,12 +9,14 @@ Getting started
 Prerequisites
 ***************
 
-Make sure you have `docker installed <https://docs.docker.com/get-docker/>`__ and `git <https://git-scm.com/>`__ installed.
+Make sure you have `docker <https://docs.docker.com/get-docker/>`__ ,`git <https://git-scm.com/>`__ and ``python > 3.6`` installed.
 
 Steps
 *****
 
-#. First install the python `flytekit<https://pypi.org/project/flytekit/>`_ python SDK for Flyte (maybe in a virtual environment) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`_ repo
+#. First install the Flyte's python SDK - `flytekit<https://pypi.org/project/flytekit/>`_ (maybe in a virtual environment) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`_ repo
+
+    .. tip:: Branch ``simplify-template`` - ``git checkout simplify-template`` till we merge it
 
     .. prompt::
 
@@ -95,7 +97,7 @@ Steps
                 curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
 
-#. Test if flytectl is installed correctly::
+#. Test if flytectl is installed correctly (Expected flytectl version > 0.1.28)::
 
     flytectl version
 
@@ -106,9 +108,9 @@ Steps
 
     .. prompt::
 
-        flytectl sandbox start --source myflyteapp
+        flytectl sandbox start --sourcesPath <full-path-to-myflyteapp>
 
-#. Setup flytectl config using ... doc to configuring flytectl::
+#. Setup flytectl config using ... doc to configuring flytectl (Not yet implemented)::
 
     flytectl setup-config
 
@@ -124,7 +126,9 @@ Steps
 
             .. prompt::
 
-                flytectl sandbox exec -- docker build .
+                flytectl sandbox exec -- docker build . --tag "myapp:v1"
+
+            .. tip:: *Recommended* use the bundled ./docker_build_and_tag.sh. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in gitOps style workflow.
 
         .. tab:: If using remote flyte cluster
 
@@ -137,15 +141,15 @@ Steps
 
 #. Now that the container is built, lets provide this information to the Flyte backend. To do that you have to package the workflow using the pyflyte cli, that is bundled with flytekit::
 
-    pyflyte package ...
+    pyflyte --pkgs myapp.workflows package --image myapp:v1
 
 #. Now lets upload this package to flyte backend. We call this process ::
 
-    flytectl register files my_wf.pb
+    flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1
 
 #. You can create an execution using flytectl as follows::
 
-    blah
+    TODO
 
 
 #. You can use the FlyteConsole to launch an execution and watch the progress.
@@ -218,20 +222,22 @@ Steps
 
        </details>
 
-    *Congratulations!* You have just run your first workflow. Now, let's run it on the sandbox cluster deployed earlier.
+    *Congratulations!* You have just edited and ran your first workflow. Now, let's run this modified version on a sandbox cluster.
 
 
 #. To deploy this workflow to the Flyte cluster (sandbox), you can repeat the previous step of docker build -> package -> register. But, since you have not really updated any of the dependencies in your requirements file, it is possible to push just the code to flyte, without really re-building the entire docker container. The docker container that was built previously is enough.
 
     .. prompt::
 
-      pyflyte package ... --fast
+        pyflyte --pkgs myapp.workflows package --image myapp:v1 --fast --force
+
+    .. tip:: Note the ``--fast`` flag. This will take the code from your local machine and provide it for ``execution`` without having to build the container and push it. Also note the ``--force`` flag, this is to simply override your previously created package.
 
 #. You can now deploy the code using flytectl, with an additional argument called --fast
 
     .. prompt::
 
-        flytectl register --fast
+        flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1 
 
 #. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
 
