@@ -9,7 +9,7 @@ Getting started
 Prerequisites
 ***************
 
-Make sure you have `docker <https://docs.docker.com/get-docker/>`__ ,`git <https://git-scm.com/>`__ and ``python > 3.6`` installed.
+Make sure you have `docker <https://docs.docker.com/get-docker/>`__ , `git <https://git-scm.com/>`__ and ``python > 3.6`` installed.
 
 Steps
 *****
@@ -237,7 +237,7 @@ Steps
 
     .. prompt::
 
-        flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1 
+        flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1
 
 #. Visit `the console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/core.basic.hello_world.my_wf>`__, click launch, and enter your name as the input.
 
