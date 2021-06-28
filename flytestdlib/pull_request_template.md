@@ -1,8 +1,9 @@
-## Read then delete
+## _Read then delete this section_
 
-- Make sure to use a concise title for the pull-request.
-- Use #patch, #minor or #major in the pull-request title to bump the corresponding version. Otherwise, the patch version
-will be bumped. [More details](https://github.com/marketplace/actions/github-tag-bump)
+_- Make sure to use a concise title for the pull-request._
+
+_- Use #patch, #minor or #major in the pull-request title to bump the corresponding version. Otherwise, the patch version
+will be bumped. [More details](https://github.com/marketplace/actions/github-tag-bump)_
 
 # TL;DR
 _Please replace this text with a description of what this PR accomplishes._
@@ -24,7 +25,9 @@ _Please replace this text with a description of what this PR accomplishes._
  _How did you fix the bug, make the feature etc. Link to any design docs etc_
 
 ## Tracking Issue
-https://github.com/flyteorg/flyte/issues/<number>
+_Remove the '*fixes*' keyword if there will be multiple PRs to fix the linked issue_
+
+fixes https://github.com/flyteorg/flyte/issues/<number>
 
 ## Follow-up issue
 _NA_
