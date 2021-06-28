@@ -1945,8 +1945,10 @@ metadata:
   name: flyte
   namespace: flyte
   annotations: 
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:832573439839:certificate/a7db79d4-4f8c-4c7b-a4f4-109bf2fb5efa
     alb.ingress.kubernetes.io/group.name: flyte
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
@@ -1954,6 +1956,11 @@ spec:
   rules:
     - http:
         paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              serviceName: ssl-redirect
+              servicePort: use-annotation
           # This is useful only for frontend development
           # Port 87 in FlyteAdmin maps to the redoc container.
           - path: /openapi
@@ -2063,16 +2070,25 @@ metadata:
   name: flyte-grpc
   namespace: flyte
   annotations:
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:832573439839:certificate/a7db79d4-4f8c-4c7b-a4f4-109bf2fb5efa
     alb.ingress.kubernetes.io/group.name: flyte
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/backend-protocol-version: HTTP2
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
   rules:
     - http:
         paths:
+          #
+          # - backend:
+          #     serviceName: ssl-redirect
+          #     servicePort: use-annotation
+          #   path: /*
+          #   pathType: ImplementationSpecific
           #
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.AdminService
