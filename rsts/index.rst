@@ -54,27 +54,208 @@ Created at `Lyft <https://www.lyft.com/>`__ in collaboration with Spotify, Freen
 
 The core unit of execution in Flyte is the ``task``, which you can easily write with the Flytekit Python SDK:
 
-.. code:: python
-   
-   @task
-   def greet(name: str) -> str:
-       return f"Welcome, {name}!"
+.. tabs::
 
-You can compose one or more tasks to create a ``workflow``:
+    .. tab:: python
 
-.. code:: python
+        .. code:: python
 
-   @task
-   def add_question(greeting: str) -> str:
-       return f"{greeting} How are you?"
-   
-   @workflow
-   def welcome(name: str) -> str:
-       greeting = greet(name=name)
-       return add_question(greeting=greeting)
+           @task
+           def greet(name: str) -> str:
+               return f"Welcome, {name}!"
 
-   welcome("Traveler")
-   # Output: "Welcome, Traveler! How are you?"
+        You can compose one or more tasks to create a ``workflow``:
+
+        .. code:: python
+
+           @task
+           def add_question(greeting: str) -> str:
+               return f"{greeting} How are you?"
+
+           @workflow
+           def welcome(name: str) -> str:
+               greeting = greet(name=name)
+               return add_question(greeting=greeting)
+
+           welcome("Traveler")
+           # Output: "Welcome, Traveler! How are you?"
+
+    .. tab:: java
+
+        .. code:: java
+
+            @AutoService(SdkRunnableTask.class)
+            public class GreetTask extends SdkRunnableTask<GreetTask.Input, GreetTask.Output> {
+              public GreetTask() {
+                super(JacksonSdkType.of(Input.class), JacksonSdkType.of(Output.class));
+              }
+
+              public static SdkTransform of(SdkBindingData name) {
+                return new GreetTask().withInput("name", name);
+              }
+
+              @AutoValue
+              public abstract static class Input {
+                public abstract String name();
+              }
+
+              @AutoValue
+              public abstract static class Output {
+                public abstract String greeting();
+
+                public static Output create(String greeting) {
+                  return new AutoValue_GreetTask_Output(greeting);
+                }
+              }
+
+              @Override
+              public Output run(Input input) {
+                return Output.create(String.format("Welcome, %s!", input.name()));
+              }
+            }
+
+        You can compose one or more tasks to create a ``workflow``:
+
+        .. code:: java
+
+            @AutoService(SdkRunnableTask.class)
+            public class AddQuestionTask extends SdkRunnableTask<AddQuestionTask.Input, AddQuestionTask.Output> {
+              public AddQuestionTask() {
+                super(JacksonSdkType.of(Input.class), JacksonSdkType.of(Output.class));
+              }
+
+              public static SdkTransform of(SdkBindingData greeting) {
+                return new AddQuestionTask().withInput("greeting", greeting);
+              }
+
+              @AutoValue
+              public abstract static class Input {
+                public abstract String greeting();
+              }
+
+              @AutoValue
+              public abstract static class Output {
+                public abstract String greeting();
+
+                public static Output create(String greeting) {
+                  return new AutoValue_AddQuestionTask_Output(greeting);
+                }
+              }
+
+              @Override
+              public Output run(Input input) {
+                return Output.create(String.format("%s How are you?", input.greeting()));
+              }
+            }
+
+        .. code:: java
+
+            @AutoService(SdkWorkflow.class)
+            public class WelcomeWorkflow extends SdkWorkflow {
+
+              @Override
+              public void expand(SdkWorkflowBuilder builder) {
+                SdkBindingData name = builder.inputOfString("name", "The name for the welcome message");
+
+                SdkBindingData greeting = builder.apply("greet", GreetTask.of(name)).getOutput("greeting");
+                SdkBindingData greetingWithQuestion = builder.apply("add-question", AddQuestionTask.of(greeting)).getOutput("greeting");
+
+                builder.output("greeting", greetingWithQuestion, "Welcome message");
+              }
+            }
+
+    .. tab:: scala
+
+        .. code:: scala
+
+            case class GreetTaskInput(name: String)
+            case class GreetTaskOutput(greeting: String)
+
+            /** Example Flyte task that takes a name as the input and outputs a simple greeting message */
+            class GreetTask
+                extends SdkRunnableTask(
+                  SdkScalaType[GreetTaskInput],
+                  SdkScalaType[GreetTaskOutput]
+                ) {
+
+              /**
+               * Defines task behavior. This task takes a name as the input, wraps it in a welcome message, and
+               * outputs the message.
+               *
+               * @param input the name of the person to be greeted
+               * @return the welcome message
+               */
+              override def run(input: GreetTaskInput): GreetTaskOutput = GreetTaskOutput(s"Welcome, ${input.name}!")
+            }
+
+            object GreetTask {
+              /**
+               * Binds input data to this task
+               *
+               * @param name the input name
+               * @return 1 transformed instance of this class with input data
+               */
+              def apply(name: SdkBindingData): SdkTransform =
+                new GreetTask().withInput("name", name)
+            }
+
+        You can compose one or more tasks to create a ``workflow``:
+
+        .. code:: scala
+
+            case class AddQuestionTaskInput(greeting: String)
+            case class AddQuestionTaskOutput(greeting: String)
+
+            /**
+             * Example Flyte task that takes a greeting message as input, appends "How are you?", and outputs
+             * the result
+             */
+            class AddQuestionTask
+                extends SdkRunnableTask(
+                  SdkScalaType[AddQuestionTaskInput],
+                  SdkScalaType[AddQuestionTaskOutput]
+                ) {
+
+              /**
+               * Defines task behavior. This task takes a greeting message as the input, append it with " How
+               * are you?", and outputs a new greeting message.
+               *
+               * @param input the greeting message
+               * @return the updated greeting message
+               */
+              override def run(input: AddQuestionTaskInput): AddQuestionTaskOutput = AddQuestionTaskOutput(s"${input.greeting} How are you?")
+            }
+
+            object AddQuestionTask {
+              /**
+               * Binds input data to this task
+               *
+               * @param greeting the input greeting message
+               * @return a transformed instance of this class with input data
+               */
+              def apply(greeting: SdkBindingData): SdkTransform =
+                new AddQuestionTask().withInput("greeting", greeting)
+            }
+
+        .. code:: scala
+
+            class WelcomeWorkflow extends SdkWorkflow {
+
+              def expand(builder: SdkWorkflowBuilder): Unit = {
+                // defines the input of the workflow
+                val name = builder.inputOfString("name", "The name for the welcome message")
+
+                // uses the workflow input as the task input of the GreetTask
+                val greeting = builder.apply("greet", GreetTask(name)).getOutput("greeting")
+
+                // uses the output of the GreetTask as the task input of the AddQuestionTask
+                val greetingWithQuestion = builder.apply("add-question", AddQuestionTask(greeting)).getOutput("greeting")
+
+                // uses the task output of the AddQuestionTask as the output of the workflow
+                builder.output("greeting", greetingWithQuestion, "Welcome message")
+              }
+            }
+
 
 
 Why Flyte?
