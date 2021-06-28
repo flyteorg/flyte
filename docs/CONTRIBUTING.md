@@ -1,6 +1,6 @@
 # Developing FlyteCtl
 
-A local cluster can be setup via --> https://lyft.github.io/flyte/administrator/install/getting_started.html#getting-started
+A local cluster can be setup via --> https://docs.flyte.org/en/latest/getting_started.html
 
 Then, if having trouble connecting to local cluster see the following:
 
