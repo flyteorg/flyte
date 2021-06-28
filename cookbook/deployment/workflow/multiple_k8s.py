@@ -133,7 +133,7 @@ FlyteAdmin Remote Cluster Access
 Some deployments of Flyte may choose to run the control-plane separate from the data-plane. FlyteAdmin is designed to create Kubernetes resources in one or more Flyte data-plane clusters. 
 For the admin to access remote clusters, it needs credentials to each cluster. 
 In Kubernetes, scoped service credentials are created by configuring a “Role” resource in a Kubernetes cluster. 
-When you attach that role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access. We create a FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/blob/c0339e7cc4550a9b7eb78d6fb4fc3884d65ea945/artifacts/base/adminserviceaccount/adminserviceaccount.yaml>`_ in each data-plane cluster to generate these tokens.
+When you attach that role to a “ServiceAccount”, Kubernetes generates a bearer token that permits access. We create a FlyteAdmin `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/kustomize/base/adminserviceaccount/adminserviceaccount.yaml>`_ in each data-plane cluster to generate these tokens.
 
 When you first create the FlyteAdmin ServiceAccount in a new cluster, a bearer token is generated and will continue to allow access unless the “ServiceAccount “is deleted. Once we create the Flyte Admin ServiceAccount on a cluster, we should never delete it. To feed the credentials to FlyteAdmin, you must retrieve them from your new data-plane cluster, and upload them to admin somehow (within Lyft, we use Confidant, for example).
 

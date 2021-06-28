@@ -37,7 +37,7 @@ Flyte Spark uses the `Spark On K8s Operator <https://github.com/GoogleCloudPlatf
 The plugin is a backend plugin which has to be enabled in your deployment. To enable a plugin follow the steps in :ref:`howto-enable-backend-plugins`.
 
 You can optionally configure the Plugin as per the - `backend Config Structure <https://pkg.go.dev/github.com/flyteorg/flyteplugins@v0.5.25/go/tasks/plugins/k8s/spark#Config>`_ and an example Config is defined
-`here <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/sandbox/config/propeller/plugins/spark.yaml>`_, which looks like:
+`here <https://github.com/flyteorg/flyte/blob/master/kustomize/overlays/eks/flyte/config/propeller/plugins/spark.yaml>`_, which looks like:
 
 .. rli:: https://raw.githubusercontent.com/flyteorg/flyte/master/kustomize/overlays/sandbox/config/propeller/plugins/spark.yaml
    :language: yaml

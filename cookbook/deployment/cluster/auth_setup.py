@@ -159,7 +159,7 @@ To set up an external OAuth2 Authorization Server, please follow the instruction
 
     .. tab:: Okta
 
-        1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of flyte admin (e.g. https://flyte.mycompany.io/).
+        1. Under security -> API, click `Add Authorization Server`. Set the audience to the public URL of flyte admin (e.g. ``<https://flyte.mycompany.io/>``).
         2. Under `Access Policies`, click `Add New Access Policy` and walk through the wizard to allow access to the authorization server.
         3. Under `Scopes`, click `Add Scope`. Set the name to `all` (required) and check `Require user consent for this scope` (recommended).
         4. Create 2 apps (for fltyectl and flytepropeller) to enable these clients to communicate with the service.
