@@ -10,7 +10,7 @@
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
-   |project-diagram| Deployment <deployment/index>
+   |rocket| Deployment <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
