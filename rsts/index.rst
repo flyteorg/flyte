@@ -10,7 +10,7 @@
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
-   |project-diagram| Deployment <concepts/deployment>
+   |project-diagram| Deployment <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
@@ -30,10 +30,7 @@
    :name: deploymenttoc
    :hidden:
 
-   deployment/overview
-   deployment/aws
-   deployment/gcp
-   deployment/cluster_config
+   deployment/index
 
 .. toctree::
    :caption: Community

@@ -10,3 +10,4 @@ sphinxext-remoteliteralinclude
 sphinx-issues
 sphinx_fontawesome
 sphinx-panels
+sphinxcontrib-mermaid

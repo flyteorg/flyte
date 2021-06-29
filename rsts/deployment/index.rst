@@ -15,7 +15,7 @@ configure your Flyte deployment for production.
 .. panels::
     :header: text-center
 
-    .. link-button:: deployment-nodes
+    .. link-button:: deployment-overview
        :type: ref
        :text: Overview
        :classes: btn-block stretched-link
@@ -50,12 +50,11 @@ configure your Flyte deployment for production.
     Once Flyte is deployed look here to configure.
 
 
-
 .. toctree::
     :maxdepth: 1
-    :name: Deployment
+    :name: deploymenttoc
     :hidden:
 
-    aws
-    gcp
-    cluster_config
+    aws/index
+    gcp/index
+    cluster_config/index
