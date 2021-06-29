@@ -239,8 +239,8 @@ Fast: Deploy your application quickly
      The ``fast`` registration method can only be used if you do not modify any requirements (re-use existing environment). But, if you add a dependency to your requirements file / env you have to follow the :ref:`getting-started-standard` method.
 
 
-#. You can now deploy the code using flytectl similar to done previously. ``flytectl`` automatically guesses that the package is for ``fast`` registration. For this to work, a new ``storage`` block has to be added to the flytectl configuration with appropriate permissions at runtime. The Storage block configures flytectl to write to a specific ``S3 / GCS bucket``.
-   If using sandbox, this is automatically configured by flytectl (so you can skip). But, take a note for future.
+#. The code can now be deployed using flytectl similar to done previously. ``flytectl`` automatically guesses that the package is for ``fast`` registration.
+   Note: For this to work, a new ``storage`` block has to be added to the flytectl configuration with appropriate permissions at runtime. The Storage block configures flytectl to write to a specific ``S3 / GCS bucket``. If using sandbox, this is automatically configured by flytectl (so you can skip). But, take a note for future.
 
    .. prompt::
 
