@@ -15,7 +15,7 @@ Make sure you have `docker <https://docs.docker.com/get-docker/>`__ , `git <http
 
     We have not yet tested this flow on a Windows machine.
 
-Build -> Deploy -> Iterate mechanics
+Code -> deploy -> iterate
 *************************************
 
 Setup
@@ -32,30 +32,23 @@ Setup
 
 #. The repo comes with a sample workflow, which can be found under ``myapp/workflows/example.py``. The structure below shows the most important files and how a typical flyteapp should be laid out.
 
-   .. raw:: html
+   .. dropdown:: Important files a typical flyteapp should have
 
-      <details>
-      <summary><a>Important files a typical flyteapp should have</a></summary>
+       .. code-block:: text
 
-   .. code-block:: text
+           .
+           ├── Dockerfile
+           ├── docker_build_and_tag.sh
+           ├── myapp
+           │         ├── __init__.py
+           │         └── workflows
+           │             ├── __init__.py
+           │             └── example.py
+           └── requirements.txt
 
-       .
-       ├── Dockerfile
-       ├── docker_build_and_tag.sh
-       ├── myapp
-       │   ├── __init__.py
-       │   └── workflows
-       │       ├── __init__.py
-       │       └── example.py
-       └── requirements.txt
+       .. note::
 
-   .. note::
-
-       You can use pip-compile to build your requirements file. the Dockerfile that comes with this is not GPU ready, but is a simple Dockerfile that should work for most apps.
-
-   .. raw:: html
-
-      </details>
+           You can use pip-compile to build your requirements file. the Dockerfile that comes with this is not GPU ready, but is a simple Dockerfile that should work for most apps.
 
 
    The workflow can be run locally simply by running it as a python script - ``note the __main__ at the bottom of the file``
@@ -65,18 +58,11 @@ Setup
        python myapp/workflows/example.py
 
 
-   .. raw:: html
+   .. dropdown:: Expected output
 
-       <details>
-       <summary><a>Expected Output</a></summary>
+      .. prompt::
 
-   .. prompt::
-
-        Running my_wf() hello world
-
-   .. raw:: html
-
-       </details>
+         Running my_wf() hello world
 
 
 #. Install :std:ref:`flytectl`. ``flytectl`` is a commandline interface for flyte.
@@ -195,17 +181,10 @@ Modify code: Modify and test locally
 
        myapp/workflows/example.py
 
-   .. raw:: html
+   .. dropdown:: myapp/workflows/example.py
 
-      <details>
-      <summary><a>myapp/workflows/example.py</a></summary>
-
-   .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/simplify-template/myapp/workflows/example.py
-      :language: python
-
-   .. raw:: html
-
-      </details>
+      .. rli:: https://raw.githubusercontent.com/flyteorg/flytekit-python-template/simplify-template/myapp/workflows/example.py
+         :language: python
 
 #. Add ``name: str`` as an argument to both ``my_wf`` and ``say_hello`` functions. Then update the body of ``say_hello`` to consume that argument.
 
@@ -235,18 +214,11 @@ Modify code: Modify and test locally
      python myapp/workflows/example.py
 
 
-   .. raw:: html
+   .. dropdown:: Expected output
 
-       <details>
-       <summary><a>Expected Output</a></summary>
+       .. prompt::
 
-   .. prompt::
-
-        Running my_wf(name='adam') hello world, adam
-
-   .. raw:: html
-
-       </details>
+            Running my_wf(name='adam') hello world, adam
 
 
 Fast: Deploy your application quickly
