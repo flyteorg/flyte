@@ -108,7 +108,7 @@ Setup
 
         .. prompt::
 
-            flytectl setup-config
+            flytectl init
 
 
 .. _getting-started-standard:
@@ -131,7 +131,7 @@ Standard: Build & Deploy your application
 
            .. tip::
             #. Why are we not pushing the docker image? Want to understand details - Refer to guide `here <>`_
-            #. *Recommended* use the bundled ./docker_build_and_tag.sh. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in gitOps style workflow.
+            #. *Recommended* use the bundled ./docker_build_and_tag.sh. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in GitOps style workflow.
 
        .. tab:: If using remote flyte cluster
 
@@ -232,14 +232,15 @@ Fast: Deploy your application quickly
 
    .. note::
 
-     Note the ``--fast`` flag. This will take the code from your local machine and provide it for ``execution`` without having to build the container and push it. Also note the ``--force`` flag, this is to simply override your previously created package.
+     Note the ``--fast`` flag. This will take the code from your local machine and provide it for ``execution`` without having to build the container and push it. The ``--force`` flag allows overriding your previously created package.
 
    .. caution::
 
-     The ``fast`` registration method can only be used if you do not modify any requirements. This is because your container / environment is essentially same. But, if you add a dependency you have to follow the :ref:`getting-started-standard` method.
+     The ``fast`` registration method can only be used if you do not modify any requirements (re-use existing environment). But, if you add a dependency to your requirements file / env you have to follow the :ref:`getting-started-standard` method.
 
 
-#. You can now deploy the code using flytectl similar to done previously. ``flytectl`` automatically guesses that the package is for ``fast`` registration. For this to work, a new ``storage`` block has to be added to the flytectl configuration with appropriate permissions at runtime. The Storage block configures flytectl to write to a specific ``S3 / GCS bucket``. For sandbox this is automatically configured for you.
+#. You can now deploy the code using flytectl similar to done previously. ``flytectl`` automatically guesses that the package is for ``fast`` registration. For this to work, a new ``storage`` block has to be added to the flytectl configuration with appropriate permissions at runtime. The Storage block configures flytectl to write to a specific ``S3 / GCS bucket``.
+   If using sandbox, this is automatically configured by flytectl (so you can skip). But, take a note for future.
 
    .. prompt::
 
