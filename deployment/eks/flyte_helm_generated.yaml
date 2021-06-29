@@ -106,7 +106,7 @@ kind: Secret
 metadata:
   name: db-pass
 stringData:
-  pass.txt: awesomesauce
+  pass.txt: <DB_PASSWORD>
 type: Opaque
 ---
 # Source: flyte/templates/propeller/secret-auth.yaml
