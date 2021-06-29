@@ -195,7 +195,7 @@ common:
       type: Opaque
       stringData:
         # -- If using plain text you can provide the password here
-        pass.txt: awesomesauce
+        pass.txt: <DB_PASSWORD>
 
 # -----------------------------------------------------
 # Core dependencies that should be configured for Flyte to work on any platform
