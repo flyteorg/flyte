@@ -23,8 +23,6 @@ Setup
 
 #. Install Flyte's python SDK - `flytekit <https://pypi.org/project/flytekit/>`_ (recommended in a virtual environment) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`_ repo.
 
-   .. tip:: Branch ``simplify-template`` - ``git checkout simplify-template`` till we merge it
-
    .. prompt::
 
      pip install flytekit
