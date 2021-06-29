@@ -299,7 +299,7 @@ Fast: Deploy your application quickly
                    scopes: https://www.googleapis.com/auth/devstorage.read_write
                  container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
 
-       .. tab:: *
+       .. tab:: Others
 
                For other supported storage backends like Oracle, Azure etc refer to Configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`_
 
