@@ -173,7 +173,7 @@ common:
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
       # -- This is the certificate arn of the cert imported in AWS certificate manager. 
-      alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-2:173113148371:certificate/763612d6-490d-491e-a603-4b789106c2b4"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
       # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)

@@ -42,7 +42,7 @@ metadata:
     helm.sh/chart: flyte-0.2.0
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::173113148371:role/iam-role-flyte
 ---
 # Source: flyte/templates/datacatalog/rbac.yaml
 apiVersion: v1
@@ -56,7 +56,7 @@ metadata:
     helm.sh/chart: flyte-0.2.0
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::173113148371:role/iam-role-flyte
 ---
 # Source: flyte/templates/propeller/rbac.yaml
 apiVersion: v1
@@ -70,7 +70,7 @@ metadata:
     helm.sh/chart: flyte-0.2.0
     app.kubernetes.io/managed-by: Helm
   annotations: 
-    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+    eks.amazonaws.com/role-arn: arn:aws:iam::173113148371:role/iam-role-flyte
 ---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
@@ -229,10 +229,10 @@ data:
       config.yaml: | 
         storage:
           type: s3
-          container: "<BUCKET_NAME>"
+          container: "doctester3"
           connection:
             auth-type: iam
-            region: <AWS_REGION>
+            region: us-east-2
           enable-multicontainer: true
 ---
 # Source: flyte/templates/admin/configmap.yaml
@@ -250,7 +250,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: <RDS_HOST_DNS>
+      host: flyteadmin.cluster-cuvm8mpzqloo.us-east-2.rds.amazonaws.com
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -317,10 +317,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "doctester3"
       connection:
         auth-type: iam
-        region: <AWS_REGION>
+        region: us-east-2
       limits:
         maxDownloadMBs: 10
   task_resource_defaults.yaml: | 
@@ -343,21 +343,21 @@ data:
         - projectQuotaMemory:
             value: 4000Mi
         - defaultIamRole:
-            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+            value: arn:aws:iam::173113148371:role/flyte-user-role
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+            value: arn:aws:iam::173113148371:role/flyte-user-role
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+            value: arn:aws:iam::173113148371:role/flyte-user-role
       refresh: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
@@ -392,7 +392,7 @@ data:
   db.yaml: | 
     database:
       dbname: flyteadmin
-      host: <RDS_HOST_DNS>
+      host: flyteadmin.cluster-cuvm8mpzqloo.us-east-2.rds.amazonaws.com
       passwordPath: /etc/db/pass.txt
       port: 5432
       username: flyteadmin
@@ -412,10 +412,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "doctester3"
       connection:
         auth-type: iam
-        region: <AWS_REGION>
+        region: us-east-2
       limits:
         maxDownloadMBs: 10
 ---
@@ -489,7 +489,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://<BUCKET_NAME>/
+      rawoutput-prefix: s3://doctester3/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -551,10 +551,10 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "doctester3"
       connection:
         auth-type: iam
-        region: <AWS_REGION>
+        region: us-east-2
       limits:
         maxDownloadMBs: 10
   cache.yaml: |
@@ -565,8 +565,8 @@ data:
     plugins:
       logs:
         cloudwatch-enabled: true
-        cloudwatch-log-group: <LOG_GROUP_NAME>
-        cloudwatch-region: <AWS_REGION>
+        cloudwatch-log-group: flyteplatform
+        cloudwatch-region: us-east-2
         kubernetes-enabled: false
 ---
 # Source: flyte/templates/propeller/crds/flyteworkflow.yaml
@@ -1325,7 +1325,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "368517dcd61181af6a27b9f4d17e89b13b4d96fa285165bc5cca474dd9629af"
+        configChecksum: "57b586422b3b36d40d759b5bda71174e140dd0faeb8ced7a7d8bb1efc8d645d"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1547,7 +1547,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f0329ce69ff36c0bcab4a06e04c5c124a749957342dba64152c6a1a7d552d6e"
+        configChecksum: "08794ebc73b90ef4e1d8b2423fae591287b564ffe9dbd69c8f1082aa141c1a4"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1633,7 +1633,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "777a87595226a9f853f6caf06d8b1a588dc52eb4865415ea61c4a6155b62714"
+        configChecksum: "af017891774be56b10375d4e2b51d6c042f521388f1f0b431c1218e3c2a960a"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1705,7 +1705,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.11.0
       annotations:
-        configChecksum: "777a87595226a9f853f6caf06d8b1a588dc52eb4865415ea61c4a6155b62714"
+        configChecksum: "af017891774be56b10375d4e2b51d6c042f521388f1f0b431c1218e3c2a960a"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
