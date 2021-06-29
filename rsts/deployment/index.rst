@@ -55,6 +55,7 @@ configure your Flyte deployment for production.
     :name: deploymenttoc
     :hidden:
 
+    overview
     aws/index
     gcp/index
     cluster_config/index

@@ -1,4 +1,4 @@
-.. _deployment-cluster-config-auth-general:
+.. _deployment-cluster-config-general:
 
 Configuring Your Flyte Deployment
 ----------------------------------
@@ -13,10 +13,11 @@ Flyte allows these custom settings along with the following combination of dimen
 - project and domain
 - project, domain, and name (must be either the name of a workflow name or a launch plan)
 
-Please see the :doc:`Control Plane <flyte:concepts/control_plane>` document to get to know about projects and domains.
+Please see the :ref:`Control Plane <control_plane>` document to get to know about projects and domains.
 Along these dimensions, the following settings are configurable.
 
 .. admonition:: Alert
+
     Not all three of the combinations mentioned above are valid for each of these settings.
 
 - Defaults are used for task resource requests and limits (when not specified by the author of the task).

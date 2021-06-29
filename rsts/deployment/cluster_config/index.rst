@@ -60,3 +60,14 @@ Cluster Config
     ^^^^^^^^^^^^
     Other things
 
+.. toctree::
+    :maxdepth: 1
+    :name: Cluster Config
+    :hidden:
+
+    auth_setup
+    auth_migration
+    auth_appendix
+    general
+    monitoring
+    notifications
