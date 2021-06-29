@@ -23,3 +23,10 @@ AWS
     ^^^^^^^^^^^^
     More Auth things
 
+.. toctree::
+    :maxdepth: 1
+    :name: AWS Deployment
+    :hidden:
+
+    opta
+    manual

@@ -60,6 +60,16 @@ Cluster Config
     ^^^^^^^^^^^^
     Other things
 
+    ---
+
+    .. link-button:: deployment-cluster-config-performance
+       :type: ref
+       :text: Performance
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Other things
+
+
 .. toctree::
     :maxdepth: 1
     :name: Cluster Config
@@ -71,3 +81,4 @@ Cluster Config
     general
     monitoring
     notifications
+    performance

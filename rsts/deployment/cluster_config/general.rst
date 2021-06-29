@@ -13,7 +13,7 @@ Flyte allows these custom settings along with the following combination of dimen
 - project and domain
 - project, domain, and name (must be either the name of a workflow name or a launch plan)
 
-Please see the :ref:`Control Plane <control_plane>` document to get to know about projects and domains.
+Please see the :std:doc:`concepts/control_plane` document to get to know about projects and domains.
 Along these dimensions, the following settings are configurable.
 
 .. admonition:: Alert
@@ -159,7 +159,7 @@ Increasing specificity defines how matchable resource attributes get applied. Th
 
 #. Domain
 
-Default values for all and per-domain attributes may be specified in the FlyteAdmin config as documented in the :ref:`config_resource_types`.
+Default values for all and per-domain attributes may be specified in the FlyteAdmin config as documented in the :std:doc:`concepts/customizable_resources`.
 
 Example
 =======

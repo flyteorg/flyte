@@ -64,18 +64,18 @@ within Kubernetes like the autoscaler, metrics server, and ingress.
 
 **Production Grade Database**
 The aws-postgres module in flyte.yaml creates an Aurora Postgresql database with disk encryption and regular snapshot
-backups. You can read more about it `here <https://docs.opta.dev/modules-reference/service-modules/aws/#postgres>`_
+backups. You can read more about it `here <https://docs.opta.dev/modules-reference/service-modules/aws/#postgres>`__
 
 **Production Grade Object Store**
 The aws-s3 module in flyte.yaml creates a new S3 bucket for Flyte, including disk encryption. You can read more about it
-`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-s3>`_
+`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-s3>`__
 
 **Production Grade Notification System**
 Flyte uses a combination of the AWS Simple Notification Service (SNS) and Simple Queueing service for a notification
 system. flyte.yaml creates both the SNS topic and SQS queue (via the notifcationsQueue and topic modules), which are
 encrypted with unique KMS keys and only the  flyte roles can access them. You can read more about the queues
-`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sqs>`_ and the topics
-`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sns>`_.
+`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sqs>`__ and the topics
+`here <https://docs.opta.dev/modules-reference/service-modules/aws/#aws-sns>`__.
 
 **Production Grade Queueing System**
 Flyte uses SQS to power its task scheduling system, and flyte.yaml creates said queue (via the schedulesQueue
