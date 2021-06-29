@@ -10,7 +10,7 @@ flyteadmin:
     # you can change the name of this role
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::832573439839:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
 
   resources:
     limits:
@@ -48,7 +48,7 @@ datacatalog:
     # -- If the service account is created by you, make this false
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::832573439839:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
   resources:
     limits:
       cpu: 500m
@@ -82,7 +82,7 @@ flytepropeller:
     # -- If the service account is created by you, make this false
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::832573439839:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-NUMBER>:role/iam-role-flyte
   resources:
     limits:
       cpu: 1
@@ -173,7 +173,7 @@ common:
       alb.ingress.kubernetes.io/tags: service_instance=production
       alb.ingress.kubernetes.io/scheme: internet-facing
       # -- This is the certificate arn of the cert imported in AWS certificate manager. 
-      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:832573439839:certificate/a7db79d4-4f8c-4c7b-a4f4-109bf2fb5efa
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:<REGION>:<ACCOUNT-NUMBER>:certificate/a7db79d4-4f8c-4c7b-a4f4-109bf2fb5efa
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
       # -- Instruct ALB Controller to not create multiple load balancers (and hence maintain a single endpoint for both GRPC and Http)
@@ -209,16 +209,16 @@ storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: s3
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  bucketName: yt-doctester2
+  bucketName: <BUCKET_NAME>
   s3:
-    region: us-east-2
+    region: <REGION>
 
 db:
   database:
     port: 5432
     # -- Create a user called flyte
     username: flyteadmin
-    host: admindb.cluster-c7wfhpvwbpaz.us-east-2.rds.amazonaws.com
+    host: <RDS_HOST_DNS>
     # -- Create a DB called flyteadmin (OR change the name here)
     dbname: flyteadmin
     passwordPath: /etc/db/pass.txt
@@ -253,7 +253,7 @@ configmap:
 
   core:
     propeller:
-      rawoutput-prefix: s3://yt-doctester2/
+      rawoutput-prefix: s3://<BUCKET_NAME>/
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50
@@ -309,9 +309,9 @@ configmap:
         # You can even disable this
         cloudwatch-enabled: true
         # -- region where logs are hosted
-        cloudwatch-region: us-east-2
+        cloudwatch-region: <REGION>
         # -- cloudwatch log-group
-        cloudwatch-log-group: flyteloggroup
+        cloudwatch-log-group: <LOG_GROUP_NAME>
 
 # ----------------------------------------------------------------
 # Optional Modules
@@ -328,15 +328,15 @@ workflow_scheduler:
       # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
       eventScheduler:
         scheme: aws
-        region: us-east-2
-        scheduleRole: arn:aws:iam::832573439839:role/flyte_cron_scheduler_role
-        targetName: arn:aws:sqs:us-east-2:832573439839:flyte-helm-test-cron-scheduler-queue
+        region: <REGION>
+        scheduleRole: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:<REGION>:<ACCOUNT-NUMBER>:flyte-helm-test-cron-scheduler-queue
         scheduleNamePrefix: flyte
       workflowExecutor:
         scheme: aws
-        region: us-east-2
+        region: <REGION>
         scheduleQueueName: flyte-helm-test-cron-scheduler-queue
-        accountId: 832573439839
+        accountId: <ACCOUNT-NUMBER>
         reconnectAttempts: 10
         reconnectDelaySeconds: 30
 
@@ -348,12 +348,12 @@ workflow_notifications:
   config:
     notifications:
       type: aws
-      region: us-east-2
+      region: <REGION>
       publisher:
-        topicName: arn:aws:sns:us-east-1:832573439839:flyte-notifications-topic
+        topicName: arn:aws:sns:us-east-1:<ACCOUNT-NUMBER>:flyte-notifications-topic
       processor:
         queueName: flyte-notifications-queue
-        accountId: 832573439839
+        accountId: <ACCOUNT-NUMBER>
       emailer:
         subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
         sender: "flyte@example.com"
@@ -376,21 +376,21 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "4000Mi"
             - defaultIamRole:
-                value: arn:aws:iam::832573439839:role/flyte-user-role
+                value: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte-user-role
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: arn:aws:iam::832573439839:role/flyte-user-role
+                value: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte-user-role
         - development:
             - projectQuotaCpu:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: arn:aws:iam::832573439839:role/flyte-user-role
+                value: arn:aws:iam::<ACCOUNT-NUMBER>:role/flyte-user-role
 
   templates:
     # -- Template for namespaces resources
@@ -525,8 +525,8 @@ sagemaker:
   plugin_config:
     plugins:
       sagemaker:
-        roleArn: arn:aws:iam::832573439839:role/mysagemakerrole
-        region: us-east-2
+        roleArn: arn:aws:iam::<ACCOUNT-NUMBER>:role/<ROLE_FOR_SAGEMAKER>
+        region: <REGION>
 # ---------------------------
 # Flink jobs using the Flink Operator
 #
