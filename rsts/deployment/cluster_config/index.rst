@@ -26,15 +26,6 @@ Cluster Config
 
     ---
 
-    .. link-button:: deployment-cluster-config-auth-appendix
-       :type: ref
-       :text: Auth Appendix
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    More Auth things
-
-    ---
-
     .. link-button:: deployment-cluster-config-general
        :type: ref
        :text: General Flyte Configuration

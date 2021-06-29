@@ -68,3 +68,4 @@ configure your Flyte deployment for production.
     aws/index
     gcp/index
     cluster_config/index
+    sandbox
