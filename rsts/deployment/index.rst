@@ -24,6 +24,15 @@ configure your Flyte deployment for production.
 
     ---
 
+    .. link-button:: sandbox
+       :type: ref
+       :text: Sandbox: Under the hood!
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    What is flyte-sandbox? What is the difference from an actual Flyte deployment? Why did we build it?
+
+    ---
+
     .. link-button:: deployment-aws
        :type: ref
        :text: AWS
