@@ -10,7 +10,7 @@ flyteadmin:
     # you can change the name of this role
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::173113148371:role/iam-role-flyte
 
   resources:
     limits:
@@ -48,7 +48,7 @@ datacatalog:
     # -- If the service account is created by you, make this false
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::173113148371:role/iam-role-flyte
   resources:
     limits:
       cpu: 500m
@@ -82,7 +82,7 @@ flytepropeller:
     # -- If the service account is created by you, make this false
     create: true
     annotations:
-      eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+      eks.amazonaws.com/role-arn: arn:aws:iam::173113148371:role/iam-role-flyte
   resources:
     limits:
       cpu: 1
@@ -209,16 +209,16 @@ storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: s3
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  bucketName: <BUCKET_NAME>
+  bucketName: doctester3
   s3:
-    region: <AWS_REGION>
+    region: us-east-2
 
 db:
   database:
     port: 5432
     # -- Create a user called flyte
     username: flyteadmin
-    host: <RDS_HOST_DNS>
+    host: flyteadmin.cluster-cuvm8mpzqloo.us-east-2.rds.amazonaws.com
     # -- Create a DB called flyteadmin (OR change the name here)
     dbname: flyteadmin
     passwordPath: /etc/db/pass.txt
@@ -253,7 +253,7 @@ configmap:
 
   core:
     propeller:
-      rawoutput-prefix: s3://<BUCKET_NAME>/
+      rawoutput-prefix: s3://doctester3/
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50
@@ -309,9 +309,9 @@ configmap:
         # You can even disable this
         cloudwatch-enabled: true
         # -- region where logs are hosted
-        cloudwatch-region: <AWS_REGION>
+        cloudwatch-region: us-east-2
         # -- cloudwatch log-group
-        cloudwatch-log-group: <LOG_GROUP_NAME>
+        cloudwatch-log-group: flyteplatform
 
 # ----------------------------------------------------------------
 # Optional Modules
@@ -328,15 +328,15 @@ workflow_scheduler:
       # -- This is configured to use Cloudwatch schedules as explained [here](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/Create-CloudWatch-Events-Scheduled-Rule.html)
       eventScheduler:
         scheme: aws
-        region: <AWS_REGION>
-        scheduleRole: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte_cron_scheduler_role
-        targetName: arn:aws:sqs:<AWS_REGION>:<ACCOUNT_NUMBER>:flyte-helm-test-cron-scheduler-queue
+        region: us-east-2
+        scheduleRole: arn:aws:iam::173113148371:role/flyte_cron_scheduler_role
+        targetName: arn:aws:sqs:us-east-2:173113148371:flyte-helm-test-cron-scheduler-queue
         scheduleNamePrefix: flyte
       workflowExecutor:
         scheme: aws
-        region: <AWS_REGION>
+        region: us-east-2
         scheduleQueueName: flyte-helm-test-cron-scheduler-queue
-        accountId: <ACCOUNT_NUMBER>
+        accountId: 173113148371
         reconnectAttempts: 10
         reconnectDelaySeconds: 30
 
@@ -348,12 +348,12 @@ workflow_notifications:
   config:
     notifications:
       type: aws
-      region: <AWS_REGION>
+      region: us-east-2
       publisher:
-        topicName: arn:aws:sns:us-east-1:<ACCOUNT_NUMBER>:flyte-notifications-topic
+        topicName: arn:aws:sns:us-east-1:173113148371:flyte-notifications-topic
       processor:
         queueName: flyte-notifications-queue
-        accountId: <ACCOUNT_NUMBER>
+        accountId: 173113148371
       emailer:
         subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
         sender: "flyte@example.com"
@@ -376,21 +376,21 @@ cluster_resource_manager:
             - projectQuotaMemory:
                 value: "4000Mi"
             - defaultIamRole:
-                value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+                value: arn:aws:iam::173113148371:role/flyte-user-role
         - staging:
             - projectQuotaCpu:
                 value: "2"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+                value: arn:aws:iam::173113148371:role/flyte-user-role
         - development:
             - projectQuotaCpu:
                 value: "4"
             - projectQuotaMemory:
                 value: "3000Mi"
             - defaultIamRole:
-                value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
+                value: arn:aws:iam::173113148371:role/flyte-user-role
 
   templates:
     # -- Template for namespaces resources
@@ -525,8 +525,8 @@ sagemaker:
   plugin_config:
     plugins:
       sagemaker:
-        roleArn: arn:aws:iam::<ACCOUNT_NUMBER>:role/<ROLE_FOR_SAGEMAKER>
-        region: <AWS_REGION>
+        roleArn: arn:aws:iam::173113148371:role/<ROLE_FOR_SAGEMAKER>
+        region: us-east-2
 # ---------------------------
 # Flink jobs using the Flink Operator
 #
