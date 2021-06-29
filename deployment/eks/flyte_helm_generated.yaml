@@ -30,6 +30,48 @@ metadata:
     app.kubernetes.io/version: "v1beta2-1.2.0-3.0.0"
     app.kubernetes.io/managed-by: Helm
 ---
+# Source: flyte/templates/admin/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flyteadmin
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.2.0
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+---
+# Source: flyte/templates/datacatalog/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datacatalog
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: datacatalog
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.2.0
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+---
+# Source: flyte/templates/propeller/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: flytepropeller
+  namespace: flyte
+  labels: 
+    app.kubernetes.io/name: flytepropeller
+    app.kubernetes.io/instance: flyte
+    helm.sh/chart: flyte-0.2.0
+    app.kubernetes.io/managed-by: Helm
+  annotations: 
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_NUMBER>:role/iam-role-flyte
+---
 # Source: flyte/templates/propeller/webhook.yaml
 # Create a Service Account for webhook
 apiVersion: v1
@@ -211,7 +253,7 @@ data:
       host: <RDS_HOST_DNS>
       passwordPath: /etc/db/pass.txt
       port: 5432
-      username: flyte
+      username: flyteadmin
   domain.yaml: | 
     domains:
     - id: development
@@ -301,21 +343,21 @@ data:
         - projectQuotaMemory:
             value: 4000Mi
         - defaultIamRole:
-            value: ""
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - staging:
         - projectQuotaCpu:
             value: "2"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: ""
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       - development:
         - projectQuotaCpu:
             value: "4"
         - projectQuotaMemory:
             value: 3000Mi
         - defaultIamRole:
-            value: ""
+            value: arn:aws:iam::<ACCOUNT_NUMBER>:role/flyte-user-role
       refresh: 5m
       templatePath: /etc/flyte/clusterresource/templates
 ---
@@ -353,7 +395,7 @@ data:
       host: <RDS_HOST_DNS>
       passwordPath: /etc/db/pass.txt
       port: 5432
-      username: flyte
+      username: flyteadmin
   logger.yaml: | 
     logger:
       level: 5
@@ -447,7 +489,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: s3://s3-bucket-for-flyte/
+      rawoutput-prefix: s3://<BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -677,7 +719,6 @@ rules:
   - "*"
 ---
 # Source: flyte/templates/admin/rbac.yaml
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -708,7 +749,6 @@ rules:
   - '*'
 ---
 # Source: flyte/templates/propeller/rbac.yaml
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -1285,7 +1325,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "37477c557018951408878497c81d2d9526d2bc6513dbc4f950acf4ed138c8ad"
+        configChecksum: "368517dcd61181af6a27b9f4d17e89b13b4d96fa285165bc5cca474dd9629af"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1507,7 +1547,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "dfa51ea1eb3834f503a89d872895996c061146a69aaafcccce8315072383c51"
+        configChecksum: "f0329ce69ff36c0bcab4a06e04c5c124a749957342dba64152c6a1a7d552d6e"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1593,7 +1633,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d852e0a0c08a227673b22bee493dfb7b341d494442afb8300d4e12971fbe34e"
+        configChecksum: "777a87595226a9f853f6caf06d8b1a588dc52eb4865415ea61c4a6155b62714"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1665,7 +1705,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v0.11.0
       annotations:
-        configChecksum: "d852e0a0c08a227673b22bee493dfb7b341d494442afb8300d4e12971fbe34e"
+        configChecksum: "777a87595226a9f853f6caf06d8b1a588dc52eb4865415ea61c4a6155b62714"
     spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
@@ -1907,7 +1947,7 @@ metadata:
   annotations: 
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:<ACCOUNT_NUMBER>:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+    alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
@@ -2021,7 +2061,6 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 80
-      host: flyte.example.com
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
 ---
@@ -2034,12 +2073,13 @@ metadata:
   annotations:
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-2:<ACCOUNT_NUMBER>:certificate/e2f04275-2dff-4118-a493-ed3ec8f41605
+    alb.ingress.kubernetes.io/certificate-arn: <CERTIFICATE_ARN>
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/backend-protocol-version: HTTP2
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
   rules:
@@ -2083,4 +2123,3 @@ spec:
             backend:
               serviceName: flyteadmin
               servicePort: 81
-      host: flyte.example.com
