@@ -1,60 +1,59 @@
 .. _deployment-sandbox:
 
 ###################
-Sandbox overview
+Sandbox Overview
 ###################
 
 .. warning::
-    The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your flyte deployment, checkout the :ref:`deployment` guide.
+    The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the :ref:`deployment` guide.
 
 
 **********************
 What is Flyte Sandbox?
 **********************
-Flyte Sandbox is a fully standalone minimal environment for running Flyte - given a kubernetes cluster. To simplify this further :std:ref:`flytectl_sandbox` provides a simplified way of running ``flyte-sandbox`` as a single docker container running locally.
-The follow section explains how you can use each of these modes and provides more information. We **recommend** to run flyte-sandbox using flytectl locally on your workstations or on a single cloud instance for trying out flyte or testing new ideas. Flyte Sandbox is not a complete representation of Flyte,
+The Flyte Sandbox is a fully standalone minimal environment for running Flyte. To simplify this further :std:ref:`flytectl_sandbox` provides a simplified way of running ``flyte-sandbox`` as a single Docker container running locally.
+The follow section explains how you can use each of these modes and provides more information. We **recommend** running the sandbox using flytectl locally on your workstation or on a single cloud instance to try out Flyte or for testing new ideas. Flyte Sandbox is not a complete representation of Flyte,
 many features are intentionally removed from this environment to ensure that the startup times and runtime footprints are low.
 
 *******************************************
-FlyteSandbox as a single docker container
+Flyte Sandbox as a single Docker container
 *******************************************
 
-Using :std:ref:`flytectl_sandbox` one can start a local sandbox environment for Flyte. This is mini-replica of an entire Flyte deployment, without the scalability and reduced extensions. The idea for this environment originated from the desire of the core team to make it extremely simple for users of Flyte to
-try out Flyte and get a feel for the user experience, without having to understand kubernetes and dabble with configuration etc. Flyte single container sandbox is also used by Flyte to run continuous integration tests and used by the `flytesnacks - UserGuide playground environment`. flyte-sandbox can mostly be run
-in any environment that support docker containers and an ubuntu docker base image.
+:std:ref:`flytectl_sandbox` starts a local sandbox environment for Flyte. This is mini-replica of an entire Flyte deployment, without the scalability and with minimal extensions. The idea for this environment originated from the desire of the core team to make it extremely simple for users of Flyte to
+try out the platform and get a feel for the user experience, without having to understand Kubernetes or dabble with configuration etc. The Flyte single container sandbox is also used by the team to run continuous integration tests and used by the `flytesnacks - UserGuide playground environment`. The sandbox can be run
+in most any environment that supports Docker containers and an Ubuntu docker base image.
 
 Architecture & Reasons why we built it?
 ========================================
-In the single container environment, a mini kubernetes cluster is installed within a container using the excellent `k3s <https://k3s.io/>`__ platform. K3s uses an in-container docker daemon (run using `docker-in-docker configuration <https://www.docker.com/blog/docker-can-now-run-within-docker/>`__) to orchestrate user containers.
+Within the single container environment, a mini Kubernetes cluster is installed using the excellent `k3s <https://k3s.io/>`__ platform. K3s uses an in-container Docker daemon (run using `docker-in-docker configuration <https://www.docker.com/blog/docker-can-now-run-within-docker/>`__) to orchestrate user containers.
 
-When users use ``flytectl sandbox start --source <dir>``, the source ``<dir>`` is mounted within the outer docker container and hence it is possible to build a docker image using the inner docker-daemon. In a typical Flyte installation, one needs to build a docker container for the tasks and push to a repository from which K8s can pull the containers.
-But, this is not possible with flyte-sandbox in docker environment, because it does not ship with a docker registry. Users are free to use an external registry and this should as expected, as long as the inner k3s cluster has permissions to pull containers from the external registry. But, to reduce the friction of procuring a new registry, procuring permissions to access it and then pushing to this registry,
-we recommend using the ``flytectl sandbox exec -- ...`` mode to trigger a docker build for your code (which is mounted into the sandbox environment) using the docker-in-docker daemon. Since K3s just uses the same docker daemon, it is possible to re-use the container that is built internally. This greatly simplifies the users interaction and ability to try out Flyte, while sacrificing on step in the real world workflow - ``docker push``.
+When users call ``flytectl sandbox start --source <dir>``, the source ``<dir>`` is mounted within the sandbox container and hence it is possible to build images for that source code, using the inner Docker daemon. In a typical Flyte installation, one needs to build Docker containers for tasks and push them to a repository from which K8s can pull.
+This is not possible with the sandbox's Docker environment however, because it does not ship with a Docker registry. Users are free to use an external registry of course, as long as the inner k3s cluster has permissions to pull from it. To reduce the friction of procuring such a registry, and configuring permissions to access it, and having to explicitly push to it,
+we recommend using the ``flytectl sandbox exec -- ...`` mode to trigger a Docker build for your code (which is mounted in the sandbox environment) using the docker-in-docker daemon. Since K3s just uses the same Docker daemon, it is possible to re-use the images built internally. This greatly simplifies the user's interaction and ability to try out Flyte, at the cost of hiding one part of the real-world iteration cycle, calling ``docker push`` on your task images.
 
 The illustration below shows the archtecture of flyte-sandbox in a single container. It is identical to a Flyte sandbox cluster, but the fact that we have built one docker container, with kubernetes and flyte already installed.
 
 .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_sandbox_single_container.png
-   :alt: Architecture of flyte-sandbox single container
+   :alt: Architecture of single container Flyte Sandbox
 
 
-Uses
-=====
-* Try out Flyte locally using a single docker command or using flytectl sandbox
+Use the Flyte Sandbox to
+========================
+* Try out Flyte locally using a single Docker command or using ``flytectl sandbox``
 * Run regular integration tests for Flyte
-* provide snapshot environment for various Flyte versions, to identify regressions
+* Provide snapshot environment for various Flyte versions, to identify regressions
 
 ***************************************************************
-Deploying your own Flytesandbox environment to a K8s cluster
+Deploying your own Flyte Sandbox environment to a K8s cluster
 ***************************************************************
 
-This installs all the dependencies as kubernetes deployments. We call this a Sandbox deployment. Flyte sandbox deployment can be deployed using the default helm template.
-
+This installs all the dependencies as Kubernetes deployments. We call this a Sandbox deployment. Flyte sandbox deployment can be deployed using the default Helm chart.
 
 .. note::
 
     #. A Sandbox deployment takes over the entire cluster
     #. It needs special cluster roles that will need access to create namespaces, pods etc
-    #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your flyte deployment, checkout the :ref:`howto_productionize`.
+    #. The sandbox deployment is not suitable for production environments. For an in-depth overview of how to productionize your Flyte deployment, checkout the rest of the Deployment guides :ref:`deployment`.
 
 
 .. image:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/core/flyte_sandbox_single_k8s_cluster.png
@@ -64,10 +63,9 @@ This installs all the dependencies as kubernetes deployments. We call this a San
 Deploy Flyte Sandbox environment locally - on your laptop
 =========================================================
 
-Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`_. On Mac::
+Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kubernetes.io/docs/tasks/tools/install-kubectl/>`__. On Mac::
 
     brew install kubectl
-
 
 
 .. tabs::
@@ -148,7 +146,7 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
             - Another alternative is to change the docker host, to build the docker image on the Minikube hosted docker daemon. https://minikube.sigs.k8s.io/docs/handbook/pushing/ provides more detailed information about this process. As a TL;DR, Flyte can only run images that are accessible to Kubernetes. To make an image accessible, you could either push it to a remote registry or to a regisry that is available to Kuberentes. In case on minikube this registry is the one thats running on the VM.
 
 
-.. _howto-sandbox-dedicated-k8s-cluster:
+.. _deployment-sandbox-dedicated-k8s-cluster:
 
 Deploy Flyte Sandbox environment to a Cloud Kubernetes cluster
 ==================================================================
@@ -175,10 +173,8 @@ Flyte configuration on your remote cluster.
 
     kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
 
-
 #. You can now port-forward (or if you have load-balancer enabled then get an LB) to connect to remote FlyteConsole, as follows::
 
     kubectl port-forward svc/envoy 30081:80
-
 
 #. Open console http://localhost:30081/console.
