@@ -62,6 +62,123 @@ func (_m *Docker) ContainerCreate(ctx context.Context, config *container.Config,
 	return r0, r1
 }
 
+type Docker_ContainerExecAttach struct {
+	*mock.Call
+}
+
+func (_m Docker_ContainerExecAttach) Return(_a0 types.HijackedResponse, _a1 error) *Docker_ContainerExecAttach {
+	return &Docker_ContainerExecAttach{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *Docker) OnContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) *Docker_ContainerExecAttach {
+	c := _m.On("ContainerExecAttach", ctx, execID, config)
+	return &Docker_ContainerExecAttach{Call: c}
+}
+
+func (_m *Docker) OnContainerExecAttachMatch(matchers ...interface{}) *Docker_ContainerExecAttach {
+	c := _m.On("ContainerExecAttach", matchers...)
+	return &Docker_ContainerExecAttach{Call: c}
+}
+
+// ContainerExecAttach provides a mock function with given fields: ctx, execID, config
+func (_m *Docker) ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error) {
+	ret := _m.Called(ctx, execID, config)
+
+	var r0 types.HijackedResponse
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.ExecStartCheck) types.HijackedResponse); ok {
+		r0 = rf(ctx, execID, config)
+	} else {
+		r0 = ret.Get(0).(types.HijackedResponse)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, types.ExecStartCheck) error); ok {
+		r1 = rf(ctx, execID, config)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Docker_ContainerExecCreate struct {
+	*mock.Call
+}
+
+func (_m Docker_ContainerExecCreate) Return(_a0 types.IDResponse, _a1 error) *Docker_ContainerExecCreate {
+	return &Docker_ContainerExecCreate{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *Docker) OnContainerExecCreate(ctx context.Context, _a1 string, config types.ExecConfig) *Docker_ContainerExecCreate {
+	c := _m.On("ContainerExecCreate", ctx, _a1, config)
+	return &Docker_ContainerExecCreate{Call: c}
+}
+
+func (_m *Docker) OnContainerExecCreateMatch(matchers ...interface{}) *Docker_ContainerExecCreate {
+	c := _m.On("ContainerExecCreate", matchers...)
+	return &Docker_ContainerExecCreate{Call: c}
+}
+
+// ContainerExecCreate provides a mock function with given fields: ctx, _a1, config
+func (_m *Docker) ContainerExecCreate(ctx context.Context, _a1 string, config types.ExecConfig) (types.IDResponse, error) {
+	ret := _m.Called(ctx, _a1, config)
+
+	var r0 types.IDResponse
+	if rf, ok := ret.Get(0).(func(context.Context, string, types.ExecConfig) types.IDResponse); ok {
+		r0 = rf(ctx, _a1, config)
+	} else {
+		r0 = ret.Get(0).(types.IDResponse)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, types.ExecConfig) error); ok {
+		r1 = rf(ctx, _a1, config)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type Docker_ContainerExecInspect struct {
+	*mock.Call
+}
+
+func (_m Docker_ContainerExecInspect) Return(_a0 types.ContainerExecInspect, _a1 error) *Docker_ContainerExecInspect {
+	return &Docker_ContainerExecInspect{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *Docker) OnContainerExecInspect(ctx context.Context, execID string) *Docker_ContainerExecInspect {
+	c := _m.On("ContainerExecInspect", ctx, execID)
+	return &Docker_ContainerExecInspect{Call: c}
+}
+
+func (_m *Docker) OnContainerExecInspectMatch(matchers ...interface{}) *Docker_ContainerExecInspect {
+	c := _m.On("ContainerExecInspect", matchers...)
+	return &Docker_ContainerExecInspect{Call: c}
+}
+
+// ContainerExecInspect provides a mock function with given fields: ctx, execID
+func (_m *Docker) ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error) {
+	ret := _m.Called(ctx, execID)
+
+	var r0 types.ContainerExecInspect
+	if rf, ok := ret.Get(0).(func(context.Context, string) types.ContainerExecInspect); ok {
+		r0 = rf(ctx, execID)
+	} else {
+		r0 = ret.Get(0).(types.ContainerExecInspect)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, execID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type Docker_ContainerList struct {
 	*mock.Call
 }

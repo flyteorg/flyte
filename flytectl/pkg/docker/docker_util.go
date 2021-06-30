@@ -40,6 +40,15 @@ var (
 			Target: K3sDir,
 		},
 	}
+	ExecConfig = types.ExecConfig{
+		AttachStderr: true,
+		Tty:          true,
+		WorkingDir:   FlyteSnackDir,
+		AttachStdout: true,
+		Cmd:          []string{},
+	}
+	StdWriterPrefixLen = 8
+	StartingBufLen     = 32*1024 + StdWriterPrefixLen + 1
 )
 
 // SetupFlyteDir will create .flyte dir if not exist
@@ -191,4 +200,26 @@ func GetDockerClient() (Docker, error) {
 		return cli, nil
 	}
 	return Client, nil
+}
+
+// ExecCommend will execute a command in container and returns an execution id
+func ExecCommend(ctx context.Context, cli Docker, containerID string, command []string) (types.IDResponse, error) {
+	ExecConfig.Cmd = command
+	r, err := cli.ContainerExecCreate(ctx, containerID, ExecConfig)
+	if err != nil {
+		return types.IDResponse{}, err
+	}
+	return r, err
+}
+
+func InspectExecResp(ctx context.Context, cli Docker, containerID string) error {
+	resp, err := cli.ContainerExecAttach(ctx, containerID, types.ExecStartCheck{})
+	if err != nil {
+		return err
+	}
+	s := bufio.NewScanner(resp.Reader)
+	for s.Scan() {
+		fmt.Println(s.Text())
+	}
+	return nil
 }
