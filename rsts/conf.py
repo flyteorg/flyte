@@ -228,6 +228,14 @@ intersphinx_mapping = {
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None)
 }
 
+# Sphinx-tabs config
+sphinx_tabs_valid_builders = ['linkcheck']
+
+# Sphinx-mermaid config
+mermaid_output_format = 'raw'
+mermaid_version = 'latest'
+mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
+
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
