@@ -207,16 +207,9 @@ Next create a relational database. This database will be used by both the primar
   * `Password <https://github.com/flyteorg/flyte/blob/3600badd2ad49ec2cd1f62752780f201212de3f3/helm/values-eks.yaml#L196>`_
 
 * Leave Public access off.
-* Choose the same VPC that your EKS cluster is in and also add the security group associated with your EKS cluster.
-  Provide inbound and outbound rule to allow too and fro traffic from the two. Refer to next section to verify the connectivity before installing flyte on the cluster
-
-  * On the security group where EKS cluster is deployed , allow inbound from RDS cluster besides the existing default
-
-    * All traffic   All All sg-c409c78d / default   – (eg : The rule would look similar to this where sg-c409c78d is default group where RDS is deployed)
-
-  * On the default security group where the RDS cluster is deployed (named as default), add inbound rule to allow traffic from EKS cluster.
-
-    * All traffic   All All sg-06948dc5a63c41453  eks-cluster-sg-<cluster-name>-<some-id> (You will get this name in search as soon as you type name of the cluster)
+* Choose the same VPC that your EKS cluster is in.
+* In a separate tab, navigate to the EKS cluster page and make note of the security group attached to your cluster.
+* Go back to the RDS page and in the security group section, add the EKS cluster's security group. This will ensure you don't have to play around with security group rules in order for pods running in the cluster to access the RDS instance.
 * Under the top level Additional configuration (there's a sub menu by the same name) under "Initial database name" enter ``flyteadmin`` as well.
 
 Leave all the other settings as is and hit Create.
