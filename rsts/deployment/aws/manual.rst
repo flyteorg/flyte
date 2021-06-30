@@ -77,7 +77,7 @@ Create an EKS cluster from AWS console.
 
 * Pick a good name for your cluster eg : <Name-EKS-Cluster>
 * Pick Kubernetes version >= 1.19
-* Choose the EKS cluster role <ClusterName-EKS-Cluster-Role> and not the node role, created in previous steps
+* Choose the EKS cluster role <ClusterName-EKS-Cluster-Role>, created in previous steps
 * Keep secrets encryption off
 * Use the same VPC where you intend to deploy your RDS instance. Keep the default VPC if none created and choose RDS to use the default aswell
 * Use the subnets for all the supported AZ's in that VPC
