@@ -8,9 +8,9 @@ Deployment
 Cluster Deployment
 ******************
 
-As the complexity of your user base grows, you may find yourself tweaking resource assignments based on specific
-projects, domains, and workflows. This section of the user guide walks through how and in what ways you can
-configure your Flyte deployment for production.
+The guides in this section are geared towards those who have found the limits of the small scale single-container
+version of Flyte, and are looking to deploy it as a platform on a cloud provider (or an equivalent on-premise Kubernetes
+solution). The following pages will help you effectively deploy and manage an enterprise-ready Flyte platform.
 
 .. panels::
     :header: text-center
@@ -20,7 +20,7 @@ configure your Flyte deployment for production.
        :text: Overview
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Overview things
+    A high-level look into the Flyte components that we'll need to move around.
 
     ---
 
@@ -38,7 +38,7 @@ configure your Flyte deployment for production.
        :text: AWS
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Stuff about AWS
+    Deployment guides with detailed instructions specific to AWS.
 
     ---
 
@@ -47,7 +47,7 @@ configure your Flyte deployment for production.
        :text: GCP
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Stuff about GCP
+    Deployment guides with detailed instructions specific to GCP. (Coming soon).
 
     ---
 
@@ -56,7 +56,7 @@ configure your Flyte deployment for production.
        :text: Cluster Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Once Flyte is deployed look here to configure.
+    Flyte comes with a lot of things you can configure. These pages will walk you through the various components.
 
 
 .. toctree::

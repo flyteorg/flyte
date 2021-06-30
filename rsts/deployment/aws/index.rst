@@ -12,7 +12,7 @@ AWS
        :text: Automated AWS/EKS Setup with Opta
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Auth things
+    This is a mostly automated setup guide that uses the Opta tool developed by RunX.
 
     ---
 
@@ -21,7 +21,8 @@ AWS
        :text: Manual AWS
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    More Auth things
+    This is a manual step-by-step guide for those who like to point and click in the AWS console and run CLIs
+    on the command line to really get down to the nitty gritty.
 
 .. toctree::
     :maxdepth: 1

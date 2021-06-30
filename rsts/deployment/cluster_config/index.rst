@@ -13,7 +13,7 @@ Cluster Config
        :text: Auth
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Auth things
+    Basic OIDC and Authentication Setup
 
     ---
 
@@ -22,7 +22,8 @@ Cluster Config
        :text: Auth More
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    More Auth things
+    Flyte previously shipped with only a barebones OIDC setup, and relied on an external authorization server. This
+    migration guide helps you move to Admin's own authorization server.
 
     ---
 
@@ -31,7 +32,7 @@ Cluster Config
        :text: General Flyte Configuration
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Other things
+    General configuration options are covered here.
 
     ---
 
@@ -40,7 +41,7 @@ Cluster Config
        :text: Notifications
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Other things
+    Guide to setting up and configuring notifications.
 
     ---
 
@@ -49,7 +50,7 @@ Cluster Config
        :text: Monitoring
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Other things
+    Guide to setting up and configuring observability.
 
     ---
 
@@ -58,7 +59,7 @@ Cluster Config
        :text: Performance
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Other things
+    Tweaks to improve performance of the core Flyte engine
 
 
 .. toctree::
