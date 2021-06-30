@@ -148,7 +148,11 @@ Build & Deploy Your Application
 
     flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1
 
-  
+#. Visualize the registered workflow. ::
+
+    flytectl get workflows -p flytesnacks -d development myapp.workflows.example.my_wf -o doturl
+
+
 .. _getting-started-execute:
 
 Execute on Flyte
@@ -162,14 +166,29 @@ Finally, use FlyteConsole to launch an execution and keep tabs on the window!
 **Alternatively,** 
 
 Launch and monitor from CLI using flytectl. This is how you will have to proceed.
+More details can be found `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl_create_execution.html>`__
 
-Launch an execution using Flytectl. ::
+#. Generate execution spec file. ::
 
-        TODO
+    flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf  --execFile exec_spec.yaml
 
-Retrieve execution status using Flytectl. ::
+#. Update the input spec file for arguments to the workflow. ::
 
-        TODO
+            ....
+            inputs:
+              name: "adam"
+            ....
+
+#. Create execution using the exec spec file. ::
+
+    flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+
+
+#. Monitor the execution by providing the execution id from create command. ::
+
+    flytectl get execution -p flytesnacks -d development <execid>
+
+
 
 For the Explorers
 *****************
