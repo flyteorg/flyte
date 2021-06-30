@@ -174,7 +174,6 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
 #. Update the input spec file for arguments to the workflow. ::
 
-    .. code-block:: text
             ....
             inputs:
               name: "adam"
