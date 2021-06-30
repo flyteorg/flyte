@@ -85,7 +85,7 @@ Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <http
 
             curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
-   **Test** if Flytectl is installed correctly (your Flytectl installation should have version > 0.1.28) using the following command:
+   **Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
 
    .. prompt:: bash $
 
