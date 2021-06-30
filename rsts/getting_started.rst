@@ -5,26 +5,23 @@ Getting Started
 
 .. raw:: html
   
-    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to get acquainted with the Flyte environment</p>
-
-First Things First
-******************
-
-Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <https://git-scm.com/>`__, and `Python <https://www.python.org/downloads/>`__ >= 3.7 installed.
+    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
 
 .. caution::
 
-    We have not yet tested this flow on a Windows machine.
+    We recommend using OSX or a Linux machine, as we have not tested this on Windows. If you happen to test it, please let us know.
 
-The Standard Process
-********************
-This guide will quickly take you through the mechanics of building, deploying, and iterating on Flyte tasks and workflows. This workflow scales from simple to very complicated of projects.
+0. Prerequisites
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Set Up the Flyte Environment
+Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <https://git-scm.com/>`__, and `Python <https://www.python.org/downloads/>`__ >= 3.7 installed.
+
+
+1. Set Up the Flyte Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #. Install Flyte's Python SDK —— `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended in a virtual environment) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo.
 
-   .. prompt::
+   .. prompt:: bash (venv)$
 
      pip install flytekit
      git clone https://github.com/flyteorg/flytekit-python-template.git myflyteapp
@@ -56,13 +53,13 @@ Set Up the Flyte Environment
 
    The workflow can be run locally, simply by running it as a Python script —— note the ``__main__`` entry point at the `bottom of the file <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py#L58>`__.
 
-   .. prompt::
+   .. prompt:: bash (venv)$
 
        python myapp/workflows/example.py
 
    .. dropdown:: Expected output
 
-      .. prompt::
+      .. prompt:: text
 
          Running my_wf() hello world
 
@@ -72,23 +69,25 @@ Set Up the Flyte Environment
 
       .. tab:: OSX
 
-        .. prompt::
+        .. prompt:: bash $
 
            brew install flyteorg/homebrew-tap/flytectl
 
         *Upgrade* existing installation using the following command:
 
-        .. prompt::
+        .. prompt:: bash $
 
            brew upgrade flytectl
 
       .. tab:: Other Operating systems
 
-        .. prompt::
+        .. prompt:: bash $
 
             curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
-   **Test** if Flytectl is installed correctly (your Flytectl installation should have version > 0.1.28) using the following command: ::
+   **Test** if Flytectl is installed correctly (your Flytectl installation should have version > 0.1.28) using the following command:
+
+   .. prompt:: bash $
 
       flytectl version
 
@@ -101,20 +100,20 @@ Set Up the Flyte Environment
 
         .. tip:: Want to dive under the hood into flyte-sandbox, refer to the guide `here<>`_.
 
-        .. prompt::
+        .. prompt:: bash $
 
            flytectl sandbox start --sourcesPath <full-path-to-myflyteapp>
 
       .. tab:: Connect to an existing Flyte cluster
 
-        .. prompt::
+        .. prompt:: bash $
 
             flytectl init
 
 
 .. _getting-started-build-deploy:
 
-Build & Deploy Your Application
+2. Build & Deploy Your Application
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #. Flyte uses Docker containers to package your workflows and tasks and sends them to the remote Flyte cluster. Thus, there is a ``Dockerfile`` already included in the cloned repo. You can build the docker container and push the built image to a registry. Read further to know how to do so.
 
@@ -124,7 +123,7 @@ Build & Deploy Your Application
 
            Since ``flyte-sandbox`` runs locally in a docker container, you do not need to push the docker image. You can combine the build and push step by simply building the image inside the Flyte-sandbox container. This can be done using the following command:
 
-           .. prompt::
+           .. prompt:: bash $
 
                flytectl sandbox exec -- docker build . --tag "myapp:v1"
 
@@ -136,28 +135,34 @@ Build & Deploy Your Application
 
            If you are using a remote Flyte cluster, then you need to build your container and push it to a registry that is accessible by the Flyte Kubernetes cluster.
 
-           .. prompt::
+           .. prompt:: bash $
 
                docker build . --tag registry/repo:version
                docker push registry/repo:version
 
-#. Now that the container is built let's provide this information to the Flyte backend, for which you have to package the workflow using the ``pyflyte`` cli bundled with Flytekit. Also, note that the image is the same as the one built in the previous step. ::
+#. Now that the container is built let's provide this information to the Flyte backend, for which you have to package the workflow using the ``pyflyte`` cli bundled with Flytekit. Also, note that the image is the same as the one built in the previous step.
 
-    pyflyte --pkgs myapp.workflows package --image myapp:v1
+   .. prompt:: bash (venv)$
 
-#. Let's now upload this package to the Flyte backend. We refer to this as ``registration``. ::
+      pyflyte --pkgs myapp.workflows package --image myapp:v1
 
-    flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1
+#. Let's now upload this package to the Flyte backend. We refer to this as ``registration``.
 
-#. Visualize the registered workflow. ::
+   .. prompt:: bash $
 
-    flytectl get workflows -p flytesnacks -d development myapp.workflows.example.my_wf -o doturl
+      flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1
+
+#. Visualize the registered workflow.
+
+   .. prompt:: bash $
+
+      flytectl get workflows -p flytesnacks -d development myapp.workflows.example.my_wf -o doturl
 
 
 .. _getting-started-execute:
 
-Execute on Flyte
-^^^^^^^^^^^^^^^^
+3. Execute on Flyte
+^^^^^^^^^^^^^^^^^^^^
 
 Finally, use FlyteConsole to launch an execution and keep tabs on the window! 
 
@@ -169,9 +174,11 @@ Finally, use FlyteConsole to launch an execution and keep tabs on the window!
 Launch and monitor from CLI using flytectl. This is how you will have to proceed.
 More details can be found `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl_create_execution.html>`__
 
-#. Generate execution spec file. ::
+#. Generate execution spec file.
 
-    flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf  --execFile exec_spec.yaml
+   .. prompt:: bash $
+
+      flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf  --execFile exec_spec.yaml
 
 #. Update the input spec file for arguments to the workflow. ::
 
@@ -180,24 +187,23 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
               name: "adam"
             ....
 
-#. Create execution using the exec spec file. ::
+#. Create execution using the exec spec file.
 
-    flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+   .. prompt:: bash $
 
-
-#. Monitor the execution by providing the execution id from create command. ::
-
-    flytectl get execution -p flytesnacks -d development <execid>
+      flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
 
 
+#. Monitor the execution by providing the execution id from create command.
 
-For the Explorers
-*****************
+   .. prompt:: bash $
 
-If you're interested in poking around the various ways to make running code on Flyte comfortable, look further.
+      flytectl get execution -p flytesnacks -d development <execid>
 
-Modify and Test Locally
-^^^^^^^^^^^^^^^^^^^^^^^
+
+
+4. Modify and Test Locally
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #. Open ``example.py`` in your favorite editor.
 
    .. code-block::
@@ -232,22 +238,22 @@ Modify and Test Locally
 
 #. When you run this file locally, it should output ``hello world, adam``.
 
-   .. prompt::
+   .. prompt:: bash (venv)$
 
      python myapp/workflows/example.py
 
 
    .. dropdown:: Expected output
 
-       .. prompt::
+       .. prompt:: text
 
             Running my_wf(name='adam') hello world, adam
 
-Build & Deploy Your Application "Fast"er!
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#. To deploy this workflow to the Flyte cluster (sandbox), you can repeat the steps previously covered in :ref:`getting-started-build-deploy`. Flyte provides a faster way to iterate on your workflows. Since you have not updated any of the dependencies in your requirements file, it is possible to push just the code to Flyte backend without re-building the entire docker container. To do so, run the following commands.
+5. [Bonus] Build & Deploy Your Application "Fast"er!
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#. To deploy this workflow to the Flyte cluster (sandbox), you can repeat the steps previously covered in :ref:`getting-started-build-deploy`. Flyte provides a **faster** way to iterate on your workflows. Since you have not updated any of the dependencies in your requirements file, it is possible to push just the code to Flyte backend without re-building the entire docker container. To do so, run the following commands.
 
-   .. prompt::
+   .. prompt:: bash (venv)$
 
        pyflyte --pkgs myapp.workflows package --image myapp:v1 --fast --force
 
@@ -259,10 +265,10 @@ Build & Deploy Your Application "Fast"er!
 
       The ``fast`` registration method can only be used if you do not modify any requirements (that is, you re-use an existing environment). But, if you add a dependency to your requirements file or env you have to follow the :ref:`getting-started-build-deploy` method.
 
-#. The code can now be deployed using Flytectl, similar to what we've done previously. ``Flytectl`` automatically understands that the package is for ``fast`` registration.
+#. The code can now be deployed using Flytectl, similar to what we've done previously. ``flytectl`` automatically understands that the package is for ``fast`` registration.
    For this to work, a new ``storage`` block has to be added to the Flytectl configuration with appropriate permissions at runtime. The storage block configures Flytectl to write to a specific ``S3 / GCS bucket``. If you're using the sandbox, this is automatically configured by Flytectl, so you can skip this for now. But do take a note for the future.
 
-   .. prompt::
+   .. prompt:: bash $
 
        flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1
 
@@ -328,7 +334,7 @@ Build & Deploy Your Application "Fast"er!
 #. Finally, visit `the sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/myapp.workflows.example.my_wf>`__, click launch, and give your name as the input. Let the magic happen!
 
 
-.. admonition:: TADA!
+.. admonition::
 
   You have successfully:
 
@@ -340,6 +346,6 @@ Build & Deploy Your Application "Fast"er!
   .. rubric:: 🎉 Congratulations! you just ran your first Flyte workflow! 🎉
 
 Next Steps: User Guide
-**********************
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 To experience the full capabilities of Flyte, take a look at the `User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>`__.
