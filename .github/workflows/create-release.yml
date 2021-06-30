@@ -44,6 +44,7 @@ jobs:
       - name: Preprare Flyte Release
         env:
           FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+          VERSION: ${{ github.event.inputs.version }}
         run: |
           make prepare_artifacts
 
