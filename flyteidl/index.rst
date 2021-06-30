@@ -28,6 +28,5 @@ This specification is used to generate client stubs for `FlyteKit <https://flyte
    :caption: FlyteIDL
    :hidden:
 
-   Overview <self>
+   README
    protos/index
-   developing
