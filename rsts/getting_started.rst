@@ -18,6 +18,7 @@ Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <http
 
 The Standard Process
 ********************
+This guide will quickly take you through the mechanics of building, deploying, and iterating on Flyte tasks and workflows. This workflow scales from simple to very complicated of projects.
 
 Set Up the Flyte Environment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
