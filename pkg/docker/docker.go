@@ -21,6 +21,9 @@ type Docker interface {
 	ContainerLogs(ctx context.Context, container string, options types.ContainerLogsOptions) (io.ReadCloser, error)
 	ContainerRemove(ctx context.Context, containerID string, options types.ContainerRemoveOptions) error
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
+	ContainerExecCreate(ctx context.Context, container string, config types.ExecConfig) (types.IDResponse, error)
+	ContainerExecAttach(ctx context.Context, execID string, config types.ExecStartCheck) (types.HijackedResponse, error)
+	ContainerExecInspect(ctx context.Context, execID string) (types.ContainerExecInspect, error)
 }
 
 type FlyteDocker struct {
