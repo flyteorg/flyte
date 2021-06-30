@@ -144,11 +144,12 @@ Follow this [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide
 
 * Next we need to add a trust relationship between this OIDC provider and the two Flyte roles.
    * Navigate to the newly created `OIDC Providers <https://console.aws.amazon.com/iamv2/home?#/identity_providers>`__ with <UUID-OIDC> and copy the ARN.
-   * Navigate to `IAM Roles <https://console.aws.amazon.com/iam/home#/roles>`__ and select your cluster role.
+   * Navigate to `IAM Roles <https://console.aws.amazon.com/iam/home#/roles>`__ and select the ``iam-role-flyte`` role.
    * Under the Trust relationships tab, hit the Edit button.
    * Replace the ``Principal:Federated`` value in the policy JSON below with the copied ARN.
    * Replace the ``<UUID-OIDC>`` placeholder in the ``Condition:StringEquals`` with the last part of the copied ARN. It'll look something like ``8DCF90D22E386AA3975FC4DCD2ECD23BC`` and should match the tail end of the issuer ID from the first step.
      Ensure you don't accidentally remove the ``:aud`` suffix. You need that.
+   * Repeat these steps for the ``flyte-user-role``.
 
 .. code-block::
 
@@ -409,10 +410,12 @@ Create a Log Group
 Navigate to the `AWS Cloudwatch <https://us-east-2.console.aws.amazon.com/cloudwatch/home>`__ page and create a Log Group.
 Give it a reasonable name like ``flyteplatform``.
 
-Installing Flyte
-================
+Time for Helm
+=============
 
-#. Clone flyte repo
+Installing Flyte
+-----------------
+#. Clone the Flyte repo
 
 .. code-block:: bash
 
@@ -451,7 +454,7 @@ Search and replace the following
      - ARN of the self-signed (or official) certificate
      - ``arn:aws:acm:us-east-2:173113148371:certificate/763d12d5-490d-4e1e-a4cc-4b28d143c2b4``
 
-#. Update the helm deps
+#. Update helm dependencies
 
 .. code-block:: bash
 
@@ -472,15 +475,15 @@ Search and replace the following
 
    kubectl get pods -n flyte
 
-Uninstalling flyte
-==================
+Uninstalling Flyte
+------------------
 
 .. code-block:: bash
 
    helm uninstall -n flyte flyte
 
-Upgrading flyte
-===============
+Upgrading Flyte
+---------------
 
 .. code-block:: bash
 

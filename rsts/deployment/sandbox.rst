@@ -23,8 +23,8 @@ Flyte Sandbox as a single Docker container
 try out the platform and get a feel for the user experience, without having to understand Kubernetes or dabble with configuration etc. The Flyte single container sandbox is also used by the team to run continuous integration tests and used by the `flytesnacks - UserGuide playground environment`. The sandbox can be run
 in most any environment that supports Docker containers and an Ubuntu docker base image.
 
-Architecture & Reasons why we built it?
-========================================
+Architecture and reasons why we built it?
+=========================================
 Within the single container environment, a mini Kubernetes cluster is installed using the excellent `k3s <https://k3s.io/>`__ platform. K3s uses an in-container Docker daemon (run using `docker-in-docker configuration <https://www.docker.com/blog/docker-can-now-run-within-docker/>`__) to orchestrate user containers.
 
 When users call ``flytectl sandbox start --source <dir>``, the source ``<dir>`` is mounted within the sandbox container and hence it is possible to build images for that source code, using the inner Docker daemon. In a typical Flyte installation, one needs to build Docker containers for tasks and push them to a repository from which K8s can pull.
