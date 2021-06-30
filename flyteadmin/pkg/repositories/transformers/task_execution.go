@@ -139,26 +139,40 @@ func CreateTaskExecutionModel(input CreateTaskExecutionModelInput) (*models.Task
 	return taskExecution, nil
 }
 
-// Returns the unique list of logs across an existing list and the latest list sent in a task execution event update.
+// mergeLogs returns the unique list of logs across an existing list and the latest list sent in a task execution event
+// update.
+// It returns all the new logs receives + any existing log that hasn't been overwritten by a new log.
+// An existing logLink is said to have been overwritten if a new logLink with the same Uri or the same Name has been
+// received.
 func mergeLogs(existing, latest []*core.TaskLog) []*core.TaskLog {
 	if len(latest) == 0 {
 		return existing
 	}
+
 	if len(existing) == 0 {
 		return latest
 	}
-	latestSet := make(map[string]*core.TaskLog, len(latest))
+
+	latestSetByURI := make(map[string]*core.TaskLog, len(latest))
+	latestSetByName := make(map[string]*core.TaskLog, len(latest))
 	for _, latestLog := range latest {
-		latestSet[latestLog.Uri] = latestLog
+		latestSetByURI[latestLog.Uri] = latestLog
+		if len(latestLog.Name) > 0 {
+			latestSetByName[latestLog.Name] = latestLog
+		}
 	}
+
 	// Copy over the latest logs since names will change for existing logs as a task transitions across phases.
 	logs := latest
 	for _, existingLog := range existing {
-		if _, ok := latestSet[existingLog.Uri]; !ok {
-			// We haven't seen this log before: add it to the output result list.
-			logs = append(logs, existingLog)
+		if _, ok := latestSetByURI[existingLog.Uri]; !ok {
+			if _, ok = latestSetByName[existingLog.Name]; !ok {
+				// We haven't seen this log before: add it to the output result list.
+				logs = append(logs, existingLog)
+			}
 		}
 	}
+
 	return logs
 }
 
