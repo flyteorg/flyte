@@ -5,7 +5,7 @@ Getting Started
 
 .. raw:: html
   
-    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">Let's walk through the preliminary steps to get your Flyte environment up and running quickly!</p>
+    <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to get acquainted with the Flyte environment</p>
 
 First Things First
 ******************
