@@ -1,16 +1,17 @@
 .. _deployment-cluster-config-auth-setup:
 
+########################
 Authentication in Flyte
------------------------
+########################
 
 Flyte ships with a canonical implementation of OpenIDConnect client and OAuth2 Server, integrating seamlessly into an
 organization's existing identity provider.
 
 .. _auth-overview:
 
-########
+********
 Overview
-########
+********
 
 The Flyte system consists of multiple components. Securing communication between each components is crucial to ensure
 the security of the overall system.
@@ -37,24 +38,22 @@ your IdP.
 
 .. _auth-setup:
 
-####################
+********************
 Authentication Setup
-####################
+********************
 
-*****************
 IdP Configuration
-*****************
+=================
 Flyte Admin requires that the application in your identity provider be configured as a web client (i.e. with a client secret). We recommend allowing the application to be issued a refresh token to avoid interrupting the user's flow by frequently redirecting to the IdP.
 
-****************************
 Example Flyte Configurations
-****************************
+============================
 
 Below are some canonical examples of how to set up some of the common IdPs to secure your Fyte services. OpenID Connect enables users to authenticate, in the
 browser, with an existing IdP. Flyte also allows connecting to an external OAuth2 Authorization Server to allow centrally managed third party app access.
 
 OpenID Connect
-===============
+--------------
 
 OpenID Connect allows users to authenticate to Flyte in their browser using a familiar authentication provider (perhaps an organization-wide configured IdP).
 Flyte supports connecting with external OIdC providers. Here are some examples for how to set these up:
@@ -145,7 +144,7 @@ Apply Configuration
       kubectl rollout restart deployment/flyteadmin -n flyte
 
 OAuth2 Authorization Server
-===========================
+---------------------------
 
 An OAuth2 Authorization Server allows external clients to request to authenticate and act on behalf of users (or as their own identities). Having
 an OAuth2 Authorization Server enables Flyte administrators control over which apps can be installed and what scopes they are allowed to request or be granted (i.e. what privileges can they assume).
@@ -249,7 +248,7 @@ Apply Configuration
       kubectl rollout restart deployment/flytepropeller -n flyte
 
 Continuous Integration - CI
-===========================
+---------------------------
 
 If your organization does any automated registration, then you'll need to authenticate with the `client credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_ flow. After retrieving an access token from the IDP, you can send it along to Flyte Admin as usual.
 
@@ -327,9 +326,9 @@ If your organization does any automated registration, then you'll need to authen
 
 .. _auth-references:
 
-##########
+**********
 References
-##########
+**********
 
 This collection of RFCs may be helpful to those who wish to investigate the implementation in more depth.
 
@@ -337,3 +336,5 @@ This collection of RFCs may be helpful to those who wish to investigate the impl
 * `OAuth Discovery RFC 8414 <https://tools.ietf.org/html/rfc8414>`_
 * `PKCE RFC 7636 <https://tools.ietf.org/html/rfc7636>`_
 * `JWT RFC 7519 <https://tools.ietf.org/html/rfc7519>`_
+
+There's also a lot more detailed information into the authentication flows in the :ref:`deployment-cluster-config-auth-appendix`.
