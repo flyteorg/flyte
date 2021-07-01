@@ -98,7 +98,8 @@ Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <http
 
         .. prompt:: bash $
 
-           flytectl sandbox start --sourcesPath <full-path-to-myflyteapp>
+           flytectl sandbox start --source .
+           # here '.' represents current directory and assuming you have cc'ed into myflyteapp - the git-cloned directory you created
 
       .. tab:: Connect to an existing Flyte cluster
 
@@ -146,13 +147,13 @@ Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <http
 
    .. prompt:: bash $
 
-      flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1
+      flytectl register files -p flytesnacks -d development --archive flyte-package.tgz  --version v1
 
 #. Finally, visualize the registered workflow.
 
    .. prompt:: bash $
 
-      flytectl get workflows -p flytesnacks -d development myapp.workflows.example.my_wf -o doturl
+      flytectl get workflows -p flytesnacks -d development myapp.workflows.example.my_wf --version v1 -o doturl
 
 
 .. _getting-started-execute:
