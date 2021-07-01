@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"strings"
@@ -185,7 +186,7 @@ func InitializeAuthMetadataClient(ctx context.Context, cfg *Config) (client serv
 	return service.NewAuthMetadataServiceClient(authMetadataConnection), nil
 }
 
-func NewAdminConnection(_ context.Context, cfg *Config, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
+func NewAdminConnection(ctx context.Context, cfg *Config, opts ...grpc.DialOption) (*grpc.ClientConn, error) {
 	if opts == nil {
 		// Initialize opts list to the potential number of options we will add. Initialization optimizes memory
 		// allocation.
@@ -196,7 +197,17 @@ func NewAdminConnection(_ context.Context, cfg *Config, opts ...grpc.DialOption)
 		opts = append(opts, grpc.WithInsecure())
 	} else {
 		// TODO: as of Go 1.11.4, this is not supported on Windows. https://github.com/golang/go/issues/16736
-		creds := credentials.NewClientTLSFromCert(nil, "")
+		var creds credentials.TransportCredentials
+		if cfg.InsecureSkipVerify {
+			logger.Warnf(ctx, "using insecureSkipVerify. Server's certificate chain and host name wont be verified. Caution : shouldn't be used for production usecases")
+			tlsConfig := &tls.Config{
+				InsecureSkipVerify: true, //nolint
+
+			}
+			creds = credentials.NewTLS(tlsConfig)
+		} else {
+			creds = credentials.NewClientTLSFromCert(nil, "")
+		}
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 

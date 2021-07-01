@@ -75,7 +75,7 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 	})
 
 	t.Run("legal-from-config", func(t *testing.T) {
-		clientSet, err := initializeClients(ctx, &Config{}, nil)
+		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
