@@ -13,47 +13,33 @@ production ready deployment might look like.
 Usage of Helm
 *******************
 
+Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart and templates are located under ``helm``. There is a base ``values.yaml`` file but there are several files that fine tune those settings.
 
-*************************
+* ``values-eks.yaml`` should be additionally applied for AWS EKS deployments.
+* ``values-gcp.yaml`` should be additionally applied for GCP GKE deployments.
+* ``values-sandbox.yaml`` should be additionally applied for our sandbox install. See the :ref:`deployment-sandbox` page for more information.
+
+Specific instructions for Helm are covered in both the :ref:`Opta <deployment-aws-opta>` and :ref:`manual <deployment-aws-manual>` AWS setup guides.
+
+.. TODO::
+   Additional instructions on the Helm after cleaning it up, how it's laid out, easy guide to know which values to
+   change for each component - plugins, sns/sqs, auth, etc.
+
+*********************
 Relational Database
-*************************
+*********************
 
-The ``FlyteAdmin`` and ``DataCatalog`` components rely on PostgreSQL to store persistent records.
-
-In this section, we'll modify the Flyte deploy to use a remote PostgreSQL database instead.
-
-First, you'll need to set up a reliable PostgreSQL database. The easiest way achieve this is to use a cloud provider like AWS `RDS <https://aws.amazon.com/rds/postgresql/>`__, GCP `Cloud SQL <https://cloud.google.com/sql/docs/postgres/>`__, or Azure `PostgreSQL <https://azure.microsoft.com/en-us/services/postgresql/>`__ to manage the PostgreSQL database for you. Create one and make note of the username, password, endpoint, and port.
-
-Next, remove old sandbox database by opening up the ``flyte/kustomization.yaml`` file and deleting database component. ::
-
-  - github.com/flyteorg/flyte/kustomize/dependencies/database
-
-With this line removed, you can re-run ``kustomize build flyte > flyte_generated.yaml`` and see that the the postgres deployment has been removed from the ``flyte_generated.yaml`` file.
-
+The ``FlyteAdmin`` and ``DataCatalog`` components rely on PostgreSQL to store persistent records. In the sandbox deployment, a containerized version of Postgres is included but for a proper Flyte installation, we recommend one of the cloud provided databases.  For AWS, we recommend their `RDS <https://aws.amazon.com/rds/postgresql/>`__ service, for GCP, `Cloud SQL <https://cloud.google.com/sql/docs/postgres/>`__, and Azure, `PostgreSQL <https://azure.microsoft.com/en-us/services/postgresql/>`__.
 
 *****************************
 Production Grade Object Store
 *****************************
 
-``FlyteAdmin``, ``FlytePropeller``, and ``DataCatalog`` components rely on an Object Store to hold files.
-
-In this section, we'll modify the Flyte deploy to use `AWS S3 <https://aws.amazon.com/s3/>`__ for object storage.
-The process for other cloud providers like `GCP GCS <https://cloud.google.com/storage/>`__ should be similar.
-
-To start, `create an s3 bucket <https://docs.aws.amazon.com/AmazonS3/latest/gsg/CreatingABucket.html>`__.
-
-Next, remove the old sandbox object store by opening up the ``flyte/kustomization.yaml`` file and deleting the storage line. ::
-
-  - github.com/flyteorg/flyte/kustomize/dependencies/storage
-
-With this line gone, you can re-run ``kustomize build flyte > flyte_generated.yaml`` and see that the sandbox object store has been removed from the ``flyte_generated.yaml`` file.
-
-Next, open the configs ``admindeployment/flyteadmin_config.yaml``, ``propeller/config.yaml``, ``datacatalog/datacatalog_config.yaml`` and look for the ``storage`` configuration.
+``FlyteAdmin``, ``FlytePropeller``, and ``DataCatalog`` rely on an Object Store to hold files. The sandbox deployment comes with a containerized Minio, which offers AWS S3 compatibility. We recommend swapping this out for `AWS S3 <https://aws.amazon.com/s3/>`__ or `GCP GCS <https://cloud.google.com/storage/>`__.
 
 *******************************
 Dynamically Configured Projects
 *******************************
-
 As your Flyte user-base evolves, adding new projects is as simple as registering them through the cli ::
 
   flyte-cli register-project -h {{ your-flyte-admin-host.com }} -p myflyteproject --name "My Flyte Project" \
@@ -67,12 +53,13 @@ This project should immediately show up in the Flyte console after refreshing.
 *******************************
 Cloud Based Pub/Sub Integration
 *******************************
+Flyte relies on cloud-provided pub/sub and schedulers to provide automated periodic execution of your launch plans. In AWS,
+
+* `CloudWatch Events <https://docs.aws.amazon.com/cloudwatch/index.html>`_ are used for the triggering mechanism to accurately serve periodic executions.
+* `SNS <https://aws.amazon.com/sns>`_ and `SQS <https://aws.amazon.com/sqs/>`_ are used for handling notifications.
 
 
 **************
 Authentication
 **************
-
-
-
-
+Flyte ships with its own authorization server, as well as the ability to use an external authorization server if your external IDP supports it.  See the :ref:`authorization <deployment-cluster-config-auth-setup>` page for detailed configuration.
