@@ -10,19 +10,32 @@ Install
 Flytectl is a Golang binary and can be installed on any platform supported by
 golang
 
-Install flytectl with homebrew tap
 
-.. prompt:: bash
+.. tabs::
 
-   brew install flyteorg/homebrew-tap/flytectl
-   # Upgrade flytectl
-   brew upgrade flytectl
+  .. tab:: OSX
 
-Install flytectl with shell script
+    .. prompt:: bash $
 
-.. prompt:: bash
+       brew install flyteorg/homebrew-tap/flytectl
 
-   curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+    *Upgrade* existing installation using the following command:
+
+    .. prompt:: bash $
+
+       brew upgrade flytectl
+
+  .. tab:: Other Operating systems
+
+    .. prompt:: bash $
+
+        curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+
+**Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
+
+.. prompt:: bash $
+
+  flytectl version
 
 Configure
 =========
@@ -32,25 +45,73 @@ on command-line. The following configuration is useful to setup.
 Basic Configuration
 --------------------
 
-.. code-block:: yaml
+.. tabs:: Flytectl configuration
 
-  admin:
-    # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-    endpoint: dns:///flyte.lyft.net
-    authType: Pkce
-  logger:
-    # Logger settings to control logger output. Useful to debug logger:
-    show-source: true
-    level: 1
+   .. tab:: Local Flyte Sandbox
+
+       Automatically configured for you by ``flytectl sandbox`` command.
+
+       .. code-block:: yaml
+
+           admin:
+             # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+             endpoint: dns:///localhost:30081
+             insecure: true
+             authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+           storage:
+             connection:
+               access-key: minio
+               auth-type: accesskey
+               disable-ssl: true
+               endpoint: http://localhost:30084
+               region: my-region-here
+               secret-key: miniostorage
+             container: my-s3-bucket
+             type: minio
+
+   .. tab:: AWS Configuration
+
+       .. code-block:: yaml
+
+           admin:
+             # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+             endpoint: dns:///<replace-me>
+             authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+           storage:
+             kind: s3
+             config:
+               auth_type: iam
+               region: <replace> # Example: us-east-2
+             container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
+
+   .. tab:: GCS Configuration
+
+       .. code-block:: yaml
+
+           admin:
+             # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+             endpoint: dns:///<replace-me>
+             authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+           storage:
+             kind: google
+             config:
+               json: ""
+               project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
+               scopes: https://www.googleapis.com/auth/devstorage.read_write
+             container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
+
+   .. tab:: Others
+
+           For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
 
 
-Place this in $HOME/.flyte directory with name config.yaml.
-This file is searched in
+    Place this in $HOME/.flyte directory with name config.yaml.
+    This file is searched in
 
-- $HOME/.flyte
-- currDir from where you run flytectl
-- /etc/flyte/config
-- You can pass it commandline using --config <config-file-path>
+    * $HOME/.flyte
+    * currDir from where you run flytectl
+    * /etc/flyte/config
+        You can pass it commandline using --config <config-file-path> aswell
 
 
 .. toctree::

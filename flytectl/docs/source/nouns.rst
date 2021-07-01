@@ -28,12 +28,16 @@ Flytectl noun specify the resource on which the action needs to be performed eg:
     gen/flytectl_update_execution-queue-attribute
     gen/flytectl_update_plugin-override
     gen/flytectl_register_files
+    gen/flytectl_register_examples
     gen/flytectl_delete_execution
     gen/flytectl_delete_task-resource-attribute
     gen/flytectl_delete_cluster-resource-attribute
     gen/flytectl_delete_execution-cluster-label
     gen/flytectl_delete_execution-queue-attribute
     gen/flytectl_delete_plugin-override
-    gen/flytectl_version
     gen/flytectl_config_validate
     gen/flytectl_config_discover
+    gen/flytectl_sandbox_start
+    gen/flytectl_sandbox_status
+    gen/flytectl_sandbox_teardown
+    gen/flytectl_sandbox_exec
