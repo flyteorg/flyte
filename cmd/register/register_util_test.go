@@ -9,6 +9,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	rconfig "github.com/flyteorg/flytectl/cmd/config/subcommand/register"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	u "github.com/flyteorg/flytectl/cmd/testutils"
@@ -50,24 +57,12 @@ func registerFilesSetup() {
 	rconfig.DefaultFilesConfig.OutputLocationPrefix = ""
 }
 
-func TestGetSortedFileList(t *testing.T) {
-	setup()
-	registerFilesSetup()
-	rconfig.DefaultFilesConfig.Archive = false
-	args = []string{"file2", "file1"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
-	assert.Equal(t, "file1", fileList[0])
-	assert.Equal(t, "file2", fileList[1])
-	assert.Equal(t, tmpDir, "")
-	assert.Nil(t, err)
-}
-
 func TestGetSortedArchivedFileWithParentFolderList(t *testing.T) {
 	setup()
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/valid-parent-folder-register.tar"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "parentfolder", "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "parentfolder", "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -84,7 +79,7 @@ func TestGetSortedArchivedFileList(t *testing.T) {
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/valid-register.tar"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -101,7 +96,7 @@ func TestGetSortedArchivedFileUnorderedList(t *testing.T) {
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/valid-unordered-register.tar"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -118,7 +113,7 @@ func TestGetSortedArchivedCorruptedFileList(t *testing.T) {
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/invalid.tar"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 0)
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -131,7 +126,7 @@ func TestGetSortedArchivedTgzList(t *testing.T) {
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/valid-register.tgz"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -147,7 +142,7 @@ func TestGetSortedArchivedCorruptedTgzFileList(t *testing.T) {
 	setup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/invalid.tgz"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -160,7 +155,7 @@ func TestGetSortedArchivedInvalidArchiveFileList(t *testing.T) {
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"testdata/invalid-extension-register.zip"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -173,7 +168,7 @@ func TestGetSortedArchivedFileThroughInvalidHttpList(t *testing.T) {
 	setup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"http://invalidhost:invalidport/testdata/valid-register.tar"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, 0, len(fileList))
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -186,7 +181,7 @@ func TestGetSortedArchivedFileThroughValidHttpList(t *testing.T) {
 	registerFilesSetup()
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"http://dummyhost:80/testdata/valid-register.tar"}
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 4)
 	assert.Equal(t, filepath.Join(tmpDir, "014_recipes.core.basic.basic_workflow.t1_1.pb"), fileList[0])
 	assert.Equal(t, filepath.Join(tmpDir, "015_recipes.core.basic.basic_workflow.t2_1.pb"), fileList[1])
@@ -204,7 +199,7 @@ func TestGetSortedArchivedFileThroughValidHttpWithNullContextList(t *testing.T) 
 	rconfig.DefaultFilesConfig.Archive = true
 	args = []string{"http://dummyhost:80/testdata/valid-register.tar"}
 	ctx = nil
-	fileList, tmpDir, err := getSortedFileList(ctx, args)
+	fileList, tmpDir, err := getSerializeOutputFiles(ctx, args)
 	assert.Equal(t, len(fileList), 0)
 	assert.True(t, strings.HasPrefix(tmpDir, "/tmp/register"))
 	assert.NotNil(t, err)
@@ -220,7 +215,7 @@ func TestRegisterFile(t *testing.T) {
 		mockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
 		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx)
 		assert.Equal(t, 1, len(results))
 		assert.Nil(t, err)
 	})
@@ -229,7 +224,7 @@ func TestRegisterFile(t *testing.T) {
 		registerFilesSetup()
 		args = []string{"testdata/non-existent.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
 		assert.Equal(t, "Error reading file due to open testdata/non-existent.pb: no such file or directory", results[0].Info)
@@ -240,7 +235,7 @@ func TestRegisterFile(t *testing.T) {
 		registerFilesSetup()
 		args = []string{"testdata/valid-register.tar"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
 		assert.Equal(t, "Error unmarshalling file due to failed unmarshalling file testdata/valid-register.tar", results[0].Info)
@@ -253,7 +248,7 @@ func TestRegisterFile(t *testing.T) {
 			status.Error(codes.AlreadyExists, "AlreadyExists"))
 		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Success", results[0].Status)
 		assert.Equal(t, "AlreadyExists", results[0].Info)
@@ -266,7 +261,7 @@ func TestRegisterFile(t *testing.T) {
 			status.Error(codes.InvalidArgument, "Invalid"))
 		args = []string{"testdata/69_core.flyte_basics.lp.greet_1.pb"}
 		var registerResults []Result
-		results, err := registerFile(ctx, args[0], registerResults, cmdCtx)
+		results, err := registerFile(ctx, args[0], "", registerResults, cmdCtx)
 		assert.Equal(t, 1, len(results))
 		assert.Equal(t, "Failed", results[0].Status)
 		assert.Equal(t, "Error registering file due to rpc error: code = InvalidArgument desc = Invalid", results[0].Info)
@@ -312,9 +307,100 @@ func TestHydrateLaunchPlanSpec(t *testing.T) {
 }
 
 func TestFlyteManifest(t *testing.T) {
-	flytesnacks, tag, err := getFlyteTestManifest()
+	_, tag, err := getFlyteTestManifest(githubOrg, githubRepository)
 	assert.Nil(t, err)
 	assert.Contains(t, tag, "v")
 	assert.NotEmpty(t, tag)
-	assert.Greater(t, len(flytesnacks), 1)
+}
+
+func TestUploadFastRegisterArtifact(t *testing.T) {
+	t.Run("Successful upload", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		s, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		assert.Nil(t, err)
+		Client = s
+		err = uploadFastRegisterArtifact(ctx, "testdata/flytesnacks-core.tgz", "flytesnacks-core.tgz", "")
+		assert.Nil(t, err)
+	})
+	t.Run("Failed upload", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		s, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		assert.Nil(t, err)
+		Client = s
+		err = uploadFastRegisterArtifact(ctx, "testdata/flytesnacks-core.tgz", "", "")
+		assert.Nil(t, err)
+	})
+	t.Run("Failed upload", func(t *testing.T) {
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		s, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		assert.Nil(t, err)
+		Client = s
+		err = uploadFastRegisterArtifact(ctx, "testdata/flytesnacksre.tgz", "", "")
+		assert.NotNil(t, err)
+	})
+}
+
+func TestGetStorageClient(t *testing.T) {
+	t.Run("Failed to create storage client", func(t *testing.T) {
+		Client = nil
+		s, err := getStorageClient(ctx)
+		assert.NotNil(t, err)
+		assert.Nil(t, s)
+	})
+}
+
+func TestGetFlyteTestManifest(t *testing.T) {
+	t.Run("Failed to get manifest with wrong name", func(t *testing.T) {
+		_, tag, err := getFlyteTestManifest("no////ne", "no////ne")
+		assert.NotNil(t, err)
+		assert.Equal(t, len(tag), 0)
+	})
+	t.Run("Failed to get release", func(t *testing.T) {
+		_, tag, err := getFlyteTestManifest("flyteorg", "homebrew-tap")
+		assert.NotNil(t, err)
+		assert.Equal(t, len(tag), 0)
+	})
+	t.Run("Failed to get manifest", func(t *testing.T) {
+		flyteManifest = ""
+		_, tag, err := getFlyteTestManifest("flyteorg", "flytesnacks")
+		assert.NotNil(t, err)
+		assert.Equal(t, len(tag), 0)
+	})
+}
+
+func TestRegister(t *testing.T) {
+	t.Run("Failed to register", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		node := &admin.NodeExecution{}
+		err := register(ctx, node, cmdCtx)
+		assert.NotNil(t, err)
+	})
+}
+
+func TestHydrateNode(t *testing.T) {
+	t.Run("Failed hydrate node", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		node := &core.Node{}
+		err := hydrateNode(node)
+		assert.NotNil(t, err)
+	})
+
+	t.Run("hydrateSpec with wrong type", func(t *testing.T) {
+		setup()
+		registerFilesSetup()
+		task := &admin.Task{}
+		err := hydrateSpec(task, "")
+		assert.NotNil(t, err)
+	})
 }

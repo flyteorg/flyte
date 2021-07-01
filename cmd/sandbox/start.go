@@ -65,10 +65,10 @@ func startSandbox(ctx context.Context, cli docker.Docker, reader io.Reader) (*bu
 		return nil, err
 	}
 
-	if len(sandboxConfig.DefaultConfig.SourcesPath) > 0 {
+	if len(sandboxConfig.DefaultConfig.Source) > 0 {
 		docker.Volumes = append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
-			Source: sandboxConfig.DefaultConfig.SourcesPath,
+			Source: sandboxConfig.DefaultConfig.Source,
 			Target: docker.FlyteSnackDir,
 		})
 	}
