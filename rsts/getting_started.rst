@@ -41,7 +41,7 @@ Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <http
 
 Start a new project / repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#. Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended in a virtual environment) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo.
+#. Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__ (recommended using a  `virtual environment <https://docs.python.org/3/library/venv.html>`__) and clone the `flytekit-python-template <https://github.com/flyteorg/flytekit-python-template>`__ repo.
 
    .. prompt:: bash (venv)$
 
