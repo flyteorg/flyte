@@ -1,12 +1,8 @@
 .. _reference:
 
-##########
-References
-##########
-
-
+#############
 API Reference
--------------
+#############
 
 .. panels::
    :header: text-center
@@ -44,7 +40,7 @@ API Reference
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
    The Java/Scala SDK for Flyte.
-
+   
    ---
 
    .. link-button:: https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html
@@ -52,39 +48,7 @@ API Reference
       :text: FlyteAdmin
       :classes: btn-block stretched-link
    ^^^^^^^^^^^^
-   The service responsible for managing Flyte entities and administering workflow executions.
-
-
-Component Reference
--------------------
-
-.. panels::
-   :header: text-center
-
-   .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller
-      :type: url
-      :text: FlytePropeller
-      :classes: btn-block stretched-link
-   ^^^^^^^^^^^^
-   The K8s-native operator that executes Flyte workflows.
-
-   ---
-
-   .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins
-      :type: url
-      :text: FlytePlugins
-      :classes: btn-block stretched-link
-   ^^^^^^^^^^^^
-   Flyte Backend Plugins
-
-   ---
-
-   .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/datacatalog
-      :type: url
-      :text: DataCatalog
-      :classes: btn-block stretched-link
-   ^^^^^^^^^^^^
-   Service that catalogs data to allow for data discovery, lineage and tagging
+   Flyte Backend REST / gRPC API specification.
 
 
 .. toctree::
@@ -97,15 +61,4 @@ Component Reference
    FlyteIDL <https://flyteidl.readthedocs.io>
    Flytekit Python <https://flytekit.readthedocs.io>
    Flytekit Java <https://github.com/spotify/flytekit-java>
-
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Component Reference
-   :name: componentreftoc
-   :hidden:
-
-   FlytePropeller <https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller>
-   FlyteAdmin <https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin>
-   FlytePlugins <https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins>
-   DataCatalog <https://pkg.go.dev/mod/github.com/flyteorg/datacatalog>
+   FlyteAdmin <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html>

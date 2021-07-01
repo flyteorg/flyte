@@ -10,7 +10,7 @@
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
-   |book| References <reference/index>
+   |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
 .. toctree::
@@ -32,7 +32,7 @@
    Join the Community <community/index>
 
 .. toctree::
-   :caption: References
+   :caption: API Reference
    :maxdepth: -1
    :name: apireference
    :hidden:
