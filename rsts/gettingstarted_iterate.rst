@@ -1,28 +1,36 @@
 .. _gettingstarted_iterate:
 
-Getting Started
----------------
+Getting Started: Iterate
+-------------------------
 
 .. raw:: html
   
     <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
 
 .. panels::
-    :container: container-lg pb-3 align-center
+    :body: text-justify
+    :container: container-xs
     :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
 
-    :body: bg-success
-    ✔ Implement
     ---
-    :body: bg-success
-    ✔ Scale
+    .. link-button:: gettingstarted_implement
+        :type: ref
+        :text: ✔ Implement
+        :classes: btn-outline-success btn-block stretched-link
     ---
-    :body: bg-primary
-    ➔ Iterate
+    .. link-button:: gettingstarted_scale
+            :type: ref
+            :text: ✔ Scale
+            :classes: btn-outline-success btn-block stretched-link
+    ---
+    .. link-button:: gettingstarted_iterate
+            :type: ref
+            :text: ➔ Iterate
+            :classes: btn-outline-primary btn-block stretched-link
 
 
-Iterate on your ideas
-======================
+3. Iterate on your ideas
+==========================
 
 
 Modify code - Test
@@ -158,6 +166,21 @@ Modify code - Test
 
 
 #. Finally, visit `the sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/myapp.workflows.example.my_wf>`__, click launch, and give your name as the input.
+
+   Alternatively, use flytectl. To pass arguments to the workflow update the execution spec file (previously generated) to send arguments to the workflow. ::
+
+        ....
+        inputs:
+          name: "adam"
+        ....
+
+   Create an execution using the exec spec file.
+
+   .. prompt:: bash $
+
+      flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+
+
 
 .. admonition:: Recap
 

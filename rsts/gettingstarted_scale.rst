@@ -1,27 +1,36 @@
 .. _gettingstarted_scale:
 
-Getting Started
----------------
+Getting Started: Scale
+-----------------------
 
 .. raw:: html
   
     <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
 
 .. panels::
-    :container: container-lg pb-3 align-center
+    :body: text-justify
+    :container: container-xs
     :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
 
-    :body: bg-success
-    ✔ Implement
     ---
-    :body: bg-primary
-    ➔ Scale
+    .. link-button:: gettingstarted_implement
+        :type: ref
+        :text: ✔ Implement
+        :classes: btn-outline-success btn-block stretched-link
     ---
-    3. Iterate
+    .. link-button:: gettingstarted_scale
+            :type: ref
+            :text: ➔ Scale
+            :classes: btn-outline-primary btn-block stretched-link
+    ---
+    .. link-button:: gettingstarted_iterate
+            :type: ref
+            :text: 3. Iterate
+            :classes: btn-outline-primary btn-block stretched-link
 
 
-Scale: Get your workflows into the cloud
-=========================================
+2. Scale: Get your workflows into the cloud
+=============================================
 
 .. _getting-started-build-deploy:
 
@@ -64,10 +73,11 @@ Install flytectl
 
         .. tip:: Want to dive under the hood into flyte-sandbox, refer to the guide `here<>`_.
 
+        Here '.' represents current directory and assuming you have changed into ``myflyteapp`` - the git-cloned directory you created
+
         .. prompt:: bash $
 
            flytectl sandbox start --source .
-           # here '.' represents current directory and assuming you have cc'ed into myflyteapp - the git-cloned directory you created
 
       .. tab:: Connect to an existing Flyte cluster
 
@@ -142,13 +152,6 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
       flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf --execFile exec_spec.yaml
 
-#. Update the spec file to send arguments to the workflow. ::
-
-            ....
-            inputs:
-              name: "adam"
-            ....
-
 #. Create an execution using the exec spec file.
 
    .. prompt:: bash $
@@ -165,3 +168,11 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 .. admonition:: Recap
 
   .. rubric:: 🎉  You have successfully packaged your workflow and tasks and pushed them to a Flyte cluster. Let's learn how to iterate?
+
+.. toctree::
+   :maxdepth: -1
+   :caption: Getting Started
+   :hidden:
+
+   Iterate "fast"er<gettingstarted_iterate>
+   User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>

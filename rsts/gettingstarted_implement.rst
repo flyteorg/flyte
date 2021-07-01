@@ -3,7 +3,6 @@
 Getting Started
 ---------------
 
-
 .. raw:: html
   
     <p style="color: #808080; font-weight: 500; font-size: 20px; padding-top: 10px;">A step-by-step guide to building, deploying, and iterating on Flyte tasks and workflows</p>
@@ -14,12 +13,20 @@ Getting Started
     :column: col-lg-4 col-md-4 col-sm-6 col-xs-12 p-2
 
     ---
-    :body: bg-primary
-    ➔ Implement
+    .. link-button:: gettingstarted_implement
+        :type: ref
+        :text: ➔ Implement
+        :classes: btn-outline-primary btn-block stretched-link
     ---
-    2. Scale
+    .. link-button:: gettingstarted_scale
+            :type: ref
+            :text: 2. Scale
+            :classes: btn-outline-primary btn-block stretched-link
     ---
-    3. Iterate
+    .. link-button:: gettingstarted_iterate
+            :type: ref
+            :text: 3. Iterate
+            :classes: btn-outline-primary btn-block stretched-link
 
 .. caution::
 
