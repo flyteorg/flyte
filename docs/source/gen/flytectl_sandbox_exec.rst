@@ -1,38 +1,32 @@
-.. _flytectl_sandbox_start:
+.. _flytectl_sandbox_exec:
 
-flytectl sandbox start
-----------------------
+flytectl sandbox exec
+---------------------
 
-Start the flyte sandbox
+Execute any command in sandbox
 
 Synopsis
 ~~~~~~~~
 
 
 
-Start will run the flyte sandbox cluster inside a docker container and setup the config that is required 
-::
+Execute command will Will run non-interactive commands and return immediately with the output.
 
- bin/flytectl sandbox start
-	
-Mount your flytesnacks repository code inside sandbox 
 ::
-
- bin/flytectl sandbox start --sourcesPath=$HOME/flyteorg/flytesnacks 
+ bin/flytectl sandbox exec -- ls -al 
 
 Usage
-	
 
 ::
 
-  flytectl sandbox start [flags]
+  flytectl sandbox exec [flags]
 
 Options
 ~~~~~~~
 
 ::
 
-  -h, --help            help for start
+  -h, --help            help for exec
       --source string    Path of your source code
 
 Options inherited from parent commands

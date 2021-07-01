@@ -43,6 +43,7 @@ SEE ALSO
 ~~~~~~~~
 
 * :doc:`flytectl` 	 - flyetcl CLI tool
+* :doc:`flytectl_sandbox_exec` 	 - Execute any command in sandbox
 * :doc:`flytectl_sandbox_start` 	 - Start the flyte sandbox
 * :doc:`flytectl_sandbox_status` 	 - Get the status of the sandbox environment.
 * :doc:`flytectl_sandbox_teardown` 	 - Teardown will cleanup the sandbox environment
