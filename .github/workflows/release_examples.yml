@@ -1,10 +1,6 @@
 name: Serialize & Release Examples
 
 on:
-  pull_request:
-    paths-ignore:
-      - 'cookbook/docs/**'
-      - 'cookbook/deployment/**'
   create:
     tags:
       - v*
@@ -21,7 +17,6 @@ jobs:
         with:
           fetch-depth: "0"
       - uses: actions/cache@v1
-        if: github.event_name != 'pull_request'
         with:
           path: /tmp/release-snacks-${{ matrix.directory }}/
           key: release-snacks-${{ matrix.directory }}-${{ github.sha }}
@@ -31,17 +26,15 @@ jobs:
         run: |
           REGISTRY=ghcr.io/flyteorg VERSION=latest make -C cookbook/${{ matrix.directory }} serialize
       - name: Cache Serialized protos
-        if: github.event_name != 'pull_request'
         env:
           REGISTRY: "ghcr.io/flyteorg"
         run: |
           mkdir -p cookbook/release-snacks /tmp/release-snacks-${{ matrix.directory }}/
           make -C cookbook archive
-          cp -r cookbook/release-snacks/* /tmp/release-snacks-${{ matrix.directory }}/
+          cp -r cookbook/release-snacks/ /tmp/release-snacks-${{ matrix.directory }}/*
   releaser:
     name: Release example
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
     needs: [ serialize-example ]
     steps:
       - uses: actions/checkout@v2

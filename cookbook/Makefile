@@ -32,3 +32,7 @@ run-examples: ## Runs all examples
 .PHONY: archive
 archive: # archive directories (e.g. _pb_output/)
 	bash scripts/ci_helper.sh RELEASE
+
+.PHONY: register-workflow-ci
+register-workflow-ci:
+	bash scripts/ci_helper.sh REGISTER
