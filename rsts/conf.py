@@ -206,6 +206,7 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 2
 
 # -- Options for intersphinx extension ---------------------------------------
 
