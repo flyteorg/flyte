@@ -334,7 +334,7 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
   3. Run a Flyte workflow on a cluster,
   4. Iterated on a Flyte workflow.
 
-  .. rubric:: 🎉 Congratulations! you just ran your first Flyte workflow! 🎉
+  .. rubric:: 🎉 Congratulations! You just ran your first Flyte workflow! 🎉
 
 Next Steps: User Guide
 ^^^^^^^^^^^^^^^^^^^^^^^^
