@@ -6,7 +6,7 @@
    :titlesonly:
    :hidden:
 
-   |plane| Getting Started <gettingstarted_implement>
+   |plane| Getting Started <getting_started>
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
