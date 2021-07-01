@@ -4,4 +4,15 @@ admin:
   insecure: true
 logger:
   show-source: true
-  level: 1
+  level: 3
+storage:
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    disable-ssl: true
+    endpoint: http://localhost:30084
+    region: us-east-1
+    secret-key: miniostorage
+  type: minio
+  container: "my-s3-bucket"
+  enable-multicontainer: true

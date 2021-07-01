@@ -19,5 +19,6 @@ func (cfg FilesConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVarP(&DefaultFilesConfig.AssumableIamRole, fmt.Sprintf("%v%v", prefix, "assumableIamRole"), "i", DefaultFilesConfig.AssumableIamRole, " Custom assumable iam auth role to register launch plans with.")
 	cmdFlags.StringVarP(&DefaultFilesConfig.K8ServiceAccount, fmt.Sprintf("%v%v", prefix, "k8ServiceAccount"), "k", DefaultFilesConfig.K8ServiceAccount, " custom kubernetes service account auth role to register launch plans with.")
 	cmdFlags.StringVarP(&DefaultFilesConfig.OutputLocationPrefix, fmt.Sprintf("%v%v", prefix, "outputLocationPrefix"), "l", DefaultFilesConfig.OutputLocationPrefix, " custom output location prefix for offloaded types (files/schemas).")
+	cmdFlags.StringVar(&DefaultFilesConfig.SourceUploadPath, fmt.Sprintf("%v%v", prefix, "sourceUploadPath"), DefaultFilesConfig.SourceUploadPath, " Location for source code in storage.")
 	return cmdFlags
 }

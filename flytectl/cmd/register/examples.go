@@ -19,19 +19,21 @@ Registers all latest flytesnacks example
 
 Usage
 `
+)
+
+var (
 	githubOrg        = "flyteorg"
 	githubRepository = "flytesnacks"
-	archive          = true
 	snackReleaseURL  = "https://github.com/flyteorg/flytesnacks/releases/download/%s/flytesnacks-%s.tgz"
 	flyteManifest    = "https://github.com/flyteorg/flytesnacks/releases/download/%s/flyte_tests_manifest.json"
 )
 
 func registerExamplesFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	flytesnacks, tag, err := getFlyteTestManifest()
+	flytesnacks, tag, err := getFlyteTestManifest(githubOrg, githubRepository)
 	if err != nil {
 		return err
 	}
-	rconfig.DefaultFilesConfig.Archive = archive
+	rconfig.DefaultFilesConfig.Archive = true
 	for _, v := range flytesnacks {
 		args := []string{
 			fmt.Sprintf(snackReleaseURL, tag, v.Name),

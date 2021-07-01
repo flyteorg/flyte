@@ -11,8 +11,13 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 
 	"github.com/google/go-github/github"
 
@@ -31,9 +36,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// Variable define in serialized proto that needs to be replace in registration time
 const registrationProjectPattern = "{{ registration.project }}"
 const registrationDomainPattern = "{{ registration.domain }}"
 const registrationVersionPattern = "{{ registration.version }}"
+
+// Additional variable define in fast serialized proto that needs to be replace in registration time
+const registrationRemotePackagePattern = "{{ .remote_package_path }}"
 
 type Result struct {
 	Name   string
@@ -47,6 +56,7 @@ type HTTPClient interface {
 }
 
 var FlyteSnacksRelease []FlyteSnack
+var Client *storage.DataStore
 
 // FlyteSnack Defines flyte test manifest structure
 type FlyteSnack struct {
@@ -200,6 +210,21 @@ func hydrateIdentifier(identifier *core.Identifier) {
 	}
 }
 
+func hydrateTaskSpec(task *admin.TaskSpec, sourceCode string) error {
+	if task.Template.GetContainer() != nil {
+		for k := range task.Template.GetContainer().Args {
+			if task.Template.GetContainer().Args[k] == "" || task.Template.GetContainer().Args[k] == registrationRemotePackagePattern {
+				remotePath, err := getRemoteStoragePath(context.Background(), Client, rconfig.DefaultFilesConfig.SourceUploadPath, sourceCode, rconfig.DefaultFilesConfig.Version)
+				if err != nil {
+					return err
+				}
+				task.Template.GetContainer().Args[k] = string(remotePath)
+			}
+		}
+	}
+	return nil
+}
+
 func hydrateLaunchPlanSpec(lpSpec *admin.LaunchPlanSpec) {
 	assumableIamRole := len(rconfig.DefaultFilesConfig.AssumableIamRole) > 0
 	k8ServiceAcct := len(rconfig.DefaultFilesConfig.K8ServiceAccount) > 0
@@ -217,7 +242,7 @@ func hydrateLaunchPlanSpec(lpSpec *admin.LaunchPlanSpec) {
 	}
 }
 
-func hydrateSpec(message proto.Message) error {
+func hydrateSpec(message proto.Message, sourceCode string) error {
 	switch v := message.(type) {
 	case *admin.LaunchPlan:
 		launchPlan := message.(*admin.LaunchPlan)
@@ -242,8 +267,13 @@ func hydrateSpec(message proto.Message) error {
 	case *admin.TaskSpec:
 		taskSpec := message.(*admin.TaskSpec)
 		hydrateIdentifier(taskSpec.Template.Id)
+		// In case of fast serialize input proto also have on additional variable to substitute i.e destination bucket for source code
+		if err := hydrateTaskSpec(taskSpec, sourceCode); err != nil {
+			return err
+		}
+
 	default:
-		return fmt.Errorf("Unknown type %T", v)
+		return fmt.Errorf("unknown type %T", v)
 	}
 	return nil
 }
@@ -261,29 +291,30 @@ func DownloadFileFromHTTP(ctx context.Context, ref storage.DataReference) (io.Re
 }
 
 /*
-Get file list from the args list.
-If the archive flag is on then download the archives to temp directory and extract it.
+Get serialize output file list from the args list.
+If the archive flag is on then download the archives to temp directory and extract it. In case of fast register it will also return the compressed source code
 The o/p of this function would be sorted list of the file locations.
 */
-func getSortedFileList(ctx context.Context, args []string) ([]string, string, error) {
+func getSerializeOutputFiles(ctx context.Context, args []string) ([]string, string, error) {
 	if !rconfig.DefaultFilesConfig.Archive {
 		/*
 		 * Sorting is required for non-archived case since its possible for the user to pass in a list of unordered
 		 * serialized protobuf files , but flyte expects them to be registered in topologically sorted order that it had
 		 * generated otherwise the registration can fail if the dependent files are not registered earlier.
 		 */
+
 		sort.Strings(args)
 		return args, "", nil
 	}
+
 	tempDir, err := ioutil.TempDir("/tmp", "register")
 
 	if err != nil {
 		return nil, tempDir, err
 	}
-	dataRefs := args
 	var unarchivedFiles []string
-	for i := 0; i < len(dataRefs); i++ {
-		dataRefReaderCloser, err := getArchiveReaderCloser(ctx, dataRefs[i])
+	for _, v := range args {
+		dataRefReaderCloser, err := getArchiveReaderCloser(ctx, v)
 		if err != nil {
 			return unarchivedFiles, tempDir, err
 		}
@@ -295,6 +326,7 @@ func getSortedFileList(ctx context.Context, args []string) ([]string, string, er
 			return unarchivedFiles, tempDir, err
 		}
 	}
+
 	/*
 	 * Similarly in case of archived files, it possible to have an archive created in totally different order than the
 	 * listing order of the serialized files which is required by flyte. Hence we explicitly sort here after unarchiving it.
@@ -338,10 +370,11 @@ func readAndCopyArchive(src io.Reader, tempDir string, unarchivedFiles []string)
 	}
 }
 
-func registerFile(ctx context.Context, fileName string, registerResults []Result, cmdCtx cmdCore.CommandContext) ([]Result, error) {
+func registerFile(ctx context.Context, fileName, sourceCode string, registerResults []Result, cmdCtx cmdCore.CommandContext) ([]Result, error) {
 	var registerResult Result
 	var fileContents []byte
 	var err error
+
 	if fileContents, err = ioutil.ReadFile(fileName); err != nil {
 		registerResults = append(registerResults, Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error reading file due to %v", err)})
 		return registerResults, err
@@ -352,12 +385,15 @@ func registerFile(ctx context.Context, fileName string, registerResults []Result
 		registerResults = append(registerResults, registerResult)
 		return registerResults, err
 	}
-	if err := hydrateSpec(spec); err != nil {
+
+	if err := hydrateSpec(spec, sourceCode); err != nil {
 		registerResult = Result{Name: fileName, Status: "Failed", Info: fmt.Sprintf("Error hydrating spec due to %v", err)}
 		registerResults = append(registerResults, registerResult)
 		return registerResults, err
 	}
+
 	logger.Debugf(ctx, "Hydrated spec : %v", getJSONSpec(spec))
+
 	if err := register(ctx, spec, cmdCtx); err != nil {
 		// If error is AlreadyExists then dont consider this to be an error but just a warning state
 		if grpcError := status.Code(err); grpcError == codes.AlreadyExists {
@@ -369,6 +405,7 @@ func registerFile(ctx context.Context, fileName string, registerResults []Result
 		registerResults = append(registerResults, registerResult)
 		return registerResults, err
 	}
+
 	registerResult = Result{Name: fileName, Status: "Success", Info: "Successfully registered file"}
 	logger.Debugf(ctx, "Successfully registered %v", fileName)
 	registerResults = append(registerResults, registerResult)
@@ -383,10 +420,12 @@ func getArchiveReaderCloser(ctx context.Context, ref string) (io.ReadCloser, err
 	if err != nil {
 		return nil, err
 	}
+	var dataRefReaderCloser io.ReadCloser
+
 	if ext != "tar" && ext != "tgz" {
 		return nil, errors.New("only .tar and .tgz extension archives are supported")
 	}
-	var dataRefReaderCloser io.ReadCloser
+
 	if scheme == "http" || scheme == "https" {
 		dataRefReaderCloser, err = DownloadFileFromHTTP(ctx, dataRef)
 	} else {
@@ -414,12 +453,15 @@ func getJSONSpec(message proto.Message) string {
 	return jsonSpec
 }
 
-func getFlyteTestManifest() ([]FlyteSnack, string, error) {
+func getFlyteTestManifest(org, repository string) ([]FlyteSnack, string, error) {
 	c := github.NewClient(nil)
 	opt := &github.ListOptions{Page: 1, PerPage: 1}
-	releases, _, err := c.Repositories.ListReleases(context.Background(), githubOrg, githubRepository, opt)
+	releases, _, err := c.Repositories.ListReleases(context.Background(), org, repository, opt)
 	if err != nil {
 		return nil, "", err
+	}
+	if len(releases) == 0 {
+		return nil, "", fmt.Errorf("Repository doesn't have any release")
 	}
 	response, err := http.Get(fmt.Sprintf(flyteManifest, *releases[0].TagName))
 	if err != nil {
@@ -437,4 +479,89 @@ func getFlyteTestManifest() ([]FlyteSnack, string, error) {
 		return nil, "", err
 	}
 	return FlyteSnacksRelease, *releases[0].TagName, nil
+
+}
+
+func getRemoteStoragePath(ctx context.Context, s *storage.DataStore, remoteLocation, file, identifier string) (storage.DataReference, error) {
+	remotePath, err := s.ConstructReference(ctx, storage.DataReference(remoteLocation), fmt.Sprintf("%v-%v", identifier, file))
+	if err != nil {
+		return storage.DataReference(""), err
+	}
+	return remotePath, nil
+}
+
+func uploadFastRegisterArtifact(ctx context.Context, file, sourceCodeName, version string) error {
+	dataStore, err := getStorageClient(ctx)
+	if err != nil {
+		return err
+	}
+	var dataRefReaderCloser io.ReadCloser
+	remotePath := storage.DataReference(rconfig.DefaultFilesConfig.SourceUploadPath)
+	if len(rconfig.DefaultFilesConfig.SourceUploadPath) == 0 {
+		remotePath, err = dataStore.ConstructReference(ctx, dataStore.GetBaseContainerFQN(ctx), "fast")
+		if err != nil {
+			return err
+		}
+	}
+	rconfig.DefaultFilesConfig.SourceUploadPath = string(remotePath)
+	fullRemotePath, err := getRemoteStoragePath(ctx, dataStore, rconfig.DefaultFilesConfig.SourceUploadPath, sourceCodeName, version)
+	if err != nil {
+		return err
+	}
+	raw, err := json.Marshal(file)
+	if err != nil {
+		return err
+	}
+	dataRefReaderCloser, err = os.Open(file)
+	if err != nil {
+		return err
+	}
+	dataRefReaderCloser, err = gzip.NewReader(dataRefReaderCloser)
+	if err != nil {
+		return err
+	}
+	if err := dataStore.ComposedProtobufStore.WriteRaw(ctx, fullRemotePath, int64(len(raw)), storage.Options{}, dataRefReaderCloser); err != nil {
+		return err
+	}
+	return nil
+}
+
+func getStorageClient(ctx context.Context) (*storage.DataStore, error) {
+	if Client != nil {
+		return Client, nil
+	}
+	testScope := promutils.NewTestScope()
+	// Set Keys
+	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+	s, err := storage.NewDataStore(storage.GetConfig(), testScope.NewSubScope("flytectl"))
+	if err != nil {
+		logger.Errorf(ctx, "error while creating storage client %v", err)
+		return Client, err
+	}
+	Client = s
+	return Client, nil
+}
+
+func isFastRegister(file string) bool {
+	_, f := filepath.Split(file)
+	// Pyflyte always archive source code with a name that start with fast and have an extension .tar.gz
+	if strings.HasPrefix(f, "fast") && strings.HasSuffix(f, sourceCodeExtension) {
+		return true
+	}
+	return false
+}
+
+func segregateSourceAndProtos(dataRefs []string) (string, []string, []string) {
+	var validProto, InvalidFiles []string
+	var sourceCode string
+	for _, v := range dataRefs {
+		if isFastRegister(v) {
+			sourceCode = v
+		} else if strings.HasSuffix(v, ".pb") {
+			validProto = append(validProto, v)
+		} else {
+			InvalidFiles = append(InvalidFiles, v)
+		}
+	}
+	return sourceCode, validProto, InvalidFiles
 }
