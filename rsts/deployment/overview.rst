@@ -21,10 +21,6 @@ Flyte uses Helm to manage its deployment releases onto a K8s cluster. The chart 
 
 Specific instructions for Helm are covered in both the :ref:`Opta <deployment-aws-opta>` and :ref:`manual <deployment-aws-manual>` AWS setup guides.
 
-.. TODO::
-   Additional instructions on the Helm after cleaning it up, how it's laid out, easy guide to know which values to
-   change for each component - plugins, sns/sqs, auth, etc.
-
 *********************
 Relational Database
 *********************
