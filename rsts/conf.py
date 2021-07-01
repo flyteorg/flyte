@@ -18,7 +18,6 @@
 
 import sphinx.application
 import sphinx.errors
-import sphinx_fontawesome
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
 # -- Project information -----------------------------------------------------
