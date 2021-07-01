@@ -79,11 +79,18 @@ Install flytectl
 
            flytectl sandbox start --source .
 
+        *NOTE*: Output of the command will contain a recommendation to export an environment variable called FLYTECTL_CONFIG. please export as follows or copy paste
+
+        .. prompt:: bash $
+
+           export FLYTECTL_CONFIG=$HOME/.flyte/config-sandbox.yaml
+
       .. tab:: Connect to an existing Flyte cluster
 
         .. prompt:: bash $
 
             flytectl init
+
 
 
 Build & Deploy Your Application to the cluster
