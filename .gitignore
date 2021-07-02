@@ -4,3 +4,4 @@ rsts/
 stats/
 .DS_Store
 .vscode/
+.python-version
