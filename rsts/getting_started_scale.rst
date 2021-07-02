@@ -181,5 +181,5 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
    :caption: Getting Started
    :hidden:
 
-   Iterate "fast"er<gettingstarted_iterate>
+   Iterate "fast"er<getting_started_iterate>
    User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>

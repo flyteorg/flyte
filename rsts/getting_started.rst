@@ -97,6 +97,6 @@ The workflow can be run locally, simply by running it as a Python script — not
    :caption: Getting Started
    :hidden:
 
-   Build and Deploy your application<gettingstarted_scale>
-   Iterate "fast"er<gettingstarted_iterate>
+   Build and Deploy your application<getting_started_scale>
+   Iterate "fast"er<getting_started_iterate>
    User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
