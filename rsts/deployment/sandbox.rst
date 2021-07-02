@@ -60,6 +60,8 @@ This installs all the dependencies as Kubernetes deployments. We call this a San
    :alt: Architecture of Sandbox deployment of Flyte. Single K8s cluster
 
 
+.. _deploy-sandbox-local:
+
 Deploy Flyte Sandbox environment locally - on your laptop
 =========================================================
 
@@ -71,7 +73,11 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. tab:: Docker Image
 
-        Refer to :ref:`getting-started-firstrun`
+        Recommend using ``flytectl sandbox`` as describe in  to :ref:`gettingstarted_implement`
+
+        .. prompt:: bash $
+
+              docker run --rm --privileged -p 30081:30081 -p 30084:30084 cr.flyte.org/flyteorg/flyte-sandbox
 
     .. tab:: k3d
 
@@ -174,7 +180,7 @@ If you can access your cluster with ``kubectl cluster-info``, you're ready to de
 Deployment
 -----------
 
-We'll proceed like with :ref:`locally hosted flyte <getting-started-run-on-flyte>` with deploying the sandbox
+We'll proceed like with :ref:`locally hosted flyte <deploy-sandbox-local>` with deploying the sandbox
 Flyte configuration on your remote cluster.
 
 #. The Flyte sandbox can be deployed with a single command ::

@@ -65,7 +65,7 @@ Install flytectl
 
       flytectl version
 
-#. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run this getting started against a hosted or pre-provisioned environment. Refer to the `deployment guide <>` to learn how to deploy a flyte cluster.
+#. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run this getting started against a hosted or pre-provisioned environment. Refer to :ref:`deployment` section to learn how to deploy a flyte cluster.
 
    .. tabs::
 
