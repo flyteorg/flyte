@@ -39,27 +39,27 @@ Install flytectl
 
 #. Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte.
 
-   .. tabs::
+   .. tabbed:: OSX
 
-      .. tab:: OSX
+     .. prompt:: bash $
 
-        .. prompt:: bash $
+        brew install flyteorg/homebrew-tap/flytectl
 
-           brew install flyteorg/homebrew-tap/flytectl
+     *Upgrade* existing installation using the following command:
 
-        *Upgrade* existing installation using the following command:
+     .. prompt:: bash $
 
-        .. prompt:: bash $
+        brew upgrade flytectl
 
-           brew upgrade flytectl
+   .. tabbed:: Other Operating systems
 
-      .. tab:: Other Operating systems
+     .. prompt:: bash $
 
-        .. prompt:: bash $
+         curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
+         export PATH=$(pwd)/bin:$PATH
 
-            curl -s https://raw.githubusercontent.com/lyft/flytectl/master/install.sh | bash
 
-   **Test** if Flytectl is installed correctly (your Flytectl version should be > 0.2.0) using the following command:
+   **Test** if Flytectl is installed correctly (your Flytectl version should be >= 0.1.34.) using the following command:
 
    .. prompt:: bash $
 
@@ -67,29 +67,27 @@ Install flytectl
 
 #. Flyte can be deployed locally using a single Docker container — we refer to this as the ``flyte-sandbox`` environment. You can also run this getting started against a hosted or pre-provisioned environment. Refer to :ref:`deployment` section to learn how to deploy a flyte cluster.
 
-   .. tabs::
+   .. tabbed:: Start a new sandbox cluster
 
-      .. tab:: Start a new sandbox cluster
+     .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
 
-        .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
+     Here '.' represents current directory and assuming you have changed into ``myflyteapp`` - the git-cloned directory you created
 
-        Here '.' represents current directory and assuming you have changed into ``myflyteapp`` - the git-cloned directory you created
+     .. prompt:: bash $
 
-        .. prompt:: bash $
+        flytectl sandbox start --source .
 
-           flytectl sandbox start --source .
+     *NOTE*: Output of the command will contain a recommendation to export an environment variable called FLYTECTL_CONFIG. please export as follows or copy paste
 
-        *NOTE*: Output of the command will contain a recommendation to export an environment variable called FLYTECTL_CONFIG. please export as follows or copy paste
+     .. prompt:: bash $
 
-        .. prompt:: bash $
+        export FLYTECTL_CONFIG=$HOME/.flyte/config-sandbox.yaml
 
-           export FLYTECTL_CONFIG=$HOME/.flyte/config-sandbox.yaml
+   .. tabbed:: Connect to an existing Flyte cluster
 
-      .. tab:: Connect to an existing Flyte cluster
+     .. prompt:: bash $
 
-        .. prompt:: bash $
-
-            # COMING SOON! flytectl init
+         # COMING SOON! flytectl init
 
 
 
@@ -97,28 +95,26 @@ Build & Deploy Your Application to the Cluster
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #. Flyte uses Docker containers to package the workflows and tasks and sends them to the remote Flyte cluster. Thus, there is a ``Dockerfile`` already included in the cloned repo. You can build the Docker container and push the built image to a registry.
 
-   .. tabs::
+   .. tabbed:: Flyte Sandbox
 
-       .. tab:: Flyte Sandbox
+     Since ``flyte-sandbox`` runs locally in a Docker container, you do not need to push the Docker image. You can combine the build and push step by simply building the image inside the Flyte-sandbox container. This can be done using the following command:
 
-           Since ``flyte-sandbox`` runs locally in a Docker container, you do not need to push the Docker image. You can combine the build and push step by simply building the image inside the Flyte-sandbox container. This can be done using the following command:
+     .. prompt:: bash $
 
-           .. prompt:: bash $
+         flytectl sandbox exec -- docker build . --tag "myapp:v1"
 
-               flytectl sandbox exec -- docker build . --tag "myapp:v1"
+     .. tip::
+      #. Why are we not pushing the Docker image? Want to understand the details — refer to :ref:`deployment-sandbox`
+      #. *Recommended:* Use the bundled `./docker_build_and_tag.sh`. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in achieving GitOps style workflows.
 
-           .. tip::
-            #. Why are we not pushing the Docker image? Want to understand the details — refer to :ref:`deployment-sandbox`
-            #. *Recommended:* Use the bundled `./docker_build_and_tag.sh`. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in achieving GitOps style workflows.
+   .. tabbed:: Remote Flyte Cluster
 
-       .. tab:: Remote Flyte Cluster
+     If you are using a remote Flyte cluster, then you need to build your container and push it to a registry that is accessible by the Flyte Kubernetes cluster.
 
-           If you are using a remote Flyte cluster, then you need to build your container and push it to a registry that is accessible by the Flyte Kubernetes cluster.
+     .. prompt:: bash $
 
-           .. prompt:: bash $
-
-               docker build . --tag registry/repo:version
-               docker push registry/repo:version
+         docker build . --tag registry/repo:version
+         docker push registry/repo:version
 
 #. Next, package the workflow using the ``pyflyte`` cli bundled with Flytekit and upload it to the Flyte backend. Note that the image is the same as the one built in the previous step.
 
@@ -157,7 +153,7 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
    .. prompt:: bash $
 
-      flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf --execFile exec_spec.yaml
+      flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
 
 #. Create an execution using the exec spec file.
 
@@ -165,11 +161,11 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
       flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
 
-#. Monitor the execution by providing the execution id from the ``create execution`` command.
+#. Monitor the execution by providing the execution name from the ``create execution`` command.
 
    .. prompt:: bash $
 
-      flytectl get execution -p flytesnacks -d development <execid>
+      flytectl get execution -p flytesnacks -d development <execname>
 
 
 .. admonition:: Recap

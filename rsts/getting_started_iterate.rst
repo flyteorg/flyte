@@ -104,81 +104,99 @@ Modify Code - Test
 
    .. prompt:: bash $
 
-       flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1
+      flytectl register files -p flytesnacks -d development -a flyte-package.tgz  -v v1-fast1
 
-   .. tabs:: Flytectl configuration with ``storage`` block for Fast registration
 
-       .. tab:: Local Flyte Sandbox
+   .. dropdown:: Flytectl configuration with ``storage`` block for Fast registration
 
-           Automatically configured for you by ``flytectl sandbox`` command.
+         .. tabbed:: Local Flyte Sandbox
 
-           .. code-block:: yaml
+            Automatically configured for you by ``flytectl sandbox`` command.
 
-               admin:
-                 # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-                 endpoint: dns:///localhost:30081
-                 insecure: true
-               storage:
-                 connection:
-                   access-key: minio
-                   auth-type: accesskey
-                   disable-ssl: true
-                   endpoint: http://localhost:30084
-                   region: my-region-here
-                   secret-key: miniostorage
-                 container: my-s3-bucket
-                 type: minio
-
-       .. tab:: S3 Configuration
-
-           .. code-block:: yaml
+            .. code-block:: yaml
 
                admin:
-                 # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-                 endpoint: dns:///<replace-me>
-                 authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+                  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+                  endpoint: dns:///localhost:30081
+                  insecure: true
                storage:
-                 kind: s3
-                 config:
-                   auth_type: iam
-                   region: <replace> # Example: us-east-2
-                 container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
+                  connection:
+                    access-key: minio
+                    auth-type: accesskey
+                    disable-ssl: true
+                    endpoint: http://localhost:30084
+                    region: my-region-here
+                    secret-key: miniostorage
+                  container: my-s3-bucket
+                  type: minio
 
-       .. tab:: GCS Configuration
+         .. tabbed:: S3 Configuration
 
-           .. code-block:: yaml
+            .. code-block:: yaml
 
                admin:
-                 # For GRPC endpoints you might want to use dns:///flyte.myexample.com
-                 endpoint: dns:///<replace-me>
-                 authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+                  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+                  endpoint: dns:///<replace-me>
+                  authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
                storage:
-                 kind: google
-                 config:
-                   json: ""
-                   project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
-                   scopes: https://www.googleapis.com/auth/devstorage.read_write
-                 container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
+                  kind: s3
+                  config:
+                    auth_type: iam
+                    region: <replace> # Example: us-east-2
+                  container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have read access to this bucket
 
-       .. tab:: Others
+         .. tabbed:: GCS Configuration
 
-               For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
+            .. code-block:: yaml
+
+               admin:
+                  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+                  endpoint: dns:///<replace-me>
+                  authType: Pkce # if using authentication or just drop this. If insecure set insecure: True
+               storage:
+                  kind: google
+                  config:
+                    json: ""
+                    project_id: <replace-me> # TODO: replace <project-id> with the GCP project ID
+                    scopes: https://www.googleapis.com/auth/devstorage.read_write
+                  container: <replace> # Example my-bucket. Flyte k8s cluster / service account for execution should have access to this bucket
+
+         .. tabbed:: Others
+
+            For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
 
 
 #. Finally, visit `the sandbox console <http://localhost:30081/console/projects/flytesnacks/domains/development/workflows/myapp.workflows.example.my_wf>`__, click launch, and give your name as the input.
 
-   Alternatively, use flytectl. To pass arguments to the workflow update the execution spec file (previously generated) to send arguments to the workflow. ::
+   Alternatively, use flytectl. To pass arguments to the workflow using the execution spec file. We will overwrite the old file to update to latest version.
 
-        ....
-        inputs:
+   #. Generate an execution spec file. This will prompt you to overwrite and answer 'y' on it.
+
+      .. prompt:: bash $
+
+       flytectl get launchplan -p flytesnacks -d development myapp.workflows.example.my_wf --latest --execFile exec_spec.yaml
+
+   #. Modify the execution spec file and update the input params and save the file. Notice the version would be changed to your latest one
+
+      .. code-block:: text
+
+         ....
+         inputs:
           name: "adam"
-        ....
+         ....
+         version: v1-fast1
 
-   Create an execution using the exec spec file.
+   #. Create an execution using the exec spec file.
 
-   .. prompt:: bash $
+      .. prompt:: bash $
 
-      flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+       flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+
+   #. Monitor the execution by providing the execution name from the ``create execution`` command.
+
+      .. prompt:: bash $
+
+         flytectl get execution -p flytesnacks -d development <execname>
 
 
 
