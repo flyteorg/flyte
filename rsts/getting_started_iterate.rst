@@ -182,7 +182,7 @@ Modify Code and Test Locally
 
    #. Modify the execution spec file and update the input params and save the file. Notice that the version would be changed to your latest one.
 
-      .. code-block:: text
+      .. code-block:: yaml
 
          ....
          inputs:
@@ -194,7 +194,7 @@ Modify Code and Test Locally
 
       .. prompt:: bash $
 
-       flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
+        flytectl create execution -p flytesnacks -d development --execFile exec_spec.yaml
 
    #. Monitor the execution by providing the execution name from the ``create execution`` command.
 
