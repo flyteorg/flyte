@@ -71,7 +71,7 @@ Install flytectl
 
       .. tab:: Start a new sandbox cluster
 
-        .. tip:: Want to dive under the hood into flyte-sandbox, refer to the guide `here<>`_.
+        .. tip:: Want to dive under the hood into flyte-sandbox, refer to :ref:`deployment-sandbox`.
 
         Here '.' represents current directory and assuming you have changed into ``myflyteapp`` - the git-cloned directory you created
 
@@ -108,7 +108,7 @@ Build & Deploy Your Application to the cluster
                flytectl sandbox exec -- docker build . --tag "myapp:v1"
 
            .. tip::
-            #. Why are we not pushing the Docker image? Want to understand the details — refer to guide `here <>`_
+            #. Why are we not pushing the Docker image? Want to understand the details — refer to :ref:`deployment-sandbox`
             #. *Recommended:* Use the bundled `./docker_build_and_tag.sh`. It will automatically build the local Dockerfile, name it and tag it with the current git-SHA. This helps in achieving GitOps style workflows.
 
        .. tab:: Remote Flyte Cluster
