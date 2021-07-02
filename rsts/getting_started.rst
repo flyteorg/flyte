@@ -40,7 +40,7 @@ Implement Your Workflows in Python
 
 Prerequisites
 ^^^^^^^^^^^^^^^^
-Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ , `Git <https://git-scm.com/>`__, and `Python <https://www.python.org/downloads/>`__ >= 3.7 installed.
+Make sure you have `Git <https://git-scm.com/>`__, and `Python <https://www.python.org/downloads/>`__ >= 3.7 installed. Also ensure you have pip3 (mostly the case).
 
 Start a new project / repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -48,7 +48,7 @@ Install Flyte's Python SDK — `Flytekit <https://pypi.org/project/flytekit/>`__
 
 .. prompt:: bash (venv)$
 
-    pip install flytekit
+    pip3 install flytekit
     git clone https://github.com/flyteorg/flytekit-python-template.git myflyteapp
     cd myflyteapp
 

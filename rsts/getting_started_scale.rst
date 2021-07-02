@@ -36,6 +36,9 @@ Scale by Deploying Your Workflows into the Cloud
 
 .. _getting-started-build-deploy:
 
+Prerequisites
+^^^^^^^^^^^^^^^^
+Make sure you have `Docker <https://docs.docker.com/get-docker/>`__ and Docker Daemon is running. Also some of our users noted, that if connected to VPN may cause problems downloading the image.
 
 Install flytectl
 ^^^^^^^^^^^^^^^^^
