@@ -17,7 +17,7 @@ Fast registration only works when you're testing out code changes. If you need t
  Flytekit releases before the introduction of native typing have a slightly modified workflow for fast-registering. Please check the below-highlighted sections if your Flytkit version is < ``0.16.0``.
 
 Pre-requisites
-=============
+==============
 Upgrade your Flytekit dependency to ``>= 0.16.0`` and re-run pip-tools if necessary.
 
 .. admonition:: Flytkit < 0.16.0

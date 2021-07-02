@@ -63,12 +63,12 @@ If this is your first time using Flyte, check out the
 
    ---
 
-   .. link-button:: deployment
+   .. link-button:: auto/deployment/index
       :type: ref
-      :text: 🚢  Deployment
+      :text: 🚢  Configuring Production Features
       :classes: btn-block stretched-link
    ^^^^^^^^^^
-   Ship data processing and machine learning pipelines to production.
+   Ship and configure your machine learning pipelines on a production Flyte installation.
 
    ---
 
@@ -97,6 +97,7 @@ If this is your first time using Flyte, check out the
    |book-reader| User Guide <index>
    |chalkboard| Tutorials <tutorials>
    |project-diagram| Concepts <https://docs.flyte.org/en/latest/concepts/basics.html>
+   |rocket| Deployment <https://docs.flyte.org/en/latest/deployment/index.html>
    |book| API Reference <https://docs.flyte.org/en/latest/reference/index.html>
    |hands-helping| Community <https://docs.flyte.org/en/latest/community/index.html>
 
@@ -114,7 +115,7 @@ If this is your first time using Flyte, check out the
    Type System <auto/core/type_system/index>
    Testing <auto/testing/index>
    Containerization <auto/core/containerization/index>
-   deployment
+   Configuring Production Features <auto/deployment/index>
    integrations
    Extending flyte <auto/core/extend_flyte/index>
 

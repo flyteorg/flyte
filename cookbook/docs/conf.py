@@ -234,9 +234,7 @@ examples_dirs = [
     "../case_studies/feature_engineering/sqlite_datacleaning",
     "../testing",
     "../core/containerization",
-    "../deployment/workflow",
-    "../deployment/cluster",
-    # "../deployment/guides",  # TODO: add content to this section
+    "../deployment",
     # "../control_plane",  # TODO: add content to this section
     # "../integrations/flytekit_plugins/sqllite3",  # TODO: add content to this section
     "../integrations/flytekit_plugins/papermilltasks",
@@ -263,8 +261,7 @@ gallery_dirs = [
     "auto/case_studies/feature_engineering/sqlite_datacleaning",
     "auto/testing",
     "auto/core/containerization",
-    "auto/deployment/workflow",
-    "auto/deployment/cluster",
+    "auto/deployment",
     # "auto/deployment/guides",  # TODO: add content to this section
     # "auto/control_plane",  # TODO: add content to this section
     # "auto/integrations/flytekit_plugins/sqllite3",  # TODO: add content to this section

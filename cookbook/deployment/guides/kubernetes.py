@@ -1,8 +1,0 @@
-"""
-Kubernetes
-----------
-
-.. NOTE::
-
-    Coming soon 🛠
-"""
