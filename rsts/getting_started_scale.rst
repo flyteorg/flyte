@@ -1,7 +1,7 @@
 .. _gettingstarted_scale:
 
 Getting Started: Scale
------------------------
+----------------------
 
 .. raw:: html
   
@@ -29,15 +29,15 @@ Getting Started: Scale
             :classes: btn-outline-primary btn-block stretched-link
 
 
-2. Scale: Get your workflows into the cloud
-=============================================
+2. Scale: Get Your Workflows into the Cloud
+===========================================
 
 .. _getting-started-build-deploy:
 
 Install flytectl
 ^^^^^^^^^^^^^^^^^
 
-#. install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte.
+#. Install :std:ref:`flytectl`. ``Flytectl`` is a commandline interface for Flyte.
 
    .. tabs::
 
@@ -93,8 +93,8 @@ Install flytectl
 
 
 
-Build & Deploy Your Application to the cluster
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Build & Deploy Your Application to the Cluster
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #. Flyte uses Docker containers to package the workflows and tasks and sends them to the remote Flyte cluster. Thus, there is a ``Dockerfile`` already included in the cloned repo. You can build the Docker container and push the built image to a registry.
 
    .. tabs::
@@ -174,7 +174,7 @@ More details can be found `here <https://docs.flyte.org/projects/flytectl/en/sta
 
 .. admonition:: Recap
 
-  .. rubric:: 🎉  You have successfully packaged your workflow and tasks and pushed them to a Flyte cluster. Let's learn how to iterate?
+  .. rubric:: 🎉  You have successfully packaged your workflow and tasks and pushed them to a Flyte cluster. Let's learn how to iterate.
 
 .. toctree::
    :maxdepth: -1

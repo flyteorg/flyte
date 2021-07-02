@@ -29,11 +29,11 @@ Getting Started: Iterate
             :classes: btn-outline-primary btn-block stretched-link
 
 
-3. Iterate on your ideas
-==========================
+3. Iterate on Your Ideas
+========================
 
 
-Modify code - Test
+Modify Code - Test
 ^^^^^^^^^^^^^^^^^^^
 #. Open ``example.py`` in your favorite editor.
 
@@ -184,7 +184,7 @@ Modify code - Test
 
 .. admonition:: Recap
 
-  🎉 Congratulations! You have now
+  🎉 Congratulations! You have now:
 
   1. Run a Flyte workflow locally,
   2. Started a Flyte sanbox cluster,

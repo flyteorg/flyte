@@ -32,8 +32,8 @@ Getting Started
 
     We recommend using an OSX or a Linux machine, as we have not tested this on Windows. If you happen to test it, please let us know.
 
-1. Implement your workflows in python
-======================================
+1. Implement Your Workflows in Python
+=====================================
 
 Prerequisites
 ^^^^^^^^^^^^^^^^
@@ -73,8 +73,8 @@ The repo comes with a sample workflow, which can be found under ``myapp/workflow
        * The Dockerfile that comes with this is not GPU ready, but is a simple Dockerfile that should work for most of your apps.
 
 
-Run the workflow locally
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Run the Workflow Locally
+^^^^^^^^^^^^^^^^^^^^^^^^
 The workflow can be run locally, simply by running it as a Python script; note the ``__main__`` entry point at the `bottom of the file <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py#L58>`__.
 
 .. prompt:: bash (venv)$
