@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/go-test/deep"
@@ -304,7 +306,7 @@ func TestBranches(t *testing.T) {
 
 		t.Run(path, func(t *testing.T) {
 			// If you want to debug a single use-case. Uncomment this line.
-			//if !strings.HasSuffix(path, "success_8_nested.json") {
+			//if !strings.HasSuffix(path, "mycereal_condition_has_no_deps.json") {
 			//	t.SkipNow()
 			//}
 
@@ -317,14 +319,26 @@ func TestBranches(t *testing.T) {
 					t.FailNow()
 				}
 			} else if filepath.Ext(path) == ".pb" {
-				err = proto.Unmarshal(raw, wf)
-				if !assert.NoError(t, err) {
-					t.FailNow()
-				}
-
 				m := &jsonpb.Marshaler{
 					Indent: "  ",
 				}
+
+				err = proto.Unmarshal(raw, wf)
+				if !assert.NoError(t, err) {
+					tsk := &admin.TaskSpec{}
+					if !assert.NoError(t, proto.Unmarshal(raw, tsk)) {
+						t.FailNow()
+					}
+
+					raw, _ := m.MarshalToString(tsk)
+					err = ioutil.WriteFile(strings.TrimSuffix(path, filepath.Ext(path))+"_task.json", []byte(raw), os.ModePerm)
+					if !assert.NoError(t, err) {
+						t.FailNow()
+					}
+
+					return
+				}
+
 				raw, err := m.MarshalToString(wf)
 				if !assert.NoError(t, err) {
 					t.FailNow()

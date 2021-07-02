@@ -150,7 +150,10 @@ func (w workflowBuilder) AddEdges(n c.NodeBuilder, edgeDirection c.EdgeDirection
 	}
 
 	// Add explicitly declared edges
-	if n.GetUpstreamNodeIds() != nil {
+	switch edgeDirection {
+	case c.EdgeDirectionDownstream:
+		fallthrough
+	case c.EdgeDirectionBidirectional:
 		for _, upNode := range n.GetUpstreamNodeIds() {
 			w.AddExecutionEdge(upNode, n.GetId())
 		}

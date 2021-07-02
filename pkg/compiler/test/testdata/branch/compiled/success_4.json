@@ -273,14 +273,12 @@
       "downstream": {
         "node-0": {
           "ids": [
-            "node-1",
-            "node-1-branchnode-0"
+            "node-1"
           ]
         },
         "node-1": {
           "ids": [
-            "node-2",
-            "node-2-branchnode-0"
+            "node-2"
           ]
         },
         "node-2": {
