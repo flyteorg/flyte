@@ -89,7 +89,7 @@ Install flytectl
 
         .. prompt:: bash $
 
-            flytectl init
+            # COMING SOON! flytectl init
 
 
 
