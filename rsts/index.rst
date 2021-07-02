@@ -10,6 +10,7 @@
    |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
    |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
    |project-diagram| Concepts <concepts/basics>
+   |rocket| Deployment <deployment/index>
    |book| API Reference <reference/index>
    |hands-helping| Community <community/index>
 
@@ -22,6 +23,14 @@
    concepts/basics
    concepts/control_plane
    concepts/architecture
+
+.. toctree::
+   :caption: Deployment
+   :maxdepth: -1
+   :name: deploymenttoc
+   :hidden:
+
+   deployment/index
 
 .. toctree::
    :caption: Community
