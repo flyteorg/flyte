@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flytectl/pkg/printer"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytestdlib/logger"
+
 	"github.com/golang/protobuf/proto"
 )
 
@@ -50,6 +51,31 @@ Retrieves all the execution within project and domain in json format.
 
  bin/flytectl get execution -p flytesnacks -d development -o json
 
+
+Get more details for the execution using --details flag which shows node executions along with task executions on them. Default view is tree view and TABLE format is not supported on this view
+
+::
+
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details
+
+Using yaml view for the details. In this view only node details are available. For task details pass --nodeId flag
+
+::
+
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --details -o yaml
+
+Using --nodeId flag to get task executions on a specific node. Use the nodeId attribute from node details view
+
+::
+
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodId n0
+
+Task execution view is also available in yaml/json format. Below example shows yaml
+
+::
+
+ bin/flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodId n0 -o yaml
+
 Usage
 `
 )
@@ -86,6 +112,11 @@ func getExecutionFunc(ctx context.Context, args []string, cmdCtx cmdCore.Command
 		}
 		executions = append(executions, exec)
 		logger.Infof(ctx, "Retrieved %v executions", len(executions))
+
+		if execution.DefaultConfig.Details || len(execution.DefaultConfig.NodeID) > 0 {
+			// Fetching Node execution details
+			return getExecutionDetails(ctx, config.GetConfig().Project, config.GetConfig().Domain, name, cmdCtx)
+		}
 		return adminPrinter.Print(config.GetConfig().MustOutputFormat(), executionColumns,
 			ExecutionToProtoMessages(executions)...)
 	}

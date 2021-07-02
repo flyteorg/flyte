@@ -19,6 +19,12 @@ type AdminFetcherExtInterface interface {
 	// FetchExecution fetches the execution based on name, project, domain
 	FetchExecution(ctx context.Context, name, project, domain string) (*admin.Execution, error)
 
+	// FetchNodeExecutionDetails fetches the node execution details based on execution name, project, domain
+	FetchNodeExecutionDetails(ctx context.Context, name, project, domain string) (*admin.NodeExecutionList, error)
+
+	// FetchTaskExecutionsOnNode fetches task execution on a node , for give execution name, project, domain
+	FetchTaskExecutionsOnNode(ctx context.Context, nodeID, execName, project, domain string) (*admin.TaskExecutionList, error)
+
 	// ListExecution fetches the all versions of  based on name, project, domain
 	ListExecution(ctx context.Context, project, domain string, filter filters.Filters) (*admin.ExecutionList, error)
 
