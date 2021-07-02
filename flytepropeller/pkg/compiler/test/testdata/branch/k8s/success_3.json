@@ -130,8 +130,7 @@
     },
     "connections": {
       "node-0": [
-        "node-1",
-        "node-1-branchnode-0"
+        "node-1"
       ],
       "node-1": [
         "end-node"
@@ -144,8 +143,7 @@
     "edges": {
       "downstream": {
         "node-0": [
-          "node-1",
-          "node-1-branchnode-0"
+          "node-1"
         ],
         "node-1": [
           "end-node"

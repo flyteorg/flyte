@@ -258,8 +258,7 @@
     "connections": {
       "node-0": [
         "end-node",
-        "node-1",
-        "node-1-branchnode-1"
+        "node-1"
       ],
       "node-1": [
         "node-2"
@@ -275,8 +274,7 @@
       "downstream": {
         "node-0": [
           "end-node",
-          "node-1",
-          "node-1-branchnode-1"
+          "node-1"
         ],
         "node-1": [
           "node-2"

@@ -362,8 +362,7 @@
         "node-0": {
           "ids": [
             "end-node",
-            "node-1",
-            "node-1-branchnode-1"
+            "node-1"
           ]
         },
         "node-1": {
