@@ -77,15 +77,15 @@ Run the workflow locally
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 The workflow can be run locally, simply by running it as a Python script — note the ``__main__`` entry point at the `bottom of the file <https://github.com/flyteorg/flytekit-python-template/blob/main/myapp/workflows/example.py#L58>`__.
 
-   .. prompt:: bash (venv)$
+.. prompt:: bash (venv)$
 
-       python myapp/workflows/example.py
+   python myapp/workflows/example.py
 
-   .. dropdown:: Expected output
+.. dropdown:: Expected output
 
-      .. prompt:: text
+   .. prompt:: text
 
-         Running my_wf() hello world
+      Running my_wf() hello world
 
 .. admonition:: Recap
 
