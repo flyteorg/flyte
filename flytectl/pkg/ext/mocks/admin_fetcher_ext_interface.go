@@ -299,6 +299,47 @@ func (_m *AdminFetcherExtInterface) FetchLPVersion(ctx context.Context, name str
 	return r0, r1
 }
 
+type AdminFetcherExtInterface_FetchNodeExecutionDetails struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchNodeExecutionDetails) Return(_a0 *admin.NodeExecutionList, _a1 error) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
+	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
+	c := _m.On("FetchNodeExecutionDetails", ctx, name, project, domain)
+	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchNodeExecutionDetailsMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchNodeExecutionDetails {
+	c := _m.On("FetchNodeExecutionDetails", matchers...)
+	return &AdminFetcherExtInterface_FetchNodeExecutionDetails{Call: c}
+}
+
+// FetchNodeExecutionDetails provides a mock function with given fields: ctx, name, project, domain
+func (_m *AdminFetcherExtInterface) FetchNodeExecutionDetails(ctx context.Context, name string, project string, domain string) (*admin.NodeExecutionList, error) {
+	ret := _m.Called(ctx, name, project, domain)
+
+	var r0 *admin.NodeExecutionList
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *admin.NodeExecutionList); ok {
+		r0 = rf(ctx, name, project, domain)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.NodeExecutionList)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(ctx, name, project, domain)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminFetcherExtInterface_FetchProjectDomainAttributes struct {
 	*mock.Call
 }
@@ -333,6 +374,47 @@ func (_m *AdminFetcherExtInterface) FetchProjectDomainAttributes(ctx context.Con
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string, string, admin.MatchableResource) error); ok {
 		r1 = rf(ctx, project, domain, rsType)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminFetcherExtInterface_FetchTaskExecutionsOnNode struct {
+	*mock.Call
+}
+
+func (_m AdminFetcherExtInterface_FetchTaskExecutionsOnNode) Return(_a0 *admin.TaskExecutionList, _a1 error) *AdminFetcherExtInterface_FetchTaskExecutionsOnNode {
+	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchTaskExecutionsOnNode(ctx context.Context, nodeId string, execName string, project string, domain string) *AdminFetcherExtInterface_FetchTaskExecutionsOnNode {
+	c := _m.On("FetchTaskExecutionsOnNode", ctx, nodeId, execName, project, domain)
+	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: c}
+}
+
+func (_m *AdminFetcherExtInterface) OnFetchTaskExecutionsOnNodeMatch(matchers ...interface{}) *AdminFetcherExtInterface_FetchTaskExecutionsOnNode {
+	c := _m.On("FetchTaskExecutionsOnNode", matchers...)
+	return &AdminFetcherExtInterface_FetchTaskExecutionsOnNode{Call: c}
+}
+
+// FetchTaskExecutionsOnNode provides a mock function with given fields: ctx, nodeId, execName, project, domain
+func (_m *AdminFetcherExtInterface) FetchTaskExecutionsOnNode(ctx context.Context, nodeId string, execName string, project string, domain string) (*admin.TaskExecutionList, error) {
+	ret := _m.Called(ctx, nodeId, execName, project, domain)
+
+	var r0 *admin.TaskExecutionList
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string, string) *admin.TaskExecutionList); ok {
+		r0 = rf(ctx, nodeId, execName, project, domain)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.TaskExecutionList)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string, string) error); ok {
+		r1 = rf(ctx, nodeId, execName, project, domain)
 	} else {
 		r1 = ret.Error(1)
 	}

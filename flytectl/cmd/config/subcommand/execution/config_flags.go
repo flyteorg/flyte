@@ -50,9 +50,11 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 // flags is json-name.json-sub-name... etc.
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
-	cmdFlags.StringVar(&(DefaultConfig.Filter.FieldSelector), fmt.Sprintf("%v%v", prefix, "filter.field-selector"), *new(string), "Specifies the Field selector")
-	cmdFlags.StringVar((&DefaultConfig.Filter.SortBy), fmt.Sprintf("%v%v", prefix, "filter.sort-by"), *new(string), "Specifies which field to sort result by ")
-	cmdFlags.Int32Var((&DefaultConfig.Filter.Limit), fmt.Sprintf("%v%v", prefix, "filter.limit"), 100, "Specifies the limit")
-	cmdFlags.BoolVar((&DefaultConfig.Filter.Asc), fmt.Sprintf("%v%v", prefix, "filter.asc"), false, "Specifies the sorting order. By default flytectl sort result in descending order")
+	cmdFlags.StringVar(&DefaultConfig.Filter.FieldSelector, fmt.Sprintf("%v%v", prefix, "filter.field-selector"), DefaultConfig.Filter.FieldSelector, "Specifies the Field selector")
+	cmdFlags.StringVar(&DefaultConfig.Filter.SortBy, fmt.Sprintf("%v%v", prefix, "filter.sort-by"), DefaultConfig.Filter.SortBy, "Specifies which field to sort results ")
+	cmdFlags.Int32Var(&DefaultConfig.Filter.Limit, fmt.Sprintf("%v%v", prefix, "filter.limit"), DefaultConfig.Filter.Limit, "Specifies the limit")
+	cmdFlags.BoolVar(&DefaultConfig.Filter.Asc, fmt.Sprintf("%v%v", prefix, "filter.asc"), DefaultConfig.Filter.Asc, "Specifies the sorting order. By default flytectl sort result in descending order")
+	cmdFlags.BoolVar(&DefaultConfig.Details, fmt.Sprintf("%v%v", prefix, "details"), DefaultConfig.Details, "gets node execution details. Only applicable for single execution name i.e get execution name --details")
+	cmdFlags.StringVar(&DefaultConfig.NodeID, fmt.Sprintf("%v%v", prefix, "nodeId"), DefaultConfig.NodeID, "get task executions for given node name.")
 	return cmdFlags
 }

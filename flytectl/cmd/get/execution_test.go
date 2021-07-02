@@ -3,17 +3,20 @@ package get
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"testing"
 
-	"github.com/stretchr/testify/mock"
-
 	"github.com/flyteorg/flytectl/cmd/config"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/execution"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	u "github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestListExecutionFunc(t *testing.T) {
@@ -168,6 +171,22 @@ func TestGetExecutionFunc(t *testing.T) {
 	err := getExecutionFunc(ctx, args, cmdCtx)
 	assert.Nil(t, err)
 	mockClient.AssertCalled(t, "GetExecution", ctx, execGetRequest)
+
+}
+
+func TestGetExecutionFuncForDetails(t *testing.T) {
+	setup()
+	ctx := u.Ctx
+	mockCmdCtx := u.CmdCtx
+	mockClient = u.MockClient
+	mockFetcherExt := u.FetcherExt
+	execution.DefaultConfig.Details = true
+	args := []string{dummyExec}
+	mockFetcherExt.OnFetchExecutionMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(&admin.Execution{}, nil)
+	mockFetcherExt.OnFetchNodeExecutionDetailsMatch(ctx, dummyExec, dummyProject, dummyDomain).Return(nil, fmt.Errorf("unable to fetch details"))
+	err = getExecutionFunc(ctx, args, mockCmdCtx)
+	assert.NotNil(t, err)
+	assert.Equal(t, fmt.Errorf("unable to fetch details"), err)
 }
 
 func TestGetExecutionFuncWithError(t *testing.T) {
