@@ -11,6 +11,43 @@ We've been working diligently to help users sort out issues.
 
 Here are a couple of techniques we believe would help you jump out of the pandora box quickly! 
 
+* If having trouble with ``flytectl sandbox start`` - 
+
+  - The process hangs at ``Waiting for Flyte to become ready...`` for a while
+  - OR ends with a message ``Timed out while waiting for the datacatalog rollout to be created``
+
+  **Potential causes**
+
+  - your docker daemon is constrained on disk, memory or CPU potentially. Why docker? refer to :ref:`deployment-sandbox`.
+  - a simple solution reclaim disk from docker - `docs <https://docs.docker.com/engine/reference/commandline/system_prune/>`__ ::
+
+      docker system prune [OPTIONS]
+
+  - Another simple solution, increase mem / cpu available for docker
+
+  **Debug yourself**
+
+  - sandbox is a docker container that runs kubernetes and flyte in it. So you can simple ``exec`` into it
+
+  .. prompt:: bash $
+     docker ps
+
+  .. code-block::
+
+     CONTAINER ID   IMAGE                                      COMMAND                  CREATED         STATUS         PORTS                                                                                                           NAMES
+     d3ab7e4cb17c   cr.flyte.org/flyteorg/flyte-sandbox:dind   "tini flyte-entrypoi…"   7 minutes ago   Up 7 minutes   127.0.0.1:30081-30082->30081-30082/tcp, 127.0.0.1:30084->30084/tcp, 2375-2376/tcp, 127.0.0.1:30086->30086/tcp   flyte-sandbox
+
+  .. prompt:: bash $
+
+     docker exec -it <imageid> bash
+
+  Inside the container you can run::
+
+     kubectl get pods -n flyte
+
+  you can check on the Pending pods and do a detail check as to why the scheduler is failing. This could also affect your workflows.
+
+
 * If the issue is related to the ``make start`` command:
     - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
     - If ``make start`` results in a timeout issue:

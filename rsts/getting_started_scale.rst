@@ -86,6 +86,8 @@ Install flytectl
 
         export FLYTECTL_CONFIG=$HOME/.flyte/config-sandbox.yaml
 
+     **NOTE** if having trouble with starting the sandbox refer to :ref:`troubleshoot`.
+
    .. tabbed:: Connect to an existing Flyte cluster
 
      .. prompt:: bash $
