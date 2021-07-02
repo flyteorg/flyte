@@ -5,8 +5,6 @@ on:
     paths-ignore:
       - 'cookbook/docs/**'
       - 'cookbook/deployment/**'
-    branches:
-      - master
 
 defaults:
   run:
@@ -23,6 +21,6 @@ jobs:
           fetch-depth: "0"
       - uses: unionai/flytectl-setup-action@v0.0.1
       - name: setup sandbox
-        run: flytectl sandbox start --sourcesPath=$GITHUB_WORKSPACE
+        run: make setup
       - name: fast register
         run: REGISTRY=ghcr.io/flyteorg VERSION=latest make fast_register

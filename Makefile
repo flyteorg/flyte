@@ -49,7 +49,7 @@ endif
 .PHONY: setup
 setup:
 	$(call LOG,Starting Flyte sandbox)
-	flytectl sandbox start --sourcesPath=$(shell pwd)
+	flytectl sandbox start --source=$(shell pwd)
 
 .PHONY: start
 start: setup

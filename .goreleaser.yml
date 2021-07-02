@@ -10,5 +10,4 @@ release:
   name_template: "{{.ProjectName}} v{{.Version}}"
   disable: false
   extra_files:
-    - glob: ./cookbook/release-snacks/*.tgz
-    - glob: ./cookbook/flyte_tests_manifest.json
+    - glob: ./cookbook/release-snacks/*
