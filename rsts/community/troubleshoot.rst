@@ -56,7 +56,7 @@ Here are a couple of techniques we believe would help you jump out of the pandor
 
      docker system df
 
-    
+
 * If the issue is related to the ``make start`` command:
     - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
     - If ``make start`` results in a timeout issue:
