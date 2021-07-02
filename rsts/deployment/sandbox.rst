@@ -67,7 +67,6 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     brew install kubectl
 
-
 .. tabs::
 
     .. tab:: Docker Image
@@ -75,6 +74,10 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
         Refer to :ref:`getting-started-firstrun`
 
     .. tab:: k3d
+
+        .. TODO::
+
+            These instructions currently still rely on the old kustomize setup, we are moving them over to the Helm chart soon.
 
         #. Install k3d Using ``curl``::
 
@@ -102,7 +105,6 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
             k3d cluster delete flyte
 
-
         .. note::
 
             #. Sometimes Flyteconsole will not open up. This is probably because your docker networking is impacted. One solution is to restart docker and re-do the previous steps.
@@ -114,6 +116,10 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
     .. tab:: Docker-Mac + K8s
 
+        .. TODO::
+
+            These instructions currently still rely on the old kustomize setup, we are moving them over to the Helm chart soon.
+
         #. `Install Docker for mac with Kubernetes as explained here <https://www.docker.com/blog/docker-mac-kubernetes/>`_
         #. Make sure Kubernetes is started and once started make sure your kubectx is set to the `docker-desktop` cluster, typically ::
 
@@ -123,17 +129,19 @@ Ensure ``kubectl`` is installed. Follow `kubectl installation docs <https://kube
 
             kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
 
-
         #. Connect to `FlyteConsole <localhost/console>`__
 
     .. tab::  Using Minikube (Not recommended)
+
+        .. TODO::
+
+            These instructions currently still rely on the old kustomize setup, we are moving them over to the Helm chart soon.
 
         #. Install `Minikube <https://kubernetes.io/docs/tasks/tools/install-minikube/>`_
 
         #. Install Flyte::
 
             kubectl create -f https://raw.githubusercontent.com/flyteorg/flyte/master/deployment/sandbox/flyte_generated.yaml
-
 
         .. note::
 
