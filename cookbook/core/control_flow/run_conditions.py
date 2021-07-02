@@ -47,10 +47,10 @@ def double(n: float) -> float:
 def multiplier(my_input: float) -> float:
     return (
         conditional("fractions")
-        .if_((my_input >= 0.1) & (my_input <= 1.0))
-        .then(double(n=my_input))
-        .else_()
-        .then(square(n=my_input))
+            .if_((my_input >= 0.1) & (my_input <= 1.0))
+            .then(double(n=my_input))
+            .else_()
+            .then(square(n=my_input))
     )
 
 
@@ -73,12 +73,12 @@ if __name__ == "__main__":
 def multiplier_2(my_input: float) -> float:
     return (
         conditional("fractions")
-        .if_((my_input > 0.1) & (my_input < 1.0))
-        .then(double(n=my_input))
-        .elif_((my_input > 1.0) & (my_input <= 10.0))
-        .then(square(n=my_input))
-        .else_()
-        .fail("The input must be between 0 and 10")
+            .if_((my_input > 0.1) & (my_input < 1.0))
+            .then(double(n=my_input))
+            .elif_((my_input > 1.0) & (my_input <= 10.0))
+            .then(square(n=my_input))
+            .else_()
+            .fail("The input must be between 0 and 10")
     )
 
 
@@ -94,12 +94,12 @@ if __name__ == "__main__":
 def multiplier_3(my_input: float) -> float:
     d = (
         conditional("fractions")
-        .if_((my_input > 0.1) & (my_input < 1.0))
-        .then(double(n=my_input))
-        .elif_((my_input > 1.0) & (my_input < 10.0))
-        .then(square(n=my_input))
-        .else_()
-        .fail("The input must be between 0 and 10")
+            .if_((my_input > 0.1) & (my_input < 1.0))
+            .then(double(n=my_input))
+            .elif_((my_input > 1.0) & (my_input < 10.0))
+            .then(square(n=my_input))
+            .else_()
+            .fail("The input must be between 0 and 10")
     )
 
     # d will be either the output of `double` or t he output of `square`. If the conditional() falls through the fail
@@ -156,7 +156,9 @@ def basic_boolean_wf() -> int:
 
 
 # %%
-# Ofcourse it is also possible to pass a boolean directly to a workflow as follows
+# Example 5
+# ^^^^^^^^^^
+# It is also possible to pass a boolean directly to a workflow as follows
 #
 # .. note::
 #
@@ -169,7 +171,7 @@ def bool_input_wf(b: bool) -> int:
 
 
 # %%
-# Let us execute these workflows
+# these workflows can be locally executed
 if __name__ == "__main__":
     print("Running basic_boolean_wf a few times")
     for i in range(0, 5):
@@ -178,7 +180,9 @@ if __name__ == "__main__":
 
 
 # %%
-# Also it is possible to arbitrarily nest conditional sections, inside other
+# Example 6
+# ^^^^^^^^^
+# It is possible to arbitrarily nest conditional sections, inside other
 # conditional sections. Remember - conditional sections can only be in the
 # `then` part for a previous conditional block
 # The follow example shows how you can use float comparisons to create
@@ -187,20 +191,20 @@ if __name__ == "__main__":
 def nested_conditions(my_input: float) -> float:
     return (
         conditional("fractions")
-        .if_((my_input > 0.1) & (my_input < 1.0))
-        .then(
+            .if_((my_input > 0.1) & (my_input < 1.0))
+            .then(
             conditional("inner_fractions")
-            .if_(my_input < 0.5)
-            .then(double(n=my_input))
-            .elif_((my_input > 0.5) & (my_input < 0.7))
+                .if_(my_input < 0.5)
+                .then(double(n=my_input))
+                .elif_((my_input > 0.5) & (my_input < 0.7))
+                .then(square(n=my_input))
+                .else_()
+                .fail("Only <0.7 allowed")
+        )
+            .elif_((my_input > 1.0) & (my_input < 10.0))
             .then(square(n=my_input))
             .else_()
-            .fail("Only <0.7 allowed")
-        )
-        .elif_((my_input > 1.0) & (my_input < 10.0))
-        .then(square(n=my_input))
-        .else_()
-        .then(double(n=my_input))
+            .then(double(n=my_input))
     )
 
 
@@ -208,3 +212,51 @@ def nested_conditions(my_input: float) -> float:
 # As usual you can execute nested conditionals locally
 if __name__ == "__main__":
     print(f"nested_conditions(0.4) -> {nested_conditions(my_input=0.4)}")
+
+
+# %%
+#  Example 7
+# ^^^^^^^^^^^
+# It is also possible to consume the outputs from conditional nodes as shown in the following example.
+# In the case of conditionals though, the outputs are computed
+# to be the subset of outputs that all then-nodes produce. In the following example, we call square() in one condition
+# and call double in another.
+@task
+def sum_diff(a: float, b: float) -> (float, float):
+    """
+    sum_diff returns the sum and difference between a and b.
+    """
+    return a + b, a - b
+
+
+# %%
+# Putting it together, the workflow that consumes outputs from conditionals can be constructed as follows.
+#
+# .. tip::
+#
+#   A useful mental model for consuming outputs of conditions is to think of them like ternary operators in programming
+#   languages. The only difference being they can be n-ary. In python this is equivalent to
+#
+#       .. code-block:: python
+#
+#           x = 0 if m < 0 else 1
+@workflow
+def consume_outputs(my_input: float) -> float:
+    is_heads = coin_toss()
+    res = (
+        conditional("double_or_square")
+            .if_(is_heads == True)
+            .then(square(n=my_input))
+            .else_()
+            .then(sum_diff(a=my_input, b=my_input))
+    )
+
+    # Regardless of the result, always double before returning
+    # the variable `res` in this case will carry the value of either square or double of the variable `my_input`
+    return double(n=res)
+
+
+# %%
+# As usual local execution does not change
+if __name__ == "__main__":
+    print(f"consume_outputs(0.4) => {consume_outputs(my_input=0.4)}")

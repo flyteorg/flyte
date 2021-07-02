@@ -55,6 +55,7 @@ class CustomSorter(FileNameSortKey):
         "schema.py",
         "typed_schema.py",
         "custom_objects.py",
+        "enums.py",
         # Testing
         "mocking.py",
         # Containerization

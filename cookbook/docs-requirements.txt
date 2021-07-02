@@ -24,7 +24,7 @@ chardet==4.0.0
     # via requests
 click==7.1.2
     # via flytekit
-croniter==1.0.13
+croniter==1.0.15
     # via flytekit
 cycler==0.10.0
     # via matplotlib
@@ -45,10 +45,10 @@ docutils==0.16
     #   sphinx-panels
     #   sphinx-rtd-theme
     #   sphinx-tabs
-flyteidl==0.19.3
+flyteidl==0.19.9
     # via flytekit
-flytekit==0.19.1
-    # via -r docs-requirements.in
+flytekit==0.20.0
+    # via -r ./common/requirements-common.in
 git+git://github.com/flyteorg/furo@main
     # via -r docs-requirements.in
 grpcio==1.38.1
@@ -57,7 +57,7 @@ idna==2.10
     # via requests
 imagesize==1.2.0
     # via sphinx
-importlib-metadata==4.5.0
+importlib-metadata==4.6.0
     # via keyring
 jinja2==3.0.1
     # via
@@ -75,10 +75,13 @@ marshmallow==3.12.1
     # via
     #   dataclasses-json
     #   marshmallow-enum
+    #   marshmallow-jsonschema
 marshmallow-enum==1.5.1
     # via dataclasses-json
+marshmallow-jsonschema==0.12.0
+    # via flytekit
 matplotlib==3.4.2
-    # via -r docs-requirements.in
+    # via -r ./common/requirements-common.in
 mypy-extensions==0.4.3
     # via typing-inspect
 natsort==7.1.1
@@ -94,7 +97,7 @@ pandas==1.2.5
     # via flytekit
 pathspec==0.8.1
     # via scantree
-pillow==8.2.0
+pillow==8.3.0
     # via
     #   -r docs-requirements.in
     #   matplotlib
@@ -121,6 +124,8 @@ python-dateutil==2.8.1
     #   flytekit
     #   matplotlib
     #   pandas
+python-json-logger==2.0.1
+    # via flytekit
 pytimeparse==1.1.8
     # via flytekit
 pytz==2018.4
@@ -132,7 +137,7 @@ pyyaml==5.4.1
     # via sphinx-autoapi
 readthedocs-sphinx-search==0.1.0
     # via -r docs-requirements.in
-regex==2021.4.4
+regex==2021.7.1
     # via docker-image-py
 requests==2.25.1
     # via
@@ -227,13 +232,15 @@ urllib3==1.25.11
     #   requests
     #   responses
 wheel==0.36.2
-    # via flytekit
+    # via
+    #   -r ./common/requirements-common.in
+    #   flytekit
 wrapt==1.12.1
     # via
     #   astroid
     #   deprecated
     #   flytekit
-zipp==3.4.1
+zipp==3.4.2
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:

@@ -1,7 +1,9 @@
+-r ./common/requirements-common.in
 git+git://github.com/flyteorg/furo@main
 pillow
 readthedocs-sphinx-search
 sphinx
+sphinx-tabs
 sphinx_rtd_theme
 sphinx-gallery
 sphinx-prompt
@@ -15,5 +17,3 @@ sphinx-tabs
 sphinxcontrib-mermaid
 docutils==0.16
 astroid==2.4.2
-matplotlib
-flytekit
