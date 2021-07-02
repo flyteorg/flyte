@@ -47,7 +47,16 @@ Here are a couple of techniques we believe would help you jump out of the pandor
 
   you can check on the Pending pods and do a detail check as to why the scheduler is failing. This could also affect your workflows.
 
+  Also you can simply export this variable to use local kubectl::
 
+     export KUBECONFIG=$HOME/.flyte/k3s/k3s.yaml
+
+
+  Another useful way to debug docker is::
+
+     docker system df
+
+    
 * If the issue is related to the ``make start`` command:
     - ``make start`` usually gets completed within five minutes (could take longer if you aren't in the United States).
     - If ``make start`` results in a timeout issue:
