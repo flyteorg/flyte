@@ -8,7 +8,7 @@ Launch plans provide a way to templatize Flyte workflow invocations. Launch plan
 
 In addition to templatizing inputs, launch plans allow you to run your workflow on one or multiple schedules. Each launch
 plan can optionally define a single schedule (which can be easily disabled by disabling the launch plan) as well as
-optional notifications. Refer to the :std:ref:`User Guide <cookbook:sphx_glr_auto_deployment_cluster_notifications.py>` for a deep dive into available notifications.
+optional notifications. Refer to the :ref:`deployment-cluster-config-notifications` for a deep dive into available notifications.
 
 See `here <https://docs.google.com/drawings/d/1xtG7lyk3es2S42pNnh5OGXW59jvnRIyPXCrdjPJm-3c/edit?usp=sharing>`__ for an overview.
 

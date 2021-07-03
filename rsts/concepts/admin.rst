@@ -239,7 +239,7 @@ Permitted project operations:
 Matchable resources
 +++++++++++++++++++
 
-A thorough background on :std:ref:`matchable resources <sphx_glr_auto_deployment_cluster_config_flyte_deploy.py>` explains
+A thorough background on :std:ref:`matchable resources <protos/docs/admin/admin:matchableresource>` explains
 their purpose and application logic. As a summary, these are used to override system level defaults for kubernetes cluster
 resource management, default execution values, and more all across different levels of specificity.
 

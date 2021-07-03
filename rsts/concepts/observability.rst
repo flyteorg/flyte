@@ -3,7 +3,7 @@
 Metrics for your executions
 ===========================
 
-.. tip:: Refer to the :std:ref:`User Guide <cookbook:sphx_glr_auto_deployment_cluster_monitoring.py>` to see how to use prebuilt dashboards published to Grafana Marketplace. The following section explains some other metrics that are very important.
+.. tip:: Refer to the :ref:`deployment-cluster-config-monitoring` to see how to use prebuilt dashboards published to Grafana Marketplace. The following section explains some other metrics that are very important.
 
 Flyte-Provided Metrics
 ~~~~~~~~~~~~~~~~~~~~~~~
