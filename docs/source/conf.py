@@ -41,7 +41,6 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx-prompt",
     "sphinx_copybutton",
-    "sphinx_search.extension",
     "sphinx_fontawesome",
     "sphinx_tabs.tabs",
 ]

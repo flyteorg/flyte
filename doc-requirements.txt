@@ -13,7 +13,7 @@ beautifulsoup4==4.9.3
     #   furo
     #   sphinx-code-include
     #   sphinx-material
-certifi==2020.12.5
+certifi==2021.5.30
     # via requests
 chardet==4.0.0
     # via requests
@@ -48,8 +48,6 @@ python-slugify[unidecode]==5.0.2
     # via sphinx-material
 pytz==2021.1
     # via babel
-readthedocs-sphinx-search==0.1.0
-    # via -r doc-requirements.in
 requests==2.25.1
     # via sphinx
 six==1.16.0
@@ -70,7 +68,7 @@ sphinx==3.5.4
     #   sphinx-tabs
 sphinx-code-include==1.1.1
     # via -r doc-requirements.in
-sphinx-copybutton==0.3.1
+sphinx-copybutton==0.3.3
     # via -r doc-requirements.in
 sphinx-fontawesome==0.0.6
     # via -r doc-requirements.in
@@ -96,7 +94,7 @@ text-unidecode==1.3
     # via python-slugify
 unidecode==1.2.0
     # via python-slugify
-urllib3==1.26.4
+urllib3==1.26.6
     # via requests
 
 # The following packages are considered to be unsafe in a requirements file:
