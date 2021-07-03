@@ -1,7 +1,6 @@
 -r ./common/requirements-common.in
 git+git://github.com/flyteorg/furo@main
 pillow
-readthedocs-sphinx-search
 sphinx
 sphinx-tabs
 sphinx_rtd_theme

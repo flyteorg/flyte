@@ -158,7 +158,6 @@ extensions = [
     "sphinx_gallery.gen_gallery",
     "sphinx-prompt",
     "sphinx_copybutton",
-    "sphinx_search.extension",
     "sphinxext.remoteliteralinclude",
     "sphinx_panels",
     "sphinx_tabs.tabs",

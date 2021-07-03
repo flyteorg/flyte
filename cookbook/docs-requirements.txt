@@ -135,8 +135,6 @@ pytz==2018.4
     #   pandas
 pyyaml==5.4.1
     # via sphinx-autoapi
-readthedocs-sphinx-search==0.1.0
-    # via -r docs-requirements.in
 regex==2021.7.1
     # via docker-image-py
 requests==2.25.1
@@ -240,7 +238,7 @@ wrapt==1.12.1
     #   astroid
     #   deprecated
     #   flytekit
-zipp==3.4.2
+zipp==3.5.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
