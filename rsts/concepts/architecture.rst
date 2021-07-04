@@ -91,3 +91,37 @@ For each task in a workflow, FlytePropeller activates the appropriate plugin bas
 
 The Flyte team has pre-built plugins for Hive, Spark, and AWS Batch, and more.
 To support new use-cases, developers can create their own plugins and bundle them in their FlytePropeller deployment.
+
+Component Code References
+=========================
+
+.. panels::
+  :container: container-lg pb-4
+  :column: col-lg-4 col-md-4 col-sm-4 col-xs-12 p-2
+  :body: text-center
+
+  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin
+     :type: url
+     :text: FlyteAdmin
+     :classes: btn-block stretched-link
+
+  ---
+
+  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller
+     :type: url
+     :text: FlytePropeller
+     :classes: btn-block stretched-link
+
+  ---
+
+  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/datacatalog
+     :type: url
+     :text: DataCatalog
+     :classes: btn-block stretched-link
+
+  ---
+
+  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins
+     :type: url
+     :text: FlytePlugins
+     :classes: btn-block stretched-link
