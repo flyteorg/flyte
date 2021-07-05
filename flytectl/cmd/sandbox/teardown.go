@@ -15,7 +15,7 @@ import (
 const (
 	teardownShort = "Teardown will cleanup the sandbox environment"
 	teardownLong  = `
-Teardown will remove docker container and all the flyte config 
+Teardown will remove sandbox cluster and all the flyte config created by sandbox start
 ::
 
  bin/flytectl sandbox teardown 

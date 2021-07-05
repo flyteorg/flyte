@@ -30,7 +30,7 @@ var (
 	ImageName               = "cr.flyte.org/flyteorg/flyte-sandbox:dind"
 	FlyteSandboxClusterName = "flyte-sandbox"
 	Environment             = []string{"SANDBOX=1", "KUBERNETES_API_PORT=30086", "FLYTE_HOST=localhost:30081", "FLYTE_AWS_ENDPOINT=http://localhost:30084"}
-	FlyteSnackDir           = "/usr/src"
+	Source                  = "/root"
 	K3sDir                  = "/etc/rancher/"
 	Client                  Docker
 	Volumes                 = []mount.Mount{
@@ -43,7 +43,7 @@ var (
 	ExecConfig = types.ExecConfig{
 		AttachStderr: true,
 		Tty:          true,
-		WorkingDir:   FlyteSnackDir,
+		WorkingDir:   Source,
 		AttachStdout: true,
 		Cmd:          []string{},
 	}

@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -56,7 +57,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		_, err := startSandbox(ctx, mockDocker, os.Stdin)
 		assert.Nil(t, err)
 	})
-	t.Run("Successfully run sandbox cluster with flytesnacks", func(t *testing.T) {
+	t.Run("Successfully run sandbox cluster with source code", func(t *testing.T) {
 		ctx := context.Background()
 		errCh := make(chan error)
 		bodyStatus := make(chan container.ContainerWaitOKBody)
@@ -65,7 +66,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.FlyteSnackDir,
+			Target: docker.Source,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -92,6 +93,44 @@ func TestStartSandboxFunc(t *testing.T) {
 		_, err := startSandbox(ctx, mockDocker, os.Stdin)
 		assert.Nil(t, err)
 	})
+	t.Run("Successfully run sandbox cluster with abs path of source code", func(t *testing.T) {
+		ctx := context.Background()
+		errCh := make(chan error)
+		bodyStatus := make(chan container.ContainerWaitOKBody)
+		mockDocker := &mocks.Docker{}
+		sandboxConfig.DefaultConfig.Source = "../"
+		absPath, err := filepath.Abs(sandboxConfig.DefaultConfig.Source)
+		assert.Nil(t, err)
+		volumes := append(docker.Volumes, mount.Mount{
+			Type:   mount.TypeBind,
+			Source: absPath,
+			Target: docker.Source,
+		})
+		mockDocker.OnContainerCreate(ctx, &container.Config{
+			Env:          docker.Environment,
+			Image:        docker.ImageName,
+			Tty:          false,
+			ExposedPorts: p1,
+		}, &container.HostConfig{
+			Mounts:       volumes,
+			PortBindings: p2,
+			Privileged:   true,
+		}, nil, nil, mock.Anything).Return(container.ContainerCreateCreatedBody{
+			ID: "Hello",
+		}, nil)
+		mockDocker.OnContainerStart(ctx, "Hello", types.ContainerStartOptions{}).Return(nil)
+		mockDocker.OnContainerList(ctx, types.ContainerListOptions{All: true}).Return([]types.Container{}, nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnContainerLogsMatch(ctx, mock.Anything, types.ContainerLogsOptions{
+			ShowStderr: true,
+			ShowStdout: true,
+			Timestamps: true,
+			Follow:     true,
+		}).Return(nil, nil)
+		mockDocker.OnContainerWaitMatch(ctx, mock.Anything, container.WaitConditionNotRunning).Return(bodyStatus, errCh)
+		_, err = startSandbox(ctx, mockDocker, os.Stdin)
+		assert.Nil(t, err)
+	})
 	t.Run("Error in pulling image", func(t *testing.T) {
 		ctx := context.Background()
 		errCh := make(chan error)
@@ -101,7 +140,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.FlyteSnackDir,
+			Target: docker.Source,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -137,7 +176,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.FlyteSnackDir,
+			Target: docker.Source,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -181,7 +220,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.FlyteSnackDir,
+			Target: docker.Source,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -217,7 +256,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.FlyteSnackDir,
+			Target: docker.Source,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,
@@ -253,7 +292,7 @@ func TestStartSandboxFunc(t *testing.T) {
 		volumes := append(docker.Volumes, mount.Mount{
 			Type:   mount.TypeBind,
 			Source: sandboxConfig.DefaultConfig.Source,
-			Target: docker.FlyteSnackDir,
+			Target: docker.Source,
 		})
 		mockDocker.OnContainerCreate(ctx, &container.Config{
 			Env:          docker.Environment,

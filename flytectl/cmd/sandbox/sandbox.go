@@ -8,18 +8,31 @@ import (
 
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
-	sandboxShort = `Used for testing flyte sandbox.`
+	sandboxShort = `Used for sandbox interactions like start/teardown/status/exec.`
 	sandboxLong  = `
-Example Create sandbox cluster.
+The Flyte Sandbox is a fully standalone minimal environment for running Flyte. provides a simplified way of running flyte-sandbox as a single Docker container running locally.
+	
+Create sandbox cluster.
 ::
 
  bin/flytectl sandbox start 
 	
 	
-Example Remove sandbox cluster.
+Remove sandbox cluster.
 ::
 
  bin/flytectl sandbox teardown 	
+	
+
+Check status of sandbox container.
+::
+
+ bin/flytectl sandbox status 	
+	
+Execute command inside sandbox container.
+::
+
+ bin/flytectl sandbox exec -- pwd 	
 `
 )
 
