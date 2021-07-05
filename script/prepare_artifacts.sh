@@ -25,5 +25,5 @@ rm /tmp/chart-releaser.tar.gz
 # Package helm chart
 bin/cr package helm
 
-# Commit Chart registry to github gh-pages
-bin/cr index --owner flyteorg --git-repo flyte --charts-repo="https://flyteorg.github.io/flyte" --push --token=${FLYTE_BOT_PAT} --release-name-template="{{ .Version }}"
+# Clean git history
+git stash

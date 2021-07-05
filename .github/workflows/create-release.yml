@@ -56,4 +56,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
 
+      - name: Release helm registry
+        env:
+          FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          sed -i "s/#VERSION/${VERSION}/g" ./helm/Chart.yaml
+          # Commit Chart registry to github gh-pages
+          bin/cr index --owner flyteorg --git-repo flyte --charts-repo="https://flyteorg.github.io/flyte" --push --token=${FLYTE_BOT_PAT} --release-name-template="{{ .Version }}"
+
           
