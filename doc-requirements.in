@@ -1,5 +1,4 @@
 git+git://github.com/flyteorg/furo@main
-readthedocs-sphinx-search
 sphinx
 sphinx-prompt
 sphinx-code-include
@@ -10,3 +9,4 @@ sphinxext-remoteliteralinclude
 sphinx-issues
 sphinx_fontawesome
 sphinx-panels
+sphinxcontrib-mermaid

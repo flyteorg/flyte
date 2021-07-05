@@ -1,4 +1,4 @@
-FROM golang:1.16.0-alpine3.13 AS go_builder_
+FROM golang:1.16.5-alpine3.13 AS go_builder_
 
 # Install dependencies
 RUN apk add --no-cache build-base git make
@@ -12,31 +12,28 @@ RUN git clone -b ${BUILDKIT_CLI_FOR_KUBECTL_VERSION} --single-branch --depth 1 h
     && make -C ${GOPATH}/src/github.com/vmware-tanzu/buildkit-cli-for-kubectl ${INSTALL_DIR}/linux/kubectl-build BIN_DIR=${INSTALL_DIR} VERSION=${BUILDKIT_CLI_FOR_KUBECTL_VERSION}
 
 
-FROM alpine:3.13.2 AS base_
-
-# Install dependencies
-RUN apk add --no-cache curl
+FROM alpine:3.13.5 AS base_
 
 # Make directory to store artifacts
 RUN mkdir -p /flyteorg/bin /flyteorg/share
 
 # Install k3s
-ARG K3S_VERSION="v1.20.2%2Bk3s1"
+ARG K3S_VERSION="v1.21.1%2Bk3s1"
 RUN wget -q -O /flyteorg/bin/k3s https://github.com/k3s-io/k3s/releases/download/${K3S_VERSION}/k3s \
     && chmod +x /flyteorg/bin/k3s
 
+# Install flytectl
+RUN wget -q -O - https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | BINDIR=/flyteorg/bin sh -s
+
 # Install buildkit-cli-for-kubectl
 COPY --from=go_builder_ /install/linux/ /flyteorg/bin/
-
-# Install flytectl
-RUN curl https://raw.githubusercontent.com/flyteorg/flytectl/master/install.sh | sh
 
 # Copy flyte manifest
 COPY deployment/sandbox/flyte_generated.yaml /flyteorg/share/flyte_generated.yaml
 
 # Copy scripts
-RUN cp /bin/flytectl /flyteorg/bin/
-COPY docker/sandbox/kubectl docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
+COPY docker/sandbox/kubectl docker/sandbox/cgroup-v2-hack.sh docker/sandbox/wait-for-flyte.sh /flyteorg/bin/
+
 
 FROM base_ AS default
 
@@ -62,7 +59,7 @@ EXPOSE 30081 30082 30084
 ENTRYPOINT ["tini", "flyte-entrypoint.sh"]
 
 
-FROM docker:20.10.3-dind AS dind
+FROM docker:20.10.7-dind AS dind
 
 # Install dependencies
 RUN apk add --no-cache bash git make tini

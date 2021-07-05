@@ -1,6 +1,9 @@
 #!/bin/sh
 
-set -e
+set -euo pipefail
+
+# Apply cgroup v2 hack
+cgroup-v2-hack.sh
 
 trap 'pkill -P $$' EXIT
 

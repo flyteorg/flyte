@@ -38,21 +38,23 @@ spec:
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
+        {{- if .Values.flyteadmin.initialProjects }}
         - command:
           - flyteadmin
           - --config
           - {{ .Values.flyteadmin.configPath }}
           - migrate
           - seed-projects
-          - flytesnacks
-          - flytetester
-          - flyteexamples
+          {{- range .Values.flyteadmin.initialProjects }}
+          - {{ . }}
+          {{- end }}
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: seed-projects
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: config-volume
+        {{- end }}
         {{- if .Values.cluster_resource_manager.enabled }}
         - command:
           - flyteadmin
@@ -75,7 +77,7 @@ spec:
           command: ["/bin/sh", "-c"]
           args:
             [
-                "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --fromPath /etc/secrets/auth",
+                "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/secrets/auth && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/secrets/auth",
             ]
           volumeMounts:
             - name: config-volume
@@ -142,7 +144,7 @@ spec:
         {{- end }}
         - name: auth
           secret:
-            secretName: flyte-admin-auth
+            secretName: flyte-admin-secrets
       {{- with .Values.flyteadmin.nodeSelector }}
       nodeSelector: {{ toYaml . | nindent 8 }}
       {{- end }}

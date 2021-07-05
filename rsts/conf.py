@@ -18,7 +18,6 @@
 
 import sphinx.application
 import sphinx.errors
-import sphinx_fontawesome
 sphinx.application.ExtensionError = sphinx.errors.ExtensionError
 
 # -- Project information -----------------------------------------------------
@@ -60,8 +59,9 @@ extensions = [
     "sphinx_tabs.tabs",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
-    "sphinx_search.extension",
+    # "sphinx_search.extension",
     "sphinx_panels",
+    "sphinxcontrib.mermaid",
 ]
 
 extlinks = {
@@ -139,7 +139,8 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-# html_static_path = ['_static']
+html_static_path = ['_static']
+html_css_files = ["custom.css"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -206,6 +207,7 @@ texinfo_documents = [
 
 # -- Extension configuration -------------------------------------------------
 autosectionlabel_prefix_document = True
+autosectionlabel_maxdepth = 2
 
 # -- Options for intersphinx extension ---------------------------------------
 
@@ -226,6 +228,14 @@ intersphinx_mapping = {
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None)
 }
+
+# Sphinx-tabs config
+sphinx_tabs_valid_builders = ['linkcheck']
+
+# Sphinx-mermaid config
+mermaid_output_format = 'raw'
+mermaid_version = 'latest'
+mermaid_init_js = "mermaid.initialize({startOnLoad:false});"
 
 # -- Options for todo extension ----------------------------------------------
 
