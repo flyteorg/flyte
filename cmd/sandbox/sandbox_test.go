@@ -11,7 +11,7 @@ import (
 func TestCreateSandboxCommand(t *testing.T) {
 	sandboxCommand := CreateSandboxCommand()
 	assert.Equal(t, sandboxCommand.Use, "sandbox")
-	assert.Equal(t, sandboxCommand.Short, "Used for testing flyte sandbox.")
+	assert.Equal(t, sandboxCommand.Short, "Used for sandbox interactions like start/teardown/status/exec.")
 	fmt.Println(sandboxCommand.Commands())
 	assert.Equal(t, len(sandboxCommand.Commands()), 4)
 	cmdNouns := sandboxCommand.Commands()
