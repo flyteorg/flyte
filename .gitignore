@@ -24,3 +24,4 @@ _build/
 *-out.ipynb
 .python-version
 cookbook/release-snacks
+.kube/

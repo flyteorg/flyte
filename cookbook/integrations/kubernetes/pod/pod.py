@@ -26,6 +26,7 @@ The primary container is the driver for the flyte task execution for example, pr
 # containers. The secondary writes a file that the primary waits on before completing.
 import os
 import time
+from typing import List
 
 from flytekit import task, workflow
 from flytekitplugins.pod import Pod
@@ -47,9 +48,15 @@ def generate_pod_spec_for_task():
     primary_container = V1Container(name="primary")
 
     # Note: for non-primary containers we must specify an image.
-    secondary_container = V1Container(name="secondary", image="alpine",)
+    secondary_container = V1Container(
+        name="secondary",
+        image="alpine",
+    )
     secondary_container.command = ["/bin/sh"]
-    secondary_container.args = ["-c", "echo hi pod world > {}".format(_SHARED_DATA_PATH)]
+    secondary_container.args = [
+        "-c",
+        "echo hi pod world > {}".format(_SHARED_DATA_PATH),
+    ]
 
     resources = V1ResourceRequirements(
         requests={"cpu": "1", "memory": "100Mi"}, limits={"cpu": "1", "memory": "100Mi"}
@@ -57,7 +64,10 @@ def generate_pod_spec_for_task():
     primary_container.resources = resources
     secondary_container.resources = resources
 
-    shared_volume_mount = V1VolumeMount(name="shared-data", mount_path="/data",)
+    shared_volume_mount = V1VolumeMount(
+        name="shared-data",
+        mount_path="/data",
+    )
     secondary_container.volume_mounts = [shared_volume_mount]
     primary_container.volume_mounts = [shared_volume_mount]
 
@@ -96,5 +106,53 @@ def PodWorkflow() -> str:
     return s
 
 
+# %%
+# To use a pod task as part of a map task in your workflow, use the :py:func:`flytekit:flytekit.core.map_task` function
+# and pass in the pod task definition. This will run your pod task across a collection of inputs.
+
+from flytekit import map_task, TaskMetadata
+
+
+@task(
+    task_config=Pod(
+        pod_spec=V1PodSpec(
+            containers=[
+                V1Container(
+                    name="primary",
+                    resources=V1ResourceRequirements(
+                        requests={"cpu": ".5", "memory": "500Mi"},
+                        limits={"cpu": ".5", "memory": "500Mi"},
+                    ),
+                )
+            ],
+            init_containers=[
+                V1Container(
+                    name="init",
+                    command=["/bin/sh"],
+                    args=["-c", 'echo "I\'m a customizable init container"'],
+                )
+            ],
+        ),
+        primary_container_name="primary",
+    )
+)
+def my_pod_task(stringify: int) -> str:
+    return str(stringify)
+
+
+@task
+def coalesce(b: List[str]) -> str:
+    coalesced = ", ".join(b)
+    return coalesced
+
+
+@workflow
+def my_map_workflow(a: List[int]) -> str:
+    mapped_out = map_task(my_pod_task, metadata=TaskMetadata(retries=1))(stringify=a)
+    coalesced = coalesce(b=mapped_out)
+    return coalesced
+
+
 if __name__ == "__main__":
     pass
+

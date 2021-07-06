@@ -24,7 +24,7 @@ docker exec -it \
 	-e MAKEFLAGS \
 	-e REGISTRY \
 	-e VERSION \
-	-w /usr/src \
+        -w /root \
 	$(FLYTE_SANDBOX_NAME) \
 	$(1)
 endef
