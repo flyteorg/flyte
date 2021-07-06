@@ -28,8 +28,8 @@ Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flyteprop
 .. note::
     Format your Go code with ``golangci-lint`` followed by ``goimports`` (we used the same in the `Makefile <https://github.com/flyteorg/flytepropeller/blob/eaf084934de5d630cd4c11aae15ecae780cc787e/boilerplate/lyft/golang_test_targets/Makefile#L11-L19>`__), and Python code with ``black`` (use ``make fmt`` command which contains both black and isort). 
 
-Environment Setup
-*****************
+Component Reference
+===================
 
 .. figure:: https://raw.githubusercontent.com/flyteorg/flyte/static-resources/img/contribution_guide/dependency_graph.png
     :alt: Dependency Graph between various flyteorg repos
@@ -38,29 +38,53 @@ Environment Setup
 
     The dependency graph between various flyteorg repos
 
-#. `flyte <https://github.com/lyft/flyte>`__
-    | Purpose: Deployment, Documentation, and Issues 
-    | Languages: Kustomize & RST
-#. `flyteidl <https://github.com/lyft/flyteidl>`__
-    | Purpose: The Flyte Workflow specification in `protocol buffers <https://developers.google.com/protocol-buffers>`__ which forms the core of Flyte
-    | Language: Protobuf
-    | Setup: Refer to the `README <https://github.com/flyteorg/flyteidl#generate-code-from-protobuf>`__
-#. `flytepropeller <https://github.com/lyft/flytepropeller>`__
-    | Purpose: Kubernetes native execution engine for Flyte Workflows and Tasks
-    | Language: Go
 
-    Setup: 
+``flyte``
+*********
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flyte>`__
+    * - **Purpose**: Deployment, Documentation, and Issues 
+    * - **Languages**: Kustomize & RST
+
+``flyteidl``
+************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flyteidl>`__
+    * - **Purpose**: The Flyte Workflow specification in `protocol buffers <https://developers.google.com/protocol-buffers>`__ which forms the core of Flyte
+    * - **Language**: Protobuf
+    * - **Setup**: Refer to the `README <https://github.com/flyteorg/flyteidl#generate-code-from-protobuf>`__
+ 
+``flytepropeller``
+******************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flytepropeller>`__ | `Code Reference <https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller>`__
+    * - **Purpose**: Deployment, Documentation, and Issues 
+    * - **Languages**: Kustomize & RST
+    * - **Setup**
+
         * Check for the Makefile in the root repo
         * Run the following commands:
-            * ``make generate``
-            * ``make test_unit``
-            * ``make link``
+           * ``make generate``
+           * ``make test_unit``
+           * ``make link``
         * To compile, run ``make compile``
-#. `flyteadmin <https://github.com/lyft/flyteadmin>`__
-    | Purpose: Control Plane
-    | Language: Go
 
-    Setup:
+``flyteadmin``
+**************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flyteadmin>`__ | `Code Reference <https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin>`__
+    * - **Purpose**: Control Plane
+    * - **Language**: Go
+    * - **Setup**:
+
         * Check for the Makefile in the root repo
         * If the service code has to be tested, run it locally:
             * ``make compile``
@@ -72,45 +96,87 @@ Environment Setup
         * To run integration tests locally:
             * ``make integration``
             * (or, to run in containerized dockernetes): ``make k8s_integration``
-#. `flytekit <https://github.com/lyft/flytekit>`__
-    | Purpose: Python SDK & Tools
-    | Language: Python
-    | Setup: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/projects/flytekit/en/latest/contributing.html>`__
-#. `flyteconsole <https://github.com/lyft/flyteconsole>`__
-    | Purpose: Admin Console
-    | Language: Typescript
-    | Setup: Refer to the `README <https://github.com/flyteorg/flyteconsole#running-flyteconsole>`__
-#. `datacatalog <https://github.com/lyft/datacatalog>`__
-    | Purpose: Manage Input & Output Artifacts
-    | Language: Go
-#. `flyteplugins <https://github.com/lyft/flyteplugins>`__
-    | Purpose: Flyte Plugins
-    | Language: Go
 
-    Setup:
+``flytekit``
+************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flytekit>`__
+    * - **Purpose**: Python SDK & Tools
+    * - **Language**: Python
+    * - **Setup**: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/projects/flytekit/en/latest/contributing.html>`__
+
+``flyteconsole``
+****************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flyteconsole>`__
+    * - **Purpose**: Admin Console
+    * - **Language**: Typescript
+    * - **Setup**: Refer to the `README <https://github.com/flyteorg/flyteconsole#running-flyteconsole>`__
+
+``datacatalog``
+***************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/datacatalog>`__ | `Code Reference <https://pkg.go.dev/mod/github.com/flyteorg/datacatalog>`__
+    * - **Purpose**: Manage Input & Output Artifacts
+    * - **Language**: Go
+
+``flyteplugins``
+****************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flyteplugins>`__ | `Code Reference <https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins>`__
+    * - **Purpose**: Flyte Plugins
+    * - **Language**: Go
+    * - **Setup**:
+
         * Check for the Makefile in the root repo
         * Run the following commands:
             * ``make generate``
             * ``make test_unit``
             * ``make link``
-#. `flytestdlib <https://github.com/lyft/flytestdlib>`__
-    | Purpose: Standard Library for Shared Components
-    | Language: Go
-#. `flytesnacks <https://github.com/lyft/flytesnacks>`__
-    | Purpose: Examples, Tips, and Tricks to use Flytekit SDKs
-    | Language: Python (In future, Java shall be added)
 
-    Setup:
+``flytestdlib``
+***************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flytestdlib>`__
+    * - **Purpose**: Standard Library for Shared Components
+    * - **Language**: Go
+
+``flytesnacks``
+***************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flytesnacks>`__
+    * - **Purpose**: Examples, Tips, and Tricks to use Flytekit SDKs
+    * - **Language**: Python (In future, Java shall be added)
+    * - **Setup**:
+
         * If the Python code has to be tested, run it locally
         * If the Python code has to be tested in a cluster:
             * Run the ``make start`` command in the root directory of the flytesnacks repo
             * Visit https://localhost:30081 to view the Flyte console consisting of the examples present in ``flytesnacks/cookbook/core`` directory
             * To fetch the new dependencies and rebuild the image, run ``make register``
-#. `flytectl <https://github.com/lyft/flytectl>`__
-    | Purpose: A Standalone Flyte CLI
-    | Language: Go
 
-    Setup:
+``flytectl``
+************
+
+.. list-table::
+
+    * - `Repo <https://github.com/lyft/flytectl>`__
+    * - **Purpose**: A Standalone Flyte CLI
+    * - **Language**: Go
+    * - **Setup**:
+
         * Check for the Makefile in the root repo
         * Run the following commands:
             * ``make generate``

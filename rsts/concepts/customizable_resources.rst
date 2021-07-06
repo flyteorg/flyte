@@ -4,7 +4,7 @@
 Adding customizable resources
 #############################
 
-For background on customizable resources, see the :std:ref:`User Guide <sphx_glr_auto_deployment_cluster_config_flyte_deploy.py>`.
+For background on customizable resources, see the :ref:`deployment-cluster-config-general`.
 As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects,
 domains and workflows that override default values. Examples of such resources include execution clusters, task resource
 defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.

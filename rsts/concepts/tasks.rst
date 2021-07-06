@@ -13,12 +13,12 @@ care of executing these tasks.
 Plugin Examples
 ----------------
 Almost any action can be implemented and introduced into Flyte as a Plugin.
- - So tasks that run queries on distributed data warehouses like Redshift, Hive, Snowflake etc can be a task (using plugins)
- - Tasks that run executions on compute engines like Spark, Flink, AWS Sagemaker, AWS Batch, Kubernetes pods, jobs etc
+ - So tasks that run queries on distributed data warehouses like Redshift, Hive, Snowflake etc. can be a task (using plugins)
+ - Tasks that run executions on compute engines like Spark, Flink, AWS Sagemaker, AWS Batch, Kubernetes pods, jobs etc.
  - Tasks that call web services
 
 Flyte ships with some defaults, for example running a simple python function does not need any hosted service, so Flyte knows how to
-execute these tasks on Kubernetes. Turns out these are the vastt majority of tasks in ML and Flyte is deftly adept at handling a very large
+execute these tasks on Kubernetes. Turns out these are the vast majority of tasks in ML, and Flyte is deftly adept at handling a very large
 scale on kubernetes. this is achieved by implementing a unique scheduler on top of K8s.
 
 Dynamic Tasks
@@ -44,14 +44,14 @@ In abstract, a task in the system is characterized by:
 Requirements
 ------------
 
-When deciding whether a unit of execution constitutes a Flyte Task or not. Consider the following:
+When deciding whether a unit of execution constitutes a Flyte Task or not, consider the following:
 
 - Is there a well-defined graceful/successful exit criteria for the task? A task is expected to exit after finishing processing
   its inputs.
 
-- Is it repeatable? Under certain circumstances, a task might be retried, rerun... etc. with the same inputs. It's expected
+- Is it repeatable? Under certain circumstances, a task might be retried, rerun, etc. with the same inputs. It's expected
   to produce the same outputs every single time. For example, avoid using random number generators with current clock as seed
-  but opt to using a system-provided clock as the seed. 
+  and instead use a system-provided clock as the seed. 
 
 - Is it a pure function? i.e. does it have side effects that are not known to the system (e.g. calls a web-service). It's strongly
   advisable to avoid side-effects in tasks. When side-effects are required, ensure that those operations are idempotent.
@@ -64,7 +64,7 @@ types in the system. Flyte comes with a set of defined, battle tested task types
 
 Fault tolerance
 ---------------
-In any distributed system failure is inevitable, allowing users to design a fault-tolerant system (e.g. workflow) is an inherent goal of Flyte. At a high level, tasks offer two parameters to control how to handle that:
+In any distributed system failure is inevitable. Allowing users to design a fault-tolerant system (e.g. workflow) is an inherent goal of Flyte. At a high level, tasks offer two parameters to control how to handle that:
 
 Retries
   Tasks can define a retry strategy to let the system know how to handle failures (e.g. retry 3 times on any errors).
