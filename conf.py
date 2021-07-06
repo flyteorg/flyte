@@ -28,7 +28,7 @@ copyright = "2021, Flyte"
 author = "Flyte"
 
 # The full version, including alpha/beta/rc tags
-release = re.sub('^v', '', os.popen('git describe').read().strip())
+release = re.sub("^v", "", os.popen("git describe").read().strip())
 version = release
 
 # -- General configuration ---------------------------------------------------
@@ -67,7 +67,7 @@ templates_path = ["_templates"]
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-source_suffix = ['.rst']
+source_suffix = [".rst"]
 
 # The master toctree document.
 master_doc = "index"
@@ -82,7 +82,16 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
-exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store', 'tmp/doc_gen_deps', 'gen/*/*/*/*/*', 'CODE_OF_CONDUCT.md', 'pull_request_template.md', 'boilerplate']
+exclude_patterns = [
+    u"_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "tmp/doc_gen_deps",
+    "gen/*/*/*/*/*",
+    "CODE_OF_CONDUCT.md",
+    "pull_request_template.md",
+    "boilerplate",
+]
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "tango"
@@ -128,7 +137,8 @@ html_context = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = ["docs/_static"]
+html_css_files = ["css/fix_toc.css"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -197,11 +207,16 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
 }
 
+
 def setup(app):
-    app.add_config_value('recommonmark_config', {
-        'auto_toc_tree_section': 'Contents',
-        'enable_math': False,
-        'enable_inline_math': False,
-        'enable_eval_rst': True,
-    }, True)
+    app.add_config_value(
+        "recommonmark_config",
+        {
+            "auto_toc_tree_section": "Contents",
+            "enable_math": False,
+            "enable_inline_math": False,
+            "enable_eval_rst": True,
+        },
+        True,
+    )
     app.add_transform(AutoStructify)
