@@ -14,7 +14,8 @@ for file in ./deployment/**/flyte_generated.yaml; do
     fi
 done
 
-sed -i "s/#VERSION/${VERSION}/g" ./helm/Chart.yaml
+grep -rlZ "version:[^P]*# VERSION" ./helm/Chart.yaml | xargs -0 sed -i "s/version:[^P]*# VERSION/version: ${VERSION} # VERSION/g"
+
 # Download helm chart releaser
 wget -q -O /tmp/chart-releaser.tar.gz https://github.com/helm/chart-releaser/releases/download/v1.2.1/chart-releaser_1.2.1_linux_amd64.tar.gz 
 mkdir -p bin

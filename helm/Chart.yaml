@@ -2,8 +2,7 @@ apiVersion: v2
 name: flyte
 description: A Helm chart for Flyte
 type: application
-version: #VERSION
-appVersion: #VERSION
+version: 0.1.10 # VERSION
 dependencies:
   - name: contour
     version: 4.1.2
