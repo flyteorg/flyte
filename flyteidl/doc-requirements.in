@@ -1,5 +1,4 @@
 git+git://github.com/flyteorg/furo@main
-readthedocs-sphinx-search
 recommonmark
 sphinx
 sphinx-prompt
