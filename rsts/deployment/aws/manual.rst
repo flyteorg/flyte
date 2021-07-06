@@ -203,7 +203,6 @@ Next create a relational database. This database will be used by both the primar
 * Set the master username to ``flyteadmin``.
 * Choose a master password which you'll later use in your Helm template.
 
-  * `Username <https://github.com/flyteorg/flyte/blob/3600badd2ad49ec2cd1f62752780f201212de3f3/helm/values-eks.yaml#L218>`_
   * `Password <https://github.com/flyteorg/flyte/blob/3600badd2ad49ec2cd1f62752780f201212de3f3/helm/values-eks.yaml#L196>`_
 
 * Leave Public access off.

@@ -216,7 +216,7 @@ storage:
 db:
   database:
     port: 5432
-    # -- Create a user called flyte
+    # -- Create a user called flyteadmin
     username: flyteadmin
     host: <RDS_HOST_DNS>
     # -- Create a DB called flyteadmin (OR change the name here)
