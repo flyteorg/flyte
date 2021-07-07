@@ -88,7 +88,7 @@ Create an EKS cluster from AWS console.
 
 Connect to EKS cluster
 ======================
-* Use you AWS account access keys to run the following command to update your kubectl config and switch to the new EKS cluster context
+* Use your AWS account access keys to run the following command to update your kubectl config and switch to the new EKS cluster context
 
   .. code-block::
 
@@ -113,7 +113,7 @@ Connect to EKS cluster
 
 .. code-block::
 
-   kubectl get pods
+   $ kubectl get pods
    No resources found in default namespace.
 
 OIDC Provider for EKS cluster
@@ -319,7 +319,7 @@ Sample o/p
 
 .. code-block::
 
-   ✗ kubectl get pods -n kube-system
+   $ kubectl get pods -n kube-system
    NAME                                            READY   STATUS    RESTARTS   AGE
    aws-load-balancer-controller-674869f987-brfkj   1/1     Running   0          11s
    aws-load-balancer-controller-674869f987-tpwvn   1/1     Running   0          11s
