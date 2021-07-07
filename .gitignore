@@ -22,4 +22,5 @@ Chart.lock
 .cr-release-packages/
 .cr-index/
 bin/-
+bin/
 .python-version-
