@@ -179,6 +179,8 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
               }
             }
 
+        Link to the example code: `WelcomeWorkflow.java <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples/src/main/java/org/flyte/examples/WelcomeWorkflow.java>`_
+
     .. tab:: scala
 
         .. code:: scala
@@ -239,6 +241,8 @@ The core unit of execution in Flyte is the ``task``, which you can easily write 
                 builder.output("greeting", greetingWithQuestion, "Welcome message")
               }
             }
+
+        Link to the example code: `WelcomeWorkflow.scala <https://github.com/flyteorg/flytekit-java/blob/5cd638af1b131450e1dcf44b268112fca1f8de57/flytekit-examples-scala/src/main/scala/org/flyte/examples/flytekitscala/WelcomeWorkflow.scala>`_
 
 
 
