@@ -1,0 +1,27 @@
+apiVersion: v1
+entries:
+  flyte:
+  - apiVersion: v2
+    created: "2021-07-07T22:16:08.876688656Z"
+    dependencies:
+    - condition: contour.enabled
+      name: contour
+      repository: https://charts.bitnami.com/bitnami
+      version: 4.1.2
+    - alias: sparkoperator
+      condition: spark.enabled
+      name: spark-operator
+      repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
+      version: 1.0.6
+    - condition: kubernetes-dashboard.enabled
+      name: kubernetes-dashboard
+      repository: https://kubernetes.github.io/dashboard/
+      version: 4.0.2
+    description: A Helm chart for Flyte
+    digest: 1a433e78c0cf9f98128637cc7d6d03688010963d268f0ae1b9c9afe9723c5358
+    name: flyte
+    type: application
+    urls:
+    - https://github.com/flyteorg/flyte/releases/download/v0.15.0/flyte-v0.15.0.tgz
+    version: v0.15.0
+generated: "2021-07-07T22:16:08.876694856Z"
