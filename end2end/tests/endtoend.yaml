@@ -6,18 +6,18 @@ metadata:
   namespace: flyte
 spec:
   containers:
-  - args:
-    - make end2end_test
-    command:
-    - bash
-    - -c
-    image: cr.flyte.org/flyteorg/flytetools:7701a15fbdd3f2debfb51b250e5744791e406249
-    imagePullPolicy: IfNotPresent
-    name: flytetester
-    resources:
-      requests:
-        cpu: "0.2"
-        memory: 500Mi
+    - args:
+        - make end2end_test
+      command:
+        - bash
+        - -c
+      image: cr.flyte.org/flyteorg/flytetools:1655806d60e77775c76c1aaa01781f6c6211530f
+      imagePullPolicy: IfNotPresent
+      name: flytetester
+      resources:
+        requests:
+          cpu: "0.2"
+          memory: 500Mi
   dnsPolicy: ClusterFirst
   priority: 0
   restartPolicy: Never
