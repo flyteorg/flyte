@@ -81,14 +81,14 @@ Create an EKS cluster from AWS console.
 * Keep secrets encryption off
 * Use the same VPC where you intend to deploy your RDS instance. Keep the default VPC if none created and choose RDS to use the default aswell
 * Use the subnets for all the supported AZ's in that VPC
-* Choose the security group that you which to use for this cluster and the RDS instance(use default if using default VPC)
+* Choose the security group that you which to use for this cluster and the RDS instance (use default if using default VPC)
 * Provide public access to your cluster or depending on your devops settings
 * Choose default version of the network addons
 * You can choose to enable the control plane logging to CloudWatch.
 
 Connect to EKS cluster
 ======================
-* Use you AWS account access keys to run the following command to update your kube config and switch to the new EKS cluster context
+* Use you AWS account access keys to run the following command to update your kubectl config and switch to the new EKS cluster context
 
   .. code-block::
 
@@ -104,9 +104,9 @@ Connect to EKS cluster
 
 * Verify the context is switched
 
-.. code-block::
+.. code-block:: bash
 
-   kubectl config current-context
+   $ kubectl config current-context
    arn:aws:eks:<region>:<AWS_ACCOUNT_ID>:cluster/<Name-EKS-Cluster>
 
 * Test it with ``kubectl``. It should tell you there aren't any resources.
@@ -183,7 +183,7 @@ Create EKS node group
 
 The initial EKS cluster wont have any instances configured to operate the cluster. Create a node group which provides resources for the kubernetes cluster.
 
-* Go to your EKS cluster and under compute tab.
+* Go to your EKS cluster navigate to the Configuration -> Compute tab.
 * Provide a good enough name <Name-EKS-Node-Group>
 * Use the EKS node IAM role <ClusterName-EKS-Node-Role> created in the above steps
 * Use without any launch template, kuebernetes labels,taints or tags.
@@ -208,14 +208,14 @@ Next create a relational database. This database will be used by both the primar
 * Leave Public access off.
 * Choose the same VPC that your EKS cluster is in.
 * In a separate tab, navigate to the EKS cluster page and make note of the security group attached to your cluster.
-* Go back to the RDS page and in the security group section, add the EKS cluster's security group. This will ensure you don't have to play around with security group rules in order for pods running in the cluster to access the RDS instance.
+* Go back to the RDS page and in the security group section, add the EKS cluster's security group (feel free to leave the default as well). This will ensure you don't have to play around with security group rules in order for pods running in the cluster to access the RDS instance.
 * Under the top level Additional configuration (there's a sub menu by the same name) under "Initial database name" enter ``flyteadmin`` as well.
 
 Leave all the other settings as is and hit Create.
 
 Check connectivity to RDS database from EKS cluster
 ===================================================
-* Get the <RDS-HOST-NAME> by clicking on the db instance and find the endpoint
+* Get the <RDS-HOST-NAME> by navigating to the database cluster and copying the writer instance endpoint.
 
 We will use pgsql-postgres-client to verify DB connectivity
 
@@ -366,15 +366,15 @@ Generate a self signed cert using open ssl and get the <KEY> and <CRT> file.
 
 #. Use openssl to generate the KEY and CRT files.
 
-.. code-block::
+   .. code-block::
 
-   openssl req -x509 -nodes -days 3649 -newkey rsa:2048 -keyout key.out -out crt.out -config req.conf -extensions 'v3_req'
+      openssl req -x509 -nodes -days 3649 -newkey rsa:2048 -keyout key.out -out crt.out -config req.conf -extensions 'v3_req'
 
 #. Create ARN for the cert.
 
-.. code-block::
+   .. code-block::
 
-     aws acm import-certificate --certificate fileb://crt.out --private-key fileb://key.out --region <REGION>
+      aws acm import-certificate --certificate fileb://crt.out --private-key fileb://key.out --region <REGION>
 
 Production
 ----------
@@ -486,11 +486,11 @@ Connecting to Flyte
 
 Flyte can be accessed using the UI console or your terminal
 
-* First, find the Flyte endpoint created by the ALB ingress controller
+* First, find the Flyte endpoint created by the ALB ingress controller.
 
 .. code-block:: bash
 
-   $ kubectl get service -n flyte
+   $ kubectl -n flyte get ingress
 
    NAME         CLASS    HOSTS   ADDRESS                                                       PORTS   AGE
    flyte        <none>   *       k8s-flyte-8699360f2e-1590325550.us-east-2.elb.amazonaws.com   80      3m50s
