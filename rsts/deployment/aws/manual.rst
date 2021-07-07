@@ -130,7 +130,7 @@ Example output:
 
 .. code-block::
 
-  https://oidc.eks.us-west-2.amazonaws.com/id/<UUID-OIDC>
+  https://oidc.eks.<REGION>.amazonaws.com/id/<UUID-OIDC>
 
 * The following command creates the oidc provider using the address provided by the cluster
 
@@ -166,12 +166,12 @@ Follow this [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide
        {
          "Effect": "Allow",
          "Principal": {
-           "Federated": "arn:aws:iam::<AWS_ACCOUNT_ID>:oidc-provider/oidc.eks.us-east-2.amazonaws.com/id/<UUID-OIDC>"
+           "Federated": "arn:aws:iam::<AWS_ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<UUID-OIDC>"
          },
          "Action": "sts:AssumeRoleWithWebIdentity",
          "Condition": {
            "StringEquals": {
-             "oidc.eks.us-east-2.amazonaws.com/id/<UUID-OIDC>:aud": "sts.amazonaws.com"
+             "oidc.eks.<REGION>.amazonaws.com/id/<UUID-OIDC>:aud": "sts.amazonaws.com"
            }
          }
        }
@@ -197,7 +197,7 @@ Create RDS database
 ===================
 Next create a relational database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
 
-* Navigate to `RDS <https://us-east-2.console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database
+* Navigate to `RDS <https://console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database
 * Leave the Template as Production.
 * Change the default cluster identifier to ``flyteadmin``.
 * Set the master username to ``flyteadmin``.
@@ -374,7 +374,7 @@ Generate a self signed cert using open ssl and get the <KEY> and <CRT> file.
 
 .. code-block::
 
-     aws acm import-certificate --certificate fileb://crt.out --private-key fileb://key.out --region us-east-2
+     aws acm import-certificate --certificate fileb://crt.out --private-key fileb://key.out --region <REGION>
 
 Production
 ----------
@@ -399,7 +399,7 @@ Create S3 Bucket
 
 Create a Log Group
 ==================
-Navigate to the `AWS Cloudwatch <https://us-east-2.console.aws.amazon.com/cloudwatch/home>`__ page and create a Log Group.
+Navigate to the `AWS Cloudwatch <https://console.aws.amazon.com/cloudwatch/home>`__ page and create a Log Group.
 Give it a reasonable name like ``flyteplatform``.
 
 Time for Helm
