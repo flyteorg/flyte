@@ -133,6 +133,12 @@ func (c *nodeExecutor) IdempotentRecordEvent(ctx context.Context, nodeEvent *eve
 				nodeEvent.Phase.String(), nodeEvent.GetId().NodeId)
 			return nil
 		} else if eventsErr.IsEventAlreadyInTerminalStateError(err) {
+			if IsTerminalNodePhase(nodeEvent.Phase) {
+				// Event was trying to record a different terminal phase for an already terminal event. ignoring.
+				logger.Infof(ctx, "Node event phase: %s, nodeId %s already in terminal phase. err: %s",
+					nodeEvent.Phase.String(), nodeEvent.GetId().NodeId, err.Error())
+				return nil
+			}
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
 			return errors.Wrapf(errors.IllegalStateError, nodeEvent.Id.NodeId, err, "phase mis-match mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.Phase)
 		}

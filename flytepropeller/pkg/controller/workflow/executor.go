@@ -325,6 +325,10 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 		}
 
 		if recordingErr := c.IdempotentReportEvent(ctx, wfEvent); recordingErr != nil {
+			if eventsErr.IsAlreadyExists(recordingErr) {
+				logger.Warningf(ctx, "Failed to record workflowEvent, error [%s]. Trying to record state: %s. Ignoring this error!", recordingErr.Error(), wfEvent.Phase)
+				return nil
+			}
 			if eventsErr.IsEventAlreadyInTerminalStateError(recordingErr) {
 				// Move to WorkflowPhaseFailed for state mis-match
 				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.Phase.String(), wfEvent.ExecutionId)
