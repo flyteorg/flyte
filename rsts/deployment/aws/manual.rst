@@ -197,7 +197,7 @@ Create RDS database
 ===================
 Next create a relational database. This database will be used by both the primary control plane service (Flyte Admin) and the Flyte memoization service (Data Catalog).
 
-* Navigate to `RDS <https://<REGION>.console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database
+* Navigate to `RDS <https://console.aws.amazon.com/rds/home>`__ and create an Aurora engine with Postgres compatibility database
 * Leave the Template as Production.
 * Change the default cluster identifier to ``flyteadmin``.
 * Set the master username to ``flyteadmin``.
