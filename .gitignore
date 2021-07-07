@@ -18,5 +18,8 @@ release/
 __pycache__/
 /helm/charts/
 Chart.lock
-**/*.bak
-.python-version
+**/*.bak-
+.cr-release-packages/
+.cr-index/
+bin/-
+.python-version-
