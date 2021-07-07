@@ -1,5 +1,7 @@
 # Release Process
 
+[![hackmd-github-sync-badge](https://hackmd.io/sVOAyv6LTwiQllQUctxP1w/badge)](https://hackmd.io/sVOAyv6LTwiQllQUctxP1w)
+
 ## Resolve Issues
 1. Create [a new milestone](https://github.com/flyteorg/flyte/milestones) if one doesn't exist.
 1. Open [issues](https://github.com/flyteorg/flyte/issues) and filter by milestone and make sure they are either closed or moved over to the next milestone.
