@@ -79,3 +79,21 @@ func MarshalObjToStruct(input interface{}) (*structpb.Struct, error) {
 
 	return structObj, nil
 }
+
+// Unmarshals a struct to the passed obj. Don't use this if the unmarshalled obj is a proto message.
+func UnmarshalStructToObj(structObj *structpb.Struct, obj interface{}) error {
+	if structObj == nil {
+		return fmt.Errorf("nil Struct Object passed")
+	}
+
+	jsonObj, err := json.Marshal(structObj)
+	if err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal(jsonObj, obj); err != nil {
+		return err
+	}
+
+	return nil
+}
